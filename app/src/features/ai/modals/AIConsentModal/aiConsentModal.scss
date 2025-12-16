@@ -1,0 +1,77 @@
+.ai-consent-modal.ant-modal {
+  .ant-modal-content {
+    background-color: var(--requestly-color-surface-0);
+
+    .ant-modal-close {
+      right: 0px;
+      .ant-modal-close-x {
+        line-height: 50px;
+        transform: scale(0.8);
+      }
+    }
+
+    .ant-modal-header {
+      padding: var(--requestly-space-5);
+      padding-left: var(--requestly-space-6, 16px);
+      background: unset;
+    }
+    .ai-consent-modal-title {
+      color: var(--requestly-color-text-default);
+      font-size: var(--requestly-font-size-md);
+      font-weight: var(--requestly-font-weight-medium);
+    }
+  }
+
+  .ant-modal-body {
+    padding: var(--requestly-space-6, 16px);
+
+    .ai-consent-modal-content {
+      &__title {
+        color: var(--requestly-color-text-default);
+        font-size: var(--requstly-font-size-sm, 12px);
+      }
+      &__details-container {
+        border-radius: 6px;
+        background: var(--requestly-color-surface-1);
+        padding: var(--requstly-space-5, 12px) var(--requestly-space-6, 16px);
+        margin-top: var(--requestly-space-5, 12px);
+
+        &--title {
+          color: var(--requestly-color-text-subtle);
+          font-size: var(--requestly-font-size-xs, 11px);
+          font-weight: var(--requestly-font-weight-medium);
+        }
+        .ai-consent-modal-content__details_list {
+          margin: var(--requestly-space-6) 0;
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+          gap: var(--requestly-space-4, 8px);
+
+          .ai-consent-modal-content__details_list--item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: var(--requestly-font-size-sm, 12px);
+            color: var(--requestly-color-text-default);
+          }
+        }
+        a {
+          font-size: var(--requestly-font-size-xs, 11px);
+          display: flex;
+          align-items: center;
+          gap: 4px;
+        }
+      }
+      &__settings-link {
+        font-size: var(--requestly-font-size-xs, 11px);
+        color: var(--requestly-color-text-subtle);
+        margin-top: var(--requestly-space-6, 16px);
+
+        .external-link {
+          color: var(--requestly-color-text-subtle);
+        }
+      }
+    }
+  }
+}

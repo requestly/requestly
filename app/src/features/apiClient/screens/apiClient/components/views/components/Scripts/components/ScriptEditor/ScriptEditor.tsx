@@ -19,7 +19,7 @@ import { GenerateTestsButton } from "../AI/components/GenerateTestsButton/Genera
 import { getAIEndpointUrl, AI_ENDPOINTS } from "config/ai.config";
 import { AIResultReviewPanel } from "../AIResultReviewPanel/AIResultReviewPanel";
 import { toast } from "utils/Toast";
-import { useFeatureValue } from "@growthbook/growthbook-react";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { AITestGenerationError } from "../AI/types";
 import { globalActions } from "store/slices/global/slice";
 import { RequestTabLabelIndicator } from "../../../request/components/ApiClientRequestTabs/components/RequestTabLabel/RequestTabLabel";
@@ -71,7 +71,8 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
     ? RQAPI.ScriptType.POST_RESPONSE
     : RQAPI.ScriptType.PRE_REQUEST;
 
-  const isAITestsGenerationEnabled = useFeatureValue("ai_tests_generation", false);
+  const isAITestsGenerationEnabled = useFeatureIsOn("ai_tests_generation");
+  const isAIEnabledGlobally = useFeatureIsOn("global_ai_support");
 
   const [scriptType, setScriptType] = useState<RQAPI.ScriptType>(activeScriptType);
   const [isLibraryPickerOpen, setIsLibraryPickerOpen] = useState(false);
@@ -236,7 +237,15 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
           {isAITestsGenerationEnabled && (
             <Tooltip
               showArrow={false}
-              title={!entry?.response ? "Send the request first to generate tests from its response." : null}
+              title={
+                !isAIEnabledGlobally ? (
+                  <>
+                    AI features are disabled for your organization, <a>Contact support</a>.
+                  </>
+                ) : !entry?.response ? (
+                  "Send the request first to generate tests from its response."
+                ) : null
+              }
               placement="bottom"
               color="#000"
               overlayClassName="ai-generate-test-btn-tooltip"
@@ -251,7 +260,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
                     isPopoverOpenRef.current = open;
                   }}
                   onGenerateClick={handleGenerateTests}
-                  disabled={scriptType !== RQAPI.ScriptType.POST_RESPONSE || !entry?.response}
+                  disabled={scriptType !== RQAPI.ScriptType.POST_RESPONSE || !entry?.response || !isAIEnabledGlobally}
                   onCancelClick={stop}
                   negativeFeedback={negativeFeedback}
                   label={hasPostResponseScript ? "Update with AI" : "Generate tests"}
