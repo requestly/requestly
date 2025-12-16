@@ -1,6 +1,5 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { Workspace } from "features/workspaces/types";
-import { ApiClientViewMode } from "./types";
+import { ApiClientViewMode, WorkspaceState } from "./types";
 import { RootState } from "store/types";
 import { getTabServiceActions } from "componentsV2/Tabs/tabUtils";
 import { apiClientContextService } from "./helpers/ApiClientContextService";
@@ -9,8 +8,7 @@ import { UserDetails } from "./helpers/ApiClientContextService/ApiClientContextS
 import { ReducerKeys } from "store/constants";
 import { reduxStore } from "store";
 import { Err, Ok, Result } from "utils/try";
-import { getSelectedWorkspaceCount, getViewMode, workspaceViewActions } from "./slice";
-import { dummyPersonalWorkspace } from "store/slices/workspaces/selectors";
+import { getAllSelectedWorkspaces, getSelectedWorkspaceCount, getViewMode, workspaceViewActions } from "./slice";
 
 const SLICE_NAME = ReducerKeys.WORKSPACE_VIEW;
 
@@ -24,7 +22,7 @@ function getUserDetails(userId?: string) {
 export const workspaceViewManager = createAsyncThunk(
   `${SLICE_NAME}/workspaceViewManager`,
   async (
-    params: { workspaces: Workspace[]; action: UserAction; userId?: string },
+    params: { workspaces: WorkspaceState[]; action: UserAction; userId?: string },
     { dispatch, getState, rejectWithValue }
   ) => {
     try {
@@ -43,7 +41,7 @@ export const workspaceViewManager = createAsyncThunk(
         const remaining = selectedWorkspacesCount - workspaces.length;
         const ids = workspaces.map((w) => w.id!);
         if (viewMode === "MULTI" && remaining === 0) {
-          const lastUncheckedWorkspace = workspaces[workspaces.length - 1];
+          const lastUncheckedWorkspace = workspaces[workspaces.length - 1] as WorkspaceState;
           return dispatch(multiViewToSingle({ workspace: lastUncheckedWorkspace, userId })).unwrap();
         }
         if (viewMode === "MULTI" && remaining >= 1) {
@@ -58,7 +56,7 @@ export const workspaceViewManager = createAsyncThunk(
 
 export const addWorkspaceIntoView = createAsyncThunk<
   Result<null, Error>,
-  { workspace: Workspace; userDetails: UserDetails },
+  { workspace: WorkspaceState; userDetails: UserDetails },
   { state: RootState }
 >(`${SLICE_NAME}/addWorkspaceIntoView`, async ({ workspace, userDetails }, { dispatch }) => {
   dispatch(
@@ -73,8 +71,8 @@ export const addWorkspaceIntoView = createAsyncThunk<
 });
 
 const addWorkspacesIntoMultiView = createAsyncThunk<
-  PromiseSettledResult<{ workspace: Workspace; result: Result<null, Error> }>[],
-  { workspaces: Workspace[]; userId?: string },
+  PromiseSettledResult<{ workspace: WorkspaceState; result: Result<null, Error> }>[],
+  { workspaces: WorkspaceState[]; userId?: string },
   { state: RootState }
 >(`${SLICE_NAME}/addWorkspacesIntoMultiView`, async ({ workspaces, userId }, { dispatch }) => {
   const userDetails = getUserDetails(userId);
@@ -120,7 +118,7 @@ const removeWorkspacesFromView = createAsyncThunk<
 
 const singleToMultiView = createAsyncThunk(
   `${SLICE_NAME}/singleToMultiView`,
-  async (params: { workspaces: Workspace[]; userId?: string }, { dispatch }) => {
+  async (params: { workspaces: WorkspaceState[]; userId?: string }, { dispatch }) => {
     getTabServiceActions().resetTabs(true);
     apiClientContextRegistry.clearAll();
     dispatch(workspaceViewActions.setViewMode(ApiClientViewMode.MULTI));
@@ -131,8 +129,8 @@ const singleToMultiView = createAsyncThunk(
 );
 
 const multiViewToSingle = createAsyncThunk<
-  { workspace: Workspace; result: Result<null, Error> },
-  { workspace: Workspace; userId?: string },
+  { workspace: WorkspaceState; result: Result<null, Error> },
+  { workspace: WorkspaceState; userId?: string },
   { state: RootState }
 >(`${SLICE_NAME}/multiViewToSingle`, async ({ workspace, userId }, { dispatch, getState }) => {
   getTabServiceActions().resetTabs(true);
@@ -146,19 +144,20 @@ const multiViewToSingle = createAsyncThunk<
 
 export const switchContext = createAsyncThunk(
   `${SLICE_NAME}/switchContext`,
-  async (params: { workspace: Workspace; userId: string | undefined }, { dispatch }) => {
+  async (params: { workspace: WorkspaceState; userId: string | undefined }, { dispatch }) => {
     return dispatch(multiViewToSingle(params)).unwrap();
   }
 );
 
-export const setupWorkspaces = createAsyncThunk(
-  `${SLICE_NAME}/setupWorkspaces`,
-  async (params: { workspaces?: Workspace[]; userId?: string }, { dispatch, getState, signal }) => {
-    const { workspaces = [], userId } = params;
+export const setupWorkspaceView = createAsyncThunk(
+  `${SLICE_NAME}/setupWorkspaceView`,
+  async (params: { userId?: string }, { dispatch, getState, signal }) => {
+    const { userId } = params;
 
-    const viewMode = getViewMode(getState() as RootState);
-    if (viewMode === ApiClientViewMode.SINGLE) {
-      return dispatch(switchContext({ workspace: dummyPersonalWorkspace, userId })).unwrap();
+    const rootState = getState() as RootState;
+    const workspaces = getAllSelectedWorkspaces(rootState.workspaceView);
+    if (getViewMode(rootState) === ApiClientViewMode.SINGLE) {
+      return dispatch(switchContext({ workspace: workspaces[0]!, userId })).unwrap();
     }
 
     return dispatch(workspaceViewManager({ workspaces, userId, action: "add" })).unwrap();
