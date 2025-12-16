@@ -59,12 +59,7 @@ export const addWorkspaceIntoView = createAsyncThunk<
   { workspace: WorkspaceState; userDetails: UserDetails },
   { state: RootState }
 >(`${SLICE_NAME}/addWorkspaceIntoView`, async ({ workspace, userDetails }, { dispatch }) => {
-  dispatch(
-    workspaceViewActions.addWorkspace({
-      id: workspace.id as string,
-      status: { loading: true },
-    })
-  );
+  dispatch(workspaceViewActions.addWorkspace(workspace));
 
   const result = await apiClientContextService.createContext(workspace, userDetails);
   return result.andThen(() => new Ok(null));
@@ -151,7 +146,7 @@ export const switchContext = createAsyncThunk(
 
 export const setupWorkspaceView = createAsyncThunk(
   `${SLICE_NAME}/setupWorkspaceView`,
-  async (params: { userId?: string }, { dispatch, getState, signal }) => {
+  async (params: { userId?: string }, { dispatch, getState }) => {
     const { userId } = params;
 
     const rootState = getState() as RootState;

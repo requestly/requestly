@@ -6,7 +6,7 @@ import { ApiClientLocalRepository } from "features/apiClient/helpers/modules/syn
 import { ApiClientCloudRepository } from "features/apiClient/helpers/modules/sync/cloud";
 import localStoreRepository from "features/apiClient/helpers/modules/sync/localStore/ApiClientLocalStorageRepository";
 import { RQAPI } from "features/apiClient/types";
-import { Workspace, WorkspaceType } from "features/workspaces/types";
+import { WorkspaceType } from "features/workspaces/types";
 import { toast } from "utils/Toast";
 import { ApiClientFeatureContext } from "../ApiClientContextRegistry/types";
 import { reduxStore } from "store";
@@ -21,6 +21,7 @@ import {
 import { Err, Ok, Result } from "utils/try";
 import { configureStore } from "@reduxjs/toolkit";
 import { apiRecordsSlice } from "features/apiClient/slices/apiRecords";
+import { WorkspaceState } from "../../types";
 
 export type UserDetails = { uid: string; loggedIn: true } | { loggedIn: false };
 
@@ -37,12 +38,15 @@ class ApiClientContextService {
     this.contextRegistry = config.contextRegistry;
   }
 
-  private createRepository(workspace: Workspace, user: UserDetails): ApiClientRepositoryInterface {
-    const workspaceId = workspace.id;
-    const workspaceType = workspace.workspaceType;
+  private createRepository(params: {
+    workspaceId: WorkspaceState["id"];
+    workspaceMeta: WorkspaceState["meta"];
+    user: UserDetails;
+  }): ApiClientRepositoryInterface {
+    const { workspaceId, workspaceMeta, user } = params;
 
-    if (workspaceType === WorkspaceType.LOCAL) {
-      return new ApiClientLocalRepository({ rootPath: workspace.rootPath! });
+    if (workspaceMeta.type === WorkspaceType.LOCAL) {
+      return new ApiClientLocalRepository({ rootPath: workspaceMeta.rootPath });
     }
 
     if (!user.loggedIn) {
@@ -63,7 +67,7 @@ class ApiClientContextService {
     return store;
   }
 
-  async createContext(workspace: Workspace, userDetails: UserDetails): Promise<Result<ApiClientFeatureContext>> {
+  async createContext(workspace: WorkspaceState, userDetails: UserDetails): Promise<Result<ApiClientFeatureContext>> {
     const workspaceId = workspace.id;
 
     try {
@@ -72,7 +76,7 @@ class ApiClientContextService {
         return new Ok(existing);
       }
 
-      const repo = this.createRepository(workspace, userDetails);
+      const repo = this.createRepository({ workspaceId, workspaceMeta: workspace.meta, user: userDetails });
       await repo.validateConnection();
 
       const store = this.createStore(workspaceId);

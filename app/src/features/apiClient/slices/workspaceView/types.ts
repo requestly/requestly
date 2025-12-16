@@ -1,4 +1,5 @@
 import { EntityState } from "@reduxjs/toolkit";
+import { Workspace, WorkspaceType } from "features/workspaces/types";
 import { RawResult } from "utils/try";
 
 export enum ApiClientViewMode {
@@ -10,6 +11,14 @@ export type WorkspaceStatus = { loading: true } | { loading: false; state: RawRe
 
 export interface WorkspaceState {
   id: string;
+  meta:
+    | {
+        type: WorkspaceType;
+      }
+    | {
+        type: WorkspaceType.LOCAL;
+        rootPath: Workspace["rootPath"];
+      };
   status: WorkspaceStatus;
 }
 

@@ -1,7 +1,7 @@
 import { createEntityAdapter, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { ApiClientViewMode, WorkspaceState, WorkspaceViewState } from "./types";
 import { ReducerKeys } from "store/constants";
-import { setupWorkspaces, switchContext, workspaceViewManager } from "./thunks";
+import { setupWorkspaceView, switchContext, workspaceViewManager } from "./thunks";
 import { RootState } from "store/types";
 
 function updateWorkspaceStateById(state: WorkspaceViewState, id: string, workspaceStatus: WorkspaceState["status"]) {
@@ -141,10 +141,10 @@ export const workspaceViewSlice = createSlice({
           });
         });
       })
-      .addCase(setupWorkspaces.pending, (state) => {
+      .addCase(setupWorkspaceView.pending, (state) => {
         state.isSetupDone = false;
       })
-      .addCase(setupWorkspaces.fulfilled, (state) => {
+      .addCase(setupWorkspaceView.fulfilled, (state) => {
         state.isSetupDone = true;
       });
   },
