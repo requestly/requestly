@@ -164,7 +164,7 @@ const HttpClientView: React.FC<Props> = ({
 
     let hasJsonObjectBody = false;
     try {
-      const contentType = getContentTypeFromResponseHeaders(entry.response.headers);
+      const contentType = getContentTypeFromResponseHeaders(entry.response.headers) ?? "";
       const isJson = /application\/json/i.test(contentType);
       if (isJson) {
         const parsed = JSON.parse(entry.response.body || "null");
@@ -471,7 +471,7 @@ const HttpClientView: React.FC<Props> = ({
         }
         trackResponseLoaded({
           type: getContentTypeFromResponseHeaders(executedEntry.response.headers),
-          time: Math.round(executedEntry.response.time / 1000),
+          time: Math.round(executedEntry.response?.time / 1000),
         });
         trackApiRequestDone({
           url: executedEntry.request.url,
