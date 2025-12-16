@@ -1,7 +1,7 @@
-export { EntityType, EntityMeta, SerializedEntity, EntityDispatch, recordTypeToEntityType } from "./types";
+export { ApiClientEntityType as EntityType,  EntityDispatch } from "./types";
 
 export { ApiClientEntity } from "./base";
-export { RequestEntity } from "./request";
+export { ApiClientRecordEntity } from "./api-client-record-entity";
 
 export { HttpRecordEntity } from "./http";
 export { GraphQLRecordEntity } from "./graphql";

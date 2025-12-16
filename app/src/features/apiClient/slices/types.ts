@@ -1,3 +1,5 @@
+import { NativeError } from "../../../errors/NativeError";
+
 export type EntityId = string;
 
 export type EntityType = "request" | "collection";
@@ -26,3 +28,27 @@ export interface BufferWrapper<T = unknown> {
   diff: DeepPartial<T>;
   isDirty: boolean;
 }
+
+export class EntityNotFound extends NativeError {
+  constructor(readonly id: string, type: any) {
+    super(`Could not find entity ${id} of type ${type} in store!`);
+    this.addContext({
+      id,
+      type
+    });
+  }
+}
+
+
+export class InvalidEntityShape extends NativeError {
+  constructor(params: {id: string, expectedType: any, foundType: any}) {
+    const { id, expectedType, foundType } = params;
+    super(`Entity ${id} of type ${foundType} was expected to be of type ${expectedType}`);
+    this.addContext({
+      id,
+      foundType,
+      expectedType,
+    });
+  }
+}
+

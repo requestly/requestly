@@ -1,48 +1,31 @@
-import { RQAPI } from "features/apiClient/types";
 import { UpdateCommand, DeepPartial, DeepPartialWithNull } from "../types";
 import { ApiClientRootState } from "../hooks/types";
-import { EntityType, EntityMeta, SerializedEntity, EntityDispatch } from "./types";
+import { ApiClientEntityType, EntityDispatch } from "./types";
 
-type CommonEditableFields = Pick<RQAPI.RecordMetadata, "name" | "description" | "collectionId"> & {
-  data?: {
-    auth?: RQAPI.Auth;
-    scripts?: {
-      preRequest?: string;
-      postResponse?: string;
-    };
-  };
-};
+export type ApiClientEntityMeta = {
+  id: string,
+}
 
-export abstract class ApiClientEntity<T extends RQAPI.ApiClientRecord> {
-  abstract readonly type: EntityType;
+export abstract class ApiClientEntity<T, M extends ApiClientEntityMeta = ApiClientEntityMeta> {
+  abstract readonly type: ApiClientEntityType;
 
-  constructor(protected readonly dispatch: EntityDispatch, public readonly meta: EntityMeta) {}
+  constructor(protected readonly dispatch: EntityDispatch, public readonly meta: M) {}
 
-  protected abstract dispatchCommand(command: UpdateCommand<T>): void;
+  abstract dispatchCommand(command: UpdateCommand<T>): void;
 
-  abstract getFromState(state: ApiClientRootState): T | undefined;
+  abstract getEntityFromState(state: ApiClientRootState): T;
 
-  serialize(): SerializedEntity {
-    return { id: this.meta.id, type: this.type };
-  }
+  abstract getName(state: ApiClientRootState): string;
 
   get id(): string {
     return this.meta.id;
   }
 
-  protected SET(value: DeepPartial<T>): void {
+  SET(value: DeepPartial<T>): void {
     this.dispatchCommand({ type: "SET", value });
   }
 
-  protected DELETE(value: DeepPartialWithNull<T>): void {
+  DELETE(value: DeepPartialWithNull<T>): void {
     this.dispatchCommand({ type: "DELETE", value });
-  }
-
-  protected setCommon(value: DeepPartial<CommonEditableFields>): void {
-    this.dispatchCommand({ type: "SET", value: value as DeepPartial<T> });
-  }
-
-  protected deleteCommon(value: DeepPartialWithNull<CommonEditableFields>): void {
-    this.dispatchCommand({ type: "DELETE", value: value as DeepPartialWithNull<T> });
   }
 }

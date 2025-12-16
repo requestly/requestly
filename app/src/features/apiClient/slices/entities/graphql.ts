@@ -1,31 +1,46 @@
 import { KeyValuePair, RQAPI } from "features/apiClient/types";
-import { UpdateCommand } from "../types";
+import { InvalidEntityShape, UpdateCommand } from "../types";
 import { apiRecordsActions } from "../apiRecords/slice";
 import { selectRecordById } from "../apiRecords/selectors";
 import { ApiClientRootState } from "../hooks/types";
-import { RequestEntity } from "./request";
-import { EntityType, SerializedEntity } from "./types";
+import { ApiClientRecordEntity } from "./api-client-record-entity";
+import { ApiClientEntityType } from "./types";
 
-export class GraphQLRecordEntity extends RequestEntity<RQAPI.GraphQLApiRecord> {
-  readonly type = EntityType.GRAPHQL_RECORD;
+export class GraphQLRecordEntity extends ApiClientRecordEntity<RQAPI.GraphQLApiRecord> {
+  readonly type = ApiClientEntityType.GRAPHQL_RECORD;
 
-  protected dispatchCommand(command: UpdateCommand<RQAPI.GraphQLApiRecord>): void {
+  dispatchCommand(command: UpdateCommand<RQAPI.GraphQLApiRecord>): void {
     this.dispatch(apiRecordsActions.applyPatch({ id: this.meta.id, command }));
   }
 
-  getFromState(state: ApiClientRootState): RQAPI.GraphQLApiRecord | undefined {
+  getEntityFromState(state: ApiClientRootState): RQAPI.GraphQLApiRecord {
     const record = selectRecordById(state, this.meta.id);
-    if (record?.type !== RQAPI.RecordType.API) return undefined;
-    if (record.data?.type !== RQAPI.ApiEntryType.GRAPHQL) return undefined;
+    if (record?.type !== RQAPI.RecordType.API) {
+      throw new InvalidEntityShape({
+        id: this.id,
+        expectedType: RQAPI.RecordType.API,
+        foundType: record?.type,
+      });
+
+    };
+    if (record.data?.type !== RQAPI.ApiEntryType.GRAPHQL) {
+      throw new InvalidEntityShape({
+        id: this.id,
+        expectedType: RQAPI.ApiEntryType.GRAPHQL,
+        foundType: record.data.type,
+      });
+
+
+    };
     return record as RQAPI.GraphQLApiRecord;
   }
 
   private getRequest(state: ApiClientRootState): RQAPI.GraphQLRequest | undefined {
-    return this.getFromState(state)?.data?.request;
+    return this.getEntityFromState(state)?.data?.request;
   }
 
   getResponse(state: ApiClientRootState): RQAPI.GraphQLResponse | undefined {
-    return this.getFromState(state)?.data?.response;
+    return this.getEntityFromState(state)?.data?.response;
   }
 
   getUrl(state: ApiClientRootState): string | undefined {
@@ -74,9 +89,5 @@ export class GraphQLRecordEntity extends RequestEntity<RQAPI.GraphQLApiRecord> {
 
   deleteVariables(): void {
     this.DELETE({ data: { request: { variables: null } } });
-  }
-
-  serialize(): SerializedEntity<EntityType.GRAPHQL_RECORD> {
-    return { id: this.meta.id, type: this.type };
   }
 }
