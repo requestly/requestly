@@ -6,8 +6,9 @@ import { AIPromptPopover } from "../AIPromptPopover/AIPromptPopover";
 import { MdOutlineStopCircle } from "@react-icons/all-files/md/MdOutlineStopCircle";
 import { MdOutlineAutoAwesome } from "@react-icons/all-files/md/MdOutlineAutoAwesome";
 import { getHasGeneratedAITests } from "store/selectors";
-import { getUserMetadata } from "store/slices/global/user/selectors";
+import { getUserAuthDetails, getUserMetadata } from "store/slices/global/user/selectors";
 import { AIConsentModal } from "features/ai";
+import { isProfessionalPlan } from "utils/PremiumUtils";
 
 interface GenerateTestsButtonProps {
   hidden: boolean;
@@ -32,6 +33,8 @@ export const GenerateTestsButton: React.FC<GenerateTestsButtonProps> = ({
   onGenerateClick,
   togglePopover,
 }) => {
+  const user = useSelector(getUserAuthDetails);
+  const isProfessionalPlanUser = isProfessionalPlan(user.details?.planDetails?.planId);
   const hasGeneratedAITests = useSelector(getHasGeneratedAITests);
   const userMetadata = useSelector(getUserMetadata);
   const isAIFeaturesEnabled = userMetadata?.ai_consent;
@@ -65,7 +68,9 @@ export const GenerateTestsButton: React.FC<GenerateTestsButtonProps> = ({
             />
           }
           placement="bottomLeft"
-          overlayClassName="ai-generate-test-popover"
+          overlayClassName={`ai-generate-test-popover ${
+            !isProfessionalPlanUser ? "ai-generate-test-popover-premium-feature" : ""
+          }`}
           showArrow={false}
         >
           <RQButton

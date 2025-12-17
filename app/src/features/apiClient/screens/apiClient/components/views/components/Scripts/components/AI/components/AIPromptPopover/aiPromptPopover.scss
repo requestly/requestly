@@ -2,6 +2,10 @@
   padding-top: unset;
   width: 400px;
 
+  &.ai-generate-test-popover-premium-feature {
+    width: 280px;
+  }
+
   .ant-popover-inner-content {
     padding: var(--requestly-space-4, 8px) var(--requestly-space-5, 12px);
     border-radius: 8px;
@@ -72,6 +76,24 @@
         color: var(--requestly-color-error-300);
         font-size: var(--requestly-font-size-xs);
         margin-top: var(--requestly-space-4);
+      }
+
+      &.ai-generate-test-popover-premium-feature {
+        .ai-generate-test-popover-content__header {
+          svg {
+            color: var(--requestly-color-text-default);
+          }
+        }
+        .ai-generate-test-popover-content__description {
+          color: var(--requestly-color-text-default);
+          margin-top: var(--requestly-space-4);
+        }
+
+        .ai-generate-test-popover-content__actions-container {
+          justify-content: flex-end;
+          gap: var(--requestly-space-4);
+          padding: 0;
+        }
       }
     }
   }
