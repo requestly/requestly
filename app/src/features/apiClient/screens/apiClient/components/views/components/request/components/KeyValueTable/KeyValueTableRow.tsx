@@ -1,25 +1,16 @@
 import React, { useContext } from "react";
-import { Checkbox, Form, FormInstance, Tooltip } from "antd";
-import { KeyValuePair } from "features/apiClient/types";
+import { Checkbox, Form, FormInstance } from "antd";
+import { KeyValueDataType, KeyValuePair } from "features/apiClient/types";
 import SingleLineEditor from "features/apiClient/screens/environment/components/SingleLineEditor";
 import InfoIcon from "components/misc/InfoIcon";
 import { Conditional } from "components/common/Conditional";
 import { INVALID_KEY_CHARACTERS } from "features/apiClient/constants";
 import { ScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
 import KeyValueDescriptionCell from "./KeyValueTableDescriptionCell";
-import KeyValueTypeCell from "./KeyValueTableTypeCell";
-import { AiOutlineWarning } from "@react-icons/all-files/ai/AiOutlineWarning";
+import { KeyValueTypeCell, ValidationWarning } from "./KeyValueTableTypeCell";
 import { captureException } from "@sentry/react";
 
 const EditableContext = React.createContext<FormInstance<any> | null>(null);
-
-const ValidationWarning = ({ error }: { error: string }) => (
-  <Tooltip title={error} color="#000">
-    <span style={{ display: "flex", alignItems: "center" }}>
-      <AiOutlineWarning style={{ color: "#E09400", fontSize: "16px" }} />
-    </span>
-  </Tooltip>
-);
 
 interface EditableRowProps {
   index: number;
@@ -93,7 +84,12 @@ export const KeyValueTableEditableCell: React.FC<React.PropsWithChildren<Editabl
   if (isDataTypeField) {
     return (
       <td {...restProps}>
-        <KeyValueTypeCell record={record} dataIndex={dataIndex} form={form} onSave={save} />
+        <KeyValueTypeCell
+          record={record?.dataType ?? KeyValueDataType.STRING}
+          dataIndex={dataIndex}
+          form={form}
+          onSave={save}
+        />
       </td>
     );
   }

@@ -29,12 +29,15 @@
 
   td.ant-table-cell {
     padding: 4px 12px !important;
+    max-width: 0;
+    overflow: hidden;
 
     .key-value-delete-btn.ant-btn.ant-btn-icon-only {
       width: 30px;
       opacity: 0;
     }
   }
+
   .key-value-input-container.error-state {
     display: flex;
     align-items: center;
@@ -46,6 +49,7 @@
     border: 1px solid var(--requestly-color-error);
     border-radius: 4px;
   }
+
   .key-value-table-input {
     border: 1px solid transparent;
     background: transparent;
