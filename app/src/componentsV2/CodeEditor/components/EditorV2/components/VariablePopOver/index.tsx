@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import { Popover } from "antd";
 import { EnvironmentVariableType, VariableScope, VariableValueType } from "backend/environment/types";
 import { capitalize } from "lodash";
@@ -11,6 +11,8 @@ import { CreateVariableView } from "./components/CreateVariableView";
 import { EditVariableView } from "./components/EditVariableView";
 import { RQButton } from "lib/design-system-v2/components";
 import { MdEdit } from "@react-icons/all-files/md/MdEdit";
+import { RiEyeLine } from "@react-icons/all-files/ri/RiEyeLine";
+import { RiEyeOffLine } from "@react-icons/all-files/ri/RiEyeOffLine";
 import { getScopeIcon } from "./hooks/useScopeOptions";
 import { useContextId } from "features/apiClient/contexts/contextId.context";
 import { NoopContextId } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
@@ -31,6 +33,19 @@ interface VariablePopoverProps {
   variables: ScopedVariables;
   onClose?: () => void;
   onPinChange?: (pinned: boolean) => void;
+}
+enum FieldKey {
+  NAME = "NAME",
+  TYPE = "TYPE",
+  INITIAL_VALUE = "INITIAL_VALUE",
+  CURRENT_VALUE = "CURRENT_VALUE",
+  IS_PERSISTENT = "IS_PERSISTENT",
+}
+interface FieldConfig {
+  id: FieldKey;
+  label: string;
+  value: string | boolean;
+  isSecret?: boolean;
 }
 
 export const VariablePopover: React.FC<VariablePopoverProps> = ({
@@ -190,19 +205,12 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
   );
 };
 
-function getSanitizedVariableValue(variable: VariableData) {
-  const isSecret = variable.type === EnvironmentVariableType.Secret;
-  const makeSecret = (value: VariableValueType) => "•".repeat(String(value || "").length);
+function getValueStrings(variable: VariableData) {
   const makeRenderable = (value: VariableValueType) => `${value}`;
 
-  const sanitize = pipe(
-    (value: VariableValueType) => (value === undefined || value === null ? "" : value),
-    isSecret ? makeSecret : makeRenderable
-  );
-
   return {
-    syncValue: sanitize(variable.syncValue ?? ""),
-    localValue: sanitize(variable.localValue ?? ""),
+    syncValue: makeRenderable(variable.syncValue ?? ""),
+    localValue: makeRenderable(variable.localValue ?? ""),
     isPersisted: makeRenderable(variable.isPersisted ?? true),
   };
 }
@@ -222,33 +230,60 @@ const VariableInfo: React.FC<{
   onEditClick,
   isNoopContext,
 }) => {
-  const { syncValue, localValue, isPersisted } = getSanitizedVariableValue(variable);
-  const infoFields =
-    source.scope === VariableScope.RUNTIME
-      ? [
-          { label: "Name", value: name },
-          { label: "Type", value: capitalize(variable.type) },
-          { label: "Current Value", value: localValue },
-          { label: "Is persistent", value: isPersisted },
-        ]
-      : [
-          { label: "Name", value: name },
-          { label: "Type", value: capitalize(variable.type) },
-          { label: "Initial Value", value: syncValue },
-          { label: "Current Value", value: localValue },
-        ];
+  const [revealedSecrets, setRevealedSecrets] = useState<Record<string, boolean>>({});
+  const { syncValue, localValue, isPersisted } = getValueStrings(variable);
+  const isSecretType = variable.type === EnvironmentVariableType.Secret;
+  const infoFields: FieldConfig[] = useMemo(() => {
+    const commonFields = [
+      { id: FieldKey.NAME, label: "Name", value: name },
+      { id: FieldKey.TYPE, label: "Type", value: capitalize(variable.type) },
+    ];
+
+    if (source.scope === VariableScope.RUNTIME) {
+      return [
+        ...commonFields,
+        {
+          id: FieldKey.CURRENT_VALUE,
+          label: "Current Value",
+          value: localValue,
+          isSecret: isSecretType,
+        },
+        { id: FieldKey.IS_PERSISTENT, label: "Is persistent", value: isPersisted },
+      ];
+    }
+
+    return [
+      ...commonFields,
+      {
+        id: FieldKey.INITIAL_VALUE,
+        label: "Initial Value",
+        value: syncValue,
+        isSecret: isSecretType,
+      },
+      {
+        id: FieldKey.CURRENT_VALUE,
+        label: "Current Value",
+        value: localValue,
+        isSecret: isSecretType,
+      },
+    ];
+  }, [source.scope, name, variable.type, localValue, isPersisted, syncValue, isSecretType]);
+
+  const toggleVisibility = useCallback((key: FieldKey) => {
+    setRevealedSecrets((prev) => ({ ...prev, [key]: !prev[key] }));
+  }, []);
 
   return (
     <>
       <div className="variable-info-property-container">
-        <span>{getScopeIcon(source.scope)} </span>
-        <span className="variable-header-info-seperator"> </span>
-        <div className="variable-info-header-name"> {source.name}</div>
+        <span>{getScopeIcon(source.scope)}</span>
+        <span className="variable-header-info-seperator" />
+        <div className="variable-info-header-name">{source.name}</div>
 
         <RQButton
           type="transparent"
           size="small"
-          icon={<MdEdit style={{ fontSize: "14px", color: "var(--requestly-color-text-subtle)" }} />}
+          icon={<MdEdit className="edit-icon" />}
           onClick={onEditClick}
           className="edit-variable-btn"
         >
@@ -258,10 +293,34 @@ const VariableInfo: React.FC<{
 
       <div className="variable-info-content-container">
         <div className="variable-info-content">
-          {infoFields.map(({ label, value }) => (
-            <React.Fragment key={label}>
-              <div className="variable-info-title">{label}</div>
-              <div className="variable-info-value">{value}</div>
+          {infoFields.map((field) => (
+            <React.Fragment key={field.id}>
+              <div className="variable-info-title">{field.label}</div>
+
+              <div className={`variable-info-value ${field.isSecret ? "with-toggle" : ""}`}>
+                <span className="value-content">
+                  {field.isSecret ? (
+                    revealedSecrets[field.id] ? (
+                      <span className="secret-revealed">{String(field.value)}</span>
+                    ) : (
+                      <span className="secret-masked">•••••••••••••</span>
+                    )
+                  ) : (
+                    <span>{String(field.value)}</span>
+                  )}
+                </span>
+
+                {field.isSecret && (
+                  <div className="eye-toggle-button">
+                    <RQButton
+                      type="transparent"
+                      size="small"
+                      icon={revealedSecrets[field.id] ? <RiEyeLine /> : <RiEyeOffLine />}
+                      onClick={() => toggleVisibility(field.id)}
+                    />
+                  </div>
+                )}
+              </div>
             </React.Fragment>
           ))}
         </div>
