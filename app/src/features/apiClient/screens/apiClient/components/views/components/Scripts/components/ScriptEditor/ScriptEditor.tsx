@@ -119,7 +119,6 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
   });
 
   const handleGenerateTests = (query: string) => {
-    lastUsedQueryRef.current = query;
     setNegativeFeedback(null);
     setIsTestsStreamingFinished(false);
     const preparedApiRecord = {
@@ -132,6 +131,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
       existingScript: entry.scripts?.postResponse ?? "",
       lastGeneration: { code: lastGeneratedCodeRef.current, query: lastUsedQueryRef.current },
     });
+    lastUsedQueryRef.current = query;
   };
 
   const mergeViewConfig = useMemo(() => {
