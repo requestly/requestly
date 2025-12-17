@@ -136,7 +136,7 @@ class ApiClientContextService {
 
     let records: ContextSetupData["apiClientRecords"] = { records: [], erroredRecords: [] };
     let environments: ContextSetupData["environments"] = {
-      globalEnvironment: { id: "", name: "", variables: {} },
+      globalEnvironment: { id: environmentVariablesRepository.getGlobalEnvironmentId(), name: "Global", variables: {} },
       nonGlobalEnvironments: {},
     };
     let erroredRecords: ContextSetupData["erroredRecords"] = {

@@ -185,14 +185,32 @@ export const setupWorkspaceView = createAsyncThunk(
         ).unwrap();
       }
 
-      return dispatch(
-        switchContext({
-          workspace: selectedWorkspaces[0]!,
-          userId,
-        })
-      ).unwrap();
+      try {
+        const result = await dispatch(
+          switchContext({
+            workspace: selectedWorkspaces[0]!,
+            userId,
+          })
+        ).unwrap();
 
-      // TODO: handle workspace deleted error
+        return result;
+      } catch (error) {
+        const errorMessage = error?.message || String(error);
+        if (errorMessage.includes("Missing or insufficient permissions")) {
+          // workspace deleted, fallback to private
+          return dispatch(
+            switchContext({
+              workspace: {
+                id: dummyPersonalWorkspace.id,
+                meta: { type: WorkspaceType.PERSONAL },
+              },
+              userId,
+            })
+          ).unwrap();
+        }
+
+        throw error;
+      }
     }
 
     if (selectedWorkspaces.length === 0) {
