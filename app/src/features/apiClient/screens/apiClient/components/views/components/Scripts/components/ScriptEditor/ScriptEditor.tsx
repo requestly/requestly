@@ -84,6 +84,8 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
   const hasPostResponseScript = Boolean(entry?.scripts?.[RQAPI.ScriptType.POST_RESPONSE]);
 
   const isPopoverOpenRef = useRef(isGenerateTestPopoverOpen);
+  const lastGeneratedCodeRef = useRef<string | null>(null);
+  const lastUsedQueryRef = useRef<string | null>(null);
 
   const { object, isLoading, error, stop, submit, clear } = useObject({
     api: getAIEndpointUrl(AI_ENDPOINTS.TEST_GENERATION),
@@ -117,6 +119,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
   });
 
   const handleGenerateTests = (query: string) => {
+    lastUsedQueryRef.current = query;
     setNegativeFeedback(null);
     setIsTestsStreamingFinished(false);
     const preparedApiRecord = {
@@ -127,7 +130,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
       userQuery: query,
       apiRecord: preparedApiRecord,
       existingScript: entry.scripts?.postResponse ?? "",
-      lastGeneration: { code: object?.code },
+      lastGeneration: { code: lastGeneratedCodeRef.current, query: lastUsedQueryRef.current },
     });
   };
 
@@ -139,14 +142,20 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
       return {
         incomingValue: object?.code?.content,
         source: "ai",
-        onPartialMerge: (value: string) => {
-          onScriptsChange({
-            ...(entry?.scripts || defaultScripts),
-            postResponse: value,
-          });
-          // Fix this: default script values are assigned to editor by the compoennt and not the store
-          if (value === object?.code?.content || value === DEFAULT_SCRIPT_VALUES[RQAPI.ScriptType.POST_RESPONSE]) {
+        onPartialMerge: (mergedValue: string, newIncomingValue: string, type: "accept" | "reject") => {
+          lastGeneratedCodeRef.current = newIncomingValue;
+
+          if (type === "accept") {
+            onScriptsChange({
+              ...(entry?.scripts || defaultScripts),
+              postResponse: mergedValue,
+            });
+          }
+
+          if (mergedValue === newIncomingValue) {
             clear();
+            lastGeneratedCodeRef.current = null;
+            lastUsedQueryRef.current = null;
           }
         },
       };
