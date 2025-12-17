@@ -1,20 +1,47 @@
 import FEATURES from "config/constants/sub/features";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import {
   useApiClientMultiWorkspaceView,
   ApiClientViewMode,
 } from "../store/multiWorkspaceView/multiWorkspaceView.store";
 import { getActiveWorkspace } from "store/slices/workspaces/selectors";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { WorkspaceType } from "features/workspaces/types";
 import { WindowsAndLinuxGatedHoc } from "componentsV2/WindowsAndLinuxGatedHoc";
 import MandatoryUpdateScreen from "components/mode-specific/desktop/UpdateDialog/MandatoryUpdateScreen";
 import ApiClientFeatureContainer from "../container";
 import ApiClientErrorBoundary from "./ErrorBoundary/ErrorBoundary";
+import { resetWorkspaceView, setupWorkspaceView } from "../slices/workspaceView/thunks";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
+import { useWorkspaceViewSelector, WorkspaceProvider } from "../common/WorkspaceProvider";
+import { useEntitySelector } from "../slices/entities";
+import { getAllSelectedWorkspaces, workspaceViewActions } from "../slices/workspaceView/slice";
+import { selectAllRecords } from "../slices";
+
+const Inner = () => {
+  const records = useWorkspaceViewSelector(selectAllRecords);
+
+  return <code>{JSON.stringify(records)}</code>;
+};
+
+const Test = () => {
+  const isSetupDone = useSelector((s) => s.workspaceView.isSetupDone);
+  const workspace = useSelector((s) => getAllSelectedWorkspaces(s.workspaceView)[0]);
+
+  console.log({ workspace });
+
+  return isSetupDone ? (
+    <WorkspaceProvider workspaceId={workspace.id}>{<Inner />}</WorkspaceProvider>
+  ) : (
+    <h1>Loading...</h1>
+  );
+};
 
 export const ApiClientRouteElement = () => {
   const currentViewMode = useApiClientMultiWorkspaceView((state) => state.viewMode);
+  const user = useSelector(getUserAuthDetails);
+  const dispatch = useDispatch();
   const activeWorkspace = useSelector(getActiveWorkspace);
   const isApiClientCompatible = useMemo(() => {
     const isOlderDesktopVersion = !isFeatureCompatible(FEATURES.LOCAL_WORKSPACE_COMPATIBILITY);
@@ -24,11 +51,26 @@ export const ApiClientRouteElement = () => {
     return !hasIncompatibleConfiguration;
   }, [currentViewMode, activeWorkspace?.workspaceType]);
 
+  useEffect(() => {
+    dispatch(resetWorkspaceView() as any);
+    const promise = dispatch(
+      setupWorkspaceView({
+        userId: user.details?.profile?.uid,
+      }) as any
+    );
+
+    return () => {
+      promise.abort();
+      dispatch(resetWorkspaceView as any);
+    };
+  }, [dispatch, user.details?.profile?.uid]);
+
   return (
     <WindowsAndLinuxGatedHoc featureName="API client">
       {isApiClientCompatible ? (
         <ApiClientErrorBoundary boundaryId="api-client-error-boundary">
-          <ApiClientFeatureContainer />
+          <Test />
+          {/* <ApiClientFeatureContainer /> */}
         </ApiClientErrorBoundary>
       ) : (
         <MandatoryUpdateScreen

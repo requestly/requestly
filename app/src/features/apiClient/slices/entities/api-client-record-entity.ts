@@ -1,60 +1,56 @@
 import { RQAPI } from "features/apiClient/types";
-import { ApiClientRootState } from "../hooks/types";
+import { ApiClientStoreState } from "../workspaceView/helpers/ApiClientContextRegistry/types";
 import { ApiClientEntity } from "./base";
 import { EntityNotFound, UpdateCommand } from "../types";
 import { ApiClientEntityType } from "./types";
 import { apiRecordsActions, selectRecordById } from "../apiRecords";
 
 export abstract class ApiClientRecordEntity<T extends RQAPI.ApiClientRecord> extends ApiClientEntity<T> {
-  private base = new (
-    class extends ApiClientEntity<RQAPI.ApiClientRecord> {
-      getEntityFromState(state: ApiClientRootState): RQAPI.ApiClientRecord {
-
-        const record = selectRecordById(state, this.meta.id);
-        if (!record) {
-          throw new EntityNotFound(this.id, this.type);
-        }
-        return record;
+  private base = new (class extends ApiClientEntity<RQAPI.ApiClientRecord> {
+    getEntityFromState(state: ApiClientStoreState): RQAPI.ApiClientRecord {
+      const record = selectRecordById(state, this.meta.id);
+      if (!record) {
+        throw new EntityNotFound(this.id, this.type);
       }
-
-      dispatchCommand(command: UpdateCommand<RQAPI.ApiClientRecord>): void {
-        this.dispatch(apiRecordsActions.applyPatch({ id: this.meta.id, command }));
-      }
-
-      getName(s: ApiClientRootState) {
-        return this.getEntityFromState(s).name;
-      }
-
-      type: ApiClientEntityType;
+      return record;
     }
-  )(this.dispatch, this.meta);
 
+    dispatchCommand(command: UpdateCommand<RQAPI.ApiClientRecord>): void {
+      this.dispatch(apiRecordsActions.applyPatch({ id: this.meta.id, command }));
+    }
 
-  getName(state: ApiClientRootState): string {
+    getName(s: ApiClientStoreState) {
+      return this.getEntityFromState(s).name;
+    }
+
+    type: ApiClientEntityType;
+  })(this.dispatch, this.meta);
+
+  getName(state: ApiClientStoreState): string {
     return this.getEntityFromState(state).name;
   }
 
-  getDescription(state: ApiClientRootState): string | undefined {
+  getDescription(state: ApiClientStoreState): string | undefined {
     return this.getEntityFromState(state).description;
   }
 
-  getCollectionId(state: ApiClientRootState): string | null | undefined {
+  getCollectionId(state: ApiClientStoreState): string | null | undefined {
     return this.getEntityFromState(state).collectionId;
   }
 
-  getAuth(state: ApiClientRootState): RQAPI.Auth | undefined {
+  getAuth(state: ApiClientStoreState): RQAPI.Auth | undefined {
     return this.getEntityFromState(state).data?.auth;
   }
 
-  getScripts(state: ApiClientRootState): { preRequest?: string; postResponse?: string } | undefined {
+  getScripts(state: ApiClientStoreState): { preRequest?: string; postResponse?: string } | undefined {
     return this.getEntityFromState(state).data?.scripts;
   }
 
-  getPreRequestScript(state: ApiClientRootState): string | undefined {
+  getPreRequestScript(state: ApiClientStoreState): string | undefined {
     return this.getScripts(state)?.preRequest;
   }
 
-  getPostResponseScript(state: ApiClientRootState): string | undefined {
+  getPostResponseScript(state: ApiClientStoreState): string | undefined {
     return this.getScripts(state)?.postResponse;
   }
 
