@@ -11,8 +11,9 @@ import { clearCurrentlyActiveWorkspace } from "actions/TeamWorkspaceActions";
 import { removeWorkspace, getAllWorkspaces as getAllLocalWorkspaces } from "services/fsManagerServiceAdapter";
 import { workspaceActions } from "store/slices/workspaces/slice";
 import { redirectToRules } from "utils/RedirectionUtils";
-import { captureException } from "@sentry/react";
+import * as Sentry from "@sentry/react";
 import { WorkspaceType } from "features/workspaces/types";
+import { ErrorCode } from "errors/types";
 import { trackWorkspaceDeleteClicked, trackWorkspaceDeleted } from "modules/analytics/events/common/teams";
 
 export const DeleteLocalWorkspaceSection: React.FC = () => {
@@ -49,7 +50,7 @@ export const DeleteLocalWorkspaceSection: React.FC = () => {
         if (canNavigateToPreviousPath) navigate(previousPath as string, { replace: true });
         else redirectToRules(navigate);
       } catch (e) {
-        captureException(e);
+        Sentry.captureException(e);
         toast.error("Could not refresh workspaces");
       }
     },
@@ -60,22 +61,51 @@ export const DeleteLocalWorkspaceSection: React.FC = () => {
     if (!workspaceId || isDeleting) return;
     setIsDeleting(true);
     try {
+      let hadPermissionIssue = false;
       const previousPath = location?.state?.previousPath;
       const canNavigateToPreviousPath = previousPath && !previousPath.includes(`/teams/${workspaceId}`);
 
       const result = await removeWorkspace(workspaceId, deleteDirectory ? { deleteDirectory: true } : {});
       if (result.type === "error") {
-        throw new Error(result.error.message || "Failed to delete workspace");
+        const err = result.error;
+        const isPermissionIssue = err.code === ErrorCode.PermissionDenied || err.code === ErrorCode.NotPermitted;
+        if (isPermissionIssue) {
+          hadPermissionIssue = true;
+          Sentry.withScope((scope) => {
+            scope.setTag("error_type", "workspace_delete_permission_issue");
+            scope.setContext("workspace_delete_details", {
+              workspaceId,
+              deleteDirectory,
+              error: err,
+            });
+            Sentry.captureException(new Error(`Permission issue during file operation: ${err.message}`));
+          });
+        } else {
+          throw err;
+        }
       }
 
       if (activeWorkspaceId === workspaceId) {
         await clearCurrentlyActiveWorkspace(dispatch, appMode);
       }
-      toast.info("Workspace deleted successfully");
+      if (hadPermissionIssue) {
+        toast.info("Workspace deleted, but failed to delete files. Please retry or delete manually.");
+      } else {
+        toast.info("Workspace deleted successfully");
+      }
 
       await refreshAndNavigate(previousPath, canNavigateToPreviousPath);
     } catch (err: any) {
-      toast.error(err?.message || "Failed to delete workspace");
+      toast.error("Failed to delete workspace");
+      Sentry.withScope((scope) => {
+        scope.setTag("error_type", "workspace_delete_failed");
+        scope.setContext("workspace_delete_details", {
+          workspaceId,
+          deleteDirectory,
+          error: err,
+        });
+        Sentry.captureException(new Error(err?.message || "Failed to delete workspace"));
+      });
       if (deleteDirectory) setDeleteDirectory(false);
     } finally {
       setIsDeleting(false);
