@@ -28,8 +28,8 @@ const DeleteWorkspaceModal: React.FC<DeleteWorkspaceModalProps> = ({
         <div className="header delete-team-modal-header">Are you sure you want to delete this workspace?</div>
         <p className="text-gray">
           This will <span className="text-white delete-team-permanently-highlight">permanently</span> delete the
-          workspace <span className="text-white">{name}</span> and all the associated data, such as rules, session
-          recordings and etc for all users.
+          workspace <span className="text-white delete-team-workspace-name">{name}</span> and all the associated data,
+          such as rules, session recordings and etc for all users.
         </p>
 
         <label className="text-sm delete-team-input-label">

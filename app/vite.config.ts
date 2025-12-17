@@ -93,6 +93,9 @@ const config = async ({ mode }) => {
           additionalData: "@root-entry-name: default;",
           modifyVars: { ...getThemeVariables({ dark: true }), ...theme },
         },
+        scss: {
+          api: "modern",
+        },
       },
     },
     build: {

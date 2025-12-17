@@ -8,8 +8,10 @@ import { ApiClientFeatureContext } from "../store/apiClientFeatureContext/apiCli
 export const getAllChildrenRecords = (ctx: ApiClientFeatureContext, nodeId: string) => {
   const children = ctx.stores.records.getState().getAllChildren(nodeId);
   const getRecord = ctx.stores.records.getState().getData;
-  return children.map((child) => getRecord(child)).filter(Boolean).sort(
-    (recordA, recordB) => {
+  return children
+    .map((child) => getRecord(child))
+    .filter((record): record is RQAPI.ApiClientRecord => Boolean(record))
+    .sort((recordA, recordB) => {
       // If different type, then keep collection first
       if (recordA.type === RQAPI.RecordType.COLLECTION && recordA.isExample && !recordB.isExample) {
         return -1;
@@ -30,8 +32,7 @@ export const getAllChildrenRecords = (ctx: ApiClientFeatureContext, nodeId: stri
 
       // If names are the same, sort by creation date
       return recordA.createdTs - recordB.createdTs;
-    }
-  );
+    });
 };
 
 export const useChildren = (nodeId: string) => {

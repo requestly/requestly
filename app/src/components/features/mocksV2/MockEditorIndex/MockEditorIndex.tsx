@@ -50,11 +50,11 @@ const MockEditorIndex: React.FC<Props> = ({
   const { validatePermission } = useRBAC();
   const { isValidPermission } = validatePermission("mock_api", "create");
 
-  const [mockEditorData, setMockEditorData] = useState<MockEditorDataSchema>(null);
+  const [mockEditorData, setMockEditorData] = useState<MockEditorDataSchema | null>(null);
   const [isMockLoading, setIsMockLoading] = useState<boolean>(true);
   const [savingInProgress, setSavingInProgress] = useState<boolean>(false);
-  const [mockCollectionData, setMockCollectionData] = useState<RQMockCollection>(null);
-  const [isMockCollectionLoading, setIsMockCollectionLoading] = useState<boolean>(false);
+  const [mockCollectionData, setMockCollectionData] = useState<RQMockCollection | null>(null);
+  const [isMockCollectionLoading, setIsMockCollectionLoading] = useState<boolean | null>(false);
 
   const [searchParams] = useSearchParams();
   const collectionId = searchParams.get("collectionId") || "";
@@ -111,7 +111,7 @@ const MockEditorIndex: React.FC<Props> = ({
             const url = generateFinalUrl({
               endpoint: finalMockData.endpoint,
               uid: user?.details?.profile?.uid,
-              username: null,
+              username: undefined,
               teamId: activeWorkspaceId,
               password: data?.password,
             });

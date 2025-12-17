@@ -144,7 +144,7 @@ export const EditableCell: React.FC<EditableCellProps> = ({
             disabled={disabled}
             controls={false}
             ref={inputRef}
-            onChange={(value) => handleChange(value)}
+            onChange={(value) => handleChange(value!)}
             placeholder={getPlaceholderText(dataIndex)}
           />
         );

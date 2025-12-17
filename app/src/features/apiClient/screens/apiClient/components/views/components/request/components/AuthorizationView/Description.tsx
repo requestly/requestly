@@ -19,7 +19,7 @@ const Description: React.FC<DescriptionProps> = ({ data }) => {
       return (
         <div key={`item-${index}`}>
           <li className="step-item">{item.value}</li>
-          {!isEmpty(item.steps) && <ul className="steps">{renderSteps(item.steps)}</ul>}
+          {item.steps && !isEmpty(item.steps) && <ul className="steps">{renderSteps(item.steps)}</ul>}
         </div>
       );
     });

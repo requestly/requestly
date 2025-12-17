@@ -24,7 +24,7 @@ export const ApiClientEmptyView = () => {
   const { validatePermission } = useRBAC();
   const { isValidPermission } = validatePermission("api_client_request", "create");
 
-  const [isRecordCreating, setIsRecordCreating] = useState(null);
+  const [isRecordCreating, setIsRecordCreating] = useState<RQAPI.RecordType | null>(null);
 
   const isEmpty = apiClientRecords.length === 0;
 

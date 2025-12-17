@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { Input, InputRef } from "antd";
+import { Input, InputRef, Tooltip } from "antd";
 import { RQButton } from "lib/design-system-v2/components";
 import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
 import "./aiPromptPopover.scss";
@@ -38,9 +38,16 @@ export const AIPromptPopover: React.FC<PromptPopoverProps> = ({
 
   return (
     <div className="ai-generate-test-popover-content">
-      <div className="ai-generate-test-popover-content__header">Generate tests</div>
-      <div className="ai-generate-test-popover-content__description">
-        AI will use the request URL, method, and most recent response body to generate the tests.
+      <div className="ai-generate-test-popover-content__header">
+        Write or refine test scripts with AI{" "}
+        <Tooltip
+          title="AI will use the request URL, method, and most recent response body to generate the tests."
+          showArrow={false}
+          placement="top"
+          color="#000"
+        >
+          <MdInfoOutline />
+        </Tooltip>
       </div>
       <Input.TextArea
         className="ai-generate-test-popover-content__input"

@@ -57,7 +57,7 @@ export const createSyncServiceStore = () => {
         const recordsToSync = filteredRecords.map((record) => {
           if (isApiCollection(record)) {
             // runConfigs & runResults are synced separately
-            const { runConfigs = {}, runResults = [], ...rest } = record as LocalStore.CollectionRecord;
+            const { runConfigs, runResults, ...rest } = record as LocalStore.CollectionRecord;
             return rest;
           }
 
@@ -69,7 +69,7 @@ export const createSyncServiceStore = () => {
         );
 
         if (!syncResult.success) {
-          throw new NativeError(syncResult.message);
+          throw new NativeError(syncResult.message ?? "Failed to sync API records!");
         }
 
         const runDetails = filteredRecords

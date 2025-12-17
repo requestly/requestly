@@ -5,8 +5,6 @@ import { useSelector } from "react-redux";
 import { getAppMode, getIsRulesListLoading } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
-// @ts-ignore
-import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { RecordType, Rule } from "@requestly/shared/types/entities/rules";
 import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
 import { useFetchMockRecords } from "features/mocks/screens/mocksList/components/MocksList/hooks/useFetchMockRecords";

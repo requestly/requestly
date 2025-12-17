@@ -3,7 +3,7 @@ import { QueryParamsStore, createQueryParamsStore } from "./queryParamsStore";
 import { StoreApi } from "zustand";
 import { RQAPI } from "../types";
 
-export const QueryParamsStoreContext = createContext<StoreApi<QueryParamsStore>>(null);
+export const QueryParamsStoreContext = createContext<StoreApi<QueryParamsStore> | null>(null);
 
 export const QueryParamsProvider = ({ children, entry }: { children: ReactNode; entry: RQAPI.HttpApiEntry }) => {
   const store = useMemo(() => createQueryParamsStore(entry), [entry]);

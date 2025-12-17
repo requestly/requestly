@@ -22,12 +22,12 @@ type FeatureFlagValue = {
 export const WindowsAndLinuxGatedHoc: React.FC<WindowsAndLinuxGatedHocProps> = ({ children, featureName }) => {
   const appMode = useSelector(getAppMode);
   const featureFlagValue = useFeatureValue<FeatureFlagValue>("enable_feature_by_os", {
-    whitelist: ["macOS"],
+    whitelist: ["macOS", "Linux", "Windows"],
   });
 
   const os = getUserOS();
   const isDesktopApp = appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP;
-  const isWhitelisted = featureFlagValue?.whitelist?.includes(os);
+  const isWhitelisted = os ? featureFlagValue?.whitelist?.includes(os) : false;
 
   useEffect(() => {
     if (!isDesktopApp) {
