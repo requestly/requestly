@@ -79,6 +79,10 @@ const AuthHandler: React.FC<{}> = () => {
         dispatch(globalActions.updateUsername({ username: userData.username }));
       }
 
+      if (userData?.metadata) {
+        dispatch(globalActions.updateUserMetadata(userData.metadata));
+      }
+
       dispatch(
         globalActions.updateUserInfo({
           loggedIn: true,
@@ -265,7 +269,6 @@ const AuthHandler: React.FC<{}> = () => {
         dispatch(
           globalActions.updateUserInfo({
             loggedIn: false,
-            // @ts-ignore
             details: planDetails ? { planDetails, isPremium: isPremiumUser(planDetails) } : null,
           })
         );

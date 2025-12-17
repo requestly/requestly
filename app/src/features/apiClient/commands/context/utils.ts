@@ -6,8 +6,8 @@ export async function extractSetupDataFromRepository(
   repository: ApiClientRepositoryInterface
 ): Promise<ContextSetupData> {
   const { apiClientRecordsRepository, environmentVariablesRepository } = repository;
-  let records: ContextSetupData["apiClientRecords"];
-  let environments: ContextSetupData["environments"];
+  let records: ContextSetupData["apiClientRecords"] = { records: [], erroredRecords: [] };
+  let environments: ContextSetupData["environments"] = { globalEnvironment: {} as any, nonGlobalEnvironments: {} };
   let erroredRecords: ContextSetupData["erroredRecords"] = { apiErroredRecords: [], environmentErroredRecords: [] };
   const [fetchedRecordsResult, fetchedEnvResult] = await Promise.all([
     apiClientRecordsRepository.getAllRecords(),

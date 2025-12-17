@@ -146,6 +146,7 @@ export const FEATURE_COMPATIBLE_VERSION = {
     [GLOBAL_CONSTANTS.APP_MODES.DESKTOP]: {
       macOS: "2.0.0",
       Windows: "25.8.28",
+      Linux: "25.12.15",
     },
     [GLOBAL_CONSTANTS.APP_MODES.EXTENSION]: null,
   },
@@ -171,8 +172,12 @@ export const FEATURE_COMPATIBLE_VERSION = {
     [GLOBAL_CONSTANTS.APP_MODES.DESKTOP]: {
       macOS: "25.6.5",
       Windows: null,
-      Linux: null,
+      Linux: "25.12.15",
     },
+    [GLOBAL_CONSTANTS.APP_MODES.EXTENSION]: null,
+  },
+  [FEATURES.LOCAL_WORKSPACE_DELETION]: {
+    [GLOBAL_CONSTANTS.APP_MODES.DESKTOP]: "25.11.27",
     [GLOBAL_CONSTANTS.APP_MODES.EXTENSION]: null,
   },
 

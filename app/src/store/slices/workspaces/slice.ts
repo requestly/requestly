@@ -11,7 +11,7 @@ export interface WorkspaceSliceState {
 }
 
 export const workspacesEntityAdapter = createEntityAdapter<Workspace>({
-  selectId: (workspace) => workspace.id,
+  selectId: (workspace) => workspace.id as string,
   sortComparer: (a, b) => {
     return (a?.createdAt ?? 0) >= (b?.createdAt ?? 0) ? 1 : -1;
   },

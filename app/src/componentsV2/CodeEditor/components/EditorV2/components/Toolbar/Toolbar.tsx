@@ -21,6 +21,7 @@ interface CodeEditorToolbarProps {
   language: EditorLanguage;
   code: string;
   customOptions?: EditorCustomToolbar;
+  rightContent?: React.ReactNode;
   onCodeFormat: (formattedCode: string) => void;
   isFullScreen: boolean;
   handleFullScreenToggle: () => void;
@@ -34,6 +35,7 @@ const CodeEditorToolbar: React.FC<CodeEditorToolbarProps> = ({
   code,
   onCodeFormat,
   customOptions,
+  rightContent = null,
   isFullScreen = false,
   handleFullScreenToggle = () => {},
   isCodePrettified,
@@ -110,7 +112,8 @@ const CodeEditorToolbar: React.FC<CodeEditorToolbarProps> = ({
       </div>
 
       <div className="code-editor-actions">
-        {/* TODO: ADD toggle search button */}
+        {rightContent}
+        {rightContent && <div className="code-editor-actions-separator" />}
         <Tooltip title={isCopied ? "Copied" : "Copy code"} color={theme.colors.black} mouseEnterDelay={0.6}>
           <RQButton size="small" type="text" icon={<IoMdCopy />} onClick={handleCopyCode} />
         </Tooltip>

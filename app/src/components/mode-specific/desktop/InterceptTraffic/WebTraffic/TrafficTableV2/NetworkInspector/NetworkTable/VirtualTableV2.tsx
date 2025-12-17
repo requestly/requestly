@@ -18,11 +18,11 @@ interface Props {
 }
 
 const VirtualTableV2: React.FC<Props> = ({ logs = [], header, renderLogRow, selectedRowData, onReplayRequest }) => {
-  const [selected, setSelected] = useState(null);
-  const [lastKnownBottomIndex, setLastKnownBottomIndex] = useState(null);
+  const [selected, setSelected] = useState<string | null>(null);
+  const [lastKnownBottomIndex, setLastKnownBottomIndex] = useState<number | null>(null);
   const [isScrollToBottomEnabled, setIsScrollToBottomEnabled] = useState(true);
   const mounted = useRef(false);
-  const parentRef = useRef(null);
+  const parentRef = useRef<HTMLDivElement>(null);
 
   // https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollHeight#determine_if_an_element_has_been_totally_scrolled
   const isListAtBottom = useCallback(() => {
@@ -130,7 +130,7 @@ const VirtualTableV2: React.FC<Props> = ({ logs = [], header, renderLogRow, sele
               "--virtualPaddingBottom": paddingBottom + "px",
             } as React.CSSProperties
           }
-          selected={selected}
+          selected={selected ?? undefined}
           onSelected={(id: string) => {
             setSelected(id);
             setIsScrollToBottomEnabled(false); // Disable autoscroll when row is selected

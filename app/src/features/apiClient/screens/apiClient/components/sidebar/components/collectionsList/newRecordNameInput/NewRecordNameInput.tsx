@@ -11,7 +11,7 @@ import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClient
 import { useApiClientRepository } from "features/apiClient/contexts/meta";
 
 export interface NewRecordNameInputProps {
-  recordToBeEdited?: RQAPI.ApiClientRecord;
+  recordToBeEdited: RQAPI.ApiClientRecord;
   recordType: RQAPI.RecordType;
   onSuccess: () => void;
   analyticEventSource: RQAPI.AnalyticsEventSource;
@@ -35,13 +35,13 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({ recordTo
   const updateRecord = useCallback(async () => {
     setIsLoading(true);
 
-    if (!recordName || recordName === recordToBeEdited.name) {
+    if (!recordName || recordName === recordToBeEdited?.name) {
       setIsLoading(false);
       onSuccess?.();
       return;
     }
 
-    const record: Partial<RQAPI.ApiClientRecord> = {
+    const record: RQAPI.ApiClientRecord = {
       ...recordToBeEdited,
       name: recordName,
     };
@@ -49,7 +49,7 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({ recordTo
     const result =
       record.type === RQAPI.RecordType.API
         ? await apiClientRecordsRepository.updateRecord(record, record.id)
-        : await apiClientRecordsRepository.renameCollection(record.id, record.name);
+        : await apiClientRecordsRepository.renameCollection(record.id, record?.name);
 
     if (result.success) {
       const tabSourceName = record.type === RQAPI.RecordType.API ? "request" : "collection";

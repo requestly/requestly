@@ -25,8 +25,8 @@ export const MyBillingTeamDetails: React.FC = () => {
           billingTeamDetails?.subscriptionDetails?.rqSubscriptionType
         ) || billingTeamDetails?.subscriptionDetails?.plan === "lite"
       ) ||
-      billingTeamDetails.browserstackGroupId ||
-      Object.keys(billingTeamDetails.members || {}).length > 1,
+      billingTeamDetails?.browserstackGroupId ||
+      Object.keys(billingTeamDetails?.members || {}).length > 1,
     [
       billingTeamDetails?.subscriptionDetails?.rqSubscriptionType,
       billingTeamDetails?.subscriptionDetails?.plan,
@@ -35,7 +35,9 @@ export const MyBillingTeamDetails: React.FC = () => {
     ]
   );
 
-  if (!billingTeamDetails) return null;
+  if (!billingTeamDetails) {
+    return null;
+  }
 
   return (
     <div className="display-row-center w-full">
@@ -61,12 +63,12 @@ export const MyBillingTeamDetails: React.FC = () => {
             <Col style={{ marginTop: "24px" }}>
               <BillingTeamMembers openDrawer={() => setIsMembersDrawerOpen(true)} />
             </Col>
-            {billingTeamDetails.members?.[user?.details?.profile?.uid]?.role !== BillingTeamRoles.Member && (
+            {billingTeamDetails.members?.[user?.details?.profile?.uid as string]?.role !== BillingTeamRoles.Member && (
               <Col style={{ marginTop: "24px" }}>
                 <BillingInvoiceCard />
               </Col>
             )}
-            {billingTeamDetails.members?.[user?.details?.profile?.uid]?.role === BillingTeamRoles.Manager &&
+            {billingTeamDetails.members?.[user?.details?.profile?.uid as string]?.role === BillingTeamRoles.Manager &&
               !billingTeamDetails.browserstackGroupId && (
                 <Col style={{ marginTop: "24px" }}>
                   <BillingInformation />

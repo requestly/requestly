@@ -78,7 +78,7 @@ export const createVariablesStore = (props?: { variables: VariableValues }) => {
 
       newData.forEach((val, key) => {
         if (currentData.has(key)) {
-          newData.set(key, { ...val, localValue: currentData.get(key).localValue });
+          newData.set(key, { ...val, localValue: currentData?.get(key)?.localValue });
         }
       });
 
