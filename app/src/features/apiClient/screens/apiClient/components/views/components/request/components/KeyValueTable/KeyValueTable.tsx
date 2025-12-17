@@ -8,6 +8,8 @@ import { KeyValuePair } from "features/apiClient/types";
 import { RiDeleteBin6Line } from "@react-icons/all-files/ri/RiDeleteBin6Line";
 import "./keyValueTable.scss";
 import { ScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import FEATURES from "config/constants/sub/features";
 
 type ColumnTypes = Exclude<TableProps<KeyValuePair>["columns"], undefined>;
 
@@ -16,6 +18,7 @@ interface KeyValueTableProps {
   onChange: (updatedPairs: KeyValuePair[]) => void;
   variables: ScopedVariables;
   checkInvalidCharacter?: boolean;
+  showDescription?: boolean;
 }
 
 export const KeyValueTable: React.FC<KeyValueTableProps> = ({
@@ -23,6 +26,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
   variables,
   onChange,
   checkInvalidCharacter = false,
+  showDescription = true,
 }) => {
   const createEmptyPair = useCallback(
     () => ({
@@ -30,6 +34,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
       key: "",
       value: "",
       isEnabled: true,
+      description: "",
     }),
     []
   );
@@ -114,7 +119,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
       {
         title: "key",
         dataIndex: "key",
-        width: "45%",
+        width: "30%",
         editable: true,
         onCell: (record: KeyValuePair) => ({
           record,
@@ -130,6 +135,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
         title: "value",
         dataIndex: "value",
         editable: true,
+        width: "30%",
         onCell: (record: KeyValuePair) => ({
           record,
           editable: true,
@@ -139,6 +145,22 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
           handleUpdatePair,
         }),
       },
+      showDescription && isFeatureCompatible(FEATURES.API_CLIENT_DESCRIPTION_COMPATIBILITY)
+        ? {
+            title: "description",
+            dataIndex: "description",
+            width: "40%",
+            editable: true,
+            onCell: (record: KeyValuePair) => ({
+              record,
+              editable: true,
+              dataIndex: "description",
+              title: "description",
+              variables,
+              handleUpdatePair,
+            }),
+          }
+        : null,
       {
         title: "",
         width: "50px",
@@ -159,8 +181,8 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
           );
         },
       },
-    ];
-  }, [variables, handleUpdatePair, checkInvalidCharacter, data.length, handleDeletePair]);
+    ].filter(Boolean);
+  }, [variables, handleUpdatePair, checkInvalidCharacter, data.length, handleDeletePair, showDescription]);
 
   return (
     <ContentListTable
