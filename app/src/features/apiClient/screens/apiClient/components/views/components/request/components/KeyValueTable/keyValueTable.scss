@@ -49,7 +49,7 @@
   .key-value-table-input {
     border: 1px solid transparent;
     background: transparent;
-    padding: 4px 6px !important;
+    padding: 4px 0px !important;
     height: 24px;
     font-size: var(--requestly-font-size-sm);
     width: 100%;
@@ -89,7 +89,7 @@
   .key-value-description-view {
     width: 100%;
     height: 24px;
-    padding: 2px 2px 0px 6px;
+    padding: 2px 2px 2px 10px;
     font-size: var(--requestly-font-size-sm);
     line-height: 1.5;
     cursor: pointer;
