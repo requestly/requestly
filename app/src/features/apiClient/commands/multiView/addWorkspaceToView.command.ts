@@ -6,6 +6,7 @@ import {
   ApiClientViewMode,
 } from "features/apiClient/store/multiWorkspaceView/multiWorkspaceView.store";
 import { Workspace, WorkspaceType } from "features/workspaces/types";
+import { captureException } from "@sentry/react";
 
 export const addWorkspaceToView = async (workspace: Workspace, userId?: string) => {
   if (workspace.workspaceType !== WorkspaceType.LOCAL) {
@@ -20,6 +21,11 @@ export const addWorkspaceToView = async (workspace: Workspace, userId?: string) 
   }
 
   const contextId = workspace.id; // assumes contextId is the same as workspace id
+
+  if (contextId === null) {
+    return;
+  }
+
   const existingContext = apiClientMultiWorkspaceViewStore.getState().getSelectedWorkspace(contextId);
   if (existingContext) {
     return;
@@ -51,5 +57,6 @@ export const addWorkspaceToView = async (workspace: Workspace, userId?: string) 
       errored: true,
       error: errorMessage,
     });
+    captureException(error);
   }
 };

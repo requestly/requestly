@@ -64,6 +64,46 @@
     margin: 0 4px;
   }
 
+  .api-client-script-add-library-btn,
+  .api-client-script-packages-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px;
+    font-size: var(--requestly-font-size-xs);
+    font-weight: var(--requestly-font-weight-medium);
+    color: var(--requestly-color-text-subtle);
+    background: transparent;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    margin-left: auto;
+
+    &:hover {
+      color: var(--requestly-color-text-default);
+      background: var(--requestly-color-white-t-10);
+      border-color: var(--requestly-color-white-t-20);
+    }
+
+    svg {
+      font-size: 14px;
+    }
+
+    &__count {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 18px;
+      height: 18px;
+      padding: 0 5px;
+      font-size: var(--requestly-font-size-3xs);
+      font-weight: var(--requestly-font-weight-bold);
+      color: var(--requestly-color-text-default);
+      background: var(--requestly-color-white-t-10);
+      border-radius: 9px;
+    }
+  }
   .ai-generate-test-btn-container {
     display: flex;
     align-items: center;

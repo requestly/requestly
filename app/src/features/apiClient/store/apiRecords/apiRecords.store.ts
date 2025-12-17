@@ -122,7 +122,7 @@ export type ApiRecordsState = {
    * This is called to update/sync the internal data with external changes happening in apiClientRecords.
    */
   refresh: (records: RQAPI.ApiClientRecord[]) => void;
-  getData: (id: string) => RQAPI.ApiClientRecord | undefined;
+  getData: (id: RQAPI.ApiClientRecord["id"] | null) => RQAPI.ApiClientRecord | undefined;
   getParent: (id: string) => string | undefined;
   getRecordStore: (id: string) => StoreApi<RecordState> | undefined;
   getAllRecords: () => RQAPI.ApiClientRecord[];
@@ -268,7 +268,8 @@ export const createApiRecordsStore = (
 
     getData(id) {
       const { index } = get();
-      return index.get(id)!;
+      if (!id) return undefined;
+      return index.get(id);
     },
 
     getParent(id) {
@@ -341,7 +342,7 @@ export const createApiRecordsStore = (
       get().triggerUpdateForChildren(patch.id);
 
       if (existingCollectionId !== newCollectionId) {
-        treeBusEmitEffect();
+        treeBusEmitEffect?.();
         context.treeBus.emit(new TreeChanged(patch.id));
       }
     },
@@ -372,7 +373,7 @@ export const createApiRecordsStore = (
           get().triggerUpdateForChildren(patch.id);
 
           if (existingCollectionId !== newCollectionId) {
-            treeBusEmitEffect();
+            treeBusEmitEffect?.();
             context.treeBus.emit(new TreeChanged(patch.id));
           }
         }
@@ -396,7 +397,7 @@ export const createApiRecordsStore = (
 
       get().refresh(updatedRecords);
 
-      treeBusEmitEffect.forEach((emit) => emit());
+      treeBusEmitEffect.forEach((emit) => emit?.());
     },
 
     getRecordStore(id) {

@@ -14,6 +14,7 @@ import "./index.scss";
 import { BlockList } from "./components/BlockListSettings/BlockListSettings";
 import { SafariLimitedSupportView } from "componentsV2/SafariExtension/SafariLimitedSupportView";
 import { PopupConfig } from "./components/PopupConfig/PopupConfig";
+import { AIConsentSetting } from "./components/AIConsentSetting/AIConsentSetting";
 
 export const GlobalSettings = () => {
   const user = useSelector(getUserAuthDetails);
@@ -44,6 +45,7 @@ export const GlobalSettings = () => {
           <RulesSyncing />
           {user?.loggedIn ? <DataCollection /> : null}
         </div>
+        <AIConsentSetting />
         {appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION && isImplicitTestThisRuleCompatible ? (
           <ImplicitRuleTesting />
         ) : null}
