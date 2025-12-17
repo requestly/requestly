@@ -164,12 +164,14 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
     return undefined;
   }, [scriptType, object?.code?.content, clear, onScriptsChange, entry?.scripts]);
 
-  const handleAcceptAndRunTests = () => {
+  const handleAcceptTests = () => {
     onScriptsChange({
       preRequest: entry?.scripts?.[RQAPI.ScriptType.PRE_REQUEST] || DEFAULT_SCRIPT_VALUES[RQAPI.ScriptType.PRE_REQUEST],
       postResponse: object?.code?.content as string,
     });
     clear();
+    lastGeneratedCodeRef.current = null;
+    lastUsedQueryRef.current = null;
   };
 
   React.useEffect(() => {
@@ -338,8 +340,12 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
       />
       {isTestsStreamingFinished && object?.code?.content && !error && (
         <AIResultReviewPanel
-          onDiscard={() => clear()}
-          onAccept={handleAcceptAndRunTests}
+          onDiscard={() => {
+            clear();
+            lastGeneratedCodeRef.current = null;
+            lastUsedQueryRef.current = null;
+          }}
+          onAccept={handleAcceptTests}
           onEditInstructions={() => {
             setIsGenerateTestPopoverOpen(true);
             isPopoverOpenRef.current = true;
