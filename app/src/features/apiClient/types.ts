@@ -112,6 +112,7 @@ export namespace RQAPI {
     key: string;
     value: string;
     description?: string;
+    dataType?: KeyValueDataType;
   };
 
   export type RequestBody = RequestJsonBody | RequestRawBody | RequestFormBody | MultipartFormBody; // in case of form data, body will be key-value pairs
