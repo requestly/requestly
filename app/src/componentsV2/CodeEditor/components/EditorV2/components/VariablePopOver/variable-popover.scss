@@ -67,6 +67,10 @@ div.n-popup {
     }
   }
 
+  .rq-custom-btn.ant-btn.ant-btn-ghost:hover {
+    background: transparent !important;
+  }
+
   .variable-not-found-info-container {
     display: flex;
     flex-direction: column;
@@ -108,6 +112,11 @@ div.n-popup {
         font-size: var(--requestly-font-size-xs);
         color: var(--requestly-color-text-subtle);
         padding: 8px;
+
+        .edit-icon {
+          font-size: 14px;
+          color: var(--requestly-color-text-subtle);
+        }
       }
     }
 
@@ -183,12 +192,37 @@ div.n-popup {
       overflow: hidden;
       color: var(--requestly-color-text-default);
       text-overflow: ellipsis;
-
       font-family: var(--requestly-font-family-default);
       font-size: var(--requestly-font-size-xs);
       font-style: normal;
       font-weight: var(--requestly-font-weight-medium);
       line-height: 17px;
+      display: flex;
+      position: relative;
+
+      &.with-toggle {
+        padding-right: 36px;
+      }
+
+      &.with-toggle:hover .eye-toggle-button {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      .value-content {
+        min-width: 150px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .eye-toggle-button {
+        position: absolute;
+        right: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        opacity: 0;
+        transition: opacity 0.15s ease;
+      }
     }
 
     .add-new-variable-info-content {
