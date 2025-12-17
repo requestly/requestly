@@ -188,7 +188,8 @@ export const setupWorkspaceView = createAsyncThunk(
     }
 
     if (getViewMode(rootState) === ApiClientViewMode.SINGLE) {
-      if (selectedWorkspaces.length === 0) {
+      const selectedWorkspace = selectedWorkspaces[0];
+      if (!selectedWorkspace) {
         const activeWorkspaceId = rootState.workspace.activeWorkspaceIds[0];
         const activeWorkspace = getWorkspaceById(activeWorkspaceId)(rootState);
 
@@ -224,7 +225,7 @@ export const setupWorkspaceView = createAsyncThunk(
       try {
         const result = await dispatch(
           switchContext({
-            workspace: selectedWorkspaces[0] as WorkspaceState,
+            workspace: selectedWorkspace,
             userId,
           })
         ).unwrap();
@@ -244,6 +245,7 @@ export const setupWorkspaceView = createAsyncThunk(
           ).unwrap();
 
           await switchToPrivateWorkspace();
+          //TODO: Add toast here to communicate to user what happened and why
           return result;
         }
 
