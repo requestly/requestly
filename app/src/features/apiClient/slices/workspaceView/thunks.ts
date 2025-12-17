@@ -9,9 +9,12 @@ import { ReducerKeys } from "store/constants";
 import { reduxStore } from "store";
 import { Err, Ok, Result } from "utils/try";
 import { getAllSelectedWorkspaces, getSelectedWorkspaceCount, getViewMode, workspaceViewActions } from "./slice";
-import { dummyPersonalWorkspace, getWorkspaceById } from "store/slices/workspaces/selectors";
+import { dummyPersonalWorkspace, getWorkspaceById, isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 import { WorkspaceType } from "features/workspaces/types";
 import { FAKE_LOGGED_OUT_WORKSPACE_ID } from "../common/constants";
+import { getAppMode } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
+import { switchWorkspace } from "actions/TeamWorkspaceActions";
 
 const SLICE_NAME = ReducerKeys.WORKSPACE_VIEW;
 
@@ -134,6 +137,36 @@ export const switchContext = createAsyncThunk(
   }
 );
 
+async function switchToPrivateWorkspace() {
+  const rootState = reduxStore.getState();
+  const appMode = getAppMode(rootState);
+  const user = getUserAuthDetails(rootState);
+  const isSharedWorkspaceMode = isActiveWorkspaceShared(rootState);
+
+  await switchWorkspace(
+    {
+      teamId: null,
+      teamName: dummyPersonalWorkspace.name,
+      teamMembersCount: 0,
+      workspaceType: WorkspaceType.PERSONAL,
+    },
+    reduxStore.dispatch,
+    {
+      isSyncEnabled: user?.details?.isSyncEnabled || false,
+      isWorkspaceMode: isSharedWorkspaceMode,
+    },
+    appMode,
+    undefined, // setLoader
+    "switch_context_thunk" // source
+  );
+}
+
+function isWorkspaceDeletedError(error: Error) {
+  const errorMessage = error?.message || String(error);
+  const message = String(errorMessage).toLowerCase();
+  return message.includes("missing or insufficient permissions") || message.includes("failed to initialize fsmanager");
+}
+
 // TODO: check how it behaves with redux hydration
 export const setupWorkspaceView = createAsyncThunk(
   `${SLICE_NAME}/setupWorkspaceView`,
@@ -160,7 +193,7 @@ export const setupWorkspaceView = createAsyncThunk(
         const activeWorkspace = getWorkspaceById(activeWorkspaceId)(rootState);
 
         if (!activeWorkspaceId || !activeWorkspace || !activeWorkspace.workspaceType) {
-          return dispatch(
+          const result = await dispatch(
             switchContext({
               workspace: {
                 id: dummyPersonalWorkspace.id,
@@ -169,6 +202,9 @@ export const setupWorkspaceView = createAsyncThunk(
               userId,
             })
           ).unwrap();
+
+          await switchToPrivateWorkspace();
+          return result;
         }
 
         return dispatch(
@@ -188,17 +224,16 @@ export const setupWorkspaceView = createAsyncThunk(
       try {
         const result = await dispatch(
           switchContext({
-            workspace: selectedWorkspaces[0]!,
+            workspace: selectedWorkspaces[0] as WorkspaceState,
             userId,
           })
         ).unwrap();
 
         return result;
       } catch (error) {
-        const errorMessage = error?.message || String(error);
-        if (errorMessage.includes("Missing or insufficient permissions")) {
+        if (isWorkspaceDeletedError(error)) {
           // workspace deleted, fallback to private
-          return dispatch(
+          const result = dispatch(
             switchContext({
               workspace: {
                 id: dummyPersonalWorkspace.id,
@@ -207,6 +242,9 @@ export const setupWorkspaceView = createAsyncThunk(
               userId,
             })
           ).unwrap();
+
+          await switchToPrivateWorkspace();
+          return result;
         }
 
         throw error;
