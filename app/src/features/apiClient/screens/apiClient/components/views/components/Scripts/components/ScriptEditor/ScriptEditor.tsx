@@ -19,7 +19,7 @@ import { GenerateTestsButton } from "../AI/components/GenerateTestsButton/Genera
 import { getAIEndpointUrl, AI_ENDPOINTS } from "config/ai.config";
 import { AIResultReviewPanel } from "../AIResultReviewPanel/AIResultReviewPanel";
 import { toast } from "utils/Toast";
-import { useFeatureValue } from "@growthbook/growthbook-react";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { AITestGenerationError } from "../AI/types";
 import { globalActions } from "store/slices/global/slice";
 import { RequestTabLabelIndicator } from "../../../request/components/ApiClientRequestTabs/components/RequestTabLabel/RequestTabLabel";
@@ -43,6 +43,11 @@ const TestGenerationOutputSchema = z.object({
   err: z.string().optional().describe("Error code if user request could not be processed"),
 });
 
+const defaultScripts = {
+  preRequest: DEFAULT_SCRIPT_VALUES[RQAPI.ScriptType.PRE_REQUEST],
+  postResponse: DEFAULT_SCRIPT_VALUES[RQAPI.ScriptType.POST_RESPONSE],
+};
+
 interface ScriptEditorProps {
   requestId: string;
   entry: RQAPI.ApiEntry;
@@ -60,18 +65,14 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
 }) => {
   const dispatch = useDispatch();
 
-  const defaultScripts = {
-    preRequest: DEFAULT_SCRIPT_VALUES[RQAPI.ScriptType.PRE_REQUEST],
-    postResponse: DEFAULT_SCRIPT_VALUES[RQAPI.ScriptType.POST_RESPONSE],
-  };
-
   const activeScriptType = entry?.scripts?.[RQAPI.ScriptType.PRE_REQUEST]
     ? RQAPI.ScriptType.PRE_REQUEST
     : entry?.scripts?.[RQAPI.ScriptType.POST_RESPONSE]
     ? RQAPI.ScriptType.POST_RESPONSE
     : RQAPI.ScriptType.PRE_REQUEST;
 
-  const isAITestsGenerationEnabled = useFeatureValue("ai_tests_generation", false);
+  const isAITestsGenerationEnabled = useFeatureIsOn("ai_tests_generation");
+  const isAIEnabledGlobally = useFeatureIsOn("global_ai_support");
 
   const [scriptType, setScriptType] = useState<RQAPI.ScriptType>(activeScriptType);
   const [isLibraryPickerOpen, setIsLibraryPickerOpen] = useState(false);
@@ -138,11 +139,21 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
       return {
         incomingValue: object?.code?.content,
         source: "ai",
+        onPartialMerge: (value: string) => {
+          onScriptsChange({
+            ...(entry?.scripts || defaultScripts),
+            postResponse: value,
+          });
+          // Fix this: default script values are assigned to editor by the compoennt and not the store
+          if (value === object?.code?.content || value === DEFAULT_SCRIPT_VALUES[RQAPI.ScriptType.POST_RESPONSE]) {
+            clear();
+          }
+        },
       };
     }
 
     return undefined;
-  }, [scriptType, object?.code?.content]);
+  }, [scriptType, object?.code?.content, clear, onScriptsChange, entry?.scripts]);
 
   const handleAcceptAndRunTests = () => {
     onScriptsChange({
@@ -226,7 +237,15 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
           {isAITestsGenerationEnabled && (
             <Tooltip
               showArrow={false}
-              title={!entry?.response ? "Send the request first to generate tests from its response." : null}
+              title={
+                !isAIEnabledGlobally ? (
+                  <>
+                    AI features are disabled for your organization, <a>Contact support</a>.
+                  </>
+                ) : !entry?.response ? (
+                  "Send the request first to generate tests from its response."
+                ) : null
+              }
               placement="bottom"
               color="#000"
               overlayClassName="ai-generate-test-btn-tooltip"
@@ -241,7 +260,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
                     isPopoverOpenRef.current = open;
                   }}
                   onGenerateClick={handleGenerateTests}
-                  disabled={scriptType !== RQAPI.ScriptType.POST_RESPONSE || !entry?.response}
+                  disabled={scriptType !== RQAPI.ScriptType.POST_RESPONSE || !entry?.response || !isAIEnabledGlobally}
                   onCancelClick={stop}
                   negativeFeedback={negativeFeedback}
                   label={hasPostResponseScript ? "Update with AI" : "Generate tests"}
