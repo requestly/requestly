@@ -9,16 +9,21 @@ export enum ApiClientViewMode {
 
 export type WorkspaceStatus = { loading: true } | { loading: false; state: RawResult<null> };
 
-export interface WorkspaceState {
-  id: string;
-  meta:
-    | {
-        type: WorkspaceType;
-      }
-    | {
-        type: WorkspaceType.LOCAL;
-        rootPath: Workspace["rootPath"];
-      };
+export type WorkspaceMeta =
+  | {
+      type: WorkspaceType;
+    }
+  | {
+      type: WorkspaceType.LOCAL;
+      rootPath: Workspace["rootPath"];
+    };
+
+export interface WorkspaceInfo {
+  id: string | null;
+  meta: WorkspaceMeta;
+}
+
+export interface WorkspaceState extends WorkspaceInfo {
   status: WorkspaceStatus;
 }
 

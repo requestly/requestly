@@ -18,10 +18,9 @@ import {
   apiClientContextRegistry,
   ApiClientContextRegistry,
 } from "../ApiClientContextRegistry/ApiClientContextRegistry";
-import { Err, Ok, Result } from "utils/try";
 import { configureStore } from "@reduxjs/toolkit";
 import { apiRecordsSlice } from "features/apiClient/slices/apiRecords";
-import { WorkspaceState } from "../../types";
+import { WorkspaceInfo } from "../../types";
 
 export type UserDetails = { uid: string; loggedIn: true } | { loggedIn: false };
 
@@ -39,15 +38,17 @@ class ApiClientContextService {
   }
 
   private createRepository(params: {
-    workspaceId: WorkspaceState["id"];
-    workspaceMeta: WorkspaceState["meta"];
+    workspaceId: WorkspaceInfo["id"];
+    workspaceMeta: WorkspaceInfo["meta"];
     user: UserDetails;
   }): ApiClientRepositoryInterface {
     const { workspaceId, workspaceMeta, user } = params;
 
     if (workspaceMeta.type === WorkspaceType.LOCAL) {
-      // @ts-ignore
-      return new ApiClientLocalRepository({ rootPath: workspaceMeta.rootPath });
+      if ("rootPath" in workspaceMeta && workspaceMeta.rootPath) {
+        return new ApiClientLocalRepository({ rootPath: workspaceMeta.rootPath });
+      }
+      throw new Error("Local workspace must have rootPath");
     }
 
     if (!user.loggedIn) {
@@ -68,31 +69,28 @@ class ApiClientContextService {
     return store;
   }
 
-  async createContext(workspace: WorkspaceState, userDetails: UserDetails): Promise<Result<ApiClientFeatureContext>> {
+  async createContext(workspace: WorkspaceInfo, userDetails: UserDetails): Promise<ApiClientFeatureContext> {
     const workspaceId = workspace.id;
 
-    try {
-      const existing = this.contextRegistry.getContext(workspaceId);
-      if (existing) {
-        return new Ok(existing);
-      }
-
-      const repo = this.createRepository({ workspaceId, workspaceMeta: workspace.meta, user: userDetails });
-      await repo.validateConnection();
-
-      const store = this.createStore(workspaceId);
-
-      const result = await this.extractSetupDataFromRepository(repo);
-
-      store.dispatch(apiRecordsSlice.actions.hydrate(result.apiClientRecords));
-      //   store.dispatch(environmentsSlice.actions.setInitialData(result.environments));
-
-      const ctx: ApiClientFeatureContext = { workspaceId, store, repositories: repo };
-      this.contextRegistry.addContext(ctx);
-      return new Ok(ctx);
-    } catch (error) {
-      return new Err(error);
+    const existing = this.contextRegistry.getContext(workspaceId);
+    if (existing) {
+      return existing;
     }
+
+    const repo = this.createRepository({ workspaceId, workspaceMeta: workspace.meta, user: userDetails });
+    await repo.validateConnection();
+
+    const store = this.createStore(workspaceId);
+
+    const result = await this.extractSetupDataFromRepository(repo);
+
+    store.dispatch(apiRecordsSlice.actions.hydrate(result.apiClientRecords));
+    //   store.dispatch(environmentsSlice.actions.setInitialData(result.environments));
+
+    const ctx: ApiClientFeatureContext = { workspaceId, store, repositories: repo };
+    this.contextRegistry.addContext(ctx);
+
+    return ctx;
   }
 
   async refreshContext(workspaceId: ApiClientFeatureContext["workspaceId"]): Promise<void> {

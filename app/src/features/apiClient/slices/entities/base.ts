@@ -1,10 +1,10 @@
 import { UpdateCommand, DeepPartial, DeepPartialWithNull } from "../types";
-import { ApiClientRootState } from "../hooks/types";
+import { ApiClientStoreState } from "../workspaceView/helpers/ApiClientContextRegistry/types";
 import { ApiClientEntityType, EntityDispatch } from "./types";
 
 export type ApiClientEntityMeta = {
-  id: string,
-}
+  id: string;
+};
 
 export abstract class ApiClientEntity<T, M extends ApiClientEntityMeta = ApiClientEntityMeta> {
   abstract readonly type: ApiClientEntityType;
@@ -13,9 +13,9 @@ export abstract class ApiClientEntity<T, M extends ApiClientEntityMeta = ApiClie
 
   abstract dispatchCommand(command: UpdateCommand<T>): void;
 
-  abstract getEntityFromState(state: ApiClientRootState): T;
+  abstract getEntityFromState(state: ApiClientStoreState): T;
 
-  abstract getName(state: ApiClientRootState): string;
+  abstract getName(state: ApiClientStoreState): string;
 
   get id(): string {
     return this.meta.id;

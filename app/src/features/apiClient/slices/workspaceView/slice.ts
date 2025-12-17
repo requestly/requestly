@@ -1,22 +1,14 @@
 import { createEntityAdapter, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { ApiClientViewMode, WorkspaceState, WorkspaceViewState } from "./types";
 import { ReducerKeys } from "store/constants";
-import { setupWorkspaceView, switchContext, workspaceViewManager } from "./thunks";
+import { addWorkspaceIntoView, setupWorkspaceView, switchContext } from "./thunks";
 import { RootState } from "store/types";
 import getReducerWithLocalStorageSync from "store/getReducerWithLocalStorageSync";
-
-function updateWorkspaceStateById(state: WorkspaceViewState, id: string, workspaceStatus: WorkspaceState["status"]) {
-  const existingEntity = state.selectedWorkspaces.entities[id];
-
-  if (existingEntity) {
-    existingEntity.status = workspaceStatus;
-  } else {
-    throw new Error("Selected workspace does not exist!");
-  }
-}
+import { NativeError } from "errors/NativeError";
+import { ErrorSeverity } from "errors/types";
 
 export const workspaceViewAdapter = createEntityAdapter<WorkspaceState>({
-  selectId: (workspace) => workspace.id,
+  selectId: (workspace) => workspace.id as string,
 });
 
 // selectors
@@ -56,12 +48,6 @@ export const workspaceViewSlice = createSlice({
     },
 
     addWorkspace(state, action: PayloadAction<WorkspaceState>) {
-      const id = action.payload.id;
-
-      if (state.selectedWorkspaces.entities[id]) {
-        return;
-      }
-
       workspaceViewAdapter.addOne(state.selectedWorkspaces, action.payload);
     },
 
@@ -70,11 +56,7 @@ export const workspaceViewSlice = createSlice({
     },
 
     removeWorkspace(state, action: PayloadAction<WorkspaceState["id"]>) {
-      workspaceViewAdapter.removeOne(state.selectedWorkspaces, action.payload);
-    },
-
-    removeWorkspaces(state, action: PayloadAction<WorkspaceState["id"][]>) {
-      workspaceViewAdapter.removeMany(state.selectedWorkspaces, action.payload);
+      workspaceViewAdapter.removeOne(state.selectedWorkspaces, action.payload as string);
     },
 
     setWorkspaceStatus(state, action: PayloadAction<{ id: string; status: WorkspaceState["status"] }>) {
@@ -90,60 +72,49 @@ export const workspaceViewSlice = createSlice({
       workspaceViewAdapter.removeAll(state.selectedWorkspaces);
     },
 
+    reset(state) {
+      return initialState;
+    },
+
     // TODO: check hydration
   },
   extraReducers(builder) {
     builder
+      .addCase(addWorkspaceIntoView.pending, (state, action) => {
+        const { workspace } = action.meta.arg;
+        const workspaceState: WorkspaceState = {
+          ...workspace,
+          status: { loading: true },
+        };
+
+        // TODO
+        workspaceViewAdapter.addOne(state.selectedWorkspaces, workspaceState);
+      })
+      .addCase(addWorkspaceIntoView.rejected, (state, action) => {
+        const { workspace } = action.meta.arg;
+
+        state.selectedWorkspaces.entities[workspace.id as string] = {
+          loading: false,
+          state: { success: false, error: new Error(action.error.message) },
+        };
+      })
+      .addCase(addWorkspaceIntoView.fulfilled, (state, action) => {
+        const { workspace } = action.meta.arg;
+
+        state.selectedWorkspaces.entities[workspace.id as string].status = {
+          loading: false,
+          state: { success: true, result: null },
+        };
+      })
       .addCase(switchContext.rejected, (state, action) => {
-        const id = action.meta.arg.workspace.id as string;
-
-        updateWorkspaceStateById(state, id, {
-          loading: false,
-          state: {
-            success: false,
-            error: new Error(action.error.message),
-          },
-        });
+        throw new NativeError(action.error.message as string).setShowBoundary(true).setSeverity(ErrorSeverity.FATAL);
       })
-      .addCase(switchContext.fulfilled, (state, action) => {
-        const id = action.meta.arg.workspace.id as string;
 
-        updateWorkspaceStateById(state, id, {
-          loading: false,
-          state: {
-            success: true,
-            result: null,
-          },
-        });
-      })
-      .addCase(workspaceViewManager.rejected, (state, action) => {
-        action.meta.arg.workspaces.forEach((w) => {
-          const id = w.id as string;
-
-          updateWorkspaceStateById(state, id, {
-            loading: false,
-            state: {
-              success: false,
-              error: new Error(action.error.message),
-            },
-          });
-        });
-      })
-      .addCase(workspaceViewManager.fulfilled, (state, action) => {
-        action.meta.arg.workspaces.forEach((w) => {
-          const id = w.id as string;
-
-          updateWorkspaceStateById(state, id, {
-            loading: false,
-            state: {
-              success: true,
-              result: null,
-            },
-          });
-        });
-      })
       .addCase(setupWorkspaceView.pending, (state) => {
         state.isSetupDone = false;
+      })
+      .addCase(setupWorkspaceView.rejected, (state, action) => {
+        throw new NativeError(action.error.message as string).setShowBoundary(true).setSeverity(ErrorSeverity.FATAL);
       })
       .addCase(setupWorkspaceView.fulfilled, (state) => {
         state.isSetupDone = true;
