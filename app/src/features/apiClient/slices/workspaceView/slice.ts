@@ -82,34 +82,43 @@ export const workspaceViewSlice = createSlice({
     builder
       .addCase(addWorkspaceIntoView.pending, (state, action) => {
         const { workspace } = action.meta.arg;
-        const workspaceState: WorkspaceState = {
+
+        workspaceViewAdapter.addOne(state.selectedWorkspaces, {
           ...workspace,
           status: { loading: true },
-        };
-
-        // TODO
-        workspaceViewAdapter.addOne(state.selectedWorkspaces, workspaceState);
+        });
       })
       .addCase(addWorkspaceIntoView.rejected, (state, action) => {
         const { workspace } = action.meta.arg;
+        const id = workspace.id as string;
 
-        state.selectedWorkspaces.entities[workspace.id as string] = {
-          loading: false,
-          state: { success: false, error: new Error(action.error.message) },
-        };
+        workspaceViewAdapter.updateOne(state.selectedWorkspaces, {
+          id,
+          changes: {
+            status: {
+              loading: false,
+              state: { success: false, error: new Error(action.error.message) },
+            },
+          },
+        });
       })
       .addCase(addWorkspaceIntoView.fulfilled, (state, action) => {
         const { workspace } = action.meta.arg;
+        const id = workspace.id as string;
 
-        state.selectedWorkspaces.entities[workspace.id as string].status = {
-          loading: false,
-          state: { success: true, result: null },
-        };
+        workspaceViewAdapter.updateOne(state.selectedWorkspaces, {
+          id,
+          changes: {
+            status: {
+              loading: false,
+              state: { success: true, result: null },
+            },
+          },
+        });
       })
       .addCase(switchContext.rejected, (state, action) => {
         throw new NativeError(action.error.message as string).setShowBoundary(true).setSeverity(ErrorSeverity.FATAL);
       })
-
       .addCase(setupWorkspaceView.pending, (state) => {
         state.isSetupDone = false;
       })
