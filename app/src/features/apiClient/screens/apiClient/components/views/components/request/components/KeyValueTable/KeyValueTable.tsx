@@ -60,7 +60,6 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, variables, o
       return data;
     } else {
       const emptyData = createEmptyPair();
-      emptyData.isEnabled = false;
       return [emptyData];
     }
   }, [data, createEmptyPair]);
@@ -136,6 +135,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, variables, o
       {
         title: "Key",
         dataIndex: "key",
+        width: "30%",
         editable: true,
         onCell: (record: KeyValuePair) => ({
           record,
@@ -151,6 +151,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, variables, o
         title: "Value",
         dataIndex: "value",
         editable: true,
+        width: "30%",
         onCell: (record: KeyValuePair) => ({
           record,
           editable: true,
@@ -181,7 +182,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, variables, o
         ? {
             title: "Description",
             dataIndex: "description",
-            minWidth: 200,
+            width: "40%",
             editable: true,
             onCell: (record: KeyValuePair) => ({
               record,

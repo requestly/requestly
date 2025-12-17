@@ -9,6 +9,7 @@ import { ScopedVariables } from "features/apiClient/helpers/variableResolver/var
 import KeyValueDescriptionCell from "./KeyValueTableDescriptionCell";
 import KeyValueTypeCell from "./KeyValueTableTypeCell";
 import { AiOutlineWarning } from "@react-icons/all-files/ai/AiOutlineWarning";
+import { captureException } from "@sentry/react";
 
 const EditableContext = React.createContext<FormInstance<any> | null>(null);
 
@@ -59,6 +60,11 @@ export const KeyValueTableEditableCell: React.FC<React.PropsWithChildren<Editabl
   ...restProps
 }) => {
   const form = useContext(EditableContext);
+
+  if (!form) {
+    captureException(new Error("EditableCell rendered outside Key-Value table context"));
+    return <td {...restProps}>{children}</td>;
+  }
 
   const save = async () => {
     try {

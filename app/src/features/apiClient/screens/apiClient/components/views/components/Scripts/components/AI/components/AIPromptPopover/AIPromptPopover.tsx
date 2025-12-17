@@ -1,9 +1,14 @@
 import React, { useEffect, useRef } from "react";
-import { Input, InputRef } from "antd";
+import { useDispatch, useSelector } from "react-redux";
+import { globalActions } from "store/slices/global/slice";
+import { Input, InputRef, Tooltip } from "antd";
 import { RQButton } from "lib/design-system-v2/components";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
+import { isProfessionalPlan } from "utils/PremiumUtils";
 import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
-import "./aiPromptPopover.scss";
 import { MdOutlineStopCircle } from "@react-icons/all-files/md/MdOutlineStopCircle";
+import { MdOutlineDiamond } from "@react-icons/all-files/md/MdOutlineDiamond";
+import "./aiPromptPopover.scss";
 
 interface PromptPopoverProps {
   isLoading: boolean;
@@ -26,6 +31,8 @@ export const AIPromptPopover: React.FC<PromptPopoverProps> = ({
   onCancelClick,
   onCloseClick,
 }) => {
+  const dispatch = useDispatch();
+  const user = useSelector(getUserAuthDetails);
   const inputRef = useRef<InputRef>(null);
 
   useEffect(() => {
@@ -36,11 +43,46 @@ export const AIPromptPopover: React.FC<PromptPopoverProps> = ({
     }, 100);
   }, [isPopoverOpen]);
 
+  if (!isProfessionalPlan(user.details?.planDetails?.planId)) {
+    return (
+      <div className="ai-generate-test-popover-content ai-generate-test-popover-premium-feature">
+        <div className="ai-generate-test-popover-content__header">
+          <MdOutlineDiamond /> Premium feature
+        </div>
+        <div className="ai-generate-test-popover-content__description">
+          AI test generation is available on Pro and Team plans. Upgrade to Pro to use this feature without limits.
+        </div>
+        <div className="ai-generate-test-popover-content__actions-container">
+          <RQButton onClick={onCloseClick} size="small">
+            Close
+          </RQButton>
+          <RQButton
+            type="primary"
+            size="small"
+            onClick={() => {
+              dispatch(globalActions.toggleActiveModal({ modalName: "pricingModal", newValue: true }));
+              onCloseClick();
+            }}
+          >
+            Upgrade now
+          </RQButton>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="ai-generate-test-popover-content">
-      <div className="ai-generate-test-popover-content__header">Generate tests</div>
-      <div className="ai-generate-test-popover-content__description">
-        AI will use the request URL, method, and most recent response body to generate the tests.
+      <div className="ai-generate-test-popover-content__header">
+        Write or refine test scripts with AI{" "}
+        <Tooltip
+          title="AI will use the request URL, method, and most recent response body to generate the tests."
+          showArrow={false}
+          placement="top"
+          color="#000"
+        >
+          <MdInfoOutline />
+        </Tooltip>
       </div>
       <Input.TextArea
         className="ai-generate-test-popover-content__input"

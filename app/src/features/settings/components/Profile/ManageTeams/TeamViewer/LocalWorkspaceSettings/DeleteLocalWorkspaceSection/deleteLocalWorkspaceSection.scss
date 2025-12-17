@@ -1,0 +1,33 @@
+.local-workspace-delete-section {
+  margin-top: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  .local-workspace-delete-title {
+    font-size: var(--requestly-font-size-md);
+    font-weight: var(--requestly-font-weight-medium);
+    color: var(--requestly-color-text-default);
+  }
+
+  .local-workspace-delete-description {
+    font-size: var(--requestly-font-size-sm);
+    color: var(--requestly-color-text-subtle);
+  }
+
+  .local-workspace-delete-checkbox {
+    font-size: var(--requestly-font-size-sm);
+  }
+
+  .local-workspace-delete-warning {
+    background: rgba(255, 0, 0, 0.08);
+    border: 1px solid rgba(255, 0, 0, 0.4);
+    .ant-alert-message {
+      font-size: var(--requestly-font-size-sm);
+    }
+  }
+
+  .local-workspace-delete-button {
+    width: fit-content;
+  }
+}
