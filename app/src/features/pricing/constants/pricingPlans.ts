@@ -86,16 +86,16 @@ export const PricingPlans: PricingPlansType = {
       },
     },
   },
-  [PRICING.PLAN_NAMES.API_CLIENT_ENTERPRISE]: {
+  [PRICING.PLAN_NAMES.API_CLIENT_PROFESSIONAL]: {
     plans: {
       monthly: {
         usd: {
-          price: 10,
+          price: 20,
         },
       },
       annually: {
         usd: {
-          price: 100,
+          price: 180,
         },
       },
     },
