@@ -1,7 +1,7 @@
 import { RQAPI } from "features/apiClient/types";
 import { ApiClientStoreState } from "../workspaceView/helpers/ApiClientContextRegistry/types";
 import { ApiClientEntity } from "./base";
-import { EntityNotFound, UpdateCommand } from "../types";
+import { EntityId, EntityNotFound, UpdateCommand } from "../types";
 import { ApiClientEntityType } from "./types";
 import { apiRecordsActions, selectRecordById } from "../apiRecords";
 
@@ -15,6 +15,10 @@ export abstract class ApiClientRecordEntity<T extends RQAPI.ApiClientRecord> ext
       return record;
     }
 
+    override dispatchUnsafePatch(id: EntityId, params: (patch: RQAPI.ApiClientRecord) => void): void {
+        throw new Error("Can not dispatch unsafe from base class!");
+    }
+
     dispatchCommand(command: UpdateCommand<RQAPI.ApiClientRecord>): void {
       this.dispatch(apiRecordsActions.applyPatch({ id: this.meta.id, command }));
     }
@@ -25,6 +29,14 @@ export abstract class ApiClientRecordEntity<T extends RQAPI.ApiClientRecord> ext
 
     type: ApiClientEntityType;
   })(this.dispatch, this.meta);
+
+  dispatchCommand(command: UpdateCommand<T>): void {
+    this.dispatch(apiRecordsActions.applyPatch({ id: this.meta.id, command }));
+  }
+
+  override dispatchUnsafePatch(patcher: (state: T) => void): void {
+      this.dispatch(apiRecordsActions.unsafePatch({ id: this.meta.id, patcher }));
+  }
 
   getName(state: ApiClientStoreState): string {
     return this.getEntityFromState(state).name;

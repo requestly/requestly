@@ -4,9 +4,10 @@ import { RQAPI } from "features/apiClient/types";
 import { ErroredRecord } from "features/apiClient/helpers/modules/sync/local/services/types";
 import { buildTreeIndices } from "../utils/treeUtils";
 import { objectToSetOperations, objectToDeletePaths } from "../utils/pathConverter";
-import { EntityId, TreeIndices, UpdateCommand } from "../types";
+import { EntityId, EntityNotFound, TreeIndices, UpdateCommand } from "../types";
 import { ApiRecordsState } from "./types";
 import { API_CLIENT_RECORDS_SLICE_NAME } from "../common/constants";
+import { patch } from "semver";
 
 export const apiRecordsAdapter = createEntityAdapter<RQAPI.ApiClientRecord>({
   selectId: (record) => record.id,
@@ -54,7 +55,9 @@ export const apiRecordsSlice = createSlice({
     ) {
       const { id, command } = action.payload;
       const entity = state.records.entities[id];
-      if (entity == null) return;
+      if (entity == null) {
+        throw new EntityNotFound(id, "apiClientrecord");
+      };
 
       let shouldRebuildTree = false;
 
@@ -83,6 +86,18 @@ export const apiRecordsSlice = createSlice({
       if (shouldRebuildTree) {
         rebuildTreeIndices(state);
       }
+    },
+
+    unsafePatch(state, action: PayloadAction<{
+      id: EntityId,
+      patcher: (state: RQAPI.ApiClientRecord) => void,
+    }>) {
+      const entity = state.records.entities[action.payload.id];
+      if (entity == null) {
+        throw new EntityNotFound(action.payload.id, "apiClientrecord");
+      };
+
+      action.payload.patcher(entity);
     },
 
     recordDeleted(state, action: PayloadAction<EntityId>) {

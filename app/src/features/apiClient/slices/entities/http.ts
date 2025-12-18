@@ -1,6 +1,5 @@
 import { KeyValuePair, RequestContentType, RequestMethod, RQAPI } from "features/apiClient/types";
-import { InvalidEntityShape, UpdateCommand } from "../types";
-import { apiRecordsActions } from "../apiRecords/slice";
+import { InvalidEntityShape } from "../types";
 import { selectRecordById } from "../apiRecords/selectors";
 import { ApiClientStoreState } from "../workspaceView/helpers/ApiClientContextRegistry/types";
 import { ApiClientRecordEntity } from "./api-client-record-entity";
@@ -8,11 +7,6 @@ import { ApiClientEntityType } from "./types";
 
 export class HttpRecordEntity extends ApiClientRecordEntity<RQAPI.HttpApiRecord> {
   readonly type = ApiClientEntityType.HTTP_RECORD;
-
-  dispatchCommand(command: UpdateCommand<RQAPI.HttpApiRecord>): void {
-    this.dispatch(apiRecordsActions.applyPatch({ id: this.meta.id, command }));
-  }
-
   getEntityFromState(state: ApiClientStoreState): RQAPI.HttpApiRecord {
     const record = selectRecordById(state, this.meta.id);
     if (record?.type !== RQAPI.RecordType.API) {

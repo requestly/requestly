@@ -1,4 +1,4 @@
-import { UpdateCommand, DeepPartial, DeepPartialWithNull } from "../types";
+import { UpdateCommand, DeepPartial, DeepPartialWithNull, EntityId } from "../types";
 import { ApiClientStoreState } from "../workspaceView/helpers/ApiClientContextRegistry/types";
 import { ApiClientEntityType, EntityDispatch } from "./types";
 
@@ -12,6 +12,7 @@ export abstract class ApiClientEntity<T, M extends ApiClientEntityMeta = ApiClie
   constructor(protected readonly dispatch: EntityDispatch, public readonly meta: M) {}
 
   abstract dispatchCommand(command: UpdateCommand<T>): void;
+  abstract dispatchUnsafePatch(params: (patch: T) => void): void;
 
   abstract getEntityFromState(state: ApiClientStoreState): T;
 
@@ -19,6 +20,10 @@ export abstract class ApiClientEntity<T, M extends ApiClientEntityMeta = ApiClie
 
   get id(): string {
     return this.meta.id;
+  }
+
+  unsafePatch(patcher: (patch: T) => void) {
+    this.dispatchUnsafePatch(patcher);
   }
 
   SET(value: DeepPartial<T>): void {
