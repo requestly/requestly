@@ -7,7 +7,6 @@ import { objectToSetOperations, objectToDeletePaths } from "../utils/pathConvert
 import { EntityId, EntityNotFound, TreeIndices, UpdateCommand } from "../types";
 import { ApiRecordsState } from "./types";
 import { API_CLIENT_RECORDS_SLICE_NAME } from "../common/constants";
-import { patch } from "semver";
 
 export const apiRecordsAdapter = createEntityAdapter<RQAPI.ApiClientRecord>({
   selectId: (record) => record.id,

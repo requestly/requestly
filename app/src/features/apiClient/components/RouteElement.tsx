@@ -18,11 +18,44 @@ import { useWorkspaceViewSelector, WorkspaceProvider } from "../common/Workspace
 import { useEntitySelector } from "../slices/entities";
 import { getAllSelectedWorkspaces, workspaceViewActions } from "../slices/workspaceView/slice";
 import { selectAllRecords } from "../slices";
+import { useEntity } from "../slices/entities/hooks";
+import { ApiClientEntityType } from "../slices/entities/types";
+import { EnvironmentVariableType } from "backend/environment/types";
+
+// Function to test variables
+// To test, remove the early return and use a correct collection id
+function Updater() {
+  return;
+  const entity = useEntity({
+    id: "9130594d-2515-47d6-9371-18febb62a8a2a",
+    type: ApiClientEntityType.COLLECTION_RECORD,
+  });
+
+  return (
+    <div>
+    <button onClick={() => entity.variables.clearAll()}>clear variables</button>
+    <button onClick={() => entity.variables.add({
+      key: "ass",
+      type: EnvironmentVariableType.String,
+      localValue: "df",
+      isPersisted: true,
+    })}>add variable</button>
+        <button onClick={() => entity.variables.set({
+      id: 0,
+      localValue: "df",
+    })}>set variable</button>
+
+    </div>
+  );
+}
+
 
 const Inner = () => {
   const records = useWorkspaceViewSelector(selectAllRecords);
 
-  return <code>{JSON.stringify(records)}</code>;
+  return <div><code>{JSON.stringify(records, null, 2)}</code><br/>
+    <Updater/>
+    </div>;
 };
 
 const Test = () => {

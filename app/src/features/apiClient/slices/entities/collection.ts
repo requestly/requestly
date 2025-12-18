@@ -4,10 +4,10 @@ import { selectRecordById } from "../apiRecords/selectors";
 import { ApiClientStoreState } from "../workspaceView/helpers/ApiClientContextRegistry/types";
 import { ApiClientRecordEntity } from "./api-client-record-entity";
 import { ApiClientEntityType } from "./types";
-import { ApiClientVariables } from "./variables";
+import { ApiClientVariables } from "./api-client-variables";
 
 export class CollectionRecordEntity extends ApiClientRecordEntity<RQAPI.CollectionRecord> {
-  readonly variables = new ApiClientVariables<RQAPI.CollectionRecord>(
+  public readonly variables = new ApiClientVariables<RQAPI.CollectionRecord>(
     (e) => e.data.variables,
     this.unsafePatch.bind(this),
   )
