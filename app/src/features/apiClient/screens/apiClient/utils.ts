@@ -1172,7 +1172,12 @@ export function getInferredKeyValueDataType(value: any): KeyValueDataType {
   if (value === null || value === undefined) {
     return KeyValueDataType.STRING;
   }
+
   const parsedStr = String(value).trim().toLowerCase();
+  if (!parsedStr) {
+    return KeyValueDataType.STRING;
+  }
+
   if (parsedStr === "true" || parsedStr === "false") {
     return KeyValueDataType.BOOLEAN;
   }

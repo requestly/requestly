@@ -112,6 +112,13 @@
     font-weight: 600;
     padding: 8px 12px !important;
   }
+
+  .path-variable-table-settings {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+  }
 }
 
 .key-value-type-view {
