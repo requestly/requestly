@@ -275,6 +275,7 @@ export class HttpRequestExecutor {
     }
 
     try {
+      console.log("[debug] preparedEntry.request", preparedEntry.request);
       const response = await makeRequest(this.appMode, preparedEntry.request, this.abortController.signal);
       preparedEntry.response = response;
       scriptExecutionContext.setResponse(response);
