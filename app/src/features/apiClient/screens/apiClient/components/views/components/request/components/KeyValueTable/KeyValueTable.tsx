@@ -44,7 +44,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, variables, o
   const isDataTypeVisible =
     hasDataType(extraColumns) &&
     extraColumns.dataType.visible &&
-    isFeatureCompatible(FEATURES.API_CLIENT_TYPE_COMPATIBILITY);
+    isFeatureCompatible(FEATURES.API_CLIENT_KEY_VALUE_TABLE_DATA_TYPE_COMPATIBILITY);
 
   const createEmptyPair = useCallback(
     () => ({
