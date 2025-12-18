@@ -1134,50 +1134,61 @@ export const parseCollectionRunnerDataFile = async (filePath: string, maxlimit?:
   }
 };
 
-export function validateValue(value: string, type: KeyValueDataType | undefined): string | null {
-  if (!value || value.includes("{{")) return null;
+export function doesValueMatchDataType(value: string, type: KeyValueDataType | undefined): Boolean {
+  if (!value || value.includes("{{")) return true;
 
   switch (type) {
     case KeyValueDataType.INTEGER: {
-      const num = Number(value);
-      const isValidInt = !Number.isNaN(num) && Number.isInteger(num);
-      return isValidInt ? null : "Value must be an Integer";
+      const parsedNumber = Number(value);
+      /* 
+      !String(value).includes(".") is added to ensure that values that look like number 
+      but are integer due to floating point precision are not treated as integer. 
+      Examples: 3.0000000000000001 and 3000000000000000.1 is treated as integer by isInteger
+      */
+      const isValidInt = !Number.isNaN(parsedNumber) && Number.isInteger(parsedNumber) && !String(value).includes(".");
+      return isValidInt;
     }
 
     case KeyValueDataType.NUMBER: {
-      const num = Number(value);
-      return !Number.isNaN(num) ? null : "Value must be a Number";
+      const parsedNumber = Number(value);
+      return Number.isNaN(parsedNumber) ? false : true;
     }
 
     case KeyValueDataType.BOOLEAN: {
-      const lower = value.toLowerCase();
-      return lower === "true" || lower === "false" ? null : "Value must be 'True' or 'False'";
+      const parsedStr = value.trim().toLowerCase();
+      return parsedStr === "true" || parsedStr === "false";
+    }
+
+    case KeyValueDataType.STRING: {
+      return true;
     }
 
     default:
-      return null;
+      throw new Error("Unknown KeyValueDataType");
   }
 }
 
-export function getInferredType(value: any): KeyValueDataType {
+export function getInferredKeyValueDataType(value: any): KeyValueDataType {
   if (value === null || value === undefined) {
     return KeyValueDataType.STRING;
   }
-
-  const strValue = String(value).trim();
-  const lowerValue = strValue.toLowerCase();
-
-  if (lowerValue === "true" || lowerValue === "false") {
+  const parsedStr = String(value).trim().toLowerCase();
+  if (parsedStr === "true" || parsedStr === "false") {
     return KeyValueDataType.BOOLEAN;
   }
 
-  const num = Number(strValue);
-  if (!Number.isNaN(num)) {
-    if (Number.isInteger(num) && !strValue.includes(".")) {
+  const parsedNum = Number(value);
+  if (!Number.isNaN(parsedNum)) {
+    /*
+      !String(value).includes(".") is added to ensure that values that look like number 
+      but are integer due to floating point precision are not treated as integer. 
+      Examples: 3.0000000000000001 and 3000000000000000.1 is treated as integer by isInteger
+    */
+    if (Number.isInteger(parsedNum) && !parsedStr.includes(".")) {
       return KeyValueDataType.INTEGER;
+    } else {
+      return KeyValueDataType.NUMBER;
     }
-    return KeyValueDataType.NUMBER;
   }
-
   return KeyValueDataType.STRING;
 }

@@ -9,7 +9,7 @@ import {
 } from "features/apiClient/screens/apiClient/components/views/components/request/components/AuthorizationView/defaults";
 import { ApiClientRecordsInterface } from "features/apiClient/helpers/modules/sync/interfaces";
 import { EnvironmentVariableData } from "features/apiClient/store/variables/types";
-import { createBodyContainer, getInferredType } from "features/apiClient/screens/apiClient/utils";
+import { createBodyContainer, getInferredKeyValueDataType } from "features/apiClient/screens/apiClient/utils";
 import { captureException } from "backend/apiClient/utils";
 
 interface PostmanCollectionExport {
@@ -264,7 +264,7 @@ export const processRequestHeaders = (request: any): RequestHeadersProcessingRes
         value: header.value,
         isEnabled: !header?.disabled,
         description: header?.description || "",
-        dataType: getInferredType(header.value),
+        dataType: getInferredKeyValueDataType(header.value),
       })
     ) ?? [];
 
@@ -286,7 +286,7 @@ const createApiRecord = (
       value: query.value,
       isEnabled: true,
       description: query.description || "",
-      dataType: getInferredType(query.value),
+      dataType: getInferredKeyValueDataType(query.value),
     })) ?? [];
 
   const { requestBody, contentType } = processRequestBody(request);

@@ -6,8 +6,9 @@ import { RQAPI } from "features/apiClient/types";
 import { usePathVariablesStore } from "features/apiClient/hooks/usePathVariables.store";
 import { useScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
 import "./pathVariableTable.scss";
-import { validateValue } from "features/apiClient/screens/apiClient/utils";
+import { doesValueMatchDataType } from "features/apiClient/screens/apiClient/utils";
 import { KeyValueTableSettingsDropdown } from "../../../components/request/components/KeyValueTable/KeyValueTableSettingsDropdown";
+import { capitalize } from "lodash";
 
 interface PathVariableTableProps {
   recordId: string;
@@ -58,7 +59,9 @@ export const PathVariableTable: React.FC<PathVariableTableProps> = ({ recordId, 
           title: "value",
           environmentVariables: scopedVariables,
           handleUpdateVariable,
-          error: validateValue(record.value, record.dataType),
+          error: doesValueMatchDataType(record.value, record.dataType)
+            ? null
+            : `Value must be ${capitalize(record.dataType)}`,
         }),
       },
       {

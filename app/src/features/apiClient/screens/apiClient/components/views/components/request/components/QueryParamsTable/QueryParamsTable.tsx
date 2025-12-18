@@ -18,21 +18,20 @@ function Data(props: {
 }) {
   const scopedVariables = useScopedVariables(props.recordId);
   const [showDescription, setShowDescription] = useState(false);
-  const extraTableCols = {
-    description: {
-      visible: showDescription,
-      onToggle: (show: any) => {
-        setShowDescription(show);
-      },
-    },
-    dataType: { visible: true },
-  };
   return (
     <KeyValueTable
       data={props.queryParams}
       variables={scopedVariables}
       onChange={props.handleUpdateQueryParams}
-      extraCols={extraTableCols}
+      extraColumns={{
+        description: {
+          visible: showDescription,
+          onToggle: (show: any) => {
+            setShowDescription(show);
+          },
+        },
+        dataType: { visible: true },
+      }}
     />
   );
 }
