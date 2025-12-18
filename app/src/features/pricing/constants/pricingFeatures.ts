@@ -244,7 +244,7 @@ export const PricingFeatures: PlanFeatures = {
           enabled: true,
         },
         {
-          title: "AWS Secret Manager Integration",
+          title: "AWS Secrets Manager Integration",
           enabled: true,
         },
         {
