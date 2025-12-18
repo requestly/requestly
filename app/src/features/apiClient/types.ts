@@ -40,6 +40,7 @@ export interface KeyValuePair {
   value: string;
   isEnabled: boolean;
   type?: string; // added for special identifiers like auth
+  description?: string;
 }
 
 export enum KeyValueFormType {
@@ -307,7 +308,18 @@ export namespace RQAPI {
 
   export type ApiClientRecord = ApiRecord | CollectionRecord;
 
-  export type ApiClientRecordPromise = Promise<{ success: boolean; data: ApiClientRecord; message?: string }>;
+  export type ApiClientRecordPromise = Promise<
+    | {
+        success: true;
+        data: ApiClientRecord;
+        message?: string;
+      }
+    | {
+        success: false;
+        data: null;
+        message?: string;
+      }
+  >;
 
   export type RecordsPromise = Promise<{
     success: boolean;
