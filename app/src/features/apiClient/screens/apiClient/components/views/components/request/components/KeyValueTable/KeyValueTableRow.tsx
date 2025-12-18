@@ -6,6 +6,8 @@ import InfoIcon from "components/misc/InfoIcon";
 import { Conditional } from "components/common/Conditional";
 import { INVALID_KEY_CHARACTERS } from "features/apiClient/constants";
 import { ScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
+import KeyValueDescriptionCell from "./KeyValueTableDescriptionCell";
+import { captureException } from "@sentry/react";
 
 const EditableContext = React.createContext<FormInstance<any> | null>(null);
 
@@ -47,6 +49,11 @@ export const KeyValueTableEditableCell: React.FC<React.PropsWithChildren<Editabl
 }) => {
   const form = useContext(EditableContext);
 
+  if (!form) {
+    captureException(new Error("EditableCell rendered outside Key-Value table context"));
+    return <td {...restProps}>{children}</td>;
+  }
+
   const save = async () => {
     try {
       const values = await form.validateFields();
@@ -58,6 +65,16 @@ export const KeyValueTableEditableCell: React.FC<React.PropsWithChildren<Editabl
 
   if (!editable) {
     return <td {...restProps}>{children}</td>;
+  }
+
+  const isDescription = dataIndex === "description";
+
+  if (isDescription) {
+    return (
+      <td {...restProps}>
+        <KeyValueDescriptionCell record={record} dataIndex={dataIndex} form={form} onSave={save} />
+      </td>
+    );
   }
 
   return (
@@ -92,6 +109,7 @@ export const KeyValueTableEditableCell: React.FC<React.PropsWithChildren<Editabl
               }}
               variables={variables}
             />
+
             <Conditional
               condition={INVALID_KEY_CHARACTERS.test(record?.key) && dataIndex === "key" && checkInvalidCharacter}
             >

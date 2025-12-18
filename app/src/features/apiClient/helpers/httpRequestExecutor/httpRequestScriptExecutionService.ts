@@ -22,7 +22,7 @@ export class HttpRequestScriptExecutionService {
   ) {
     return this.workloadManager.execute(
       new PreRequestScriptWorkload(
-        entry.scripts?.preRequest,
+        entry.scripts?.preRequest ?? "",
         {
           executionContext: this.executionContext.getContext(),
           executionMetadata: {
@@ -46,7 +46,7 @@ export class HttpRequestScriptExecutionService {
   ) {
     return this.workloadManager.execute(
       new PostResponseScriptWorkload(
-        entry.scripts?.postResponse,
+        entry.scripts?.postResponse ?? "",
         {
           executionContext: this.executionContext.getContext(),
           executionMetadata: {

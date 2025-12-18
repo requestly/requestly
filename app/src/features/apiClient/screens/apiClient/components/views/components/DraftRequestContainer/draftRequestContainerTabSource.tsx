@@ -30,7 +30,9 @@ export class DraftRequestContainerTabSource extends BaseTabSource {
       />
     );
     this.urlPath = `${PATHS.API_CLIENT.ABSOLUTE}/${this.metadata.name}/new`;
-    this.icon = this.getTabIcon((this.metadata as DraftRequestContainerTabSourceMetadata).apiEntryType);
+    this.icon = this.getTabIcon(
+      (this.metadata as DraftRequestContainerTabSourceMetadata).apiEntryType ?? RQAPI.ApiEntryType.HTTP
+    );
   }
 
   static create(metadata?: DraftRequestContainerTabSourceMetadata): DraftRequestContainerTabSource {
