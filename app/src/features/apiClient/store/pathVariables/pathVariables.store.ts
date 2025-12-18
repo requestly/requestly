@@ -1,4 +1,4 @@
-import { RQAPI } from "features/apiClient/types";
+import { RQAPI, KeyValueDataType } from "features/apiClient/types";
 import { create } from "zustand";
 
 export type PathVariablesStore = {
@@ -40,6 +40,7 @@ export const createPathVariablesStore = (variables: RQAPI.PathVariable[]) => {
               key,
               value: "",
               description: "",
+              dataType: KeyValueDataType.STRING,
             };
       });
 

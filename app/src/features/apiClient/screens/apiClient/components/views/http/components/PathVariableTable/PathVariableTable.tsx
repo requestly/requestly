@@ -2,7 +2,7 @@ import React, { useCallback, useMemo, useState } from "react";
 import type { TableProps } from "antd";
 import { ContentListTable } from "componentsV2/ContentList";
 import { PathVariableTableEditableRow, PathVariableTableEditableCell } from "./PathVariableTableRow";
-import { RQAPI } from "features/apiClient/types";
+import { KeyValueDataType, RQAPI } from "features/apiClient/types";
 import { usePathVariablesStore } from "features/apiClient/hooks/usePathVariables.store";
 import { useScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
 import "./pathVariableTable.scss";
@@ -59,21 +59,14 @@ export const PathVariableTable: React.FC<PathVariableTableProps> = ({ recordId, 
           title: "value",
           environmentVariables: scopedVariables,
           handleUpdateVariable,
-          error: doesValueMatchDataType(record.value, record.dataType)
+          error: doesValueMatchDataType(record.value, record.dataType ?? KeyValueDataType.STRING)
             ? null
-            : `Value must be ${capitalize(record.dataType)}`,
+            : `Value must be ${capitalize(record.dataType ?? KeyValueDataType.STRING)}`,
         }),
       },
       {
         title: (
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              width: "100%",
-            }}
-          >
+          <div className="path-variable-table-settings">
             <span>Type</span>
             {!showDescription && (
               <KeyValueTableSettingsDropdown
@@ -100,14 +93,7 @@ export const PathVariableTable: React.FC<PathVariableTableProps> = ({ recordId, 
       },
       showDescription && {
         title: (
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              width: "100%",
-            }}
-          >
+          <div className="path-variable-table-settings">
             <span>Description</span>
             <KeyValueTableSettingsDropdown
               showDescription={showDescription}

@@ -233,7 +233,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, variables, o
     variables,
     handleUpdatePair,
     checkInvalidCharacter,
-    extraColumns?.description?.onToggle,
+    extraColumns,
     data.length,
     handleDeletePair,
   ]);
