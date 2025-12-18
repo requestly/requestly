@@ -7,22 +7,21 @@ import { CloseOutlined } from "@ant-design/icons";
 import { capitalize, kebabCase } from "lodash";
 import { PRICING } from "features/pricing/constants/pricing";
 import { PricingPlans } from "features/pricing/constants/pricingPlans";
-import { trackGetFreeTrialClicked, trackPricingPlansQuantityChanged } from "features/pricing/analytics";
+import { trackPricingPlansQuantityChanged } from "features/pricing/analytics";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import Logger from "lib/logger";
-import GiftIcon from "../../../../assets/gift-icon.svg?react";
-import { MdOutlineHelpOutline } from "@react-icons/all-files/md/MdOutlineHelpOutline";
 import { PlanQuantitySelector } from "../PlanQuantitySelector/PlanQuantitySelector";
 import { shouldShowNewCheckoutFlow } from "features/pricing/utils";
-import { useFeatureIsOn, useFeatureValue } from "@growthbook/growthbook-react";
+import { useFeatureValue } from "@growthbook/growthbook-react";
 import { useIsBrowserStackIntegrationOn } from "hooks/useIsBrowserStackIntegrationOn";
+import { useDebounce } from "hooks/useDebounce";
 
 interface PlanColumnProps {
   planName: string;
   planDetails: any;
   planPrice: number;
   duration: string;
-  product?: string;
+  product: string;
   source: string;
   isOpenedFromModal: boolean;
 }
@@ -43,7 +42,6 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
 
   const isBrowserstackIntegrationOn = useIsBrowserStackIntegrationOn();
   const isBrowserstackCheckoutEnabled = useFeatureValue("browserstack_checkout", true);
-  const isAcceleratorProgramEnabled = useFeatureIsOn("display_accelerator_on_pricing");
 
   const currentSeats = user.details?.planDetails?.subscription?.quantity ?? 1;
 
@@ -59,7 +57,7 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
     }
   }, [user.loggedIn]);
 
-  const getHeaderPlanName = () => {
+  const getPreviousPlanName = () => {
     const pricingPlansOrder = [
       PRICING.PLAN_NAMES.FREE,
       PRICING.PLAN_NAMES.LITE,
@@ -76,8 +74,8 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
       return capitalize(PRICING.PLAN_NAMES.FREE);
     }
 
-    if (planName === PRICING.PLAN_NAMES.API_CLIENT_ENTERPRISE) {
-      return capitalize(PRICING.PLAN_NAMES.PROFESSIONAL);
+    if (planName === PRICING.PLAN_NAMES.API_CLIENT_PROFESSIONAL) {
+      return capitalize(PRICING.PLAN_NAMES.FREE);
     }
 
     const index = pricingPlansOrder.indexOf(planName);
@@ -107,7 +105,7 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
                 <span>
                   Everything <img src={"/assets/media/common/yellow-highlight.svg"} alt="highlight" />
                 </span>{" "}
-                in {getHeaderPlanName()} plan +
+                in {getPreviousPlanName()} plan +
               </Col>
             )}
           </>
@@ -124,7 +122,7 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
       planName === PRICING.PLAN_NAMES.BASIC ||
       planName === PRICING.PLAN_NAMES.PROFESSIONAL ||
       planName === PRICING.PLAN_NAMES.LITE ||
-      planName === PRICING.PLAN_NAMES.API_CLIENT_ENTERPRISE
+      planName === PRICING.PLAN_NAMES.API_CLIENT_PROFESSIONAL
     )
       return `Billed $${PricingPlans[planName]?.plans[duration]?.usd?.price * quantity} annually`;
     return null;
@@ -136,18 +134,8 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
     PRICING_QUANTITY_CHANGED: "pricing_quantity_changed",
   };
 
-  function debounce(func: Function, delay: number) {
-    let timer: NodeJS.Timeout;
-    return function debouncedFunction(...args: any[]) {
-      clearTimeout(timer);
-      timer = setTimeout(() => {
-        func(...args);
-      }, delay);
-    };
-  }
-
   const sendNotification = useCallback(
-    debounce((value: number) => {
+    (value: number) => {
       if (user.loggedIn) {
         const salesInboundNotification = httpsCallable(getFunctions(), "premiumNotifications-salesInboundNotification");
         try {
@@ -158,9 +146,11 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
           console.error(error);
         }
       }
-    }, 4000),
-    [planName, source, user.loggedIn]
+    },
+    [EVENTS.PRICING_QUANTITY_CHANGED, planName, source, user.loggedIn]
   );
+
+  const debouncedSendNotification = useDebounce(sendNotification, 4000);
 
   const handleQuantityChange = useCallback(
     (value: number, skipNotification: boolean = false) => {
@@ -182,10 +172,10 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
         hasFiddledWithQuantity.current = true;
       }
       if (!skipNotification) {
-        sendNotification(value);
+        debouncedSendNotification(value);
       }
     },
-    [sendNotification, planName, source, user.loggedIn]
+    [debouncedSendNotification, planName, source, user.loggedIn]
   );
 
   const cardSubtitle = <>{planCardSubtitle ? <Typography.Text>{planCardSubtitle}</Typography.Text> : null}</>;
@@ -266,10 +256,11 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
                 planName !== PRICING.PLAN_NAMES.FREE &&
                 planName !== PRICING.PLAN_NAMES.ENTERPRISE &&
                 planName !== PRICING.PLAN_NAMES.LITE) ||
-                (product === PRICING.PRODUCTS.API_CLIENT && planName === PRICING.PLAN_NAMES.API_CLIENT_ENTERPRISE)) && (
+                (product === PRICING.PRODUCTS.API_CLIENT &&
+                  planName === PRICING.PLAN_NAMES.API_CLIENT_PROFESSIONAL)) && (
                 <PlanQuantitySelector
                   columnPlanName={planName}
-                  currentPlanName={user.details?.planDetails?.planName}
+                  currentPlanName={user.details?.planDetails?.planName ?? ""}
                   currentSeats={currentSeats}
                   isNewCheckoutFlowEnabled={isNewCheckoutFlowEnabled}
                   quantity={quantity}
@@ -336,33 +327,6 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
           })}
         </Space>
       </div>
-
-      {[PRICING.PLAN_NAMES.PROFESSIONAL, PRICING.PLAN_NAMES.API_CLIENT_ENTERPRISE].includes(planName) &&
-      isAcceleratorProgramEnabled &&
-      isOpenedFromModal &&
-      product === PRICING.PRODUCTS.API_CLIENT ? (
-        <div className="student-plan-footer">
-          <GiftIcon className="gift-plan-icon" width={16} height={16} />
-          <a
-            target="_blank"
-            rel="noreferrer"
-            href={`https://rqst.ly/accelerator-program?page_source=${
-              product === PRICING.PRODUCTS.API_CLIENT ? "api_client_pricing_page" : "rules_pricing_page"
-            }`}
-            onClick={() => {
-              trackGetFreeTrialClicked(source);
-            }}
-          >
-            Get Requestly free for 1 year!
-          </a>
-          <Tooltip
-            color="var(--requestly-color-black)"
-            title="Unlimited access, no cost, no commitment — perfect for individuals and teams evaluating their next API tool."
-          >
-            <MdOutlineHelpOutline className="info-icon" />
-          </Tooltip>
-        </div>
-      ) : null}
     </Col>
   );
 };
