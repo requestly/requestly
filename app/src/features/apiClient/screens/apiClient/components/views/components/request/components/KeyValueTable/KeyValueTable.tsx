@@ -11,7 +11,8 @@ import "./keyValueTable.scss";
 import { ScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
-import { validateValue } from "features/apiClient/screens/apiClient/utils";
+import { doesValueMatchDataType } from "features/apiClient/screens/apiClient/utils";
+import { capitalize } from "lodash";
 
 type ColumnTypes = Exclude<TableProps<KeyValuePair>["columns"], undefined>;
 
@@ -19,10 +20,10 @@ interface KeyValueTableProps {
   data: KeyValuePair[];
   onChange: (updatedPairs: KeyValuePair[]) => void;
   variables: ScopedVariables;
-  extraCols?: {
+  extraColumns?: {
     description?: {
       visible: boolean;
-      onToggle?: (show: boolean) => void;
+      onToggle: (show: boolean) => void;
     };
     dataType?: {
       visible: boolean;
@@ -30,18 +31,20 @@ interface KeyValueTableProps {
   };
   config?: {
     checkInvalidCharacter?: boolean;
-    showSettings?: boolean;
   };
 }
 
-export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, variables, onChange, extraCols, config }) => {
+export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, variables, onChange, extraColumns, config }) => {
   const { checkInvalidCharacter = false } = config || {};
 
-  const descriptionConfig = {
-    visible: extraCols?.description?.visible ?? true,
-    onToggle: extraCols?.description?.onToggle ?? (() => {}),
-  };
-  const dataTypeConfig = extraCols?.dataType || { visible: true };
+  const isDescriptionVisible =
+    hasDescription(extraColumns) &&
+    isFeatureCompatible(FEATURES.API_CLIENT_DESCRIPTION_COMPATIBILITY) &&
+    extraColumns.description.visible;
+  const isDataTypeVisible =
+    hasDataType(extraColumns) &&
+    extraColumns.dataType.visible &&
+    isFeatureCompatible(FEATURES.API_CLIENT_TYPE_COMPATIBILITY);
 
   const createEmptyPair = useCallback(
     () => ({
@@ -159,10 +162,12 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, variables, o
           title: "value",
           variables,
           handleUpdatePair,
-          error: validateValue(record.value, record.dataType),
+          error: doesValueMatchDataType(record.value, record.dataType)
+            ? null
+            : `Value must be ${capitalize(record.dataType)}`,
         }),
       },
-      dataTypeConfig.visible && isFeatureCompatible(FEATURES.API_CLIENT_TYPE_COMPATIBILITY)
+      isDataTypeVisible
         ? {
             title: "Type",
             dataIndex: "dataType",
@@ -178,7 +183,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, variables, o
             }),
           }
         : null,
-      descriptionConfig.visible && isFeatureCompatible(FEATURES.API_CLIENT_DESCRIPTION_COMPATIBILITY)
+      isDescriptionVisible
         ? {
             title: "Description",
             dataIndex: "description",
@@ -198,11 +203,11 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, variables, o
         width: "50px",
         fixed: "right",
         title: () =>
-          dataTypeConfig.visible &&
-          isFeatureCompatible(FEATURES.API_CLIENT_TYPE_COMPATIBILITY) && (
+          isDataTypeVisible &&
+          hasDescription(extraColumns) && (
             <KeyValueTableSettingsDropdown
-              showDescription={descriptionConfig.visible}
-              onToggleDescription={descriptionConfig.onToggle}
+              showDescription={isDescriptionVisible}
+              onToggleDescription={extraColumns.description.onToggle}
             />
           ),
         render: (_: any, record: KeyValuePair) => {
@@ -223,14 +228,14 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, variables, o
       },
     ].filter(Boolean);
   }, [
+    isDataTypeVisible,
+    isDescriptionVisible,
     variables,
     handleUpdatePair,
     checkInvalidCharacter,
-    data,
+    extraColumns?.description?.onToggle,
+    data.length,
     handleDeletePair,
-    descriptionConfig.visible,
-    descriptionConfig.onToggle,
-    dataTypeConfig.visible,
   ]);
 
   return (
@@ -238,7 +243,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, variables, o
       id="api-key-value-table"
       className="api-key-value-table"
       bordered
-      showHeader={dataTypeConfig.visible}
+      showHeader={isDataTypeVisible}
       rowKey="id"
       columns={columns as ColumnTypes}
       data={memoizedData}
@@ -260,3 +265,15 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, variables, o
     />
   );
 };
+
+function hasDescription<T extends { description?: unknown }>(
+  config?: T
+): config is T & { description: NonNullable<T["description"]> } {
+  return !!config && !!config.description;
+}
+
+function hasDataType<T extends { dataType?: unknown }>(
+  config?: T
+): config is T & { dataType: NonNullable<T["dataType"]> } {
+  return !!config && !!config.dataType;
+}

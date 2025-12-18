@@ -19,12 +19,12 @@ export const KeyValueTableSettingsDropdown: React.FC<KeyValueTableSettingsDropdo
         <Checkbox
           checked={showDescription}
           onClick={(e) => e.stopPropagation()}
-          style={{ display: "flex", alignItems: "center" }}
+          className="items-center"
           onChange={(e) => {
             onToggleDescription(e.target.checked);
           }}
         >
-          <span style={{ verticalAlign: "middle", marginTop: "4px" }}>Description</span>
+          <span className="align-self-center">Description</span>
         </Checkbox>
       ),
     },

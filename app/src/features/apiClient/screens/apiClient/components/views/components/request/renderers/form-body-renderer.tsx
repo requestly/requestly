@@ -30,13 +30,19 @@ export function FormBody(props: { recordId: string; setRequestEntry: RequestBody
     [setRequestEntry, setFormBody, requestBodyStateManager]
   );
 
-  const extraTableCols = {
+  const extraTableColumns = {
     description: {
       visible: false,
+      onToggle: () => {},
     },
     dataType: { visible: false },
   };
   return (
-    <KeyValueTable data={formBody} variables={scopedVariables} onChange={handleFormChange} extraCols={extraTableCols} />
+    <KeyValueTable
+      data={formBody}
+      variables={scopedVariables}
+      onChange={handleFormChange}
+      extraColumns={extraTableColumns}
+    />
   );
 }
