@@ -14,6 +14,7 @@ import { getUserMetadata } from "store/slices/global/user/selectors";
 import { Link } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
 import "./aiConsentModal.scss";
+import LINKS from "config/constants/sub/links";
 
 interface AIConsentModalProps {
   isOpen: boolean;
@@ -85,7 +86,7 @@ export const AIConsentModal: React.FC<AIConsentModalProps> = ({ isOpen, toggle, 
               </div>
             ))}
           </div>
-          <a target="_blank" href="#" rel="noreferrer">
+          <a target="_blank" href={LINKS.AI_DOC_LINK} rel="noreferrer">
             Learn more in FAQs <MdArrowOutward />
           </a>
         </div>
