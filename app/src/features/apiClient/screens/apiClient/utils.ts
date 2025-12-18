@@ -850,7 +850,7 @@ export const parseHttpRequestEntry = (
 
   const contentType = entry.request.contentType;
   // Only add content-type namespace if body is present
-  if (contentType && entry?.request?.body) {
+  if (contentType && entry?.request?.body && entry?.request?.body?.length > 0) {
     result.content_type = parseContentType(contentType);
   }
   return result;
