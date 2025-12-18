@@ -1,4 +1,4 @@
-import React, { useCallback, useRef } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 import { useDispatch } from "react-redux";
 import { EditorLanguage } from "componentsV2/CodeEditor";
 import { useMemo, useState } from "react";
@@ -23,6 +23,8 @@ import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { AITestGenerationError } from "../AI/types";
 import { globalActions } from "store/slices/global/slice";
 import { RequestTabLabelIndicator } from "../../../request/components/ApiClientRequestTabs/components/RequestTabLabel/RequestTabLabel";
+import { getAuth } from "firebase/auth";
+import firebaseApp from "firebase";
 import "./scriptEditor.scss";
 
 const TestGenerationOutputSchema = z.object({
@@ -80,6 +82,9 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
   const [isGenerateTestPopoverOpen, setIsGenerateTestPopoverOpen] = useState(false);
   const [isTestsStreamingFinished, setIsTestsStreamingFinished] = useState(false);
   const [negativeFeedback, setNegativeFeedback] = useState<string | null>(null);
+  const [authToken, setAuthToken] = useState<string | null>(null);
+
+  const auth = getAuth(firebaseApp);
 
   const hasPostResponseScript = Boolean(entry?.scripts?.[RQAPI.ScriptType.POST_RESPONSE]);
 
@@ -90,6 +95,11 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
   const { object, isLoading, error, stop, submit, clear } = useObject({
     api: getAIEndpointUrl(AI_ENDPOINTS.TEST_GENERATION),
     schema: TestGenerationOutputSchema,
+    headers: authToken
+      ? {
+          Authorization: authToken,
+        }
+      : {},
     onFinish: (result) => {
       if (result.object?.err) {
         switch (result.object?.err) {
@@ -174,11 +184,24 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
     lastUsedQueryRef.current = null;
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (focusPostResponse && hasPostResponseScript) {
       setScriptType(RQAPI.ScriptType.POST_RESPONSE);
     }
   }, [focusPostResponse, hasPostResponseScript]);
+
+  useEffect(() => {
+    if (isGenerateTestPopoverOpen) {
+      auth.currentUser
+        ?.getIdToken()
+        .then((token) => {
+          setAuthToken(token);
+        })
+        .catch(() => {
+          setAuthToken(null);
+        });
+    }
+  }, [isGenerateTestPopoverOpen, auth.currentUser]);
 
   const handleEditorReady = useCallback((view: EditorView) => {
     editorViewRef.current = view;
