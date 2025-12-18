@@ -1,6 +1,6 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useRef } from "react";
 import CodeMirror, { EditorView } from "@uiw/react-codemirror";
-import { unifiedMergeView } from "@codemirror/merge";
+import { unifiedMergeView, getOriginalDoc } from "@codemirror/merge";
 import { vscodeDark } from "@uiw/codemirror-theme-vscode";
 import { javascript } from "@codemirror/lang-javascript";
 import { customKeyBinding } from "componentsV2/CodeEditor/components/EditorV2/plugins";
@@ -9,20 +9,44 @@ import "./mergeViewEditor.scss";
 interface Props {
   originalValue: string;
   newValue: string;
+  onMergeChunk: (mergedValue: string, newIncomingValue: string, type: "accept" | "reject") => void;
 }
 
-export const MergeViewEditor: React.FC<Props> = ({ originalValue, newValue }) => {
+export const MergeViewEditor: React.FC<Props> = ({ originalValue, newValue, onMergeChunk }) => {
+  const viewRef = useRef<EditorView | null>(null);
+
   const mergeViewExtension = useMemo(() => {
     return unifiedMergeView({
       original: originalValue,
+      mergeControls: (type, action) => {
+        const button = document.createElement("button");
+        button.className = `merge-view-chunk-button ${
+          type === "accept" ? "merge-view-chunk-button__accept" : "merge-view-chunk-button__reject"
+        }`;
+        button.textContent = type === "accept" ? "Accept" : "Reject";
+        button.onclick = (e) => {
+          action(e);
+
+          const view = viewRef.current;
+          if (!view) return;
+          const mergedValue = getOriginalDoc(view.state).toString();
+          const newIncomingValue = view.state.doc.toString();
+
+          onMergeChunk(mergedValue, newIncomingValue, type);
+        };
+        return button;
+      },
     });
-  }, [originalValue]);
+  }, [originalValue, onMergeChunk]);
 
   return (
     <CodeMirror
       className="code-editor merge-view-editor"
-      readOnly
       value={newValue}
+      onCreateEditor={(view) => {
+        viewRef.current = view;
+      }}
+      readOnly
       extensions={[mergeViewExtension, javascript({ jsx: false }), customKeyBinding, EditorView.lineWrapping]}
       basicSetup={{
         highlightActiveLine: false,
