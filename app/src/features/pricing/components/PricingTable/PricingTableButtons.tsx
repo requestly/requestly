@@ -130,21 +130,21 @@ const pricingButtonsMap: Record<string, any> = {
     },
     [PRICING.PLAN_NAMES.LITE]: {
       [PRICING.PLAN_NAMES.FREE]: CTA_BUTTONS_CONFIG[CTA_CONFIG_SELECTORS.NOT_VISIBLE],
-      [PRICING.PLAN_NAMES.LITE]: CTA_BUTTONS_CONFIG[CTA_CONFIG_SELECTORS.UPGRADE],
+      [PRICING.PLAN_NAMES.LITE]: CTA_BUTTONS_CONFIG[CTA_CONFIG_SELECTORS.CURRENT_PLAN],
       [PRICING.PLAN_NAMES.BASIC]: CTA_BUTTONS_CONFIG[CTA_CONFIG_SELECTORS.UPGRADE],
       [PRICING.PLAN_NAMES.PROFESSIONAL]: CTA_BUTTONS_CONFIG[CTA_CONFIG_SELECTORS.UPGRADE],
     },
     [PRICING.PLAN_NAMES.BASIC]: {
       [PRICING.PLAN_NAMES.FREE]: CTA_BUTTONS_CONFIG[CTA_CONFIG_SELECTORS.NOT_VISIBLE],
       [PRICING.PLAN_NAMES.LITE]: CTA_BUTTONS_CONFIG[CTA_CONFIG_SELECTORS.SWITCH_PLAN],
-      [PRICING.PLAN_NAMES.BASIC]: CTA_BUTTONS_CONFIG[CTA_CONFIG_SELECTORS.UPGRADE],
+      [PRICING.PLAN_NAMES.BASIC]: CTA_BUTTONS_CONFIG[CTA_CONFIG_SELECTORS.CURRENT_PLAN],
       [PRICING.PLAN_NAMES.PROFESSIONAL]: CTA_BUTTONS_CONFIG[CTA_CONFIG_SELECTORS.UPGRADE],
     },
     [PRICING.PLAN_NAMES.PROFESSIONAL]: {
       [PRICING.PLAN_NAMES.FREE]: CTA_BUTTONS_CONFIG[CTA_CONFIG_SELECTORS.NOT_VISIBLE],
       [PRICING.PLAN_NAMES.LITE]: CTA_BUTTONS_CONFIG[CTA_CONFIG_SELECTORS.SWITCH_PLAN],
       [PRICING.PLAN_NAMES.BASIC]: CTA_BUTTONS_CONFIG[CTA_CONFIG_SELECTORS.SWITCH_PLAN],
-      [PRICING.PLAN_NAMES.PROFESSIONAL]: CTA_BUTTONS_CONFIG[CTA_CONFIG_SELECTORS.UPGRADE],
+      [PRICING.PLAN_NAMES.PROFESSIONAL]: CTA_BUTTONS_CONFIG[CTA_CONFIG_SELECTORS.CURRENT_PLAN],
     },
     [PRICING.PLAN_NAMES.ENTERPRISE]: {
       [PRICING.PLAN_NAMES.FREE]: CTA_BUTTONS_CONFIG[CTA_CONFIG_SELECTORS.NOT_VISIBLE],
@@ -152,14 +152,14 @@ const pricingButtonsMap: Record<string, any> = {
       [PRICING.PLAN_NAMES.BASIC]: CTA_BUTTONS_CONFIG[CTA_CONFIG_SELECTORS.SWITCH_PLAN],
       [PRICING.PLAN_NAMES.PROFESSIONAL]: CTA_BUTTONS_CONFIG[CTA_CONFIG_SELECTORS.SWITCH_PLAN],
       [PRICING.PLAN_NAMES.ENTERPRISE]: null,
-      [PRICING.PLAN_NAMES.API_CLIENT_ENTERPRISE]: null,
+      [PRICING.PLAN_NAMES.API_CLIENT_PROFESSIONAL]: null,
     },
-    [PRICING.PLAN_NAMES.API_CLIENT_ENTERPRISE]: {
+    [PRICING.PLAN_NAMES.API_CLIENT_PROFESSIONAL]: {
       [PRICING.PLAN_NAMES.FREE]: CTA_BUTTONS_CONFIG[CTA_CONFIG_SELECTORS.NOT_VISIBLE],
       [PRICING.PLAN_NAMES.LITE]: CTA_BUTTONS_CONFIG[CTA_CONFIG_SELECTORS.ADD_PLAN],
       [PRICING.PLAN_NAMES.BASIC]: CTA_BUTTONS_CONFIG[CTA_CONFIG_SELECTORS.ADD_PLAN],
       [PRICING.PLAN_NAMES.PROFESSIONAL]: CTA_BUTTONS_CONFIG[CTA_CONFIG_SELECTORS.UPGRADE],
-      [PRICING.PLAN_NAMES.API_CLIENT_ENTERPRISE]: null,
+      [PRICING.PLAN_NAMES.API_CLIENT_PROFESSIONAL]: null,
     },
   },
   trial: {
@@ -202,7 +202,7 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
   const isUserPremium = user?.details?.isPremium;
   const userPlanName = user?.details?.planDetails?.planName ?? PRICING.PLAN_NAMES.FREE;
   const isUserTrialing = isUserPremium && user?.details?.planDetails?.status === "trialing";
-  const userPlanType = ["team", "individual"].includes(user?.details?.planDetails?.type)
+  const userPlanType = ["team", "individual"].includes(user?.details?.planDetails?.type ?? "")
     ? user?.details?.planDetails?.type
     : "individual";
 
@@ -221,6 +221,13 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
       },
       source
     );
+
+    // Allow CONTACT_US to proceed without requiring login
+    if (functionName === CTA_ONCLICK_FUNCTIONS.CONTACT_US) {
+      window.open(LINKS.BOOK_A_DEMO, "_blank");
+      setIsButtonLoading(false);
+      return;
+    }
 
     if (!user?.details?.isLoggedIn) {
       let redirectURL = window.location.href;
@@ -395,17 +402,30 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
         });
         break;
       }
-      case CTA_ONCLICK_FUNCTIONS.CONTACT_US: {
-        window.open(LINKS.BOOK_A_DEMO, "_blank");
-        break;
-      }
       default: {
         setIsButtonLoading(false);
       }
     }
   };
 
-  let buttonConfig = pricingButtonsMap.default[userPlanName][columnPlanName];
+  // Check for Enterprise and API Client Professional plans first - these always show Contact Sales
+  if (
+    columnPlanName === PRICING.PLAN_NAMES.ENTERPRISE ||
+    columnPlanName === PRICING.PLAN_NAMES.API_CLIENT_PROFESSIONAL
+  ) {
+    return (
+      <RQButton
+        onClick={() => {
+          onButtonClick(CTA_ONCLICK_FUNCTIONS.CONTACT_US);
+        }}
+        type="primary"
+      >
+        Contact Sales
+      </RQButton>
+    );
+  }
+
+  let buttonConfig = pricingButtonsMap.default[userPlanName]?.[columnPlanName];
 
   if (buttonConfig?.onClick === CTA_ONCLICK_FUNCTIONS.USE_NOW && !user?.details?.isLoggedIn) {
     buttonConfig = CTA_BUTTONS_CONFIG["signup"];
@@ -438,22 +458,6 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
         type="primary"
       >
         Contact us
-      </RQButton>
-    );
-  }
-
-  if (
-    userPlanName !== columnPlanName &&
-    (columnPlanName === PRICING.PLAN_NAMES.ENTERPRISE || columnPlanName === PRICING.PLAN_NAMES.API_CLIENT_ENTERPRISE)
-  ) {
-    return (
-      <RQButton
-        onClick={() => {
-          onButtonClick(CTA_ONCLICK_FUNCTIONS.CONTACT_US);
-        }}
-        type="primary"
-      >
-        Contact sales
       </RQButton>
     );
   }
