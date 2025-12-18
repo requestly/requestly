@@ -64,6 +64,13 @@ class ApiClientContextService {
       reducer: {
         [apiRecordsSlice.name]: apiRecordsSlice.reducer,
       },
+      middleware(getDefaultMiddleware) {
+        return getDefaultMiddleware({
+          serializableCheck: {
+            ignoredActions: ['records/unsafePatch'],
+          },
+        })
+      },
     });
 
     return store;

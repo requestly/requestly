@@ -7,7 +7,7 @@ import { EntityFactory } from "./factory";
 import { HttpRecordEntity } from "./http";
 import { GraphQLRecordEntity } from "./graphql";
 
-function useEntity<T extends ApiClientEntityType>(params: { id: string; type: T }) {
+export function useEntity<T extends ApiClientEntityType>(params: { id: string; type: T }) {
   const dispatch = useApiClientDispatch();
   const entity = EntityFactory.from(params, dispatch);
   return useMemo(() => entity, [entity]);
