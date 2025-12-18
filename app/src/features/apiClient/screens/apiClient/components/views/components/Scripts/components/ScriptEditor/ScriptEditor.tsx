@@ -122,6 +122,9 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
       } else {
         setIsGenerateTestPopoverOpen(false);
         isPopoverOpenRef.current = false;
+        if (result.object?.code?.content) {
+          lastGeneratedCodeRef.current = result.object.code.content;
+        }
       }
       setIsTestsStreamingFinished(true);
       dispatch(globalActions.updateHasGeneratedAITests(true));
@@ -139,7 +142,13 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
       userQuery: query,
       apiRecord: preparedApiRecord,
       existingScript: entry.scripts?.postResponse ?? "",
-      lastGeneration: { code: lastGeneratedCodeRef.current, query: lastUsedQueryRef.current },
+      lastGeneration: {
+        code: {
+          content: lastGeneratedCodeRef.current,
+          language: "javascript",
+        },
+        query: lastUsedQueryRef.current,
+      },
     });
     lastUsedQueryRef.current = query;
   };
