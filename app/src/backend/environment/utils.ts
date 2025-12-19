@@ -231,8 +231,8 @@ const resolveCompositeVariables = (variables: Variables): Variables => {
       const renderedValue = hbsTemplate(resolved);
       resolved[varName] = renderedValue;
     } catch (e) {
-      console.error("Error resolving composite variable:", varName, e);
       // Keep the original value if rendering fails
+      Logger.error("Error resolving composite variable:", varName, e);
     }
   }
 
