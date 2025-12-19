@@ -313,3 +313,39 @@ export const trackCollectionRunnerTruncatedFileUsed = (params) => {
 export const trackCollectionRunnerFileCleared = (params) => {
   trackEvent(API_CLIENT.COLLECTION_RUNNER_FILE_CLEARED, params);
 };
+
+export const trackGenerateTestBtnClicked = () => {
+  trackEvent(API_CLIENT.AI_GENERATE_TESTS_BTN_CLICKED);
+};
+
+export const trackPopoverGenerateTestsClicked = () => {
+  trackEvent(API_CLIENT.AI_GENERATE_TESTS_POPOVER_GENERATE_CLICKED);
+};
+
+export const trackAITestGenerationFailed = () => {
+  trackEvent(API_CLIENT.AI_GENERATE_TESTS_FAILED);
+};
+
+export const trackAITestGenerationSuccessful = () => {
+  trackEvent(API_CLIENT.AI_GENERATE_TESTS_SUCCESSFUL);
+};
+
+export const trackAITestGenerationEditPromptClicked = () => {
+  trackEvent(API_CLIENT.AI_GENERATE_TESTS_EDIT_PROMPT_CLICKED);
+};
+
+export const trackAITestGenerationRejectAllClicked = () => {
+  trackEvent(API_CLIENT.AI_GENERATE_TESTS_REJECT_ALL_CLICKED);
+};
+
+export const trackAITestGenerationAcceptAllClicked = () => {
+  trackEvent(API_CLIENT.AI_GENERATE_TESTS_ACCEPT_ALL_CLICKED);
+};
+
+export const trackAITestGenerationAcceptClicked = () => {
+  trackEvent(API_CLIENT.AI_GENERATE_TESTS_ACCEPT_CLICKED);
+};
+
+export const trackAITestGenerationRejectClicked = () => {
+  trackEvent(API_CLIENT.AI_GENERATE_TESTS_REJECT_CLICKED);
+};
