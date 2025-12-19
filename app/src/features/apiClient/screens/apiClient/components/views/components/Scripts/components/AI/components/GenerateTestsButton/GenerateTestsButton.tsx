@@ -9,6 +9,7 @@ import { getHasGeneratedAITests } from "store/selectors";
 import { getIsOptedforAIFeatures, getUserAuthDetails } from "store/slices/global/user/selectors";
 import { AIConsentModal } from "features/ai";
 import { isProfessionalPlan } from "utils/PremiumUtils";
+import { trackGenerateTestBtnClicked } from "modules/analytics/events/features/apiClient";
 
 interface GenerateTestsButtonProps {
   hidden: boolean;
@@ -78,6 +79,7 @@ export const GenerateTestsButton: React.FC<GenerateTestsButtonProps> = ({
             icon={<MdOutlineAutoAwesome />}
             disabled={disabled}
             loading={isLoading && !isGenerateTestPopoverOpen}
+            onClick={() => trackGenerateTestBtnClicked()}
           >
             {label}
           </RQButton>
