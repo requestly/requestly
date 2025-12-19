@@ -187,13 +187,9 @@ const resolveCompositeVariables = (variables: Variables): Variables => {
       if (variableReferences) {
         variableReferences.forEach((refName) => {
           const trimmedRef = refName.trim();
-          try {
-            // Only add dependency if the referenced variable exists
-            if (trimmedRef in variables) {
-              graph.addDependency(key, trimmedRef);
-            }
-          } catch (error) {
-            Logger.log(`Error while resolving composite variables circular dependency detected: ${error.message}`);
+          // Only add dependency if the referenced variable exists
+          if (trimmedRef in variables) {
+            graph.addDependency(key, trimmedRef);
           }
         });
       }
