@@ -267,7 +267,7 @@ const VariableInfo: React.FC<{
     ];
   }, [source.scope, name, variable.type, localValue, isPersisted, syncValue, isSecretType]);
 
-  const toggleVisibility = useCallback((key: InfoFieldLabel.INITIAL_VALUE | InfoFieldLabel.CURRENT_VALUE) => {
+  const toggleVisibility = useCallback((key: InfoFieldLabel) => {
     setRevealedLabels((prev) => ({ ...prev, [key]: !prev[key] }));
   }, []);
 
