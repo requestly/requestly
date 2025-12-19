@@ -8,7 +8,7 @@ import localStoreRepository from "features/apiClient/helpers/modules/sync/localS
 import { RQAPI } from "features/apiClient/types";
 import { WorkspaceType } from "features/workspaces/types";
 import { toast } from "utils/Toast";
-import { ApiClientFeatureContext } from "../ApiClientContextRegistry/types";
+import { ApiClientFeatureContext, ApiClientStore } from "../ApiClientContextRegistry/types";
 import { reduxStore } from "store";
 import { forceRefreshRecords } from "features/apiClient/commands/records";
 import { forceRefreshEnvironments } from "features/apiClient/commands/environments";
@@ -21,6 +21,10 @@ import {
 import { configureStore } from "@reduxjs/toolkit";
 import { apiRecordsSlice } from "features/apiClient/slices/apiRecords";
 import { WorkspaceInfo } from "../../types";
+import persistStore from "redux-persist/es/persistStore";
+import { REHYDRATE } from "redux-persist";
+import { ApiClientVariables } from "features/apiClient/slices/entities/api-client-variables";
+import { createApiClientRecordsPersistConfig, createApiClientRecordsPersistedReducer } from "features/apiClient/slices/apiRecords/slice";
 
 export type UserDetails = { uid: string; loggedIn: true } | { loggedIn: false };
 
@@ -60,9 +64,16 @@ class ApiClientContextService {
   }
 
   private createStore(workspaceId: ApiClientFeatureContext["workspaceId"]): ApiClientFeatureContext["store"] {
+    const manualRehydrationMiddleware = (api: any) => (next: any) => (action: any) => {
+      if (action.type === REHYDRATE && !action.meta?.manual) {
+        return;
+      }
+      return next(action);
+    };
     const store = configureStore({
-      reducer: {
-        [apiRecordsSlice.name]: apiRecordsSlice.reducer,
+      reducer:
+      {
+        [apiRecordsSlice.name]: createApiClientRecordsPersistedReducer(workspaceId || 'null'),
       },
       middleware(getDefaultMiddleware) {
         return getDefaultMiddleware({
@@ -70,10 +81,65 @@ class ApiClientContextService {
             ignoredActions: ['records/unsafePatch'],
           },
         })
+          .concat(manualRehydrationMiddleware);
       },
     });
 
+    persistStore(store);
+
     return store;
+  }
+
+  private async hydrateInPlace(params: {
+    workspaceId: string,
+    entitiesToHydrate: {
+      apiClientRecords: RQAPI.ApiClientRecord[],
+    },
+    store: ApiClientStore,
+  }) {
+    const {
+      workspaceId,
+      entitiesToHydrate: {
+        apiClientRecords,
+      },
+      store,
+    } = params;
+    const recordsPersistConfig = createApiClientRecordsPersistConfig(workspaceId);
+    await ApiClientVariables.hydrateInPlace({
+      records: apiClientRecords.filter(r => r.type === RQAPI.RecordType.COLLECTION),
+      persistConfig: recordsPersistConfig,
+      getVariablesFromRecord(record) {
+        return record.data.variables;
+      },
+      getVariablesFromPersistedData(record, persistedData) {
+        debugger;
+        const persistedRecord = persistedData.records.entities[record.id];
+        if (!persistedRecord) {
+          return;
+        }
+
+        if(!("variables" in persistedRecord.data)) {
+          return
+        }
+
+        return persistedRecord.data.variables;
+      },
+    })
+
+    store.dispatch({
+      type: REHYDRATE,
+      key: recordsPersistConfig.key,
+      payload: {
+        records: {
+          ids: [],
+          entities: {},
+        },
+        _persist: { version: 1, rehydrated: true },
+      },
+      err: null,
+      meta: { manual: true },
+    });
+
   }
 
   async createContext(workspace: WorkspaceInfo, userDetails: UserDetails): Promise<ApiClientFeatureContext> {
@@ -90,7 +156,12 @@ class ApiClientContextService {
     const store = this.createStore(workspaceId);
 
     const result = await this.extractSetupDataFromRepository(repo);
-
+    await this.hydrateInPlace({
+      workspaceId: workspace.id || 'null',
+      entitiesToHydrate: { apiClientRecords: result.apiClientRecords.records },
+      store,
+    });
+    debugger;
     store.dispatch(apiRecordsSlice.actions.hydrate(result.apiClientRecords));
     //   store.dispatch(environmentsSlice.actions.setInitialData(result.environments));
 
