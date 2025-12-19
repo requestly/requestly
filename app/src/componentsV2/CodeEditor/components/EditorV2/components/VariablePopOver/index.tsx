@@ -228,7 +228,10 @@ const VariableInfo: React.FC<{
   onEditClick,
   isNoopContext,
 }) => {
-  const [revealedSecrets, setRevealedSecrets] = useState<Record<string, boolean>>({});
+  const [revealedLabels, setRevealedLabels] = useState<Record<string, boolean>>({
+    [InfoFieldLabel.INITIAL_VALUE]: false,
+    [InfoFieldLabel.CURRENT_VALUE]: false,
+  });
   const { syncValue, localValue, isPersisted } = getValueStrings(variable);
   const isSecretType = variable.type === EnvironmentVariableType.Secret;
   const infoFields: InfoFieldConfig[] = useMemo(() => {
@@ -265,7 +268,7 @@ const VariableInfo: React.FC<{
   }, [source.scope, name, variable.type, localValue, isPersisted, syncValue, isSecretType]);
 
   const toggleVisibility = useCallback((key: InfoFieldLabel) => {
-    setRevealedSecrets((prev) => ({ ...prev, [key]: !prev[key] }));
+    setRevealedLabels((prev) => ({ ...prev, [key]: !prev[key] }));
   }, []);
 
   return (
@@ -295,7 +298,7 @@ const VariableInfo: React.FC<{
               <div className={`variable-info-value ${field.isSecret ? "with-toggle" : ""}`}>
                 <span className="value-content">
                   {field.isSecret ? (
-                    revealedSecrets[field.label] ? (
+                    revealedLabels[field.label] ? (
                       <span className="secret-revealed">{String(field.value)}</span>
                     ) : (
                       <span className="secret-masked">{"•".repeat(Math.min(String(field.value).length, 15))}</span>
@@ -310,7 +313,7 @@ const VariableInfo: React.FC<{
                     <RQButton
                       type="transparent"
                       size="small"
-                      icon={revealedSecrets[field.label] ? <RiEyeLine /> : <RiEyeOffLine />}
+                      icon={revealedLabels[field.label] ? <RiEyeLine /> : <RiEyeOffLine />}
                       onClick={() => toggleVisibility(field.label)}
                     />
                   </div>
