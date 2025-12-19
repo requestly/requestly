@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { createSelector } from "@reduxjs/toolkit";
 import { useApiClientDispatch, useApiClientSelector } from "../hooks/base.hooks";
 import { ApiClientStoreState } from "../workspaceView/helpers/ApiClientContextRegistry/types";
+import { ApiClientRootState } from "../hooks/types";
 import { ApiClientEntityType } from "./types";
 import { EntityFactory } from "./factory";
 import { HttpRecordEntity } from "./http";
@@ -11,7 +12,7 @@ import { BufferedHttpRecordEntity } from "./buffered/http";
 import { BufferedGraphQLRecordEntity } from "./buffered/graphql";
 import { bufferAdapterSelectors } from "../buffer/slice";
 
-function useEntity<T extends ApiClientEntityType>(params: { id: string; type: T }) {
+export function useEntity<T extends ApiClientEntityType>(params: { id: string; type: T }) {
   const dispatch = useApiClientDispatch();
   const entity = EntityFactory.from(params, dispatch);
   return useMemo(() => entity, [entity]);
@@ -78,9 +79,7 @@ export function useBufferedGraphQLRecordEntity(id: string): BufferedGraphQLRecor
 }
 
 export function useBufferEntry(id: string) {
-  return useApiClientSelector((state) =>
-    bufferAdapterSelectors.selectById(state.buffer, id) ?? null
-  );
+  return useApiClientSelector((state) => bufferAdapterSelectors.selectById(state.buffer, id) ?? null);
 }
 
 export function useBufferIsDirty(id: string): boolean {
@@ -91,9 +90,5 @@ export function useBufferIsDirty(id: string): boolean {
 }
 
 export function useHasBuffer(id: string): boolean {
-  return useApiClientSelector((state) =>
-    bufferAdapterSelectors.selectById(state.buffer, id) !== undefined
-  );
+  return useApiClientSelector((state) => bufferAdapterSelectors.selectById(state.buffer, id) !== undefined);
 }
-
-
