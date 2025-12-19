@@ -128,5 +128,7 @@ export const tabsSlice = createSlice({
   },
 });
 
+// TODO: persistance
+
 export const tabsActions = tabsSlice.actions;
 export const tabsReducer = tabsSlice.reducer;
