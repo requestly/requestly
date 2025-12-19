@@ -1,11 +1,19 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { tabsActions, tabsAdapter } from "./slice";
-import { TabId, ActiveWorkflow } from "./types";
+import { TabId, ActiveWorkflow, TabState } from "./types";
 import { RootState } from "store/types";
 import { selectTabBySource } from "./selectors";
 import { ReducerKeys } from "store/constants";
+import { reduxStore } from "store";
 
 const SLICE_NAME = ReducerKeys.TABS;
+
+function cleanupTabActiveWorkflows(tab: TabState) {
+  tab.activeWorkflows.forEach((w) => {
+    w.workflow.abort();
+    reduxStore.dispatch(tabsActions.removeActiveWorkflow({ tabId: tab.id, workflow: w }));
+  });
+}
 
 export const closeTab = createAsyncThunk<void, { tabId: TabId; skipUnsavedPrompt?: boolean }, { state: RootState }>(
   `${SLICE_NAME}/closeTab`,
@@ -25,8 +33,7 @@ export const closeTab = createAsyncThunk<void, { tabId: TabId; skipUnsavedPrompt
           return;
         }
 
-        // Abort all workflows
-        tab.activeWorkflows.forEach((workflow) => workflow.workflow.abort());
+        cleanupTabActiveWorkflows(tab);
       }
     }
 
@@ -66,9 +73,7 @@ export const closeAllTabs = createAsyncThunk<void, { skipUnsavedPrompt?: boolean
             return;
           }
 
-          tabsWithWorkflows.forEach((tab) => {
-            tab.activeWorkflows.forEach((workflow) => workflow.workflow.abort());
-          });
+          tabsWithWorkflows.forEach((tab) => cleanupTabActiveWorkflows(tab));
         }
       }
     }
