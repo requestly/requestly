@@ -18,13 +18,6 @@ export const tabsSlice = createSlice({
   name: ReducerKeys.TABS,
   initialState,
   reducers: {
-    addTab(state, action: PayloadAction<TabState>) {
-      tabsAdapter.addOne(state.tabs, action.payload);
-      if (!state.activeTabId) {
-        state.activeTabId = action.payload.id;
-      }
-    },
-
     removeTab(state, action: PayloadAction<TabId>) {
       const tabId = action.payload;
       const tabsArray = tabsAdapter.getSelectors().selectAll(state.tabs);
@@ -162,9 +155,7 @@ export const tabsSlice = createSlice({
       };
 
       tabsAdapter.addOne(state.tabs, newTab);
-      if (!state.activeTabId) {
-        state.activeTabId = tabId;
-      }
+      state.activeTabId = tabId;
 
       if (preview) {
         state.previewTabId = tabId;
