@@ -11,6 +11,7 @@ import { MdOutlineDiamond } from "@react-icons/all-files/md/MdOutlineDiamond";
 import "./aiPromptPopover.scss";
 import { redirectToUrl } from "utils/RedirectionUtils";
 import LINKS from "config/constants/sub/links";
+import { trackPopoverGenerateTestsClicked } from "modules/analytics/events/features/apiClient";
 
 interface PromptPopoverProps {
   isLoading: boolean;
@@ -125,7 +126,15 @@ export const AIPromptPopover: React.FC<PromptPopoverProps> = ({
           <RQButton onClick={onCloseClick} size="small">
             {isLoading ? "Continue in background" : "Close"}
           </RQButton>
-          <RQButton type="primary" loading={isLoading} onClick={() => onGenerateClick(userQuery)} size="small">
+          <RQButton
+            type="primary"
+            loading={isLoading}
+            onClick={() => {
+              onGenerateClick(userQuery);
+              trackPopoverGenerateTestsClicked();
+            }}
+            size="small"
+          >
             {isLoading ? "Generating..." : "Generate"}
           </RQButton>
         </div>
