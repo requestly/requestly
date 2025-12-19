@@ -2,7 +2,7 @@ import { useSelector } from "react-redux";
 import { tabsAdapter } from "./slice";
 import { TabId } from "./types";
 import { RootState } from "store/types";
-import { selectTabsByEntityType } from "./selectors";
+import { selectTabsByEntityTypes } from "./selectors";
 import { EntityType } from "features/apiClient/slices/types";
 
 const tabsSelectors = tabsAdapter.getSelectors<RootState>((state) => state.tabs.tabs);
@@ -25,6 +25,6 @@ export const usePreviewTab = () => {
   return useTabById(previewTabId);
 };
 
-export function useTabsByEntityType(entityType: EntityType) {
-  return useSelector((state: RootState) => selectTabsByEntityType(state, entityType));
+export function useTabsByEntityTypes(entityTypes: EntityType[]) {
+  return useSelector((state: RootState) => selectTabsByEntityTypes(state, entityTypes));
 }

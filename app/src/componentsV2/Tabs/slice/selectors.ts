@@ -40,9 +40,9 @@ export const selectTabBySource = createSelector(
   }
 );
 
-export const selectTabsByEntityType = createSelector(
-  [selectAllTabs, (_state: RootState, entityType: EntityType) => entityType],
-  (tabs, entityType) => {
-    return tabs.filter((tab) => tab.modeConfig.entityType === entityType);
+export const selectTabsByEntityTypes = createSelector(
+  [selectAllTabs, (_state: RootState, entityTypes: EntityType[]) => entityTypes],
+  (tabs, entityTypes) => {
+    return tabs.filter((tab) => entityTypes.includes(tab.modeConfig.entityType));
   }
 );
