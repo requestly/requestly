@@ -162,9 +162,9 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, variables, o
           title: "value",
           variables,
           handleUpdatePair,
-          error: doesValueMatchDataType(record.value, record.dataType)
+          error: doesValueMatchDataType(record.value, record.dataType ?? KeyValueDataType.STRING)
             ? null
-            : `Value must be ${capitalize(record.dataType)}`,
+            : `Value must be ${capitalize(record.dataType ?? KeyValueDataType.STRING)}`,
         }),
       },
       isDataTypeVisible
