@@ -1,41 +1,41 @@
 import { createSlice, createEntityAdapter, PayloadAction } from "@reduxjs/toolkit";
+import { v4 as uuidv4 } from "uuid";
 import { set, unset, cloneDeep } from "lodash";
 import { objectToSetOperations, objectToDeletePaths } from "../utils/pathConverter";
 import { BufferEntry, BufferState } from "./types";
 import { ApiClientEntityType } from "../entities/types";
+import { BUFFER_SLICE_NAME } from "../common/constants";
 
 const bufferAdapter = createEntityAdapter<BufferEntry>();
 
 const initialState: BufferState = bufferAdapter.getInitialState();
 
-function findBufferByReferenceId(
-  entities: BufferState["entities"],
-  referenceId: string
-): BufferEntry | undefined {
+function findBufferByReferenceId(entities: BufferState["entities"], referenceId: string): BufferEntry | undefined {
   const allEntries = Object.values(entities) as (BufferEntry | undefined)[];
   return allEntries.find((e) => e?.referenceId === referenceId);
 }
 
 export const bufferSlice = createSlice({
-  name: "buffer",
+  name: BUFFER_SLICE_NAME,
   initialState,
   reducers: {
     open(
       state,
       action: PayloadAction<{
-        id: string;
         entityType: ApiClientEntityType;
         isNew: boolean;
         referenceId?: string;
         data: unknown;
       }>
     ) {
-      const { id, entityType, isNew, referenceId, data } = action.payload;
+      const { entityType, isNew, referenceId, data } = action.payload;
 
       if (referenceId) {
         const existing = findBufferByReferenceId(state.entities, referenceId);
         if (existing) return;
       }
+
+      const id = uuidv4();
 
       const entry: BufferEntry = {
         id,
@@ -43,8 +43,8 @@ export const bufferSlice = createSlice({
         isNew,
         referenceId,
         current: cloneDeep(data),
-        diff: isNew ? (cloneDeep(data) as Partial<unknown>) : {},
-        isDirty: isNew,
+        diff: {},
+        isDirty: false,
       };
 
       bufferAdapter.addOne(state, entry);
@@ -76,6 +76,19 @@ export const bufferSlice = createSlice({
       }
 
       entry.isNew = false;
+      entry.isDirty = true;
+    },
+
+    unsafePatch(
+      state,
+      action: PayloadAction<{
+        id: string;
+        patcher: (entry: BufferEntry) => void;
+      }>
+    ) {
+      const entry = state.entities[action.payload.id];
+      if (!entry) return;
+      action.payload.patcher(entry);
       entry.isDirty = true;
     },
 
@@ -119,14 +132,6 @@ export const bufferSlice = createSlice({
       entry.current = cloneDeep(savedData);
       entry.diff = {};
       entry.isDirty = false;
-    },
-
-    setDirty(state, action: PayloadAction<{ id: string; isDirty: boolean }>) {
-      const { id, isDirty } = action.payload;
-      const entry = state.entities[id] as BufferEntry | undefined;
-      if (entry) {
-        entry.isDirty = isDirty;
-      }
     },
 
     close(state, action: PayloadAction<string>) {

@@ -8,6 +8,7 @@ import { EntityId, EntityNotFound, TreeIndices, UpdateCommand } from "../types";
 import { ApiRecordsState } from "./types";
 import { entitySynced } from "../common/actions";
 import { API_CLIENT_RECORDS_SLICE_NAME } from "../common/constants";
+import { ApiClientEntityType } from "../entities/types";
 
 export const apiRecordsAdapter = createEntityAdapter<RQAPI.ApiClientRecord>({
   selectId: (record) => record.id,
@@ -57,7 +58,7 @@ export const apiRecordsSlice = createSlice({
       const entity = state.records.entities[id];
       if (entity == null) {
         throw new EntityNotFound(id, "apiClientrecord");
-      };
+      }
 
       let shouldRebuildTree = false;
 
@@ -88,14 +89,17 @@ export const apiRecordsSlice = createSlice({
       }
     },
 
-    unsafePatch(state, action: PayloadAction<{
-      id: EntityId,
-      patcher: (state: RQAPI.ApiClientRecord) => void,
-    }>) {
+    unsafePatch(
+      state,
+      action: PayloadAction<{
+        id: EntityId;
+        patcher: (state: RQAPI.ApiClientRecord) => void;
+      }>
+    ) {
       const entity = state.records.entities[action.payload.id];
       if (entity == null) {
         throw new EntityNotFound(action.payload.id, "apiClientrecord");
-      };
+      }
 
       action.payload.patcher(entity);
     },
@@ -128,7 +132,19 @@ export const apiRecordsSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder.addCase(entitySynced, (state, action) => {
-      const record = action.payload.data as RQAPI.ApiClientRecord;
+      const { entityType, data } = action.payload;
+
+      const recordEntityTypes = [
+        ApiClientEntityType.HTTP_RECORD,
+        ApiClientEntityType.COLLECTION_RECORD,
+        ApiClientEntityType.GRAPHQL_RECORD,
+      ];
+
+      if (!recordEntityTypes.includes(entityType)) {
+        return;
+      }
+
+      const record = data as RQAPI.ApiClientRecord;
       apiRecordsAdapter.upsertOne(state.records, record);
       rebuildTreeIndices(state);
     });
