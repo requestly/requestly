@@ -6,7 +6,7 @@ type BaseVariableData = {
   syncValue?: VariableValueType;
   localValue?: VariableValueType;
   type: EnvironmentVariableType;
-  id: number;
+  id: number | string;
 };
 
 export interface EnvironmentVariableData extends BaseVariableData {
