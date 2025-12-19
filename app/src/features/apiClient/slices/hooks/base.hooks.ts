@@ -1,7 +1,8 @@
-import { useSelector, useDispatch, TypedUseSelectorHook } from "react-redux";
+import { TypedUseSelectorHook } from "react-redux";
 import { Dispatch } from "@reduxjs/toolkit";
-import { ApiClientRootState } from "./types";
+import { ApiClientStoreState } from "../workspaceView/helpers/ApiClientContextRegistry/types";
+import { useWorkspaceViewDispatch, useWorkspaceViewSelector } from "features/apiClient/common/WorkspaceProvider";
 
-export const useApiClientSelector: TypedUseSelectorHook<ApiClientRootState> = useSelector;
+export const useApiClientSelector: TypedUseSelectorHook<ApiClientStoreState> = useWorkspaceViewSelector;
 
-export const useApiClientDispatch = () => useDispatch<Dispatch>();
+export const useApiClientDispatch = () => useWorkspaceViewDispatch<Dispatch>();

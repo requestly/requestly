@@ -6,6 +6,7 @@ import InfoIcon from "components/misc/InfoIcon";
 import { Conditional } from "components/common/Conditional";
 import { INVALID_KEY_CHARACTERS } from "features/apiClient/constants";
 import { ScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
+import KeyValueDescriptionCell from "./KeyValueTableDescriptionCell";
 import { captureException } from "@sentry/react";
 
 const EditableContext = React.createContext<FormInstance<any> | null>(null);
@@ -66,6 +67,16 @@ export const KeyValueTableEditableCell: React.FC<React.PropsWithChildren<Editabl
     return <td {...restProps}>{children}</td>;
   }
 
+  const isDescription = dataIndex === "description";
+
+  if (isDescription) {
+    return (
+      <td {...restProps}>
+        <KeyValueDescriptionCell record={record} dataIndex={dataIndex} form={form} onSave={save} />
+      </td>
+    );
+  }
+
   return (
     <td {...restProps}>
       <Form.Item style={{ margin: 0 }} name={dataIndex} initialValue={record?.[dataIndex]}>
@@ -98,6 +109,7 @@ export const KeyValueTableEditableCell: React.FC<React.PropsWithChildren<Editabl
               }}
               variables={variables}
             />
+
             <Conditional
               condition={INVALID_KEY_CHARACTERS.test(record?.key) && dataIndex === "key" && checkInvalidCharacter}
             >

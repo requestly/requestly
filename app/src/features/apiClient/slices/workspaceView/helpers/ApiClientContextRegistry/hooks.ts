@@ -18,7 +18,7 @@ function useApiClientRepository(workspaceId: ApiClientFeatureContext["workspaceI
   return context.repositories;
 }
 
-function useApiClientStore(workspaceId: ApiClientFeatureContext["workspaceId"]) {
+export function useApiClientStore(workspaceId: ApiClientFeatureContext["workspaceId"]) {
   const context = useApiClientFeatureContext(workspaceId);
   return context.store;
 }

@@ -1,5 +1,6 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import { captureException } from "@sentry/react";
+import { User } from "backend/models/users";
 import { SUB_TOUR_TYPES, TOUR_TYPES } from "components/misc/ProductWalkthrough/types";
 import { ONBOARDING_STEPS } from "features/onboarding/types";
 import { GlobalSliceState } from "store/slices/global/types";
@@ -70,6 +71,14 @@ export const updateUsername = (prevState: GlobalSliceState, action: PayloadActio
     return;
   }
   prevState.user.details.username = action.payload.username;
+};
+
+export const updateUserMetadata = (prevState: GlobalSliceState, action: PayloadAction<User["metadata"]>) => {
+  if (!prevState.user.details) {
+    captureException(new Error("Trying to update user metadata when user details is undefined"));
+    return;
+  }
+  prevState.user.details.metadata = action.payload;
 };
 
 export const updateUserDisplayName = (prevState: GlobalSliceState, action: PayloadAction<string>) => {

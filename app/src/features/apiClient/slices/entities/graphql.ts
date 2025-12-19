@@ -2,7 +2,7 @@ import { KeyValuePair, RQAPI } from "features/apiClient/types";
 import { InvalidEntityShape, UpdateCommand } from "../types";
 import { apiRecordsActions } from "../apiRecords/slice";
 import { selectRecordById } from "../apiRecords/selectors";
-import { ApiClientRootState } from "../hooks/types";
+import { ApiClientStoreState } from "../workspaceView/helpers/ApiClientContextRegistry/types";
 import { ApiClientRecordEntity } from "./api-client-record-entity";
 import { ApiClientEntityType } from "./types";
 
@@ -13,7 +13,7 @@ export class GraphQLRecordEntity extends ApiClientRecordEntity<RQAPI.GraphQLApiR
     this.dispatch(apiRecordsActions.applyPatch({ id: this.meta.id, command }));
   }
 
-  getEntityFromState(state: ApiClientRootState): RQAPI.GraphQLApiRecord {
+  getEntityFromState(state: ApiClientStoreState): RQAPI.GraphQLApiRecord {
     const record = selectRecordById(state, this.meta.id);
     if (record?.type !== RQAPI.RecordType.API) {
       throw new InvalidEntityShape({
@@ -21,45 +21,42 @@ export class GraphQLRecordEntity extends ApiClientRecordEntity<RQAPI.GraphQLApiR
         expectedType: RQAPI.RecordType.API,
         foundType: record?.type,
       });
-
-    };
+    }
     if (record.data?.type !== RQAPI.ApiEntryType.GRAPHQL) {
       throw new InvalidEntityShape({
         id: this.id,
         expectedType: RQAPI.ApiEntryType.GRAPHQL,
         foundType: record.data.type,
       });
-
-
-    };
+    }
     return record as RQAPI.GraphQLApiRecord;
   }
 
-  private getRequest(state: ApiClientRootState): RQAPI.GraphQLRequest | undefined {
+  private getRequest(state: ApiClientStoreState): RQAPI.GraphQLRequest | undefined {
     return this.getEntityFromState(state)?.data?.request;
   }
 
-  getResponse(state: ApiClientRootState): RQAPI.GraphQLResponse | undefined {
+  getResponse(state: ApiClientStoreState): RQAPI.GraphQLResponse | undefined {
     return this.getEntityFromState(state)?.data?.response;
   }
 
-  getUrl(state: ApiClientRootState): string | undefined {
+  getUrl(state: ApiClientStoreState): string | undefined {
     return this.getRequest(state)?.url;
   }
 
-  getHeaders(state: ApiClientRootState): KeyValuePair[] | undefined {
+  getHeaders(state: ApiClientStoreState): KeyValuePair[] | undefined {
     return this.getRequest(state)?.headers;
   }
 
-  getOperation(state: ApiClientRootState): string | undefined {
+  getOperation(state: ApiClientStoreState): string | undefined {
     return this.getRequest(state)?.operation;
   }
 
-  getVariables(state: ApiClientRootState): string | undefined {
+  getVariables(state: ApiClientStoreState): string | undefined {
     return this.getRequest(state)?.variables;
   }
 
-  getOperationName(state: ApiClientRootState): string | undefined {
+  getOperationName(state: ApiClientStoreState): string | undefined {
     return this.getRequest(state)?.operationName;
   }
 

@@ -6,19 +6,21 @@ import { ApiClientLocalRepository } from "features/apiClient/helpers/modules/syn
 import { ApiClientCloudRepository } from "features/apiClient/helpers/modules/sync/cloud";
 import localStoreRepository from "features/apiClient/helpers/modules/sync/localStore/ApiClientLocalStorageRepository";
 import { RQAPI } from "features/apiClient/types";
-import { Workspace, WorkspaceType } from "features/workspaces/types";
+import { WorkspaceType } from "features/workspaces/types";
 import { toast } from "utils/Toast";
 import { ApiClientFeatureContext } from "../ApiClientContextRegistry/types";
 import { reduxStore } from "store";
 import { forceRefreshRecords } from "features/apiClient/commands/records";
 import { forceRefreshEnvironments } from "features/apiClient/commands/environments";
 import { reloadFsManager } from "services/fsManagerServiceAdapter";
-import { multiWorkspaceViewActions } from "../../multiWorkspaceViewSlice";
+import { workspaceViewActions } from "../../slice";
 import {
   apiClientContextRegistry,
   ApiClientContextRegistry,
 } from "../ApiClientContextRegistry/ApiClientContextRegistry";
-import { Err, Ok, Result } from "utils/try";
+import { configureStore } from "@reduxjs/toolkit";
+import { apiRecordsSlice } from "features/apiClient/slices/apiRecords";
+import { WorkspaceInfo } from "../../types";
 
 export type UserDetails = { uid: string; loggedIn: true } | { loggedIn: false };
 
@@ -35,12 +37,18 @@ class ApiClientContextService {
     this.contextRegistry = config.contextRegistry;
   }
 
-  private createRepository(workspace: Workspace, user: UserDetails): ApiClientRepositoryInterface {
-    const workspaceId = workspace.id;
-    const workspaceType = workspace.workspaceType;
+  private createRepository(params: {
+    workspaceId: WorkspaceInfo["id"];
+    workspaceMeta: WorkspaceInfo["meta"];
+    user: UserDetails;
+  }): ApiClientRepositoryInterface {
+    const { workspaceId, workspaceMeta, user } = params;
 
-    if (workspaceType === WorkspaceType.LOCAL) {
-      return new ApiClientLocalRepository({ rootPath: workspace.rootPath! });
+    if (workspaceMeta.type === WorkspaceType.LOCAL) {
+      if ("rootPath" in workspaceMeta && workspaceMeta.rootPath) {
+        return new ApiClientLocalRepository({ rootPath: workspaceMeta.rootPath });
+      }
+      throw new Error("Local workspace must have rootPath");
     }
 
     if (!user.loggedIn) {
@@ -52,46 +60,44 @@ class ApiClientContextService {
   }
 
   private createStore(workspaceId: ApiClientFeatureContext["workspaceId"]): ApiClientFeatureContext["store"] {
-    // TODO: integration pending
-    // const store = configureStore({
-    //   reducer: {
-    //     recordsSlice: recordsSlice.reducer,
-    //     environmentSlice: environmentSlice.reducer,
-    //   },
-    // });
+    const store = configureStore({
+      reducer: {
+        [apiRecordsSlice.name]: apiRecordsSlice.reducer,
+      },
+      middleware(getDefaultMiddleware) {
+        return getDefaultMiddleware({
+          serializableCheck: {
+            ignoredActions: ['records/unsafePatch'],
+          },
+        })
+      },
+    });
 
-    // return store;
-
-    // STUB
-    return {} as ApiClientFeatureContext["store"];
+    return store;
   }
 
-  async createContext(workspace: Workspace, userDetails: UserDetails): Promise<Result<ApiClientFeatureContext>> {
+  async createContext(workspace: WorkspaceInfo, userDetails: UserDetails): Promise<ApiClientFeatureContext> {
     const workspaceId = workspace.id;
 
-    try {
-      const existing = this.contextRegistry.getContext(workspaceId);
-      if (existing) {
-        return new Ok(existing);
-      }
-
-      const repo = this.createRepository(workspace, userDetails);
-      await repo.validateConnection();
-
-      const store = this.createStore(workspaceId);
-
-      const result = await this.extractSetupDataFromRepository(repo);
-
-      // TODO: at integration
-      // store.dispatch(recordsSlice.actions.setInitialData(result.apiClientRecords.records));
-      // store.dispatch(environmentsSlice.actions.setInitialData(result.environments));
-
-      const ctx: ApiClientFeatureContext = { workspaceId, store, repositories: repo };
-      this.contextRegistry.addContext(ctx);
-      return new Ok(ctx);
-    } catch (error) {
-      return new Err(error);
+    const existing = this.contextRegistry.getContext(workspaceId);
+    if (existing) {
+      return existing;
     }
+
+    const repo = this.createRepository({ workspaceId, workspaceMeta: workspace.meta, user: userDetails });
+    await repo.validateConnection();
+
+    const store = this.createStore(workspaceId);
+
+    const result = await this.extractSetupDataFromRepository(repo);
+
+    store.dispatch(apiRecordsSlice.actions.hydrate(result.apiClientRecords));
+    //   store.dispatch(environmentsSlice.actions.setInitialData(result.environments));
+
+    const ctx: ApiClientFeatureContext = { workspaceId, store, repositories: repo };
+    this.contextRegistry.addContext(ctx);
+
+    return ctx;
   }
 
   async refreshContext(workspaceId: ApiClientFeatureContext["workspaceId"]): Promise<void> {
@@ -111,9 +117,9 @@ class ApiClientContextService {
       await Promise.all([forceRefreshRecords(context as any), forceRefreshEnvironments(context as any)]);
     } catch (e) {
       reduxStore.dispatch(
-        multiWorkspaceViewActions.setWorkspaceState({
+        workspaceViewActions.setWorkspaceStatus({
           id: workspaceId!,
-          workspaceState: {
+          status: {
             loading: false,
             state: {
               success: false,
@@ -137,7 +143,7 @@ class ApiClientContextService {
 
     let records: ContextSetupData["apiClientRecords"] = { records: [], erroredRecords: [] };
     let environments: ContextSetupData["environments"] = {
-      globalEnvironment: { id: "", name: "", variables: {} },
+      globalEnvironment: { id: environmentVariablesRepository.getGlobalEnvironmentId(), name: "Global", variables: {} },
       nonGlobalEnvironments: {},
     };
     let erroredRecords: ContextSetupData["erroredRecords"] = {

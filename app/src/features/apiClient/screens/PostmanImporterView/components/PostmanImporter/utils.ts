@@ -10,6 +10,7 @@ import {
 import { ApiClientRecordsInterface } from "features/apiClient/helpers/modules/sync/interfaces";
 import { EnvironmentVariableData } from "features/apiClient/store/variables/types";
 import { createBodyContainer } from "features/apiClient/screens/apiClient/utils";
+import { captureException } from "backend/apiClient/utils";
 
 interface PostmanCollectionExport {
   info: {
@@ -122,7 +123,8 @@ const processAuthorizationOptions = (item: PostmanAuth.Item | undefined, parentC
     };
   } else if (item.type === PostmanAuth.AuthType.BASIC_AUTH) {
     const basicAuthOptions = item[item.type];
-    let username: PostmanAuth.KV<"username">, password: PostmanAuth.KV<"password">;
+    //if somehow username or password comes undefined return empty string in that case as fallback to avoid runtime error
+    let username: PostmanAuth.KV<"username"> | undefined, password: PostmanAuth.KV<"password"> | undefined;
 
     basicAuthOptions.forEach((option) => {
       if (option.key === "username") {
@@ -133,13 +135,13 @@ const processAuthorizationOptions = (item: PostmanAuth.Item | undefined, parentC
     });
 
     auth.authConfigStore[Authorization.Type.BASIC_AUTH] = {
-      username: username.value,
-      password: password.value,
+      username: username?.value ?? "",
+      password: password?.value ?? "",
     };
   } else if (item.type === PostmanAuth.AuthType.API_KEY) {
     const apiKeyOptions = item[item.type];
-    let keyLabel: PostmanAuth.KV<"key">;
-    let apiKey: PostmanAuth.KV<"value">;
+    let keyLabel: PostmanAuth.KV<"key"> | undefined;
+    let apiKey: PostmanAuth.KV<"value"> | undefined;
     let addTo: Authorization.API_KEY_CONFIG["addTo"] = "HEADER";
 
     apiKeyOptions.forEach((option) => {
@@ -153,8 +155,8 @@ const processAuthorizationOptions = (item: PostmanAuth.Item | undefined, parentC
     });
 
     auth.authConfigStore[Authorization.Type.API_KEY] = {
-      key: keyLabel.value,
-      value: apiKey.value,
+      key: keyLabel?.value ?? "",
+      value: apiKey?.value ?? "",
       addTo,
     };
   }
@@ -252,12 +254,18 @@ const processRequestBody = (request: any): RequestBodyProcessingResult => {
 
 export const processRequestHeaders = (request: any): RequestHeadersProcessingResult => {
   const headers =
-    request.header?.map((header: { key: string; value: string; disabled: boolean; type: string }, index: number) => ({
-      id: index,
-      key: header.key,
-      value: header.value,
-      isEnabled: !header?.disabled,
-    })) ?? [];
+    request.header?.map(
+      (
+        header: { key: string; value: string; disabled: boolean; type: string; description?: string },
+        index: number
+      ) => ({
+        id: index,
+        key: header.key,
+        value: header.value,
+        isEnabled: !header?.disabled,
+        description: header?.description || "",
+      })
+    ) ?? [];
 
   return { headers };
 };
@@ -276,6 +284,7 @@ const createApiRecord = (
       key: query.key,
       value: query.value,
       isEnabled: true,
+      description: query.description || "",
     })) ?? [];
 
   const { requestBody, contentType } = processRequestBody(request);
@@ -369,6 +378,11 @@ export const processPostmanCollectionData = (
         subCollection.collectionId = parentCollectionId;
         result.collections.push(subCollection);
 
+        if (!subCollection.id) {
+          const error = new Error(`Failed to generate collection ID for: ${item.name}`);
+          captureException(error);
+          return;
+        }
         const subItems = processItems(item.item, subCollection.id);
         result.collections.push(...subItems.collections);
         result.apis.push(...subItems.apis);

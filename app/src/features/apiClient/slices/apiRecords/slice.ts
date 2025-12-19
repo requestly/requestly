@@ -4,9 +4,10 @@ import { RQAPI } from "features/apiClient/types";
 import { ErroredRecord } from "features/apiClient/helpers/modules/sync/local/services/types";
 import { buildTreeIndices } from "../utils/treeUtils";
 import { objectToSetOperations, objectToDeletePaths } from "../utils/pathConverter";
-import { EntityId, TreeIndices, UpdateCommand } from "../types";
+import { EntityId, EntityNotFound, TreeIndices, UpdateCommand } from "../types";
 import { ApiRecordsState } from "./types";
 import { entitySynced } from "../common/actions";
+import { API_CLIENT_RECORDS_SLICE_NAME } from "../common/constants";
 
 export const apiRecordsAdapter = createEntityAdapter<RQAPI.ApiClientRecord>({
   selectId: (record) => record.id,
@@ -32,7 +33,7 @@ function rebuildTreeIndices(state: ApiRecordsState): void {
 }
 
 export const apiRecordsSlice = createSlice({
-  name: "apiClient/records",
+  name: API_CLIENT_RECORDS_SLICE_NAME,
   initialState,
   reducers: {
     setAllRecords(state, action: PayloadAction<RQAPI.ApiClientRecord[]>) {
@@ -54,7 +55,9 @@ export const apiRecordsSlice = createSlice({
     ) {
       const { id, command } = action.payload;
       const entity = state.records.entities[id];
-      if (entity == null) return;
+      if (entity == null) {
+        throw new EntityNotFound(id, "apiClientrecord");
+      };
 
       let shouldRebuildTree = false;
 
@@ -85,6 +88,18 @@ export const apiRecordsSlice = createSlice({
       }
     },
 
+    unsafePatch(state, action: PayloadAction<{
+      id: EntityId,
+      patcher: (state: RQAPI.ApiClientRecord) => void,
+    }>) {
+      const entity = state.records.entities[action.payload.id];
+      if (entity == null) {
+        throw new EntityNotFound(action.payload.id, "apiClientrecord");
+      };
+
+      action.payload.patcher(entity);
+    },
+
     recordDeleted(state, action: PayloadAction<EntityId>) {
       apiRecordsAdapter.removeOne(state.records, action.payload);
       rebuildTreeIndices(state);
@@ -100,20 +115,14 @@ export const apiRecordsSlice = createSlice({
       state.tree = emptyTreeIndices;
     },
 
-    hydrateRecords(
+    hydrate(
       state,
       action: PayloadAction<{
-        success: boolean;
-        data: {
-          records: RQAPI.ApiClientRecord[];
-          erroredRecords: ErroredRecord[];
-        };
-        message?: string;
+        records: RQAPI.ApiClientRecord[];
+        erroredRecords: ErroredRecord[];
       }>
     ) {
-      if (!action.payload.success) return;
-
-      apiRecordsAdapter.setAll(state.records, action.payload.data.records);
+      apiRecordsAdapter.setAll(state.records, action.payload.records);
       rebuildTreeIndices(state);
     },
   },
