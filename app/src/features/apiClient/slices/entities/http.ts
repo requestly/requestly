@@ -1,20 +1,13 @@
 import { KeyValuePair, RequestContentType, RequestMethod, RQAPI } from "features/apiClient/types";
-import { InvalidEntityShape, UpdateCommand } from "../types";
-import { apiRecordsActions } from "../apiRecords/slice";
+import { InvalidEntityShape } from "../types";
 import { selectRecordById } from "../apiRecords/selectors";
-import { ApiClientRootState } from "../hooks/types";
+import { ApiClientStoreState } from "../workspaceView/helpers/ApiClientContextRegistry/types";
 import { ApiClientRecordEntity } from "./api-client-record-entity";
 import { ApiClientEntityType } from "./types";
 
 export class HttpRecordEntity extends ApiClientRecordEntity<RQAPI.HttpApiRecord> {
-
   readonly type = ApiClientEntityType.HTTP_RECORD;
-
-  dispatchCommand(command: UpdateCommand<RQAPI.HttpApiRecord>): void {
-    this.dispatch(apiRecordsActions.applyPatch({ id: this.meta.id, command }));
-  }
-
-  getEntityFromState(state: ApiClientRootState): RQAPI.HttpApiRecord {
+  getEntityFromState(state: ApiClientStoreState): RQAPI.HttpApiRecord {
     const record = selectRecordById(state, this.meta.id);
     if (record?.type !== RQAPI.RecordType.API) {
       throw new InvalidEntityShape({
@@ -22,51 +15,50 @@ export class HttpRecordEntity extends ApiClientRecordEntity<RQAPI.HttpApiRecord>
         expectedType: RQAPI.RecordType.API,
         foundType: record?.type,
       });
-    };
+    }
     if (record.data?.type !== RQAPI.ApiEntryType.HTTP) {
       throw new InvalidEntityShape({
         id: this.id,
         expectedType: RQAPI.ApiEntryType.HTTP,
         foundType: record.data.type,
       });
-
-    };
+    }
     return record as RQAPI.HttpApiRecord;
   }
 
-  private getRequest(state: ApiClientRootState): RQAPI.HttpRequest {
+  private getRequest(state: ApiClientStoreState): RQAPI.HttpRequest {
     return this.getEntityFromState(state).data.request;
   }
 
-  getResponse(state: ApiClientRootState): RQAPI.HttpResponse | undefined {
+  getResponse(state: ApiClientStoreState): RQAPI.HttpResponse | undefined {
     return this.getEntityFromState(state).data.response;
   }
 
-  getUrl(state: ApiClientRootState): string | undefined {
+  getUrl(state: ApiClientStoreState): string | undefined {
     return this.getRequest(state).url;
   }
 
-  getMethod(state: ApiClientRootState): RequestMethod | undefined {
+  getMethod(state: ApiClientStoreState): RequestMethod | undefined {
     return this.getRequest(state).method;
   }
 
-  getHeaders(state: ApiClientRootState): KeyValuePair[] | undefined {
+  getHeaders(state: ApiClientStoreState): KeyValuePair[] | undefined {
     return this.getRequest(state).headers;
   }
 
-  getQueryParams(state: ApiClientRootState): KeyValuePair[] | undefined {
+  getQueryParams(state: ApiClientStoreState): KeyValuePair[] | undefined {
     return this.getRequest(state).queryParams;
   }
 
-  getBody(state: ApiClientRootState): RQAPI.RequestBody | undefined {
+  getBody(state: ApiClientStoreState): RQAPI.RequestBody | undefined {
     return this.getRequest(state).body;
   }
 
-  getContentType(state: ApiClientRootState): RequestContentType | undefined {
+  getContentType(state: ApiClientStoreState): RequestContentType | undefined {
     return this.getRequest(state).contentType;
   }
 
-  getPathVariables(state: ApiClientRootState): RQAPI.PathVariable[] | undefined {
+  getPathVariables(state: ApiClientStoreState): RQAPI.PathVariable[] | undefined {
     return this.getRequest(state).pathVariables;
   }
 
