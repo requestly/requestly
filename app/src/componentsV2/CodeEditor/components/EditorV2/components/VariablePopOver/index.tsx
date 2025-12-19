@@ -275,7 +275,7 @@ const VariableInfo: React.FC<{
     <>
       <div className="variable-info-property-container">
         <span>{getScopeIcon(source.scope)}</span>
-        <span className="variable-header-info-seperator" />
+        <span className="variable-header-info-separator" />
         <div className="variable-info-header-name">{source.name}</div>
 
         <RQButton
