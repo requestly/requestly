@@ -4,9 +4,10 @@ import { EntityType } from "features/apiClient/slices/types";
 
 export type TabId = string;
 
-export type Abortable<T = unknown> = {
+export type Abortable = {
   abort: () => void;
-  promise: Promise<T>;
+  then: (cb: () => void) => void;
+  catch: (cb: () => void) => void;
 };
 
 export type ActiveWorkflow = {

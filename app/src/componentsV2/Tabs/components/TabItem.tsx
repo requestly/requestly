@@ -43,7 +43,11 @@ export const TabItem: React.FC<React.PropsWithChildren<{ tabId: TabId }>> = Reac
           (w: ActiveWorkflow) => {
             dispatch(tabsActions.addActiveWorkflow({ tabId: props.tabId, workflow: w }));
 
-            w.workflow.promise.then(() => {
+            w.workflow.then(() => {
+              dispatch(tabsActions.removeActiveWorkflow({ tabId: props.tabId, workflow: w }));
+            });
+
+            w.workflow.catch(() => {
               dispatch(tabsActions.removeActiveWorkflow({ tabId: props.tabId, workflow: w }));
             });
 
