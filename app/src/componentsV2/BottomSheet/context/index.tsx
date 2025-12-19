@@ -1,82 +1,155 @@
-import React, { createContext, useState, useContext, useCallback } from "react";
+import React, { createContext, useState, useContext, useEffect, useMemo, useCallback } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { BottomSheetPlacement } from "../types";
 import {
   trackBottomSheetToggled,
   trackViewBottomSheetOnBottomClicked,
   trackViewBottomSheetOnRightClicked,
 } from "../analytics";
+import { getBottomSheetState } from "store/selectors";
+import { globalActions } from "store/slices/global/slice";
 
-interface toggleParams {
+interface ToggleParams {
   isOpen?: boolean;
   action: string;
 }
+
 interface BottomSheetContextProps {
   isBottomSheetOpen: boolean;
   sheetPlacement: BottomSheetPlacement;
-  toggleBottomSheet: (params?: toggleParams) => void;
+  sheetSize: number[];
+  toggleBottomSheet: (params: ToggleParams) => void;
   toggleSheetPlacement: (placement?: BottomSheetPlacement) => void;
+  updateSheetSize: (size: number[]) => void;
 }
 
-const BottomSheetContext = createContext<BottomSheetContextProps | undefined>(undefined);
+const DEFAULT_SIZE: number[] = [70, 30];
+
+const isValidSize = (size?: number[]) => Array.isArray(size) && size.length === 2 && size[0] >= 10 && size[1] >= 10;
+
+const BottomSheetContext = createContext<BottomSheetContextProps | null>(null);
 
 export const BottomSheetProvider: React.FC<{
   children: React.ReactNode;
-  defaultPlacement: BottomSheetPlacement;
+  context?: "api_client" | "rules";
+  defaultPlacement?: BottomSheetPlacement;
   isSheetOpenByDefault?: boolean;
-}> = ({ children, defaultPlacement, isSheetOpenByDefault = false }) => {
-  const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(isSheetOpenByDefault);
-  const [sheetPlacement, setSheetPlacement] = useState<BottomSheetPlacement>(defaultPlacement);
+}> = ({
+  children,
+  context = "rules",
+  defaultPlacement = BottomSheetPlacement.BOTTOM,
+  isSheetOpenByDefault = false,
+}) => {
+  const dispatch = useDispatch();
+  const reduxState = useSelector((state) => getBottomSheetState(state, context));
 
-  const toggleBottomSheet = (params: toggleParams) => {
-    if (!params) {
-      return;
+  const hasReduxState = typeof reduxState?.open === "boolean";
+
+  const [userHasInteracted, setUserHasInteracted] = useState(hasReduxState);
+
+  const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(hasReduxState ? reduxState.open : isSheetOpenByDefault);
+
+  const [sheetPlacement, setSheetPlacement] = useState<BottomSheetPlacement>(
+    reduxState?.placement === "right" ? BottomSheetPlacement.RIGHT : defaultPlacement
+  );
+
+  const [sheetSize, setSheetSize] = useState<number[]>(isValidSize(reduxState?.size) ? reduxState!.size : DEFAULT_SIZE);
+
+  useEffect(() => {
+    if (!reduxState) return;
+
+    const shouldSyncOpen = !isSheetOpenByDefault || userHasInteracted;
+
+    if (shouldSyncOpen && reduxState.open !== isBottomSheetOpen) {
+      setIsBottomSheetOpen(reduxState.open);
     }
-    const { isOpen, action } = params;
-    if (typeof isOpen !== "undefined") {
-      setIsBottomSheetOpen(isOpen);
-      trackBottomSheetToggled(isOpen, action);
-    } else {
-      const newOpenState = !isBottomSheetOpen;
-      setIsBottomSheetOpen(newOpenState);
-      trackBottomSheetToggled(newOpenState, action);
+
+    setSheetPlacement(reduxState.placement === "right" ? BottomSheetPlacement.RIGHT : BottomSheetPlacement.BOTTOM);
+
+    if (isValidSize(reduxState.size)) {
+      setSheetSize(reduxState.size);
     }
-  };
+  }, [reduxState, userHasInteracted, isSheetOpenByDefault, isBottomSheetOpen]);
+
+  const toggleBottomSheet = useCallback(
+    ({ isOpen, action }: ToggleParams) => {
+      const nextState = typeof isOpen === "boolean" ? isOpen : !isBottomSheetOpen;
+
+      setUserHasInteracted(true);
+      setIsBottomSheetOpen(nextState);
+
+      dispatch(
+        globalActions.updateBottomSheetState({
+          context,
+          state: { open: nextState },
+        })
+      );
+
+      trackBottomSheetToggled(nextState, action);
+    },
+    [dispatch, context, isBottomSheetOpen]
+  );
 
   const toggleSheetPlacement = useCallback(
     (placement?: BottomSheetPlacement) => {
-      if (placement) {
-        setSheetPlacement(placement);
-        return;
+      const nextPlacement =
+        placement ??
+        (sheetPlacement === BottomSheetPlacement.BOTTOM ? BottomSheetPlacement.RIGHT : BottomSheetPlacement.BOTTOM);
+
+      if (!placement) {
+        nextPlacement === BottomSheetPlacement.RIGHT
+          ? trackViewBottomSheetOnRightClicked()
+          : trackViewBottomSheetOnBottomClicked();
       }
-      if (sheetPlacement === BottomSheetPlacement.BOTTOM) {
-        setSheetPlacement(BottomSheetPlacement.RIGHT);
-        trackViewBottomSheetOnRightClicked();
-      } else {
-        setSheetPlacement(BottomSheetPlacement.BOTTOM);
-        trackViewBottomSheetOnBottomClicked();
-      }
+
+      setSheetPlacement(nextPlacement);
+
+      dispatch(
+        globalActions.updateBottomSheetState({
+          context,
+          state: {
+            placement: nextPlacement === BottomSheetPlacement.RIGHT ? "right" : "bottom",
+          },
+        })
+      );
     },
-    [sheetPlacement]
+    [dispatch, context, sheetPlacement]
   );
 
-  return (
-    <BottomSheetContext.Provider
-      value={{
-        isBottomSheetOpen,
-        toggleBottomSheet,
-        sheetPlacement,
-        toggleSheetPlacement,
-      }}
-    >
-      {children}
-    </BottomSheetContext.Provider>
+  const updateSheetSize = useCallback(
+    (size: number[]) => {
+      if (!isValidSize(size)) return;
+
+      setSheetSize(size);
+      dispatch(
+        globalActions.updateBottomSheetState({
+          context,
+          state: { size },
+        })
+      );
+    },
+    [dispatch, context]
   );
+
+  const value = useMemo(
+    () => ({
+      isBottomSheetOpen,
+      toggleBottomSheet,
+      sheetPlacement,
+      toggleSheetPlacement,
+      sheetSize,
+      updateSheetSize,
+    }),
+    [isBottomSheetOpen, toggleBottomSheet, sheetPlacement, toggleSheetPlacement, sheetSize, updateSheetSize]
+  );
+
+  return <BottomSheetContext.Provider value={value}>{children}</BottomSheetContext.Provider>;
 };
 
 export const useBottomSheetContext = () => {
-  const context = useContext(BottomSheetContext);
-  if (!context) {
-    throw new Error("useBottomSheetContext must be used within a BottomSheetProvider");
+  const ctx = useContext(BottomSheetContext);
+  if (!ctx) {
+    throw new Error("useBottomSheetContext must be used within BottomSheetProvider");
   }
-  return context;
+  return ctx;
 };

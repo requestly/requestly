@@ -8,6 +8,15 @@ export const getIsExtensionEnabled = (state) => {
   return getGlobalState(state)["isExtensionEnabled"];
 };
 
+export const getBottomSheetOrientation = (state) => {
+  return getGlobalState(state)["bottomSheetOrientation"] || {};
+};
+
+export const getBottomSheetState = (state, context) => {
+  const orientation = getBottomSheetOrientation(state);
+  return orientation[context] || null;
+};
+
 export const getRulesNode = (state) => {
   return getGlobalState(state)["rules"];
 };

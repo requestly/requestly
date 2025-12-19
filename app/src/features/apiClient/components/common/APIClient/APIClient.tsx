@@ -135,7 +135,7 @@ export const APIClientModal: React.FC<Props> = ({ request, isModalOpen, onModalC
       destroyOnClose
     >
       <WindowsAndLinuxGatedHoc featureName="API client">
-        <BottomSheetProvider defaultPlacement={BottomSheetPlacement.BOTTOM}>
+        <BottomSheetProvider context="api_client" defaultPlacement={BottomSheetPlacement.BOTTOM}>
           <ContextId id={NoopContextId}>
             <AutogenerateProvider>
               <ClientViewFactory
