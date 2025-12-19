@@ -3,6 +3,9 @@ import { TabState, TabServiceState, TabId, ActiveWorkflow, TabModeConfig } from 
 import { TabSource } from "../types";
 import { ReducerKeys } from "store/constants";
 import { v4 as uuidv4 } from "uuid";
+import { enableMapSet } from "immer";
+
+enableMapSet();
 
 export const tabsAdapter = createEntityAdapter<TabState>({
   selectId: (tab) => tab.id,
@@ -57,26 +60,19 @@ export const tabsSlice = createSlice({
 
     addActiveWorkflow(state, action: PayloadAction<{ tabId: TabId; workflow: ActiveWorkflow }>) {
       const { tabId, workflow } = action.payload;
-      const tab = tabsAdapter.getSelectors().selectById(state.tabs, tabId);
+      const tab = state.tabs.entities[tabId];
+
       if (tab) {
         tab.activeWorkflows.add(workflow);
-        tabsAdapter.updateOne(state.tabs, {
-          id: tabId,
-          changes: { activeWorkflows: tab.activeWorkflows },
-        });
       }
     },
 
     removeActiveWorkflow(state, action: PayloadAction<{ tabId: TabId; workflow: ActiveWorkflow }>) {
       const { tabId, workflow } = action.payload;
-      const tab = tabsAdapter.getSelectors().selectById(state.tabs, tabId);
+      const tab = state.tabs.entities[tabId];
 
       if (tab) {
         tab.activeWorkflows.delete(workflow);
-        tabsAdapter.updateOne(state.tabs, {
-          id: tabId,
-          changes: { activeWorkflows: tab.activeWorkflows },
-        });
       }
     },
 
