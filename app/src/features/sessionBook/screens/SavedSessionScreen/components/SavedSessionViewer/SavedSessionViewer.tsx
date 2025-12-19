@@ -109,7 +109,7 @@ export const SavedSessionViewer = () => {
 
   return (
     <div className="saved-session-viewer-container">
-      <BottomSheetProvider defaultPlacement={BottomSheetPlacement.RIGHT}>
+      <BottomSheetProvider context="rules" defaultPlacement={BottomSheetPlacement.RIGHT}>
         <div className="saved-session-header">
           <SessionTitle />
 

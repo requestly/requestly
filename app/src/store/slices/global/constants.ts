@@ -185,6 +185,19 @@ const INITIAL_GLOBAL_SLICE_STATE: GlobalSliceState = {
     isAcquisitionAnnouncementModalVisible: true,
   },
 
+  bottomSheetOrientation: {
+    api_client: {
+      open: false,
+      placement: "bottom",
+      size: [70, 30],
+    },
+    rules: {
+      open: false,
+      placement: "bottom",
+      size: [70, 30],
+    },
+  },
+
   editorToast: {},
 
   popupConfig: {},

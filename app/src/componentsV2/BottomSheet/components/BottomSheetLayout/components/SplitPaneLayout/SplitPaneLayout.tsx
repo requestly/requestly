@@ -16,10 +16,18 @@ const getDefaultSizes = (isSheetPlacedAtBottom: boolean, initialSizes: Array<num
 };
 
 export const SplitPaneLayout: React.FC<Props> = ({ bottomSheet, children, minSize = 26, initialSizes = [40, 60] }) => {
-  const { sheetPlacement, isBottomSheetOpen, toggleBottomSheet } = useBottomSheetContext();
+  const { sheetPlacement, isBottomSheetOpen, toggleBottomSheet, sheetSize, updateSheetSize } = useBottomSheetContext();
   const isSheetPlacedAtBottom = sheetPlacement === BottomSheetPlacement.BOTTOM;
 
-  const [sizes, setSizes] = useState<number[]>(() => getDefaultSizes(isSheetPlacedAtBottom, initialSizes));
+  const [sizes, setSizes] = useState<number[]>(() => {
+    if (sheetSize?.length === 2) {
+      const [firstSize, secondSize] = sheetSize;
+      if (secondSize >= 10 && firstSize >= 10) {
+        return sheetSize;
+      }
+    }
+    return getDefaultSizes(isSheetPlacedAtBottom, initialSizes);
+  });
   const splitContainerRef = useRef<HTMLDivElement>(null);
 
   const splitDirection = isSheetPlacedAtBottom ? SplitDirection.VERTICAL : SplitDirection.HORIZONTAL;
@@ -30,16 +38,29 @@ export const SplitPaneLayout: React.FC<Props> = ({ bottomSheet, children, minSiz
     if (!isBottomSheetOpen) {
       setSizes([100, 0]);
     } else {
-      setSizes(getDefaultSizes(isSheetPlacedAtBottom, initialSizes));
+      let targetSizes;
+      if (sheetSize?.length === 2) {
+        const [firstSize, secondSize] = sheetSize;
+        if (secondSize >= 10 && firstSize >= 10) {
+          targetSizes = sheetSize;
+        }
+      }
+
+      if (!targetSizes) {
+        targetSizes = getDefaultSizes(isSheetPlacedAtBottom, initialSizes);
+      }
+
+      setSizes(targetSizes);
     }
-    // Adding initialSizes to dependencies will cause the bottomsheet split sizes to reset when parent re-renders.
-    // TODO: move size state to context
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isBottomSheetOpen, isSheetPlacedAtBottom]);
+  }, [isBottomSheetOpen, isSheetPlacedAtBottom, sheetSize]);
 
   const handleDrag = useCallback(
     (newSizes: number[]) => {
       setSizes(newSizes);
+      if (isBottomSheetOpen && newSizes[1] >= 10 && newSizes[0] >= 10) {
+        updateSheetSize(newSizes);
+      }
 
       if (!splitContainerRef.current) return;
 
@@ -53,7 +74,7 @@ export const SplitPaneLayout: React.FC<Props> = ({ bottomSheet, children, minSiz
         toggleBottomSheet({ isOpen: true, action: "bottom_sheet_collapse_expand" });
       }
     },
-    [isSheetPlacedAtBottom, toggleBottomSheet, SNAP_OFFSET_PIXELS]
+    [isSheetPlacedAtBottom, toggleBottomSheet, SNAP_OFFSET_PIXELS, updateSheetSize, isBottomSheetOpen]
   );
 
   return (

@@ -1,4 +1,7 @@
 import React, { useCallback, useMemo } from "react";
+import { useSelector } from "react-redux";
+import { BottomSheetPlacement, BottomSheetProvider } from "componentsV2/BottomSheet";
+import { getBottomSheetState } from "store/selectors";
 import { RequestViewTabSource } from "../../RequestView/requestViewTabSource";
 import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
 import { RQAPI } from "features/apiClient/types";
@@ -14,6 +17,7 @@ export const HistoryView: React.FC = () => {
   const [openTab] = useTabServiceWithSelector((state) => [state.openTab]);
   const { history, addToHistory, setCurrentHistoryIndex, selectedHistoryIndex } = useApiClientContext();
   const [viewMode] = useApiClientMultiWorkspaceView((s) => [s.viewMode]);
+  const currentBottomSheetState = useSelector((state) => getBottomSheetState(state, "api_client"));
 
   const entry = useMemo(() => {
     if (selectedHistoryIndex != null && history?.[selectedHistoryIndex]) {
@@ -55,6 +59,8 @@ export const HistoryView: React.FC = () => {
     [addToHistory, setCurrentHistoryIndex, history]
   );
 
+  const shouldInheritState = currentBottomSheetState && typeof currentBottomSheetState.open === "boolean";
+
   if (!entry) {
     return (
       <div className="empty-state">
@@ -64,14 +70,27 @@ export const HistoryView: React.FC = () => {
       </div>
     );
   }
+  const defaultOpen = shouldInheritState ? currentBottomSheetState.open : true;
+  const defaultPlacement = shouldInheritState
+    ? currentBottomSheetState.placement === "right"
+      ? BottomSheetPlacement.RIGHT
+      : BottomSheetPlacement.BOTTOM
+    : BottomSheetPlacement.BOTTOM;
 
   return (
-    <GenericApiClient
-      isCreateMode
-      isOpenInModal={hideSaveBtn} // TODO: rename isOpenInModal prop with some meaningful name
-      onSaveCallback={handleSaveCallback}
-      apiEntryDetails={entry}
-      handleAppRequestFinished={handleAppRequestFinished}
-    />
+    <BottomSheetProvider
+      key={"api_client_history"}
+      context="api_client"
+      defaultPlacement={defaultPlacement}
+      isSheetOpenByDefault={defaultOpen}
+    >
+      <GenericApiClient
+        isCreateMode
+        isOpenInModal={hideSaveBtn} // TODO: rename isOpenInModal prop with some meaningful name
+        onSaveCallback={handleSaveCallback}
+        apiEntryDetails={entry}
+        handleAppRequestFinished={handleAppRequestFinished}
+      />
+    </BottomSheetProvider>
   );
 };

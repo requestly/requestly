@@ -111,7 +111,7 @@ const HttpClientView: React.FC<Props> = ({
 
   const [, setDeepLinkState] = useDeepLinkState({ tab: RequestTab.QUERY_PARAMS });
 
-  const { toggleBottomSheet, toggleSheetPlacement, sheetPlacement } = useBottomSheetContext();
+  const { toggleBottomSheet, sheetPlacement } = useBottomSheetContext();
 
   const { onSaveRecord } = useNewApiClientContext();
 
@@ -231,18 +231,6 @@ const HttpClientView: React.FC<Props> = ({
     state.purgeAndAddHeaders,
   ]);
   const [getData, getParentChain] = useAPIRecords((state) => [state.getData, state.getParentChain]);
-
-  const isDefaultPlacementRef = useRef(false);
-
-  useLayoutEffect(() => {
-    if (isDefaultPlacementRef.current) {
-      return;
-    }
-
-    isDefaultPlacementRef.current = true;
-    const bottomSheetPlacement = window.innerWidth <= 1280 ? BottomSheetPlacement.BOTTOM : BottomSheetPlacement.RIGHT;
-    toggleSheetPlacement(bottomSheetPlacement);
-  }, [toggleSheetPlacement]);
 
   useEffect(() => {
     setEntry(apiEntryDetails?.data ?? (getEmptyApiEntry(RQAPI.ApiEntryType.HTTP) as RQAPI.HttpApiEntry));

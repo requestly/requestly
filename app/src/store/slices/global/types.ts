@@ -4,12 +4,24 @@ import { GlobalModals } from "./modals/types";
 import { RulesState } from "./rules/types";
 import { UserAuth } from "./user/types";
 
+export interface BottomSheetState {
+  open: boolean;
+  placement: "bottom" | "right";
+  size: number[];
+}
+
+export interface BottomSheetOrientation {
+  api_client: BottomSheetState;
+  rules: BottomSheetState;
+}
+
 export interface GlobalSliceState {
   activeModals: GlobalModals;
   editorToast: EditorToastState["editorToast"];
   rules: RulesState;
   user: UserAuth;
   syncingV2: boolean;
+  bottomSheetOrientation: BottomSheetOrientation;
   isExtensionEnabled: boolean;
   pendingRefresh: {
     rules: boolean;

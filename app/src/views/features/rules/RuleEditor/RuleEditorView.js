@@ -20,7 +20,7 @@ const RuleEditorView = () => {
   }
 
   return (
-    <BottomSheetProvider defaultPlacement={BottomSheetPlacement.BOTTOM}>
+    <BottomSheetProvider context="rules" defaultPlacement={BottomSheetPlacement.BOTTOM}>
       <RuleEditor />
     </BottomSheetProvider>
   );
