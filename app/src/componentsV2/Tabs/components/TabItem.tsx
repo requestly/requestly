@@ -4,7 +4,6 @@ import { useDispatch } from "react-redux";
 import { closeTab } from "../slice/thunks";
 import { tabsActions } from "../slice/slice";
 import { useTabById } from "../slice/hooks";
-import { useWorkflowManager } from "../slice/hooks";
 import { useActiveTab } from "../slice/hooks";
 import { TabSource } from "../types";
 import { TabId, ActiveWorkflow } from "../slice/types";
@@ -13,7 +12,6 @@ export const TabItem: React.FC<React.PropsWithChildren<{ tabId: TabId }>> = Reac
   const dispatch = useDispatch();
   const tab = useTabById(props.tabId);
   const activeTab = useActiveTab();
-  const { registerWorkflow, unregisterWorkflow } = useWorkflowManager();
 
   const isActive = activeTab?.id === props.tabId;
 
@@ -42,17 +40,16 @@ export const TabItem: React.FC<React.PropsWithChildren<{ tabId: TabId }>> = Reac
         }, [tab]),
 
         registerWorkflow: useCallback(
-          (workflow: ActiveWorkflow) => {
-            registerWorkflow(props.tabId, workflow);
-          },
-          [registerWorkflow, props.tabId]
-        ),
+          (w: ActiveWorkflow) => {
+            dispatch(tabsActions.addActiveWorkflow({ tabId: props.tabId, workflow: w }));
 
-        unregisterWorkflow: useCallback(
-          (workflow: ActiveWorkflow) => {
-            unregisterWorkflow(props.tabId, workflow);
+            w.workflow.promise.then(() => {
+              dispatch(tabsActions.removeActiveWorkflow({ tabId: props.tabId, workflow: w }));
+            });
+
+            return w;
           },
-          [unregisterWorkflow, props.tabId]
+          [props.tabId, dispatch]
         ),
       }}
     >

@@ -1,7 +1,8 @@
 import { createEntityAdapter, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { TabState, TabServiceState, TabId, ActiveWorkflow } from "./types";
+import { TabState, TabServiceState, TabId, ActiveWorkflow, TabModeConfig } from "./types";
 import { TabSource } from "../types";
 import { ReducerKeys } from "store/constants";
+import { v4 as uuidv4 } from "uuid";
 
 export const tabsAdapter = createEntityAdapter<TabState>({
   selectId: (tab) => tab.id,
@@ -65,7 +66,7 @@ export const tabsSlice = createSlice({
       const { tabId, workflow } = action.payload;
       const tab = tabsAdapter.getSelectors().selectById(state.tabs, tabId);
       if (tab) {
-        tab.activeWorkflows.push(workflow);
+        tab.activeWorkflows.add(workflow);
         tabsAdapter.updateOne(state.tabs, {
           id: tabId,
           changes: { activeWorkflows: tab.activeWorkflows },
@@ -76,11 +77,12 @@ export const tabsSlice = createSlice({
     removeActiveWorkflow(state, action: PayloadAction<{ tabId: TabId; workflow: ActiveWorkflow }>) {
       const { tabId, workflow } = action.payload;
       const tab = tabsAdapter.getSelectors().selectById(state.tabs, tabId);
+
       if (tab) {
-        const activeWorkflows = tab.activeWorkflows.filter((w) => w !== workflow);
+        tab.activeWorkflows.delete(workflow);
         tabsAdapter.updateOne(state.tabs, {
           id: tabId,
-          changes: { activeWorkflows },
+          changes: { activeWorkflows: tab.activeWorkflows },
         });
       }
     },
@@ -124,6 +126,49 @@ export const tabsSlice = createSlice({
       state.tabs = tabsAdapter.getInitialState();
       state.activeTabId = undefined;
       state.previewTabId = undefined;
+    },
+
+    openTab(
+      state,
+      action: PayloadAction<{
+        source: TabSource;
+        modeConfig: TabModeConfig;
+        preview?: boolean;
+      }>
+    ) {
+      const { source, modeConfig, preview } = action.payload;
+      const sourceId = source.getSourceId();
+      const sourceName = source.getSourceName();
+
+      const allTabs = tabsAdapter.getSelectors().selectAll(state.tabs);
+      const existingTab = allTabs.find(
+        (tab) => tab.source.getSourceId() === sourceId && tab.source.getSourceName() === sourceName
+      );
+
+      if (existingTab) {
+        state.activeTabId = existingTab.id;
+        if (preview) {
+          state.previewTabId = existingTab.id;
+        }
+        return;
+      }
+
+      const tabId = uuidv4();
+      const newTab: TabState = {
+        id: tabId,
+        source,
+        modeConfig,
+        activeWorkflows: new Set(),
+      };
+
+      tabsAdapter.addOne(state.tabs, newTab);
+      if (!state.activeTabId) {
+        state.activeTabId = tabId;
+      }
+
+      if (preview) {
+        state.previewTabId = tabId;
+      }
     },
   },
 });

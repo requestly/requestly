@@ -4,8 +4,9 @@ import { EntityType } from "features/apiClient/slices/types";
 
 export type TabId = string;
 
-export type Abortable = {
+export type Abortable<T = unknown> = {
   abort: () => void;
+  promise: Promise<T>;
 };
 
 export type ActiveWorkflow = {
@@ -25,7 +26,7 @@ export type TabModeConfig = { entityId: string; entityType: EntityType } & (
 export interface TabState<T extends TabSource = TabSource> {
   id: TabId;
   source: T;
-  activeWorkflows: ActiveWorkflow[];
+  activeWorkflows: Set<ActiveWorkflow>;
   modeConfig: TabModeConfig;
 }
 

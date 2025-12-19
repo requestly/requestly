@@ -10,7 +10,6 @@ export interface HostContext {
   getSourceId: () => string | undefined;
 
   registerWorkflow: (workflow: ActiveWorkflow) => void;
-  unregisterWorkflow: (workflow: ActiveWorkflow) => void;
 }
 
 const defaultHostContext: HostContext = {
@@ -19,7 +18,6 @@ const defaultHostContext: HostContext = {
   getIsActive: () => false,
   getSourceId: () => undefined,
   registerWorkflow: () => {},
-  unregisterWorkflow: () => {},
 };
 
 export const HostContextImpl = createContext<HostContext>(defaultHostContext);
