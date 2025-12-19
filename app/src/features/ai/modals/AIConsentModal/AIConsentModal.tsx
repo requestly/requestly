@@ -10,7 +10,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { toast } from "utils/Toast";
 import { globalActions } from "store/slices/global/slice";
-import { getUserMetadata } from "store/slices/global/user/selectors";
 import { Link } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
 import "./aiConsentModal.scss";
@@ -39,7 +38,6 @@ const AI_DETAILS = [
 
 export const AIConsentModal: React.FC<AIConsentModalProps> = ({ isOpen, toggle, onEnableCallback }) => {
   const user = useSelector(getUserAuthDetails);
-  const userMetadata = useSelector(getUserMetadata);
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -47,7 +45,7 @@ export const AIConsentModal: React.FC<AIConsentModalProps> = ({ isOpen, toggle, 
     setIsLoading(true);
     const result = await toggleAIFeatures(user.details?.profile?.uid, true);
     if (result.success) {
-      dispatch(globalActions.updateUserMetadata({ ...userMetadata, ai_consent: true }));
+      dispatch(globalActions.updateIsOptedforAIFeatures(true));
       toggle(false);
       onEnableCallback?.();
     } else {
