@@ -18,12 +18,18 @@ export const selectActiveTabId = createSelector(selectTabsSlice, (slice) => slic
 export const selectPreviewTabId = createSelector(selectTabsSlice, (slice) => slice.previewTabId);
 
 export const selectActiveTab = createSelector([selectTabsSlice, selectActiveTabId], (slice, activeTabId) => {
-  if (!activeTabId) return undefined;
+  if (!activeTabId) {
+    return;
+  }
+
   return tabsAdapter.getSelectors().selectById(slice.tabs, activeTabId);
 });
 
 export const selectPreviewTab = createSelector([selectTabsSlice, selectPreviewTabId], (slice, previewTabId) => {
-  if (!previewTabId) return undefined;
+  if (!previewTabId) {
+    return;
+  }
+
   return tabsAdapter.getSelectors().selectById(slice.tabs, previewTabId);
 });
 
