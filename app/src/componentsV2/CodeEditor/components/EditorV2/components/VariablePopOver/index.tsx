@@ -33,16 +33,15 @@ interface VariablePopoverProps {
   onClose?: () => void;
   onPinChange?: (pinned: boolean) => void;
 }
-enum InfoFieldKey {
-  NAME = "NAME",
-  TYPE = "TYPE",
-  INITIAL_VALUE = "INITIAL_VALUE",
-  CURRENT_VALUE = "CURRENT_VALUE",
-  IS_PERSISTENT = "IS_PERSISTENT",
+enum InfoFieldLabel {
+  NAME = "Name",
+  TYPE = "Type",
+  INITIAL_VALUE = "Initial Value",
+  CURRENT_VALUE = "Current Value",
+  IS_PERSISTENT = "Is persistent",
 }
 interface InfoFieldConfig {
-  id: InfoFieldKey;
-  label: string;
+  label: InfoFieldLabel;
   value: string | boolean;
   isSecret?: boolean;
 }
@@ -234,41 +233,38 @@ const VariableInfo: React.FC<{
   const isSecretType = variable.type === EnvironmentVariableType.Secret;
   const infoFields: InfoFieldConfig[] = useMemo(() => {
     const commonFields = [
-      { id: InfoFieldKey.NAME, label: "Name", value: name },
-      { id: InfoFieldKey.TYPE, label: "Type", value: capitalize(variable.type) },
+      { label: InfoFieldLabel.NAME, value: name },
+      { label: InfoFieldLabel.TYPE, value: capitalize(variable.type) },
     ];
 
     if (source.scope === VariableScope.RUNTIME) {
       return [
         ...commonFields,
         {
-          id: InfoFieldKey.CURRENT_VALUE,
-          label: "Current Value",
+          label: InfoFieldLabel.CURRENT_VALUE,
           value: localValue,
           isSecret: isSecretType,
         },
-        { id: InfoFieldKey.IS_PERSISTENT, label: "Is persistent", value: isPersisted },
+        { label: InfoFieldLabel.IS_PERSISTENT, value: isPersisted },
       ];
     }
 
     return [
       ...commonFields,
       {
-        id: InfoFieldKey.INITIAL_VALUE,
-        label: "Initial Value",
+        label: InfoFieldLabel.INITIAL_VALUE,
         value: syncValue,
         isSecret: isSecretType,
       },
       {
-        id: InfoFieldKey.CURRENT_VALUE,
-        label: "Current Value",
+        label: InfoFieldLabel.CURRENT_VALUE,
         value: localValue,
         isSecret: isSecretType,
       },
     ];
   }, [source.scope, name, variable.type, localValue, isPersisted, syncValue, isSecretType]);
 
-  const toggleVisibility = useCallback((key: InfoFieldKey) => {
+  const toggleVisibility = useCallback((key: InfoFieldLabel) => {
     setRevealedSecrets((prev) => ({ ...prev, [key]: !prev[key] }));
   }, []);
 
@@ -293,13 +289,13 @@ const VariableInfo: React.FC<{
       <div className="variable-info-content-container">
         <div className="variable-info-content">
           {infoFields.map((field) => (
-            <React.Fragment key={field.id}>
+            <React.Fragment key={field.label}>
               <div className="variable-info-title">{field.label}</div>
 
               <div className={`variable-info-value ${field.isSecret ? "with-toggle" : ""}`}>
                 <span className="value-content">
                   {field.isSecret ? (
-                    revealedSecrets[field.id] ? (
+                    revealedSecrets[field.label] ? (
                       <span className="secret-revealed">{String(field.value)}</span>
                     ) : (
                       <span className="secret-masked">{"•".repeat(Math.min(String(field.value).length, 15))}</span>
@@ -314,8 +310,8 @@ const VariableInfo: React.FC<{
                     <RQButton
                       type="transparent"
                       size="small"
-                      icon={revealedSecrets[field.id] ? <RiEyeLine /> : <RiEyeOffLine />}
-                      onClick={() => toggleVisibility(field.id)}
+                      icon={revealedSecrets[field.label] ? <RiEyeLine /> : <RiEyeOffLine />}
+                      onClick={() => toggleVisibility(field.label)}
                     />
                   </div>
                 )}
