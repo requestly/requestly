@@ -2,7 +2,6 @@ import React, { useState, useCallback, useMemo } from "react";
 import { Popover } from "antd";
 import { EnvironmentVariableType, VariableScope, VariableValueType } from "backend/environment/types";
 import { capitalize } from "lodash";
-import { pipe } from "lodash/fp";
 import { ScopedVariable, ScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
 import { VariableData } from "features/apiClient/store/variables/types";
 import { PopoverView } from "./types";
@@ -34,15 +33,15 @@ interface VariablePopoverProps {
   onClose?: () => void;
   onPinChange?: (pinned: boolean) => void;
 }
-enum FieldKey {
+enum InfoFieldKey {
   NAME = "NAME",
   TYPE = "TYPE",
   INITIAL_VALUE = "INITIAL_VALUE",
   CURRENT_VALUE = "CURRENT_VALUE",
   IS_PERSISTENT = "IS_PERSISTENT",
 }
-interface FieldConfig {
-  id: FieldKey;
+interface InfoFieldConfig {
+  id: InfoFieldKey;
   label: string;
   value: string | boolean;
   isSecret?: boolean;
@@ -233,35 +232,35 @@ const VariableInfo: React.FC<{
   const [revealedSecrets, setRevealedSecrets] = useState<Record<string, boolean>>({});
   const { syncValue, localValue, isPersisted } = getValueStrings(variable);
   const isSecretType = variable.type === EnvironmentVariableType.Secret;
-  const infoFields: FieldConfig[] = useMemo(() => {
+  const infoFields: InfoFieldConfig[] = useMemo(() => {
     const commonFields = [
-      { id: FieldKey.NAME, label: "Name", value: name },
-      { id: FieldKey.TYPE, label: "Type", value: capitalize(variable.type) },
+      { id: InfoFieldKey.NAME, label: "Name", value: name },
+      { id: InfoFieldKey.TYPE, label: "Type", value: capitalize(variable.type) },
     ];
 
     if (source.scope === VariableScope.RUNTIME) {
       return [
         ...commonFields,
         {
-          id: FieldKey.CURRENT_VALUE,
+          id: InfoFieldKey.CURRENT_VALUE,
           label: "Current Value",
           value: localValue,
           isSecret: isSecretType,
         },
-        { id: FieldKey.IS_PERSISTENT, label: "Is persistent", value: isPersisted },
+        { id: InfoFieldKey.IS_PERSISTENT, label: "Is persistent", value: isPersisted },
       ];
     }
 
     return [
       ...commonFields,
       {
-        id: FieldKey.INITIAL_VALUE,
+        id: InfoFieldKey.INITIAL_VALUE,
         label: "Initial Value",
         value: syncValue,
         isSecret: isSecretType,
       },
       {
-        id: FieldKey.CURRENT_VALUE,
+        id: InfoFieldKey.CURRENT_VALUE,
         label: "Current Value",
         value: localValue,
         isSecret: isSecretType,
@@ -269,7 +268,7 @@ const VariableInfo: React.FC<{
     ];
   }, [source.scope, name, variable.type, localValue, isPersisted, syncValue, isSecretType]);
 
-  const toggleVisibility = useCallback((key: FieldKey) => {
+  const toggleVisibility = useCallback((key: InfoFieldKey) => {
     setRevealedSecrets((prev) => ({ ...prev, [key]: !prev[key] }));
   }, []);
 
@@ -303,7 +302,7 @@ const VariableInfo: React.FC<{
                     revealedSecrets[field.id] ? (
                       <span className="secret-revealed">{String(field.value)}</span>
                     ) : (
-                      <span className="secret-masked">•••••••••••••</span>
+                      <span className="secret-masked">{"•".repeat(Math.min(String(field.value).length, 15))}</span>
                     )
                   ) : (
                     <span>{String(field.value)}</span>
