@@ -119,7 +119,7 @@ const processTemplateString = <T extends string>(input: T, variables: Variables)
       usedVariables,
     };
   } catch (e) {
-    console.error("Error while rendering template string:", input);
+    Logger.error("Error while rendering template string:", input);
     return {
       renderedTemplate: input,
       usedVariables: {},
