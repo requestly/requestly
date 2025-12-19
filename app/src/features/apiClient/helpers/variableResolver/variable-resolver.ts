@@ -278,14 +278,6 @@ class VariableEventsManager {
       }
     }
   }
-
-  destroy() {
-    for (const [, data] of this.map) {
-      data.unsubscriber();
-    }
-    this.map.clear();
-    this.variableHolder.destroy();
-  }
 }
 
 export function useScopedVariables(id: string) {
