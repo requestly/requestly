@@ -2,7 +2,9 @@ import { EnvironmentVariables } from "backend/environment/types";
 import lodash from 'lodash';
 import { v4 as uuidv4 } from "uuid";
 import { ApiClientStoreState } from "../workspaceView/helpers/ApiClientContextRegistry";
-import { EntityNotFound } from "../types";
+import { DeepPartial, EntityNotFound } from "../types";
+import getStoredState from "redux-persist/es/getStoredState";
+import { PersistConfig } from "redux-persist";
 
 type Variable = EnvironmentVariables[0];
 
@@ -34,7 +36,6 @@ export class ApiClientVariables<T> {
   set(params: Pick<Variable, 'id'> & Partial<Omit<Variable, 'id'>>) {
     const {id, ...variableData} = params;
     this.unsafePatch(s => {
-      debugger;
       const variables = this.getVariableObject(s);
       let variable = lodash.find(variables, (v) => v.id === params.id);
       if(!variable) {
@@ -66,5 +67,36 @@ export class ApiClientVariables<T> {
       const keys = Object.keys(variables);
       keys.forEach(key => lodash.unset(variables, key));
     })
+  }
+
+  static merge(object: EnvironmentVariables, source: DeepPartial<EnvironmentVariables>) {
+    for(const key in object) {
+      if(source[key]) {
+        lodash.merge(object[key], source[key]);
+        debugger;
+      }
+    }
+  }
+
+  static async hydrateInPlace<T, P1, P2, P3, P4>(params: {
+    records: T[],
+    persistConfig: PersistConfig<P1, P2, P3, P4>,
+    getVariablesFromRecord: (record: T) => EnvironmentVariables,
+    getVariablesFromPersistedData: (record: T, persistedData: P1) => DeepPartial<EnvironmentVariables> | undefined,
+  }) {
+    debugger;
+    const storedState = (await getStoredState(params.persistConfig)) as P1 | undefined;
+    if(!storedState) {
+      return;
+    }
+    for(const r of params.records) {
+      const persistedVariables = params.getVariablesFromPersistedData(r, storedState);
+      if(!persistedVariables) {
+        return;
+      }
+      ApiClientVariables.merge(params.getVariablesFromRecord(r), persistedVariables);
+    }
+    debugger;
+    return params.records;
   }
 }
