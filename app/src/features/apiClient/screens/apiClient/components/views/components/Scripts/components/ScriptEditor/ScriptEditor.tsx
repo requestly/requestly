@@ -26,6 +26,12 @@ import { RequestTabLabelIndicator } from "../../../request/components/ApiClientR
 import { getAuth } from "firebase/auth";
 import firebaseApp from "firebase";
 import "./scriptEditor.scss";
+import {
+  trackAITestGenerationAcceptClicked,
+  trackAITestGenerationFailed,
+  trackAITestGenerationRejectClicked,
+  trackAITestGenerationSuccessful,
+} from "modules/analytics/events/features/apiClient";
 
 const TestGenerationOutputSchema = z.object({
   text: z
@@ -102,6 +108,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
       : {},
     onFinish: (result) => {
       if (result.object?.err) {
+        trackAITestGenerationFailed();
         switch (result.object?.err) {
           case AITestGenerationError.UNRELATED_QUERY:
             if (!isPopoverOpenRef.current) {
@@ -124,6 +131,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
         isPopoverOpenRef.current = false;
         if (result.object?.code?.content) {
           lastGeneratedCodeRef.current = result.object.code.content;
+          trackAITestGenerationSuccessful();
         }
       }
       setIsTestsStreamingFinished(true);
@@ -169,6 +177,9 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
               ...(entry?.scripts || defaultScripts),
               postResponse: mergedValue,
             });
+            trackAITestGenerationAcceptClicked();
+          } else {
+            trackAITestGenerationRejectClicked();
           }
 
           if (mergedValue === newIncomingValue) {

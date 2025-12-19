@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Modal } from "antd";
 import { TbShieldLock } from "@react-icons/all-files/tb/TbShieldLock";
 import { MdOutlineNearMeDisabled } from "@react-icons/all-files/md/MdOutlineNearMeDisabled";
@@ -12,8 +12,9 @@ import { toast } from "utils/Toast";
 import { globalActions } from "store/slices/global/slice";
 import { Link } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
-import "./aiConsentModal.scss";
 import LINKS from "config/constants/sub/links";
+import { trackAIFeaturesConsentModalShown } from "modules/analytics/events/common/ai";
+import "./aiConsentModal.scss";
 
 interface AIConsentModalProps {
   isOpen: boolean;
@@ -53,6 +54,11 @@ export const AIConsentModal: React.FC<AIConsentModalProps> = ({ isOpen, toggle, 
     }
     setIsLoading(false);
   };
+
+  useEffect(() => {
+    if (isOpen) trackAIFeaturesConsentModalShown();
+  }, [isOpen]);
+
   return (
     <Modal
       width={480}
