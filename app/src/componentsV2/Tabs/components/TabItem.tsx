@@ -1,114 +1,62 @@
 import React, { useCallback } from "react";
-import { ActiveBlocker, TabState } from "../store/tabStore";
-import { StoreApi } from "zustand";
-import { GenericStateContext } from "hooks/useGenericState";
-import { useTabServiceWithSelector } from "../store/tabServiceStore";
+import { HostContextImpl } from "hooks/useHostContext";
+import { useDispatch } from "react-redux";
+import { closeTab } from "../slice/thunks";
+import { tabsActions } from "../slice/slice";
+import { useTabById } from "../slice/hooks";
+import { useWorkflowManager } from "../slice/hooks";
+import { useActiveTab } from "../slice/hooks";
+import { TabSource } from "../types";
+import { TabId, ActiveWorkflow } from "../slice/types";
 
-export const TabItem: React.FC<React.PropsWithChildren<{ store: StoreApi<TabState> }>> = React.memo((props) => {
-  const [
-    activeTabId,
-    incrementVersion,
-    resetPreviewTab,
-    closeTabById,
-    upsertTabSource,
-  ] = useTabServiceWithSelector((state) => [
-    state.activeTabId,
-    state.incrementVersion,
-    state.resetPreviewTab,
-    state.closeTabById,
-    state.upsertTabSource,
-  ]);
+export const TabItem: React.FC<React.PropsWithChildren<{ tabId: TabId }>> = React.memo((props) => {
+  const dispatch = useDispatch();
+  const tab = useTabById(props.tabId);
+  const activeTab = useActiveTab();
+  const { registerWorkflow, unregisterWorkflow } = useWorkflowManager();
+
+  const isActive = activeTab?.id === props.tabId;
 
   return (
-    <GenericStateContext.Provider
+    <HostContextImpl.Provider
       value={{
         close: useCallback(() => {
-          closeTabById(props.store.getState().id);
-        }, [closeTabById, props.store]),
+          dispatch(closeTab({ tabId: props.tabId }) as any);
+        }, [dispatch, props.tabId]),
 
         replace: useCallback(
-          (tabSource: TabState["source"]) => {
-            upsertTabSource(props.store.getState().id, tabSource);
-          },
-          [props.store, upsertTabSource]
-        ),
+          (source: TabSource) => {
+            if (!tab) return;
 
-        getIsNew: useCallback(() => {
-          return props.store.getState().isNewTab;
-        }, [props.store]),
-
-        setIsNew: useCallback(
-          (isNewTab: boolean) => {
-            props.store.getState().setIsNewTab(isNewTab);
-            incrementVersion();
+            dispatch(tabsActions.updateTab({ tabId: props.tabId, source, modeConfig: tab.modeConfig }));
           },
-          [incrementVersion, props.store]
+          [dispatch, props.tabId, tab]
         ),
 
         getIsActive: useCallback(() => {
-          return activeTabId === props.store.getState().id;
-        }, [activeTabId, props.store]),
+          return isActive;
+        }, [isActive]),
 
         getSourceId: useCallback(() => {
-          return props.store.getState()?.source?.metadata?.id;
-        }, [props.store]),
+          return tab?.source.getSourceId();
+        }, [tab]),
 
-        addCloseBlocker: useCallback(
-          (topic: ActiveBlocker["topic"], id: ActiveBlocker["id"], details: ActiveBlocker["details"]) => {
-            props.store.getState().addCloseBlocker(topic, id, {
-              canClose: false,
-              details,
-            });
-            incrementVersion();
+        registerWorkflow: useCallback(
+          (workflow: ActiveWorkflow) => {
+            registerWorkflow(props.tabId, workflow);
           },
-          [incrementVersion, props.store]
+          [registerWorkflow, props.tabId]
         ),
 
-        removeCloseBlocker: useCallback(
-          (topic: ActiveBlocker["topic"], id: ActiveBlocker["id"]) => {
-            props.store.getState().removeCloseBlocker(topic, id);
-            incrementVersion();
+        unregisterWorkflow: useCallback(
+          (workflow: ActiveWorkflow) => {
+            unregisterWorkflow(props.tabId, workflow);
           },
-          [incrementVersion, props.store]
-        ),
-
-        setTitle: useCallback(
-          (title: string) => {
-            props.store.getState().setTitle(title);
-            incrementVersion();
-          },
-          [incrementVersion, props.store]
-        ),
-
-        setIcon: useCallback(
-          (icon: React.ReactNode) => {
-            props.store.getState().setIcon(icon);
-            incrementVersion();
-          },
-          [incrementVersion, props.store]
-        ),
-
-        setPreview: useCallback(
-          (preview: boolean) => {
-            props.store.getState().setPreview(preview);
-            if (!preview) {
-              resetPreviewTab();
-            }
-            incrementVersion();
-          },
-          [props.store, incrementVersion, resetPreviewTab]
-        ),
-
-        setUnsaved: useCallback(
-          (unsaved: boolean) => {
-            props.store.getState().setUnsaved(unsaved);
-            incrementVersion();
-          },
-          [incrementVersion, props.store]
+          [unregisterWorkflow, props.tabId]
         ),
       }}
     >
       {props.children}
-    </GenericStateContext.Provider>
+    </HostContextImpl.Provider>
   );
 });
