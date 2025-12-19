@@ -23,7 +23,6 @@ export function renderVariables<T extends string | Record<string, any>>(
   renderedVariables?: Record<string, unknown>;
   result: T;
 } {
-  console.log("!!!debug", "template", { template, scopes });
   const parents = getApiClientRecordsStore(ctx).getState().getParentChain(recordId);
   const variables = Object.fromEntries(
     Array.from(getScopedVariables(parents, ctx.stores, scopes)).map(([key, [variable, _]]) => {
@@ -110,10 +109,6 @@ const processObject = <T extends Record<string, any>>(input: T, variables: Varia
 };
 
 const processTemplateString = <T extends string>(input: T, variables: Variables): RenderResult<T> => {
-  console.log("!!!debug", "processtemplatestring", {
-    input,
-    variables,
-  });
   try {
     const { wrappedTemplate, usedVariables } = collectAndEscapeVariablesFromTemplate(input, variables);
     const hbsTemplate = compile(wrappedTemplate, { noEscape: true });
@@ -171,21 +166,16 @@ const collectAndEscapeVariablesFromTemplate = (
 
 /**
  * Resolves composite variables (variables that reference other variables) using dependency-graph
- * Example: composite = "c_value", var_1 = "{{composite}}-name" => var_1 = "c_value-name"
- *
- * @requires dependency-graph - Install with: npm install dependency-graph
- * @requires import { DepGraph } from 'dependency-graph';
- *
+ * Example: composite = "composite_value", var_1 = "{{composite}}-name" => var_1 = "composite_value-name"
  * @param variables - The variables to resolve
  * @returns Resolved variables with all composite references expanded
  */
 const resolveCompositeVariables = (variables: Variables): Variables => {
   const resolved: Variables = { ...variables };
   const graph = new DepGraph({
-    circular: true,
+    circular: true, // to not throw errors in case of circular dependencies and return the unresolved variables as is
   });
 
-  // Add all variables as nodes
   Object.keys(variables).forEach((key) => {
     graph.addNode(key);
   });
@@ -203,9 +193,7 @@ const resolveCompositeVariables = (variables: Variables): Variables => {
               graph.addDependency(key, trimmedRef);
             }
           } catch (error) {
-            // Circular dependency detected
-            // Logger.warn(`Circular dependency detected: ${error.message}`);
-            console.log(`!!!Circular dependency detected: ${error.message}`);
+            Logger.log(`Error while resolving composite variables circular dependency detected: ${error.message}`);
           }
         });
       }
@@ -218,7 +206,6 @@ const resolveCompositeVariables = (variables: Variables): Variables => {
     resolutionOrder = graph.overallOrder();
   } catch (error) {
     Logger.error("Failed to resolve variable dependencies:", error);
-    console.error("!!!Failed to resolve variable dependencies:", error);
     return resolved;
   }
 
