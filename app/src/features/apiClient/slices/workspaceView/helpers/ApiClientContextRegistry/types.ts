@@ -3,11 +3,11 @@ import { ApiClientRepositoryInterface } from "features/apiClient/helpers/modules
 import { Workspace } from "features/workspaces/types";
 import { ApiRecordsState } from "features/apiClient/slices/apiRecords";
 import { BufferState } from "features/apiClient/slices/buffer/types";
-import { API_CLIENT_RECORDS_SLICE_NAME } from "features/apiClient/slices/common/constants";
+import { API_CLIENT_RECORDS_SLICE_NAME, BUFFER_SLICE_NAME } from "features/apiClient/slices/common/constants";
 
 export interface ApiClientStoreState {
   [API_CLIENT_RECORDS_SLICE_NAME]: ApiRecordsState;
-  buffer: BufferState;
+  [BUFFER_SLICE_NAME]: BufferState;
   // environments: EnvironmentsState;
 }
 
