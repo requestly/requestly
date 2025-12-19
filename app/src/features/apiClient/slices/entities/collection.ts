@@ -10,6 +10,7 @@ export class CollectionRecordEntity extends ApiClientRecordEntity<RQAPI.Collecti
   public readonly variables = new ApiClientVariables<RQAPI.CollectionRecord>(
     (e) => e.data.variables,
     this.unsafePatch.bind(this),
+    this.getEntityFromState.bind(this),
   )
   readonly type = ApiClientEntityType.COLLECTION_RECORD;
   getEntityFromState(state: ApiClientStoreState): RQAPI.CollectionRecord {
