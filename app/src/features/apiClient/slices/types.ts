@@ -20,14 +20,6 @@ export interface TreeIndices {
   rootIds: EntityId[];
 }
 
-export interface BufferWrapper<T = unknown> {
-  readonly id: EntityId;
-  readonly entityType: EntityType;
-  readonly original: T;
-  data: T;
-  diff: DeepPartial<T>;
-  isDirty: boolean;
-}
 
 export class EntityNotFound extends NativeError {
   constructor(readonly id: string, type: any) {

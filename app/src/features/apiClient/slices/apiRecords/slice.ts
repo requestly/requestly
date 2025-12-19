@@ -6,6 +6,7 @@ import { buildTreeIndices } from "../utils/treeUtils";
 import { objectToSetOperations, objectToDeletePaths } from "../utils/pathConverter";
 import { EntityId, TreeIndices, UpdateCommand } from "../types";
 import { ApiRecordsState } from "./types";
+import { entitySynced } from "../common/actions";
 
 export const apiRecordsAdapter = createEntityAdapter<RQAPI.ApiClientRecord>({
   selectId: (record) => record.id,
@@ -115,6 +116,13 @@ export const apiRecordsSlice = createSlice({
       apiRecordsAdapter.setAll(state.records, action.payload.data.records);
       rebuildTreeIndices(state);
     },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(entitySynced, (state, action) => {
+      const record = action.payload.data as RQAPI.ApiClientRecord;
+      apiRecordsAdapter.upsertOne(state.records, record);
+      rebuildTreeIndices(state);
+    });
   },
 });
 

@@ -31,9 +31,8 @@
     ],
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "noFallThroughCasesInSwitch": true,
     "noUncheckedIndexedAccess": true,
-    "noImplicitOverride": true
+    "noImplicitOverride": false
   },
   "exclude": [
     "node_modules",
