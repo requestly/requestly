@@ -1,6 +1,6 @@
 import React, { useMemo, useRef } from "react";
 import CodeMirror, { EditorView } from "@uiw/react-codemirror";
-import { unifiedMergeView } from "@codemirror/merge";
+import { unifiedMergeView, getOriginalDoc } from "@codemirror/merge";
 import { vscodeDark } from "@uiw/codemirror-theme-vscode";
 import { javascript } from "@codemirror/lang-javascript";
 import { customKeyBinding } from "componentsV2/CodeEditor/components/EditorV2/plugins";
@@ -9,7 +9,7 @@ import "./mergeViewEditor.scss";
 interface Props {
   originalValue: string;
   newValue: string;
-  onMergeChunk: (mergedValue: string) => void;
+  onMergeChunk: (mergedValue: string, newIncomingValue: string, type: "accept" | "reject") => void;
 }
 
 export const MergeViewEditor: React.FC<Props> = ({ originalValue, newValue, onMergeChunk }) => {
@@ -26,10 +26,13 @@ export const MergeViewEditor: React.FC<Props> = ({ originalValue, newValue, onMe
         button.textContent = type === "accept" ? "Accept" : "Reject";
         button.onclick = (e) => {
           action(e);
+
           const view = viewRef.current;
           if (!view) return;
-          const mergedValue = view.state.doc.toString();
-          onMergeChunk(mergedValue);
+          const mergedValue = getOriginalDoc(view.state).toString();
+          const newIncomingValue = view.state.doc.toString();
+
+          onMergeChunk(mergedValue, newIncomingValue, type);
         };
         return button;
       },

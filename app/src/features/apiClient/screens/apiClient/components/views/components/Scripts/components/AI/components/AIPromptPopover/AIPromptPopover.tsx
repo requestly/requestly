@@ -9,6 +9,8 @@ import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
 import { MdOutlineStopCircle } from "@react-icons/all-files/md/MdOutlineStopCircle";
 import { MdOutlineDiamond } from "@react-icons/all-files/md/MdOutlineDiamond";
 import "./aiPromptPopover.scss";
+import { redirectToUrl } from "utils/RedirectionUtils";
+import LINKS from "config/constants/sub/links";
 
 interface PromptPopoverProps {
   isLoading: boolean;
@@ -109,7 +111,13 @@ export const AIPromptPopover: React.FC<PromptPopoverProps> = ({
             Stop
           </RQButton>
         ) : (
-          <RQButton type="transparent" icon={<MdInfoOutline />} size="small" className="ai-generate-test-help-btn">
+          <RQButton
+            type="transparent"
+            icon={<MdInfoOutline />}
+            size="small"
+            className="ai-generate-test-help-btn"
+            onClick={() => redirectToUrl(LINKS.AI_DOC_LINK, true)}
+          >
             Need help
           </RQButton>
         )}
