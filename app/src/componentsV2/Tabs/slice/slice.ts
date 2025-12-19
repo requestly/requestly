@@ -128,7 +128,7 @@ export const tabsSlice = createSlice({
   },
 });
 
-// TODO: persistance
+// TODO: local storage persistence
 
 export const tabsActions = tabsSlice.actions;
 export const tabsReducer = tabsSlice.reducer;
