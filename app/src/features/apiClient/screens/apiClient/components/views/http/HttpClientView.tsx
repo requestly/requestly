@@ -646,6 +646,9 @@ const HttpClientView: React.FC<Props> = ({
     if (isCreateMode) {
       const requestId = apiClientRecordsRepository.generateApiRecordId();
       record.id = requestId;
+      // Set default name and collectionId for new records
+      record.name = apiEntryDetails?.name || "Untitled request";
+      record.collectionId = apiEntryDetails?.collectionId || "";
     }
 
     //  Is this check necessary?
@@ -831,24 +834,22 @@ const HttpClientView: React.FC<Props> = ({
               Send
             </RQButton>
 
-            <Conditional condition={!openInModal}>
-              <RBACButton
-                disabled={
-                  !hasUnsavedChanges ||
-                  (appMode === "EXTENSION" && entry.request.contentType === RequestContentType.MULTIPART_FORM)
-                }
-                permission="create"
-                resource="api_client_request"
-                showHotKeyText
-                hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SAVE_REQUEST.hotKey}
-                onClick={onSaveButtonClick}
-                loading={isRequestSaving}
-                tooltipTitle="Saving is not allowed in view-only mode. You can update and view changes but cannot save them."
-                enableHotKey={enableHotkey}
-              >
-                Save
-              </RBACButton>
-            </Conditional>
+            <RBACButton
+              disabled={
+                (!openInModal && !hasUnsavedChanges) ||
+                (appMode === "EXTENSION" && entry.request.contentType === RequestContentType.MULTIPART_FORM)
+              }
+              permission="create"
+              resource="api_client_request"
+              showHotKeyText={!openInModal}
+              hotKey={!openInModal ? KEYBOARD_SHORTCUTS.API_CLIENT.SAVE_REQUEST.hotKey : undefined}
+              onClick={onSaveButtonClick}
+              loading={isRequestSaving}
+              tooltipTitle="Saving is not allowed in view-only mode. You can update and view changes but cannot save them."
+              enableHotKey={enableHotkey && !openInModal}
+            >
+              Save
+            </RBACButton>
           </div>
         </div>
       </div>

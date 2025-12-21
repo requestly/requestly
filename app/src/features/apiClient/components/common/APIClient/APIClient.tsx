@@ -1,5 +1,6 @@
 import { Modal } from "antd";
-import React, { useMemo } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useSelector } from "react-redux";
 import { APIClientRequest } from "./types";
 import { RequestContentType, RequestMethod, RQAPI } from "features/apiClient/types";
 import {
@@ -19,6 +20,9 @@ import { AutogenerateProvider } from "features/apiClient/store/autogenerateConte
 import { ClientViewFactory } from "features/apiClient/screens/apiClient/clientView/ClientViewFactory";
 import { ContextId } from "features/apiClient/contexts/contextId.context";
 import { NoopContextId } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
+import { getActiveWorkspace } from "store/slices/workspaces/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
+import { setupContextWithoutMarkingLoaded } from "features/apiClient/commands/context";
 
 interface Props {
   request: string | APIClientRequest; // string for cURL request
@@ -47,6 +51,53 @@ export const createDummyApiRecord = (apiEntry: RQAPI.ApiEntry): RQAPI.ApiRecord 
 
 // Its okay if we dont open GraphQL request from network table
 export const APIClientModal: React.FC<Props> = ({ request, isModalOpen, onModalClose, modalTitle }) => {
+  const [contextId, setContextId] = useState<string | null>(null);
+  const activeWorkspace = useSelector(getActiveWorkspace);
+  const user = useSelector(getUserAuthDetails);
+
+  const handleSaveCallback = useCallback(() => {
+    // Close modal after successful save
+    onModalClose?.();
+  }, [onModalClose]);
+
+  // Initialize API Client context when modal opens
+  useEffect(() => {
+    if (!isModalOpen || !activeWorkspace || contextId) {
+      return;
+    }
+
+    let isMounted = true;
+
+    (async () => {
+      try {
+        const { id } = await setupContextWithoutMarkingLoaded(activeWorkspace, {
+          loggedIn: user.loggedIn,
+          uid: user.details?.profile?.uid ?? "",
+        });
+        if (isMounted) {
+          setContextId(id);
+        }
+      } catch (error) {
+        console.error("Failed to initialize API Client context:", error);
+        // Fallback to NoopContextId if initialization fails
+        if (isMounted) {
+          setContextId(NoopContextId);
+        }
+      }
+    })();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [isModalOpen, activeWorkspace, user.loggedIn, user.details?.profile?.uid, contextId]);
+
+  // Reset context when modal closes
+  useEffect(() => {
+    if (!isModalOpen && contextId) {
+      setContextId(null);
+    }
+  }, [isModalOpen, contextId]);
+
   const apiRecord = useMemo<RQAPI.ApiRecord>(() => {
     if (!request) {
       return createDummyApiRecord(getEmptyApiEntry(RQAPI.ApiEntryType.HTTP));
@@ -123,6 +174,11 @@ export const APIClientModal: React.FC<Props> = ({ request, isModalOpen, onModalC
     return null;
   }
 
+  // Don't render modal content until context is initialized
+  if (!contextId) {
+    return null;
+  }
+
   return (
     <Modal
       className="api-client-modal"
@@ -136,13 +192,13 @@ export const APIClientModal: React.FC<Props> = ({ request, isModalOpen, onModalC
     >
       <WindowsAndLinuxGatedHoc featureName="API client">
         <BottomSheetProvider defaultPlacement={BottomSheetPlacement.BOTTOM}>
-          <ContextId id={NoopContextId}>
+          <ContextId id={contextId}>
             <AutogenerateProvider>
               <ClientViewFactory
                 isOpenInModal
                 apiRecord={apiRecord}
                 handleRequestFinished={() => {}}
-                onSaveCallback={() => {}}
+                onSaveCallback={handleSaveCallback}
                 isCreateMode={true}
               />
             </AutogenerateProvider>
