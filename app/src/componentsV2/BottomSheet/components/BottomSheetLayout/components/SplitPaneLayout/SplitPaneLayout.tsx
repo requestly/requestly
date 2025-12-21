@@ -98,14 +98,15 @@ export const SplitPaneLayout: React.FC<Props> = ({ bottomSheet, children, minSiz
         gutter={(index, direction) => {
           const gutterContainer = document.createElement("div");
           gutterContainer.style.position = "relative";
-          gutterContainer.className = ` bottomsheet-layout-gutter gutter-container gutter-container-${direction}`;
-          gutterContainer.innerHTML = `<div class="gutter gutter-${direction}" />`;
+          gutterContainer.className = ` bottomsheet-layout-gutter gutter-container`;
+          gutterContainer.innerHTML = `<div class="gutter" />`;
           return gutterContainer;
         }}
         gutterStyle={() => {
           return {
             height: splitDirection === SplitDirection.HORIZONTAL ? "100%" : "0px",
             width: splitDirection === SplitDirection.HORIZONTAL ? "0px" : "100%",
+            cursor: splitDirection === SplitDirection.HORIZONTAL ? "col-resize" : "row-resize",
           };
         }}
         gutterAlign="center"
