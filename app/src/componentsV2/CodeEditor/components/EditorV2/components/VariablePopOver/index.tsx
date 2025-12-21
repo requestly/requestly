@@ -16,6 +16,7 @@ import { getScopeIcon } from "./hooks/useScopeOptions";
 import { useContextId } from "features/apiClient/contexts/contextId.context";
 import { NoopContextId } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 import { captureMessage } from "@sentry/react";
+import { RoleBasedComponent } from "features/rbac";
 
 const PopoverViewTransitions: Record<PopoverView, PopoverView[]> = {
   [PopoverView.IDLE]: [PopoverView.VARIABLE_INFO, PopoverView.NOT_FOUND],
@@ -278,15 +279,17 @@ const VariableInfo: React.FC<{
         <span className="variable-header-info-separator" />
         <div className="variable-info-header-name">{source.name}</div>
 
-        <RQButton
-          type="transparent"
-          size="small"
-          icon={<MdEdit className="edit-icon" />}
-          onClick={onEditClick}
-          className="edit-variable-btn"
-        >
-          Edit
-        </RQButton>
+        <RoleBasedComponent resource="api_client_environment" permission="update">
+          <RQButton
+            type="transparent"
+            size="small"
+            icon={<MdEdit className="edit-icon" />}
+            onClick={onEditClick}
+            className="edit-variable-btn"
+          >
+            Edit
+          </RQButton>
+        </RoleBasedComponent>
       </div>
 
       <div className="variable-info-content-container">
@@ -309,14 +312,16 @@ const VariableInfo: React.FC<{
                 </span>
 
                 {field.isSecret && (
-                  <div className="eye-toggle-button">
-                    <RQButton
-                      type="transparent"
-                      size="small"
-                      icon={revealedLabels[field.label] ? <RiEyeLine /> : <RiEyeOffLine />}
-                      onClick={() => toggleVisibility(field.label)}
-                    />
-                  </div>
+                  <RoleBasedComponent resource="api_client_environment" permission="update">
+                    <div className="eye-toggle-button">
+                      <RQButton
+                        type="transparent"
+                        size="small"
+                        icon={revealedLabels[field.label] ? <RiEyeLine /> : <RiEyeOffLine />}
+                        onClick={() => toggleVisibility(field.label)}
+                      />
+                    </div>
+                  </RoleBasedComponent>
                 )}
               </div>
             </React.Fragment>
