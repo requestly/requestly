@@ -58,9 +58,6 @@ export const SplitPaneLayout: React.FC<Props> = ({ bottomSheet, children, minSiz
   const handleDrag = useCallback(
     (newSizes: number[]) => {
       setSizes(newSizes);
-      if (isBottomSheetOpen && newSizes[1] >= 10 && newSizes[0] >= 10) {
-        updateSheetSize(newSizes);
-      }
 
       if (!splitContainerRef.current) return;
 
@@ -74,7 +71,16 @@ export const SplitPaneLayout: React.FC<Props> = ({ bottomSheet, children, minSiz
         toggleBottomSheet({ isOpen: true, action: "bottom_sheet_collapse_expand" });
       }
     },
-    [isSheetPlacedAtBottom, toggleBottomSheet, SNAP_OFFSET_PIXELS, updateSheetSize, isBottomSheetOpen]
+    [isSheetPlacedAtBottom, toggleBottomSheet, SNAP_OFFSET_PIXELS]
+  );
+
+  const handleDragEnd = useCallback(
+    (newSizes: number[]) => {
+      if (newSizes[1] >= 10 && newSizes[0] >= 10) {
+        updateSheetSize(newSizes);
+      }
+    },
+    [updateSheetSize]
   );
 
   return (
@@ -83,6 +89,7 @@ export const SplitPaneLayout: React.FC<Props> = ({ bottomSheet, children, minSiz
         direction={splitDirection}
         sizes={sizes}
         onDrag={handleDrag}
+        onDragEnd={handleDragEnd}
         snapOffset={[0, SNAP_OFFSET_PIXELS]}
         minSize={[isSheetPlacedAtBottom ? 150 : 500, minSize]}
         className={`bottomsheet-layout-container ${
