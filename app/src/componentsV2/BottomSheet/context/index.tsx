@@ -25,7 +25,7 @@ interface BottomSheetContextProps {
 
 const DEFAULT_SIZE: number[] = [70, 30];
 
-const isValidSize = (size?: number[]) => Array.isArray(size) && size.length === 2 && size[0] >= 10 && size[1] >= 10;
+const isValidSize = (size?: number[]) => Array.isArray(size) && size.length === 2;
 
 const BottomSheetContext = createContext<BottomSheetContextProps | null>(null);
 

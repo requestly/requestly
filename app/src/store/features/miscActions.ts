@@ -44,7 +44,7 @@ export const updateBottomSheetState = (
     prevState.bottomSheetOrientation[context].placement = state.placement;
   }
   if (state.size !== undefined) {
-    if (state.size.length === 2 && state.size[0] >= 10 && state.size[1] >= 10) {
+    if (state.size.length === 2) {
       prevState.bottomSheetOrientation[context].size = state.size;
     }
   }
