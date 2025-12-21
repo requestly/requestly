@@ -70,9 +70,7 @@ export const SplitPaneLayout: React.FC<Props> = ({ bottomSheet, children, minSiz
 
   const handleDragEnd = useCallback(
     (newSizes: number[]) => {
-      if (newSizes[1] >= 10 && newSizes[0] >= 10) {
-        updateSheetSize(newSizes);
-      }
+      updateSheetSize(newSizes);
     },
     [updateSheetSize]
   );
