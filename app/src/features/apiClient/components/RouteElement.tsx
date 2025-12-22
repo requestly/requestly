@@ -16,7 +16,7 @@ import { resetWorkspaceView, setupWorkspaceView } from "../slices/workspaceView/
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useWorkspaceViewSelector, WorkspaceProvider } from "../common/WorkspaceProvider";
 import { getAllSelectedWorkspaces, workspaceViewActions } from "../slices/workspaceView/slice";
-import { selectAllRecords } from "../slices";
+import { selectAllEnvironments, selectAllRecords } from "../slices";
 import { useEntity, useEntitySelector } from "../slices/entities/hooks";
 import { ApiClientEntityType } from "../slices/entities/types";
 import { EnvironmentVariableType } from "backend/environment/types";
@@ -163,7 +163,7 @@ function Updater() {
 }
 
 const Inner = () => {
-  const records = useWorkspaceViewSelector(selectAllRecords);
+  const records = useWorkspaceViewSelector(selectAllEnvironments);
 
   return <div><code>{JSON.stringify(records, null, 2)}</code><br />
     <Updater />
