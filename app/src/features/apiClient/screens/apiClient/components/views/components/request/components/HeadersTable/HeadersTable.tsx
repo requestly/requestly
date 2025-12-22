@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { KeyValuePair } from "features/apiClient/types";
 import { useAutogenerateStore } from "features/apiClient/hooks/useAutogenerateStore";
 import { useScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
@@ -17,12 +17,23 @@ function Data(props: {
   handleHeadersChange: (updatedPairs: KeyValuePair[]) => void;
 }) {
   const scopedVariables = useScopedVariables(props.recordId);
+  const [showDescription, setShowDescription] = useState(false);
+
   return (
     <KeyValueTable
       data={props.headers}
       variables={scopedVariables}
       onChange={props.handleHeadersChange}
-      checkInvalidCharacter={true}
+      config={{ checkInvalidCharacter: true }}
+      extraColumns={{
+        description: {
+          visible: showDescription,
+          onToggle: (show: any) => {
+            setShowDescription(show);
+          },
+        },
+        dataType: { visible: true },
+      }}
     />
   );
 }

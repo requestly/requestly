@@ -23,7 +23,7 @@ import {
 } from "features/apiClient/store/multiWorkspaceView/multiWorkspaceView.store";
 import { SiOpenapiinitiative } from "@react-icons/all-files/si/SiOpenapiinitiative";
 import { CommonApiClientImportModal } from "../../../modals/CommonApiClientImportModal/CommonApiClientImportModal";
-import { ApiClientImporterMethod, openApiImporter } from "@requestly/alternative-importers";
+import { ApiClientImporterMethod, openApiImporter } from "alternative-importers-beta-sd";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 
 interface Props {

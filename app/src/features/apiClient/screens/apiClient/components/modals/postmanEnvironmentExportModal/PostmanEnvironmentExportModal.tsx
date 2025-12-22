@@ -8,7 +8,7 @@ import { EnvironmentData } from "backend/environment/types";
 import { isGlobalEnvironment } from "../../../../environment/utils";
 import { trackEnvironmentExported } from "modules/analytics/events/features/apiClient";
 import { MdOutlineIosShare } from "@react-icons/all-files/md/MdOutlineIosShare";
-import { postmanEnvironmentExporter } from "@requestly/alternative-importers";
+import { postmanEnvironmentExporter } from "alternative-importers-beta-sd";
 
 interface PostmanEnvironmentExportModalProps {
   environments: EnvironmentData[];
