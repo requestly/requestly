@@ -99,4 +99,10 @@ export class ApiClientVariables<T> {
     debugger;
     return params.records;
   }
+
+  static perist(variables: EnvironmentVariables, config: {
+    isPersisted?: boolean,
+  }) {
+    return lodash.mapValues(variables, (v) => ({localValue: config ? config.isPersisted : v.isPersisted ? v.localValue : undefined}))
+  }
 }
