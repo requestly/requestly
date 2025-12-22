@@ -124,7 +124,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, variables, o
       {
         title: "",
         dataIndex: "isEnabled",
-        width: "50px",
+        width: "40px",
         editable: true,
         onCell: (record: KeyValuePair) => ({
           record,
@@ -138,7 +138,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, variables, o
       {
         title: "Key",
         dataIndex: "key",
-        minWidth: "30%",
+        width: isDescriptionVisible ? "30%" : "50%",
         editable: true,
         onCell: (record: KeyValuePair) => ({
           record,
@@ -154,7 +154,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, variables, o
         title: "Value",
         dataIndex: "value",
         editable: true,
-        minWidth: "30%",
+        width: isDescriptionVisible ? "30%" : "50%",
         onCell: (record: KeyValuePair) => ({
           record,
           editable: true,
@@ -171,7 +171,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, variables, o
         ? {
             title: "Type",
             dataIndex: "dataType",
-            width: 120,
+            width: 110,
             editable: true,
             onCell: (record: KeyValuePair) => ({
               record,
@@ -257,7 +257,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, variables, o
       scroll={{ x: 550 }}
       footer={() => (
         <div className="api-key-value-table-footer">
-          <RQButton icon={<MdAdd />} size="small" onClick={handleAddPair}>
+          <RQButton icon={<MdAdd />} size="small" onClick={handleAddPair} className="key-value-add-more-btn">
             Add More
           </RQButton>
         </div>

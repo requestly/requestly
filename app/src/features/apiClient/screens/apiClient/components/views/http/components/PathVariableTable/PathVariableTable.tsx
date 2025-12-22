@@ -79,7 +79,7 @@ export const PathVariableTable: React.FC<PathVariableTableProps> = ({ recordId, 
           </div>
         ),
         dataIndex: "dataType",
-        width: 120,
+        width: 110,
         className: "path-variable-type-column",
         editable: true,
         onCell: (record: RQAPI.PathVariable) => ({
