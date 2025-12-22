@@ -30,7 +30,9 @@
   td.ant-table-cell {
     padding: 4px 12px !important;
     max-width: 0;
-    overflow: hidden;
+    // overflow: hidden;
+    overflow: visible !important;
+    position: relative;
 
     .key-value-delete-btn.ant-btn.ant-btn-icon-only {
       width: 30px;
@@ -136,12 +138,23 @@
   .ant-table-footer {
     background: var(--requestly-color-background);
     position: relative;
+    padding: 4px !important;
     z-index: 1;
+
+    .key-value-add-more-btn {
+      background: none;
+      border: 1px solid transparent;
+
+      &:hover {
+        border: 1px solid transparent;
+        transition: ease-in-out;
+      }
+    }
   }
 
   .ant-table-thead > tr > th {
     font-weight: 600;
-    padding: 8px 12px !important;
+    padding: 8px 16px !important;
   }
 }
 
@@ -170,7 +183,7 @@
 .key-value-type-text {
   flex-grow: 1;
   flex-shrink: 1;
-  padding: 4px 0px 4px 2px;
+  padding: 4px !important;
   white-space: nowrap;
   opacity: 0.8;
 }
@@ -191,7 +204,7 @@
 
 .key-value-settings-header {
   display: flex;
-  justify-content: end;
+  justify-content: center;
   align-items: center;
   width: 100%;
 }
