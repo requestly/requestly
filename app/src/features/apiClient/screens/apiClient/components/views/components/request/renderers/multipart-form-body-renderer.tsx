@@ -1,34 +1,23 @@
-import react, { useCallback, useContext } from "react";
-import { RequestBodyProps } from "../request-body-types";
+import react, { useCallback } from "react";
 import { RQAPI } from "features/apiClient/types";
-import { RequestBodyContext, useMultipartFormBody } from "../request-body-state-manager";
 import { MultipartFormTable } from "../components/KeyValueTable/MultiPartFormTable";
 import { useScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
+import { RequestContentType } from "@requestly/shared/types/entities/apiClient";
 
 export const MultipartFormBodyRenderer: react.FC<{
   recordId: string;
-  setRequestEntry: RequestBodyProps["setRequestEntry"];
-}> = ({ recordId, setRequestEntry }) => {
-  const { requestBodyStateManager } = useContext(RequestBodyContext);
-  const { multiPartForm, setMultiPartForm } = useMultipartFormBody(requestBodyStateManager);
+  contentType: RequestContentType;
+  handleContentChange: (contentType: RequestContentType, body: RQAPI.RequestBody) => void;
+  body?: RQAPI.FormDataKeyValuePair[];
+}> = ({ recordId, contentType, handleContentChange, body = [] }) => {
   const scopedVariables = useScopedVariables(recordId);
 
   const handleMultiPartFormChange = useCallback(
     (updatedPairs: RQAPI.FormDataKeyValuePair[]) => {
-      setMultiPartForm(updatedPairs);
-      setRequestEntry((prev) => {
-        return {
-          ...prev,
-          request: {
-            ...prev.request,
-            body: updatedPairs,
-            bodyContainer: requestBodyStateManager.serialize(),
-          },
-        };
-      });
+      handleContentChange(contentType, updatedPairs);
     },
-    [requestBodyStateManager, setMultiPartForm, setRequestEntry]
+    [handleContentChange, contentType]
   );
 
-  return <MultipartFormTable data={multiPartForm} variables={scopedVariables} onChange={handleMultiPartFormChange} />;
+  return <MultipartFormTable data={body} variables={scopedVariables} onChange={handleMultiPartFormChange} />;
 };
