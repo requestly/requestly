@@ -200,7 +200,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, variables, o
           }
         : null,
       {
-        width: "50px",
+        width: "55px",
         fixed: "right",
         title: () =>
           isDataTypeVisible &&
