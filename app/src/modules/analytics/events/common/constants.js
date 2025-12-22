@@ -258,3 +258,7 @@ export const PRICING = {
   PAID_FEATURE_NUDGE_VIEWED: "paid_feature_nudge_viewed",
   VIEW_PRICING_PLANS_CLICKED: "view_pricing_plans_clicked",
 };
+
+export const AI = {
+  AI_FEATURES_CONSENT_MODAL_SHOWN: "ai_features_consent_modal_shown",
+};
