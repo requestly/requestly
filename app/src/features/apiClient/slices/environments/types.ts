@@ -1,5 +1,5 @@
 import { EntityState } from "@reduxjs/toolkit";
-import { EnvironmentData, EnvironmentVariables } from "backend/environment/types";
+import { EnvironmentVariables } from "backend/environment/types";
 
 export interface EnvironmentEntity {
   id: string;
@@ -8,8 +8,8 @@ export interface EnvironmentEntity {
 }
 
 export interface EnvironmentsState {
-  environments: EntityState<EnvironmentEntity, string>;
-  globalEnvironment: EnvironmentEntity | null;
+  environments: EntityState<EnvironmentEntity>;
+  globalEnvironment: EnvironmentEntity;
   activeEnvironmentId: string | null;
 }
 
