@@ -13,6 +13,7 @@ import { PersistConfig } from "redux-deep-persist/lib/types";
 import persistReducer from "redux-persist/es/persistReducer";
 import createTransform from "redux-persist/es/createTransform";
 import storage from 'redux-persist/lib/storage';
+import { ApiClientVariables } from "../entities/api-client-variables";
 
 export const apiRecordsAdapter = createEntityAdapter<RQAPI.ApiClientRecord>({
   selectId: (record) => record.id,
@@ -169,7 +170,9 @@ const hydrationTransformer = createTransform<
       const data: DeepPartial<RQAPI.CollectionRecord> = {
         id: c.id,
         data: {
-          variables: mapValues(c.data.variables, (v) => ({localValue: v.localValue}))
+          variables: ApiClientVariables.perist(c.data.variables, {
+            isPersisted: true, // always persist collection variables
+          }),
         },
       }
 

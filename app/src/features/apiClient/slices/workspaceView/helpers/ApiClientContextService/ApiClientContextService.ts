@@ -25,6 +25,8 @@ import persistStore from "redux-persist/es/persistStore";
 import { REHYDRATE } from "redux-persist";
 import { ApiClientVariables } from "features/apiClient/slices/entities/api-client-variables";
 import { createApiClientRecordsPersistConfig, createApiClientRecordsPersistedReducer } from "features/apiClient/slices/apiRecords/slice";
+import { createEnvironmentsPersistedReducer, createEnvironmentsPersistConfig, environmentsSlice } from "features/apiClient/slices/environments";
+import { EnvironmentEntity } from "features/apiClient/slices/environments/types";
 
 export type UserDetails = { uid: string; loggedIn: true } | { loggedIn: false };
 
@@ -60,7 +62,11 @@ class ApiClientContextService {
     }
 
     const userId = user.uid;
-    return new ApiClientCloudRepository({ uid: userId, teamId: workspaceId }) as ApiClientRepositoryInterface;
+    return new ApiClientCloudRepository({ uid: userId,
+      //@ts-ignore
+      // Ignoring workpspaceId being null for now
+      teamId: workspaceId
+    }) as ApiClientRepositoryInterface;
   }
 
   private createStore(workspaceId: ApiClientFeatureContext["workspaceId"]): ApiClientFeatureContext["store"] {
@@ -74,6 +80,7 @@ class ApiClientContextService {
       reducer:
       {
         [apiRecordsSlice.name]: createApiClientRecordsPersistedReducer(workspaceId || 'null'),
+        [environmentsSlice.name]: createEnvironmentsPersistedReducer(workspaceId || 'null'),
       },
       middleware(getDefaultMiddleware) {
         return getDefaultMiddleware({
@@ -94,6 +101,8 @@ class ApiClientContextService {
     workspaceId: string,
     entitiesToHydrate: {
       apiClientRecords: RQAPI.ApiClientRecord[],
+      environments: EnvironmentEntity[],
+      globalEnvironment: EnvironmentEntity,
     },
     store: ApiClientStore,
   }) {
@@ -101,7 +110,34 @@ class ApiClientContextService {
       workspaceId,
       entitiesToHydrate: {
         apiClientRecords,
+        environments,
+        globalEnvironment,
       },
+      store,
+    } = params;
+    await Promise.all([
+      this.hydrateApiClientRecords({
+        workspaceId,
+        apiClientRecords,
+        store,
+      }),
+      this.hydrateEnvironments({
+        workspaceId,
+        environments,
+        globalEnvironment,
+        store,
+      }),
+    ]);
+  }
+
+  private async hydrateApiClientRecords(params: {
+    workspaceId: string,
+    apiClientRecords: RQAPI.ApiClientRecord[],
+    store: ApiClientStore,
+  }) {
+    const {
+      workspaceId,
+      apiClientRecords,
       store,
     } = params;
     const recordsPersistConfig = createApiClientRecordsPersistConfig(workspaceId);
@@ -142,6 +178,69 @@ class ApiClientContextService {
 
   }
 
+  private async hydrateEnvironments(params: {
+    workspaceId: string,
+    environments: EnvironmentEntity[],
+    globalEnvironment: EnvironmentEntity,
+    store: ApiClientStore,
+  }) {
+    const {
+      workspaceId,
+      environments,
+      globalEnvironment,
+      store,
+    } = params;
+
+    const environmentsPersistConfig = createEnvironmentsPersistConfig(workspaceId);
+
+    // Hydrate environment variables in place
+    await ApiClientVariables.hydrateInPlace({
+      records: environments,
+      persistConfig: environmentsPersistConfig,
+      getVariablesFromRecord(record) {
+        return record.variables;
+      },
+      getVariablesFromPersistedData(record, persistedData: any) {
+        const persistedEnv = persistedData.environments?.entities?.[record.id];
+        if (!persistedEnv) {
+          return;
+        }
+        return persistedEnv.variables;
+      },
+    });
+
+    // Hydrate global environment variables in place
+    await ApiClientVariables.hydrateInPlace({
+      records: [globalEnvironment],
+      persistConfig: environmentsPersistConfig,
+      getVariablesFromRecord(record) {
+        return record.variables;
+      },
+      getVariablesFromPersistedData(record, persistedData: any) {
+        const persistedGlobalEnv = persistedData.globalEnvironment;
+        if (!persistedGlobalEnv) {
+          return;
+        }
+        return persistedGlobalEnv.variables;
+      },
+    });
+
+    store.dispatch({
+      type: REHYDRATE,
+      key: environmentsPersistConfig.key,
+      payload: {
+        environments: {
+          ids: [],
+          entities: {},
+        },
+        globalEnvironment: null,
+        _persist: { version: 1, rehydrated: true },
+      },
+      err: null,
+      meta: { manual: true },
+    });
+  }
+
   async createContext(workspace: WorkspaceInfo, userDetails: UserDetails): Promise<ApiClientFeatureContext> {
     const workspaceId = workspace.id;
 
@@ -156,14 +255,37 @@ class ApiClientContextService {
     const store = this.createStore(workspaceId);
 
     const result = await this.extractSetupDataFromRepository(repo);
+
+    // Convert environment data to EnvironmentEntity format
+    const environments: EnvironmentEntity[] = Object.values(result.environments.nonGlobalEnvironments).map((env) => ({
+      id: env.id,
+      name: env.name,
+      variables: env.variables,
+    }));
+    const globalEnvironment: EnvironmentEntity = {
+      id: result.environments.globalEnvironment.id,
+      name: result.environments.globalEnvironment.name,
+      variables: result.environments.globalEnvironment.variables,
+    };
+
     await this.hydrateInPlace({
       workspaceId: workspace.id || 'null',
-      entitiesToHydrate: { apiClientRecords: result.apiClientRecords.records },
+      entitiesToHydrate: {
+        apiClientRecords: result.apiClientRecords.records,
+        environments,
+        globalEnvironment,
+      },
       store,
     });
-    debugger;
+
+    // Hydrate records slice
     store.dispatch(apiRecordsSlice.actions.hydrate(result.apiClientRecords));
-    //   store.dispatch(environmentsSlice.actions.setInitialData(result.environments));
+
+    // Hydrate environments slice
+    store.dispatch(environmentsSlice.actions.hydrate({
+      environments,
+      globalEnvironment,
+    }));
 
     const ctx: ApiClientFeatureContext = { workspaceId, store, repositories: repo };
     this.contextRegistry.addContext(ctx);

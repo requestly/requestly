@@ -5,6 +5,12 @@ export { ApiClientRecordEntity } from "./api-client-record-entity";
 
 export { HttpRecordEntity } from "./http";
 export { GraphQLRecordEntity } from "./graphql";
+export {
+  ApiClientEnvironmentEntity,
+  EnvironmentEntity,
+  GlobalEnvironmentEntity,
+  EnvironmentEntityType,
+} from "./environment";
 
 export { EntityFactory } from "./factory";
 
