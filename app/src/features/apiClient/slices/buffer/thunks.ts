@@ -1,12 +1,13 @@
-import { createAsyncThunk, Dispatch } from "@reduxjs/toolkit";
-import { RQAPI } from "features/apiClient/types";
-import { ApiClientRecordsInterface } from "../../helpers/modules/sync/interfaces";
-import { ApiClientRootState } from "../hooks/types";
+import { createAsyncThunk } from "@reduxjs/toolkit";
+import type { ThunkDispatch, AnyAction } from "@reduxjs/toolkit";
+import type { RQAPI } from "features/apiClient/types";
+import type { ApiClientRecordsInterface } from "../../helpers/modules/sync/interfaces";
+import type { ApiClientRootState } from "../hooks/types";
 import { bufferActions, bufferAdapterSelectors } from "./slice";
 import { createRecord, updateRecord } from "../apiRecords/thunks";
 import { ApiClientEntityType } from "../entities/types";
 import { BUFFER_SLICE_NAME } from "../common/constants";
-import { BufferEntry } from "./types";
+import type { BufferEntry } from "./types";
 
 type Repository = ApiClientRecordsInterface<Record<string, unknown>>;
 
@@ -15,33 +16,39 @@ interface SaveResult {
   data: unknown;
 }
 
+type AppThunkDispatch = ThunkDispatch<ApiClientRootState, unknown, AnyAction>;
+
 interface EntityHandler {
-  save: (entry: BufferEntry, repository: Repository, dispatch: Dispatch) => Promise<SaveResult>;
+  save: (entry: BufferEntry, repository: Repository, dispatch: AppThunkDispatch) => Promise<SaveResult>;
 }
 
 const createRecordHandler = (entityType: ApiClientEntityType): EntityHandler => ({
   save: async (entry, repository, dispatch) => {
-    const isNew = !entry.referenceId;
+    if (!entry.referenceId) {
+      // Create new record
+      const record = await dispatch(
+        createRecord({
+          entityType,
+          id: entry.id,
+          data: entry.current as RQAPI.ApiRecord,
+          repository,
+        })
+      ).unwrap();
 
-    const record = isNew
-      ? await (dispatch as any)(
-          createRecord({
-            entityType,
-            id: entry.id,
-            data: entry.current as RQAPI.ApiRecord,
-            repository,
-          })
-        ).unwrap()
-      : await (dispatch as any)(
-          updateRecord({
-            entityType,
-            id: entry.referenceId!,
-            data: entry.current as Partial<RQAPI.ApiRecord>,
-            repository,
-          })
-        ).unwrap();
+      return { id: record.id, data: record };
+    }
 
-    return { id: record.id, data: record };
+    // Update existing record - might not return data
+    const record = await dispatch(
+      updateRecord({
+        entityType,
+        id: entry.referenceId,
+        data: entry.current as Partial<RQAPI.ApiRecord>,
+        repository,
+      })
+    ).unwrap();
+
+    return { id: record?.id ?? entry.referenceId, data: record ?? entry.current };
   },
 });
 
