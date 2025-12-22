@@ -103,6 +103,6 @@ export class ApiClientVariables<T> {
   static perist(variables: EnvironmentVariables, config: {
     isPersisted?: boolean,
   }) {
-    return lodash.mapValues(variables, (v) => ({localValue: config ? config.isPersisted : v.isPersisted ? v.localValue : undefined}))
+    return lodash.mapValues(variables, (v) => ({localValue: (config ? config.isPersisted : v.isPersisted) ? v.localValue : undefined}))
   }
 }
