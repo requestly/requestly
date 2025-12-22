@@ -12,8 +12,6 @@ export function FormBody(props: {
 }) {
   const { recordId, contentType, handleContentChange, body = [] } = props;
 
-  console.log("[debug] FormBody", { body, contentType });
-
   const scopedVariables = useScopedVariables(recordId);
 
   const handleFormChange = useCallback(

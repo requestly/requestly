@@ -612,7 +612,6 @@ const HttpClientView: React.FC<Props> = ({
       record.id = apiEntryDetails?.id;
     }
 
-    console.log("[debug] onSaveButtonClick record", record);
     const result = isCreateMode
       ? await apiClientRecordsRepository.createRecordWithId(record, record.id!) // not the ideal way but had to assert because record is typed as Partial here
       : await apiClientRecordsRepository.updateRecord(record, record.id!);
@@ -636,7 +635,6 @@ const HttpClientView: React.FC<Props> = ({
       }
       toast.success("Request saved!");
     } else {
-      console.log("[debug] result", result);
       notification.error({
         message: `Could not save request.`,
         description: result?.message,
