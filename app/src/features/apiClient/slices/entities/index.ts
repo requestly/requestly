@@ -14,4 +14,16 @@ export {
 
 export { EntityFactory } from "./factory";
 
-export { useEntitySelector, useHttpRecordEntity, useGraphQLRecordEntity } from "./hooks";
+export {
+  useEntitySelector,
+  useHttpRecordEntity,
+  useGraphQLRecordEntity,
+  useBufferedEntitySelector,
+  useBufferedHttpRecordEntity,
+  useBufferedGraphQLRecordEntity,
+  useBufferEntry,
+  useBufferIsDirty,
+  useHasBuffer,
+} from "./hooks";
+
+export { BufferedEntityFactory, BufferedHttpRecordEntity, BufferedGraphQLRecordEntity } from "./buffered";

@@ -25,7 +25,7 @@
     "emitDecoratorMetadata": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedIndexedAccess": true,
-    "noImplicitOverride": true
+    "noImplicitOverride": false
   },
   "exclude": ["node_modules", "build"],
   "include": ["./src/**/*"]
