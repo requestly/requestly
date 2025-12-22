@@ -23,7 +23,8 @@ interface BottomSheetContextProps {
   updateSheetSize: (size: number[]) => void;
 }
 
-const DEFAULT_SIZE: number[] = [70, 30];
+const DEFAULT_SIZE: number[] = [60, 40];
+const CLOSED_SIZE: number[] = [100, 0];
 
 const isValidSize = (size?: number[]) => Array.isArray(size) && size.length === 2;
 
@@ -74,14 +75,16 @@ export const BottomSheetProvider: React.FC<{
   const toggleBottomSheet = useCallback(
     ({ isOpen, action }: ToggleParams) => {
       const nextState = typeof isOpen === "boolean" ? isOpen : !isBottomSheetOpen;
+      const newSize = nextState ? DEFAULT_SIZE : CLOSED_SIZE;
 
       setUserHasInteracted(true);
       setIsBottomSheetOpen(nextState);
+      setSheetSize(newSize);
 
       dispatch(
         globalActions.updateBottomSheetState({
           context,
-          state: { open: nextState },
+          state: { open: nextState, size: newSize },
         })
       );
 
