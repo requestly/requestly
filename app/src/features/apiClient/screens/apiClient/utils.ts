@@ -847,7 +847,8 @@ export const parseHttpRequestEntry = (
   result.auth = authNamespaceContents;
 
   const contentType = entry.request.contentType;
-  if (contentType) {
+  // Only add content-type namespace if body is present
+  if (contentType && entry?.request?.body && entry?.request?.body?.length > 0) {
     result.content_type = parseContentType(contentType);
   }
   return result;
