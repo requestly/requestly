@@ -3,10 +3,16 @@ import { HttpRecordEntity } from "./http";
 import { GraphQLRecordEntity } from "./graphql";
 import { ApiClientEntityMeta } from "./base";
 import { CollectionRecordEntity } from "./collection";
+import { EnvironmentEntity, GlobalEnvironmentEntity } from "./environment";
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace EntityFactory {
-  export type EntityTypeMap<T extends ApiClientEntityType> = T extends ApiClientEntityType.HTTP_RECORD ? HttpRecordEntity :  T extends ApiClientEntityType.COLLECTION_RECORD ? CollectionRecordEntity :  GraphQLRecordEntity;
+  export type EntityTypeMap<T extends ApiClientEntityType> =
+    T extends ApiClientEntityType.HTTP_RECORD ? HttpRecordEntity :
+    T extends ApiClientEntityType.COLLECTION_RECORD ? CollectionRecordEntity :
+    T extends ApiClientEntityType.ENVIRONMENT ? EnvironmentEntity :
+    T extends ApiClientEntityType.GLOBAL_ENVIRONMENT ? GlobalEnvironmentEntity
+    :  GraphQLRecordEntity;
 
 
   export function from<T extends ApiClientEntityType>(
@@ -23,6 +29,10 @@ export namespace EntityFactory {
           return new CollectionRecordEntity(dispatch, meta);
         case ApiClientEntityType.GRAPHQL_RECORD:
           return new GraphQLRecordEntity(dispatch, meta);
+        case ApiClientEntityType.ENVIRONMENT:
+          return new EnvironmentEntity(dispatch, meta);
+        case ApiClientEntityType.GLOBAL_ENVIRONMENT:
+          return new GlobalEnvironmentEntity(dispatch);
       }
     })() as EntityTypeMap<T>;
 
