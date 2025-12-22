@@ -6,7 +6,9 @@ import { buildTreeIndices } from "../utils/treeUtils";
 import { objectToSetOperations, objectToDeletePaths } from "../utils/pathConverter";
 import { DeepPartial, EntityId, EntityNotFound, TreeIndices, UpdateCommand } from "../types";
 import { ApiRecordsState } from "./types";
+import { entitySynced } from "../common/actions";
 import { API_CLIENT_RECORDS_SLICE_NAME } from "../common/constants";
+import { ApiClientEntityType } from "../entities/types";
 import { PersistConfig } from "redux-deep-persist/lib/types";
 import persistReducer from "redux-persist/es/persistReducer";
 import createTransform from "redux-persist/es/createTransform";
@@ -61,7 +63,7 @@ export const apiRecordsSlice = createSlice({
       const entity = state.records.entities[id];
       if (entity == null) {
         throw new EntityNotFound(id, "apiClientrecord");
-      };
+      }
 
       let shouldRebuildTree = false;
 
@@ -92,14 +94,17 @@ export const apiRecordsSlice = createSlice({
       }
     },
 
-    unsafePatch(state, action: PayloadAction<{
-      id: EntityId,
-      patcher: (state: RQAPI.ApiClientRecord) => void,
-    }>) {
+    unsafePatch(
+      state,
+      action: PayloadAction<{
+        id: EntityId;
+        patcher: (state: RQAPI.ApiClientRecord) => void;
+      }>
+    ) {
       const entity = state.records.entities[action.payload.id];
       if (entity == null) {
         throw new EntityNotFound(action.payload.id, "apiClientrecord");
-      };
+      }
 
       action.payload.patcher(entity);
     },
@@ -129,6 +134,25 @@ export const apiRecordsSlice = createSlice({
       apiRecordsAdapter.setAll(state.records, action.payload.records);
       rebuildTreeIndices(state);
     },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(entitySynced, (state, action) => {
+      const { entityType, data } = action.payload;
+
+      const recordEntityTypes = [
+        ApiClientEntityType.HTTP_RECORD,
+        ApiClientEntityType.COLLECTION_RECORD,
+        ApiClientEntityType.GRAPHQL_RECORD,
+      ];
+
+      if (!recordEntityTypes.includes(entityType)) {
+        return;
+      }
+
+      const record = data as RQAPI.ApiClientRecord;
+      apiRecordsAdapter.upsertOne(state.records, record);
+      rebuildTreeIndices(state);
+    });
   },
 });
 
