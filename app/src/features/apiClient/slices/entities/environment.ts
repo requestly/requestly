@@ -5,12 +5,9 @@ import { EnvironmentEntity as EnvironmentRecord } from "../environments/types";
 import { selectEnvironmentById, selectGlobalEnvironment } from "../environments/selectors";
 import { environmentsActions } from "../environments/slice";
 import { EntityNotFound } from "../types";
-import { EntityDispatch } from "./types";
+import { ApiClientEntityType, EntityDispatch } from "./types";
 
-export enum EnvironmentEntityType {
-  ENVIRONMENT = "environment",
-  GLOBAL_ENVIRONMENT = "global_environment",
-}
+
 
 export type EnvironmentEntityMeta = {
   id: string;
@@ -24,7 +21,7 @@ export type EnvironmentEntityMeta = {
 export abstract class ApiClientEnvironmentEntity<
   M extends EnvironmentEntityMeta = EnvironmentEntityMeta
 > {
-  abstract readonly type: EnvironmentEntityType;
+  abstract readonly type: ApiClientEntityType;
   abstract readonly variables: ApiClientVariables<EnvironmentRecord>;
 
   constructor(
@@ -68,7 +65,7 @@ export abstract class ApiClientEnvironmentEntity<
  * Supports full CRUD operations including delete.
  */
 export class EnvironmentEntity extends ApiClientEnvironmentEntity {
-  readonly type = EnvironmentEntityType.ENVIRONMENT;
+  readonly type = ApiClientEntityType.ENVIRONMENT;
 
   public readonly variables = new ApiClientVariables<EnvironmentRecord>(
     (e) => e.variables,
@@ -76,9 +73,7 @@ export class EnvironmentEntity extends ApiClientEnvironmentEntity {
     this.getEntityFromState.bind(this)
   );
 
-  constructor(dispatch: Dispatch, id: string) {
-    super(dispatch, { id });
-  }
+
 
   getEntityFromState(state: ApiClientStoreState): EnvironmentRecord {
     const env = selectEnvironmentById(state, this.id);
@@ -137,7 +132,7 @@ export class EnvironmentEntity extends ApiClientEnvironmentEntity {
  * Has limited operations compared to regular environments (no delete, no set as active).
  */
 export class GlobalEnvironmentEntity extends ApiClientEnvironmentEntity {
-  readonly type = EnvironmentEntityType.GLOBAL_ENVIRONMENT;
+  readonly type = ApiClientEntityType.GLOBAL_ENVIRONMENT;
 
   public readonly variables = new ApiClientVariables<EnvironmentRecord>(
     (e) => e.variables,
@@ -146,13 +141,15 @@ export class GlobalEnvironmentEntity extends ApiClientEnvironmentEntity {
   );
 
   constructor(dispatch: Dispatch) {
-    super(dispatch, { id: "global" });
+      super(dispatch, {
+        id: "global_environment"
+      });
   }
 
   getEntityFromState(state: ApiClientStoreState): EnvironmentRecord {
     const env = selectGlobalEnvironment(state);
     if (!env) {
-      throw new EntityNotFound("global", "global_environment");
+      throw new EntityNotFound(this.id, "global_environment");
     }
     return env;
   }

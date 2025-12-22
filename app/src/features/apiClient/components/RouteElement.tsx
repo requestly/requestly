@@ -16,7 +16,7 @@ import { resetWorkspaceView, setupWorkspaceView } from "../slices/workspaceView/
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useWorkspaceViewSelector, WorkspaceProvider } from "../common/WorkspaceProvider";
 import { getAllSelectedWorkspaces, workspaceViewActions } from "../slices/workspaceView/slice";
-import { selectAllEnvironments, selectAllRecords } from "../slices";
+import { selectAllEnvironments, selectAllRecords, useGlobalEnvironmentEntity } from "../slices";
 import { useEntity, useEntitySelector } from "../slices/entities/hooks";
 import { ApiClientEntityType } from "../slices/entities/types";
 import { EnvironmentVariableType } from "backend/environment/types";
@@ -125,14 +125,10 @@ function TabTester() {
 function Updater() {
   const id = useRef<string>(null);
   // return;
-  const entity = useEntity({
-    id: "9130594d-2515-47d6-9371-18febb62a8a2",
-    type: ApiClientEntityType.COLLECTION_RECORD,
-  });
-
+  const entity = useGlobalEnvironmentEntity();
   const variables = useEntitySelector({
-    id: "9130594d-2515-47d6-9371-18febb62a8a2",
-    type: ApiClientEntityType.COLLECTION_RECORD,
+    id: entity.id,
+    type: entity.type,
 
   }, (e, s) => {
     return e.variables.getAll(s);

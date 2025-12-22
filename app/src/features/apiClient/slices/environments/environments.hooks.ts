@@ -16,6 +16,9 @@ import {
 import { useApiClientSelector } from "../hooks/base.hooks";
 import { EnvironmentEntity } from "./types";
 import { EnvironmentVariables } from "backend/environment/types";
+import { useEntitySelector } from "../entities";
+import { useEntity } from "../entities/hooks";
+import { ApiClientEntityType } from "../entities/types";
 
 export function useAllEnvironments(): EnvironmentEntity[] {
   return useApiClientSelector(selectAllEnvironments);
@@ -38,7 +41,7 @@ export function useActiveEnvironment(): EnvironmentEntity | null {
   return useApiClientSelector(selectActiveEnvironment);
 }
 
-export function useGlobalEnvironment(): EnvironmentEntity | null {
+export function useGlobalEnvironment(): EnvironmentEntity {
   return useApiClientSelector(selectGlobalEnvironment);
 }
 
@@ -63,3 +66,9 @@ export function useTotalEnvironments(): number {
   return useApiClientSelector(selectTotalEnvironments);
 }
 
+export function useGlobalEnvironmentEntity() {
+  return useEntity({
+    id: "global_environment",
+    type: ApiClientEntityType.GLOBAL_ENVIRONMENT,
+  })
+}

@@ -8,6 +8,7 @@ import createTransform from "redux-persist/es/createTransform";
 import storage from "redux-persist/lib/storage";
 import { ApiClientVariables } from "../entities/api-client-variables";
 import { DeepPartial, EntityId } from "../types";
+import { RQAPI } from "features/apiClient/types";
 
 export const environmentsAdapter = createEntityAdapter<EnvironmentEntity>({
   selectId: (env) => env.id,
@@ -16,7 +17,11 @@ export const environmentsAdapter = createEntityAdapter<EnvironmentEntity>({
 
 const initialState: EnvironmentsState = {
   environments: environmentsAdapter.getInitialState(),
-  globalEnvironment: null,
+  globalEnvironment: {
+    id: "global_environment",
+    name: "Global Environment",
+    variables: {},
+  },
   activeEnvironmentId: null,
 };
 
@@ -109,8 +114,8 @@ const hydrationTransformer = createTransform<
 >(
   // Transform state on its way to being serialized and persisted
   (inboundState) => {
-    const entities = mapValues(inboundState.entities, (env) => {
-      if (!env) return undefined;
+    const inboundEntities = pickBy(inboundState.entities, (e) => !!e);
+    const entities = mapValues(inboundEntities, (env) => {
       return {
         id: env.id,
         variables: ApiClientVariables.perist(env.variables, {
@@ -119,11 +124,11 @@ const hydrationTransformer = createTransform<
       };
     });
 
+
     return {
-      entities: pickBy(entities, (e) => e !== undefined) as { [key: string]: DeepPartial<EnvironmentEntity> },
+      entities,
     };
   },
-  // Transform state being rehydrated
   (outboundState) => {
     return {
       ids: [],
@@ -136,13 +141,19 @@ const hydrationTransformer = createTransform<
 );
 
 // Global environment persistence transform
-const globalEnvTransformer = createTransform<
+const globalEnvHydrationTransformer = createTransform<
   EnvironmentsState["globalEnvironment"],
   DeepPartial<EnvironmentEntity> | null,
   EnvironmentsState
 >(
   (inboundState) => {
-    if (!inboundState) return null;
+    if (!inboundState) {
+      return {
+        id: "global_environment",
+        name: "Global Environment",
+        variables: {},
+      }
+    };
     return {
       id: inboundState.id,
       variables: ApiClientVariables.perist(inboundState.variables, {
@@ -163,7 +174,7 @@ export const createEnvironmentsPersistConfig = (
 ): PersistConfig<EnvironmentsState, { [key: string]: DeepPartial<EnvironmentEntity> }, unknown, unknown> => ({
   key: `${contextId}:api_client_environments`,
   storage: storage,
-  transforms: [hydrationTransformer, globalEnvTransformer],
+  transforms: [hydrationTransformer, globalEnvHydrationTransformer],
   whitelist: ["environments", "globalEnvironment", "activeEnvironmentId"],
 });
 
