@@ -1,29 +1,23 @@
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback } from "react";
 import { HostContextImpl } from "hooks/useHostContext";
 import { useDispatch } from "react-redux";
 import { closeTab } from "../slice/thunks";
 import { tabsActions } from "../slice/slice";
-import { useTabById, useTabBufferIsDirty } from "../slice/hooks";
+import { useTabById } from "../slice/hooks";
 import { useActiveTab } from "../slice/hooks";
 import { TabSource } from "../types";
-import { TabId, ActiveWorkflow, TabState } from "../slice/types";
+import { TabId, ActiveWorkflow } from "../slice/types";
 
 export const TabItem: React.FC<React.PropsWithChildren<{ tabId: TabId }>> = React.memo((props) => {
   const dispatch = useDispatch();
-  const tab = useTabById(props.tabId) as TabState;
+  const tab = useTabById(props.tabId);
   const activeTab = useActiveTab();
 
   const isActive = activeTab?.id === props.tabId;
-  const workspaceId = tab?.source.metadata.context?.id ?? null;
-  const isDirty = useTabBufferIsDirty(workspaceId, tab.modeConfig);
 
   return (
     <HostContextImpl.Provider
       value={{
-        isDirty: useMemo(() => {
-          return isDirty;
-        }, [isDirty]),
-
         close: useCallback(() => {
           dispatch(closeTab({ tabId: props.tabId }) as any);
         }, [dispatch, props.tabId]),
