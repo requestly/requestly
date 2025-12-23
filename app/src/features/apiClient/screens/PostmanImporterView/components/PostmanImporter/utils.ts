@@ -283,7 +283,7 @@ const createApiRecord = (
       id: index,
       key: query.key,
       value: query.value,
-      isEnabled: true,
+      isEnabled: query?.disabled !== true,
       description: query.description || "",
     })) ?? [];
 
