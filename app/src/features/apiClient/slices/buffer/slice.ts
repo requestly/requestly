@@ -5,6 +5,7 @@ import { objectToSetOperations, objectToDeletePaths } from "../utils/pathConvert
 import { BufferEntry, BufferState } from "./types";
 import { ApiClientEntityType } from "../entities/types";
 import { BUFFER_SLICE_NAME } from "../common/constants";
+import { emitBufferUpdated } from "componentsV2/Tabs/slice";
 
 const bufferAdapter = createEntityAdapter<BufferEntry>();
 
@@ -80,6 +81,13 @@ export const bufferSlice = createSlice({
 
       entry.isNew = false;
       entry.isDirty = true;
+
+      if (entry.referenceId) {
+        emitBufferUpdated({
+          entityId: entry.referenceId,
+          entityType: entry.entityType,
+        });
+      }
     },
 
     unsafePatch(
@@ -93,6 +101,13 @@ export const bufferSlice = createSlice({
       if (!entry) return;
       action.payload.patcher(entry);
       entry.isDirty = true;
+
+      if (entry.referenceId) {
+        emitBufferUpdated({
+          entityId: entry.referenceId,
+          entityType: entry.entityType,
+        });
+      }
     },
 
     syncFromSource(
