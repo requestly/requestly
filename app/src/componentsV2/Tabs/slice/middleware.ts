@@ -19,21 +19,59 @@ function getEntityDataFromTabSource(
   const sourceId = source.getSourceId();
   const sourceName = source.getSourceName();
 
-  let category: "request" | "collection" | "environments" | null = null;
+  if (source instanceof RequestViewTabSource) {
+    const record = apiRecordsAdapter.getSelectors().selectById(state.records.records, sourceId);
 
-  if (source instanceof RequestViewTabSource || sourceName === "request") {
-    category = "request";
-  } else if (source instanceof CollectionViewTabSource || sourceName === "collection") {
-    category = "collection";
-  } else if (source instanceof EnvironmentViewTabSource || sourceName === "environments") {
-    category = "environments";
-  }
+    if (!record) {
+      return null;
+    }
 
-  if (!category) {
+    if (record.type === RQAPI.RecordType.API) {
+      const apiRecord = record as RQAPI.ApiRecord;
+      const entityType =
+        apiRecord.data.type === RQAPI.ApiEntryType.HTTP
+          ? ApiClientEntityType.HTTP_RECORD
+          : ApiClientEntityType.GRAPHQL_RECORD;
+
+      return {
+        entityType,
+        entityId: sourceId,
+        data: record,
+      };
+    }
+
     return null;
   }
 
-  if (category === "request") {
+  if (source instanceof CollectionViewTabSource) {
+    const record = apiRecordsAdapter.getSelectors().selectById(state.records.records, sourceId);
+
+    if (!record) {
+      return null;
+    }
+
+    return {
+      entityType: ApiClientEntityType.COLLECTION_RECORD,
+      entityId: sourceId,
+      data: record,
+    };
+  }
+
+  if (source instanceof EnvironmentViewTabSource) {
+    const environment = environmentsAdapter.getSelectors().selectById(state.environments.environments, sourceId);
+
+    if (!environment) {
+      return null;
+    }
+
+    return {
+      entityType: ApiClientEntityType.ENVIRONMENT,
+      entityId: sourceId,
+      data: environment,
+    };
+  }
+
+  if (sourceName === "request") {
     const record = apiRecordsAdapter.getSelectors().selectById(state.records.records, sourceId);
 
     if (!record || record.type !== RQAPI.RecordType.API) {
@@ -53,11 +91,11 @@ function getEntityDataFromTabSource(
     };
   }
 
-  if (category === "collection") {
-    // TODO
+  if (sourceName === "collection") {
+    //TODO
   }
 
-  if (category === "environments") {
+  if (sourceName === "environments") {
     const environment = environmentsAdapter.getSelectors().selectById(state.environments.environments, sourceId);
 
     if (!environment) {
