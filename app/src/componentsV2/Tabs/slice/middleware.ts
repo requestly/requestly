@@ -12,6 +12,10 @@ import { CollectionViewTabSource } from "features/apiClient/screens/apiClient/co
 import { EnvironmentViewTabSource } from "features/apiClient/screens/environment/components/environmentView/EnvironmentViewTabSource";
 import { RQAPI } from "features/apiClient/types";
 
+/**
+ * Fetches entity data from the appropriate slice based on tab source type and returns
+ * the correct entity type and data for buffer creation.
+ */
 function getEntityDataFromTabSource(
   source: TabSource,
   state: ApiClientStoreState
@@ -19,59 +23,23 @@ function getEntityDataFromTabSource(
   const sourceId = source.getSourceId();
   const sourceName = source.getSourceName();
 
-  if (source instanceof RequestViewTabSource) {
-    const record = apiRecordsAdapter.getSelectors().selectById(state.records.records, sourceId);
+  // Determine entity category from source name or instance type
+  let category: "request" | "collection" | "environments" | null = null;
 
-    if (!record) {
-      return null;
-    }
+  if (source instanceof RequestViewTabSource || sourceName === "request") {
+    category = "request";
+  } else if (source instanceof CollectionViewTabSource || sourceName === "collection") {
+    category = "collection";
+  } else if (source instanceof EnvironmentViewTabSource || sourceName === "environments") {
+    category = "environments";
+  }
 
-    if (record.type === RQAPI.RecordType.API) {
-      const apiRecord = record as RQAPI.ApiRecord;
-      const entityType =
-        apiRecord.data.type === RQAPI.ApiEntryType.HTTP
-          ? ApiClientEntityType.HTTP_RECORD
-          : ApiClientEntityType.GRAPHQL_RECORD;
-
-      return {
-        entityType,
-        entityId: sourceId,
-        data: record,
-      };
-    }
-
+  if (!category) {
     return null;
   }
 
-  if (source instanceof CollectionViewTabSource) {
-    const record = apiRecordsAdapter.getSelectors().selectById(state.records.records, sourceId);
-
-    if (!record) {
-      return null;
-    }
-
-    return {
-      entityType: ApiClientEntityType.COLLECTION_RECORD,
-      entityId: sourceId,
-      data: record,
-    };
-  }
-
-  if (source instanceof EnvironmentViewTabSource) {
-    const environment = environmentsAdapter.getSelectors().selectById(state.environments.environments, sourceId);
-
-    if (!environment) {
-      return null;
-    }
-
-    return {
-      entityType: ApiClientEntityType.ENVIRONMENT,
-      entityId: sourceId,
-      data: environment,
-    };
-  }
-
-  if (sourceName === "request") {
+  // Handle request category - could be HTTP or GraphQL
+  if (category === "request") {
     const record = apiRecordsAdapter.getSelectors().selectById(state.records.records, sourceId);
 
     if (!record || record.type !== RQAPI.RecordType.API) {
@@ -91,11 +59,23 @@ function getEntityDataFromTabSource(
     };
   }
 
-  if (sourceName === "collection") {
-    //TODO
+  // Handle collection category
+  if (category === "collection") {
+    const record = apiRecordsAdapter.getSelectors().selectById(state.records.records, sourceId);
+
+    if (!record) {
+      return null;
+    }
+
+    return {
+      entityType: ApiClientEntityType.COLLECTION_RECORD,
+      entityId: sourceId,
+      data: record,
+    };
   }
 
-  if (sourceName === "environments") {
+  // Handle environments category
+  if (category === "environments") {
     const environment = environmentsAdapter.getSelectors().selectById(state.environments.environments, sourceId);
 
     if (!environment) {
