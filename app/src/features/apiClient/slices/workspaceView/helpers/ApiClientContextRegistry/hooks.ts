@@ -3,13 +3,20 @@ import { NativeError } from "errors/NativeError";
 import { ApiClientFeatureContext } from "./types";
 import { apiClientContextRegistry } from "./ApiClientContextRegistry";
 
-function useApiClientFeatureContext(workspaceId: ApiClientFeatureContext["workspaceId"]): ApiClientFeatureContext {
-  const context = useMemo(() => apiClientContextRegistry.getContext(workspaceId), [workspaceId]);
+export function getApiClientFeatureContext(
+  workspaceId: ApiClientFeatureContext["workspaceId"]
+): ApiClientFeatureContext {
+  const context = apiClientContextRegistry.getContext(workspaceId);
 
   if (!context) {
-    throw new NativeError("No context found!");
+    throw new NativeError("No context found in registry!").addContext({ workspaceId });
   }
 
+  return context;
+}
+
+function useApiClientFeatureContext(workspaceId: ApiClientFeatureContext["workspaceId"]): ApiClientFeatureContext {
+  const context = useMemo(() => getApiClientFeatureContext(workspaceId), [workspaceId]);
   return context;
 }
 
