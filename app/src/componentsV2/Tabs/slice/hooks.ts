@@ -1,9 +1,14 @@
 import { useSelector } from "react-redux";
+import { useSyncExternalStore, useCallback } from "react";
 import { tabsAdapter } from "./slice";
-import { TabId } from "./types";
+import { TabId, TabModeConfig } from "./types";
 import { RootState } from "store/types";
 import { selectTabsByEntityTypes } from "./selectors";
 import { EntityType } from "features/apiClient/slices/types";
+import { findBufferByReferenceId } from "features/apiClient/slices/buffer/slice";
+import { BUFFER_SLICE_NAME } from "features/apiClient/slices/common/constants";
+import { Workspace } from "features/workspaces/types";
+import { getApiClientFeatureContext } from "features/apiClient/slices";
 
 const tabsSelectors = tabsAdapter.getSelectors<RootState>((state) => state.tabs.tabs);
 
@@ -27,4 +32,32 @@ export const usePreviewTab = () => {
 
 export function useTabsByEntityTypes(entityTypes: EntityType[]) {
   return useSelector((state: RootState) => selectTabsByEntityTypes(state, entityTypes));
+}
+
+export function useTabBufferIsDirty(workspaceId: Workspace["id"], modeConfig: TabModeConfig): boolean {
+  const subscribe = useCallback(
+    (onStoreChange: () => void) => {
+      const { store } = getApiClientFeatureContext(workspaceId);
+      const unsubscribe = store.subscribe(() => {
+        onStoreChange();
+      });
+
+      return unsubscribe;
+    },
+    [workspaceId]
+  );
+
+  const getSnapshot = useCallback(() => {
+    const { store } = getApiClientFeatureContext(workspaceId);
+    if (!store || modeConfig.mode !== "buffer") {
+      return false;
+    }
+
+    const bufferState = store.getState()[BUFFER_SLICE_NAME];
+    const bufferEntry = findBufferByReferenceId(bufferState.entities, modeConfig.entityId);
+
+    return bufferEntry?.isDirty ?? false;
+  }, [modeConfig, workspaceId]);
+
+  return useSyncExternalStore(subscribe, getSnapshot);
 }
