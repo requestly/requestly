@@ -24,8 +24,15 @@ import { WorkspaceInfo } from "../../types";
 import persistStore from "redux-persist/es/persistStore";
 import { REHYDRATE } from "redux-persist";
 import { ApiClientVariables } from "features/apiClient/slices/entities/api-client-variables";
-import { createApiClientRecordsPersistConfig, createApiClientRecordsPersistedReducer } from "features/apiClient/slices/apiRecords/slice";
-import { createEnvironmentsPersistedReducer, createEnvironmentsPersistConfig, environmentsSlice } from "features/apiClient/slices/environments";
+import {
+  createApiClientRecordsPersistConfig,
+  createApiClientRecordsPersistedReducer,
+} from "features/apiClient/slices/apiRecords/slice";
+import {
+  createEnvironmentsPersistedReducer,
+  createEnvironmentsPersistConfig,
+  environmentsSlice,
+} from "features/apiClient/slices/environments";
 import { EnvironmentEntity } from "features/apiClient/slices/environments/types";
 
 export type UserDetails = { uid: string; loggedIn: true } | { loggedIn: false };
@@ -62,10 +69,11 @@ class ApiClientContextService {
     }
 
     const userId = user.uid;
-    return new ApiClientCloudRepository({ uid: userId,
+    return new ApiClientCloudRepository({
+      uid: userId,
       //@ts-ignore
       // Ignoring workpspaceId being null for now
-      teamId: workspaceId
+      teamId: workspaceId,
     }) as ApiClientRepositoryInterface;
   }
 
@@ -77,18 +85,16 @@ class ApiClientContextService {
       return next(action);
     };
     const store = configureStore({
-      reducer:
-      {
-        [apiRecordsSlice.name]: createApiClientRecordsPersistedReducer(workspaceId || 'null'),
-        [environmentsSlice.name]: createEnvironmentsPersistedReducer(workspaceId || 'null'),
+      reducer: {
+        [apiRecordsSlice.name]: createApiClientRecordsPersistedReducer(workspaceId || "null"),
+        [environmentsSlice.name]: createEnvironmentsPersistedReducer(workspaceId || "null"),
       },
       middleware(getDefaultMiddleware) {
         return getDefaultMiddleware({
           serializableCheck: {
-            ignoredActions: ['records/unsafePatch'],
+            ignoredActions: ["records/unsafePatch"],
           },
-        })
-          .concat(manualRehydrationMiddleware);
+        }).concat(manualRehydrationMiddleware);
       },
     });
 
@@ -98,21 +104,17 @@ class ApiClientContextService {
   }
 
   private async hydrateInPlace(params: {
-    workspaceId: string,
+    workspaceId: string;
     entitiesToHydrate: {
-      apiClientRecords: RQAPI.ApiClientRecord[],
-      environments: EnvironmentEntity[],
-      globalEnvironment: EnvironmentEntity,
-    },
-    store: ApiClientStore,
+      apiClientRecords: RQAPI.ApiClientRecord[];
+      environments: EnvironmentEntity[];
+      globalEnvironment: EnvironmentEntity;
+    };
+    store: ApiClientStore;
   }) {
     const {
       workspaceId,
-      entitiesToHydrate: {
-        apiClientRecords,
-        environments,
-        globalEnvironment,
-      },
+      entitiesToHydrate: { apiClientRecords, environments, globalEnvironment },
       store,
     } = params;
     await Promise.all([
@@ -131,36 +133,31 @@ class ApiClientContextService {
   }
 
   private async hydrateApiClientRecords(params: {
-    workspaceId: string,
-    apiClientRecords: RQAPI.ApiClientRecord[],
-    store: ApiClientStore,
+    workspaceId: string;
+    apiClientRecords: RQAPI.ApiClientRecord[];
+    store: ApiClientStore;
   }) {
-    const {
-      workspaceId,
-      apiClientRecords,
-      store,
-    } = params;
+    const { workspaceId, apiClientRecords, store } = params;
     const recordsPersistConfig = createApiClientRecordsPersistConfig(workspaceId);
     await ApiClientVariables.hydrateInPlace({
-      records: apiClientRecords.filter(r => r.type === RQAPI.RecordType.COLLECTION),
+      records: apiClientRecords.filter((r) => r.type === RQAPI.RecordType.COLLECTION),
       persistConfig: recordsPersistConfig,
       getVariablesFromRecord(record) {
         return record.data.variables;
       },
       getVariablesFromPersistedData(record, persistedData) {
-        debugger;
         const persistedRecord = persistedData.records.entities[record.id];
         if (!persistedRecord) {
           return;
         }
 
-        if(!("variables" in persistedRecord.data)) {
-          return
+        if (!("variables" in persistedRecord.data)) {
+          return;
         }
 
         return persistedRecord.data.variables;
       },
-    })
+    });
 
     store.dispatch({
       type: REHYDRATE,
@@ -175,21 +172,15 @@ class ApiClientContextService {
       err: null,
       meta: { manual: true },
     });
-
   }
 
   private async hydrateEnvironments(params: {
-    workspaceId: string,
-    environments: EnvironmentEntity[],
-    globalEnvironment: EnvironmentEntity,
-    store: ApiClientStore,
+    workspaceId: string;
+    environments: EnvironmentEntity[];
+    globalEnvironment: EnvironmentEntity;
+    store: ApiClientStore;
   }) {
-    const {
-      workspaceId,
-      environments,
-      globalEnvironment,
-      store,
-    } = params;
+    const { workspaceId, environments, globalEnvironment, store } = params;
 
     const environmentsPersistConfig = createEnvironmentsPersistConfig(workspaceId);
 
@@ -269,7 +260,7 @@ class ApiClientContextService {
     };
 
     await this.hydrateInPlace({
-      workspaceId: workspace.id || 'null',
+      workspaceId: workspace.id || "null",
       entitiesToHydrate: {
         apiClientRecords: result.apiClientRecords.records,
         environments,
@@ -282,10 +273,12 @@ class ApiClientContextService {
     store.dispatch(apiRecordsSlice.actions.hydrate(result.apiClientRecords));
 
     // Hydrate environments slice
-    store.dispatch(environmentsSlice.actions.hydrate({
-      environments,
-      globalEnvironment,
-    }));
+    store.dispatch(
+      environmentsSlice.actions.hydrate({
+        environments,
+        globalEnvironment,
+      })
+    );
 
     const ctx: ApiClientFeatureContext = { workspaceId, store, repositories: repo };
     this.contextRegistry.addContext(ctx);
