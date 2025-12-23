@@ -3,9 +3,7 @@ import { NativeError } from "errors/NativeError";
 import { ApiClientFeatureContext } from "./types";
 import { apiClientContextRegistry } from "./ApiClientContextRegistry";
 
-export function getApiClientFeatureContext(
-  workspaceId: ApiClientFeatureContext["workspaceId"]
-): ApiClientFeatureContext {
+function getApiClientFeatureContext(workspaceId: ApiClientFeatureContext["workspaceId"]): ApiClientFeatureContext {
   const context = apiClientContextRegistry.getContext(workspaceId);
 
   if (!context) {
