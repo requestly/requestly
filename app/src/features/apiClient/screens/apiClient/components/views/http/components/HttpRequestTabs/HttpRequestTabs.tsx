@@ -32,7 +32,6 @@ interface Props {
   requestId: RQAPI.ApiRecord["id"];
   collectionId: RQAPI.ApiRecord["collectionId"];
   setRequestEntry: (updater: (prev: RQAPI.HttpApiEntry) => RQAPI.HttpApiEntry) => void;
-  setContentType: (contentType: RequestContentType) => void;
   handleAuthChange: (newAuth: RQAPI.Auth) => void;
   focusPostResponseScriptEditor?: boolean;
   scriptEditorVersion?: number;
@@ -44,7 +43,6 @@ const HttpRequestTabs: React.FC<Props> = ({
   requestId,
   collectionId,
   setRequestEntry,
-  setContentType,
   handleAuthChange,
   focusPostResponseScriptEditor,
   scriptEditorVersion,
@@ -115,23 +113,12 @@ const HttpRequestTabs: React.FC<Props> = ({
             showDot={isRequestBodySupported}
           />
         ),
-        children: requestEntry.request.bodyContainer ? (
+        children: (
           <RequestBody
-            mode="multiple"
-            recordId={requestId}
-            bodyContainer={requestEntry.request.bodyContainer}
-            contentType={getContentTypeWithAlert(requestEntry.request.contentType)}
-            setRequestEntry={setRequestEntry}
-            setContentType={setContentType}
-          />
-        ) : (
-          <RequestBody
-            mode="single"
             recordId={requestId}
             body={requestEntry.request.body ?? ""}
             contentType={getContentTypeWithAlert(requestEntry.request.contentType)}
             setRequestEntry={setRequestEntry}
-            setContentType={setContentType}
           />
         ),
         disabled: !isRequestBodySupported,
@@ -195,7 +182,6 @@ const HttpRequestTabs: React.FC<Props> = ({
     queryParams.length,
     pathVariables.length,
     requestEntry,
-    setContentType,
     setRequestEntry,
     focusPostResponseScriptEditor,
     scriptEditorVersion,
