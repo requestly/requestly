@@ -1,35 +1,28 @@
-import React, { useCallback, useContext } from "react";
+import React, { useCallback } from "react";
 import { EditorLanguage } from "componentsV2/CodeEditor";
 import { useDebounce } from "hooks/useDebounce";
-import { RequestBodyContext, useTextBody } from "../request-body-state-manager";
-import { RequestBodyProps } from "../request-body-types";
 import Editor from "componentsV2/CodeEditor";
 import { RequestContentType } from "features/apiClient/types";
 import { useScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
+import { RQAPI } from "@requestly/shared/types/entities/apiClient";
 
 export function RawBody(props: {
+  handleContentChange: (contentType: RequestContentType, body: RQAPI.RequestBody) => void;
   contentType: RequestContentType;
   recordId: string;
-  setRequestEntry: RequestBodyProps["setRequestEntry"];
   editorOptions: React.ReactNode;
+  body?: string;
 }) {
-  const { recordId, setRequestEntry, editorOptions, contentType } = props;
-
-  const { requestBodyStateManager } = useContext(RequestBodyContext);
-  const { text, setText } = useTextBody(requestBodyStateManager);
+  const { recordId, editorOptions, contentType, handleContentChange, body = "" } = props;
 
   const scopedVariables = useScopedVariables(recordId);
 
   const handleTextChange = useDebounce(
     useCallback(
       (value: string) => {
-        setText(value);
-        setRequestEntry((prev) => ({
-          ...prev,
-          request: { ...prev.request, body: value, bodyContainer: requestBodyStateManager.serialize() },
-        }));
+        handleContentChange(contentType, value);
       },
-      [setRequestEntry, setText, requestBodyStateManager]
+      [handleContentChange, contentType]
     ),
     500,
     { leading: true, trailing: true }
@@ -41,7 +34,7 @@ export function RawBody(props: {
     <div className="api-client-code-editor-container api-request-body-editor-container">
       <Editor
         language={editorLanguage}
-        value={text ?? ""}
+        value={body}
         handleChange={handleTextChange}
         prettifyOnInit={false}
         isResizable={false}
