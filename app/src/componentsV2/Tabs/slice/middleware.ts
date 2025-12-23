@@ -1,67 +1,56 @@
 import type { Middleware } from "@reduxjs/toolkit";
 import { tabsActions } from "./slice";
 import { bufferActions } from "features/apiClient/slices/buffer/slice";
-import { apiClientContextRegistry } from "features/apiClient/slices/workspaceView/helpers/ApiClientContextRegistry/ApiClientContextRegistry";
 import { apiRecordsAdapter } from "features/apiClient/slices/apiRecords/slice";
 import { environmentsAdapter } from "features/apiClient/slices/environments/slice";
 import type { ApiClientStoreState } from "features/apiClient/slices/workspaceView/helpers/ApiClientContextRegistry/types";
 import { ApiClientEntityType } from "features/apiClient/slices/entities/types";
 import type { TabSource } from "componentsV2/Tabs/types";
+import { RQAPI } from "features/apiClient/types";
+import { getApiClientFeatureContext } from "features/apiClient/slices";
+import { NativeError } from "errors/NativeError";
 import { RequestViewTabSource } from "features/apiClient/screens/apiClient/components/views/components/RequestView/requestViewTabSource";
+import { DraftRequestContainerTabSource } from "features/apiClient/screens/apiClient/components/views/components/DraftRequestContainer/draftRequestContainerTabSource";
 import { CollectionViewTabSource } from "features/apiClient/screens/apiClient/components/views/components/Collection/collectionViewTabSource";
 import { EnvironmentViewTabSource } from "features/apiClient/screens/environment/components/environmentView/EnvironmentViewTabSource";
-import { RQAPI } from "features/apiClient/types";
 
 function getEntityDataFromTabSource(
   source: TabSource,
   state: ApiClientStoreState
-): { entityType: ApiClientEntityType; entityId: string; data: unknown } | null {
+): { entityType: ApiClientEntityType; entityId: string; data: unknown } {
   const sourceId = source.getSourceId();
-  const sourceName = source.getSourceName();
+  const sourceType = source.type;
 
-  let category: "request" | "collection" | "environments" | null = null;
+  const isRequest = sourceType === RequestViewTabSource.name || sourceType === DraftRequestContainerTabSource.name;
+  const isCollection = sourceType === CollectionViewTabSource.name;
+  const isEnvironment = sourceType === EnvironmentViewTabSource.name;
 
-  if (source instanceof RequestViewTabSource || sourceName === "request") {
-    category = "request";
-  } else if (source instanceof CollectionViewTabSource || sourceName === "collection") {
-    category = "collection";
-  } else if (source instanceof EnvironmentViewTabSource || sourceName === "environments") {
-    category = "environments";
-  }
+  if (isRequest || isCollection) {
+    const apiRecord = apiRecordsAdapter.getSelectors().selectById(state.records.records, sourceId);
 
-  if (!category) {
-    return null;
-  }
-
-  if (category === "request") {
-    const record = apiRecordsAdapter.getSelectors().selectById(state.records.records, sourceId);
-
-    if (!record || record.type !== RQAPI.RecordType.API) {
-      return null;
+    if (!apiRecord) {
+      throw new NativeError(`[Tab Buffer Middleware] Cannot find request`).addContext({ id: sourceId });
     }
 
-    const apiRecord = record as RQAPI.ApiRecord;
     const entityType =
-      apiRecord.data.type === RQAPI.ApiEntryType.HTTP
+      apiRecord.type === RQAPI.RecordType.COLLECTION
+        ? ApiClientEntityType.COLLECTION_RECORD
+        : apiRecord.data.type === RQAPI.ApiEntryType.HTTP
         ? ApiClientEntityType.HTTP_RECORD
         : ApiClientEntityType.GRAPHQL_RECORD;
 
     return {
       entityType,
       entityId: sourceId,
-      data: record,
+      data: apiRecord,
     };
   }
 
-  if (category === "collection") {
-    // TODO
-  }
-
-  if (category === "environments") {
+  if (isEnvironment) {
     const environment = environmentsAdapter.getSelectors().selectById(state.environments.environments, sourceId);
 
     if (!environment) {
-      return null;
+      throw new NativeError(`[Tab Buffer Middleware] Cannot find environment`).addContext({ id: sourceId });
     }
 
     return {
@@ -71,59 +60,36 @@ function getEntityDataFromTabSource(
     };
   }
 
-  return null;
+  throw new NativeError(`[Tab Buffer Middleware] Unknown source type ${sourceType}`).addContext({ id: sourceId });
 }
 
 export const tabBufferMiddleware: Middleware = () => (next) => (action) => {
-  if (tabsActions.openTab.match(action)) {
-    const { source, modeConfig } = action.payload;
-
-    if (modeConfig.mode === "buffer") {
-      try {
-        const context = apiClientContextRegistry.getLastUsedContext();
-
-        if (!context) {
-          if (process.env.NODE_ENV === "development") {
-            console.warn("[Tab Buffer Middleware] No API client context found");
-          }
-          return next(action);
-        }
-
-        const apiClientStore = context.store;
-        const state = apiClientStore.getState() as ApiClientStoreState;
-
-        const entityData = getEntityDataFromTabSource(source, state);
-
-        if (!entityData) {
-          if (process.env.NODE_ENV === "development") {
-            console.warn(
-              `[Tab Buffer Middleware] Cannot determine entity or data not found: ${source.getSourceName()}`
-            );
-          }
-          return next(action);
-        }
-
-        const { entityType, entityId, data } = entityData;
-
-        apiClientStore.dispatch(
-          bufferActions.open({
-            entityType: entityType,
-            isNew: false,
-            referenceId: entityId,
-            data: data,
-          })
-        );
-
-        if (process.env.NODE_ENV === "development") {
-          console.log(`[Tab Buffer Middleware] Buffer ensured for ${entityType}/${entityId}`);
-        }
-      } catch (error) {
-        if (process.env.NODE_ENV === "development") {
-          console.error("[Tab Buffer Middleware] Error creating buffer:", error);
-        }
-      }
-    }
+  if (!tabsActions.openTab.match(action)) {
+    return next(action);
   }
+
+  const { source, modeConfig } = action.payload;
+
+  if (modeConfig.mode !== "buffer") {
+    return next(action);
+  }
+
+  const workspaceId = source.metadata.context.id;
+  const { store } = getApiClientFeatureContext(workspaceId);
+  const state = store.getState();
+
+  const entityData = getEntityDataFromTabSource(source, state);
+
+  const { entityType, entityId, data } = entityData;
+
+  store.dispatch(
+    bufferActions.open({
+      entityType: entityType,
+      isNew: false,
+      referenceId: entityId,
+      data: data,
+    })
+  );
 
   return next(action);
 };
