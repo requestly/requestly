@@ -14,7 +14,7 @@ import ApiClientFeatureContainer from "../container";
 import ApiClientErrorBoundary from "./ErrorBoundary/ErrorBoundary";
 import { resetWorkspaceView, setupWorkspaceView } from "../slices/workspaceView/thunks";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { useWorkspaceViewSelector, WorkspaceProvider } from "../common/WorkspaceProvider";
+import { useWorkspaceViewSelector, useWorkspaceViewStore, WorkspaceProvider } from "../common/WorkspaceProvider";
 import { getAllSelectedWorkspaces, workspaceViewActions } from "../slices/workspaceView/slice";
 import { selectAllEnvironments, selectAllRecords, useGlobalEnvironmentEntity } from "../slices";
 import { useEntity, useEntitySelector } from "../slices/entities/hooks";
@@ -26,6 +26,10 @@ import { TabItem } from "componentsV2/Tabs/components/TabItem";
 import { closeTab } from "componentsV2/Tabs/slice/thunks";
 import { DraftRequestContainerTabSource } from "../screens/apiClient/components/views/components/DraftRequestContainer/draftRequestContainerTabSource";
 import { useHostContext } from "hooks/useHostContext";
+import { useApiClientSelector } from "../slices/hooks/base.hooks";
+import { getScopedVariables, makeScopeChain, ScopedVariable, ScopedVariables, useScopedVariables, VariableHolder } from "../helpers/variableResolver/variable-resolver";
+import { createSelector } from "@reduxjs/toolkit";
+import { Select } from "antd";
 
 function TabContent({ tabId }: { tabId: string }) {
   const { registerWorkflow, close, getSourceId, getIsActive } = useHostContext();
@@ -123,22 +127,50 @@ function TabTester() {
 // Function to test variables
 // To test, remove the early return and use a correct collection id
 function Updater() {
-  const id = useRef<string>(null);
+  // const id = useRef<string>(null);
   // return;
   const entity = useGlobalEnvironmentEntity();
-  const variables = useEntitySelector({
-    id: entity.id,
-    type: entity.type,
+  // const variables = useEntitySelector({
+  //   id: entity.id,
+  //   type: entity.type,
 
-  }, (e, s) => {
-    return e.variables.getAll(s);
-  })
+  // }, (e, s) => {
+  //   return e.variables.getAll(s);
+  // });
 
+  // const selector = useMemo(() => createSelector(
+  //   getScopedVariables.bind(null,'9130594d-2515-47d6-9371-18febb62a8a2'),
+  //   (v) => v
+  // ), []);
+  //
+
+  // const vh = useMemo(() => new VariableHolder(), []);
+
+  const last = useRef<ScopedVariables>(null)
+
+  // const s = makeScopeChain('9130594d-2515-47d6-9371-18febb62a8a2', vh);
+  const store = useWorkspaceViewStore();
+  const scopedVariables = useScopedVariables('9130594d-2515-47d6-9371-18febb62a8a2');
+
+  useEffect(() => {
+    if(!last.current && scopedVariables) {
+      last.current = scopedVariables;
+    }
+    // const areSame = s(store.getState()) === s(store.getState());
+    debugger;
+    // const as = s(store.getState()) === scopedVariables;
+    debugger;
+    const bs = last.current === scopedVariables;
+    debugger;
+  }, [store,  scopedVariables])
+
+
+  debugger;
   return (
     <div>
       <br />
       <br />
-      {JSON.stringify(variables, null, 2)}
+      {JSON.stringify(scopedVariables, null, 2)}
       <button onClick={() => entity.variables.clearAll()}>clear variables</button>
       <button onClick={() => {
         const id1 = entity.variables.add({
@@ -147,7 +179,6 @@ function Updater() {
           localValue: "df",
           isPersisted: true,
         });
-        id.current = id1;
       }}>add variable</button>
       <button onClick={() => entity.variables.set({
         id: 0,
@@ -158,11 +189,36 @@ function Updater() {
   );
 }
 
-const Inner = () => {
-  const records = useWorkspaceViewSelector(selectAllEnvironments);
+function RecordView() {
+  const entity = useEntity({
+    id: "9130594d-2515-47d6-9371-18febb62a8a2",
+    type: ApiClientEntityType.COLLECTION_RECORD,
+  });
 
-  return <div><code>{JSON.stringify(records, null, 2)}</code><br />
+  const records = useApiClientSelector(s => s.records.records.entities);
+
+
+
+  return (
+    <div>
+      <br />
+      <br />
+      {JSON.stringify(records, null, 2)}
+      <button onClick={() => entity.setName('tada')}>set variable</button>
+
+    </div>
+  );
+}
+
+const Inner = () => {
+  // const records = useWorkspaceViewSelector(selectAllEnvironments);
+    // <code>{JSON.stringify(records, null, 2)}</code><br />
+
+  return <div>
     <Updater />
+    <br/>
+    <br/>
+    <RecordView/>
   </div>;
 };
 

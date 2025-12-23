@@ -1,15 +1,11 @@
-import { VariableScope } from "backend/environment/types";
-import { NativeError } from "errors/NativeError";
-import { VariablesState } from "features/apiClient/store/variables/variables.store";
+import { EnvironmentVariables, VariableScope } from "backend/environment/types";
 import { RQAPI } from "features/apiClient/types";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { StoreApi } from "zustand";
-import { AllApiClientStores } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
-import { useActiveEnvironment } from "features/apiClient/hooks/useActiveEnvironment.hook";
-import { useApiRecordState } from "features/apiClient/hooks/useApiRecordState.hook";
+import lodash from 'lodash';
+import { useMemo } from "react";
 import { VariableData, VariableKey } from "features/apiClient/store/variables/types";
 import { runtimeVariablesStore as _runtimeVariablesStore } from "features/apiClient/store/runtimeVariables/runtimeVariables.store";
-import { useApiClientFeatureContext } from "features/apiClient/contexts/meta";
+import { ApiClientStoreState, selectActiveEnvironment, selectAncestorIds, selectGlobalEnvironment, selectRecordById } from "features/apiClient/slices";
+import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
 
 export type VariableSource = {
   scope: VariableScope;
@@ -20,19 +16,21 @@ export type VariableSource = {
 
 export type ScopedVariable = [VariableData, VariableSource];
 
-export type Scope = [VariableSource, StoreApi<VariablesState>];
+export type Scope = [VariableSource, EnvironmentVariables];
 
-export type ScopedVariables = Map<VariableKey, ScopedVariable>;
+export type ScopedVariables = Record<VariableKey, ScopedVariable>;
 
 /**
  * Configuration for overriding store reads with execution context values.
  * This allows deriving scopes from passed data instead of reading from stores.
  */
 export type StoreOverrideConfig = {
-  runtimeVariablesStore?: StoreApi<VariablesState>;
-  activeEnvironmentVariablesStore?: StoreApi<VariablesState>;
-  globalEnvironmentVariablesStore?: StoreApi<VariablesState>;
-  collectionVariablesStore?: StoreApi<VariablesState>;
+  runtimeVariables?: EnvironmentVariables;
+  activeEnvironmentVariables?: EnvironmentVariables;
+  globalEnvironmentVariables?: EnvironmentVariables;
+  collectionVariables?: Partial<{
+    [key: string]: EnvironmentVariables
+  }>;
 };
 
 /**
@@ -47,37 +45,46 @@ export type StoreOverrideConfig = {
 export class VariableHolder {
   private data = new Map<number, ScopedVariables>();
   private isDestroyed = false;
+  public variables: ScopedVariables = {};
 
-  private parseVariableState(state: VariablesState["data"], variableSource: VariableSource) {
-    const result: ScopedVariables = new Map();
-    for (const [key, value] of state) {
-      result.set(key, [value, variableSource]);
+  private parseVariableState(variables: EnvironmentVariables, variableSource: VariableSource) {
+    const result: ScopedVariables = {};
+    for (const key in variables) {
+      const variable = variables[key];
+      if(!variable) {
+        continue;
+      }
+      result[key] = [variable, variableSource];
     }
 
     return result;
   }
 
-  refresh(params: { variableSource: VariableSource; variableState: VariablesState }) {
+  refresh(params: { variableSource: VariableSource; variables: EnvironmentVariables }) {
     if (this.isDestroyed) {
       return false;
     }
-    const { variableState, variableSource } = params;
-    this.data.set(variableSource.level, this.parseVariableState(variableState.data, variableSource));
+    const { variables, variableSource } = params;
+    this.data.set(variableSource.level, this.parseVariableState(variables, variableSource));
+    const newVariables = this.getAll();
+    if(!lodash.isEqual(this.variables, newVariables)) {
+      this.variables = this.getAll();
+    }
     return true;
   }
 
-  getAll(): ScopedVariables {
-    const result: ScopedVariables = new Map();
+  private getAll(): ScopedVariables {
+    const result: ScopedVariables = {};
     const sortedLevels = Array.from(this.data.keys()).sort();
 
     for (const level of sortedLevels) {
-      const scopedVariable = this.data.get(level);
-      if (!scopedVariable) {
+      const levelledScopedVariables = this.data.get(level);
+      if (!levelledScopedVariables) {
         throw new Error("Scoped variable not found for level!");
       }
-      for (const [key, value] of scopedVariable) {
-        if (!result.has(key)) {
-          result.set(key, value);
+      for (const key in levelledScopedVariables) {
+        if (!(key in result)) {
+          result[key] = levelledScopedVariables[key]!;
         }
       }
     }
@@ -91,42 +98,34 @@ export class VariableHolder {
 }
 
 function getScopes(
-  parents: string[],
-  stores: AllApiClientStores,
-  initialScopes: Scope[] = [],
-  storeOverrideConfig?: StoreOverrideConfig
+  state: ApiClientStoreState,
+  id: string,
+  config?: {
+    initialScopes?: Scope[],
+    storeOverrideConfig?: StoreOverrideConfig
+  }
 ): Scope[] {
+  const parents = selectAncestorIds(state, id);
+  const override = config?.storeOverrideConfig;
+  const initialScopes = config?.initialScopes || [];
   let currentScopeLevel = initialScopes.length;
   const scopes: Scope[] = [...initialScopes];
-  const {
-    activeEnvironment: activeEnvironmentStore,
-    globalEnvironment: globalEnvironmentStore,
-  } = stores.environments.getState();
+  const activeEnvironment = selectActiveEnvironment(state);
+  const globalEnvironment = selectGlobalEnvironment(state);
 
-  const activeEnvironment = activeEnvironmentStore?.getState();
-  const globalEnvironment = globalEnvironmentStore.getState();
-
-  const activeEnvironmentVariablesStore =
-    storeOverrideConfig?.activeEnvironmentVariablesStore ?? activeEnvironment?.data.variables;
-  const globalEnvironmentVariablesStore =
-    storeOverrideConfig?.globalEnvironmentVariablesStore ?? globalEnvironment.data.variables;
-  const runtimeVariablesStore = storeOverrideConfig?.runtimeVariablesStore ?? _runtimeVariablesStore;
-  const runtimeVariables = runtimeVariablesStore.getState();
-
-  const { getRecordStore } = stores.records.getState();
 
   // 0. Runtime Variables
-  if (runtimeVariables) {
-    scopes.push([
-      {
-        scope: VariableScope.RUNTIME,
-        scopeId: "runtime",
-        name: "Runtime Variables",
-        level: currentScopeLevel++,
-      },
-      runtimeVariablesStore,
-    ]);
-  }
+  // if (runtimeVariables) {
+  //   scopes.push([
+  //     {
+  //       scope: VariableScope.RUNTIME,
+  //       scopeId: "runtime",
+  //       name: "Runtime Variables",
+  //       level: currentScopeLevel++,
+  //     },
+  //     runtimeVariablesStore,
+  //   ]);
+  // }
 
   //1. Active Envrionment
   if (activeEnvironment) {
@@ -137,25 +136,22 @@ function getScopes(
         name: activeEnvironment.name,
         level: currentScopeLevel++,
       },
-      activeEnvironmentVariablesStore!,
+      override?.activeEnvironmentVariables || activeEnvironment.variables,
     ]);
   }
 
   //2. Collection Variables
-  for (const parent of parents) {
-    const recordState = getRecordStore(parent)?.getState();
-    if (!recordState) {
-      throw new NativeError(`Could not find store for record: ${parent}`);
-    }
-    if (recordState.type === RQAPI.RecordType.COLLECTION) {
+  for (const parent of [id, ...parents]) {
+    const recordState = selectRecordById(state, parent);
+    if (recordState?.type === RQAPI.RecordType.COLLECTION) {
       scopes.push([
         {
           scope: VariableScope.COLLECTION,
-          scopeId: recordState.record.id,
-          name: recordState.record.name,
+          scopeId: recordState.id,
+          name: recordState.name,
           level: currentScopeLevel++,
         },
-        storeOverrideConfig?.collectionVariablesStore ?? recordState.collectionVariables,
+        override?.collectionVariables?.[parent] || recordState.data.variables,
       ]);
     }
   }
@@ -168,7 +164,7 @@ function getScopes(
       name: globalEnvironment.name,
       level: currentScopeLevel++,
     },
-    globalEnvironmentVariablesStore!,
+    override?.globalEnvironmentVariables || globalEnvironment.variables,
   ]);
 
   return scopes;
@@ -181,134 +177,47 @@ function readScopesIntoVariableHolder(
   variableHolder: VariableHolder
 ) {
   const scopes = params.scopes;
-  for (const [variableSource, variableStore] of scopes) {
+  for (const [variableSource, variables] of scopes) {
     variableHolder.refresh({
       variableSource,
-      variableState: variableStore.getState(),
+      variables,
     });
   }
 }
 
 export function getScopedVariables(
-  parents: string[],
-  stores: AllApiClientStores,
-  scopes?: Scope[],
-  storeOverrideConfig?: StoreOverrideConfig
+  state: ApiClientStoreState,
+  id: string,
+  config?: {
+    variableHolder?: VariableHolder,
+    scopes?: Scope[],
+    storeOverrideConfig?: StoreOverrideConfig
+  }
 ): ScopedVariables {
-  const variableHolder = new VariableHolder();
+  const variableHolder = config?.variableHolder || new VariableHolder();
   readScopesIntoVariableHolder(
     {
-      scopes: getScopes(parents, stores, scopes, storeOverrideConfig),
+      scopes: getScopes(state, id, config),
     },
     variableHolder
   );
 
-  return variableHolder.getAll();
+  return variableHolder.variables;
 }
 
 export function resolveVariable(
+  state: ApiClientStoreState,
+  id: string,
   key: string,
-  parents: string[],
-  stores: AllApiClientStores,
-  storeOverrideConfig?: StoreOverrideConfig
+  config: {
+    scopes?: Scope[],
+    storeOverrideConfig?: StoreOverrideConfig
+  }
 ) {
-  return getScopedVariables(parents, stores, undefined, storeOverrideConfig).get(key);
-}
-
-class VariableEventsManager {
-  private variableHolder: VariableHolder;
-  private map = new Map<
-    VariableSource["scopeId"],
-    {
-      unsubscriber: (...args: any[]) => any[] | void;
-    }
-  >();
-
-  private resetVariableHolder(scopes: Scope[]) {
-    this.variableHolder = new VariableHolder();
-    readScopesIntoVariableHolder(
-      {
-        scopes,
-      },
-      this.variableHolder
-    );
-  }
-
-  constructor(private readonly setScopedVariables: (variable: ScopedVariables) => void, scopes: Scope[]) {
-    this.resetVariableHolder(scopes);
-    scopes.forEach((scope) => this.addScope(scope));
-  }
-
-  private addScope(scope: Scope) {
-    const [variableSource, variableState] = scope;
-    const unsubscriber = variableState.subscribe((variableState) => {
-      this.variableHolder.refresh({
-        variableSource,
-        variableState,
-      });
-      this.setScopedVariables(this.variableHolder.getAll());
-    });
-    this.map.set(variableSource.scopeId, {
-      unsubscriber,
-    });
-  }
-
-  private deleteScope(scopeId: VariableSource["scopeId"]) {
-    const data = this.map.get(scopeId);
-    if (!data) {
-      return false;
-    }
-    data.unsubscriber();
-    this.map.delete(scopeId);
-    return true;
-  }
-
-  refresh(scopes: Scope[]) {
-    this.resetVariableHolder(scopes);
-    const newScopeIds = new Set(scopes.map((s) => s[0].scopeId));
-    for (const scope of scopes) {
-      if (!this.map.has(scope[0].scopeId)) {
-        this.addScope(scope);
-      }
-    }
-
-    for (const [scopeId] of this.map) {
-      if (!newScopeIds.has(scopeId)) {
-        this.deleteScope(scopeId);
-      }
-    }
-  }
+  return getScopedVariables(state, id, config)[key];
 }
 
 export function useScopedVariables(id: string) {
-  const stores = useApiClientFeatureContext().stores;
-  if (!stores) {
-    throw new Error("Unable to locate stores!");
-  }
-
-  const { version } = useApiRecordState(id);
-
-  const { getParentChain } = stores.records.getState();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const parents = useMemo(() => getParentChain(id), [id, version]);
-
-  const activeEnvironment = useActiveEnvironment();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const scopes = useMemo(() => getScopes(parents, stores), [activeEnvironment, parents, stores]);
-
-  const [scopedVariables, setScopedVariables] = useState(getScopedVariables(parents, stores));
-
-  const variableEventsManagerRef = useRef<VariableEventsManager>();
-
-  useEffect(() => {
-    variableEventsManagerRef.current = new VariableEventsManager(setScopedVariables, scopes);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    variableEventsManagerRef.current?.refresh(scopes);
-    setScopedVariables(getScopedVariables(parents, stores));
-  }, [parents, scopes, stores]);
-
-  return scopedVariables;
+  const variableHolder = useMemo(() => new VariableHolder(), [id]);
+  return useApiClientSelector((state: ApiClientStoreState) => getScopedVariables(state, id, { variableHolder }));
 }
