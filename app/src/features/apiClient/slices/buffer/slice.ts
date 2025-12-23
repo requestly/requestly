@@ -10,7 +10,10 @@ const bufferAdapter = createEntityAdapter<BufferEntry>();
 
 const initialState: BufferState = bufferAdapter.getInitialState();
 
-function findBufferByReferenceId(entities: BufferState["entities"], referenceId: string): BufferEntry | undefined {
+export function findBufferByReferenceId(
+  entities: BufferState["entities"],
+  referenceId: string
+): BufferEntry | undefined {
   const allEntries = Object.values(entities) as (BufferEntry | undefined)[];
   return allEntries.find((e) => e?.referenceId === referenceId);
 }
