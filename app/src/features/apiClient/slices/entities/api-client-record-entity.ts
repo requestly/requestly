@@ -1,7 +1,7 @@
 import type { RQAPI } from "features/apiClient/types";
 import type { ApiClientStoreState } from "../workspaceView/helpers/ApiClientContextRegistry/types";
 import { ApiClientEntity } from "./base";
-import type { UpdateCommand } from "../types";
+import type { UpdateCommand, DeepPartial, DeepPartialWithNull } from "../types";
 import { apiRecordsActions } from "../apiRecords";
 
 export abstract class ApiClientRecordEntity<T extends RQAPI.ApiClientRecord> extends ApiClientEntity<T> {
@@ -11,6 +11,16 @@ export abstract class ApiClientRecordEntity<T extends RQAPI.ApiClientRecord> ext
 
   override dispatchUnsafePatch(patcher: (state: T) => void): void {
     this.dispatch(apiRecordsActions.unsafePatch({ id: this.meta.id, patcher }));
+  }
+
+  protected SETCOMMON(value: DeepPartial<RQAPI.ApiClientRecord>): void {
+    const command = { type: "SET" as const, value };
+    this.dispatchCommand(command as UpdateCommand<T>);
+  }
+
+  protected DELETECOMMON(value: DeepPartialWithNull<RQAPI.ApiClientRecord>): void {
+    const command = { type: "DELETE" as const, value };
+    this.dispatchCommand(command as UpdateCommand<T>);
   }
 
   getName(state: ApiClientStoreState): string {
