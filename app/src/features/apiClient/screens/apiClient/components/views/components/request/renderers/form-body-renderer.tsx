@@ -1,33 +1,24 @@
 import { KeyValuePair } from "features/apiClient/types";
-import { useCallback, useContext } from "react";
-import { RequestBodyContext, useFormBody } from "../request-body-state-manager";
-import { RequestBodyProps } from "../request-body-types";
+import { useCallback } from "react";
 import { KeyValueTable } from "../components/KeyValueTable/KeyValueTable";
 import { useScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
+import { RequestContentType, RQAPI } from "@requestly/shared/types/entities/apiClient";
 
-export function FormBody(props: { recordId: string; setRequestEntry: RequestBodyProps["setRequestEntry"] }) {
-  const { recordId, setRequestEntry } = props;
-
-  const { requestBodyStateManager } = useContext(RequestBodyContext);
-  const { formBody, setFormBody } = useFormBody(requestBodyStateManager);
+export function FormBody(props: {
+  recordId: string;
+  contentType: RequestContentType;
+  handleContentChange: (contentType: RequestContentType, body: RQAPI.RequestBody) => void;
+  body?: KeyValuePair[];
+}) {
+  const { recordId, contentType, handleContentChange, body = [] } = props;
 
   const scopedVariables = useScopedVariables(recordId);
 
   const handleFormChange = useCallback(
     (updatedPairs: KeyValuePair[]) => {
-      setRequestEntry((prev) => {
-        setFormBody(updatedPairs);
-        return {
-          ...prev,
-          request: {
-            ...prev.request,
-            body: updatedPairs,
-            bodyContainer: requestBodyStateManager.serialize(),
-          },
-        };
-      });
+      handleContentChange(contentType, updatedPairs);
     },
-    [setRequestEntry, setFormBody, requestBodyStateManager]
+    [handleContentChange, contentType]
   );
 
   const extraTableColumns = {
@@ -39,7 +30,7 @@ export function FormBody(props: { recordId: string; setRequestEntry: RequestBody
   };
   return (
     <KeyValueTable
-      data={formBody}
+      data={body}
       variables={scopedVariables}
       onChange={handleFormChange}
       extraColumns={extraTableColumns}

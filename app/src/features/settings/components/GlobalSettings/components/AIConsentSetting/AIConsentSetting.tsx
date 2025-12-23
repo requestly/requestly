@@ -1,17 +1,18 @@
 import { useDispatch, useSelector } from "react-redux";
 import SettingsItem from "../SettingsItem";
-import { getUserAuthDetails, getUserMetadata } from "store/slices/global/user/selectors";
+import { getUserAuthDetails, getIsOptedforAIFeatures } from "store/slices/global/user/selectors";
 import { AIConsentModal } from "features/ai";
 import { useState } from "react";
 import { toggleAIFeatures } from "backend/user/toggleAIFeatures";
 import { globalActions } from "store/slices/global/slice";
 import { toast } from "utils/Toast";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import LINKS from "config/constants/sub/links";
 
 export const AIConsentSetting = () => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
-  const userMetadata = useSelector(getUserMetadata);
+  const isOptedforAIFeatures = useSelector(getIsOptedforAIFeatures);
 
   const [isAIConsentModalOpen, setIsAIConsentModalOpen] = useState(false);
 
@@ -20,7 +21,7 @@ export const AIConsentSetting = () => {
   const handleDisableAIFeatures = async () => {
     const result = await toggleAIFeatures(user.details?.profile?.uid, false);
     if (result.success) {
-      dispatch(globalActions.updateUserMetadata({ ...userMetadata, ai_consent: false }));
+      dispatch(globalActions.updateIsOptedforAIFeatures(false));
     } else toast.error(result.message);
   };
 
@@ -33,13 +34,16 @@ export const AIConsentSetting = () => {
         title="AI features"
         caption={
           <>
-            Enable AI-powered capabilities in the application. Learn how AI works in the <a>FAQs</a>
+            Enable AI-powered capabilities in the application. Learn how AI works in the{" "}
+            <a href={LINKS.AI_DOC_LINK} target="_blank" rel="noreferrer">
+              FAQs
+            </a>
           </>
         }
-        isActive={!!userMetadata?.ai_consent}
+        isActive={isOptedforAIFeatures}
         onChange={(checked) => {
           if (checked) {
-            if (!userMetadata?.ai_consent) {
+            if (!isOptedforAIFeatures) {
               setIsAIConsentModalOpen(true);
               return;
             }

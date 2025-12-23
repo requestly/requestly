@@ -172,6 +172,8 @@ const LINKS = {
 
   NOTION_PAGE_FOR_PROMOTION:
     "https://requestly.notion.site/Help-Us-Grow-Requestly-Get-4-Months-Free-25cd193f3c998015ad1dfab733e8cfd2?source=copy_link",
+
+  AI_DOC_LINK: "https://www.browserstack.com/support/faq/browserstack-ai",
 };
 
 export default LINKS;

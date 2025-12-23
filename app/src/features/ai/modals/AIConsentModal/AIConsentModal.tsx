@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Modal } from "antd";
 import { TbShieldLock } from "@react-icons/all-files/tb/TbShieldLock";
 import { MdOutlineNearMeDisabled } from "@react-icons/all-files/md/MdOutlineNearMeDisabled";
@@ -10,9 +10,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { toast } from "utils/Toast";
 import { globalActions } from "store/slices/global/slice";
-import { getUserMetadata } from "store/slices/global/user/selectors";
 import { Link } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
+import LINKS from "config/constants/sub/links";
+import { trackAIFeaturesConsentModalShown } from "modules/analytics/events/common/ai";
 import "./aiConsentModal.scss";
 
 interface AIConsentModalProps {
@@ -38,7 +39,6 @@ const AI_DETAILS = [
 
 export const AIConsentModal: React.FC<AIConsentModalProps> = ({ isOpen, toggle, onEnableCallback }) => {
   const user = useSelector(getUserAuthDetails);
-  const userMetadata = useSelector(getUserMetadata);
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -46,7 +46,7 @@ export const AIConsentModal: React.FC<AIConsentModalProps> = ({ isOpen, toggle, 
     setIsLoading(true);
     const result = await toggleAIFeatures(user.details?.profile?.uid, true);
     if (result.success) {
-      dispatch(globalActions.updateUserMetadata({ ...userMetadata, ai_consent: true }));
+      dispatch(globalActions.updateIsOptedforAIFeatures(true));
       toggle(false);
       onEnableCallback?.();
     } else {
@@ -54,6 +54,11 @@ export const AIConsentModal: React.FC<AIConsentModalProps> = ({ isOpen, toggle, 
     }
     setIsLoading(false);
   };
+
+  useEffect(() => {
+    if (isOpen) trackAIFeaturesConsentModalShown();
+  }, [isOpen]);
+
   return (
     <Modal
       width={480}
@@ -85,7 +90,7 @@ export const AIConsentModal: React.FC<AIConsentModalProps> = ({ isOpen, toggle, 
               </div>
             ))}
           </div>
-          <a target="_blank" href="#" rel="noreferrer">
+          <a target="_blank" href={LINKS.AI_DOC_LINK} rel="noreferrer">
             Learn more in FAQs <MdArrowOutward />
           </a>
         </div>

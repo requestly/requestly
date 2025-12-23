@@ -166,53 +166,97 @@ export const PricingFeatures: PlanFeatures = {
       heading: "All you need for individual & small teams",
       features: [
         {
-          title: "Unlimited collections and environments",
+          title: "API Client",
           enabled: true,
         },
         {
-          title: "Unlimited collection runs",
+          title: "Unlimited Collections",
           enabled: true,
         },
         {
-          title: "Unlimited collaborators",
+          title: "Unlimited Environments",
           enabled: true,
         },
         {
-          title: "Unlimited local workspaces",
+          title: "Scripting",
           enabled: true,
         },
         {
-          title: "Unlimited team workspaces",
+          title: "100 Collection Runs",
           enabled: true,
         },
         {
-          title: "Git Integration",
+          title: "Unlimited API Tests",
+          enabled: true,
+        },
+        {
+          title: "3 Custom Packages",
+          enabled: true,
+        },
+        {
+          title: "2 Workspaces",
+          enabled: true,
+        },
+        {
+          title: "Git-Based Collaboration",
+          enabled: true,
+        },
+        {
+          title: "Import Collections from Git",
+          enabled: true,
+        },
+        {
+          title: "Import OpenAPI Spec",
+          enabled: true,
+        },
+        {
+          title: "Import from Postman",
           enabled: true,
         },
       ],
     },
-    [PRICING.PLAN_NAMES.API_CLIENT_ENTERPRISE]: {
-      planTitle: "Enterprise",
-      heading: "Org-wide secure & controlled API dev",
+    [PRICING.PLAN_NAMES.API_CLIENT_PROFESSIONAL]: {
+      planTitle: "Professional",
+      heading: "For collaboration in teams",
       features: [
         {
-          title: "Role-based access control",
+          title: "Unlimited Workspaces",
           enabled: true,
         },
         {
-          title: "SSO & SAML",
+          title: "Unlimited Collaborators",
           enabled: true,
         },
         {
-          title: "SLAs (Service Uptime, Insurance)",
+          title: "Unlimited Collection Runs",
           enabled: true,
         },
         {
-          title: "SOC2 Reports",
+          title: "Unlimited Script Packages",
           enabled: true,
         },
         {
-          title: "Pay by invoice",
+          title: "AI-Powered API Testing",
+          enabled: true,
+        },
+        {
+          title: "Test Reports",
+          enabled: true,
+        },
+        {
+          title: "AWS Secrets Manager Integration",
+          enabled: true,
+        },
+        {
+          title: "SOC2 Report",
+          enabled: true,
+        },
+        {
+          title: "Pay by Card/Invoice",
+          enabled: true,
+        },
+        {
+          title: "Priority Support",
           enabled: true,
         },
       ],
