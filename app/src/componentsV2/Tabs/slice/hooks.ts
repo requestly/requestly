@@ -8,7 +8,7 @@ import { EntityType } from "features/apiClient/slices/types";
 import { findBufferByReferenceId } from "features/apiClient/slices/buffer/slice";
 import { BUFFER_SLICE_NAME } from "features/apiClient/slices/common/constants";
 import { Workspace } from "features/workspaces/types";
-import { getApiClientFeatureContext } from "features/apiClient/slices";
+import { useApiClientStore } from "features/apiClient/slices";
 
 const tabsSelectors = tabsAdapter.getSelectors<RootState>((state) => state.tabs.tabs);
 
@@ -35,20 +35,9 @@ export function useTabsByEntityTypes(entityTypes: EntityType[]) {
 }
 
 export function useTabBufferIsDirty(workspaceId: Workspace["id"], modeConfig: TabModeConfig): boolean {
-  const subscribe = useCallback(
-    (onStoreChange: () => void) => {
-      const { store } = getApiClientFeatureContext(workspaceId);
-      const unsubscribe = store.subscribe(() => {
-        onStoreChange();
-      });
-
-      return unsubscribe;
-    },
-    [workspaceId]
-  );
+  const store = useApiClientStore(workspaceId);
 
   const getSnapshot = useCallback(() => {
-    const { store } = getApiClientFeatureContext(workspaceId);
     if (!store || modeConfig.mode !== "buffer") {
       return false;
     }
@@ -57,7 +46,7 @@ export function useTabBufferIsDirty(workspaceId: Workspace["id"], modeConfig: Ta
     const bufferEntry = findBufferByReferenceId(bufferState.entities, modeConfig.entityId);
 
     return bufferEntry?.isDirty ?? false;
-  }, [modeConfig, workspaceId]);
+  }, [modeConfig.entityId, modeConfig.mode, store]);
 
-  return useSyncExternalStore(subscribe, getSnapshot);
+  return useSyncExternalStore(store.subscribe, getSnapshot);
 }
