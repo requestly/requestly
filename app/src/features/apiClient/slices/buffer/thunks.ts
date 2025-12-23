@@ -8,6 +8,7 @@ import { createRecord, updateRecord } from "../apiRecords/thunks";
 import { ApiClientEntityType } from "../entities/types";
 import { BUFFER_SLICE_NAME } from "../common/constants";
 import type { BufferEntry } from "./types";
+import { emitBufferUpdated } from "componentsV2/Tabs/slice/previewTabManager";
 
 type Repository = ApiClientRecordsInterface<Record<string, unknown>>;
 
@@ -84,6 +85,11 @@ export const saveBuffer = createAsyncThunk<
       referenceId: result.id,
     })
   );
+
+  emitBufferUpdated({
+    entityId: result.id,
+    entityType: entry.entityType,
+  });
 
   return result;
 });

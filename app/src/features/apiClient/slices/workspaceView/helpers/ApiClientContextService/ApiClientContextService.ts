@@ -34,6 +34,7 @@ import {
   environmentsSlice,
 } from "features/apiClient/slices/environments";
 import { EnvironmentEntity } from "features/apiClient/slices/environments/types";
+import { bufferSlice } from "features/apiClient/slices/buffer";
 
 export type UserDetails = { uid: string; loggedIn: true } | { loggedIn: false };
 
@@ -88,6 +89,7 @@ class ApiClientContextService {
       reducer: {
         [apiRecordsSlice.name]: createApiClientRecordsPersistedReducer(workspaceId || "null"),
         [environmentsSlice.name]: createEnvironmentsPersistedReducer(workspaceId || "null"),
+        [bufferSlice.name]: bufferSlice.reducer,
       },
       middleware(getDefaultMiddleware) {
         return getDefaultMiddleware({
