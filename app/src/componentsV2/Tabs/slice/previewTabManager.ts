@@ -24,7 +24,7 @@ export function onBufferUpdated(handler: (payload: BufferUpdatePayload) => void)
   };
 }
 
-export function emitBufferUpdate(payload: BufferUpdatePayload): void {
+export function emitBufferUpdated(payload: BufferUpdatePayload): void {
   const event = new CustomEvent<BufferUpdateEventDetail>(BUFFER_UPDATED_EVENT, {
     detail: payload,
   });
