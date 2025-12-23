@@ -4,6 +4,9 @@ import { TabSource } from "../types";
 import { ReducerKeys } from "store/constants";
 import { v4 as uuidv4 } from "uuid";
 import { enableMapSet } from "immer";
+import persistReducer from "redux-persist/es/persistReducer";
+import { tabsPersistTransform } from "./persistTransform";
+import storage from "redux-persist/lib/storage";
 
 enableMapSet();
 
@@ -160,7 +163,12 @@ export const tabsSlice = createSlice({
   },
 });
 
-// TODO: local storage persistence
+const tabsPersistConfig = {
+  key: "rq_tabs_store",
+  storage,
+  throttle: 1000,
+  transforms: [tabsPersistTransform],
+};
 
 export const tabsActions = tabsSlice.actions;
-export const tabsReducer = tabsSlice.reducer;
+export const tabsReducerWithPersist = persistReducer(tabsPersistConfig, tabsSlice.reducer);
