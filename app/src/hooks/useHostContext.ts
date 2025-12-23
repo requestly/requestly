@@ -4,6 +4,7 @@ import { ActiveWorkflow } from "componentsV2/Tabs/slice/types";
 import { NativeError } from "errors/NativeError";
 
 export interface HostContext {
+  isDirty: boolean;
   close: () => void;
   replace: (source: TabSource) => void;
 
