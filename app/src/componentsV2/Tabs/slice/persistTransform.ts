@@ -2,12 +2,11 @@ import * as Sentry from "@sentry/react";
 import { createTransform } from "redux-persist";
 import { TAB_SOURCES_MAP } from "../constants";
 import type { TabServiceState, TabState } from "./types";
+import { TabSource } from "../types";
 
 interface TabStateSerialized {
   id: string;
-  sourceType: string;
-  sourceMetadata: unknown;
-  activeWorkflows: never[];
+  source: TabSource;
   modeConfig: TabState["modeConfig"];
 }
 
@@ -23,18 +22,16 @@ interface TabServiceStateSerialized {
 function serializeTab(tab: TabState): TabStateSerialized {
   return {
     id: tab.id,
-    sourceType: tab.source.constructor.name,
-    sourceMetadata: tab.source.metadata,
-    activeWorkflows: [],
+    source: tab.source,
     modeConfig: tab.modeConfig,
   };
 }
 
 function deserializeTab(serialized: TabStateSerialized): TabState | null {
   try {
-    const SourceClass = TAB_SOURCES_MAP[serialized.sourceType];
+    const SourceClass = TAB_SOURCES_MAP[serialized.source.type];
     if (!SourceClass) {
-      Sentry.captureMessage(`Unknown tab source type: ${serialized.sourceType}`, {
+      Sentry.captureMessage(`Unknown tab source type: ${serialized.source.type}`, {
         level: "warning",
         tags: { error_type: "tab_persistence_issue" },
         extra: { serializedTab: serialized },

@@ -13,7 +13,7 @@ import { variablesReducer } from "./features/variables/slice";
 
 import { globalReducers } from "./slices/global/slice";
 import { workspaceViewReducerWithLocal } from "features/apiClient/slices";
-import { tabsReducerWithPersist } from "componentsV2/Tabs/slice/persistConfig";
+import { tabsReducerWithPersist } from "componentsV2/Tabs/slice";
 
 export const reduxStore = configureStore({
   reducer: {
