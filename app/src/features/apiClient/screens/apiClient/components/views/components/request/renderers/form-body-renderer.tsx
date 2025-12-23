@@ -21,5 +21,19 @@ export function FormBody(props: {
     [handleContentChange, contentType]
   );
 
-  return <KeyValueTable data={body} variables={scopedVariables} onChange={handleFormChange} showDescription={false} />;
+  const extraTableColumns = {
+    description: {
+      visible: false,
+      onToggle: () => {},
+    },
+    dataType: { visible: false },
+  };
+  return (
+    <KeyValueTable
+      data={body}
+      variables={scopedVariables}
+      onChange={handleFormChange}
+      extraColumns={extraTableColumns}
+    />
+  );
 }
