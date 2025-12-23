@@ -7,10 +7,6 @@ export type ApiClientEntityMeta = {
   id: string;
 };
 
-type CommonEditableFields = Pick<RQAPI.RecordMetadata, "name" | "description" | "collectionId"> & {
-  data: Pick<RQAPI.ApiEntryMetaData, "auth" | "scripts">;
-};
-
 export abstract class ApiClientEntity<T, M extends ApiClientEntityMeta = ApiClientEntityMeta> {
   abstract readonly type: ApiClientEntityType;
 
@@ -39,13 +35,13 @@ export abstract class ApiClientEntity<T, M extends ApiClientEntityMeta = ApiClie
     this.dispatchCommand({ type: "DELETE", value });
   }
 
-  protected SETCOMMON(value:DeepPartial<CommonEditableFields>): void {
-    const command = { type: "SET" as const, value};
+  protected SETCOMMON(value: DeepPartial<RQAPI.ApiClientRecord>): void {
+    const command = { type: "SET" as const, value };
     this.dispatchCommand(command as UpdateCommand<T>);
   }
 
-  protected DELETECOMMON(value: DeepPartialWithNull<CommonEditableFields>): void {
-    const command = { type: "DELETE" as const, value};
+  protected DELETECOMMON(value: DeepPartialWithNull<RQAPI.ApiClientRecord>): void {
+    const command = { type: "DELETE" as const, value };
     this.dispatchCommand(command as UpdateCommand<T>);
   }
 }
