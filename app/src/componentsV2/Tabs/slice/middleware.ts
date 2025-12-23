@@ -12,10 +12,6 @@ import { CollectionViewTabSource } from "features/apiClient/screens/apiClient/co
 import { EnvironmentViewTabSource } from "features/apiClient/screens/environment/components/environmentView/EnvironmentViewTabSource";
 import { RQAPI } from "features/apiClient/types";
 
-/**
- * Fetches entity data from the appropriate slice based on tab source type and returns
- * the correct entity type and data for buffer creation.
- */
 function getEntityDataFromTabSource(
   source: TabSource,
   state: ApiClientStoreState
@@ -23,7 +19,6 @@ function getEntityDataFromTabSource(
   const sourceId = source.getSourceId();
   const sourceName = source.getSourceName();
 
-  // Determine entity category from source name or instance type
   let category: "request" | "collection" | "environments" | null = null;
 
   if (source instanceof RequestViewTabSource || sourceName === "request") {
@@ -38,7 +33,6 @@ function getEntityDataFromTabSource(
     return null;
   }
 
-  // Handle request category - could be HTTP or GraphQL
   if (category === "request") {
     const record = apiRecordsAdapter.getSelectors().selectById(state.records.records, sourceId);
 
@@ -59,22 +53,10 @@ function getEntityDataFromTabSource(
     };
   }
 
-  // Handle collection category
   if (category === "collection") {
-    const record = apiRecordsAdapter.getSelectors().selectById(state.records.records, sourceId);
-
-    if (!record) {
-      return null;
-    }
-
-    return {
-      entityType: ApiClientEntityType.COLLECTION_RECORD,
-      entityId: sourceId,
-      data: record,
-    };
+    // TODO
   }
 
-  // Handle environments category
   if (category === "environments") {
     const environment = environmentsAdapter.getSelectors().selectById(state.environments.environments, sourceId);
 
