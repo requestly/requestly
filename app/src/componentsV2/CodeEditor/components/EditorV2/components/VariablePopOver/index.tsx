@@ -10,13 +10,12 @@ import { CreateVariableView } from "./components/CreateVariableView";
 import { EditVariableView } from "./components/EditVariableView";
 import { RQButton } from "lib/design-system-v2/components";
 import { MdEdit } from "@react-icons/all-files/md/MdEdit";
-import { RiEyeLine } from "@react-icons/all-files/ri/RiEyeLine";
-import { RiEyeOffLine } from "@react-icons/all-files/ri/RiEyeOffLine";
 import { getScopeIcon } from "./hooks/useScopeOptions";
+import { VariableSecretValue } from "../../../../../VariableSecretValue/VariableSecretValue";
 import { useContextId } from "features/apiClient/contexts/contextId.context";
 import { NoopContextId } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 import { captureMessage } from "@sentry/react";
-import { RoleBasedComponent } from "features/rbac";
+import { RBAC, RoleBasedComponent } from "features/rbac";
 
 const PopoverViewTransitions: Record<PopoverView, PopoverView[]> = {
   [PopoverView.IDLE]: [PopoverView.VARIABLE_INFO, PopoverView.NOT_FOUND],
@@ -229,10 +228,6 @@ const VariableInfo: React.FC<{
   onEditClick,
   isNoopContext,
 }) => {
-  const [revealedLabels, setRevealedLabels] = useState<Record<string, boolean>>({
-    [InfoFieldLabel.INITIAL_VALUE]: false,
-    [InfoFieldLabel.CURRENT_VALUE]: false,
-  });
   const { syncValue, localValue, isPersisted } = getValueStrings(variable);
   const isSecretType = variable.type === EnvironmentVariableType.Secret;
   const infoFields: InfoFieldConfig[] = useMemo(() => {
@@ -268,10 +263,6 @@ const VariableInfo: React.FC<{
     ];
   }, [source.scope, name, variable.type, localValue, isPersisted, syncValue, isSecretType]);
 
-  const toggleVisibility = useCallback((key: InfoFieldLabel) => {
-    setRevealedLabels((prev) => ({ ...prev, [key]: !prev[key] }));
-  }, []);
-
   return (
     <>
       <div className="variable-info-property-container">
@@ -298,32 +289,15 @@ const VariableInfo: React.FC<{
             <React.Fragment key={field.label}>
               <div className="variable-info-title">{field.label}</div>
 
-              <div className={`variable-info-value ${field.isSecret ? "with-toggle" : ""}`}>
-                <span className="value-content">
-                  {field.isSecret ? (
-                    revealedLabels[field.label] ? (
-                      <span className="secret-revealed">{String(field.value)}</span>
-                    ) : (
-                      <span className="secret-masked">{"•".repeat(Math.min(String(field.value).length, 15))}</span>
-                    )
-                  ) : (
+              {field.isSecret ? (
+                <VariableSecretValue value={field.value} roleResource={RBAC.Resource.api_client_environment} />
+              ) : (
+                <div className="variable-info-value">
+                  <span className="value-content">
                     <span>{String(field.value)}</span>
-                  )}
-                </span>
-
-                {field.isSecret && (
-                  <RoleBasedComponent resource="api_client_environment" permission="update">
-                    <div className="eye-toggle-button">
-                      <RQButton
-                        type="transparent"
-                        size="small"
-                        icon={revealedLabels[field.label] ? <RiEyeLine /> : <RiEyeOffLine />}
-                        onClick={() => toggleVisibility(field.label)}
-                      />
-                    </div>
-                  </RoleBasedComponent>
-                )}
-              </div>
+                  </span>
+                </div>
+              )}
             </React.Fragment>
           ))}
         </div>
