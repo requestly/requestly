@@ -1,6 +1,11 @@
 import React, { useCallback, useRef, useState } from "react";
 import { FilePicker } from "components/common/FilePicker";
-import { getUploadedPostmanFileType, processPostmanCollectionData, processPostmanEnvironmentData } from "./utils";
+import {
+  getUploadedPostmanFileType,
+  processPostmanCollectionData,
+  processPostmanEnvironmentData,
+  UnsupportedFeaturesMeta,
+} from "./utils";
 import { toast } from "utils/Toast";
 import { RQButton } from "lib/design-system-v2/components";
 import { MdCheckCircleOutline } from "@react-icons/all-files/md/MdCheckCircleOutline";
@@ -12,6 +17,7 @@ import {
   trackImportParsed,
   trackImportParseFailed,
   trackImportSuccess,
+  trackPostmanUnsupportedFeaturesDetected,
 } from "modules/analytics/events/features/apiClient";
 import Logger from "lib/logger";
 import "./postmanImporter.scss";
@@ -22,7 +28,13 @@ import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClient
 import { EnvironmentVariableData } from "features/apiClient/store/variables/types";
 
 type ProcessedData = {
-  environments: { name: string; variables: Record<string, EnvironmentVariableData>; isGlobal: boolean }[];
+  environments: {
+    name: string;
+    variables: Record<string, EnvironmentVariableData>;
+    isGlobal: boolean;
+    unsupportedFeatures?: string[];
+    meta?: any;
+  }[];
   apiRecords: (RQAPI.CollectionRecord | RQAPI.ApiRecord)[];
   variables: Record<string, EnvironmentVariableData>;
 };
@@ -116,16 +128,81 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
             apiRecords: [],
             variables: {},
           };
+          const allUnsupportedFeatures = new Set<string>();
+          const allMeta: Partial<UnsupportedFeaturesMeta> = {
+            vaultVars: [],
+            dynamicVars: [],
+            disabledVars: [],
+            unsupportedAuthTypes: [],
+            unsupportedScriptMethods: [],
+            requestsWithExamples: [],
+            collectionsWithScripts: [],
+            requestExamplesCount: 0,
+            collectionLevelScriptCount: 0,
+          };
 
           results.forEach((result: any) => {
             if (result.status === "fulfilled") {
               if (result.value.type === "environment") {
                 processedRecords.environments.push(result.value.data);
+                // Collect unsupported features from environment
+                if (result.value.data.unsupportedFeatures?.length > 0) {
+                  result.value.data.unsupportedFeatures.forEach((f: string) => allUnsupportedFeatures.add(f));
+                  if (result.value.data.meta) {
+                    (result.value.data.meta.vaultVars || []).forEach((v: string) => {
+                      if (!allMeta.vaultVars!.includes(v)) allMeta.vaultVars!.push(v);
+                    });
+                    (result.value.data.meta.dynamicVars || []).forEach((v: string) => {
+                      if (!allMeta.dynamicVars!.includes(v)) allMeta.dynamicVars!.push(v);
+                    });
+                    (result.value.data.meta.disabledVars || []).forEach((v: string) => {
+                      if (!allMeta.disabledVars!.includes(v)) allMeta.disabledVars!.push(v);
+                    });
+                  }
+                }
               } else {
-                const { collections, apis } = result.value.data.apiRecords;
+                const {
+                  collections,
+                  apis,
+                  unsupportedFeatures: collectionUnsupported,
+                  meta,
+                } = result.value.data.apiRecords;
                 processedRecords.variables = { ...processedRecords.variables, ...result.value.data.variables };
                 processedRecords.apiRecords.push(...collections, ...apis);
                 collectionsCount.current += collections.length;
+
+                // Collect unsupported features from collection
+                if (collectionUnsupported?.length > 0) {
+                  collectionUnsupported.forEach((f: string) => allUnsupportedFeatures.add(f));
+                  if (meta) {
+                    (meta.vaultVars || []).forEach((v: string) => {
+                      if (!allMeta.vaultVars!.includes(v)) allMeta.vaultVars!.push(v);
+                    });
+                    (meta.dynamicVars || []).forEach((v: string) => {
+                      if (!allMeta.dynamicVars!.includes(v)) allMeta.dynamicVars!.push(v);
+                    });
+                    (meta.disabledVars || []).forEach((v: string) => {
+                      if (!allMeta.disabledVars!.includes(v)) allMeta.disabledVars!.push(v);
+                    });
+                    (meta.unsupportedAuthTypes || []).forEach((v: string) => {
+                      if (!allMeta.unsupportedAuthTypes!.includes(v)) allMeta.unsupportedAuthTypes!.push(v);
+                    });
+                    (meta.unsupportedScriptMethods || []).forEach((v: string) => {
+                      if (!allMeta.unsupportedScriptMethods!.includes(v)) allMeta.unsupportedScriptMethods!.push(v);
+                    });
+                    (meta.requestsWithExamples || []).forEach((v: string) => {
+                      if (!allMeta.requestsWithExamples!.includes(v)) allMeta.requestsWithExamples!.push(v);
+                    });
+                    (meta.collectionsWithScripts || []).forEach((v: string) => {
+                      if (!allMeta.collectionsWithScripts!.includes(v)) allMeta.collectionsWithScripts!.push(v);
+                    });
+                    allMeta.requestExamplesCount =
+                      (allMeta.requestExamplesCount || 0) + (meta.requestExamplesCount || 0);
+                    allMeta.collectionLevelScriptCount =
+                      (allMeta.collectionLevelScriptCount || 0) + (meta.collectionLevelScriptCount || 0);
+                  }
+                }
+
                 trackImportParsed(ApiClientImporterType.POSTMAN, collections.length, apis.length);
               }
             } else {
@@ -134,6 +211,16 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
           });
 
           setProcessedFileData(processedRecords);
+          // Fire analytics for unsupported features if any detected
+          if (allUnsupportedFeatures.size > 0) {
+            trackPostmanUnsupportedFeaturesDetected(
+              Array.from(allUnsupportedFeatures),
+              allMeta as UnsupportedFeaturesMeta,
+              collectionsCount.current,
+              processedRecords.apiRecords.filter((r) => r.type === RQAPI.RecordType.API).length
+            );
+          }
+
           setProcessingStatus("processed");
         })
         .catch((error) => {
