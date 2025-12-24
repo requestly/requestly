@@ -11,11 +11,11 @@ import { EditVariableView } from "./components/EditVariableView";
 import { RQButton } from "lib/design-system-v2/components";
 import { MdEdit } from "@react-icons/all-files/md/MdEdit";
 import { getScopeIcon } from "./hooks/useScopeOptions";
-import { VariableSecretValue } from "../../../../../VariableSecretValue/VariableSecretValue";
+import { RevealableSecretField } from "../../../../../VariableSecretValue/RevealableSecretField";
 import { useContextId } from "features/apiClient/contexts/contextId.context";
 import { NoopContextId } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 import { captureMessage } from "@sentry/react";
-import { RBAC, RoleBasedComponent } from "features/rbac";
+import { useRBAC } from "features/rbac";
 
 const PopoverViewTransitions: Record<PopoverView, PopoverView[]> = {
   [PopoverView.IDLE]: [PopoverView.VARIABLE_INFO, PopoverView.NOT_FOUND],
@@ -229,6 +229,8 @@ const VariableInfo: React.FC<{
   isNoopContext,
 }) => {
   const { syncValue, localValue, isPersisted } = getValueStrings(variable);
+  const { validatePermission } = useRBAC();
+  const { isValidPermission } = validatePermission("api_client_environment", "update");
   const isSecretType = variable.type === EnvironmentVariableType.Secret;
   const infoFields: InfoFieldConfig[] = useMemo(() => {
     const commonFields = [
@@ -262,25 +264,22 @@ const VariableInfo: React.FC<{
       },
     ];
   }, [source.scope, name, variable.type, localValue, isPersisted, syncValue, isSecretType]);
-
   return (
     <>
       <div className="variable-info-property-container">
         <span>{getScopeIcon(source.scope)}</span>
         <span className="variable-header-info-separator" />
         <div className="variable-info-header-name">{source.name}</div>
-
-        <RoleBasedComponent resource="api_client_environment" permission="update">
-          <RQButton
-            type="transparent"
-            size="small"
-            icon={<MdEdit className="edit-icon" />}
-            onClick={onEditClick}
-            className="edit-variable-btn"
-          >
-            Edit
-          </RQButton>
-        </RoleBasedComponent>
+        <RQButton
+          type="transparent"
+          size="small"
+          icon={<MdEdit className="edit-icon" />}
+          onClick={onEditClick}
+          className="edit-variable-btn"
+          hidden={!isValidPermission}
+        >
+          Edit
+        </RQButton>
       </div>
 
       <div className="variable-info-content-container">
@@ -288,9 +287,8 @@ const VariableInfo: React.FC<{
           {infoFields.map((field) => (
             <React.Fragment key={field.label}>
               <div className="variable-info-title">{field.label}</div>
-
               {field.isSecret ? (
-                <VariableSecretValue value={field.value} roleResource={RBAC.Resource.api_client_environment} />
+                <RevealableSecretField value={field.value} isRevealable={isValidPermission} />
               ) : (
                 <div className="variable-info-value">
                   <span className="value-content">
