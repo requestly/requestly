@@ -7,6 +7,7 @@ export enum ApiClientEntityType {
   GRAPHQL_RECORD = "graphql_record",
   ENVIRONMENT = "environment",
   GLOBAL_ENVIRONMENT = "global_environment",
+  RUNTIME_VARIABLES = "runtime_variables",
 }
 
 export type { DeepPartial, DeepPartialWithNull };

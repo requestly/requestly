@@ -14,6 +14,7 @@ import { variablesReducer } from "./features/variables/slice";
 import { globalReducers } from "./slices/global/slice";
 import { workspaceViewReducerWithLocal } from "features/apiClient/slices";
 import { tabsReducerWithPersist } from "componentsV2/Tabs/slice";
+import { runtimeVariablesReducerWithPersist } from "features/apiClient/slices/runtimeVariables";
 
 export const reduxStore = configureStore({
   reducer: {
@@ -27,6 +28,7 @@ export const reduxStore = configureStore({
     [ReducerKeys.VARIABLES]: variablesReducer,
     [ReducerKeys.WORKSPACE_VIEW]: workspaceViewReducerWithLocal,
     [ReducerKeys.TABS]: tabsReducerWithPersist,
+    [ReducerKeys.RUNTIME_VARIABLES]: runtimeVariablesReducerWithPersist,
   },
   middleware: (getDefaultMiddleware) => {
     // In development mode redux-toolkit will

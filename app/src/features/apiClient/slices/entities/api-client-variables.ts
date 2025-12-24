@@ -8,11 +8,11 @@ import { PersistConfig } from "redux-persist";
 
 type Variable = EnvironmentVariables[0];
 
-export class ApiClientVariables<T> {
+export class ApiClientVariables<T, State = ApiClientStoreState> {
   constructor(
-    readonly getVariableObject: (entity: T) => EnvironmentVariables,
-    readonly unsafePatch: (patcher: (state: T) => void) => void,
-    readonly getEntityFromState: (state: ApiClientStoreState) => T
+    private readonly getVariableObject: (entity: T) => EnvironmentVariables,
+    private readonly unsafePatch: (patcher: (state: T) => void) => void,
+    private readonly getEntityFromState: (state: State) => T
   ) {}
 
   add(params: Omit<Variable, "id"> & { key: string }) {
@@ -43,7 +43,7 @@ export class ApiClientVariables<T> {
     });
   }
 
-  get(state: ApiClientStoreState, id: Variable["id"]) {
+  get(state: State, id: Variable["id"]) {
     const entity = this.getEntityFromState(state);
     const variables = this.getVariableObject(entity);
     const variable = lodash.find(variables, (v) => v.id === id);
@@ -53,7 +53,7 @@ export class ApiClientVariables<T> {
     return variable;
   }
 
-  getAll(state: ApiClientStoreState) {
+  getAll(state: State) {
     const entity = this.getEntityFromState(state);
     const variables = this.getVariableObject(entity);
     return variables;
@@ -103,6 +103,18 @@ export class ApiClientVariables<T> {
   ) {
     return lodash.mapValues(variables, (v) => ({
       localValue: (config ? config.isPersisted : v.isPersisted) ? v.localValue : undefined,
+    }));
+  }
+
+  /**
+   * Persists full variable data, conditionally including localValue based on each variable's isPersisted flag.
+   * Unlike `perist` which only keeps localValue for overlay merging, this preserves the complete variable structure.
+   * Suitable for slices where variables are self-contained and don't need hydrate-in-place merging.
+   */
+  static persistFull(variables: EnvironmentVariables) {
+    return lodash.mapValues(variables, (v) => ({
+      ...v,
+      localValue: v.isPersisted ? v.localValue : undefined,
     }));
   }
 }
