@@ -1,5 +1,5 @@
 import type { EntityState, Middleware } from "@reduxjs/toolkit";
-import { openBufferedTab, tabsActions } from "./slice";
+import { tabsActions } from "./slice";
 import { bufferActions } from "features/apiClient/slices/buffer/slice";
 import { apiRecordsAdapter } from "features/apiClient/slices/apiRecords/slice";
 import { environmentsAdapter } from "features/apiClient/slices/environments/slice";
@@ -16,6 +16,7 @@ import type { RootState } from "store/types";
 import { EnvironmentEntity, getApiClientFeatureContext } from "features/apiClient/slices";
 import { TabState } from "./types";
 import { reduxStore } from "store";
+import { openBufferedTab } from "./actions";
 
 export interface GetEntityDataFromTabSourceState {
   records: {

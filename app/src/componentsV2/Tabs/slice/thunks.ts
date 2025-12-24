@@ -37,7 +37,7 @@ export const closeTab = createAsyncThunk<void, { tabId: TabId; skipUnsavedPrompt
       }
     }
 
-    dispatch(tabsActions.removeTab(tabId));
+    dispatch(tabsActions.closeTab(tabId));
   }
 );
 
