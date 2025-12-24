@@ -23,60 +23,42 @@ interface BottomSheetContextProps {
   updateSheetSize: (size: number[]) => void;
 }
 
-const DEFAULT_SIZE: number[] = [60, 40];
+const DEFAULT_SIZE: number[] = [50, 50];
 const CLOSED_SIZE: number[] = [100, 0];
-
-const isValidSize = (size?: number[]) => Array.isArray(size) && size.length === 2;
 
 const BottomSheetContext = createContext<BottomSheetContextProps | null>(null);
 
 export const BottomSheetProvider: React.FC<{
   children: React.ReactNode;
-  context?: "api_client" | "rules";
+  context: "api_client" | "rules";
   defaultPlacement?: BottomSheetPlacement;
   isSheetOpenByDefault?: boolean;
-}> = ({
-  children,
-  context = "rules",
-  defaultPlacement = BottomSheetPlacement.BOTTOM,
-  isSheetOpenByDefault = false,
-}) => {
+}> = ({ children, context, defaultPlacement, isSheetOpenByDefault }) => {
   const dispatch = useDispatch();
   const reduxState = useSelector((state) => getBottomSheetState(state, context));
-
   const hasReduxState = typeof reduxState?.open === "boolean";
 
   const [userHasInteracted, setUserHasInteracted] = useState(hasReduxState);
-
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(hasReduxState ? reduxState.open : isSheetOpenByDefault);
-
   const [sheetPlacement, setSheetPlacement] = useState<BottomSheetPlacement>(
-    reduxState?.placement === "right" ? BottomSheetPlacement.RIGHT : defaultPlacement
+    reduxState?.placement ? reduxState.placement : defaultPlacement
   );
-
-  const [sheetSize, setSheetSize] = useState<number[]>(isValidSize(reduxState?.size) ? reduxState!.size : DEFAULT_SIZE);
+  const [sheetSize, setSheetSize] = useState<number[]>(reduxState?.size ? reduxState.size : DEFAULT_SIZE);
 
   useEffect(() => {
     if (!reduxState) return;
-
     const shouldSyncOpen = !isSheetOpenByDefault || userHasInteracted;
-
     if (shouldSyncOpen && reduxState.open !== isBottomSheetOpen) {
       setIsBottomSheetOpen(reduxState.open);
     }
-
     setSheetPlacement(reduxState.placement === "right" ? BottomSheetPlacement.RIGHT : BottomSheetPlacement.BOTTOM);
-
-    if (isValidSize(reduxState.size)) {
-      setSheetSize(reduxState.size);
-    }
+    setSheetSize(reduxState.size);
   }, [reduxState, userHasInteracted, isSheetOpenByDefault, isBottomSheetOpen]);
 
   const toggleBottomSheet = useCallback(
     ({ isOpen, action }: ToggleParams) => {
       const nextState = typeof isOpen === "boolean" ? isOpen : !isBottomSheetOpen;
       const newSize = nextState ? DEFAULT_SIZE : CLOSED_SIZE;
-
       setUserHasInteracted(true);
       setIsBottomSheetOpen(nextState);
       setSheetSize(newSize);
@@ -121,7 +103,7 @@ export const BottomSheetProvider: React.FC<{
 
   const updateSheetSize = useCallback(
     (size: number[]) => {
-      if (!isValidSize(size)) return;
+      if (!size) return;
 
       setSheetSize(size);
       dispatch(

@@ -29,14 +29,6 @@ export const updateBottomSheetState = (
   }>
 ) => {
   const { context, state } = action.payload;
-  if (!prevState.bottomSheetOrientation[context]) {
-    prevState.bottomSheetOrientation[context] = {
-      open: false,
-      placement: "bottom",
-      size: [70, 30],
-    };
-  }
-
   if (state.open !== undefined) {
     prevState.bottomSheetOrientation[context].open = state.open;
   }

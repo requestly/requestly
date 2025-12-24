@@ -44,7 +44,7 @@ const DraftSessionDetailsPanel: React.FC<DraftSessionDetailsPanelProps> = ({ isR
   );
 
   return (
-    <BottomSheetProvider defaultPlacement={BottomSheetPlacement.BOTTOM}>
+    <BottomSheetProvider context="rules">
       <div className="session-details-panel-wrapper">
         <BottomSheetLayout
           layout={SheetLayout.DRAWER}

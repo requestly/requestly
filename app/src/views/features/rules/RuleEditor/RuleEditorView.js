@@ -1,4 +1,4 @@
-import { BottomSheetPlacement, BottomSheetProvider } from "componentsV2/BottomSheet";
+import { BottomSheetProvider } from "componentsV2/BottomSheet";
 import RuleEditor from "./RuleEditor";
 import { useSelector } from "react-redux";
 import { getAppMode } from "store/selectors";
@@ -20,7 +20,7 @@ const RuleEditorView = () => {
   }
 
   return (
-    <BottomSheetProvider context="rules" defaultPlacement={BottomSheetPlacement.BOTTOM}>
+    <BottomSheetProvider context="rules">
       <RuleEditor />
     </BottomSheetProvider>
   );

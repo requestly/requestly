@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { Tooltip } from "antd";
-import { BottomSheetLayout, BottomSheetPlacement, BottomSheetProvider } from "componentsV2/BottomSheet";
+import { BottomSheetLayout, BottomSheetProvider } from "componentsV2/BottomSheet";
 import { SaveSessionButton } from "features/sessionBook/components/SaveSessionButton/SaveSessionButton";
 import { SessionPlayer } from "features/sessionBook/components/SessionPlayer/SessionPlayer";
 import { SessionTitle } from "features/sessionBook/screens/SavedSessionScreen/components/SessionsTitle/SessionTitle";
@@ -109,7 +109,7 @@ export const SavedSessionViewer = () => {
 
   return (
     <div className="saved-session-viewer-container">
-      <BottomSheetProvider context="rules" defaultPlacement={BottomSheetPlacement.RIGHT}>
+      <BottomSheetProvider context="rules">
         <div className="saved-session-header">
           <SessionTitle />
 
