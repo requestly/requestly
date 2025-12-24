@@ -1,4 +1,5 @@
-import type { EntityState, Middleware } from "@reduxjs/toolkit";
+import type { EntityState } from "@reduxjs/toolkit";
+import { createListenerMiddleware } from "@reduxjs/toolkit";
 import { tabsActions } from "./slice";
 import { bufferActions } from "features/apiClient/slices/buffer/slice";
 import { apiRecordsAdapter } from "features/apiClient/slices/apiRecords/slice";
@@ -12,11 +13,11 @@ import { RequestViewTabSource } from "features/apiClient/screens/apiClient/compo
 import { DraftRequestContainerTabSource } from "features/apiClient/screens/apiClient/components/views/components/DraftRequestContainer/draftRequestContainerTabSource";
 import { CollectionViewTabSource } from "features/apiClient/screens/apiClient/components/views/components/Collection/collectionViewTabSource";
 import { EnvironmentViewTabSource } from "features/apiClient/screens/environment/components/environmentView/EnvironmentViewTabSource";
-import type { RootState } from "store/types";
 import { EntityNotFound, EnvironmentEntity, getApiClientFeatureContext } from "features/apiClient/slices";
 import { TabState } from "./types";
 import { reduxStore } from "store";
 import { openBufferedTab } from "./actions";
+import { closeTab, closeAllTabs } from "./thunks";
 
 export interface GetEntityDataFromTabSourceState {
   records: {
@@ -94,35 +95,82 @@ function getApiClientStoreByTabSource(source: TabState["source"]) {
   return context.store;
 }
 
-export const tabBufferMiddleware: Middleware = (params: { getState: () => RootState }) => (next) => (action) => {
-  if (openBufferedTab.match(action)) {
-    const { source, isNew = false, preview } = action.payload;
+function handleOpenBufferedTab(action: ReturnType<typeof openBufferedTab>) {
+  const { source, isNew = false, preview } = action.payload;
 
-    const apiClientStore = getApiClientStoreByTabSource(source);
-    const state = apiClientStore.getState() as ApiClientStoreState;
-    const entityData = getEntityDataFromTabSource(source, { records: state.records, environments: state.environments });
-    const { entityType, entityId, data } = entityData;
+  const apiClientStore = getApiClientStoreByTabSource(source);
+  const state = apiClientStore.getState() as ApiClientStoreState;
+  const entityData = getEntityDataFromTabSource(source, {
+    records: state.records,
+    environments: state.environments,
+  });
+  const { entityType, entityId, data } = entityData;
 
-    const payloadAction = apiClientStore.dispatch(
-      bufferActions.open({
-        isNew,
-        entityType: entityType,
-        referenceId: entityId,
-        data: data,
-      })
-    );
+  const payloadAction = apiClientStore.dispatch(
+    bufferActions.open({
+      isNew,
+      entityType: entityType,
+      referenceId: entityId,
+      data: data,
+    })
+  );
 
-    reduxStore.dispatch(
-      tabsActions.openTab({
-        source,
-        modeConfig: {
-          mode: "buffer",
-          entityId: payloadAction.meta.id,
-        },
-        preview,
-      })
-    );
+  reduxStore.dispatch(
+    tabsActions.openTab({
+      source,
+      modeConfig: {
+        mode: "buffer",
+        entityId: payloadAction.meta.id,
+      },
+      preview,
+    })
+  );
+}
+
+function closeBufferByTab(tab: TabState) {
+  const apiClientStore = getApiClientStoreByTabSource(tab.source);
+  apiClientStore.dispatch(bufferActions.close(tab.modeConfig.entityId));
+}
+
+function handleCloseTabFulfilled(action: ReturnType<typeof closeTab.fulfilled>) {
+  const result = action.payload;
+  if (result?.tab && result.tab.modeConfig.mode === "buffer") {
+    closeBufferByTab(result.tab);
+  }
+}
+
+function handleCloseAllTabsFulfilled(action: ReturnType<typeof closeAllTabs.fulfilled>) {
+  const result = action.payload;
+  if (!result?.tabs) {
+    return;
   }
 
-  return next(action);
-};
+  result.tabs.forEach((tab) => {
+    if (tab.modeConfig.mode === "buffer") {
+      closeBufferByTab(tab);
+    }
+  });
+}
+
+const tabBufferListenerMiddleware = createListenerMiddleware();
+
+tabBufferListenerMiddleware.startListening({
+  predicate: (action) => {
+    return openBufferedTab.match(action) || closeTab.fulfilled.match(action) || closeAllTabs.fulfilled.match(action);
+  },
+  effect: (action) => {
+    if (openBufferedTab.match(action)) {
+      handleOpenBufferedTab(action);
+    }
+
+    if (closeTab.fulfilled.match(action)) {
+      handleCloseTabFulfilled(action);
+    }
+
+    if (closeAllTabs.fulfilled.match(action)) {
+      handleCloseAllTabsFulfilled(action);
+    }
+  },
+});
+
+export const tabBufferMiddleware = tabBufferListenerMiddleware.middleware;
