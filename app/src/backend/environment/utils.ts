@@ -187,8 +187,8 @@ const resolveCompositeVariables = (variables: Variables): Variables => {
       if (variableReferences) {
         variableReferences.forEach((refName) => {
           const trimmedRef = refName.trim();
-          // Only add dependency if the referenced variable exists
-          if (trimmedRef in variables) {
+          // Only add dependency if the referenced variable exists and is not a self-reference
+          if (trimmedRef in variables && trimmedRef !== key) {
             graph.addDependency(key, trimmedRef);
           }
         });
@@ -197,13 +197,7 @@ const resolveCompositeVariables = (variables: Variables): Variables => {
   });
 
   // Get resolution order (topologically sorted)
-  let resolutionOrder: string[];
-  try {
-    resolutionOrder = graph.overallOrder();
-  } catch (error) {
-    Logger.error("Failed to resolve variable dependencies:", error);
-    return resolved;
-  }
+  const resolutionOrder = graph.overallOrder();
 
   // Resolve variables in dependency order
   for (const varName of resolutionOrder) {
@@ -222,9 +216,14 @@ const resolveCompositeVariables = (variables: Variables): Variables => {
 
     // Render this variable value using the current resolved variables
     try {
-      const { wrappedTemplate } = collectAndEscapeVariablesFromTemplate(value, resolved);
+      // Create a resolution context without the current variable
+      // This prevents self-reference resolution (e.g., a = "{{a}}-{{b}}")
+      const resolutionContext = { ...resolved };
+      delete resolutionContext[varName];
+
+      const { wrappedTemplate } = collectAndEscapeVariablesFromTemplate(value, resolutionContext);
       const hbsTemplate = compile(wrappedTemplate, { noEscape: true });
-      const renderedValue = hbsTemplate(resolved);
+      const renderedValue = hbsTemplate(resolutionContext);
       resolved[varName] = renderedValue;
     } catch (e) {
       // Keep the original value if rendering fails
