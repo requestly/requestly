@@ -1,41 +1,26 @@
-import { RQAPI } from "features/apiClient/types";
-import { ApiClientStoreState } from "../workspaceView/helpers/ApiClientContextRegistry/types";
+import type { RQAPI } from "features/apiClient/types";
+import type { ApiClientStoreState } from "../workspaceView/helpers/ApiClientContextRegistry/types";
 import { ApiClientEntity } from "./base";
-import { EntityId, EntityNotFound, UpdateCommand } from "../types";
-import { ApiClientEntityType } from "./types";
-import { apiRecordsActions, selectRecordById } from "../apiRecords";
+import type { UpdateCommand, DeepPartial, DeepPartialWithNull } from "../types";
+import { apiRecordsActions } from "../apiRecords";
 
 export abstract class ApiClientRecordEntity<T extends RQAPI.ApiClientRecord> extends ApiClientEntity<T> {
-  private base = new (class extends ApiClientEntity<RQAPI.ApiClientRecord> {
-    getEntityFromState(state: ApiClientStoreState): RQAPI.ApiClientRecord {
-      const record = selectRecordById(state, this.meta.id);
-      if (!record) {
-        throw new EntityNotFound(this.id, this.type);
-      }
-      return record;
-    }
-
-    override dispatchUnsafePatch(id: EntityId, params: (patch: RQAPI.ApiClientRecord) => void): void {
-        throw new Error("Can not dispatch unsafe from base class!");
-    }
-
-    dispatchCommand(command: UpdateCommand<RQAPI.ApiClientRecord>): void {
-      this.dispatch(apiRecordsActions.applyPatch({ id: this.meta.id, command }));
-    }
-
-    getName(s: ApiClientStoreState) {
-      return this.getEntityFromState(s).name;
-    }
-
-    type: ApiClientEntityType;
-  })(this.dispatch, this.meta);
-
   dispatchCommand(command: UpdateCommand<T>): void {
     this.dispatch(apiRecordsActions.applyPatch({ id: this.meta.id, command }));
   }
 
   override dispatchUnsafePatch(patcher: (state: T) => void): void {
-      this.dispatch(apiRecordsActions.unsafePatch({ id: this.meta.id, patcher }));
+    this.dispatch(apiRecordsActions.unsafePatch({ id: this.meta.id, patcher }));
+  }
+
+  protected SETCOMMON(value: DeepPartial<RQAPI.ApiClientRecord>): void {
+    const command = { type: "SET" as const, value };
+    this.dispatchCommand(command as UpdateCommand<T>);
+  }
+
+  protected DELETECOMMON(value: DeepPartialWithNull<RQAPI.ApiClientRecord>): void {
+    const command = { type: "DELETE" as const, value };
+    this.dispatchCommand(command as UpdateCommand<T>);
   }
 
   getName(state: ApiClientStoreState): string {
@@ -67,42 +52,42 @@ export abstract class ApiClientRecordEntity<T extends RQAPI.ApiClientRecord> ext
   }
 
   setName(name: string): void {
-    this.base.SET({ name });
+    this.SETCOMMON({ name });
   }
 
   setDescription(description: string): void {
-    this.base.SET({ description });
+    this.SETCOMMON({ description });
   }
 
   setCollectionId(collectionId: string | null): void {
-    this.base.SET({ collectionId });
+    this.SETCOMMON({ collectionId });
   }
 
   deleteName(): void {
-    this.base.DELETE({ name: null });
+    this.DELETECOMMON({ name: null });
   }
 
   deleteDescription(): void {
-    this.base.DELETE({ description: null });
+    this.DELETECOMMON({ description: null });
   }
 
   setAuth(auth: RQAPI.Auth): void {
-    this.base.SET({ data: { auth } });
+    this.SETCOMMON({ data: { auth } });
   }
 
   deleteAuth(): void {
-    this.base.DELETE({ data: { auth: null } });
+    this.DELETECOMMON({ data: { auth: null } });
   }
 
   setScripts(scripts: { preRequest?: string; postResponse?: string }): void {
-    this.base.SET({ data: { scripts } });
+    this.SETCOMMON({ data: { scripts } });
   }
 
   setPreRequestScript(script: string): void {
-    this.base.SET({ data: { scripts: { preRequest: script } } });
+    this.SETCOMMON({ data: { scripts: { preRequest: script } } });
   }
 
   setPostResponseScript(script: string): void {
-    this.base.SET({ data: { scripts: { postResponse: script } } });
+    this.SETCOMMON({ data: { scripts: { postResponse: script } } });
   }
 }
