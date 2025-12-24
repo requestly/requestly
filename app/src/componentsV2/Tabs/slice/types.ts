@@ -1,6 +1,5 @@
 import { EntityState } from "@reduxjs/toolkit";
 import { TabSource } from "../types";
-import { EntityType } from "features/apiClient/slices/types";
 
 export type TabId = string;
 
@@ -15,7 +14,7 @@ export type ActiveWorkflow = {
   workflow: Abortable;
 };
 
-export type TabModeConfig = { entityId: string; entityType: EntityType } & (
+export type TabModeConfig = { entityId: string } & (
   | {
       mode: "buffer";
     }
