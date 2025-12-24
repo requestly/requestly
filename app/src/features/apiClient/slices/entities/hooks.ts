@@ -12,6 +12,7 @@ import { BufferedHttpRecordEntity } from "./buffered/http";
 import { BufferedGraphQLRecordEntity } from "./buffered/graphql";
 import { useDispatch } from "react-redux";
 import { bufferAdapterSelectors, findBufferByReferenceId } from "../buffer/slice";
+import { EntityNotFound } from "../types";
 
 export function useEntity<T extends ApiClientEntityType>(params: { id: string; type: T }) {
   const dispatch = EntityFactory.GlobalStateOverrideConfig[params.type] ? useDispatch() : useApiClientDispatch();
@@ -48,7 +49,10 @@ export function useGraphQLRecordEntity(id: string): GraphQLRecordEntity {
 
 export function useBufferedEntity<T extends ApiClientEntityType>(params: { id: string; type: T }) {
   const dispatch = useApiClientDispatch();
-  const buffer = useApiClientSelector((s) => findBufferByReferenceId(s.buffer.entities, params.id))!;
+  const buffer = useApiClientSelector((s) => findBufferByReferenceId(s.buffer.entities, params.id));
+  if (!buffer) {
+    throw new EntityNotFound(params.id, params.type);
+  }
   const entity = BufferedEntityFactory.from(
     {
       id: buffer.id,

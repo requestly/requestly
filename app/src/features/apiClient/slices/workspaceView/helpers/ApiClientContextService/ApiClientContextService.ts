@@ -39,6 +39,7 @@ import { getEntityDataFromTabSource, GetEntityDataFromTabSourceState } from "com
 import { closeTab } from "componentsV2/Tabs/slice/thunks";
 import { groupBy, mapValues } from "lodash";
 import { RootState } from "store/types";
+import { EntityNotFound } from "features/apiClient/slices/types";
 
 export type UserDetails = { uid: string; loggedIn: true } | { loggedIn: false };
 
@@ -294,7 +295,11 @@ class ApiClientContextService {
           )
         );
       } catch (error) {
-        reduxStore.dispatch(closeTab({ tabId: tab.id, skipUnsavedPrompt: true }));
+        if (error instanceof EntityNotFound) {
+          reduxStore.dispatch(closeTab({ tabId: tab.id, skipUnsavedPrompt: true }));
+          return;
+        }
+        throw error;
       }
     });
   }

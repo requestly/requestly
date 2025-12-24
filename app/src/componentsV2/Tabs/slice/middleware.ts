@@ -13,7 +13,7 @@ import { DraftRequestContainerTabSource } from "features/apiClient/screens/apiCl
 import { CollectionViewTabSource } from "features/apiClient/screens/apiClient/components/views/components/Collection/collectionViewTabSource";
 import { EnvironmentViewTabSource } from "features/apiClient/screens/environment/components/environmentView/EnvironmentViewTabSource";
 import type { RootState } from "store/types";
-import { EnvironmentEntity, getApiClientFeatureContext } from "features/apiClient/slices";
+import { EntityNotFound, EnvironmentEntity, getApiClientFeatureContext } from "features/apiClient/slices";
 import { TabState } from "./types";
 import { reduxStore } from "store";
 import { openBufferedTab } from "./actions";
@@ -54,7 +54,7 @@ export function getEntityDataFromTabSource(
     const apiRecord = apiRecordsAdapter.getSelectors().selectById(state.records.records, sourceId);
 
     if (!apiRecord) {
-      throw new NativeError(`[Tab Buffer Middleware] Cannot find request`).addContext({ id: sourceId });
+      throw new EntityNotFound(sourceId, source.type);
     }
 
     const entityType =
@@ -75,7 +75,7 @@ export function getEntityDataFromTabSource(
     const environment = environmentsAdapter.getSelectors().selectById(state.environments.environments, sourceId);
 
     if (!environment) {
-      throw new NativeError(`[Tab Buffer Middleware] Cannot find environment`).addContext({ id: sourceId });
+      throw new EntityNotFound(sourceId, source.type);
     }
 
     return {
