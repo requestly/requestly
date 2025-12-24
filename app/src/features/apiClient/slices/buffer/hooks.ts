@@ -4,7 +4,6 @@ import { useApiClientStore } from "../workspaceView/helpers/ApiClientContextRegi
 import { NativeError } from "errors/NativeError";
 import { useCallback, useSyncExternalStore } from "react";
 import { BUFFER_SLICE_NAME } from "../common/constants";
-import { findBufferByReferenceId } from "./slice";
 
 export function useIsDirtyBuffer(workspaceId: Workspace["id"], modeConfig: TabModeConfig): boolean {
   const store = useApiClientStore(workspaceId);
@@ -17,7 +16,7 @@ export function useIsDirtyBuffer(workspaceId: Workspace["id"], modeConfig: TabMo
 
   const getSnapshot = useCallback(() => {
     const bufferState = store.getState()[BUFFER_SLICE_NAME];
-    const bufferEntry = findBufferByReferenceId(bufferState.entities, modeConfig.entityId);
+    const bufferEntry = bufferState.entities[modeConfig.entityId];
 
     if (!bufferEntry) {
       throw new NativeError("Buffer entry not found!").addContext({ modeConfig });
