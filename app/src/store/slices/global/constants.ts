@@ -189,7 +189,7 @@ const INITIAL_GLOBAL_SLICE_STATE: GlobalSliceState = {
     api_client: {
       open: true,
       placement: "right",
-      size: [50, 50],
+      size: [55, 45],
     },
     rules: {
       open: false,

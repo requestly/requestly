@@ -17,13 +17,13 @@ interface ToggleParams {
 interface BottomSheetContextProps {
   isBottomSheetOpen: boolean;
   sheetPlacement: BottomSheetPlacement;
-  sheetSize: number[];
+  sheetSize: [number, number];
   toggleBottomSheet: (params: ToggleParams) => void;
   toggleSheetPlacement: (placement?: BottomSheetPlacement) => void;
-  updateSheetSize: (size: number[]) => void;
+  updateSheetSize: (size: [number, number]) => void;
 }
 
-const DEFAULT_SIZE: [number, number] = [50, 50];
+const DEFAULT_SIZE: [number, number] = [55, 45];
 const CLOSED_SIZE: [number, number] = [100, 0];
 
 const BottomSheetContext = createContext<BottomSheetContextProps | null>(null);
@@ -43,7 +43,7 @@ export const BottomSheetProvider: React.FC<{
   const [sheetPlacement, setSheetPlacement] = useState<BottomSheetPlacement>(
     reduxState?.placement ? reduxState.placement : defaultPlacement
   );
-  const [sheetSize, setSheetSize] = useState<number[]>(reduxState?.size ? reduxState.size : DEFAULT_SIZE);
+  const [sheetSize, setSheetSize] = useState<[number, number]>(reduxState?.size ? reduxState.size : DEFAULT_SIZE);
 
   useEffect(() => {
     if (!reduxState) return;
@@ -58,7 +58,7 @@ export const BottomSheetProvider: React.FC<{
   const toggleBottomSheet = useCallback(
     ({ isOpen, action }: ToggleParams) => {
       const nextState = typeof isOpen === "boolean" ? isOpen : !isBottomSheetOpen;
-      const newSize = nextState ? DEFAULT_SIZE : CLOSED_SIZE;
+      const newSize: [number, number] = nextState ? (sheetSize[0] < 80 ? sheetSize : DEFAULT_SIZE) : CLOSED_SIZE;
       setUserHasInteracted(true);
       setIsBottomSheetOpen(nextState);
       setSheetSize(newSize);
@@ -79,7 +79,7 @@ export const BottomSheetProvider: React.FC<{
 
       trackBottomSheetToggled(nextState, action);
     },
-    [dispatch, context, isBottomSheetOpen]
+    [dispatch, context, isBottomSheetOpen, sheetSize]
   );
 
   const toggleSheetPlacement = useCallback(
