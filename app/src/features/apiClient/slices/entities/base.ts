@@ -1,4 +1,4 @@
-import { UpdateCommand, DeepPartial, DeepPartialWithNull, EntityId } from "../types";
+import { UpdateCommand, DeepPartial, DeepPartialWithNull } from "../types";
 import { ApiClientStoreState } from "../workspaceView/helpers/ApiClientContextRegistry/types";
 import { ApiClientEntityType, EntityDispatch } from "./types";
 
@@ -6,7 +6,7 @@ export type ApiClientEntityMeta = {
   id: string;
 };
 
-export abstract class ApiClientEntity<T, M extends ApiClientEntityMeta = ApiClientEntityMeta> {
+export abstract class ApiClientEntity<T, M extends ApiClientEntityMeta = ApiClientEntityMeta, State = ApiClientStoreState> {
   abstract readonly type: ApiClientEntityType;
 
   constructor(protected readonly dispatch: EntityDispatch, public readonly meta: M) {}
@@ -14,9 +14,9 @@ export abstract class ApiClientEntity<T, M extends ApiClientEntityMeta = ApiClie
   abstract dispatchCommand(command: UpdateCommand<T>): void;
   abstract dispatchUnsafePatch(params: (patch: T) => void): void;
 
-  abstract getEntityFromState(state: ApiClientStoreState): T;
+  abstract getEntityFromState(state: State): T;
 
-  abstract getName(state: ApiClientStoreState): string;
+  abstract getName(state: State): string;
 
   get id(): string {
     return this.meta.id;
