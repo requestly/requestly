@@ -11,14 +11,15 @@ import { BufferedEntityFactory } from "./buffered/factory";
 import { BufferedHttpRecordEntity } from "./buffered/http";
 import { BufferedGraphQLRecordEntity } from "./buffered/graphql";
 import { bufferAdapterSelectors } from "../buffer/slice";
+import { useDispatch } from "react-redux";
 
 export function useEntity<T extends ApiClientEntityType>(params: { id: string; type: T }) {
-  const dispatch = useApiClientDispatch();
+  const dispatch = EntityFactory.GlobalStateOverrideConfig[params.type] ? useDispatch(): useApiClientDispatch();
   const entity = EntityFactory.from(params, dispatch);
   return useMemo(() => entity, [entity]);
 }
 
-export function useEntitySelector<T extends ApiClientEntityType, R>(
+export function useEntitySelector<T extends Exclude<ApiClientEntityType, ApiClientEntityType.RUNTIME_VARIABLES>, R>(
   params: { id: string; type: T },
   selector: (entity: EntityFactory.EntityTypeMap<T>, state: ApiClientStoreState) => R
 ): R {

@@ -12,4 +12,5 @@ export enum ReducerKeys {
   WORKSPACE = "workspace",
   WORKSPACE_VIEW = "workspaceView",
   TABS = "tabs",
+  RUNTIME_VARIABLES = "runtimeVariables",
 }
