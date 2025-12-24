@@ -500,7 +500,6 @@ const processAuthorizationOptions = (item: PostmanAuth.Item | undefined, parentC
     }
     return auth;
   } catch (error) {
-    console.log(`Error processing auth type "${item?.type}": ${error.message}`);
     // Gracefully handle unsupported auth types by returning default auth
     Logger.log(`Error processing auth type "${item?.type}": ${error.message}`);
     return getDefaultAuth(parentCollectionId === null);
