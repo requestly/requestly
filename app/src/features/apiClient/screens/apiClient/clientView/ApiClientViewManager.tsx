@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback } from "react";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { BottomSheetProvider } from "componentsV2/BottomSheet";
 import { RQAPI } from "features/apiClient/types";
@@ -30,7 +30,7 @@ export const ApiClientViewManager: React.FC<Props> = React.memo((props) => {
   const { history, addToHistory, setCurrentHistoryIndex } = useApiClientContext();
   const selectedEntryDetails = useApiRecord(isCreateMode ? "" : (props as EditModeProps).requestId);
 
-  const onSaveCallback = useMemo(() => props.onSaveCallback ?? (() => {}), [props.onSaveCallback]);
+  const onSaveCallback = props.onSaveCallback ?? (() => {});
   const handleAppRequestFinished = useCallback(
     (entry: RQAPI.ApiEntry) => {
       if (isHistoryMode) {

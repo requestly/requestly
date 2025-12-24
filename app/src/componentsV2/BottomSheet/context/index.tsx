@@ -108,7 +108,7 @@ export const BottomSheetProvider: React.FC<{
 
   const updateSheetSize = useCallback(
     (size: [number, number]) => {
-      if (!size || size.length !== 2) return;
+      if (!size) return;
 
       setSheetSize(size);
       dispatch(
@@ -137,9 +137,9 @@ export const BottomSheetProvider: React.FC<{
 };
 
 export const useBottomSheetContext = () => {
-  const ctx = useContext(BottomSheetContext);
-  if (!ctx) {
+  const context = useContext(BottomSheetContext);
+  if (!context) {
     throw new Error("useBottomSheetContext must be used within BottomSheetProvider");
   }
-  return ctx;
+  return context;
 };
