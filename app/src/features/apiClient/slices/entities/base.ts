@@ -1,6 +1,6 @@
-import { UpdateCommand, DeepPartial, DeepPartialWithNull } from "../types";
-import { ApiClientStoreState } from "../workspaceView/helpers/ApiClientContextRegistry/types";
-import { ApiClientEntityType, EntityDispatch } from "./types";
+import type { UpdateCommand, DeepPartial, DeepPartialWithNull } from "../types";
+import type { ApiClientStoreState } from "../workspaceView/helpers/ApiClientContextRegistry/types";
+import type { ApiClientEntityType, EntityDispatch } from "./types";
 
 export type ApiClientEntityMeta = {
   id: string;
