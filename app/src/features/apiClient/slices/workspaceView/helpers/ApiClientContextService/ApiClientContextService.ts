@@ -18,7 +18,7 @@ import {
   apiClientContextRegistry,
   ApiClientContextRegistry,
 } from "../ApiClientContextRegistry/ApiClientContextRegistry";
-import { configureStore } from "@reduxjs/toolkit";
+import { configureStore, EntityState } from "@reduxjs/toolkit";
 import { apiRecordsSlice } from "features/apiClient/slices/apiRecords";
 import { WorkspaceInfo } from "../../types";
 import persistStore from "redux-persist/es/persistStore";
@@ -34,7 +34,11 @@ import {
   environmentsSlice,
 } from "features/apiClient/slices/environments";
 import { EnvironmentEntity } from "features/apiClient/slices/environments/types";
-import { bufferSlice } from "features/apiClient/slices/buffer";
+import { bufferActions, bufferSlice } from "features/apiClient/slices/buffer";
+import { getEntityDataFromTabSource, GetEntityDataFromTabSourceState } from "componentsV2/Tabs/slice";
+import { closeTab } from "componentsV2/Tabs/slice/thunks";
+import { groupBy, mapValues } from "lodash";
+import { RootState } from "store/types";
 
 export type UserDetails = { uid: string; loggedIn: true } | { loggedIn: false };
 
@@ -43,6 +47,16 @@ type ContextSetupData = {
   environments: { globalEnvironment: EnvironmentData; nonGlobalEnvironments: EnvironmentMap };
   erroredRecords: { apiErroredRecords: ErroredRecord[]; environmentErroredRecords: ErroredRecord[] };
 };
+
+function arrayToEntityState<T extends { id: string }>(items: T[]): EntityState<T> {
+  return {
+    ids: items.map((item) => item.id),
+    entities: mapValues(
+      groupBy(items, (item) => item.id),
+      (group) => group[0]
+    ),
+  };
+}
 
 class ApiClientContextService {
   contextRegistry: ApiClientContextRegistry;
@@ -234,6 +248,57 @@ class ApiClientContextService {
     });
   }
 
+  private hydrateBuffers(params: {
+    workspaceId: WorkspaceInfo["id"];
+    store: ApiClientStore;
+    records: RQAPI.ApiClientRecord[];
+    environments: EnvironmentEntity[];
+    globalEnvironment: EnvironmentEntity;
+  }): void {
+    const { workspaceId, store, records, environments, globalEnvironment } = params;
+
+    const tabs = Object.values((reduxStore.getState() as RootState).tabs.tabs.entities);
+
+    tabs.forEach((tab) => {
+      if (!tab || tab.modeConfig.mode !== "buffer") {
+        return;
+      }
+
+      if (tab.source.metadata.context.id !== workspaceId) {
+        return;
+      }
+
+      try {
+        const state: GetEntityDataFromTabSourceState = {
+          records: {
+            records: arrayToEntityState(records),
+          },
+          environments: {
+            globalEnvironment,
+            environments: arrayToEntityState(environments),
+          },
+        };
+
+        const entityData = getEntityDataFromTabSource(tab.source, state);
+        const { entityType, entityId, data } = entityData;
+
+        store.dispatch(
+          bufferActions.open(
+            {
+              isNew: false,
+              entityType: entityType,
+              referenceId: entityId,
+              data: data,
+            },
+            { id: tab.modeConfig.entityId }
+          )
+        );
+      } catch (error) {
+        reduxStore.dispatch(closeTab({ tabId: tab.id, skipUnsavedPrompt: true }));
+      }
+    });
+  }
+
   async createContext(workspace: WorkspaceInfo, userDetails: UserDetails): Promise<ApiClientFeatureContext> {
     const workspaceId = workspace.id;
 
@@ -281,6 +346,15 @@ class ApiClientContextService {
         globalEnvironment,
       })
     );
+
+    // Hydrate buffer tabs and close tabs with missing entities
+    this.hydrateBuffers({
+      workspaceId,
+      store,
+      records: result.apiClientRecords.records,
+      environments,
+      globalEnvironment,
+    });
 
     const ctx: ApiClientFeatureContext = { workspaceId, store, repositories: repo };
     this.contextRegistry.addContext(ctx);
