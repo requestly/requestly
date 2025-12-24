@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo } from "react";
 import { useSelector } from "react-redux";
 import { useApiClientContext } from "features/apiClient/contexts";
-import { BottomSheetPlacement, BottomSheetProvider } from "componentsV2/BottomSheet";
+import { BottomSheetProvider } from "componentsV2/BottomSheet";
 import { RQAPI } from "features/apiClient/types";
 import { useApiRecord } from "features/apiClient/hooks/useApiRecord.hook";
 import { Result } from "antd";
@@ -69,17 +69,5 @@ export const ApiClientViewManager: React.FC<Props> = React.memo((props) => {
     );
   }, [selectedEntryDetails, handleAppRequestFinished, onSaveCallback, isCreateMode]);
 
-  const shouldInheritState = currentBottomSheetState && typeof currentBottomSheetState.open === "boolean";
-  const defaultOpen = shouldInheritState ? currentBottomSheetState.open : true;
-  const defaultPlacement = shouldInheritState
-    ? currentBottomSheetState.placement === "right"
-      ? BottomSheetPlacement.RIGHT
-      : BottomSheetPlacement.BOTTOM
-    : BottomSheetPlacement.BOTTOM;
-
-  return (
-    <BottomSheetProvider context="api_client" defaultPlacement={defaultPlacement} isSheetOpenByDefault={defaultOpen}>
-      {content}
-    </BottomSheetProvider>
-  );
+  return <BottomSheetProvider context="api_client">{content}</BottomSheetProvider>;
 });

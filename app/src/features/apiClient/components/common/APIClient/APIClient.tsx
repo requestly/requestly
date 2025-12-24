@@ -12,7 +12,7 @@ import {
   parseMultipartFormDataString,
 } from "features/apiClient/screens/apiClient/utils";
 import { CONTENT_TYPE_HEADER } from "features/apiClient/constants";
-import { BottomSheetPlacement, BottomSheetProvider } from "componentsV2/BottomSheet";
+import { BottomSheetProvider } from "componentsV2/BottomSheet";
 import "./apiClient.scss";
 import { WindowsAndLinuxGatedHoc } from "componentsV2/WindowsAndLinuxGatedHoc";
 import { AutogenerateProvider } from "features/apiClient/store/autogenerateContextProvider";
@@ -135,7 +135,7 @@ export const APIClientModal: React.FC<Props> = ({ request, isModalOpen, onModalC
       destroyOnClose
     >
       <WindowsAndLinuxGatedHoc featureName="API client">
-        <BottomSheetProvider context="api_client" defaultPlacement={BottomSheetPlacement.BOTTOM}>
+        <BottomSheetProvider context="api_client">
           <ContextId id={NoopContextId}>
             <AutogenerateProvider>
               <ClientViewFactory

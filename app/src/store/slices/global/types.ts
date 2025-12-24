@@ -10,10 +10,9 @@ export interface BottomSheetState {
   size: number[];
 }
 
-export interface BottomSheetOrientation {
-  api_client: BottomSheetState;
-  rules: BottomSheetState;
-}
+export type BottomSheetFeatureContext = "api_client" | "rules";
+
+export type BottomSheetOrientation = Record<BottomSheetFeatureContext, BottomSheetState>;
 
 export interface GlobalSliceState {
   activeModals: GlobalModals;

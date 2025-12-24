@@ -20,7 +20,7 @@ export const SplitPaneLayout: React.FC<Props> = ({ bottomSheet, children, minSiz
   const isSheetPlacedAtBottom = sheetPlacement === BottomSheetPlacement.BOTTOM;
 
   const [sizes, setSizes] = useState<number[]>(() => {
-    if (sheetSize?.length === 2) {
+    if (sheetSize) {
       return sheetSize;
     }
     return getDefaultSizes(isSheetPlacedAtBottom, initialSizes);
@@ -36,7 +36,7 @@ export const SplitPaneLayout: React.FC<Props> = ({ bottomSheet, children, minSiz
       setSizes([100, 0]);
     } else {
       let targetSizes;
-      if (sheetSize?.length === 2) {
+      if (sheetSize) {
         targetSizes = sheetSize;
       }
 

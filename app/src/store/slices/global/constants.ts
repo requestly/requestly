@@ -187,9 +187,9 @@ const INITIAL_GLOBAL_SLICE_STATE: GlobalSliceState = {
 
   bottomSheetOrientation: {
     api_client: {
-      open: false,
-      placement: "bottom",
-      size: [70, 30],
+      open: true,
+      placement: "right",
+      size: [50, 50],
     },
     rules: {
       open: false,
