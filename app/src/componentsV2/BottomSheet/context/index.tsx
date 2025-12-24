@@ -41,7 +41,7 @@ export const BottomSheetProvider: React.FC<{
   const [userHasInteracted, setUserHasInteracted] = useState(hasReduxState);
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(hasReduxState ? reduxState.open : isSheetOpenByDefault);
   const [sheetPlacement, setSheetPlacement] = useState<BottomSheetPlacement>(
-    reduxState?.placement ? reduxState.placement : defaultPlacement
+    reduxState?.placement === "right" ? BottomSheetPlacement.RIGHT : defaultPlacement ?? BottomSheetPlacement.BOTTOM
   );
   const [sheetSize, setSheetSize] = useState<[number, number]>(reduxState?.size ? reduxState.size : DEFAULT_SIZE);
 
