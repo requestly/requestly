@@ -36,7 +36,11 @@ export const bufferSlice = createSlice({
 
       if (referenceId) {
         const existing = findBufferByReferenceId(state.entities, referenceId);
-        if (existing) return;
+        if (existing) {
+          existing.current = cloneDeep(data);
+          existing.diff = {};
+          return;
+        }
       }
 
       const id = uuidv4();
