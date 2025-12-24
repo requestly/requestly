@@ -200,28 +200,11 @@ div.n-popup {
       display: flex;
       position: relative;
 
-      &.with-toggle {
-        padding-right: 36px;
-      }
-
-      &.with-toggle:hover .eye-toggle-button {
-        opacity: 1;
-        pointer-events: auto;
-      }
-
       .value-content {
         min-width: 150px;
         overflow: hidden;
         text-overflow: ellipsis;
-      }
-
-      .eye-toggle-button {
-        position: absolute;
-        right: 0;
-        top: 50%;
-        transform: translateY(-50%);
-        opacity: 0;
-        transition: opacity 0.15s ease;
+        white-space: nowrap;
       }
     }
 
