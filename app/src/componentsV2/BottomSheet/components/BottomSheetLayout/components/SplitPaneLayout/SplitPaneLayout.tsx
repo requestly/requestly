@@ -90,7 +90,7 @@ export const SplitPaneLayout: React.FC<Props> = ({ bottomSheet, children, minSiz
         className={`bottomsheet-layout-container ${
           splitDirection === SplitDirection.HORIZONTAL ? "horizontal-split" : "vertical-split"
         }`}
-        gutter={(index, direction) => {
+        gutter={() => {
           const gutterContainer = document.createElement("div");
           gutterContainer.style.position = "relative";
           gutterContainer.className = ` bottomsheet-layout-gutter gutter-container`;
