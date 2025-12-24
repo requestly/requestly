@@ -23,8 +23,8 @@ interface BottomSheetContextProps {
   updateSheetSize: (size: number[]) => void;
 }
 
-const DEFAULT_SIZE: number[] = [50, 50];
-const CLOSED_SIZE: number[] = [100, 0];
+const DEFAULT_SIZE: [number, number] = [50, 50];
+const CLOSED_SIZE: [number, number] = [100, 0];
 
 const BottomSheetContext = createContext<BottomSheetContextProps | null>(null);
 
@@ -64,9 +64,16 @@ export const BottomSheetProvider: React.FC<{
       setSheetSize(newSize);
 
       dispatch(
-        globalActions.updateBottomSheetState({
+        globalActions.updateBottomSheetToggle({
           context,
-          state: { open: nextState, size: newSize },
+          open: nextState,
+        })
+      );
+
+      dispatch(
+        globalActions.updateBottomSheetSize({
+          context,
+          size: newSize,
         })
       );
 
@@ -90,11 +97,9 @@ export const BottomSheetProvider: React.FC<{
       setSheetPlacement(nextPlacement);
 
       dispatch(
-        globalActions.updateBottomSheetState({
+        globalActions.updateBottomSheetPlacement({
           context,
-          state: {
-            placement: nextPlacement === BottomSheetPlacement.RIGHT ? "right" : "bottom",
-          },
+          placement: nextPlacement === BottomSheetPlacement.RIGHT ? "right" : "bottom",
         })
       );
     },
@@ -102,14 +107,14 @@ export const BottomSheetProvider: React.FC<{
   );
 
   const updateSheetSize = useCallback(
-    (size: number[]) => {
-      if (!size) return;
+    (size: [number, number]) => {
+      if (!size || size.length !== 2) return;
 
       setSheetSize(size);
       dispatch(
-        globalActions.updateBottomSheetState({
+        globalActions.updateBottomSheetSize({
           context,
-          state: { size },
+          size: size,
         })
       );
     },

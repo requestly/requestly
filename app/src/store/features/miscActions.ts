@@ -17,27 +17,23 @@ export const updateHasGeneratedAITests = (prevState: any, action: PayloadAction<
   prevState.misc.persist.hasGeneratedAITests = action.payload;
 };
 
-export const updateBottomSheetState = (
+export const updateBottomSheetToggle = (
   prevState: any,
-  action: PayloadAction<{
-    context: "api_client" | "rules";
-    state: {
-      open?: boolean;
-      placement?: "bottom" | "right";
-      size?: number[];
-    };
-  }>
+  action: PayloadAction<{ context: "api_client" | "rules"; open: boolean }>
 ) => {
-  const { context, state } = action.payload;
-  if (state.open !== undefined) {
-    prevState.bottomSheetOrientation[context].open = state.open;
-  }
-  if (state.placement !== undefined) {
-    prevState.bottomSheetOrientation[context].placement = state.placement;
-  }
-  if (state.size !== undefined) {
-    if (state.size.length === 2) {
-      prevState.bottomSheetOrientation[context].size = state.size;
-    }
-  }
+  prevState.bottomSheetOrientation[action.payload.context].open = action.payload.open;
+};
+
+export const updateBottomSheetPlacement = (
+  prevState: any,
+  action: PayloadAction<{ context: "api_client" | "rules"; placement: "bottom" | "right" }>
+) => {
+  prevState.bottomSheetOrientation[action.payload.context].placement = action.payload.placement;
+};
+
+export const updateBottomSheetSize = (
+  prevState: any,
+  action: PayloadAction<{ context: "api_client" | "rules"; size: [number, number] }>
+) => {
+  prevState.bottomSheetOrientation[action.payload.context].size = action.payload.size;
 };

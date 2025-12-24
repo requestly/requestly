@@ -1,5 +1,4 @@
 import React, { useCallback, useMemo } from "react";
-import { useSelector } from "react-redux";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { BottomSheetProvider } from "componentsV2/BottomSheet";
 import { RQAPI } from "features/apiClient/types";
@@ -7,7 +6,6 @@ import { useApiRecord } from "features/apiClient/hooks/useApiRecord.hook";
 import { Result } from "antd";
 import { AutogenerateProvider } from "features/apiClient/store/autogenerateContextProvider";
 import { ClientViewFactory } from "./ClientViewFactory";
-import { getBottomSheetState } from "store/selectors";
 import "../apiClient.scss";
 
 type BaseProps = {
@@ -30,7 +28,6 @@ type Props = CreateModeProps | EditModeProps;
 export const ApiClientViewManager: React.FC<Props> = React.memo((props) => {
   const { isCreateMode, isHistoryMode } = props;
   const { history, addToHistory, setCurrentHistoryIndex } = useApiClientContext();
-  const currentBottomSheetState = useSelector((state) => getBottomSheetState(state, "api_client"));
   const selectedEntryDetails = useApiRecord(isCreateMode ? "" : (props as EditModeProps).requestId);
 
   const onSaveCallback = useMemo(() => props.onSaveCallback ?? (() => {}), [props.onSaveCallback]);
@@ -44,18 +41,16 @@ export const ApiClientViewManager: React.FC<Props> = React.memo((props) => {
     [addToHistory, isHistoryMode, setCurrentHistoryIndex, history.length]
   );
 
-  const content = useMemo(() => {
-    if (selectedEntryDetails.type === RQAPI.RecordType.COLLECTION) {
-      return null;
-    }
+  if (selectedEntryDetails.type === RQAPI.RecordType.COLLECTION) {
+    return null;
+  }
 
-    if (!selectedEntryDetails.data) {
-      return (
-        <Result status="error" title="Request not found" subTitle="Oops! Looks like this request doesn't exist." />
-      );
-    }
+  if (!selectedEntryDetails.data) {
+    return <Result status="error" title="Request not found" subTitle="Oops! Looks like this request doesn't exist." />;
+  }
 
-    return (
+  return (
+    <BottomSheetProvider context="api_client">
       <div className="api-client-container-content">
         <AutogenerateProvider>
           <ClientViewFactory
@@ -66,8 +61,6 @@ export const ApiClientViewManager: React.FC<Props> = React.memo((props) => {
           />
         </AutogenerateProvider>
       </div>
-    );
-  }, [selectedEntryDetails, handleAppRequestFinished, onSaveCallback, isCreateMode]);
-
-  return <BottomSheetProvider context="api_client">{content}</BottomSheetProvider>;
+    </BottomSheetProvider>
+  );
 });
