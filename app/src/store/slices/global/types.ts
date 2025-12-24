@@ -7,7 +7,7 @@ import { UserAuth } from "./user/types";
 export interface BottomSheetState {
   open: boolean;
   placement: "bottom" | "right";
-  size: number[];
+  size: [number, number];
 }
 
 export type BottomSheetFeatureContext = "api_client" | "rules";

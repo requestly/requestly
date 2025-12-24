@@ -8,10 +8,13 @@ interface Props {
   bottomSheet: ReactNode;
   children: ReactNode;
   minSize?: number;
-  initialSizes?: Array<number>;
+  initialSizes?: [number, number];
 }
 
-const getDefaultSizes = (isSheetPlacedAtBottom: boolean, initialSizes: Array<number>) => {
+const getDefaultSizes: (isSheetPlacedAtBottom: boolean, initialSizes: [number, number]) => [number, number] = (
+  isSheetPlacedAtBottom,
+  initialSizes
+) => {
   return isSheetPlacedAtBottom ? initialSizes : [55, 45];
 };
 
@@ -19,7 +22,7 @@ export const SplitPaneLayout: React.FC<Props> = ({ bottomSheet, children, minSiz
   const { sheetPlacement, isBottomSheetOpen, toggleBottomSheet, sheetSize, updateSheetSize } = useBottomSheetContext();
   const isSheetPlacedAtBottom = sheetPlacement === BottomSheetPlacement.BOTTOM;
 
-  const [sizes, setSizes] = useState<number[]>(() => {
+  const [sizes, setSizes] = useState<[number, number]>(() => {
     if (sheetSize) {
       return sheetSize;
     }
@@ -50,7 +53,7 @@ export const SplitPaneLayout: React.FC<Props> = ({ bottomSheet, children, minSiz
   }, [isBottomSheetOpen, isSheetPlacedAtBottom, sheetSize]);
 
   const handleDrag = useCallback(
-    (newSizes: number[]) => {
+    (newSizes: [number, number]) => {
       setSizes(newSizes);
 
       if (!splitContainerRef.current) return;
@@ -69,7 +72,7 @@ export const SplitPaneLayout: React.FC<Props> = ({ bottomSheet, children, minSiz
   );
 
   const handleDragEnd = useCallback(
-    (newSizes: number[]) => {
+    (newSizes: [number, number]) => {
       updateSheetSize(newSizes);
     },
     [updateSheetSize]
