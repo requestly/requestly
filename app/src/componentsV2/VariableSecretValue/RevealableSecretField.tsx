@@ -2,15 +2,14 @@ import React, { useState } from "react";
 import { RQButton } from "lib/design-system-v2/components";
 import { RiEyeLine } from "@react-icons/all-files/ri/RiEyeLine";
 import { RiEyeOffLine } from "@react-icons/all-files/ri/RiEyeOffLine";
-import { RBAC, RoleBasedComponent } from "features/rbac";
-import "./VariableSecretValue.scss";
+import "./RevealableSecretField.scss";
 
-interface VariableSecretValueProps {
+interface RevealableSecretFieldProps {
   value: string | boolean;
-  roleResource: RBAC.Resource;
+  isRevealable: boolean;
 }
 
-export const VariableSecretValue: React.FC<VariableSecretValueProps> = ({ value, roleResource }) => {
+export const RevealableSecretField: React.FC<RevealableSecretFieldProps> = ({ value, isRevealable }) => {
   const [revealed, setRevealed] = useState(false);
   const toggleVisibility = () => setRevealed((prev) => !prev);
   return (
@@ -22,7 +21,7 @@ export const VariableSecretValue: React.FC<VariableSecretValueProps> = ({ value,
           <span className="secret-masked">{"•".repeat(Math.min(String(value).length, 15))}</span>
         )}
       </span>
-      <RoleBasedComponent resource={roleResource} permission="update">
+      {isRevealable && (
         <div className="eye-toggle-button">
           <RQButton
             type="transparent"
@@ -31,7 +30,7 @@ export const VariableSecretValue: React.FC<VariableSecretValueProps> = ({ value,
             onClick={toggleVisibility}
           />
         </div>
-      </RoleBasedComponent>
+      )}
     </div>
   );
 };
