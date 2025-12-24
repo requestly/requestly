@@ -23,37 +23,50 @@ export const bufferSlice = createSlice({
   name: BUFFER_SLICE_NAME,
   initialState,
   reducers: {
-    open(
-      state,
-      action: PayloadAction<{
-        entityType: ApiClientEntityType;
-        isNew: boolean;
-        referenceId?: string;
-        data: unknown;
-      }>
-    ) {
-      const { entityType, isNew, referenceId, data } = action.payload;
+    open: {
+      reducer(
+        state,
+        action: PayloadAction<
+          {
+            entityType: ApiClientEntityType;
+            isNew: boolean;
+            referenceId?: string;
+            data: unknown;
+          },
+          string,
+          { id: string }
+        >
+      ) {
+        const { entityType, isNew, referenceId, data } = action.payload;
 
-      if (referenceId) {
-        const existing = findBufferByReferenceId(state.entities, referenceId);
-        if (existing) return;
-      }
+        if (referenceId) {
+          const existing = findBufferByReferenceId(state.entities, referenceId);
+          if (existing) {
+            existing.current = cloneDeep(data);
+            existing.diff = {};
+            return;
+          }
+        }
 
-      const id = uuidv4();
+        const entry: BufferEntry = {
+          id: action.meta.id,
+          entityType,
+          isNew,
+          referenceId,
+          current: cloneDeep(data),
+          diff: {},
+          isDirty: false,
+        };
 
-      const entry: BufferEntry = {
-        id,
-        entityType,
-        isNew,
-        referenceId,
-        current: cloneDeep(data),
-        diff: {},
-        isDirty: false,
-      };
-
-      bufferAdapter.addOne(state, entry);
+        bufferAdapter.addOne(state, entry);
+      },
+      prepare(
+        payload: { entityType: ApiClientEntityType; isNew: boolean; referenceId?: string; data: unknown },
+        meta?: { id: string }
+      ) {
+        return { payload, meta: { id: meta?.id || uuidv4() } };
+      },
     },
-
     applyPatch(
       state,
       action: PayloadAction<{

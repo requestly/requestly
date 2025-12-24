@@ -8,30 +8,24 @@ import { NativeError } from "errors/NativeError";
 
 const tabsSelectors = tabsAdapter.getSelectors<RootState>((state) => state.tabs.tabs);
 
-export const useTabs = () => {
+export function useTabs() {
   return useSelector(tabsSelectors.selectAll);
-};
+}
 
-export const useTabById = (id: TabId | undefined): TabState => {
-  const tab = useSelector((state: RootState) => (id ? tabsSelectors.selectById(state, id) : undefined));
+export function useTabById(id: TabId): TabState {
+  const tab = useSelector((s: RootState) => tabsSelectors.selectById(s, id));
 
   if (!tab) {
     throw new NativeError("Tab not found!").addContext({ tabId: id });
   }
 
   return tab;
-};
-
-export const useActiveTab = () => {
-  const activeTabId = useSelector((state: RootState) => state.tabs.activeTabId);
-  return useTabById(activeTabId);
-};
-
-export const usePreviewTab = () => {
-  const previewTabId = useSelector((state: RootState) => state.tabs.previewTabId);
-  return useTabById(previewTabId);
-};
+}
 
 export function useTabsByEntityTypes(entityTypes: EntityType[]) {
   return useSelector((state: RootState) => selectTabsByEntityTypes(state, entityTypes));
+}
+
+export function useIsActiveTab(tabId: TabId): boolean {
+  return useSelector((state: RootState) => state.tabs.activeTabId === tabId);
 }

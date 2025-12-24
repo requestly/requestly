@@ -13,8 +13,8 @@ import { variablesReducer } from "./features/variables/slice";
 
 import { globalReducers } from "./slices/global/slice";
 import { workspaceViewReducerWithLocal } from "features/apiClient/slices";
-import { tabsReducerWithPersist } from "componentsV2/Tabs/slice";
 import { runtimeVariablesReducerWithPersist } from "features/apiClient/slices/runtimeVariables";
+import { tabsReducerWithPersist, tabBufferMiddleware } from "componentsV2/Tabs/slice";
 
 export const reduxStore = configureStore({
   reducer: {
@@ -35,7 +35,8 @@ export const reduxStore = configureStore({
     // check for non-serializable values in actions,
     // in our case we have functions in payload,
     // so avoiding this check.
-    return getDefaultMiddleware({ serializableCheck: false });
+    const middlewares = getDefaultMiddleware({ serializableCheck: false });
+    return middlewares.concat(tabBufferMiddleware);
   },
   enhancers: (existingEnhancers) => {
     // Add the autobatch enhancer to the store setup

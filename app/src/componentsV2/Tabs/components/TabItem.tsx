@@ -3,17 +3,14 @@ import { HostContextImpl } from "hooks/useHostContext";
 import { useDispatch } from "react-redux";
 import { closeTab } from "../slice/thunks";
 import { tabsActions } from "../slice/slice";
-import { useTabById } from "../slice/hooks";
-import { useActiveTab } from "../slice/hooks";
+import { useIsActiveTab, useTabById } from "../slice/hooks";
 import { TabSource } from "../types";
 import { TabId, ActiveWorkflow } from "../slice/types";
 
 export const TabItem: React.FC<React.PropsWithChildren<{ tabId: TabId }>> = React.memo((props) => {
   const dispatch = useDispatch();
   const tab = useTabById(props.tabId);
-  const activeTab = useActiveTab();
-
-  const isActive = activeTab?.id === props.tabId;
+  const isActive = useIsActiveTab(props.tabId);
 
   return (
     <HostContextImpl.Provider
@@ -24,8 +21,6 @@ export const TabItem: React.FC<React.PropsWithChildren<{ tabId: TabId }>> = Reac
 
         replace: useCallback(
           (source: TabSource) => {
-            if (!tab) return;
-
             dispatch(tabsActions.updateTab({ tabId: props.tabId, source, modeConfig: tab.modeConfig }));
           },
           [dispatch, props.tabId, tab]
@@ -36,7 +31,7 @@ export const TabItem: React.FC<React.PropsWithChildren<{ tabId: TabId }>> = Reac
         }, [isActive]),
 
         getSourceId: useCallback(() => {
-          return tab?.source.getSourceId();
+          return tab.source.getSourceId();
         }, [tab]),
 
         registerWorkflow: useCallback(

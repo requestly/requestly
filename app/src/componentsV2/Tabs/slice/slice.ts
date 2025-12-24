@@ -24,7 +24,7 @@ export const tabsSlice = createSlice({
   name: ReducerKeys.TABS,
   initialState,
   reducers: {
-    removeTab(state, action: PayloadAction<TabId>) {
+    closeTab(state, action: PayloadAction<TabId>) {
       const tabId = action.payload;
       const tabsArray = tabsAdapter.getSelectors().selectAll(state.tabs);
       const currentIndex = tabsArray.findIndex((t) => t.id === tabId);
@@ -171,4 +171,4 @@ const tabsPersistConfig = {
 };
 
 export const tabsActions = tabsSlice.actions;
-export const tabsReducerWithPersist = persistReducer(tabsPersistConfig, tabsSlice.reducer);
+export const tabsReducerWithPersist = persistReducer<TabServiceState>(tabsPersistConfig, tabsSlice.reducer);
