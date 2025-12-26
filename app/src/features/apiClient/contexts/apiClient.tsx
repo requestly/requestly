@@ -8,7 +8,7 @@ import {
   trackNewCollectionClicked,
   trackNewRequestClicked,
 } from "modules/analytics/events/features/apiClient";
-import { createBlankApiRecord, isApiCollection } from "../screens/apiClient/utils";
+import { createBlankApiRecord, getEmptyDraftApiRecord, isApiCollection } from "../screens/apiClient/utils";
 import { APIClientWorkloadManager } from "../helpers/modules/scriptsV2/workloadManager/APIClientWorkloadManager";
 import { notification } from "antd";
 import { toast } from "utils/Toast";
@@ -149,7 +149,13 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
       collectionId?: string;
       entryType?: RQAPI.ApiEntryType;
     }) => {
-      const { contextId, analyticEventSource, recordType, collectionId = "", entryType } = params;
+      const {
+        contextId,
+        analyticEventSource,
+        recordType,
+        collectionId = "",
+        entryType = RQAPI.ApiEntryType.HTTP,
+      } = params;
 
       if (!isValidPermission) {
         toast.warn(getRBACValidationFailureErrorMessage(RBAC.Permission.create, recordType), 5);
@@ -165,7 +171,13 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
           trackNewRequestClicked(analyticEventSource);
 
           if (["api_client_sidebar_header", "home_screen"].includes(analyticEventSource)) {
-            openTab(new DraftRequestContainerTabSource({ apiEntryType: entryType, context: { id: context?.id } }));
+            openTab(
+              new DraftRequestContainerTabSource({
+                apiEntryType: entryType,
+                context: { id: context?.id },
+                emptyRecord: getEmptyDraftApiRecord(entryType),
+              })
+            );
             return;
           }
 
