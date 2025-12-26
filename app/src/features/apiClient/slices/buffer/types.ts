@@ -1,13 +1,13 @@
-import { EntityState } from "@reduxjs/toolkit";
-import { ApiClientEntityType } from "../entities/types";
-import { RQAPI } from "features/apiClient/types";
+import type { EntityState } from "@reduxjs/toolkit";
+import type { ApiClientEntityType } from "../entities/types";
+import type { RQAPI } from "features/apiClient/types";
+import type { EnvironmentEntity } from "../environments/types";
 
 export type EntityDataMap = {
   [ApiClientEntityType.HTTP_RECORD]: RQAPI.HttpApiRecord;
   [ApiClientEntityType.GRAPHQL_RECORD]: RQAPI.GraphQLApiRecord;
-  // Future:
-  // [ApiClientEntityType.ENVIRONMENT]: EnvironmentData;
-  // [ApiClientEntityType.COLLECTION]: CollectionData;
+  [ApiClientEntityType.ENVIRONMENT]: EnvironmentEntity;
+  [ApiClientEntityType.GLOBAL_ENVIRONMENT]: EnvironmentEntity;
 };
 
 export interface BufferEntry<T = unknown> {
