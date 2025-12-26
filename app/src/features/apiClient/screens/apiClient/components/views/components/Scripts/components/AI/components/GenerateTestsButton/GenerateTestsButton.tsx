@@ -6,8 +6,10 @@ import { AIPromptPopover } from "../AIPromptPopover/AIPromptPopover";
 import { MdOutlineStopCircle } from "@react-icons/all-files/md/MdOutlineStopCircle";
 import { MdOutlineAutoAwesome } from "@react-icons/all-files/md/MdOutlineAutoAwesome";
 import { getHasGeneratedAITests } from "store/selectors";
-import { getUserMetadata } from "store/slices/global/user/selectors";
+import { getIsOptedforAIFeatures, getUserAuthDetails } from "store/slices/global/user/selectors";
 import { AIConsentModal } from "features/ai";
+import { isProfessionalPlan } from "utils/PremiumUtils";
+import { trackGenerateTestBtnClicked } from "modules/analytics/events/features/apiClient";
 
 interface GenerateTestsButtonProps {
   hidden: boolean;
@@ -32,9 +34,10 @@ export const GenerateTestsButton: React.FC<GenerateTestsButtonProps> = ({
   onGenerateClick,
   togglePopover,
 }) => {
+  const user = useSelector(getUserAuthDetails);
+  const isProfessionalPlanUser = isProfessionalPlan(user.details?.planDetails?.planId);
   const hasGeneratedAITests = useSelector(getHasGeneratedAITests);
-  const userMetadata = useSelector(getUserMetadata);
-  const isAIFeaturesEnabled = userMetadata?.ai_consent;
+  const isOptedforAIFeatures = useSelector(getIsOptedforAIFeatures);
 
   const [isAIConsentModalOpen, setIsAIConsentModalOpen] = useState(false);
   const [userQuery, setUserQuery] = useState("Generate test cases for this request and check status 200");
@@ -45,7 +48,7 @@ export const GenerateTestsButton: React.FC<GenerateTestsButtonProps> = ({
         <Popover
           open={isGenerateTestPopoverOpen}
           onOpenChange={(open) => {
-            if (!isAIFeaturesEnabled) {
+            if (!isOptedforAIFeatures) {
               setIsAIConsentModalOpen(true);
               return;
             }
@@ -65,7 +68,9 @@ export const GenerateTestsButton: React.FC<GenerateTestsButtonProps> = ({
             />
           }
           placement="bottomLeft"
-          overlayClassName="ai-generate-test-popover"
+          overlayClassName={`ai-generate-test-popover ${
+            !isProfessionalPlanUser ? "ai-generate-test-popover-premium-feature" : ""
+          }`}
           showArrow={false}
         >
           <RQButton
@@ -74,6 +79,7 @@ export const GenerateTestsButton: React.FC<GenerateTestsButtonProps> = ({
             icon={<MdOutlineAutoAwesome />}
             disabled={disabled}
             loading={isLoading && !isGenerateTestPopoverOpen}
+            onClick={() => trackGenerateTestBtnClicked()}
           >
             {label}
           </RQButton>

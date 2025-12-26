@@ -1,9 +1,14 @@
 import React, { useContext } from "react";
 import { Form, FormInstance, Input } from "antd";
-import { RQAPI } from "features/apiClient/types";
+import { KeyValueDataType, RQAPI } from "features/apiClient/types";
 import SingleLineEditor from "features/apiClient/screens/environment/components/SingleLineEditor";
 import { ScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
+import {
+  KeyValueTypeCell,
+  ValidationWarning,
+} from "features/apiClient/screens/apiClient/components/views/components/request/components/KeyValueTable/KeyValueTableTypeCell";
 import * as Sentry from "@sentry/react";
+import { Conditional } from "components/common/Conditional";
 
 const EditableContext = React.createContext<FormInstance<RQAPI.PathVariable> | null>(null);
 
@@ -31,6 +36,7 @@ interface EditableCellProps {
   record: RQAPI.PathVariable;
   environmentVariables: ScopedVariables;
   handleUpdateVariable: (record: RQAPI.PathVariable) => void;
+  error?: string | null;
 }
 
 export const PathVariableTableEditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> = ({
@@ -41,6 +47,7 @@ export const PathVariableTableEditableCell: React.FC<React.PropsWithChildren<Edi
   record,
   environmentVariables,
   handleUpdateVariable,
+  error,
   ...restProps
 }) => {
   const form = useContext(EditableContext);
@@ -54,6 +61,24 @@ export const PathVariableTableEditableCell: React.FC<React.PropsWithChildren<Edi
     form.setFieldsValue({ [dataIndex]: value });
     handleUpdateVariable({ ...record, [dataIndex]: value });
   };
+
+  const handleTypeSave = async () => {
+    const value = form.getFieldValue(dataIndex);
+    handleChange(value);
+  };
+
+  if (dataIndex === "dataType") {
+    return (
+      <td {...restProps}>
+        <KeyValueTypeCell
+          record={record?.[dataIndex] ?? KeyValueDataType.STRING}
+          dataIndex={dataIndex}
+          form={form}
+          onSave={handleTypeSave}
+        />
+      </td>
+    );
+  }
 
   if (!editable) {
     return (
@@ -90,6 +115,11 @@ export const PathVariableTableEditableCell: React.FC<React.PropsWithChildren<Edi
               placeholder={dataIndex === "key" ? "Key" : "Description"}
             />
           )}
+          <Conditional condition={!!error && dataIndex === "value"}>
+            <div className="key-value-table-error-icon">
+              <ValidationWarning error={error!} />
+            </div>
+          </Conditional>
         </div>
       </Form.Item>
     </td>

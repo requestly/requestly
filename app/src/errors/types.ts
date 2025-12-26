@@ -1,5 +1,10 @@
 export enum ErrorCode {
-  PERMISSION_DENIED = "permission_denied",
+  WrongInput = "wrong_input",
+  PermissionDenied = "permission_denied",
+  NotPermitted = "not_permitted",
+  MigrationFailed = "migration_failed",
+  EntityAlreadyExists = "entity_already_exists",
+  NotFound = "not_found",
   UNKNOWN = "unknown",
 }
 

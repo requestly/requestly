@@ -4,10 +4,15 @@ import { ContentListTable } from "componentsV2/ContentList";
 import { MdAdd } from "@react-icons/all-files/md/MdAdd";
 import { RQButton } from "lib/design-system-v2/components";
 import { KeyValueTableEditableRow, KeyValueTableEditableCell } from "./KeyValueTableRow";
-import { KeyValuePair } from "features/apiClient/types";
+import { KeyValueTableSettingsDropdown } from "./KeyValueTableSettingsDropdown";
+import { KeyValuePair, KeyValueDataType } from "features/apiClient/types";
 import { RiDeleteBin6Line } from "@react-icons/all-files/ri/RiDeleteBin6Line";
 import "./keyValueTable.scss";
 import { ScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import FEATURES from "config/constants/sub/features";
+import { doesValueMatchDataType } from "features/apiClient/screens/apiClient/utils";
+import { capitalize } from "lodash";
 
 type ColumnTypes = Exclude<TableProps<KeyValuePair>["columns"], undefined>;
 
@@ -15,21 +20,40 @@ interface KeyValueTableProps {
   data: KeyValuePair[];
   onChange: (updatedPairs: KeyValuePair[]) => void;
   variables: ScopedVariables;
-  checkInvalidCharacter?: boolean;
+  extraColumns?: {
+    description?: {
+      visible: boolean;
+      onToggle: (show: boolean) => void;
+    };
+    dataType?: {
+      visible: boolean;
+    };
+  };
+  config?: {
+    checkInvalidCharacter?: boolean;
+  };
 }
 
-export const KeyValueTable: React.FC<KeyValueTableProps> = ({
-  data,
-  variables,
-  onChange,
-  checkInvalidCharacter = false,
-}) => {
+export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, variables, onChange, extraColumns, config }) => {
+  const { checkInvalidCharacter = false } = config || {};
+
+  const isDescriptionVisible =
+    hasDescription(extraColumns) &&
+    isFeatureCompatible(FEATURES.API_CLIENT_DESCRIPTION_COMPATIBILITY) &&
+    extraColumns.description.visible;
+  const isDataTypeVisible =
+    hasDataType(extraColumns) &&
+    extraColumns.dataType.visible &&
+    isFeatureCompatible(FEATURES.API_CLIENT_KEY_VALUE_TABLE_DATA_TYPE_COMPATIBILITY);
+
   const createEmptyPair = useCallback(
     () => ({
       id: Date.now(),
       key: "",
       value: "",
       isEnabled: true,
+      description: "",
+      dataType: KeyValueDataType.STRING,
     }),
     []
   );
@@ -98,9 +122,9 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
   const columns = useMemo(() => {
     return [
       {
-        title: "isEnabled",
+        title: "",
         dataIndex: "isEnabled",
-        width: "50px",
+        width: "40px",
         editable: true,
         onCell: (record: KeyValuePair) => ({
           record,
@@ -112,9 +136,9 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
         }),
       },
       {
-        title: "key",
+        title: "Key",
         dataIndex: "key",
-        width: "45%",
+        width: isDescriptionVisible ? "30%" : "50%",
         editable: true,
         onCell: (record: KeyValuePair) => ({
           record,
@@ -127,9 +151,10 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
         }),
       },
       {
-        title: "value",
+        title: "Value",
         dataIndex: "value",
         editable: true,
+        width: isDescriptionVisible ? "30%" : "50%",
         onCell: (record: KeyValuePair) => ({
           record,
           editable: true,
@@ -137,12 +162,54 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
           title: "value",
           variables,
           handleUpdatePair,
+          error: doesValueMatchDataType(record.value, record.dataType ?? KeyValueDataType.STRING)
+            ? null
+            : `Value must be ${capitalize(record.dataType ?? KeyValueDataType.STRING)}`,
         }),
       },
+      isDataTypeVisible
+        ? {
+            title: "Type",
+            dataIndex: "dataType",
+            width: 110,
+            editable: true,
+            onCell: (record: KeyValuePair) => ({
+              record,
+              editable: true,
+              dataIndex: "dataType",
+              title: "type",
+              variables,
+              handleUpdatePair,
+            }),
+          }
+        : null,
+      isDescriptionVisible
+        ? {
+            title: "Description",
+            dataIndex: "description",
+            width: "40%",
+            editable: true,
+            onCell: (record: KeyValuePair) => ({
+              record,
+              editable: true,
+              dataIndex: "description",
+              title: "description",
+              variables,
+              handleUpdatePair,
+            }),
+          }
+        : null,
       {
-        title: "",
-        width: "50px",
+        width: "55px",
         fixed: "right",
+        title: () =>
+          isDataTypeVisible &&
+          hasDescription(extraColumns) && (
+            <KeyValueTableSettingsDropdown
+              showDescription={isDescriptionVisible}
+              onToggleDescription={extraColumns.description.onToggle}
+            />
+          ),
         render: (_: any, record: KeyValuePair) => {
           if (record.key === "" && record.value === "" && data.length === 1) {
             return null;
@@ -159,15 +226,24 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
           );
         },
       },
-    ];
-  }, [variables, handleUpdatePair, checkInvalidCharacter, data.length, handleDeletePair]);
+    ].filter(Boolean);
+  }, [
+    isDataTypeVisible,
+    isDescriptionVisible,
+    variables,
+    handleUpdatePair,
+    checkInvalidCharacter,
+    extraColumns,
+    data.length,
+    handleDeletePair,
+  ]);
 
   return (
     <ContentListTable
       id="api-key-value-table"
       className="api-key-value-table"
       bordered
-      showHeader={false}
+      showHeader={isDataTypeVisible}
       rowKey="id"
       columns={columns as ColumnTypes}
       data={memoizedData}
@@ -181,7 +257,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
       scroll={{ x: 550 }}
       footer={() => (
         <div className="api-key-value-table-footer">
-          <RQButton icon={<MdAdd />} size="small" onClick={handleAddPair}>
+          <RQButton icon={<MdAdd />} size="small" onClick={handleAddPair} className="key-value-add-more-btn">
             Add More
           </RQButton>
         </div>
@@ -189,3 +265,15 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
     />
   );
 };
+
+function hasDescription<T extends { description?: unknown }>(
+  config?: T
+): config is T & { description: NonNullable<T["description"]> } {
+  return !!config && !!config.description;
+}
+
+function hasDataType<T extends { dataType?: unknown }>(
+  config?: T
+): config is T & { dataType: NonNullable<T["dataType"]> } {
+  return !!config && !!config.dataType;
+}
