@@ -123,7 +123,7 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
             variables: {},
           };
           const allUnsupportedFeatures = new Set<string>();
-          const allMeta: Partial<UnsupportedFeaturesMeta> = {
+          const allMeta: UnsupportedFeaturesMeta = {
             vaultVars: [],
             dynamicVars: [],
             disabledVars: [],
@@ -145,18 +145,19 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
                   variables: envData.variables,
                   isGlobal: envData.isGlobal,
                 });
-                // Collect unsupported features from environment for telemetry only
+
+                // Collect unsupported features from environment
                 if (envData.unsupportedFeatures?.length > 0) {
                   envData.unsupportedFeatures.forEach((f: string) => allUnsupportedFeatures.add(f));
                   if (envData.meta) {
                     (envData.meta.vaultVars || []).forEach((v: string) => {
-                      if (!allMeta.vaultVars!.includes(v)) allMeta.vaultVars!.push(v);
+                      if (!allMeta.vaultVars.includes(v)) allMeta.vaultVars.push(v);
                     });
                     (envData.meta.dynamicVars || []).forEach((v: string) => {
-                      if (!allMeta.dynamicVars!.includes(v)) allMeta.dynamicVars!.push(v);
+                      if (!allMeta.dynamicVars.includes(v)) allMeta.dynamicVars.push(v);
                     });
                     (envData.meta.disabledVars || []).forEach((v: string) => {
-                      if (!allMeta.disabledVars!.includes(v)) allMeta.disabledVars!.push(v);
+                      if (!allMeta.disabledVars.includes(v)) allMeta.disabledVars.push(v);
                     });
                   }
                 }
@@ -211,7 +212,6 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
           });
 
           setProcessedFileData(processedRecords);
-          // Fire analytics for unsupported features if any detected
           if (allUnsupportedFeatures.size > 0) {
             trackPostmanUnsupportedFeaturesDetected(
               Array.from(allUnsupportedFeatures),

@@ -245,8 +245,7 @@ export const scanEnvironmentForEnvRefs = (env: any): EnvironmentEnvRefsResult =>
 
 // Main orchestrator: Detect all unsupported features in a collection
 export const detectUnsupportedFeaturesInCollection = (
-  fileContent: any,
-  apiClientRecordsRepository: ApiClientRecordsInterface<Record<string, any>>
+  fileContent: any
 ): { unsupportedFeatures: string[]; meta: UnsupportedFeaturesMeta } => {
   const unsupportedFeatures = new Set<string>();
   const meta: UnsupportedFeaturesMeta = {
@@ -323,7 +322,7 @@ export const detectUnsupportedFeaturesInCollection = (
   };
 
   if (fileContent.auth) scanAuth(fileContent.auth);
-  // Track collection-level scripts on the root collection
+
   trackCollectionLevelScripts(fileContent, fileContent?.info?.name || "");
   walk(fileContent?.item || []);
 
@@ -339,20 +338,13 @@ export const detectUnsupportedFeaturesInCollection = (
   };
 };
 
+type EnvironmentUnsupportedFeaturesMeta = Pick<UnsupportedFeaturesMeta, "vaultVars" | "dynamicVars" | "disabledVars">;
 // Main orchestrator: Detect all unsupported features in an environment
 export const detectUnsupportedFeaturesInEnvironment = (
   fileContent: any
 ): {
   unsupportedFeatures: string[];
-  meta: Omit<
-    UnsupportedFeaturesMeta,
-    | "unsupportedAuthTypes"
-    | "unsupportedScriptMethods"
-    | "requestExamplesCount"
-    | "requestsWithExamples"
-    | "collectionLevelScriptCount"
-    | "collectionsWithScripts"
-  >;
+  meta: EnvironmentUnsupportedFeaturesMeta;
 } => {
   const unsupportedFeatures = new Set<string>();
   const envRefs = scanEnvironmentForEnvRefs(fileContent);
@@ -739,7 +731,7 @@ export const processPostmanCollectionData = (
   }
 
   // Detect unsupported features early
-  const { unsupportedFeatures, meta } = detectUnsupportedFeaturesInCollection(fileContent, apiClientRecordsRepository);
+  const { unsupportedFeatures, meta } = detectUnsupportedFeaturesInCollection(fileContent);
 
   const processItems = (items: any[], parentCollectionId: string) => {
     const result = {
