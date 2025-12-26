@@ -1,4 +1,5 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type React from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 // import { VariableRow, VariablesList } from "../VariablesList/VariablesList";
 import { VariablesListHeader } from "../VariablesListHeader/VariablesListHeader";
 import { toast } from "utils/Toast";
@@ -9,33 +10,89 @@ import { ApiClientExportModal } from "features/apiClient/screens/apiClient/compo
 import { PostmanEnvironmentExportModal } from "features/apiClient/screens/apiClient/components/modals/postmanEnvironmentExportModal/PostmanEnvironmentExportModal";
 import { trackVariablesSaved } from "modules/analytics/events/features/apiClient";
 import { useGenericState } from "hooks/useGenericState";
-import { useCommand } from "features/apiClient/commands";
-import { useEnvironment } from "features/apiClient/hooks/useEnvironment.hook";
 import "./environmentView.scss";
-import { useVariableStore } from "features/apiClient/hooks/useVariable.hook";
 import { EnvironmentVariablesList } from "../VariablesList/EnvironmentVariablesList";
-import { VariableRow } from "../VariablesList/VariablesList";
+import type { VariableRow } from "../VariablesList/VariablesList";
+import {
+  useEnvironmentByIdMemoized,
+  useEnvironmentVariablesMemoized,
+} from "features/apiClient/slices/environments/environments.hooks";
+import { useBufferedEnvironmentEntity, useBufferIsDirty } from "features/apiClient/slices/entities/hooks";
+import { useApiClientDispatch, useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
+import { ApiClientEntityType } from "features/apiClient/slices/entities/types";
+import { bufferActions } from "features/apiClient/slices/buffer";
+import { updateEnvironmentVariables } from "features/apiClient/slices/environments/thunks";
+import { GLOBAL_ENVIRONMENT_ID } from "features/apiClient/slices/common/constants";
+import { useApiClientRepository } from "features/apiClient/contexts/meta";
 
 interface EnvironmentViewProps {
   envId: string;
 }
 
 export const EnvironmentView: React.FC<EnvironmentViewProps> = ({ envId }) => {
-  const environment = useEnvironment(envId, (s) => s);
-  const variablesMap = useVariableStore(environment.data.variables);
-  const variablesData = useMemo(() => {
-    return mapToEnvironmentArray(Object.fromEntries(variablesMap.data));
-  }, [variablesMap]);
-  const {
-    env: { setEnvironmentVariables },
-  } = useCommand();
+  const dispatch = useApiClientDispatch();
+  // const repositories = useApiClientRepository();
 
-  const pendingVariablesRef = useRef<VariableRow[]>([]);
+  // Determine if this is global environment
+  const isGlobal = envId === GLOBAL_ENVIRONMENT_ID;
+
+  // Get environment data from Redux
+  const environment = useEnvironmentByIdMemoized(envId);
+  const sourceVariables = useEnvironmentVariablesMemoized(envId);
+
+  // Get buffer state by referenceId (envId)
+  const bufferEntry = useApiClientSelector((state) =>
+    Object.values(state.buffer.entities).find((entry) => entry?.referenceId === envId)
+  );
+  const hasBuffer = bufferEntry !== null && bufferEntry !== undefined;
+  const bufferId = bufferEntry?.id ?? null; 
+  const isDirty = bufferId ? useBufferIsDirty(bufferId) : false;
+
+  const bufferedEntity = useBufferedEnvironmentEntity(envId);
+
 
   const [searchValue, setSearchValue] = useState<string>("");
   const [isSaving, setIsSaving] = useState<boolean>(false);
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const [isPostmanExportModalOpen, setIsPostmanExportModalOpen] = useState(false);
 
-  const environmentName = environment.name;
+  const environmentName = environment?.name ?? "";
+
+  // Initialize buffer on mount - ONLY ONCE //TEMP
+  useEffect(() => {
+    if (!environment) return;
+
+    dispatch(
+      bufferActions.open({
+        entityType: isGlobal ? ApiClientEntityType.GLOBAL_ENVIRONMENT : ApiClientEntityType.ENVIRONMENT,
+        isNew: false,
+        referenceId: envId,
+        data: environment,
+      })
+    );
+
+    // Cleanup: close buffer on unmount
+    return () => {
+      if (bufferId) {
+        dispatch(bufferActions.close(bufferId));
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, envId, isGlobal, bufferId, environment]); // Added environment back, included bufferId
+
+  const currentVariables = useMemo(() => {
+    if (hasBuffer && bufferEntry?.current) {
+      return (bufferEntry.current as { variables: typeof sourceVariables }).variables;
+    }
+    return sourceVariables;
+  }, [hasBuffer, bufferEntry, sourceVariables]);
+
+  // Convert to array format for the list
+  const variablesData = useMemo(() => {
+    return mapToEnvironmentArray(currentVariables);
+  }, [currentVariables]);
+
+  const pendingVariablesRef = useRef<VariableRow[]>([]);
 
   // FIXME: Saves last input value even when cleared
   const variables = useMemo(() => {
@@ -43,8 +100,6 @@ export const EnvironmentView: React.FC<EnvironmentViewProps> = ({ envId }) => {
   }, [variablesData]);
 
   const [pendingVariables, setPendingVariables] = useState<VariableRow[]>(variables);
-  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
-  const [isPostmanExportModalOpen, setIsPostmanExportModalOpen] = useState(false);
 
   const { hasUnsavedChanges, resetChanges } = useHasUnsavedChanges(pendingVariables);
 
@@ -58,12 +113,12 @@ export const EnvironmentView: React.FC<EnvironmentViewProps> = ({ envId }) => {
   }, [environmentName, setTitle]);
 
   useEffect(() => {
-    setUnsaved(hasUnsavedChanges);
+    setUnsaved(hasUnsavedChanges || isDirty);
 
-    if (hasUnsavedChanges) {
+    if (hasUnsavedChanges || isDirty) {
       setPreview(false);
     }
-  }, [setUnsaved, setPreview, hasUnsavedChanges]);
+  }, [setUnsaved, setPreview, hasUnsavedChanges, isDirty]);
 
   useEffect(() => {
     if (!isSaving) {
@@ -71,17 +126,54 @@ export const EnvironmentView: React.FC<EnvironmentViewProps> = ({ envId }) => {
     }
   }, [variables, isSaving]);
 
-  const handleSetPendingVariables = useCallback((variables: VariableRow[]) => {
-    setPendingVariables(variables);
-    pendingVariablesRef.current = variables;
-  }, []);
+  const handleSetPendingVariables = useCallback(
+    (newVariables: VariableRow[]) => {
+      setPendingVariables(newVariables);
+      pendingVariablesRef.current = newVariables;
+
+      if (hasBuffer && bufferId && bufferedEntity) {
+        bufferedEntity.variables.clearAll();
+        for (const v of newVariables) {
+          if (v.key) {
+            bufferedEntity.variables.add({
+              key: v.key,
+              type: v.type,
+              localValue: v.localValue,
+              syncValue: v.syncValue,
+              isPersisted: true,
+            });
+          }
+        }
+      }
+    },
+    [hasBuffer, bufferId, bufferedEntity]
+  );
 
   const handleSaveVariables = async () => {
     try {
       setIsSaving(true);
 
       const variablesToSave = convertEnvironmentToMap(pendingVariables);
-      await setEnvironmentVariables({ environmentId: envId, variables: variablesToSave });
+
+      // // Persist to repository using thunk
+      // await dispatch(
+      //   updateEnvironmentVariables({
+      //     environmentId: envId,
+      //     variables: variablesToSave,
+      //     repository: repositories.environmentVariablesRepository,
+      //   })
+      // ).unwrap();
+
+      // Mark buffer as saved
+      if (hasBuffer && bufferId && environment) {
+        dispatch(
+          bufferActions.markSaved({
+            id: bufferId, // Use actual buffer ID (UUID), not envId
+            savedData: { ...environment, variables: variablesToSave },
+            referenceId: envId, // Environment ID is the reference
+          })
+        );
+      }
 
       toast.success("Variables updated successfully");
       trackVariablesSaved({

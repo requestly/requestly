@@ -8,7 +8,8 @@ import createTransform from "redux-persist/es/createTransform";
 import storage from "redux-persist/lib/storage";
 import { ApiClientVariables } from "../entities/api-client-variables";
 import { DeepPartial, EntityId } from "../types";
-import { RQAPI } from "features/apiClient/types";
+import { entitySynced } from "../common/actions";
+import { ApiClientEntityType } from "../entities/types";
 
 export const environmentsAdapter = createEntityAdapter<EnvironmentEntity>({
   selectId: (env) => env.id,
@@ -29,7 +30,6 @@ export const environmentsSlice = createSlice({
   name: API_CLIENT_ENVIRONMENTS_SLICE_NAME,
   initialState,
   reducers: {
-
     environmentCreated(state, action: PayloadAction<EnvironmentEntity>) {
       environmentsAdapter.addOne(state.environments, action.payload);
     },
@@ -99,8 +99,22 @@ export const environmentsSlice = createSlice({
         state.activeEnvironmentId = activeEnvironmentId;
       }
     },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(entitySynced, (state, action) => {
+      const { entityType, entityId, data } = action.payload;
 
-
+      if (entityType === ApiClientEntityType.ENVIRONMENT) {
+        const env = state.environments.entities[entityId];
+        if (env && data) {
+          Object.assign(env, data);
+        }
+      } else if (entityType === ApiClientEntityType.GLOBAL_ENVIRONMENT) {
+        if (data) {
+          Object.assign(state.globalEnvironment, data);
+        }
+      }
+    });
   },
 });
 
@@ -123,7 +137,6 @@ const hydrationTransformer = createTransform<
         }),
       };
     });
-
 
     return {
       entities,
@@ -152,8 +165,8 @@ const globalEnvHydrationTransformer = createTransform<
         id: "global_environment",
         name: "Global Environment",
         variables: {},
-      }
-    };
+      };
+    }
     return {
       id: inboundState.id,
       variables: ApiClientVariables.perist(inboundState.variables, {
@@ -183,4 +196,3 @@ export const createEnvironmentsPersistedReducer = (contextId: string) =>
 
 export const environmentsActions = environmentsSlice.actions;
 export const environmentsReducer = environmentsSlice.reducer;
-
