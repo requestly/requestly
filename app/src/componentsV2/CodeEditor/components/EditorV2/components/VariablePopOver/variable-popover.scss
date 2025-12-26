@@ -67,6 +67,10 @@ div.n-popup {
     }
   }
 
+  .rq-custom-btn.ant-btn.ant-btn-ghost:hover {
+    background: transparent !important;
+  }
+
   .variable-not-found-info-container {
     display: flex;
     flex-direction: column;
@@ -108,6 +112,11 @@ div.n-popup {
         font-size: var(--requestly-font-size-xs);
         color: var(--requestly-color-text-subtle);
         padding: 8px;
+
+        .edit-icon {
+          font-size: 14px;
+          color: var(--requestly-color-text-subtle);
+        }
       }
     }
 
@@ -128,7 +137,7 @@ div.n-popup {
       text-transform: uppercase;
     }
 
-    .variable-header-info-seperator {
+    .variable-header-info-separator {
       position: relative;
       left: -10px;
       top: 2px;
@@ -183,12 +192,20 @@ div.n-popup {
       overflow: hidden;
       color: var(--requestly-color-text-default);
       text-overflow: ellipsis;
-
       font-family: var(--requestly-font-family-default);
       font-size: var(--requestly-font-size-xs);
       font-style: normal;
       font-weight: var(--requestly-font-weight-medium);
       line-height: 17px;
+      display: flex;
+      position: relative;
+
+      .value-content {
+        min-width: 150px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
     }
 
     .add-new-variable-info-content {
