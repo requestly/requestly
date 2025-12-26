@@ -1,7 +1,7 @@
 import React, { useCallback } from "react";
 import { RQInput } from "lib/design-system/components";
 import { Input } from "antd";
-import { BottomSheetLayout, BottomSheetPlacement, BottomSheetProvider } from "componentsV2/BottomSheet";
+import { BottomSheetLayout, BottomSheetProvider } from "componentsV2/BottomSheet";
 import SessionViewerBottomSheet from "features/sessionBook/components/SessionViewerBottomSheet/SessionViewerBottomSheet";
 import { useDispatch, useSelector } from "react-redux";
 import { getSessionRecordingMetaData } from "store/features/session-recording/selectors";
@@ -9,7 +9,7 @@ import { sessionRecordingActions } from "store/features/session-recording/slice"
 import { useDebounce } from "hooks/useDebounce";
 import { trackDraftSessionNamed, trackSessionRecordingDescriptionUpdated } from "features/sessionBook/analytics";
 import { isAppOpenedInIframe } from "utils/AppUtils";
-import { SheetLayout } from "componentsV2/BottomSheet/types";
+import { BottomSheetFeatureContext, SheetLayout } from "componentsV2/BottomSheet/types";
 import "./draftSessionDetailsPanel.scss";
 
 interface DraftSessionDetailsPanelProps {
@@ -42,9 +42,9 @@ const DraftSessionDetailsPanel: React.FC<DraftSessionDetailsPanelProps> = ({ isR
     },
     [dispatch, desbouncedTrackNameUpdated]
   );
-
+  // Added Rules as context for BottomSheetProvider as this feature is getting deprecated
   return (
-    <BottomSheetProvider context="rules">
+    <BottomSheetProvider context={BottomSheetFeatureContext.rules}>
       <div className="session-details-panel-wrapper">
         <BottomSheetLayout
           layout={SheetLayout.DRAWER}

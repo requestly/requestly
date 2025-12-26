@@ -19,6 +19,7 @@ import { AutogenerateProvider } from "features/apiClient/store/autogenerateConte
 import { ClientViewFactory } from "features/apiClient/screens/apiClient/clientView/ClientViewFactory";
 import { ContextId } from "features/apiClient/contexts/contextId.context";
 import { NoopContextId } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
+import { BottomSheetFeatureContext } from "componentsV2/BottomSheet/types";
 
 interface Props {
   request: string | APIClientRequest; // string for cURL request
@@ -135,7 +136,7 @@ export const APIClientModal: React.FC<Props> = ({ request, isModalOpen, onModalC
       destroyOnClose
     >
       <WindowsAndLinuxGatedHoc featureName="API client">
-        <BottomSheetProvider context="api_client">
+        <BottomSheetProvider context={BottomSheetFeatureContext.api_client}>
           <ContextId id={NoopContextId}>
             <AutogenerateProvider>
               <ClientViewFactory

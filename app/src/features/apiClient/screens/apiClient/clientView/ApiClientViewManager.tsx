@@ -7,6 +7,7 @@ import { Result } from "antd";
 import { AutogenerateProvider } from "features/apiClient/store/autogenerateContextProvider";
 import { ClientViewFactory } from "./ClientViewFactory";
 import "../apiClient.scss";
+import { BottomSheetFeatureContext } from "componentsV2/BottomSheet/types";
 
 type BaseProps = {
   onSaveCallback?: (apiEntryDetails: RQAPI.ApiRecord) => void;
@@ -50,7 +51,7 @@ export const ApiClientViewManager: React.FC<Props> = React.memo((props) => {
   }
 
   return (
-    <BottomSheetProvider context="api_client">
+    <BottomSheetProvider context={BottomSheetFeatureContext.api_client}>
       <div className="api-client-container-content">
         <AutogenerateProvider>
           <ClientViewFactory
