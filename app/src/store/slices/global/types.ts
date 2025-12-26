@@ -3,16 +3,7 @@ import { EditorToastState } from "./editorToast/types";
 import { GlobalModals } from "./modals/types";
 import { RulesState } from "./rules/types";
 import { UserAuth } from "./user/types";
-
-export interface BottomSheetState {
-  open: boolean;
-  placement: "bottom" | "right";
-  size: [number, number];
-}
-
-export type BottomSheetFeatureContext = "api_client" | "rules";
-
-export type BottomSheetOrientation = Record<BottomSheetFeatureContext, BottomSheetState>;
+import { BottomSheetOrientation } from "componentsV2/BottomSheet/types";
 
 export interface GlobalSliceState {
   activeModals: GlobalModals;

@@ -29,7 +29,7 @@ import { secToMinutesAndSeconds } from "utils/DateTimeUtils";
 import { useRBAC } from "features/rbac";
 import { Conditional } from "components/common/Conditional";
 import { copyToClipBoard } from "utils/Misc";
-import { SheetLayout } from "componentsV2/BottomSheet/types";
+import { BottomSheetFeatureContext, SheetLayout } from "componentsV2/BottomSheet/types";
 
 interface NavigationState {
   fromApp?: boolean;
@@ -107,9 +107,10 @@ export const SavedSessionViewer = () => {
     }
   }, [isMobileView]);
 
+  // Added Rules as context for BottomSheetProvider as this feature is getting deprecated
   return (
     <div className="saved-session-viewer-container">
-      <BottomSheetProvider context="rules">
+      <BottomSheetProvider context={BottomSheetFeatureContext.rules}>
         <div className="saved-session-header">
           <SessionTitle />
 

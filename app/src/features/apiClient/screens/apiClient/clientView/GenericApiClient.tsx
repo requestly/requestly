@@ -4,6 +4,7 @@ import { AutogenerateProvider } from "features/apiClient/store/autogenerateConte
 import { ClientViewFactory } from "./ClientViewFactory";
 import { BottomSheetProvider } from "componentsV2/BottomSheet";
 import "../apiClient.scss";
+import { BottomSheetFeatureContext } from "componentsV2/BottomSheet/types";
 
 type Props = {
   apiEntryDetails: RQAPI.ApiRecord;
@@ -16,7 +17,7 @@ type Props = {
 export const GenericApiClient: React.FC<Props> = React.memo(
   ({ apiEntryDetails, onSaveCallback, handleAppRequestFinished, isCreateMode, isOpenInModal = false }) => {
     return (
-      <BottomSheetProvider context="api_client">
+      <BottomSheetProvider context={BottomSheetFeatureContext.api_client}>
         <div className="api-client-container-content">
           <AutogenerateProvider>
             <ClientViewFactory

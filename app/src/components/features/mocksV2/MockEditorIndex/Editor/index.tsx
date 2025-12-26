@@ -24,9 +24,9 @@ import MockEditorEndpoint from "./Endpoint";
 import { trackRQDesktopLastActivity, trackRQLastActivity } from "utils/AnalyticsUtils";
 import { MOCKSV2 } from "modules/analytics/events/features/constants";
 import { EditorLanguage } from "componentsV2/CodeEditor";
-import { BottomSheetLayout, BottomSheetPlacement, BottomSheetProvider } from "componentsV2/BottomSheet";
+import { BottomSheetLayout, BottomSheetProvider } from "componentsV2/BottomSheet";
 import MockLogs from "./BottomSheet/MockLogs";
-import { SheetLayout } from "componentsV2/BottomSheet/types";
+import { BottomSheetFeatureContext, SheetLayout } from "componentsV2/BottomSheet/types";
 import { useFeatureValue } from "@growthbook/growthbook-react";
 import { ExportMocksModalWrapper } from "features/mocks/modals";
 import { globalActions } from "store/slices/global/slice";
@@ -451,7 +451,7 @@ const MockEditor: React.FC<Props> = ({
 
       {areLogsVisible ? (
         <div className="mock-parent mock-editor-layout-container">
-          <BottomSheetProvider defaultPlacement={BottomSheetPlacement.RIGHT}>
+          <BottomSheetProvider context={BottomSheetFeatureContext.mocks}>
             <MockEditorHeader
               isNewMock={isNew}
               mockType={mockType}
