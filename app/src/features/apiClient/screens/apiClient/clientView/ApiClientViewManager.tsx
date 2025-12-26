@@ -51,7 +51,7 @@ export const ApiClientViewManager: React.FC<Props> = React.memo((props) => {
   }
 
   return (
-    <BottomSheetProvider context={BottomSheetFeatureContext.api_client}>
+    <BottomSheetProvider context={BottomSheetFeatureContext.API_CLIENT}>
       <div className="api-client-container-content">
         <AutogenerateProvider>
           <ClientViewFactory

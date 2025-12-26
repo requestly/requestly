@@ -44,7 +44,7 @@ const DraftSessionDetailsPanel: React.FC<DraftSessionDetailsPanelProps> = ({ isR
   );
   // Added Rules as context for BottomSheetProvider as this feature is getting deprecated
   return (
-    <BottomSheetProvider context={BottomSheetFeatureContext.rules}>
+    <BottomSheetProvider context={BottomSheetFeatureContext.RULES}>
       <div className="session-details-panel-wrapper">
         <BottomSheetLayout
           layout={SheetLayout.DRAWER}

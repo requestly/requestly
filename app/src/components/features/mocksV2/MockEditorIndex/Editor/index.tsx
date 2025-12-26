@@ -451,7 +451,7 @@ const MockEditor: React.FC<Props> = ({
 
       {areLogsVisible ? (
         <div className="mock-parent mock-editor-layout-container">
-          <BottomSheetProvider context={BottomSheetFeatureContext.mocks}>
+          <BottomSheetProvider context={BottomSheetFeatureContext.MOCKS}>
             <MockEditorHeader
               isNewMock={isNew}
               mockType={mockType}

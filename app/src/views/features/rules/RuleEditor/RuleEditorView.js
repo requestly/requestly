@@ -21,7 +21,7 @@ const RuleEditorView = () => {
   }
 
   return (
-    <BottomSheetProvider context={BottomSheetFeatureContext.rules}>
+    <BottomSheetProvider context={BottomSheetFeatureContext.RULES}>
       <RuleEditor />
     </BottomSheetProvider>
   );

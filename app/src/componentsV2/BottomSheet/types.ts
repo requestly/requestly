@@ -4,9 +4,9 @@ export enum BottomSheetPlacement {
 }
 
 export enum BottomSheetFeatureContext {
-  api_client = "api_client",
-  rules = "rules",
-  mocks = "mocks",
+  API_CLIENT = "api_client",
+  RULES = "rules",
+  MOCKS = "mocks",
 }
 
 export enum SplitDirection {
