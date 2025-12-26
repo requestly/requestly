@@ -11,7 +11,7 @@ import { EditVariableView } from "./components/EditVariableView";
 import { RQButton } from "lib/design-system-v2/components";
 import { MdEdit } from "@react-icons/all-files/md/MdEdit";
 import { getScopeIcon } from "./hooks/useScopeOptions";
-import { RevealableSecretField } from "../../../../../VariableSecretValue/RevealableSecretField";
+import { RevealableSecretField } from "../../../../../RevealableSecretField/RevealableSecretField";
 import { useContextId } from "features/apiClient/contexts/contextId.context";
 import { NoopContextId } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 import { captureMessage } from "@sentry/react";
