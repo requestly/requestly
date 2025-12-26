@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, useEffect, useMemo, useCallback } from "react";
+import React, { createContext, useContext, useMemo, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { BottomSheetPlacement, BottomSheetFeatureContext } from "../types";
 import {
@@ -31,38 +31,15 @@ const BottomSheetContext = createContext<BottomSheetContextProps | null>(null);
 export const BottomSheetProvider: React.FC<{
   children: React.ReactNode;
   context: BottomSheetFeatureContext;
-  defaultPlacement?: BottomSheetPlacement;
-  isSheetOpenByDefault?: boolean;
-}> = ({ children, context, defaultPlacement, isSheetOpenByDefault }) => {
+}> = ({ children, context }) => {
   const dispatch = useDispatch();
   const sheetOrientation = useSelector((state) => getBottomSheetState(state, context));
-  const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(sheetOrientation.open);
-  const [sheetPlacement, setSheetPlacement] = useState<BottomSheetPlacement>(sheetOrientation.placement);
-  const [sheetSize, setSheetSize] = useState<number[]>(sheetOrientation.size);
-
-  useEffect(() => {
-    if (!sheetOrientation) return;
-    setSheetPlacement(sheetOrientation.placement);
-    setSheetSize(sheetOrientation.size);
-    setIsBottomSheetOpen(sheetOrientation.open);
-  }, [sheetOrientation]);
-
-  useEffect(() => {
-    if (defaultPlacement) {
-      setSheetPlacement(defaultPlacement);
-    }
-    if (isSheetOpenByDefault) {
-      setIsBottomSheetOpen(true);
-      setSheetSize(DEFAULT_SIZE);
-    }
-  }, []);
+  const { open: isBottomSheetOpen, placement: sheetPlacement, size: sheetSize } = sheetOrientation;
 
   const toggleBottomSheet = useCallback(
     ({ isOpen, action }: ToggleParams) => {
       const nextState = typeof isOpen === "boolean" ? isOpen : !isBottomSheetOpen;
       const newSize: number[] = nextState ? (sheetSize[0] < 80 ? sheetSize : DEFAULT_SIZE) : CLOSED_SIZE;
-      setIsBottomSheetOpen(nextState);
-      setSheetSize(newSize);
 
       dispatch(
         globalActions.updateBottomSheetToggle({
@@ -80,7 +57,7 @@ export const BottomSheetProvider: React.FC<{
 
       trackBottomSheetToggled(nextState, action);
     },
-    [dispatch, context, isBottomSheetOpen, sheetSize]
+    [isBottomSheetOpen, sheetSize, dispatch, context]
   );
 
   const toggleSheetPlacement = useCallback(
@@ -94,8 +71,6 @@ export const BottomSheetProvider: React.FC<{
           : trackViewBottomSheetOnBottomClicked();
       }
 
-      setSheetPlacement(nextPlacement);
-
       dispatch(
         globalActions.updateBottomSheetPlacement({
           context,
@@ -103,14 +78,13 @@ export const BottomSheetProvider: React.FC<{
         })
       );
     },
-    [dispatch, context, sheetPlacement]
+    [sheetPlacement, dispatch, context]
   );
 
   const updatePersistedSheetSize = useCallback(
     (size: number[]) => {
       if (!size) return;
 
-      setSheetSize(size);
       dispatch(
         globalActions.updateBottomSheetSize({
           context,

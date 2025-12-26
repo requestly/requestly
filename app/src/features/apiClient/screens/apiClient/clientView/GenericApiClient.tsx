@@ -17,7 +17,7 @@ type Props = {
 export const GenericApiClient: React.FC<Props> = React.memo(
   ({ apiEntryDetails, onSaveCallback, handleAppRequestFinished, isCreateMode, isOpenInModal = false }) => {
     return (
-      <BottomSheetProvider context={BottomSheetFeatureContext.api_client}>
+      <BottomSheetProvider context={BottomSheetFeatureContext.API_CLIENT}>
         <div className="api-client-container-content">
           <AutogenerateProvider>
             <ClientViewFactory

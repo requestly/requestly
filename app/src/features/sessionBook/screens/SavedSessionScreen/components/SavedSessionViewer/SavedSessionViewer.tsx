@@ -110,7 +110,7 @@ export const SavedSessionViewer = () => {
   // Added Rules as context for BottomSheetProvider as this feature is getting deprecated
   return (
     <div className="saved-session-viewer-container">
-      <BottomSheetProvider context={BottomSheetFeatureContext.rules}>
+      <BottomSheetProvider context={BottomSheetFeatureContext.RULES}>
         <div className="saved-session-header">
           <SessionTitle />
 
