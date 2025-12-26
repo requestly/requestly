@@ -81,6 +81,20 @@ export const updateUserMetadata = (prevState: GlobalSliceState, action: PayloadA
   prevState.user.details.metadata = action.payload;
 };
 
+export const updateIsOptedforAIFeatures = (prevState: GlobalSliceState, action: PayloadAction<boolean>) => {
+  if (!prevState.user.details) {
+    captureException(new Error("Trying to update is opted for AI features when user details is undefined"));
+    return;
+  }
+  if (prevState.user.details.metadata) {
+    prevState.user.details.metadata.ai_consent = action.payload;
+  } else {
+    prevState.user.details.metadata = {
+      ai_consent: action.payload,
+    };
+  }
+};
+
 export const updateUserDisplayName = (prevState: GlobalSliceState, action: PayloadAction<string>) => {
   if (!prevState.user.details?.profile) {
     captureException(new Error("Trying to update user display name when user profile is undefined"));

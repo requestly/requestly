@@ -9,7 +9,7 @@ import {
 } from "features/apiClient/screens/apiClient/components/views/components/request/components/AuthorizationView/defaults";
 import { ApiClientRecordsInterface } from "features/apiClient/helpers/modules/sync/interfaces";
 import { EnvironmentVariableData } from "features/apiClient/store/variables/types";
-import { createBodyContainer } from "features/apiClient/screens/apiClient/utils";
+import { createBodyContainer, getInferredKeyValueDataType } from "features/apiClient/screens/apiClient/utils";
 import { captureException } from "backend/apiClient/utils";
 
 interface PostmanCollectionExport {
@@ -254,12 +254,19 @@ const processRequestBody = (request: any): RequestBodyProcessingResult => {
 
 export const processRequestHeaders = (request: any): RequestHeadersProcessingResult => {
   const headers =
-    request.header?.map((header: { key: string; value: string; disabled: boolean; type: string }, index: number) => ({
-      id: index,
-      key: header.key,
-      value: header.value,
-      isEnabled: !header?.disabled,
-    })) ?? [];
+    request.header?.map(
+      (
+        header: { key: string; value: string; disabled: boolean; type: string; description?: string },
+        index: number
+      ) => ({
+        id: index,
+        key: header.key,
+        value: header.value,
+        isEnabled: !header?.disabled,
+        description: header?.description || "",
+        dataType: getInferredKeyValueDataType(header.value),
+      })
+    ) ?? [];
 
   return { headers };
 };
@@ -277,7 +284,9 @@ const createApiRecord = (
       id: index,
       key: query.key,
       value: query.value,
-      isEnabled: true,
+      isEnabled: query?.disabled !== true,
+      description: query.description || "",
+      dataType: getInferredKeyValueDataType(query.value),
     })) ?? [];
 
   const { requestBody, contentType } = processRequestBody(request);

@@ -40,6 +40,15 @@ export interface KeyValuePair {
   value: string;
   isEnabled: boolean;
   type?: string; // added for special identifiers like auth
+  description?: string;
+  dataType?: KeyValueDataType;
+}
+
+export enum KeyValueDataType {
+  STRING = "string",
+  NUMBER = "number",
+  INTEGER = "integer",
+  BOOLEAN = "boolean",
 }
 
 export enum KeyValueFormType {
@@ -103,6 +112,7 @@ export namespace RQAPI {
     key: string;
     value: string;
     description?: string;
+    dataType?: KeyValueDataType;
   };
 
   export type RequestBody = RequestJsonBody | RequestRawBody | RequestFormBody | MultipartFormBody; // in case of form data, body will be key-value pairs

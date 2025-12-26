@@ -2,6 +2,13 @@
   &.rq-content-list-table {
     border: none !important;
   }
+
+  .ant-table-container,
+  .ant-table-content,
+  .ant-table-body {
+    overflow: visible !important;
+  }
+
   tr {
     td.ant-table-cell:nth-last-child(2) {
       border-right: none !important;
@@ -22,12 +29,17 @@
 
   td.ant-table-cell {
     padding: 4px 12px !important;
+    max-width: 0;
+    // overflow: hidden;
+    overflow: visible !important;
+    position: relative;
 
     .key-value-delete-btn.ant-btn.ant-btn-icon-only {
       width: 30px;
       opacity: 0;
     }
   }
+
   .key-value-input-container.error-state {
     display: flex;
     align-items: center;
@@ -39,10 +51,11 @@
     border: 1px solid var(--requestly-color-error);
     border-radius: 4px;
   }
+
   .key-value-table-input {
     border: 1px solid transparent;
     background: transparent;
-    padding: 4px 6px !important;
+    padding: 4px 0px !important;
     height: 24px;
     font-size: var(--requestly-font-size-sm);
     width: 100%;
@@ -63,6 +76,7 @@
       overflow-x: auto;
       overflow-y: hidden;
       min-width: 100%;
+      margin-left: -8px;
 
       .cm-content {
         white-space: nowrap;
@@ -79,7 +93,118 @@
     }
   }
 
+  .key-value-description-view {
+    width: 100%;
+    height: 24px;
+    padding: 2px 2px 0px 4px;
+    font-size: var(--requestly-font-size-sm);
+    line-height: 1.5;
+    cursor: pointer;
+    border: 1px solid transparent;
+    border-radius: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: inherit;
+
+    .placeholder {
+      opacity: 0.5;
+    }
+
+    &:hover {
+      background-color: transparent;
+      border-color: transparent;
+    }
+  }
+
+  .key-value-description-floating-editor {
+    position: absolute;
+    top: 2px;
+    left: 0;
+    width: 100%;
+    z-index: 10;
+  }
+
+  .key-value-description-textarea {
+    resize: none;
+    border-radius: 2px;
+    padding: 4px 6px;
+    font-size: var(--requestly-font-size-sm);
+    line-height: 1.5;
+    max-height: 400px !important;
+    overflow-y: auto !important;
+  }
+
   .ant-table-footer {
     background: var(--requestly-color-background);
+    position: relative;
+    padding: 4px !important;
+    z-index: 1;
+
+    .key-value-add-more-btn {
+      background: none;
+      border: 1px solid transparent;
+
+      &:hover {
+        border: 1px solid transparent;
+        transition: ease-in-out;
+      }
+    }
   }
+
+  .ant-table-thead > tr > th {
+    font-weight: 600;
+    padding: 8px 16px !important;
+  }
+}
+
+.key-value-description-tooltip {
+  .ant-tooltip-inner {
+    word-break: break-word;
+    max-width: 200px;
+    text-align: left;
+  }
+}
+
+.key-value-type-view {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: var(--requestly-font-size-sm);
+  padding: 0;
+  cursor: pointer;
+}
+
+.key-value-type-text {
+  flex-grow: 1;
+  flex-shrink: 1;
+  padding: 4px !important;
+  white-space: nowrap;
+  opacity: 0.8;
+}
+
+.key-value-type-arrow {
+  padding: 0 8px;
+  flex-shrink: 0;
+  opacity: 0;
+  visibility: hidden;
+  margin-left: 0;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.key-value-type-view:hover .key-value-type-arrow {
+  opacity: 1;
+  visibility: visible;
+}
+
+.key-value-settings-header {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  width: 100%;
 }
