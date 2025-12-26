@@ -271,6 +271,7 @@ export const API_CLIENT = {
   IMPORT_DATA_FAILED: "api_client_import_requests_parsing_failed",
   IMPORT_SUCCESS: "api_client_import_success",
   IMPORT_FAILED: "api_client_import_failed",
+  POSTMAN_UNSUPPORTED_FEATURES_DETECTED: "api_client_postman_unsupported_features_detected",
 
   // Collection Runner
   COLLECTION_RUN_STARTED: "api_client_collection_run_started",

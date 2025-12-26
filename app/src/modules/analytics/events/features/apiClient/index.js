@@ -180,6 +180,30 @@ export const trackImportFailed = (type, reason) => {
   trackEvent(API_CLIENT.IMPORT_FAILED, { import_type: type, reason });
 };
 
+export const trackPostmanUnsupportedFeaturesDetected = (unsupportedFeatures, meta, collectionsCount, requestsCount) => {
+  trackEvent(API_CLIENT.POSTMAN_UNSUPPORTED_FEATURES_DETECTED, {
+    import_type: "POSTMAN",
+    unsupported_features: unsupportedFeatures,
+    features_count: unsupportedFeatures.length,
+    collection_count: collectionsCount,
+    request_count: requestsCount,
+    vault_vars: meta?.vaultVars || [],
+    vault_vars_count: meta?.vaultVars?.length || 0,
+    dynamic_vars: meta?.dynamicVars || [],
+    dynamic_vars_count: meta?.dynamicVars?.length || 0,
+    disabled_vars: meta?.disabledVars || [],
+    disabled_vars_count: meta?.disabledVars?.length || 0,
+    unsupported_auth_types: meta?.unsupportedAuthTypes || [],
+    unsupported_auth_types_count: meta?.unsupportedAuthTypes?.length || 0,
+    unsupported_script_methods: meta?.unsupportedScriptMethods || [],
+    unsupported_script_methods_count: meta?.unsupportedScriptMethods?.length || 0,
+    request_examples_count: meta?.requestExamplesCount || 0,
+    requests_with_examples: meta?.requestsWithExamples || [],
+    collection_level_script_count: meta?.collectionLevelScriptCount || 0,
+    collections_with_scripts: meta?.collectionsWithScripts || [],
+  });
+};
+
 export const trackImportCurlClicked = () => {
   trackEvent(API_CLIENT.IMPORT_CURL_CLICKED);
 };
