@@ -28,13 +28,7 @@ import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClient
 import { EnvironmentVariableData } from "features/apiClient/store/variables/types";
 
 type ProcessedData = {
-  environments: {
-    name: string;
-    variables: Record<string, EnvironmentVariableData>;
-    isGlobal: boolean;
-    unsupportedFeatures?: string[];
-    meta?: any;
-  }[];
+  environments: { name: string; variables: Record<string, EnvironmentVariableData>; isGlobal: boolean }[];
   apiRecords: (RQAPI.CollectionRecord | RQAPI.ApiRecord)[];
   variables: Record<string, EnvironmentVariableData>;
 };
@@ -144,18 +138,24 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
           results.forEach((result: any) => {
             if (result.status === "fulfilled") {
               if (result.value.type === "environment") {
-                processedRecords.environments.push(result.value.data);
-                // Collect unsupported features from environment
-                if (result.value.data.unsupportedFeatures?.length > 0) {
-                  result.value.data.unsupportedFeatures.forEach((f: string) => allUnsupportedFeatures.add(f));
-                  if (result.value.data.meta) {
-                    (result.value.data.meta.vaultVars || []).forEach((v: string) => {
+                const envData = result.value.data;
+                // Store only what we need for import
+                processedRecords.environments.push({
+                  name: envData.name,
+                  variables: envData.variables,
+                  isGlobal: envData.isGlobal,
+                });
+                // Collect unsupported features from environment for telemetry only
+                if (envData.unsupportedFeatures?.length > 0) {
+                  envData.unsupportedFeatures.forEach((f: string) => allUnsupportedFeatures.add(f));
+                  if (envData.meta) {
+                    (envData.meta.vaultVars || []).forEach((v: string) => {
                       if (!allMeta.vaultVars!.includes(v)) allMeta.vaultVars!.push(v);
                     });
-                    (result.value.data.meta.dynamicVars || []).forEach((v: string) => {
+                    (envData.meta.dynamicVars || []).forEach((v: string) => {
                       if (!allMeta.dynamicVars!.includes(v)) allMeta.dynamicVars!.push(v);
                     });
-                    (result.value.data.meta.disabledVars || []).forEach((v: string) => {
+                    (envData.meta.disabledVars || []).forEach((v: string) => {
                       if (!allMeta.disabledVars!.includes(v)) allMeta.disabledVars!.push(v);
                     });
                   }
