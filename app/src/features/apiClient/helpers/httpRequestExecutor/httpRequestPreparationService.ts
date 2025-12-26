@@ -197,6 +197,12 @@ export class HttpRequestPreparationService {
     );
     renderedEntry.request.url = addUrlSchemeIfMissing(renderedEntry.request.url);
 
+    // Hacky Fix - When "" or [] is sent along with POST, fetch send content-type=text/plain by default
+    // Ideally body should be undefined in db also
+    if (!renderedEntry?.request?.body || renderedEntry.request?.body?.length <= 0) {
+      renderedEntry.request.body = undefined;
+    }
+
     return {
       renderedVariables,
       preparedEntry: renderedEntry,
