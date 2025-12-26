@@ -109,7 +109,7 @@ class ApiClientContextService {
       middleware(getDefaultMiddleware) {
         return getDefaultMiddleware({
           serializableCheck: {
-            ignoredActions: ["records/unsafePatch"],
+            ignoredActions: ["records/unsafePatch", "environments/unsafePatch", "buffer/unsafePatch"],
           },
         }).concat(manualRehydrationMiddleware);
       },

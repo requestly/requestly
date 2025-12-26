@@ -7,11 +7,13 @@ import { isGlobalEnvironment } from "../../utils";
 import { KEYBOARD_SHORTCUTS } from "../../../../../../constants/keyboardShortcuts";
 import { RoleBasedComponent } from "features/rbac";
 import { useGenericState } from "hooks/useGenericState";
-import { useCommand } from "features/apiClient/commands";
+// TEMP: Commented out for testing buffer migration
+// import { useCommand } from "features/apiClient/commands";
 import "./variablesListHeader.scss";
 import RequestlyIcon from "assets/img/brand/rq_logo.svg";
 import PostmanIcon from "assets/img/brand/postman-icon.svg";
 import { toast } from "utils/Toast";
+import { updateEnvironmentName } from "features/apiClient/slices";
 
 interface VariablesListHeaderProps {
   searchValue: string;
@@ -41,9 +43,10 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
   onSave,
   exportActions,
 }) => {
-  const {
-    env: { renameEnvironment },
-  } = useCommand();
+  // TEMP: Commented out for testing buffer migration - rename functionality needs Zustand context
+  // const {
+  //   env: { renameEnvironment },
+  // } = useCommand();
   const { setTitle, getIsActive, getIsNew, setIsNew } = useGenericState();
   const enableHotKey = getIsActive();
   const isNewEnvironment = getIsNew();
@@ -52,7 +55,9 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
     try {
       const updatedName = newName || "New Environment";
 
-      await renameEnvironment({ environmentId, newName: updatedName });
+      // TEMP: Disabled for testing
+      // await updateEnvironmentName({ environmentId, name: updatedName, repository:  });
+      console.log("Rename disabled for testing. Would rename to:", updatedName);
       setTitle(updatedName);
     } catch (error) {
       toast.error(error.message || "Could not rename environment!");
