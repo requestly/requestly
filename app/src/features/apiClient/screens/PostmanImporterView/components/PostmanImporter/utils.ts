@@ -9,7 +9,7 @@ import {
 } from "features/apiClient/screens/apiClient/components/views/components/request/components/AuthorizationView/defaults";
 import { ApiClientRecordsInterface } from "features/apiClient/helpers/modules/sync/interfaces";
 import { EnvironmentVariableData } from "features/apiClient/store/variables/types";
-import { createBodyContainer } from "features/apiClient/screens/apiClient/utils";
+import { createBodyContainer, getInferredKeyValueDataType } from "features/apiClient/screens/apiClient/utils";
 import { captureException } from "backend/apiClient/utils";
 import Logger from "lib/logger";
 
@@ -607,6 +607,7 @@ export const processRequestHeaders = (request: any): RequestHeadersProcessingRes
         value: header.value,
         isEnabled: !header?.disabled,
         description: header?.description || "",
+        dataType: getInferredKeyValueDataType(header.value),
       })
     ) ?? [];
 
@@ -627,8 +628,9 @@ const createApiRecord = (
         id: index,
         key: query.key,
         value: query.value,
-        isEnabled: true,
+        isEnabled: query?.disabled !== true,
         description: query.description || "",
+        dataType: getInferredKeyValueDataType(query.value),
       })) ?? [];
 
     const { requestBody, contentType } = processRequestBody(request);

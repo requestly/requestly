@@ -9,6 +9,14 @@
 
   td.ant-table-cell {
     padding: 4px 12px !important;
+    max-width: 0;
+    overflow: hidden;
+  }
+
+  tr {
+    td.ant-table-cell:nth-last-child(2) {
+      border-right: 1px solid #303030 !important;
+    }
   }
 
   .path-variable-input-container {
@@ -19,17 +27,20 @@
     gap: 6px;
     flex: 1 0 0;
     line-height: 17px;
+    overflow: hidden;
   }
 
   .path-variable-table-input {
     border: 1px solid transparent;
     background: transparent;
-    padding: 4px 6px;
+    padding: 4px 0px;
     height: 24px;
     font-size: var(--requestly-font-size-sm);
     width: 100%;
     box-shadow: none;
     text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
 
     &:hover {
       border: 1px solid transparent;
@@ -70,6 +81,78 @@
   }
 
   .cm-editor {
-    margin-top: -6px !important;
+    margin-top: -7px !important;
+    overflow-x: hidden !important;
+    overflow-y: hidden;
+    min-width: 0;
+
+    .cm-content {
+      white-space: nowrap;
+      overflow: hidden;
+    }
+
+    .cm-line {
+      white-space: nowrap;
+    }
+
+    .cm-scroller {
+      overflow-x: auto;
+      overflow-y: hidden;
+    }
   }
+
+  .path-variable-type-column {
+    width: 110px !important;
+    min-width: 110px !important;
+    max-width: 110px !important;
+    overflow: hidden;
+  }
+
+  .ant-table-thead > tr > th {
+    font-weight: 600;
+    padding: 8px 12px !important;
+  }
+
+  .path-variable-table-settings {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+  }
+}
+
+.key-value-type-view {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: var(--requestly-font-size-sm);
+  padding: 0;
+  cursor: pointer;
+}
+
+.key-value-type-text {
+  flex-grow: 1;
+  flex-shrink: 1;
+  padding: 4px 0px 4px 2px;
+  white-space: nowrap;
+  opacity: 0.8;
+}
+
+.key-value-type-arrow {
+  padding: 0 8px;
+  flex-shrink: 0;
+  opacity: 0;
+  visibility: hidden;
+  margin-left: 0;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.key-value-type-view:hover .key-value-type-arrow {
+  opacity: 1;
+  visibility: visible;
 }
