@@ -42,7 +42,7 @@ enum InfoFieldLabel {
 }
 interface InfoFieldConfig {
   label: InfoFieldLabel;
-  value: string | boolean;
+  value: string;
   isSecret?: boolean;
 }
 

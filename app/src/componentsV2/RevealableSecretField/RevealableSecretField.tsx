@@ -5,7 +5,7 @@ import { RiEyeOffLine } from "@react-icons/all-files/ri/RiEyeOffLine";
 import "./RevealableSecretField.scss";
 
 interface RevealableSecretFieldProps {
-  value: string | boolean;
+  value: string;
   isRevealable: boolean;
 }
 
