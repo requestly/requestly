@@ -1,6 +1,14 @@
 import { getAPIResponse as getAPIResponseViaExtension } from "actions/ExtensionActions";
 import { getAPIResponse as getAPIResponseViaProxy } from "actions/DesktopActions";
-import { AbortReason, FormDropDownOptions, KeyValuePair, RQAPI, RequestContentType, RequestMethod } from "../../types";
+import {
+  AbortReason,
+  FormDropDownOptions,
+  KeyValuePair,
+  RQAPI,
+  RequestContentType,
+  RequestMethod,
+  KeyValueDataType,
+} from "../../types";
 import { CONSTANTS } from "@requestly/requestly-core";
 import {
   CONTENT_TYPE_HEADER,
@@ -847,7 +855,8 @@ export const parseHttpRequestEntry = (
   result.auth = authNamespaceContents;
 
   const contentType = entry.request.contentType;
-  if (contentType) {
+  // Only add content-type namespace if body is present
+  if (contentType && entry?.request?.body && entry?.request?.body?.length > 0) {
     result.content_type = parseContentType(contentType);
   }
   return result;
@@ -1125,3 +1134,67 @@ export const parseCollectionRunnerDataFile = async (filePath: string, maxlimit?:
     }
   }
 };
+
+export function doesValueMatchDataType(value: string, type: KeyValueDataType | undefined): Boolean {
+  if (!value || value.includes("{{")) return true;
+
+  switch (type) {
+    case KeyValueDataType.INTEGER: {
+      const parsedNumber = Number(value);
+      /* 
+      !String(value).includes(".") is added to ensure that values that look like number 
+      but are integer due to floating point precision are not treated as integer. 
+      Examples: 3.0000000000000001 and 3000000000000000.1 is treated as integer by isInteger
+      */
+      const isValidInt = !Number.isNaN(parsedNumber) && Number.isInteger(parsedNumber) && !String(value).includes(".");
+      return isValidInt;
+    }
+
+    case KeyValueDataType.NUMBER: {
+      const parsedNumber = Number(value);
+      return Number.isNaN(parsedNumber) ? false : true;
+    }
+
+    case KeyValueDataType.BOOLEAN: {
+      const parsedStr = value.trim().toLowerCase();
+      return parsedStr === "true" || parsedStr === "false";
+    }
+
+    case KeyValueDataType.STRING: {
+      return true;
+    }
+
+    default:
+      throw new Error("Unknown KeyValueDataType");
+  }
+}
+
+export function getInferredKeyValueDataType(value: any): KeyValueDataType {
+  if (value === null || value === undefined) {
+    return KeyValueDataType.STRING;
+  }
+
+  const parsedStr = String(value).trim().toLowerCase();
+  if (!parsedStr) {
+    return KeyValueDataType.STRING;
+  }
+
+  if (parsedStr === "true" || parsedStr === "false") {
+    return KeyValueDataType.BOOLEAN;
+  }
+
+  const parsedNum = Number(value);
+  if (!Number.isNaN(parsedNum)) {
+    /*
+      !String(value).includes(".") is added to ensure that values that look like number 
+      but are integer due to floating point precision are not treated as integer. 
+      Examples: 3.0000000000000001 and 3000000000000000.1 is treated as integer by isInteger
+    */
+    if (Number.isInteger(parsedNum) && !parsedStr.includes(".")) {
+      return KeyValueDataType.INTEGER;
+    } else {
+      return KeyValueDataType.NUMBER;
+    }
+  }
+  return KeyValueDataType.STRING;
+}
