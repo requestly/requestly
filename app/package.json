@@ -98,6 +98,7 @@
     "comlink": "^4.4.2",
     "csv-parse": "^6.1.0",
     "curlconverter": "^4.12.0",
+    "dependency-graph": "^1.0.0",
     "dexie": "^4.2.1",
     "fflate": "^0.7.3",
     "file-saver": "^2.0.5",

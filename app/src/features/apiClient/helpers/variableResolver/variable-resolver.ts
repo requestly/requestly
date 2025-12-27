@@ -298,7 +298,7 @@ export function useScopedVariables(id: string) {
 
   const [scopedVariables, setScopedVariables] = useState(getScopedVariables(parents, stores));
 
-  const variableEventsManagerRef = useRef<VariableEventsManager>();
+  const variableEventsManagerRef = useRef<VariableEventsManager | null>(null);
 
   useEffect(() => {
     variableEventsManagerRef.current = new VariableEventsManager(setScopedVariables, scopes);
