@@ -25,6 +25,7 @@ import { SafariLimitedSupportView } from "componentsV2/SafariExtension/SafariLim
 import { isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 import { useRBAC } from "features/rbac";
 import clientSessionRecordingStorageService from "services/clientStorageService/features/session-recording";
+import { SessionBookDeprecationBanner } from "features/sessionBook/components/SessionBookDeprecationBanner";
 
 const emptyPageSourceData: SessionRecordingPageSource = {
   value: "",
@@ -245,6 +246,8 @@ export const SessionsSettings: React.FC = () => {
       <div className="session-settings-wrapper">
         <Col flex="1">
           <div className="header">SessionBook Settings</div>
+
+          <SessionBookDeprecationBanner style={{ marginBottom: 24 }} />
 
           <div className="automatic-recording-container">
             <div className="automatic-recording-details">
