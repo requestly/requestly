@@ -1,9 +1,10 @@
 import React from "react";
-import { BottomSheetPlacement, BottomSheetProvider } from "componentsV2/BottomSheet";
 import { RQAPI } from "features/apiClient/types";
 import { AutogenerateProvider } from "features/apiClient/store/autogenerateContextProvider";
 import { ClientViewFactory } from "./ClientViewFactory";
+import { BottomSheetProvider } from "componentsV2/BottomSheet";
 import "../apiClient.scss";
+import { BottomSheetFeatureContext } from "componentsV2/BottomSheet/types";
 
 type Props = {
   apiEntryDetails: RQAPI.ApiRecord;
@@ -16,7 +17,7 @@ type Props = {
 export const GenericApiClient: React.FC<Props> = React.memo(
   ({ apiEntryDetails, onSaveCallback, handleAppRequestFinished, isCreateMode, isOpenInModal = false }) => {
     return (
-      <BottomSheetProvider defaultPlacement={BottomSheetPlacement.BOTTOM} isSheetOpenByDefault={true}>
+      <BottomSheetProvider context={BottomSheetFeatureContext.API_CLIENT}>
         <div className="api-client-container-content">
           <AutogenerateProvider>
             <ClientViewFactory
