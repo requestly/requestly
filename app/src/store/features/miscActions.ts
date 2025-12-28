@@ -1,4 +1,5 @@
 import { PayloadAction } from "@reduxjs/toolkit";
+import { BottomSheetFeatureContext, BottomSheetPlacement } from "componentsV2/BottomSheet/types";
 
 export const updateAppLanguage = (prevState: any, action: PayloadAction<string>) => {
   prevState.appLanguage = action.payload;
@@ -15,4 +16,25 @@ export const updatePopupConfig = (prevState: any, action: PayloadAction<any>) =>
 
 export const updateHasGeneratedAITests = (prevState: any, action: PayloadAction<boolean>) => {
   prevState.misc.persist.hasGeneratedAITests = action.payload;
+};
+
+export const updateBottomSheetToggle = (
+  prevState: any,
+  action: PayloadAction<{ context: BottomSheetFeatureContext; open: boolean }>
+) => {
+  prevState.bottomSheetOrientation[action.payload.context].open = action.payload.open;
+};
+
+export const updateBottomSheetPlacement = (
+  prevState: any,
+  action: PayloadAction<{ context: BottomSheetFeatureContext; placement: BottomSheetPlacement }>
+) => {
+  prevState.bottomSheetOrientation[action.payload.context].placement = action.payload.placement;
+};
+
+export const updateBottomSheetSize = (
+  prevState: any,
+  action: PayloadAction<{ context: BottomSheetFeatureContext; size: number[] }>
+) => {
+  prevState.bottomSheetOrientation[action.payload.context].size = action.payload.size;
 };
