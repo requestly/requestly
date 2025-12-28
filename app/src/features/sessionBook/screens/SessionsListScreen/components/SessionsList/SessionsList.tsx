@@ -11,6 +11,7 @@ import APP_CONSTANTS from "config/constants";
 import ShareRecordingModal from "views/features/sessions/ShareRecordingModal";
 import { isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 import { RBACEmptyState, RoleBasedComponent } from "features/rbac";
+import { SessionBookDeprecationBanner } from "features/sessionBook/components/SessionBookDeprecationBanner";
 
 export const SessionsList = () => {
   const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
@@ -57,6 +58,7 @@ export const SessionsList = () => {
   if (user.loggedIn && sessions.length) {
     return (
       <>
+        <SessionBookDeprecationBanner style={{ marginBottom: 16 }} />
         <SessionsListContentHeader searchValue={searchValue} handleSearchValueUpdate={setSearchValue} />
         <SessionsTable
           sessions={searchedSessions}
@@ -79,17 +81,20 @@ export const SessionsList = () => {
     );
   } else
     return (
-      <RoleBasedComponent
-        resource="session_recording"
-        permission="create"
-        fallback={
-          <RBACEmptyState
-            title="No sessions created yet."
-            description="As a viewer, you will be able to view sessions once someone from your team creates them. You can contact your workspace admin to update your role."
-          />
-        }
-      >
-        <SessionsOnboardingView />
-      </RoleBasedComponent>
+      <>
+        <SessionBookDeprecationBanner style={{ marginBottom: 16 }} />
+        <RoleBasedComponent
+          resource="session_recording"
+          permission="create"
+          fallback={
+            <RBACEmptyState
+              title="No sessions created yet."
+              description="As a viewer, you will be able to view sessions once someone from your team creates them. You can contact your workspace admin to update your role."
+            />
+          }
+        >
+          <SessionsOnboardingView />
+        </RoleBasedComponent>
+      </>
     );
 };
