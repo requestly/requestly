@@ -5,13 +5,13 @@ export interface AISessionContextValue {
   sessionId: string | null;
   generationId: string | null;
   lastUsedQuery: string | null;
-  recentGeneratedCode: string | null;
+  lastGeneratedCode: string | null;
   createNewAISession: () => string;
   startNewGeneration: () => string;
   endAISession: () => void;
   getCurrentGenerationId: () => string | null;
   setLastUsedQuery: (query: string) => void;
-  setRecentGeneratedCode: (code: string) => void;
+  setLastGeneratedCode: (code: string) => void;
 }
 
 const AISessionContext = createContext<AISessionContextValue | undefined>(undefined);
@@ -24,7 +24,7 @@ export const AISessionProvider: React.FC<AISessionProviderProps> = ({ children }
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [generationId, setGenerationId] = useState<string | null>(null);
   const [lastUsedQuery, setLastUsedQuery] = useState<string | null>(null);
-  const [recentGeneratedCode, setRecentGeneratedCode] = useState<string | null>(null);
+  const [lastGeneratedCode, setLastGeneratedCode] = useState<string | null>(null);
 
   // generationIdRef is used so async callbacks (like AI onFinish handlers) can always read
   // the latest generationId value instead of a stale one captured in closure.
@@ -44,7 +44,7 @@ export const AISessionProvider: React.FC<AISessionProviderProps> = ({ children }
     setSessionId(null);
     setGenerationId(null);
     setLastUsedQuery(null);
-    setRecentGeneratedCode(null);
+    setLastGeneratedCode(null);
     generationIdRef.current = null;
   };
 
@@ -61,13 +61,13 @@ export const AISessionProvider: React.FC<AISessionProviderProps> = ({ children }
     sessionId,
     generationId,
     lastUsedQuery,
-    recentGeneratedCode,
+    lastGeneratedCode,
     createNewAISession,
     startNewGeneration,
     endAISession,
     getCurrentGenerationId,
     setLastUsedQuery,
-    setRecentGeneratedCode,
+    setLastGeneratedCode,
   };
 
   return <AISessionContext.Provider value={value}>{children}</AISessionContext.Provider>;

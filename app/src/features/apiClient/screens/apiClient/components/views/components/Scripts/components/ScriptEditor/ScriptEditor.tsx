@@ -85,9 +85,9 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
   const {
     sessionId,
     lastUsedQuery,
-    recentGeneratedCode,
+    lastGeneratedCode,
     setLastUsedQuery,
-    setRecentGeneratedCode,
+    setLastGeneratedCode,
     getCurrentGenerationId,
     endAISession,
   } = useAISessionContext();
@@ -140,7 +140,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
         setIsGenerateTestPopoverOpen(false);
         isPopoverOpenRef.current = false;
         if (result.object?.code?.content) {
-          setRecentGeneratedCode(result.object.code.content);
+          setLastGeneratedCode(result.object.code.content);
           trackAITestGenerationSuccessful(sessionId, currentGenerationId);
         }
       }
@@ -162,7 +162,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
       existingScript: entry.scripts?.postResponse ?? "",
       lastGeneration: {
         code: {
-          content: recentGeneratedCode,
+          content: lastGeneratedCode,
           language: "javascript",
         },
         query: lastUsedQuery,
@@ -180,7 +180,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
         incomingValue: object?.code?.content,
         source: "ai",
         onPartialMerge: (mergedValue: string, newIncomingValue: string, type: "accept" | "reject") => {
-          setRecentGeneratedCode(newIncomingValue);
+          setLastGeneratedCode(newIncomingValue);
 
           if (type === "accept") {
             onScriptsChange({
@@ -212,7 +212,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
     sessionId,
     getCurrentGenerationId,
     endAISession,
-    setRecentGeneratedCode,
+    setLastGeneratedCode,
   ]);
 
   const handleAcceptTests = () => {
