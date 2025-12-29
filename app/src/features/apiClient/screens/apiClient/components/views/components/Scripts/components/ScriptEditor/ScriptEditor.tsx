@@ -82,7 +82,15 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
 
   const isAITestsGenerationEnabled = useFeatureIsOn("ai_tests_generation");
   const isAIEnabledGlobally = useFeatureIsOn("global_ai_support");
-  const { sessionId, getCurrentGenerationId, endAISession } = useAISessionContext();
+  const {
+    sessionId,
+    lastUsedQuery,
+    recentGeneratedCode,
+    setLastUsedQuery,
+    setRecentGeneratedCode,
+    getCurrentGenerationId,
+    endAISession,
+  } = useAISessionContext();
 
   const [scriptType, setScriptType] = useState<RQAPI.ScriptType>(activeScriptType);
   const [isLibraryPickerOpen, setIsLibraryPickerOpen] = useState(false);
@@ -97,8 +105,6 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
   const hasPostResponseScript = Boolean(entry?.scripts?.[RQAPI.ScriptType.POST_RESPONSE]);
 
   const isPopoverOpenRef = useRef(isGenerateTestPopoverOpen);
-  const lastGeneratedCodeRef = useRef<string | null>(null);
-  const lastUsedQueryRef = useRef<string | null>(null);
 
   const { object, isLoading, error, stop, submit, clear } = useObject({
     api: getAIEndpointUrl(AI_ENDPOINTS.TEST_GENERATION),
@@ -134,7 +140,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
         setIsGenerateTestPopoverOpen(false);
         isPopoverOpenRef.current = false;
         if (result.object?.code?.content) {
-          lastGeneratedCodeRef.current = result.object.code.content;
+          setRecentGeneratedCode(result.object.code.content);
           trackAITestGenerationSuccessful(sessionId, currentGenerationId);
         }
       }
@@ -156,13 +162,13 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
       existingScript: entry.scripts?.postResponse ?? "",
       lastGeneration: {
         code: {
-          content: lastGeneratedCodeRef.current,
+          content: recentGeneratedCode,
           language: "javascript",
         },
-        query: lastUsedQueryRef.current,
+        query: lastUsedQuery,
       },
     });
-    lastUsedQueryRef.current = query;
+    setLastUsedQuery(query);
   };
 
   const mergeViewConfig = useMemo(() => {
@@ -174,7 +180,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
         incomingValue: object?.code?.content,
         source: "ai",
         onPartialMerge: (mergedValue: string, newIncomingValue: string, type: "accept" | "reject") => {
-          lastGeneratedCodeRef.current = newIncomingValue;
+          setRecentGeneratedCode(newIncomingValue);
 
           if (type === "accept") {
             onScriptsChange({
@@ -191,8 +197,6 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
           if (mergedValue === newIncomingValue) {
             clear();
             endAISession();
-            lastGeneratedCodeRef.current = null;
-            lastUsedQueryRef.current = null;
           }
         },
       };
@@ -208,6 +212,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
     sessionId,
     getCurrentGenerationId,
     endAISession,
+    setRecentGeneratedCode,
   ]);
 
   const handleAcceptTests = () => {
@@ -216,8 +221,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
       postResponse: object?.code?.content as string,
     });
     clear();
-    lastGeneratedCodeRef.current = null;
-    lastUsedQueryRef.current = null;
+    endAISession();
   };
 
   useEffect(() => {
@@ -403,8 +407,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
         <AIResultReviewPanel
           onDiscard={() => {
             clear();
-            lastGeneratedCodeRef.current = null;
-            lastUsedQueryRef.current = null;
+            endAISession();
           }}
           onAccept={handleAcceptTests}
           onEditInstructions={() => {
