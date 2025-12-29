@@ -16,9 +16,8 @@ const WorkspaceStoreContext = createContext<ReactReduxContextValue<ApiClientStor
 export const useWorkspaceViewStore = createStoreHook(WorkspaceStoreContext);
 export const useWorkspaceViewDispatch = createDispatchHook(WorkspaceStoreContext);
 
-export const useWorkspaceViewSelector: TypedUseSelectorHook<ApiClientStoreState> = createSelectorHook(
-  WorkspaceStoreContext
-);
+export const useWorkspaceViewSelector: TypedUseSelectorHook<ApiClientStoreState> =
+  createSelectorHook(WorkspaceStoreContext);
 
 const WorkspaceIdContext = createContext<Workspace["id"] | undefined>(undefined);
 
