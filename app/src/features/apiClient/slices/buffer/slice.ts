@@ -1,4 +1,5 @@
 import { createSlice, createEntityAdapter, PayloadAction } from "@reduxjs/toolkit";
+import { produceWithPatches, enablePatches, current } from "immer";
 import { v4 as uuidv4 } from "uuid";
 import { set, unset, cloneDeep } from "lodash";
 import { objectToSetOperations, objectToDeletePaths } from "../utils/pathConverter";
@@ -6,6 +7,8 @@ import { BufferEntry, BufferState } from "./types";
 import { ApiClientEntityType } from "../entities/types";
 import { BUFFER_SLICE_NAME } from "../common/constants";
 import { emitBufferUpdated } from "componentsV2/Tabs/slice";
+
+enablePatches();
 
 const bufferAdapter = createEntityAdapter<BufferEntry>();
 
@@ -15,8 +18,7 @@ export function findBufferByReferenceId(
   entities: BufferState["entities"],
   referenceId: string
 ): BufferEntry | undefined {
-  const allEntries = Object.values(entities) as (BufferEntry | undefined)[];
-  return allEntries.find((e) => e?.referenceId === referenceId);
+  return Object.values(entities).find((e) => e?.referenceId === referenceId);
 }
 
 export const bufferSlice = createSlice({
@@ -61,12 +63,18 @@ export const bufferSlice = createSlice({
         bufferAdapter.addOne(state, entry);
       },
       prepare(
-        payload: { entityType: ApiClientEntityType; isNew: boolean; referenceId?: string; data: unknown },
+        payload: {
+          entityType: ApiClientEntityType;
+          isNew: boolean;
+          referenceId?: string;
+          data: unknown;
+        },
         meta?: { id: string }
       ) {
         return { payload, meta: { id: meta?.id || uuidv4() } };
       },
     },
+
     applyPatch(
       state,
       action: PayloadAction<{
@@ -74,9 +82,10 @@ export const bufferSlice = createSlice({
         command: { type: "SET" | "DELETE"; value: unknown };
       }>
     ) {
-      const { id, command } = action.payload;
-      const entry = state.entities[id] as BufferEntry | undefined;
+      const entry = state.entities[action.payload.id];
       if (!entry) return;
+
+      const { command } = action.payload;
 
       if (command.type === "SET") {
         const operations = objectToSetOperations(command.value);
@@ -84,7 +93,9 @@ export const bufferSlice = createSlice({
           set(entry.current as object, path, value);
           set(entry.diff as object, path, value);
         }
-      } else if (command.type === "DELETE") {
+      }
+
+      if (command.type === "DELETE") {
         const paths = objectToDeletePaths(command.value);
         for (const path of paths) {
           unset(entry.current as object, path);
@@ -112,7 +123,27 @@ export const bufferSlice = createSlice({
     ) {
       const entry = state.entities[action.payload.id];
       if (!entry) return;
-      action.payload.patcher(entry);
+
+      const plain = current(entry.current);
+
+      const [nextCurrent, patches] = produceWithPatches(plain, (draft) => {
+        action.payload.patcher({ current: draft } as BufferEntry);
+      });
+
+      entry.current = nextCurrent;
+      for (const patch of patches) {
+        const path = patch.path;
+        switch (patch.op) {
+          case "add":
+          case "replace":
+            set(entry.diff as object, path, patch.value);
+            break;
+          case "remove":
+            set(entry.diff as object, path, null);
+            break;
+        }
+      }
+
       entry.isDirty = true;
 
       if (entry.referenceId) {
@@ -130,12 +161,10 @@ export const bufferSlice = createSlice({
         sourceData: unknown;
       }>
     ) {
-      const { referenceId, sourceData } = action.payload;
-
-      const entry = findBufferByReferenceId(state.entities, referenceId);
+      const entry = findBufferByReferenceId(state.entities, action.payload.referenceId);
       if (!entry) return;
 
-      entry.current = cloneDeep(sourceData);
+      entry.current = cloneDeep(action.payload.sourceData);
 
       const operations = objectToSetOperations(entry.diff);
       for (const { path, value } of operations) {
@@ -155,12 +184,11 @@ export const bufferSlice = createSlice({
         referenceId: string;
       }>
     ) {
-      const { id, savedData, referenceId } = action.payload;
-      const entry = state.entities[id];
+      const entry = state.entities[action.payload.id];
       if (!entry) return;
 
-      entry.referenceId = referenceId;
-      entry.current = cloneDeep(savedData);
+      entry.referenceId = action.payload.referenceId;
+      entry.current = cloneDeep(action.payload.savedData);
       entry.diff = {};
       entry.isDirty = false;
     },
