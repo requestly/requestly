@@ -8,6 +8,7 @@ import {
   TypedUseSelectorHook,
 } from "react-redux";
 import { ApiClientStoreState, useApiClientStore } from "../slices";
+import { Workspace } from "features/workspaces/types";
 
 const WorkspaceStoreContext = createContext<ReactReduxContextValue<ApiClientStoreState> | null>(null);
 
@@ -19,7 +20,7 @@ export const useWorkspaceViewSelector: TypedUseSelectorHook<ApiClientStoreState>
   WorkspaceStoreContext
 );
 
-export function WorkspaceProvider(props: { workspaceId: string; children: React.ReactNode }) {
+export function WorkspaceProvider(props: { workspaceId: Workspace["id"]; children: React.ReactNode }) {
   const store = useApiClientStore(props.workspaceId);
 
   return (
