@@ -34,7 +34,7 @@ import {
   environmentsSlice,
 } from "features/apiClient/slices/environments";
 import { EnvironmentEntity } from "features/apiClient/slices/environments/types";
-import { bufferActions, bufferSlice } from "features/apiClient/slices/buffer";
+import { bufferActions, bufferSlice, bufferSyncMiddleware } from "features/apiClient/slices/buffer";
 import { getEntityDataFromTabSource, GetEntityDataFromTabSourceState } from "componentsV2/Tabs/slice";
 import { closeTab } from "componentsV2/Tabs/slice/thunks";
 import { groupBy, mapValues } from "lodash";
@@ -111,7 +111,9 @@ class ApiClientContextService {
           serializableCheck: {
             ignoredActions: ["records/unsafePatch", "environments/unsafePatch", "buffer/unsafePatch"],
           },
-        }).concat(manualRehydrationMiddleware);
+        })
+          .concat(bufferSyncMiddleware)
+          .concat(manualRehydrationMiddleware);
       },
     });
 
