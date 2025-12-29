@@ -1,18 +1,19 @@
 import { useMemo } from "react";
 import { createSelector } from "@reduxjs/toolkit";
 import { useApiClientDispatch, useApiClientSelector } from "../hooks/base.hooks";
-import { ApiClientStoreState } from "../workspaceView/helpers/ApiClientContextRegistry/types";
-import { ApiClientRootState } from "../hooks/types";
+import type { ApiClientStoreState } from "../workspaceView/helpers/ApiClientContextRegistry/types";
+import type { ApiClientRootState } from "../hooks/types";
 import { ApiClientEntityType } from "./types";
 import { EntityFactory } from "./factory";
-import { HttpRecordEntity } from "./http";
-import { GraphQLRecordEntity } from "./graphql";
+import type { HttpRecordEntity } from "./http";
+import type { GraphQLRecordEntity } from "./graphql";
 import { BufferedEntityFactory } from "./buffered/factory";
-import { BufferedHttpRecordEntity } from "./buffered/http";
-import { BufferedGraphQLRecordEntity } from "./buffered/graphql";
+import type { BufferedHttpRecordEntity } from "./buffered/http";
+import type { BufferedGraphQLRecordEntity } from "./buffered/graphql";
 import { useDispatch } from "react-redux";
 import { bufferAdapterSelectors, findBufferByReferenceId } from "../buffer/slice";
 import { EntityNotFound } from "../types";
+import { GLOBAL_ENVIRONMENT_ID } from "../common/constants";
 
 export function useEntity<T extends ApiClientEntityType>(params: { id: string; type: T }) {
   const dispatch = EntityFactory.GlobalStateOverrideConfig[params.type] ? useDispatch() : useApiClientDispatch();
@@ -103,4 +104,18 @@ export function useBufferIsDirty(id: string): boolean {
 
 export function useHasBuffer(id: string): boolean {
   return useApiClientSelector((state) => bufferAdapterSelectors.selectById(state.buffer, id) !== undefined);
+}
+
+export function useEnvironmentEntity(id: string, type: ApiClientEntityType.ENVIRONMENT | ApiClientEntityType.GLOBAL_ENVIRONMENT) {
+  return useEntity({
+    id,
+    type
+  });
+};
+
+export function useBufferedEnvironmentEntity(id: string, isGlobal: boolean) {
+  return useBufferedEntity({
+    id,
+    type: isGlobal ? ApiClientEntityType.GLOBAL_ENVIRONMENT : ApiClientEntityType.ENVIRONMENT,
+  });
 }

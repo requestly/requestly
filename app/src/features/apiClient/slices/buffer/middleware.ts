@@ -2,8 +2,13 @@ import { createListenerMiddleware } from "@reduxjs/toolkit";
 import { bufferActions, bufferAdapterSelectors } from "./slice";
 import type { ApiClientRootState } from "../hooks/types";
 import { ApiClientEntityType } from "../entities/types";
-import { API_CLIENT_RECORDS_SLICE_NAME, BUFFER_SLICE_NAME } from "../common/constants";
+import {
+  API_CLIENT_RECORDS_SLICE_NAME,
+  API_CLIENT_ENVIRONMENTS_SLICE_NAME,
+  BUFFER_SLICE_NAME,
+} from "../common/constants";
 import { apiRecordsAdapter } from "../apiRecords/slice";
+import { environmentsAdapter } from "../environments/slice";
 
 type SourceSelectorMap = {
   [K in ApiClientEntityType]?: {
@@ -27,9 +32,21 @@ const BUFFER_SOURCE_SELECTORS: SourceSelectorMap = {
     selectById: (state, id) => apiRecordsAdapter.getSelectors().selectById(state.records.records, id),
     sliceName: API_CLIENT_RECORDS_SLICE_NAME,
   },
+  [ApiClientEntityType.ENVIRONMENT]: {
+    selectById: (state, id) => environmentsAdapter.getSelectors().selectById(state.environments.environments, id),
+    sliceName: API_CLIENT_ENVIRONMENTS_SLICE_NAME,
+  },
+  [ApiClientEntityType.GLOBAL_ENVIRONMENT]: {
+    selectById: (state) =>
+      state.environments.globalEnvironment,
+    sliceName: API_CLIENT_ENVIRONMENTS_SLICE_NAME,
+  },    
 };
 
-const MONITORED_ROOT_SLICES: readonly string[] = [API_CLIENT_RECORDS_SLICE_NAME] as const;
+const MONITORED_ROOT_SLICES: readonly string[] = [
+  API_CLIENT_RECORDS_SLICE_NAME,
+  API_CLIENT_ENVIRONMENTS_SLICE_NAME,
+] as const;
 
 function shouldRunSyncEffect(currentState: unknown, previousState: unknown): boolean {
   const current = currentState as ApiClientRootState;

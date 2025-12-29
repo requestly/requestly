@@ -21,12 +21,12 @@ export function getApiClientFeatureContext(
   return context;
 }
 
-function useApiClientFeatureContext(workspaceId: ApiClientFeatureContext["workspaceId"]): ApiClientFeatureContext {
+function useApiClientFeatureContext(workspaceId?: ApiClientFeatureContext["workspaceId"]): ApiClientFeatureContext {
   const context = useMemo(() => getApiClientFeatureContext(workspaceId), [workspaceId]);
   return context;
 }
 
-function useApiClientRepository(workspaceId: ApiClientFeatureContext["workspaceId"]) {
+export function useApiClientRepository(workspaceId?: ApiClientFeatureContext["workspaceId"]) {
   const context = useApiClientFeatureContext(workspaceId);
   return context.repositories;
 }
