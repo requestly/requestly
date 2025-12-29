@@ -115,7 +115,7 @@ const AppFooter: React.FC = () => {
             key: FOOTER_LINKS.CONTACT_SALES,
             icon: <PiChatTextBold />,
             onClick: () => {
-              handleFooterLinkClick(APP_CONSTANTS.LINKS.BOOK_A_DEMO, FOOTER_LINKS.CONTACT_SALES);
+              openFreshChat();
             },
           },
         ],
@@ -159,6 +159,13 @@ const AppFooter: React.FC = () => {
       </Footer>
     </>
   );
+};
+
+export const openFreshChat = () => {
+  if (window.fcWidget && typeof window.fcWidget.open === "function") {
+    window.fcWidget.open();
+  }
+  trackFooterClicked(FOOTER_LINKS.CONTACT_SALES);
 };
 
 export default AppFooter;
