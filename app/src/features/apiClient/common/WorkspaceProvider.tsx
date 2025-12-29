@@ -15,7 +15,6 @@ const WorkspaceStoreContext = createContext<ReactReduxContextValue<ApiClientStor
 export const useWorkspaceViewStore = createStoreHook(WorkspaceStoreContext);
 export const useWorkspaceViewDispatch = createDispatchHook(WorkspaceStoreContext);
 
-// TODO: integrate selector with records slice
 export const useWorkspaceViewSelector: TypedUseSelectorHook<ApiClientStoreState> = createSelectorHook(
   WorkspaceStoreContext
 );
