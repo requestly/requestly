@@ -5,13 +5,14 @@ import { MatchedTabSource, TabSourceMetadata } from "componentsV2/Tabs/types";
 import { MdHorizontalSplit } from "@react-icons/all-files/md/MdHorizontalSplit";
 import { getApiClientEnvironmentsStore } from "features/apiClient/commands/store.utils";
 import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
+import { EnvironmentViewManager } from "./EnvironmentViewManager";
 
 interface EnvironmentViewTabSourceMetadata extends TabSourceMetadata {}
 
 export class EnvironmentViewTabSource extends BaseTabSource {
   constructor(metadata: EnvironmentViewTabSourceMetadata) {
     super();
-    this.component = <EnvironmentView key={metadata.id} envId={metadata.id} />;
+    this.component = <EnvironmentViewManager key={metadata.id} envId={metadata.id} isGlobal={false} />;
     this.metadata = {
       ...metadata,
       name: "environments", // FIXME: Its legacy, should be "environment"

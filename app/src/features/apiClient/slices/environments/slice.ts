@@ -103,15 +103,19 @@ export const environmentsSlice = createSlice({
   extraReducers: (builder) => {
     builder.addCase(entitySynced, (state, action) => {
       const { entityType, entityId, data } = action.payload;
-
       if (entityType === ApiClientEntityType.ENVIRONMENT) {
-        const env = state.environments.entities[entityId];
-        if (env && data) {
-          Object.assign(env, data);
+        if (data) {
+          environmentsAdapter.updateOne(state.environments, {
+            id: entityId,
+            changes: data,
+          });
         }
       } else if (entityType === ApiClientEntityType.GLOBAL_ENVIRONMENT) {
         if (data) {
-          Object.assign(state.globalEnvironment, data);
+          environmentsAdapter.updateOne(state.environments, {
+            id: "global_environment",
+            changes: data,
+          });
         }
       }
     });

@@ -106,9 +106,14 @@ export function useHasBuffer(id: string): boolean {
   return useApiClientSelector((state) => bufferAdapterSelectors.selectById(state.buffer, id) !== undefined);
 }
 
+export function useEnvironmentEntity(id: string, type: ApiClientEntityType.ENVIRONMENT | ApiClientEntityType.GLOBAL_ENVIRONMENT) {
+  return useEntity({
+    id,
+    type
+  });
+};
 
-export function useBufferedEnvironmentEntity(id: string) {
-  const isGlobal = id === GLOBAL_ENVIRONMENT_ID;
+export function useBufferedEnvironmentEntity(id: string, isGlobal: boolean) {
   return useBufferedEntity({
     id,
     type: isGlobal ? ApiClientEntityType.GLOBAL_ENVIRONMENT : ApiClientEntityType.ENVIRONMENT,
