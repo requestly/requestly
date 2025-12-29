@@ -8,18 +8,32 @@ interface Props {
   bottomSheet: ReactNode;
   children: ReactNode;
   minSize?: number;
-  initialSizes?: Array<number>;
+  initialSizes?: number[];
 }
 
-const getDefaultSizes = (isSheetPlacedAtBottom: boolean, initialSizes: Array<number>) => {
+const getDefaultSizes: (isSheetPlacedAtBottom: boolean, initialSizes: number[]) => number[] = (
+  isSheetPlacedAtBottom,
+  initialSizes
+) => {
   return isSheetPlacedAtBottom ? initialSizes : [55, 45];
 };
 
 export const SplitPaneLayout: React.FC<Props> = ({ bottomSheet, children, minSize = 26, initialSizes = [40, 60] }) => {
-  const { sheetPlacement, isBottomSheetOpen, toggleBottomSheet } = useBottomSheetContext();
+  const {
+    sheetPlacement,
+    isBottomSheetOpen,
+    toggleBottomSheet,
+    sheetSize,
+    updatePersistedSheetSize,
+  } = useBottomSheetContext();
   const isSheetPlacedAtBottom = sheetPlacement === BottomSheetPlacement.BOTTOM;
 
-  const [sizes, setSizes] = useState<number[]>(() => getDefaultSizes(isSheetPlacedAtBottom, initialSizes));
+  const [sizes, setSizes] = useState<number[]>(() => {
+    if (sheetSize) {
+      return sheetSize;
+    }
+    return getDefaultSizes(isSheetPlacedAtBottom, initialSizes);
+  });
   const splitContainerRef = useRef<HTMLDivElement>(null);
 
   const splitDirection = isSheetPlacedAtBottom ? SplitDirection.VERTICAL : SplitDirection.HORIZONTAL;
@@ -30,12 +44,19 @@ export const SplitPaneLayout: React.FC<Props> = ({ bottomSheet, children, minSiz
     if (!isBottomSheetOpen) {
       setSizes([100, 0]);
     } else {
-      setSizes(getDefaultSizes(isSheetPlacedAtBottom, initialSizes));
+      let targetSizes;
+      if (sheetSize) {
+        targetSizes = sheetSize;
+      }
+
+      if (!targetSizes) {
+        targetSizes = getDefaultSizes(isSheetPlacedAtBottom, initialSizes);
+      }
+
+      setSizes(targetSizes);
     }
-    // Adding initialSizes to dependencies will cause the bottomsheet split sizes to reset when parent re-renders.
-    // TODO: move size state to context
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isBottomSheetOpen, isSheetPlacedAtBottom]);
+  }, [isBottomSheetOpen, isSheetPlacedAtBottom, sheetSize]);
 
   const handleDrag = useCallback(
     (newSizes: number[]) => {
@@ -56,28 +77,37 @@ export const SplitPaneLayout: React.FC<Props> = ({ bottomSheet, children, minSiz
     [isSheetPlacedAtBottom, toggleBottomSheet, SNAP_OFFSET_PIXELS]
   );
 
+  const handleDragEnd = useCallback(
+    (newSizes: number[]) => {
+      updatePersistedSheetSize(newSizes);
+    },
+    [updatePersistedSheetSize]
+  );
+
   return (
     <div ref={splitContainerRef} className="bottomsheet-split-layout-container">
       <Split
         direction={splitDirection}
         sizes={sizes}
         onDrag={handleDrag}
+        onDragEnd={handleDragEnd}
         snapOffset={[0, SNAP_OFFSET_PIXELS]}
         minSize={[isSheetPlacedAtBottom ? 150 : 500, minSize]}
         className={`bottomsheet-layout-container ${
           splitDirection === SplitDirection.HORIZONTAL ? "horizontal-split" : "vertical-split"
         }`}
-        gutter={(index, direction) => {
+        gutter={() => {
           const gutterContainer = document.createElement("div");
           gutterContainer.style.position = "relative";
-          gutterContainer.className = ` bottomsheet-layout-gutter gutter-container gutter-container-${direction}`;
-          gutterContainer.innerHTML = `<div class="gutter gutter-${direction}" />`;
+          gutterContainer.className = ` bottomsheet-layout-gutter gutter-container`;
+          gutterContainer.innerHTML = `<div class="gutter" />`;
           return gutterContainer;
         }}
         gutterStyle={() => {
           return {
             height: splitDirection === SplitDirection.HORIZONTAL ? "100%" : "0px",
             width: splitDirection === SplitDirection.HORIZONTAL ? "0px" : "100%",
+            cursor: splitDirection === SplitDirection.HORIZONTAL ? "col-resize" : "row-resize",
           };
         }}
         gutterAlign="center"

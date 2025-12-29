@@ -1,11 +1,14 @@
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import type { TableProps } from "antd";
 import { ContentListTable } from "componentsV2/ContentList";
 import { PathVariableTableEditableRow, PathVariableTableEditableCell } from "./PathVariableTableRow";
-import { RQAPI } from "features/apiClient/types";
+import { KeyValueDataType, RQAPI } from "features/apiClient/types";
 import { usePathVariablesStore } from "features/apiClient/hooks/usePathVariables.store";
 import { useScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
 import "./pathVariableTable.scss";
+import { doesValueMatchDataType } from "features/apiClient/screens/apiClient/utils";
+import { KeyValueTableSettingsDropdown } from "../../../components/request/components/KeyValueTable/KeyValueTableSettingsDropdown";
+import { capitalize } from "lodash";
 
 interface PathVariableTableProps {
   recordId: string;
@@ -17,6 +20,7 @@ type ColumnTypes = Exclude<TableProps<RQAPI.PathVariable>["columns"], undefined>
 export const PathVariableTable: React.FC<PathVariableTableProps> = ({ recordId, onChange }) => {
   const [variables, setPathVariables] = usePathVariablesStore((state) => [state.pathVariables, state.setPathVariables]);
   const scopedVariables = useScopedVariables(recordId);
+  const [showDescription, setShowDescription] = useState(false);
 
   const handleUpdateVariable = useCallback(
     (variable: RQAPI.PathVariable) => {
@@ -30,9 +34,9 @@ export const PathVariableTable: React.FC<PathVariableTableProps> = ({ recordId, 
   const columns = useMemo(() => {
     return [
       {
-        title: "key",
+        title: "Key",
         dataIndex: "key",
-        width: "25%",
+        minWidth: "30%",
         editable: false,
         onCell: (record: RQAPI.PathVariable) => ({
           record,
@@ -44,9 +48,9 @@ export const PathVariableTable: React.FC<PathVariableTableProps> = ({ recordId, 
         }),
       },
       {
-        title: "value",
+        title: "Value",
         dataIndex: "value",
-        width: "35%",
+        minWidth: "30%",
         editable: true,
         onCell: (record: RQAPI.PathVariable) => ({
           record,
@@ -55,10 +59,50 @@ export const PathVariableTable: React.FC<PathVariableTableProps> = ({ recordId, 
           title: "value",
           environmentVariables: scopedVariables,
           handleUpdateVariable,
+          error: doesValueMatchDataType(record.value, record.dataType ?? KeyValueDataType.STRING)
+            ? null
+            : `Value must be ${capitalize(record.dataType ?? KeyValueDataType.STRING)}`,
         }),
       },
       {
-        title: "description",
+        title: (
+          <div className="path-variable-table-settings">
+            <span>Type</span>
+            {!showDescription && (
+              <KeyValueTableSettingsDropdown
+                showDescription={showDescription}
+                onToggleDescription={(show: any) => {
+                  setShowDescription(show);
+                }}
+              />
+            )}
+          </div>
+        ),
+        dataIndex: "dataType",
+        width: 110,
+        className: "path-variable-type-column",
+        editable: true,
+        onCell: (record: RQAPI.PathVariable) => ({
+          record,
+          editable: true,
+          dataIndex: "dataType",
+          title: "type",
+          environmentVariables: scopedVariables,
+          handleUpdateVariable,
+        }),
+      },
+      showDescription && {
+        title: (
+          <div className="path-variable-table-settings">
+            <span>Description</span>
+            <KeyValueTableSettingsDropdown
+              showDescription={showDescription}
+              onToggleDescription={(show: any) => {
+                setShowDescription(show);
+              }}
+            />
+          </div>
+        ),
         dataIndex: "description",
         width: "40%",
         editable: true,
@@ -71,8 +115,8 @@ export const PathVariableTable: React.FC<PathVariableTableProps> = ({ recordId, 
           handleUpdateVariable,
         }),
       },
-    ];
-  }, [handleUpdateVariable, scopedVariables]);
+    ].filter(Boolean);
+  }, [handleUpdateVariable, scopedVariables, showDescription]);
 
   if (variables.length === 0) {
     return null;
@@ -85,7 +129,7 @@ export const PathVariableTable: React.FC<PathVariableTableProps> = ({ recordId, 
         id="api-path-variable-table"
         className="api-path-variable-table"
         bordered
-        showHeader={false}
+        showHeader={true}
         rowKey="id"
         columns={columns as ColumnTypes}
         data={variables}
