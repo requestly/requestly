@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { EntityId } from "../types";
+import type { EntityId } from "../types";
 import {
   selectAllEnvironments,
   selectEnvironmentById,
@@ -14,9 +14,8 @@ import {
   makeSelectEnvironmentVariables,
 } from "./selectors";
 import { useApiClientSelector } from "../hooks/base.hooks";
-import { EnvironmentEntity } from "./types";
-import { EnvironmentVariables } from "backend/environment/types";
-import { useEntitySelector } from "../entities";
+import type { EnvironmentEntity } from "./types";
+import type { EnvironmentVariables } from "backend/environment/types";
 import { useEntity } from "../entities/hooks";
 import { ApiClientEntityType } from "../entities/types";
 
@@ -70,5 +69,5 @@ export function useGlobalEnvironmentEntity() {
   return useEntity({
     id: "global_environment",
     type: ApiClientEntityType.GLOBAL_ENVIRONMENT,
-  })
+  });
 }

@@ -8,5 +8,5 @@ export {
 } from "./slice";
 export * from "./selectors";
 export * from "./environments.hooks";
+export * from "./thunks";
 export type { EnvironmentsState, EnvironmentEntity } from "./types";
-

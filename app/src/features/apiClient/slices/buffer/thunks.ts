@@ -56,6 +56,16 @@ const entityHandlers: Record<ApiClientEntityType, EntityHandler> = {
   [ApiClientEntityType.HTTP_RECORD]: createRecordHandler(ApiClientEntityType.HTTP_RECORD),
   [ApiClientEntityType.COLLECTION_RECORD]: createRecordHandler(ApiClientEntityType.COLLECTION_RECORD),
   [ApiClientEntityType.GRAPHQL_RECORD]: createRecordHandler(ApiClientEntityType.GRAPHQL_RECORD),
+  [ApiClientEntityType.ENVIRONMENT]: {
+    save: async () => {
+      throw new Error("Environment buffer save should use updateEnvironmentVariables thunk");
+    },
+  },
+  [ApiClientEntityType.GLOBAL_ENVIRONMENT]: {
+    save: async () => {
+      throw new Error("Global environment buffer save should use updateEnvironmentVariables thunk");
+    },
+  },
 };
 
 export const saveBuffer = createAsyncThunk<
