@@ -10,23 +10,30 @@ import { ApiClientExportModal } from "features/apiClient/screens/apiClient/compo
 import { PostmanEnvironmentExportModal } from "features/apiClient/screens/apiClient/components/modals/postmanEnvironmentExportModal/PostmanEnvironmentExportModal";
 import { EnvironmentData } from "backend/environment/types";
 import { useRBAC } from "features/rbac";
-import { useAPIEnvironment } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
-import {
-  parseEnvironmentsStore,
-  parseEnvironmentState,
-  parseEnvironmentStore,
-} from "features/apiClient/commands/environments/utils";
+import { useGlobalEnvironment, useAllEnvironments } from "features/apiClient/slices/environments/environments.hooks";
 import "./environmentsList.scss";
 import { ApiClientSidebarTabKey } from "features/apiClient/screens/apiClient/components/sidebar/SingleWorkspaceSidebar/SingleWorkspaceSidebar";
 import { EmptyEnvironmentsCreateCard } from "features/apiClient/screens/apiClient/components/sidebar/components/EmptyEnvironmentsCreateCard/EmptyEnvironmentsCreateCard";
 import { Conditional } from "components/common/Conditional";
 
 export const EnvironmentsList = () => {
-  const [globalEnvironment, nonGlobalEnvironments, getEnvironment] = useAPIEnvironment((s) => [
-    s.globalEnvironment,
-    s.environments,
-    s.getEnvironment,
-  ]);
+  // Get environments from Redux
+  const globalEnvironment = useGlobalEnvironment();
+
+  // TODO: create a selector for this
+  const allEnvironments = useAllEnvironments();
+  const nonGlobalEnvironments = allEnvironments.filter((env) => env.id !== globalEnvironment.id);
+
+  // Helper function to get environment by id (for compatibility with existing code)
+  const getEnvironment = useCallback(
+    (id: string) => {
+      if (id === globalEnvironment.id) {
+        return globalEnvironment;
+      }
+      return allEnvironments.find((env) => env.id === id);
+    },
+    [globalEnvironment, allEnvironments]
+  );
 
   const [searchValue, setSearchValue] = useState("");
   const [environmentsToExport, setEnvironmentsToExport] = useState<EnvironmentData[]>([]);
@@ -37,8 +44,18 @@ export const EnvironmentsList = () => {
   const { isValidPermission } = validatePermission("api_client_environment", "update");
 
   const filteredEnvironments = useMemo(() => {
-    const globalEnv = parseEnvironmentStore(globalEnvironment);
-    const parsedEnvs = parseEnvironmentsStore(nonGlobalEnvironments);
+    // Convert EnvironmentEntity to EnvironmentData format
+    const globalEnv: EnvironmentData = {
+      id: globalEnvironment.id,
+      name: globalEnvironment.name,
+      variables: globalEnvironment.variables,
+    };
+
+    const parsedEnvs: EnvironmentData[] = nonGlobalEnvironments.map((env) => ({
+      id: env.id,
+      name: env.name,
+      variables: env.variables,
+    }));
 
     return [
       globalEnv,
@@ -52,12 +69,17 @@ export const EnvironmentsList = () => {
 
   const handleExportEnvironments = useCallback(
     (environment: { id: string; name: string }, exportType: ExportType) => {
-      const environmentState = getEnvironment(environment.id);
-      if (!environmentState) {
+      const environmentEntity = getEnvironment(environment.id);
+      if (!environmentEntity) {
         throw new Error("Environment not found!");
       }
-      const variables = parseEnvironmentState(environmentState).variables;
-      setEnvironmentsToExport([{ ...environment, variables }]);
+      // Convert EnvironmentEntity to EnvironmentData format
+      const environmentData: EnvironmentData = {
+        id: environmentEntity.id,
+        name: environmentEntity.name,
+        variables: environmentEntity.variables,
+      };
+      setEnvironmentsToExport([environmentData]);
 
       switch (exportType) {
         case ExportType.REQUESTLY:
