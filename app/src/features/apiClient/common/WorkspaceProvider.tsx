@@ -1,4 +1,4 @@
-import React, { createContext } from "react";
+import React, { createContext, useContext } from "react";
 import {
   createDispatchHook,
   createSelectorHook,
@@ -8,23 +8,36 @@ import {
   TypedUseSelectorHook,
 } from "react-redux";
 import { ApiClientStoreState, useApiClientStore } from "../slices";
+import { Workspace } from "features/workspaces/types";
+import { NativeError } from "errors/NativeError";
 
 const WorkspaceStoreContext = createContext<ReactReduxContextValue<ApiClientStoreState> | null>(null);
 
 export const useWorkspaceViewStore = createStoreHook(WorkspaceStoreContext);
 export const useWorkspaceViewDispatch = createDispatchHook(WorkspaceStoreContext);
 
-// TODO: integrate selector with records slice
 export const useWorkspaceViewSelector: TypedUseSelectorHook<ApiClientStoreState> = createSelectorHook(
   WorkspaceStoreContext
 );
+
+const WorkspaceIdContext = createContext<Workspace["id"] | undefined>(undefined);
+
+export function useWorkspaceId() {
+  const ctx = useContext(WorkspaceIdContext);
+
+  if (ctx === undefined) {
+    throw new NativeError("Context not found, use `useWorkspaceIdContext` inside a `WorkspaceIdContext.Provider`");
+  }
+
+  return ctx;
+}
 
 export function WorkspaceProvider(props: { workspaceId: string; children: React.ReactNode }) {
   const store = useApiClientStore(props.workspaceId);
 
   return (
     <Provider context={WorkspaceStoreContext} store={store}>
-      {props.children}
+      <WorkspaceIdContext.Provider value={props.workspaceId}>{props.children}</WorkspaceIdContext.Provider>
     </Provider>
   );
 }
