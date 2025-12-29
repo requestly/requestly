@@ -43,11 +43,11 @@ export class BufferedGlobalEnvironmentEntity extends GlobalEnvironmentEntity {
   );
 
   override getEntityFromState(state: ApiClientRootState): EnvironmentRecord {
-    const entry = bufferAdapterSelectors.selectById(state.buffer, this.meta.id);
-    if (!entry) {
+    const globalEnvironment = state.environments.globalEnvironment;
+    if (!globalEnvironment) {
       throw new EntityNotFound(this.id, this.type);
     }
-    return entry.current as EnvironmentRecord;
+    return globalEnvironment;
   }
 
 

@@ -37,10 +37,10 @@ const BUFFER_SOURCE_SELECTORS: SourceSelectorMap = {
     sliceName: API_CLIENT_ENVIRONMENTS_SLICE_NAME,
   },
   [ApiClientEntityType.GLOBAL_ENVIRONMENT]: {
-    selectById: (state, id) =>
-      state.environments.globalEnvironment.id === id ? state.environments.globalEnvironment : undefined,
+    selectById: (state) =>
+      state.environments.globalEnvironment,
     sliceName: API_CLIENT_ENVIRONMENTS_SLICE_NAME,
-  },
+  },    
 };
 
 const MONITORED_ROOT_SLICES: readonly string[] = [
