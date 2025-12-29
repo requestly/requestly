@@ -1,6 +1,6 @@
 import { createSlice, createEntityAdapter, PayloadAction } from "@reduxjs/toolkit";
 import { mapValues, pickBy } from "lodash";
-import { API_CLIENT_ENVIRONMENTS_SLICE_NAME } from "../common/constants";
+import { API_CLIENT_ENVIRONMENTS_SLICE_NAME, GLOBAL_ENVIRONMENT_ID } from "../common/constants";
 import { EnvironmentEntity, EnvironmentsState } from "./types";
 import { PersistConfig } from "redux-deep-persist/lib/types";
 import persistReducer from "redux-persist/es/persistReducer";
@@ -113,7 +113,7 @@ export const environmentsSlice = createSlice({
       } else if (entityType === ApiClientEntityType.GLOBAL_ENVIRONMENT) {
         if (data) {
           environmentsAdapter.updateOne(state.environments, {
-            id: "global_environment",
+            id: GLOBAL_ENVIRONMENT_ID,
             changes: data,
           });
         }
