@@ -98,8 +98,8 @@ export const bufferSlice = createSlice({
       if (command.type === "DELETE") {
         const paths = objectToDeletePaths(command.value);
         for (const path of paths) {
-          unset(entry.current as object, path);
-          unset(entry.diff as object, path);
+          unset(entry.current, path);
+          unset(entry.diff, path);
         }
       }
 
@@ -136,10 +136,10 @@ export const bufferSlice = createSlice({
         switch (patch.op) {
           case "add":
           case "replace":
-            set(entry.diff as object, path, patch.value);
+            set(entry.diff, path, patch.value);
             break;
           case "remove":
-            unset(entry.diff as object, path);
+            unset(entry.diff, path);
             break;
         }
       }
