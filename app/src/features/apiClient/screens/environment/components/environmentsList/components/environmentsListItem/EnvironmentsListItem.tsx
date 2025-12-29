@@ -18,9 +18,7 @@ import { EnvironmentViewTabSource } from "../../../environmentView/EnvironmentVi
 import { IoChevronForward } from "@react-icons/all-files/io5/IoChevronForward";
 import RequestlyIcon from "assets/img/brand/rq_logo.svg";
 import PostmanIcon from "assets/img/brand/postman-icon.svg";
-import { useCommand } from "features/apiClient/commands";
-import { useEnvironment } from "features/apiClient/hooks/useEnvironment.hook";
-import { useActiveEnvironment } from "features/apiClient/hooks/useActiveEnvironment.hook";
+import { useEnvironmentById, useActiveEnvironment } from "features/apiClient/slices/environments/environments.hooks";
 import { useContextId } from "features/apiClient/contexts/contextId.context";
 
 export enum ExportType {
@@ -43,22 +41,30 @@ export enum EnvironmentMenuKey {
   DELETE = "delete",
 }
 
+async function renameEnvironment(_params: { environmentId: string; newName: string }) {
+  toast.warn("Rename environment not yet available during migration");
+}
+
+async function duplicateEnvironment(_params: { environmentId: string }) {
+  toast.warn("Duplicate environment not yet available during migration");
+}
+
+async function deleteEnvironment(_params: { environmentId: string }) {
+  toast.warn("Delete environment not yet available during migration");
+}
+
 export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
   isReadOnly,
   environmentId,
   onExportClick,
 }) => {
-  const {
-    env: { renameEnvironment, duplicateEnvironment, deleteEnvironment },
-  } = useCommand();
-
   const contextId = useContextId();
+
+  const environment = useEnvironmentById(environmentId);
   const activeEnvironment = useActiveEnvironment();
-  const environment = useEnvironment(environmentId, (s) => s);
 
   const [isRenameInputVisible, setIsRenameInputVisible] = useState(false);
-  // TODO: can be cleaned up
-  const [newEnvironmentName, setNewEnvironmentName] = useState(environment.name);
+  const [newEnvironmentName, setNewEnvironmentName] = useState(environment?.name || "");
   const [isRenaming, setIsRenaming] = useState(false);
   const [openTab, closeTabBySource, activeTabSource] = useTabServiceWithSelector((state) => [
     state.openTab,
@@ -73,6 +79,7 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
   }, [activeTabSource]);
 
   const handleEnvironmentRename = useCallback(async () => {
+    if (!environment) return;
     try {
       if (newEnvironmentName === environment.name) {
         setIsRenameInputVisible(false);
@@ -99,9 +106,10 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
       setIsRenaming(false);
       setIsRenameInputVisible(false);
     }
-  }, [newEnvironmentName, environment.id, environment.name, renameEnvironment, openTab]);
+  }, [newEnvironmentName, environment, renameEnvironment, openTab, contextId]);
 
   const handleEnvironmentDuplicate = useCallback(async () => {
+    if (!environment) return;
     try {
       toast.loading("Duplicating environment...");
       await duplicateEnvironment({ environmentId: environment.id });
@@ -111,9 +119,10 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
     } catch (error) {
       toast.error("Failed to duplicate environment");
     }
-  }, [environment.id, duplicateEnvironment]);
+  }, [environment, duplicateEnvironment]);
 
   const handleEnvironmentDelete = useCallback(async () => {
+    if (!environment) return;
     try {
       toast.loading("Deleting environment...");
       await deleteEnvironment({ environmentId: environment.id });
@@ -125,9 +134,10 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
     } catch (error) {
       toast.error("Failed to delete environment");
     }
-  }, [environment.id, deleteEnvironment, closeTabBySource]);
+  }, [environment, deleteEnvironment, closeTabBySource]);
 
   const menuItems = useMemo(() => {
+    if (!environment) return [];
     return [
       {
         key: EnvironmentMenuKey.RENAME,
@@ -157,6 +167,10 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
       { key: EnvironmentMenuKey.DELETE, label: "Delete", danger: true, onClick: () => handleEnvironmentDelete() },
     ];
   }, [handleEnvironmentDuplicate, onExportClick, environment, handleEnvironmentDelete]);
+
+  if (!environment) {
+    return null;
+  }
 
   if (isRenameInputVisible) {
     return (
