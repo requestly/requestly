@@ -27,7 +27,7 @@ export const TestRuleButton: React.FC = () => {
         icon={<MdOutlineScience />}
         onClick={() => {
           if (sheetPlacement === BottomSheetPlacement.BOTTOM) {
-            toggleBottomSheet({ isOpen: false, isTrack: true, action: "test_rule_btn_bottom_sheet" });
+            toggleBottomSheet({ isOpen: false, action: "test_rule_btn_bottom_sheet" });
           }
         }}
       >
