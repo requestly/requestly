@@ -54,6 +54,7 @@ const globalReducersWithLocal = getReducerWithLocalStorageSync("root", reducer, 
   "misc.persist",
   "rules.currentlySelectedRule.showDetailsPanel",
   "rules.isSampleRulesImported",
+  "bottomSheetOrientation",
 ]);
 
 export const globalActions = actions;

@@ -115,7 +115,7 @@ const GraphQLClientView: React.FC<Props> = ({
 
   const { apiClientRecordsRepository } = useApiClientRepository();
   const { onSaveRecord } = useNewApiClientContext();
-  const { sheetPlacement, toggleSheetPlacement } = useBottomSheetContext();
+  const { sheetPlacement } = useBottomSheetContext();
 
   const location = useLocation();
   const dispatch = useDispatch();
@@ -495,18 +495,6 @@ const GraphQLClientView: React.FC<Props> = ({
   useEffect(() => {
     setUnsaved(hasUnsavedChanges);
   }, [hasUnsavedChanges, setUnsaved]);
-
-  const isDefaultPlacementRef = useRef(false);
-
-  useLayoutEffect(() => {
-    if (isDefaultPlacementRef.current) {
-      return;
-    }
-
-    isDefaultPlacementRef.current = true;
-    const bottomSheetPlacement = window.innerWidth <= 1280 ? BottomSheetPlacement.BOTTOM : BottomSheetPlacement.RIGHT;
-    toggleSheetPlacement(bottomSheetPlacement);
-  }, [toggleSheetPlacement]);
 
   return (
     <div className="api-client-view gql-client-view">
