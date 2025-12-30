@@ -1,5 +1,6 @@
 import type React from "react";
 import { useCallback, useMemo, useState } from "react";
+import { useDispatch } from "react-redux";
 import { RuntimeVariablesList } from "../RuntimeVariablesList/runtimevariableslist";
 import { RuntimeVariablesHeader } from "../RuntimeVariablesHeader";
 import { useApiClientDispatch, useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
@@ -13,7 +14,8 @@ import { DeleteAllRuntimeVariablesModal } from "features/apiClient/screens/apiCl
 import { RUNTIME_VARIABLES_ENTITY_ID } from "features/apiClient/slices/common/constants";
 
 export const RuntimeVariablesView: React.FC = () => {
-  const dispatch = useApiClientDispatch();
+  const globalDispatch = useDispatch();
+  const apiClientDispatch = useApiClientDispatch();
   const entity = useBufferedRuntimeVariablesEntity();
   const state = useApiClientSelector((s) => s);
 
@@ -32,8 +34,7 @@ export const RuntimeVariablesView: React.FC = () => {
       setIsSaving(true);
       const dataToSave = variables.getAll(state);
 
-      // Sync to the main runtime variables slice
-      dispatch(
+      globalDispatch(
         runtimeVariablesActions.unsafePatch({
           patcher: (entity) => {
             entity.variables = dataToSave;
@@ -41,15 +42,13 @@ export const RuntimeVariablesView: React.FC = () => {
         })
       );
 
-      // Mark buffer as saved
-      dispatch(
+      apiClientDispatch(
         bufferActions.markSaved({
           id: entity.meta.id,
           referenceId: RUNTIME_VARIABLES_ENTITY_ID,
           savedData: { variables: dataToSave },
         })
       );
-
       toast.success("Variables updated successfully");
     } catch (error) {
       console.error("Failed to update variables", error);
@@ -57,7 +56,7 @@ export const RuntimeVariablesView: React.FC = () => {
     } finally {
       setIsSaving(false);
     }
-  }, [variables, state, dispatch, entity.meta.id]);
+  }, [variables, state, globalDispatch, apiClientDispatch, entity.meta.id]);
 
   const handleDeleteAll = useCallback(() => {
     try {
