@@ -20,6 +20,7 @@ import { ClientViewFactory } from "features/apiClient/screens/apiClient/clientVi
 import { ContextId } from "features/apiClient/contexts/contextId.context";
 import { NoopContextId } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 import { BottomSheetFeatureContext } from "componentsV2/BottomSheet/types";
+import { AISessionProvider } from "features/ai/contexts/AISession";
 
 interface Props {
   request: string | APIClientRequest; // string for cURL request
@@ -139,13 +140,15 @@ export const APIClientModal: React.FC<Props> = ({ request, isModalOpen, onModalC
         <BottomSheetProvider context={BottomSheetFeatureContext.API_CLIENT}>
           <ContextId id={NoopContextId}>
             <AutogenerateProvider>
-              <ClientViewFactory
-                isOpenInModal
-                apiRecord={apiRecord}
-                handleRequestFinished={() => {}}
-                onSaveCallback={() => {}}
-                isCreateMode={true}
-              />
+              <AISessionProvider>
+                <ClientViewFactory
+                  isOpenInModal
+                  apiRecord={apiRecord}
+                  handleRequestFinished={() => {}}
+                  onSaveCallback={() => {}}
+                  isCreateMode={true}
+                />
+              </AISessionProvider>
             </AutogenerateProvider>
           </ContextId>
         </BottomSheetProvider>

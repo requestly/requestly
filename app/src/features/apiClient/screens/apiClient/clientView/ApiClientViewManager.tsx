@@ -6,8 +6,9 @@ import { useApiRecord } from "features/apiClient/hooks/useApiRecord.hook";
 import { Result } from "antd";
 import { AutogenerateProvider } from "features/apiClient/store/autogenerateContextProvider";
 import { ClientViewFactory } from "./ClientViewFactory";
-import "../apiClient.scss";
 import { BottomSheetFeatureContext } from "componentsV2/BottomSheet/types";
+import { AISessionProvider } from "features/ai/contexts/AISession";
+import "../apiClient.scss";
 
 type BaseProps = {
   onSaveCallback?: (apiEntryDetails: RQAPI.ApiRecord) => void;
@@ -54,12 +55,14 @@ export const ApiClientViewManager: React.FC<Props> = React.memo((props) => {
     <BottomSheetProvider context={BottomSheetFeatureContext.API_CLIENT}>
       <div className="api-client-container-content">
         <AutogenerateProvider>
-          <ClientViewFactory
-            apiRecord={selectedEntryDetails}
-            handleRequestFinished={handleAppRequestFinished}
-            onSaveCallback={onSaveCallback}
-            isCreateMode={isCreateMode}
-          />
+          <AISessionProvider>
+            <ClientViewFactory
+              apiRecord={selectedEntryDetails}
+              handleRequestFinished={handleAppRequestFinished}
+              onSaveCallback={onSaveCallback}
+              isCreateMode={isCreateMode}
+            />
+          </AISessionProvider>
         </AutogenerateProvider>
       </div>
     </BottomSheetProvider>

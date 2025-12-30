@@ -42,8 +42,8 @@ export function setupPreviewTabUnsetListener(): () => void {
     }
 
     if (previewTab.modeConfig.mode === "buffer") {
-      const { entityId, entityType } = previewTab.modeConfig;
-      if (entityId === payload.entityId && entityType === payload.entityType) {
+      const { entityId } = previewTab.modeConfig;
+      if (entityId === payload.entityId) {
         reduxStore.dispatch(tabsActions.setPreviewTab(undefined));
       }
     }
