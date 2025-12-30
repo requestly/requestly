@@ -4,7 +4,7 @@ import { tabsAdapter } from "./slice";
 
 const selectTabsSlice = (state: RootState) => state.tabs;
 
-const tabsSelectors = tabsAdapter.getSelectors<RootState>((state) => state.tabs.tabs);
+export const tabsSelectors = tabsAdapter.getSelectors<RootState>((state) => state.tabs.tabs);
 
 export const selectAllTabs = tabsSelectors.selectAll;
 export const selectTabById = tabsSelectors.selectById;
