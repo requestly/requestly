@@ -128,6 +128,15 @@ const AppFooter: React.FC = () => {
     trackFooterClicked(key);
   };
 
+  const openFreshChat = () => {
+    if (window.fcWidget && typeof window.fcWidget.open === "function") {
+      window.fcWidget.open();
+    } else {
+      redirectToUrl(APP_CONSTANTS.LINKS.BOOK_A_DEMO, true);
+    }
+    trackFooterClicked(FOOTER_LINKS.CONTACT_SALES);
+  };
+
   if (PAGES_WITHOUT_FOOTER.some((path) => pathname.includes(path))) return null;
 
   return (
@@ -159,15 +168,6 @@ const AppFooter: React.FC = () => {
       </Footer>
     </>
   );
-};
-
-export const openFreshChat = () => {
-  if (window.fcWidget && typeof window.fcWidget.open === "function") {
-    window.fcWidget.open();
-  } else {
-    redirectToUrl(APP_CONSTANTS.LINKS.BOOK_A_DEMO, true);
-  }
-  trackFooterClicked(FOOTER_LINKS.CONTACT_SALES);
 };
 
 export default AppFooter;
