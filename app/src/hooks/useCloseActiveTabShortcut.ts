@@ -1,7 +1,7 @@
 import { useHotkeys } from "react-hotkeys-hook";
-import { useTabServiceWithSelector } from "../componentsV2/Tabs/store/tabServiceStore";
 import { isDesktopMode } from "../utils/AppUtils";
 import { KEYBOARD_SHORTCUTS, Feature } from "../constants/keyboardShortcuts";
+import { useActiveTabId, useTabActions } from "componentsV2/Tabs/slice";
 
 /**
  * Custom hook that provides keyboard shortcuts to close the active tab.
@@ -10,9 +10,8 @@ import { KEYBOARD_SHORTCUTS, Feature } from "../constants/keyboardShortcuts";
  * - Extension: ⌘ ⌥ W (Mac) / Ctrl Alt W (Windows)
  */
 export const useCloseActiveTabShortcut = () => {
-  const { closeActiveTab } = useTabServiceWithSelector((state) => ({
-    closeActiveTab: state.closeActiveTab,
-  }));
+  const activeTabId = useActiveTabId();
+  const { closeTab } = useTabActions();
 
   // Determine the appropriate shortcut based on app mode
   const shortcutKey = isDesktopMode()
@@ -22,12 +21,17 @@ export const useCloseActiveTabShortcut = () => {
   useHotkeys(
     shortcutKey,
     () => {
-      closeActiveTab();
+      if (!activeTabId) {
+        return;
+      }
+
+      closeTab({ tabId: activeTabId });
     },
     {
       enableOnFormTags: false,
       preventDefault: true,
       description: "Close active tab",
-    }
+    },
+    [activeTabId, closeTab]
   );
 };

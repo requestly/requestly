@@ -95,21 +95,18 @@ export const tabsSlice = createSlice({
 
     updateTab(
       state,
-      action: PayloadAction<{
-        tabId: TabId;
-        source: TabSource;
-        modeConfig?: TabState["modeConfig"];
-      }>
+      action: PayloadAction<
+        {
+          tabId: TabId;
+        } & Partial<{ source: TabSource; modeConfig: TabState["modeConfig"] }>
+      >
     ) {
-      const { tabId, source, modeConfig } = action.payload;
+      const { tabId, ...changes } = action.payload;
       const tab = tabsAdapter.getSelectors().selectById(state.tabs, tabId);
       if (tab) {
         tabsAdapter.updateOne(state.tabs, {
           id: tabId,
-          changes: {
-            source,
-            ...(modeConfig ?? {}),
-          },
+          changes,
         });
       }
     },
@@ -128,7 +125,7 @@ export const tabsSlice = createSlice({
         preview?: boolean;
       }>
     ) {
-      const { source, modeConfig, preview } = action.payload;
+      const { source, modeConfig, preview = true } = action.payload;
       const sourceId = source.getSourceId();
       const sourceName = source.getSourceName();
 
@@ -139,9 +136,6 @@ export const tabsSlice = createSlice({
 
       if (existingTab) {
         state.activeTabId = existingTab.id;
-        if (preview) {
-          state.previewTabId = existingTab.id;
-        }
         return;
       }
 
@@ -153,12 +147,27 @@ export const tabsSlice = createSlice({
         activeWorkflows: new Set(),
       };
 
+      if (preview) {
+        if (!state.previewTabId) {
+          tabsAdapter.addOne(state.tabs, newTab);
+          state.activeTabId = tabId;
+          state.previewTabId = tabId;
+          return;
+        }
+
+        tabsSlice.reducer(
+          state,
+          tabsSlice.actions.updateTab({
+            tabId: state.previewTabId,
+            source: newTab.source,
+            modeConfig: newTab.modeConfig,
+          })
+        );
+        return;
+      }
+
       tabsAdapter.addOne(state.tabs, newTab);
       state.activeTabId = tabId;
-
-      if (preview) {
-        state.previewTabId = tabId;
-      }
     },
   },
 });

@@ -42,6 +42,23 @@ export const closeTab = createAsyncThunk<
   return { tab };
 });
 
+export const closeTabByEntityId = createAsyncThunk<
+  { tab: TabState } | void,
+  { entityId: string; skipUnsavedPrompt?: boolean },
+  { state: RootState }
+>(`${SLICE_NAME}/closeTabByEntityId`, async ({ entityId, skipUnsavedPrompt }, { dispatch, getState }) => {
+  const state = getState();
+  const allTabs = tabsAdapter.getSelectors().selectAll(state.tabs.tabs);
+
+  const tab = allTabs.find((t) => t.source.getSourceId() === entityId);
+
+  if (!tab) {
+    return;
+  }
+
+  return dispatch(closeTab({ tabId: tab.id })).unwrap();
+});
+
 export const closeAllTabs = createAsyncThunk<
   { tabs: TabState[] } | void,
   { skipUnsavedPrompt?: boolean },

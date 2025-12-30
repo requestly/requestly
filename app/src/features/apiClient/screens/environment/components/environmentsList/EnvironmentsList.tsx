@@ -10,23 +10,25 @@ import { ApiClientExportModal } from "features/apiClient/screens/apiClient/compo
 import { PostmanEnvironmentExportModal } from "features/apiClient/screens/apiClient/components/modals/postmanEnvironmentExportModal/PostmanEnvironmentExportModal";
 import { EnvironmentData } from "backend/environment/types";
 import { useRBAC } from "features/rbac";
-import { useAPIEnvironment } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
-import {
-  parseEnvironmentsStore,
-  parseEnvironmentState,
-  parseEnvironmentStore,
-} from "features/apiClient/commands/environments/utils";
+import { useGlobalEnvironment, useAllEnvironments } from "features/apiClient/slices/environments/environments.hooks";
 import "./environmentsList.scss";
 import { ApiClientSidebarTabKey } from "features/apiClient/screens/apiClient/components/sidebar/SingleWorkspaceSidebar/SingleWorkspaceSidebar";
 import { EmptyEnvironmentsCreateCard } from "features/apiClient/screens/apiClient/components/sidebar/components/EmptyEnvironmentsCreateCard/EmptyEnvironmentsCreateCard";
 import { Conditional } from "components/common/Conditional";
+import { EnvironmentEntity } from "features/apiClient/slices/environments/types";
+
+function parseEnvironmentEntityToData(env: EnvironmentEntity): EnvironmentData {
+  return {
+    id: env.id,
+    name: env.name,
+    variables: env.variables,
+  };
+}
 
 export const EnvironmentsList = () => {
-  const [globalEnvironment, nonGlobalEnvironments, getEnvironment] = useAPIEnvironment((s) => [
-    s.globalEnvironment,
-    s.environments,
-    s.getEnvironment,
-  ]);
+  const globalEnvironment = useGlobalEnvironment();
+  const allEnvironments = useAllEnvironments();
+  const nonGlobalEnvironments = allEnvironments.filter((env) => env.id !== globalEnvironment.id);
 
   const [searchValue, setSearchValue] = useState("");
   const [environmentsToExport, setEnvironmentsToExport] = useState<EnvironmentData[]>([]);
@@ -36,9 +38,20 @@ export const EnvironmentsList = () => {
   const { validatePermission } = useRBAC();
   const { isValidPermission } = validatePermission("api_client_environment", "update");
 
+  const getEnvironment = useCallback(
+    (id: string) => {
+      if (id === globalEnvironment.id) {
+        return globalEnvironment;
+      }
+
+      return allEnvironments.find((env) => env.id === id);
+    },
+    [globalEnvironment, allEnvironments]
+  );
+
   const filteredEnvironments = useMemo(() => {
-    const globalEnv = parseEnvironmentStore(globalEnvironment);
-    const parsedEnvs = parseEnvironmentsStore(nonGlobalEnvironments);
+    const globalEnv = parseEnvironmentEntityToData(globalEnvironment);
+    const parsedEnvs = nonGlobalEnvironments.map(parseEnvironmentEntityToData);
 
     return [
       globalEnv,
@@ -52,12 +65,11 @@ export const EnvironmentsList = () => {
 
   const handleExportEnvironments = useCallback(
     (environment: { id: string; name: string }, exportType: ExportType) => {
-      const environmentState = getEnvironment(environment.id);
-      if (!environmentState) {
+      const environmentEntity = getEnvironment(environment.id);
+      if (!environmentEntity) {
         throw new Error("Environment not found!");
       }
-      const variables = parseEnvironmentState(environmentState).variables;
-      setEnvironmentsToExport([{ ...environment, variables }]);
+      setEnvironmentsToExport([parseEnvironmentEntityToData(environmentEntity)]);
 
       switch (exportType) {
         case ExportType.REQUESTLY:
@@ -93,8 +105,8 @@ export const EnvironmentsList = () => {
             <ListEmptySearchView message="No environments found. Try searching with a different name" />
           ) : (
             <>
-              {filteredEnvironments.map((environment) =>
-                isGlobalEnvironment(environment.id) ? (
+              {filteredEnvironments.map((environment) => {
+                return isGlobalEnvironment(environment.id) ? (
                   <EnvironmentsListItem
                     key={environment.id}
                     environmentId={environment.id}
@@ -107,8 +119,8 @@ export const EnvironmentsList = () => {
                     isReadOnly={!isValidPermission}
                     onExportClick={handleExportEnvironments}
                   />
-                )
-              )}
+                );
+              })}
               <Conditional condition={showEmptyCreateCard}>
                 <EmptyEnvironmentsCreateCard contextId={null} isValidPermission={isValidPermission} />
               </Conditional>
