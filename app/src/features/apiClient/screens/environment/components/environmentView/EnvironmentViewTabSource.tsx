@@ -1,5 +1,4 @@
 import { BaseTabSource } from "componentsV2/Tabs/helpers/baseTabSource";
-import { EnvironmentView } from "./EnvironmentView";
 import PATHS from "config/constants/sub/paths";
 import { MatchedTabSource, TabSourceMetadata } from "componentsV2/Tabs/types";
 import { MdHorizontalSplit } from "@react-icons/all-files/md/MdHorizontalSplit";

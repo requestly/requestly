@@ -1,7 +1,6 @@
 import { createSelector } from "@reduxjs/toolkit";
 import { RootState } from "store/types";
 import { tabsAdapter } from "./slice";
-import { EntityType } from "features/apiClient/slices/types";
 
 const selectTabsSlice = (state: RootState) => state.tabs;
 
@@ -37,12 +36,5 @@ export const selectTabBySource = createSelector(
   [selectAllTabs, (_state: RootState, sourceId: string, sourceName: string) => ({ sourceId, sourceName })],
   (tabs, { sourceId, sourceName }) => {
     return tabs.find((tab) => tab.source.getSourceId() === sourceId && tab.source.getSourceName() === sourceName);
-  }
-);
-
-export const selectTabsByEntityTypes = createSelector(
-  [selectAllTabs, (_state: RootState, entityTypes: EntityType[]) => entityTypes],
-  (tabs, entityTypes) => {
-    return tabs.filter((tab) => entityTypes.includes(tab.modeConfig.entityType));
   }
 );

@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import type { EntityId } from "../types";
+import { EntityNotFound, EntityId } from "../types";
 import {
   selectAllEnvironments,
   selectEnvironmentById,
@@ -23,8 +23,14 @@ export function useAllEnvironments(): EnvironmentEntity[] {
   return useApiClientSelector(selectAllEnvironments);
 }
 
-export function useEnvironmentById(id: EntityId): EnvironmentEntity | undefined {
-  return useApiClientSelector((state) => selectEnvironmentById(state, id));
+export function useEnvironmentById(id: EntityId): EnvironmentEntity {
+  const env = useApiClientSelector((state) => selectEnvironmentById(state, id));
+
+  if (!env) {
+    throw new EntityNotFound(id, "environment");
+  }
+
+  return env;
 }
 
 export function useEnvironmentByIdMemoized(id: EntityId): EnvironmentEntity | null {
