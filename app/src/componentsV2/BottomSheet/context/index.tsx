@@ -1,11 +1,7 @@
 import React, { createContext, useContext, useMemo, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { BottomSheetPlacement, BottomSheetFeatureContext } from "../types";
-import {
-  trackBottomSheetToggled,
-  trackViewBottomSheetOnBottomClicked,
-  trackViewBottomSheetOnRightClicked,
-} from "../analytics";
+import { trackViewBottomSheetOnBottomClicked, trackViewBottomSheetOnRightClicked } from "../analytics";
 import { getBottomSheetState } from "store/selectors";
 import { globalActions } from "store/slices/global/slice";
 
