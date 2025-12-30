@@ -20,14 +20,20 @@ import { selectAllEnvironments, selectAllRecords, useGlobalEnvironmentEntity } f
 import { useEntity, useEntitySelector } from "../slices/entities/hooks";
 import { ApiClientEntityType } from "../slices/entities/types";
 import { EnvironmentVariableType } from "backend/environment/types";
-import { useTabsByEntityTypes, useTabs, useActiveTab, tabsActions } from "componentsV2/Tabs/slice";
+import { useTabsByEntityTypes, useTabs, tabsActions } from "componentsV2/Tabs/slice";
 import { useTabById } from "componentsV2/Tabs/slice/hooks";
 import { TabItem } from "componentsV2/Tabs/components/TabItem";
 import { closeTab } from "componentsV2/Tabs/slice/thunks";
 import { DraftRequestContainerTabSource } from "../screens/apiClient/components/views/components/DraftRequestContainer/draftRequestContainerTabSource";
 import { useHostContext } from "hooks/useHostContext";
 import { useApiClientSelector } from "../slices/hooks/base.hooks";
-import { getScopedVariables, makeScopeChain, ScopedVariable, ScopedVariables, useScopedVariables, VariableHolder } from "../helpers/variableResolver/variable-resolver";
+import {
+  getScopedVariables,
+  ScopedVariable,
+  ScopedVariables,
+  useScopedVariables,
+  VariableHolder,
+} from "../helpers/variableResolver/variable-resolver";
 import { createSelector } from "@reduxjs/toolkit";
 import { Select } from "antd";
 
@@ -85,7 +91,6 @@ function TabTester() {
   const dispatch = useDispatch();
   // const tabs = useTabs();
   const tabs = useTabsByEntityTypes(["request", "collection"]);
-  const activeTab = useActiveTab();
   const workspace = useSelector((s: any) => getAllSelectedWorkspaces(s.workspaceView)[0]);
 
   const handleOpenTab = () => {
@@ -106,14 +111,9 @@ function TabTester() {
   return (
     <div>
       <button onClick={handleOpenTab}>Open Tab</button>
-      <div style={{ marginTop: "12px" }}>
-        <strong>Active Tab:</strong> {activeTab?.id || "None"}
-      </div>
+
       <div>
         <strong>Tabs Count:</strong> {tabs.length}
-      </div>
-      <div>
-        <strong>Active Workflows:</strong> {activeTab?.activeWorkflows.size || 0}
       </div>
       {tabs.map((tab) => (
         <TabItem key={tab.id} tabId={tab.id}>
@@ -146,14 +146,14 @@ function Updater() {
 
   // const vh = useMemo(() => new VariableHolder(), []);
 
-  const last = useRef<ScopedVariables>(null)
+  const last = useRef<ScopedVariables>(null);
 
   // const s = makeScopeChain('9130594d-2515-47d6-9371-18febb62a8a2', vh);
   const store = useWorkspaceViewStore();
-  const scopedVariables = useScopedVariables('9130594d-2515-47d6-9371-18febb62a8a2');
+  const scopedVariables = useScopedVariables("9130594d-2515-47d6-9371-18febb62a8a2");
 
   useEffect(() => {
-    if(!last.current && scopedVariables) {
+    if (!last.current && scopedVariables) {
       last.current = scopedVariables;
     }
     // const areSame = s(store.getState()) === s(store.getState());
@@ -162,8 +162,7 @@ function Updater() {
     debugger;
     const bs = last.current === scopedVariables;
     debugger;
-  }, [store,  scopedVariables])
-
+  }, [store, scopedVariables]);
 
   debugger;
   return (
@@ -172,19 +171,28 @@ function Updater() {
       <br />
       {JSON.stringify(scopedVariables, null, 2)}
       <button onClick={() => entity.variables.clearAll()}>clear variables</button>
-      <button onClick={() => {
-        const id1 = entity.variables.add({
-          key: "ass",
-          type: EnvironmentVariableType.String,
-          localValue: "df",
-          isPersisted: true,
-        });
-      }}>add variable</button>
-      <button onClick={() => entity.variables.set({
-        id: 0,
-        localValue: "dfaaa",
-      })}>set variable</button>
-
+      <button
+        onClick={() => {
+          const id1 = entity.variables.add({
+            key: "ass",
+            type: EnvironmentVariableType.String,
+            localValue: "df",
+            isPersisted: true,
+          });
+        }}
+      >
+        add variable
+      </button>
+      <button
+        onClick={() =>
+          entity.variables.set({
+            id: 0,
+            localValue: "dfaaa",
+          })
+        }
+      >
+        set variable
+      </button>
     </div>
   );
 }
@@ -195,31 +203,30 @@ function RecordView() {
     type: ApiClientEntityType.COLLECTION_RECORD,
   });
 
-  const records = useApiClientSelector(s => s.records.records.entities);
-
-
+  const records = useApiClientSelector((s) => s.records.records.entities);
 
   return (
     <div>
       <br />
       <br />
       {JSON.stringify(records, null, 2)}
-      <button onClick={() => entity.setName('tada')}>set variable</button>
-
+      <button onClick={() => entity.setName("tada")}>set variable</button>
     </div>
   );
 }
 
 const Inner = () => {
   // const records = useWorkspaceViewSelector(selectAllEnvironments);
-    // <code>{JSON.stringify(records, null, 2)}</code><br />
+  // <code>{JSON.stringify(records, null, 2)}</code><br />
 
-  return <div>
-    <Updater />
-    <br/>
-    <br/>
-    <RecordView/>
-  </div>;
+  return (
+    <div>
+      <Updater />
+      <br />
+      <br />
+      <RecordView />
+    </div>
+  );
 };
 
 const Test = () => {
@@ -266,8 +273,7 @@ export const ApiClientRouteElement = () => {
     <WindowsAndLinuxGatedHoc featureName="API client">
       {isApiClientCompatible ? (
         <ApiClientErrorBoundary boundaryId="api-client-error-boundary">
-          <Test />
-          {/* <ApiClientFeatureContainer /> */}
+          <ApiClientFeatureContainer />
         </ApiClientErrorBoundary>
       ) : (
         <MandatoryUpdateScreen
