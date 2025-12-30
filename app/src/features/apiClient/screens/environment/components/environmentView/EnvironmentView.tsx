@@ -69,7 +69,7 @@ export const EnvironmentView: React.FC<EnvironmentViewProps> = ({ entity, enviro
 
   const handleSetPendingVariables = useCallback(
     (newVariables: VariableRow[]) => {
-      setPendingVariables(newVariables);
+      // setPendingVariables(newVariables);
       pendingVariablesRef.current = newVariables;
 
       // Update entity variables
@@ -126,12 +126,12 @@ export const EnvironmentView: React.FC<EnvironmentViewProps> = ({ entity, enviro
             onPostmanExportClick: () => {},
           }}
         />
-        <EnvironmentVariablesList
+        {/* <EnvironmentVariablesList
           searchValue={"searchValue"}
           pendingVariables={pendingVariables}
           handleSetPendingVariables={handleSetPendingVariables}
           onSearchValueChange={() => {}}
-        />
+        /> */}
         {/* {isExportModalOpen && (
           <ApiClientExportModal
             exportType="environment"
