@@ -16,7 +16,7 @@ const initialState: BufferState = bufferAdapter.getInitialState();
 
 export function findBufferByReferenceId(
   entities: BufferState["entities"],
-  referenceId?: string
+  referenceId: string
 ): BufferEntry | undefined {
   return Object.values(entities).find((e) => e?.referenceId === referenceId);
 }
