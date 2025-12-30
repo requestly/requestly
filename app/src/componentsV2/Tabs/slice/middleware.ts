@@ -111,7 +111,7 @@ function handleOpenBufferedTab(action: ReturnType<typeof openBufferedTab>) {
   });
   const { entityType, entityId, data } = entityData;
 
-  const existingBuffer = findBufferByReferenceId(state.buffer.entities, entityId);
+  const existingBuffer = entityId ? findBufferByReferenceId(state.buffer.entities, entityId) : null;
 
   const payloadAction = apiClientStore.dispatch(
     bufferActions.open(
