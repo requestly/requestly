@@ -10,6 +10,9 @@ import type {
 } from "features/apiClient/slices/entities/buffered/environment";
 import { useWorkspaceId } from "features/apiClient/common/WorkspaceProvider";
 import { useApiClientRepository } from "features/apiClient/slices";
+import { VariablesListHeader } from "../VariablesListHeader/VariablesListHeader";
+import { isEmpty } from "lodash";
+import { EnvironmentVariablesList } from "../VariablesList/EnvironmentVariablesList";
 
 interface EnvironmentViewProps {
   entity: BufferedEnvironmentEntity | BufferedGlobalEnvironmentEntity;
@@ -17,18 +20,13 @@ interface EnvironmentViewProps {
   isGlobal: boolean;
 }
 
-export const EnvironmentView: React.FC<EnvironmentViewProps> = ({
-  entity,
-  environmentId,
-  isGlobal,
-}) => {
+export const EnvironmentView: React.FC<EnvironmentViewProps> = ({ entity, environmentId, isGlobal }) => {
   const dispatch = useApiClientDispatch();
   const workspaceId = useWorkspaceId();
 
   const repositories = useApiClientRepository(workspaceId);
   const state = useApiClientSelector((s) => s);
   const environmentName = entity.getName(state);
-
 
   const variablesData = useMemo(() => {
     return mapToEnvironmentArray(entity.variables.getAll(state) ?? []);
@@ -40,7 +38,9 @@ export const EnvironmentView: React.FC<EnvironmentViewProps> = ({
     return pendingVariablesRef.current.length > 0 ? pendingVariablesRef.current : variablesData;
   }, [variablesData]);
 
-  const [pendingVariables, setPendingVariables] = useState<VariableRow[]>(variables);
+  // const [pendingVariables, setPendingVariables] = useState<VariableRow[]>(variables);
+
+  const [searchValue, setSearchValue] = useState("");
 
   // const { hasUnsavedChanges, resetChanges } = useHasUnsavedChanges(pendingVariables);
 
@@ -89,54 +89,49 @@ export const EnvironmentView: React.FC<EnvironmentViewProps> = ({
     [entity]
   );
 
-  // const handleSaveVariables = async () => {
-  //   if (!bufferId) return;
-    
-  //   try {
-  //     setIsSaving(true);
-  //     const variablesToSave = convertEnvironmentToMap(pendingVariables);
-  //     const currentEnvironment = entity.getEntityFromState(state);
-      
-  //     dispatch(
-  //       bufferActions.markSaved({
-  //         id: bufferId,
-  //         savedData: { ...currentEnvironment, variables: variablesToSave },
-  //         referenceId: envId,
-  //       })
-  //     );
-      
-  //     resetChanges();
-  //   } catch (error) {
-  //     console.error("Failed to update variables", error);
-  //   } finally {
-  //     setIsSaving(false);
-  //   }
-  // };
+  const handleSaveVariables = async () => {
+    // if (!bufferId) return;
+    // try {
+    //   setIsSaving(true);
+    //   const variablesToSave = convertEnvironmentToMap(pendingVariables);
+    //   const currentEnvironment = entity.getEntityFromState(state);
+    //   dispatch(
+    //     bufferActions.markSaved({
+    //       id: bufferId,
+    //       savedData: { ...currentEnvironment, variables: variablesToSave },
+    //       referenceId: envId,
+    //     })
+    //   );
+    //   resetChanges();
+    // } catch (error) {
+    //   console.error("Failed to update variables", error);
+    // } finally {
+    //   setIsSaving(false);
+    // }
+  };
 
   return (
     <div key={environmentId} className="variables-list-view-container">
       <div className="variables-list-view">
-        {/* <VariablesListHeader
-          // searchValue={searchValue}
-          // onSearchValueChange={setSearchValue}
+        <VariablesListHeader
+          searchValue={searchValue}
+          onSearchValueChange={setSearchValue}
           currentEnvironmentName={environmentName}
           environmentId={environmentId}
-          // onSave={handleSaveVariables}
-          hasUnsavedChanges={hasUnsavedChanges}
-          // isSaving={isSaving}
+          onSave={handleSaveVariables}
           exportActions={{
             showExport: isGlobal,
             enableExport: !isEmpty(variables),
             onRequestlyExportClick: () => {},
             onPostmanExportClick: () => {},
           }}
-        /> */}
-        {/* <EnvironmentVariablesList
+        />
+        <EnvironmentVariablesList
           searchValue={"searchValue"}
           pendingVariables={pendingVariables}
           handleSetPendingVariables={handleSetPendingVariables}
           onSearchValueChange={() => {}}
-        /> */}
+        />
         {/* {isExportModalOpen && (
           <ApiClientExportModal
             exportType="environment"

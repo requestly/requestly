@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
-import { tabsAdapter } from "./slice";
+import { tabsActions, tabsAdapter } from "./slice";
 import { TabId, TabState } from "./types";
 import { RootState } from "store/types";
 import { NativeError } from "errors/NativeError";
@@ -48,6 +48,10 @@ export function useTabActions() {
 
       closeAllTabs(params: Parameters<typeof _closeAllTabs>[0]) {
         return dispatch(_closeAllTabs(params) as any);
+      },
+
+      setActiveTab(params: Parameters<typeof tabsActions.setActiveTab>[0]) {
+        return dispatch(tabsActions.setActiveTab(params));
       },
     };
   }, [dispatch]);
