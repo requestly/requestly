@@ -193,9 +193,9 @@ export const TabsContainer: React.FC = () => {
   unstable_useBlocker(({ nextLocation }) => {
     const isNextLocationApiClientView = nextLocation.pathname.startsWith("/api-client");
 
-  //   if (isNextLocationApiClientView) {
-  //     return false;
-  //   }
+    if (isNextLocationApiClientView) {
+      return false;
+    }
 
     const hasUnsavedChanges = getHasAnyUnsavedChanges();
     if (hasUnsavedChanges) {
@@ -213,8 +213,8 @@ export const TabsContainer: React.FC = () => {
       return !shouldDiscardChanges;
     }
 
-  //   return false;
-  // });
+    return false;
+  });
 
   const matchedTabSource = useMatchedTabSource();
   useEffect(() => {
@@ -230,22 +230,22 @@ export const TabsContainer: React.FC = () => {
   const activeTab = tabs.find((t) => t.id === activeTabId);
   const activeTabSource = activeTab?.source;
 
-  // const isInitialLoadRef = useRef(true);
-  // useEffect(() => {
-  //   if (activeTabSource) {
-  //     const newPath = activeTabSource.getUrlPath();
+  const isInitialLoadRef = useRef(true);
+  useEffect(() => {
+    if (activeTabSource) {
+      const newPath = activeTabSource.getUrlPath();
 
-  //     if (newPath !== window.location.pathname + window.location.search) {
-  //       setUrl(newPath, isInitialLoadRef.current);
-  //     }
+      if (newPath !== window.location.pathname + window.location.search) {
+        setUrl(newPath, isInitialLoadRef.current);
+      }
 
-  //     if (isInitialLoadRef.current) {
-  //       isInitialLoadRef.current = false;
-  //     }
-  //   } else {
-  //     setUrl(PATHS.API_CLIENT.ABSOLUTE, isInitialLoadRef.current);
-  //   }
-  // }, [activeTabSource, setUrl]);
+      if (isInitialLoadRef.current) {
+        isInitialLoadRef.current = false;
+      }
+    } else {
+      setUrl(PATHS.API_CLIENT.ABSOLUTE, isInitialLoadRef.current);
+    }
+  }, [activeTabSource, setUrl]);
 
   const handleUnpreviewTab = useCallback(
     (tabId: string) => {
