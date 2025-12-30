@@ -33,7 +33,7 @@ export const BottomSheetProvider: React.FC<{
   const { open: isBottomSheetOpen, placement: sheetPlacement, size: sheetSize } = sheetOrientation;
 
   const toggleBottomSheet = useCallback(
-    ({ isOpen, action }: ToggleParams) => {
+    ({ isOpen }: ToggleParams) => {
       const nextState = typeof isOpen === "boolean" ? isOpen : !isBottomSheetOpen;
       const newSize: number[] = nextState ? (sheetSize[0] < 80 ? sheetSize : DEFAULT_SIZE) : CLOSED_SIZE;
 
