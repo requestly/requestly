@@ -37,6 +37,10 @@ export function useActiveTabId() {
   return useSelector((state: RootState) => state.tabs.activeTabId);
 }
 
+export function usePreviewTabId() {
+  return useSelector((state: RootState) => state.tabs.previewTabId);
+}
+
 export function useTabActions() {
   const dispatch = useDispatch();
 
@@ -61,13 +65,19 @@ export function useTabActions() {
       setActiveTab(params: Parameters<typeof tabsActions.setActiveTab>[0]) {
         return dispatch(tabsActions.setActiveTab(params));
       },
+
+      setPreviewTab(params: Parameters<typeof tabsActions.setPreviewTab>[0]) {
+        return dispatch(tabsActions.setPreviewTab(params));
+      },
     };
   }, [dispatch]);
 
   return actions;
 }
 
-export function getTabBufferedEntity(tab: TabState & { modeConfig: { mode: "buffer" } }) {
+export type BufferModeTab = TabState & { modeConfig: { mode: "buffer" } };
+
+export function getTabBufferedEntity(tab: BufferModeTab) {
   const workspaceId = tab.source.metadata.context.id;
   const bufferId = tab.modeConfig.entityId;
   const { store } = getApiClientFeatureContext(workspaceId);
@@ -87,12 +97,11 @@ export function getTabBufferedEntity(tab: TabState & { modeConfig: { mode: "buff
   );
 
   return {
+    store,
     entity,
     buffer,
   };
 }
-
-export type BufferModeTab = TabState & { modeConfig: { mode: "buffer"; entityId: string } };
 
 export function useTabBuffer<T>(
   tab: BufferModeTab,
@@ -124,4 +133,26 @@ export function useIsTabDirty(tab: BufferModeTab) {
 
 export function useTabTitle(tab: BufferModeTab) {
   return useTabBuffer(tab, ({ entity, state }) => entity.getName(state));
+}
+
+export function useHasAnyUnsavedChanges(): boolean {
+  const tabs = useTabs();
+
+  const hasUnsaved = tabs.some((tab) => {
+    if (tab.modeConfig.mode !== "buffer") {
+      return false;
+    }
+
+    try {
+      const workspaceId = tab.source.metadata.context?.id;
+      const { store } = getApiClientFeatureContext(workspaceId);
+      const buffer = store.getState().buffer.entities[tab.modeConfig.entityId];
+
+      return buffer?.isDirty;
+    } catch {
+      return false;
+    }
+  });
+
+  return hasUnsaved;
 }
