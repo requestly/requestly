@@ -6,6 +6,7 @@ import { selectEnvironmentById, selectGlobalEnvironment } from "../environments/
 import { environmentsActions } from "../environments/slice";
 import { EntityNotFound } from "../types";
 import { ApiClientEntityType, EntityDispatch } from "./types";
+import { GLOBAL_ENVIRONMENT_ID } from "../common/constants";
 
 
 
@@ -142,14 +143,14 @@ export class GlobalEnvironmentEntity extends ApiClientEnvironmentEntity {
 
   constructor(dispatch: Dispatch) {
       super(dispatch, {
-        id: "global_environment"
+        id: GLOBAL_ENVIRONMENT_ID,
       });
   }
 
   getEntityFromState(state: ApiClientStoreState): EnvironmentRecord {
     const env = selectGlobalEnvironment(state);
     if (!env) {
-      throw new EntityNotFound(this.id, "global_environment");
+      throw new EntityNotFound(this.id, GLOBAL_ENVIRONMENT_ID);
     }
     return env;
   }

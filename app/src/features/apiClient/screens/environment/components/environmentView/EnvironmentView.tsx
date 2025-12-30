@@ -7,7 +7,7 @@ import type {
   BufferedGlobalEnvironmentEntity,
 } from "features/apiClient/slices/entities/buffered/environment";
 import { useWorkspaceId } from "features/apiClient/common/WorkspaceProvider";
-import { entitySynced, useApiClientRepository } from "features/apiClient/slices";
+import { EntityNotFound, entitySynced, useApiClientRepository } from "features/apiClient/slices";
 import { EnvironmentVariablesList } from "../VariablesList/EnvironmentVariablesList";
 import { VariablesListHeader } from "../VariablesListHeader/VariablesListHeader";
 import { bufferActions, bufferAdapterSelectors } from "features/apiClient/slices/buffer/slice";
@@ -45,12 +45,13 @@ export const EnvironmentView: React.FC<EnvironmentViewProps> = ({ entity, enviro
 
   const handleSaveVariables = useCallback(async () => {
     try {
+      if (!bufferEntry) throw new EntityNotFound(entity.meta.id, "buffer");
       setIsSaving(true);
       const dataToSave = variables.getAll(state);
       await repositories.environmentVariablesRepository.updateEnvironment(environmentId, { variables: dataToSave });
       dispatch(
         entitySynced({
-          entityType: ApiClientEntityType.ENVIRONMENT,
+          entityType: bufferEntry.entityType,
           entityId: environmentId,
           data: { variables: dataToSave },
         })

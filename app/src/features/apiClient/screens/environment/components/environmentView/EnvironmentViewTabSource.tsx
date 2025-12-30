@@ -6,12 +6,15 @@ import { getApiClientEnvironmentsStore } from "features/apiClient/commands/store
 import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 import { EnvironmentViewManager } from "./EnvironmentViewManager";
 
-interface EnvironmentViewTabSourceMetadata extends TabSourceMetadata {}
+interface EnvironmentViewTabSourceMetadata extends TabSourceMetadata {
+  isGlobal: boolean;
+}
 
 export class EnvironmentViewTabSource extends BaseTabSource {
+  metadata: EnvironmentViewTabSourceMetadata;
   constructor(metadata: EnvironmentViewTabSourceMetadata) {
     super();
-    this.component = <EnvironmentViewManager key={metadata.id} envId={metadata.id} isGlobal={false} />;
+    this.component = <EnvironmentViewManager key={metadata.id} envId={metadata.id} isGlobal={metadata.isGlobal} />;
     this.metadata = {
       ...metadata,
       name: "environments", // FIXME: Its legacy, should be "environment"
@@ -27,7 +30,7 @@ export class EnvironmentViewTabSource extends BaseTabSource {
       throw new Error("Environment id not found!");
     }
 
-    return new EnvironmentViewTabSource({ id: envId, title: "Environment", context: {} });
+    return new EnvironmentViewTabSource({ id: envId, title: "Environment", context: {}, isGlobal: false });
   }
 
   getIsValidTab(context: ApiClientFeatureContext): boolean {

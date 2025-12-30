@@ -18,6 +18,7 @@ import type { EnvironmentEntity } from "./types";
 import type { EnvironmentVariables } from "backend/environment/types";
 import { useEntity } from "../entities/hooks";
 import { ApiClientEntityType } from "../entities/types";
+import { GLOBAL_ENVIRONMENT_ID } from "../common/constants";
 
 export function useAllEnvironments(): EnvironmentEntity[] {
   return useApiClientSelector(selectAllEnvironments);
@@ -73,7 +74,7 @@ export function useTotalEnvironments(): number {
 
 export function useGlobalEnvironmentEntity() {
   return useEntity({
-    id: "global_environment",
+    id: GLOBAL_ENVIRONMENT_ID,
     type: ApiClientEntityType.GLOBAL_ENVIRONMENT,
   });
 }

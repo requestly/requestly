@@ -113,6 +113,7 @@ export const EnvironmentsList = () => {
                     key={environment.id}
                     environmentId={environment.id}
                     isReadOnly={!isValidPermission}
+                    isGlobal={true}
                   />
                 ) : (
                   <EnvironmentsListItem
@@ -120,6 +121,7 @@ export const EnvironmentsList = () => {
                     environmentId={environment.id}
                     isReadOnly={!isValidPermission}
                     onExportClick={handleExportEnvironments}
+                    isGlobal={false}
                   />
                 );
               })}
