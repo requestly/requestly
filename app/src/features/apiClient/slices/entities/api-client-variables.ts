@@ -31,15 +31,22 @@ export class ApiClientVariables<T, State = ApiClientStoreState> {
     return id;
   }
 
-  set(params: Pick<Variable, "id"> & Partial<Omit<Variable, "id">>) {
+  set(params: Pick<Variable, "id"> & Partial<Omit<Variable, "id">> & { key?: string }) {
     const { id, ...variableData } = params;
     this.unsafePatch((s) => {
       const variables = this.getVariableObject(s);
-      let variable = lodash.find(variables, (v) => v.id === params.id);
-      if (!variable) {
+      const entry = Object.entries(variables).find(([_, v]) => v.id === params.id);
+      if (!entry) {
         return;
       }
+      const [oldKey, variable] = entry;
       lodash.extend(variable, variableData);
+      if (params.key) {
+        if (oldKey !== params.key) {
+          variables[params.key] = variable;
+          delete variables[oldKey];
+        }
+      }
     });
   }
 
@@ -73,20 +80,6 @@ export class ApiClientVariables<T, State = ApiClientStoreState> {
       const entry = Object.entries(variables).find(([_, v]) => v.id === id);
       if (entry) {
         delete variables[entry[0]];
-      }
-    });
-  }
-
-  changeKey(params: { id: Variable["id"]; newKey: string }) {
-    this.unsafePatch((s) => {
-      const variables = this.getVariableObject(s);
-      const entry = Object.entries(variables).find(([_, v]) => v.id === params.id);
-      if (entry) {
-        const [oldKey, variable] = entry;
-        if (oldKey !== params.newKey) {
-          variables[params.newKey] = variable;
-          delete variables[oldKey];
-        }
       }
     });
   }

@@ -102,22 +102,9 @@ export const VariablesList: React.FC<VariablesListProps> = ({
         return;
       }
 
-      if (fieldChanged === "key") {
-        const oldEntry = Object.entries(variablesData).find(([_, v]) => v.id === row.id);
-        if (oldEntry && oldEntry[0] !== row.key) {
-          if (row.key) {
-            variables.changeKey({ id: row.id, newKey: row.key });
-            variables.set({ id: row.id, type: row.type, syncValue: row.syncValue, localValue: row.localValue });
-          } else {
-            variables.delete(row.id);
-          }
-          return;
-        }
-      }
-
       variables.set({ id: row.id, [fieldChanged]: row[fieldChanged] });
     },
-    [variablesData, variables]
+    [variables]
   );
 
   const handleAddNewRow = useCallback(() => {
