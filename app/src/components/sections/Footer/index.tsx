@@ -164,6 +164,8 @@ const AppFooter: React.FC = () => {
 export const openFreshChat = () => {
   if (window.fcWidget && typeof window.fcWidget.open === "function") {
     window.fcWidget.open();
+  } else {
+    redirectToUrl(APP_CONSTANTS.LINKS.BOOK_A_DEMO, true);
   }
   trackFooterClicked(FOOTER_LINKS.CONTACT_SALES);
 };
