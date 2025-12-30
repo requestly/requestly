@@ -69,7 +69,7 @@ export const bufferSlice = createSlice({
           referenceId?: string;
           data: unknown;
         },
-        meta?: { id: string }
+        meta?: { id: string | undefined }
       ) {
         return { payload, meta: { id: meta?.id || uuidv4() } };
       },
