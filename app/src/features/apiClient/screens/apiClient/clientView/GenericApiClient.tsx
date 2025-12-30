@@ -5,6 +5,7 @@ import { ClientViewFactory } from "./ClientViewFactory";
 import { BottomSheetProvider } from "componentsV2/BottomSheet";
 import "../apiClient.scss";
 import { BottomSheetFeatureContext } from "componentsV2/BottomSheet/types";
+import { AISessionProvider } from "features/ai/contexts/AISession";
 
 type Props = {
   apiEntryDetails: RQAPI.ApiRecord;
@@ -20,13 +21,15 @@ export const GenericApiClient: React.FC<Props> = React.memo(
       <BottomSheetProvider context={BottomSheetFeatureContext.API_CLIENT}>
         <div className="api-client-container-content">
           <AutogenerateProvider>
-            <ClientViewFactory
-              apiRecord={apiEntryDetails}
-              handleRequestFinished={handleAppRequestFinished}
-              onSaveCallback={onSaveCallback}
-              isCreateMode={isCreateMode}
-              isOpenInModal={isOpenInModal}
-            />
+            <AISessionProvider>
+              <ClientViewFactory
+                apiRecord={apiEntryDetails}
+                handleRequestFinished={handleAppRequestFinished}
+                onSaveCallback={onSaveCallback}
+                isCreateMode={isCreateMode}
+                isOpenInModal={isOpenInModal}
+              />
+            </AISessionProvider>
           </AutogenerateProvider>
         </div>
       </BottomSheetProvider>
