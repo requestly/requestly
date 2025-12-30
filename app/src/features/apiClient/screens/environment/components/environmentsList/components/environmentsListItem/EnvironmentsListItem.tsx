@@ -17,9 +17,21 @@ import { EnvironmentViewTabSource } from "../../../environmentView/EnvironmentVi
 import { IoChevronForward } from "@react-icons/all-files/io5/IoChevronForward";
 import RequestlyIcon from "assets/img/brand/rq_logo.svg";
 import PostmanIcon from "assets/img/brand/postman-icon.svg";
-import { useEnvironmentById, useActiveEnvironment } from "features/apiClient/slices/environments/environments.hooks";
+import {
+  useEnvironmentById,
+  useActiveEnvironment,
+  useAllEnvironments,
+} from "features/apiClient/slices/environments/environments.hooks";
 import { useActiveTabId, useTabActions } from "componentsV2/Tabs/slice";
 import { useWorkspaceId } from "features/apiClient/common/WorkspaceProvider";
+import { useApiClientDispatch } from "features/apiClient/slices/hooks/base.hooks";
+
+import {
+  updateEnvironmentName,
+  deleteEnvironment,
+  duplicateEnvironment,
+} from "features/apiClient/slices/environments/thunks";
+import { useApiClientRepository } from "features/apiClient/slices";
 
 export enum ExportType {
   REQUESTLY = "requestly",
@@ -41,43 +53,28 @@ export enum EnvironmentMenuKey {
   DELETE = "delete",
 }
 
-async function renameEnvironment(_params: { environmentId: string; newName: string }) {
-  toast.warn("Rename environment not yet available during migration");
-}
-
-async function duplicateEnvironment(_params: { environmentId: string }) {
-  toast.warn("Duplicate environment not yet available during migration");
-}
-
-async function deleteEnvironment(_params: { environmentId: string }) {
-  toast.warn("Delete environment not yet available during migration");
-}
-
 export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
   isReadOnly,
   environmentId,
   onExportClick,
 }) => {
+  const dispatch = useApiClientDispatch();
   const workspaceId = useWorkspaceId();
-  const { openBufferedTab } = useTabActions();
+  const { environmentVariablesRepository } = useApiClientRepository(workspaceId);
+  const { openBufferedTab, closeTabByEntityId } = useTabActions();
+  const activeTabSourceId = useActiveTabId();
 
   const environment = useEnvironmentById(environmentId);
   const activeEnvironment = useActiveEnvironment();
+  const allEnvironments = useAllEnvironments();
 
   const [isRenameInputVisible, setIsRenameInputVisible] = useState(false);
   const [newEnvironmentName, setNewEnvironmentName] = useState(environment?.name || "");
   const [isRenaming, setIsRenaming] = useState(false);
 
-  // const [openTab, closeTabBySource, activeTabSource] = useTabServiceWithSelector((state) => [
-  //   state.openTab,
-  //   state.closeTabBySource,
-  //   state.activeTabSource,
-  // ]);
-
-  const activeTabSourceId = useActiveTabId();
-
   const handleEnvironmentRename = useCallback(async () => {
     if (!environment) return;
+
     try {
       if (newEnvironmentName === environment.name) {
         setIsRenameInputVisible(false);
@@ -85,18 +82,24 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
       }
 
       setIsRenaming(true);
-      await renameEnvironment({ environmentId: environment.id, newName: newEnvironmentName });
+      await dispatch(
+        updateEnvironmentName({
+          environmentId: environment.id,
+          name: newEnvironmentName,
+          repository: environmentVariablesRepository,
+        })
+      ).unwrap();
 
       trackEnvironmentRenamed();
-      // openTab(
-      //   new EnvironmentViewTabSource({
-      //     id: environment.id,
-      //     title: newEnvironmentName,
-      //     context: {
-      //       id: workspaceId,
-      //     },
-      //   })
-      // );
+      openBufferedTab({
+        source: new EnvironmentViewTabSource({
+          id: environment.id,
+          title: newEnvironmentName,
+          context: {
+            id: workspaceId,
+          },
+        }),
+      });
       toast.success("Environment renamed successfully");
     } catch (error) {
       toast.error("Failed to rename environment");
@@ -104,35 +107,52 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
       setIsRenaming(false);
       setIsRenameInputVisible(false);
     }
-  }, [newEnvironmentName, environment, renameEnvironment, workspaceId]);
+  }, [environment, newEnvironmentName, openBufferedTab, workspaceId, dispatch, environmentVariablesRepository]);
 
   const handleEnvironmentDuplicate = useCallback(async () => {
     if (!environment) return;
     try {
       toast.loading("Duplicating environment...");
-      await duplicateEnvironment({ environmentId: environment.id });
+
+      // Convert environments array to EnvironmentMap
+      const allEnvironmentsMap = allEnvironments.reduce((acc, env) => {
+        acc[env.id] = env;
+        return acc;
+      }, {} as Record<string, typeof allEnvironments[number]>);
+
+      await dispatch(
+        duplicateEnvironment({
+          environmentId: environment.id,
+          allEnvironments: allEnvironmentsMap,
+          repository: environmentVariablesRepository,
+        })
+      ).unwrap();
 
       trackEnvironmentDuplicated();
       toast.success("Environment duplicated successfully");
     } catch (error) {
       toast.error("Failed to duplicate environment");
     }
-  }, [environment, duplicateEnvironment]);
+  }, [environment, allEnvironments, dispatch, environmentVariablesRepository]);
 
   const handleEnvironmentDelete = useCallback(async () => {
     if (!environment) return;
     try {
       toast.loading("Deleting environment...");
-      await deleteEnvironment({ environmentId: environment.id });
+      await dispatch(
+        deleteEnvironment({
+          environmentId: environment.id,
+          repository: environmentVariablesRepository,
+        })
+      ).unwrap();
 
-      // closeTabBySource(environment.id, "environments");
-
+      closeTabByEntityId({ entityId: environment.id });
       trackEnvironmentDeleted();
       toast.success("Environment deleted successfully");
     } catch (error) {
       toast.error("Failed to delete environment");
     }
-  }, [environment, deleteEnvironment]);
+  }, [environment, dispatch, environmentVariablesRepository, closeTabByEntityId]);
 
   const menuItems = useMemo(() => {
     if (!environment) return [];

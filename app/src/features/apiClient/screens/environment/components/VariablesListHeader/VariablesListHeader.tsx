@@ -23,8 +23,8 @@ interface VariablesListHeaderProps {
   currentEnvironmentName: string;
   environmentId: string;
   hideBreadcrumb?: boolean;
-  hasUnsavedChanges?: boolean;
-  isSaving?: boolean;
+  hasUnsavedChanges: boolean;
+  isSaving: boolean;
   exportActions?: {
     showExport: boolean;
     enableExport: boolean;
