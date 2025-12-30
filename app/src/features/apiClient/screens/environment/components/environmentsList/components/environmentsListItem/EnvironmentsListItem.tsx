@@ -41,6 +41,7 @@ export enum ExportType {
 interface EnvironmentsListItemProps {
   isReadOnly: boolean;
   environmentId: string;
+  isGlobal: boolean;
   onExportClick?: (environment: { id: string; name: string }, exportType: ExportType) => void;
 }
 
@@ -57,6 +58,7 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
   isReadOnly,
   environmentId,
   onExportClick,
+  isGlobal,
 }) => {
   const dispatch = useApiClientDispatch();
   const workspaceId = useWorkspaceId();
@@ -98,6 +100,7 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
           context: {
             id: workspaceId,
           },
+          isGlobal,
         }),
       });
       toast.success("Environment renamed successfully");
@@ -118,7 +121,7 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
       const allEnvironmentsMap = allEnvironments.reduce((acc, env) => {
         acc[env.id] = env;
         return acc;
-      }, {} as Record<string, typeof allEnvironments[number]>);
+      }, {} as Record<string, (typeof allEnvironments)[number]>);
 
       await dispatch(
         duplicateEnvironment({
@@ -215,6 +218,7 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
             context: {
               id: workspaceId,
             },
+            isGlobal,
           }),
         });
       }}

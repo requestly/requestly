@@ -32,7 +32,7 @@ export namespace BufferedEntityFactory {
         case ApiClientEntityType.ENVIRONMENT:
           return new BufferedEnvironmentEntity(dispatch, meta);
         case ApiClientEntityType.GLOBAL_ENVIRONMENT:
-          return new BufferedGlobalEnvironmentEntity(dispatch);
+          return new BufferedGlobalEnvironmentEntity(dispatch, meta);
       }
     })() as EntityTypeMap<T>;
 
