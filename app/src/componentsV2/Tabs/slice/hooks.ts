@@ -5,7 +5,11 @@ import { RootState } from "store/types";
 import { NativeError } from "errors/NativeError";
 import { openBufferedTab as _openBufferedTab } from "./actions";
 import { useCallback, useMemo, useSyncExternalStore } from "react";
-import { closeTab as _closeTab, closeAllTabs as _closeAllTabs } from "./thunks";
+import {
+  closeTab as _closeTab,
+  closeAllTabs as _closeAllTabs,
+  closeTabByEntityId as _closeTabByEntityId,
+} from "./thunks";
 import { BufferEntry, EntityNotFound, getApiClientFeatureContext } from "features/apiClient/slices";
 import { BufferedEntityFactory } from "features/apiClient/slices/entities";
 
@@ -48,6 +52,10 @@ export function useTabActions() {
 
       closeAllTabs(params: Parameters<typeof _closeAllTabs>[0]) {
         return dispatch(_closeAllTabs(params) as any);
+      },
+
+      closeTabByEntityId(params: Parameters<typeof _closeTabByEntityId>[0]) {
+        return dispatch(_closeTabByEntityId(params) as any);
       },
 
       setActiveTab(params: Parameters<typeof tabsActions.setActiveTab>[0]) {
