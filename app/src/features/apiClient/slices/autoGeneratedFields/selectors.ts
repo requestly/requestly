@@ -3,7 +3,6 @@ import lodash from 'lodash';
 import { selectAncestorRecords, selectRecordById } from "../apiRecords";
 import { ApiClientStoreState } from "../workspaceView/helpers/ApiClientContextRegistry";
 import { Authorization } from "features/apiClient/screens/apiClient/components/views/components/request/components/AuthorizationView/types/AuthConfig";
-import { NativeError } from "errors/NativeError";
 import { EntityNotFound } from "../types";
 import { useApiClientSelector } from "../hooks/base.hooks";
 import { ScopedVariables, useScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
@@ -42,7 +41,10 @@ function makeAuthResolverSelector(id: string) {
         }
       }
 
-      throw new NativeError(`Could not find auth of ${id}, neither in self, nor in parent chain!`);
+      return {
+        currentAuthType: Authorization.Type.NO_AUTH,
+        authConfigStore: {},
+      } as RQAPI.Auth
     },
   );
 
