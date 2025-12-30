@@ -15,7 +15,6 @@ import PostmanIcon from "assets/img/brand/postman-icon.svg";
 import { toast } from "utils/Toast";
 import { updateEnvironmentName, useApiClientRepository } from "features/apiClient/slices";
 import { useWorkspaceId } from "features/apiClient/common/WorkspaceProvider";
-import { useDispatch } from "react-redux";
 import { useApiClientDispatch } from "features/apiClient/slices/hooks/base.hooks";
 
 interface VariablesListHeaderProps {
@@ -25,6 +24,7 @@ interface VariablesListHeaderProps {
   hideBreadcrumb?: boolean;
   hasUnsavedChanges: boolean;
   isSaving: boolean;
+  isNewEnvironment: boolean;
   exportActions?: {
     showExport: boolean;
     enableExport: boolean;
@@ -45,6 +45,7 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
   exportActions,
   hasUnsavedChanges,
   isSaving,
+  isNewEnvironment,
 }) => {
   // TEMP: Commented out for testing buffer migration - rename functionality needs Zustand context
   // const {
@@ -56,7 +57,6 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
 
   const repos = useApiClientRepository(workspaceId);
   const enableHotKey = true;
-  const isNewEnvironment = true;
 
   const handleNewEnvironmentNameChange = async (newName: string) => {
     try {

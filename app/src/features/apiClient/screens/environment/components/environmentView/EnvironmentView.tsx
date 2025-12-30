@@ -30,6 +30,7 @@ export const EnvironmentView: React.FC<EnvironmentViewProps> = ({ entity, enviro
   const workspaceId = useWorkspaceId();
   const repositories = useApiClientRepository(workspaceId);
   const state = useApiClientSelector((s) => s);
+  const isNewEnvironment = useApiClientSelector(s => s.buffer.entities[entity.id]?.isNew);
 
   const [searchValue, setSearchValue] = useState("");
   const [isSaving, setIsSaving] = useState(false);
@@ -72,6 +73,7 @@ export const EnvironmentView: React.FC<EnvironmentViewProps> = ({ entity, enviro
     <div key={environmentId} className="variables-list-view-container">
       <div className="variables-list-view">
         <VariablesListHeader
+          isNewEnvironment={isNewEnvironment || false}
           searchValue={searchValue}
           onSearchValueChange={setSearchValue}
           currentEnvironmentName={environmentName}
