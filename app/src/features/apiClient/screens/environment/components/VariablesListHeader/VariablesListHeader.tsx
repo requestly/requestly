@@ -23,6 +23,8 @@ interface VariablesListHeaderProps {
   currentEnvironmentName: string;
   environmentId: string;
   hideBreadcrumb?: boolean;
+  hasUnsavedChanges?: boolean;
+  isSaving?: boolean;
   exportActions?: {
     showExport: boolean;
     enableExport: boolean;
@@ -41,6 +43,8 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
   hideBreadcrumb = false,
   onSave,
   exportActions,
+  hasUnsavedChanges,
+  isSaving,
 }) => {
   // TEMP: Commented out for testing buffer migration - rename functionality needs Zustand context
   // const {
@@ -64,11 +68,20 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
           name: updatedName,
           repository: repos.environmentVariablesRepository,
         })
-      ).unwrap()
+      ).unwrap();
 
       console.log("Rename disabled for testing. Would rename to:", updatedName);
     } catch (error) {
       toast.error(error.message || "Could not rename environment!");
+    }
+  };
+
+  const handleSave = async () => {
+    try {
+      await onSave();
+      toast.success("Environment saved successfully");
+    } catch (error) {
+      toast.error(error.message || "Could not save environment!");
     }
   };
 
@@ -147,9 +160,9 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
             hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SAVE_ENVIRONMENT.hotKey}
             enableHotKey={enableHotKey}
             type="primary"
-            onClick={onSave}
-            // disabled={!hasUnsavedChanges}
-            // loading={isSaving}
+            onClick={handleSave}
+            disabled={!hasUnsavedChanges}
+            loading={isSaving}
           >
             Save
           </RQButton>

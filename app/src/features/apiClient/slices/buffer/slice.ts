@@ -1,7 +1,7 @@
 import { createSlice, createEntityAdapter, PayloadAction } from "@reduxjs/toolkit";
 import { produceWithPatches, enablePatches, current } from "immer";
 import { v4 as uuidv4 } from "uuid";
-import { set, unset, cloneDeep } from "lodash";
+import { set, unset, cloneDeep, merge } from "lodash";
 import { objectToSetOperations, objectToDeletePaths } from "../utils/pathConverter";
 import { BufferEntry, BufferState } from "./types";
 import { ApiClientEntityType } from "../entities/types";
@@ -188,7 +188,7 @@ export const bufferSlice = createSlice({
       if (!entry) return;
 
       entry.referenceId = action.payload.referenceId;
-      entry.current = cloneDeep(action.payload.savedData);
+      entry.current = merge(entry.current, action.payload.savedData);
       entry.diff = {};
       entry.isDirty = false;
     },

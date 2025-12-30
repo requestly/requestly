@@ -1,18 +1,20 @@
 import { VariablesList } from "./VariablesList";
 import { useRBAC } from "features/rbac";
 import React from "react";
+import { EnvironmentVariables } from "backend/environment/types";
+import { ApiClientVariables } from "features/apiClient/slices/entities/api-client-variables";
 
 interface EnvironmentVariablesListProps {
+  variablesData: EnvironmentVariables;
+  variables: ApiClientVariables<any>;
   searchValue: string;
-  pendingVariables: any[];
-  handleSetPendingVariables: (variables: any[]) => void;
   onSearchValueChange: (value: string) => void;
 }
 
 export const EnvironmentVariablesList: React.FC<EnvironmentVariablesListProps> = ({
+  variablesData,
+  variables,
   searchValue,
-  pendingVariables,
-  handleSetPendingVariables,
   onSearchValueChange,
 }) => {
   const { validatePermission } = useRBAC();
@@ -20,12 +22,12 @@ export const EnvironmentVariablesList: React.FC<EnvironmentVariablesListProps> =
 
   return (
     <VariablesList
+      variablesData={variablesData}
+      variables={variables}
       searchValue={searchValue}
-      variables={pendingVariables}
-      onVariablesChange={handleSetPendingVariables}
-      isReadOnly={!isValidPermission} // tobe omitted in runtime variable list
-      container="environments"
       onSearchValueChange={onSearchValueChange}
+      isReadOnly={!isValidPermission}
+      container="environments"
     />
   );
 };

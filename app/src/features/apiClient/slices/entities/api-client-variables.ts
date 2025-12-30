@@ -67,6 +67,30 @@ export class ApiClientVariables<T, State = ApiClientStoreState> {
     });
   }
 
+  delete(id: Variable["id"]): void {
+    this.unsafePatch((s) => {
+      const variables = this.getVariableObject(s);
+      const entry = Object.entries(variables).find(([_, v]) => v.id === id);
+      if (entry) {
+        delete variables[entry[0]];
+      }
+    });
+  }
+
+  changeKey(params: { id: Variable["id"]; newKey: string }) {
+    this.unsafePatch((s) => {
+      const variables = this.getVariableObject(s);
+      const entry = Object.entries(variables).find(([_, v]) => v.id === params.id);
+      if (entry) {
+        const [oldKey, variable] = entry;
+        if (oldKey !== params.newKey) {
+          variables[params.newKey] = variable;
+          delete variables[oldKey];
+        }
+      }
+    });
+  }
+
   static merge(object: EnvironmentVariables, source: DeepPartial<EnvironmentVariables>) {
     for (const key in object) {
       if (source[key]) {
