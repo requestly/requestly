@@ -1,8 +1,8 @@
 import React from "react";
 import { AbstractTabSource } from "./tabSource";
 import { TabSourceMetadata } from "../types";
-import { ContextId } from "features/apiClient/contexts/contextId.context";
 import { NativeError } from "errors/NativeError";
+import { WorkspaceProvider } from "features/apiClient/common/WorkspaceProvider";
 
 export class BaseTabSource implements AbstractTabSource {
   component: NonNullable<React.ReactNode>;
@@ -20,14 +20,13 @@ export class BaseTabSource implements AbstractTabSource {
   }
 
   render(): React.ReactNode {
-    const contextId = this.metadata.context?.id;
-    if (contextId) {
-      return ContextId({
-        children: this.component,
-        id: contextId,
-      });
+    const workspaceId = this.metadata.context?.id;
+
+    if (workspaceId === undefined) {
+      return this.component;
     }
-    return this.component;
+
+    return <WorkspaceProvider children={this.component} workspaceId={workspaceId} />;
   }
 
   getDefaultTitle(): string {

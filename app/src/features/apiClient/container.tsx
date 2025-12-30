@@ -80,7 +80,7 @@ const ApiClientFeatureContainer: React.FC = () => {
             gutterAlign="center"
           >
             <APIClientSidebar />
-            {/* <TabsContainer /> */}
+            <TabsContainer />
           </Split>
           {/* </ApiClientProvider> */}
         </div>

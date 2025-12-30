@@ -8,10 +8,11 @@ import { isProfessionalPlan } from "utils/PremiumUtils";
 import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
 import { MdOutlineStopCircle } from "@react-icons/all-files/md/MdOutlineStopCircle";
 import { MdOutlineDiamond } from "@react-icons/all-files/md/MdOutlineDiamond";
-import "./aiPromptPopover.scss";
 import { redirectToUrl } from "utils/RedirectionUtils";
 import LINKS from "config/constants/sub/links";
 import { trackPopoverGenerateTestsClicked } from "modules/analytics/events/features/apiClient";
+import { useAISessionContext } from "features/ai/contexts/AISession";
+import "./aiPromptPopover.scss";
 
 interface PromptPopoverProps {
   isLoading: boolean;
@@ -37,6 +38,8 @@ export const AIPromptPopover: React.FC<PromptPopoverProps> = ({
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const inputRef = useRef<InputRef>(null);
+
+  const { sessionId, startNewGeneration } = useAISessionContext();
 
   useEffect(() => {
     setTimeout(() => {
@@ -73,6 +76,11 @@ export const AIPromptPopover: React.FC<PromptPopoverProps> = ({
       </div>
     );
   }
+  const handleGenerateClick = () => {
+    const newGenerationId = startNewGeneration();
+    trackPopoverGenerateTestsClicked(sessionId, newGenerationId);
+    onGenerateClick(userQuery);
+  };
 
   return (
     <div className="ai-generate-test-popover-content">
@@ -96,7 +104,7 @@ export const AIPromptPopover: React.FC<PromptPopoverProps> = ({
         autoSize={{ minRows: 2, maxRows: 8 }}
         onKeyDown={(e) => {
           if ((e.metaKey || e.ctrlKey) && e.key === "Enter" && !isLoading) {
-            onGenerateClick(userQuery);
+            handleGenerateClick();
           }
         }}
       />
@@ -126,15 +134,7 @@ export const AIPromptPopover: React.FC<PromptPopoverProps> = ({
           <RQButton onClick={onCloseClick} size="small">
             {isLoading ? "Continue in background" : "Close"}
           </RQButton>
-          <RQButton
-            type="primary"
-            loading={isLoading}
-            onClick={() => {
-              onGenerateClick(userQuery);
-              trackPopoverGenerateTestsClicked();
-            }}
-            size="small"
-          >
+          <RQButton type="primary" loading={isLoading} onClick={handleGenerateClick} size="small">
             {isLoading ? "Generating..." : "Generate"}
           </RQButton>
         </div>
