@@ -10,10 +10,11 @@ import type { GraphQLRecordEntity } from "./graphql";
 import { BufferedEntityFactory } from "./buffered/factory";
 import type { BufferedHttpRecordEntity } from "./buffered/http";
 import type { BufferedGraphQLRecordEntity } from "./buffered/graphql";
+import type { BufferedRuntimeVariablesEntity } from "./buffered/runtime-variables";
 import { useDispatch } from "react-redux";
 import { bufferAdapterSelectors, findBufferByReferenceId } from "../buffer/slice";
 import { EntityNotFound } from "../types";
-import { GLOBAL_ENVIRONMENT_ID } from "../common/constants";
+import { GLOBAL_ENVIRONMENT_ID, RUNTIME_VARIABLES_ENTITY_ID } from "../common/constants";
 
 export function useEntity<T extends ApiClientEntityType>(params: { id: string; type: T }) {
   const dispatch = EntityFactory.GlobalStateOverrideConfig[params.type] ? useDispatch() : useApiClientDispatch();
@@ -117,5 +118,12 @@ export function useBufferedEnvironmentEntity(id: string, isGlobal: boolean) {
   return useBufferedEntity({
     id,
     type: isGlobal ? ApiClientEntityType.GLOBAL_ENVIRONMENT : ApiClientEntityType.ENVIRONMENT,
+  });
+}
+
+export function useBufferedRuntimeVariablesEntity(): BufferedRuntimeVariablesEntity {
+  return useBufferedEntity({
+    id: RUNTIME_VARIABLES_ENTITY_ID,
+    type: ApiClientEntityType.RUNTIME_VARIABLES,
   });
 }

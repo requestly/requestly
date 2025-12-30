@@ -1,125 +1,103 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type React from "react";
+import { useCallback, useMemo, useState } from "react";
 import { RuntimeVariablesList } from "../RuntimeVariablesList/runtimevariableslist";
 import { RuntimeVariablesHeader } from "../RuntimeVariablesHeader";
-import { useRuntimeVariables } from "features/apiClient/hooks/useRuntimeVariables.hook";
-import { RuntimeVariableValue } from "features/apiClient/store/runtimeVariables/runtimeVariables.store";
-import { useHasUnsavedChanges } from "hooks/useHasUnsavedChanges";
-import { useGenericState } from "hooks/useGenericState";
-import { mapRuntimeArray } from "features/apiClient/store/runtimeVariables/utils";
+import { useApiClientDispatch, useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
+import { useBufferedRuntimeVariablesEntity } from "features/apiClient/slices/entities/hooks";
+import { bufferActions, bufferAdapterSelectors } from "features/apiClient/slices/buffer/slice";
+import { runtimeVariablesActions } from "features/apiClient/slices/runtimeVariables/slice";
 import { toast } from "utils/Toast";
+import { isEmpty } from "lodash";
 import "./runtimevariableview.scss";
 import { DeleteAllRuntimeVariablesModal } from "features/apiClient/screens/apiClient/components/modals/DeleteAllRuntimeVariablesModal/deleteAllRuntimeVariablesModal";
-import { VariableRow } from "../../VariablesList/VariablesList";
+import { RUNTIME_VARIABLES_ENTITY_ID } from "features/apiClient/slices/common/constants";
 
 export const RuntimeVariablesView: React.FC = () => {
-  const [runtimeVariablesMap, resetVariables] = useRuntimeVariables((s) => [s.data, s.reset]);
-  const runtimeVariableData = useMemo(() => Object.fromEntries(runtimeVariablesMap), [runtimeVariablesMap]);
+  const dispatch = useApiClientDispatch();
+  const entity = useBufferedRuntimeVariablesEntity();
+  const state = useApiClientSelector((s) => s);
 
-  const pendingVariablesRef = useRef<VariableRow[]>([]);
-  const [isSaving, setIsSaving] = useState<boolean>(false);
-
-  const variables = useMemo(() => {
-    return pendingVariablesRef.current.length > 0 ? pendingVariablesRef.current : mapRuntimeArray(runtimeVariableData);
-  }, [runtimeVariableData]);
-
-  const [pendingVariables, setPendingVariables] = useState<VariableRow[]>(variables);
-  const { hasUnsavedChanges, resetChanges } = useHasUnsavedChanges(pendingVariables);
-  const { setPreview, setUnsaved } = useGenericState();
+  const [searchValue, setSearchValue] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
-  useEffect(() => {
-    setUnsaved(hasUnsavedChanges);
+  const variables = entity.variables;
+  const variablesData = useMemo(() => variables.getAll(state), [variables, state]);
 
-    if (hasUnsavedChanges) {
-      setPreview(false);
-    }
-  }, [setUnsaved, setPreview, hasUnsavedChanges]);
+  const bufferEntry = useApiClientSelector((s) => bufferAdapterSelectors.selectById(s.buffer, entity.meta.id));
+  const hasUnsavedChanges = useMemo(() => bufferEntry?.isDirty ?? false, [bufferEntry]);
 
-  useEffect(() => {
-    if (!isSaving) {
-      setPendingVariables(variables);
-    }
-  }, [variables, isSaving]);
-
-  const onDeleteModalClose = useCallback(() => {
-    setIsDeleteModalOpen(false);
-  }, []);
-
-  const handleDeleteAll = useCallback(() => {
-    try {
-      pendingVariablesRef.current = [];
-      setPendingVariables([]);
-      resetVariables();
-      resetChanges();
-    } catch {
-      toast.error("Error while deleting all variables");
-    }
-
-    setIsDeleteModalOpen(false);
-  }, [resetChanges, resetVariables]);
-
-  const handleSetPendingVariables = useCallback((variables: VariableRow[]) => {
-    setPendingVariables(variables);
-    pendingVariablesRef.current = variables;
-  }, []);
-
-  const handleUpdate = useCallback(
-    (variables: VariableRow[]) => {
-      const newVariablesMap = new Map(
-        variables.map((v) => [
-          v.key,
-          {
-            localValue: v.localValue,
-            isPersisted: v.isPersisted,
-            type: v.type,
-            id: v.id,
-          } as RuntimeVariableValue,
-        ])
-      );
-      resetVariables(newVariablesMap);
-    },
-    [resetVariables]
-  );
-
-  const handleSaveVariables = async () => {
+  const handleSaveVariables = useCallback(async () => {
     try {
       setIsSaving(true);
-      handleUpdate(pendingVariables);
+      const dataToSave = variables.getAll(state);
+
+      // Sync to the main runtime variables slice
+      dispatch(
+        runtimeVariablesActions.unsafePatch({
+          patcher: (entity) => {
+            entity.variables = dataToSave;
+          },
+        })
+      );
+
+      // Mark buffer as saved
+      dispatch(
+        bufferActions.markSaved({
+          id: entity.meta.id,
+          referenceId: RUNTIME_VARIABLES_ENTITY_ID,
+          savedData: { variables: dataToSave },
+        })
+      );
 
       toast.success("Variables updated successfully");
-
-      resetChanges();
     } catch (error) {
       console.error("Failed to update variables", error);
       toast.error("Failed to update variables");
     } finally {
       setIsSaving(false);
     }
-  };
-  const [searchValue, setSearchValue] = useState<string>("");
+  }, [variables, state, dispatch, entity.meta.id]);
+
+  const handleDeleteAll = useCallback(() => {
+    try {
+      variables.clearAll();
+
+      setIsDeleteModalOpen(false);
+    } catch {
+      toast.error("Error while deleting all variables");
+    }
+  }, [variables]);
+
+  const onDeleteModalClose = useCallback(() => {
+    setIsDeleteModalOpen(false);
+  }, []);
+
   return (
     <div className="runtime-variables-view-container">
       <div className="runtime-variables-list-view">
         <RuntimeVariablesHeader
           searchValue={searchValue}
-          variables={variables}
+          hasVariables={!isEmpty(variablesData)}
           onSearchValueChange={setSearchValue}
           onSave={handleSaveVariables}
+          hasUnsavedChanges={hasUnsavedChanges}
+          isSaving={isSaving}
           onDeleteAll={() => {
             setIsDeleteModalOpen(true);
           }}
         />
-        {isDeleteModalOpen ? (
+        {isDeleteModalOpen && (
           <DeleteAllRuntimeVariablesModal
             open={isDeleteModalOpen}
             onClose={onDeleteModalClose}
             onClickDelete={handleDeleteAll}
           />
-        ) : null}
+        )}
         <RuntimeVariablesList
-          searchValue={searchValue}
+          variablesData={variablesData}
           variables={variables}
-          onVariablesChange={handleSetPendingVariables}
+          searchValue={searchValue}
           onSearchValueChange={setSearchValue}
         />
       </div>

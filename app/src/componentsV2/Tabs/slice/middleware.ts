@@ -13,7 +13,9 @@ import { RequestViewTabSource } from "features/apiClient/screens/apiClient/compo
 import { DraftRequestContainerTabSource } from "features/apiClient/screens/apiClient/components/views/components/DraftRequestContainer/draftRequestContainerTabSource";
 import { CollectionViewTabSource } from "features/apiClient/screens/apiClient/components/views/components/Collection/collectionViewTabSource";
 import { EnvironmentViewTabSource } from "features/apiClient/screens/environment/components/environmentView/EnvironmentViewTabSource";
+import { RuntimeVariablesViewTabSource } from "features/apiClient/screens/environment/components/RuntimeVariables/runtimevariablesTabSource";
 import { EntityNotFound, EnvironmentEntity, getApiClientFeatureContext } from "features/apiClient/slices";
+import { selectRuntimeVariablesEntity } from "features/apiClient/slices/runtimeVariables/selectors";
 import { TabState } from "./types";
 import { reduxStore } from "store";
 import { openBufferedTab } from "./actions";
@@ -40,6 +42,7 @@ export function getEntityDataFromTabSource(
   const isRequest = source instanceof RequestViewTabSource;
   const isCollection = source instanceof CollectionViewTabSource;
   const isEnvironment = source instanceof EnvironmentViewTabSource;
+  const isRuntimeVariables = source instanceof RuntimeVariablesViewTabSource;
 
   if (isDraftRequest) {
     return {
@@ -83,6 +86,16 @@ export function getEntityDataFromTabSource(
       entityType: ApiClientEntityType.ENVIRONMENT,
       entityId: sourceId,
       data: environment,
+    };
+  }
+
+  if (isRuntimeVariables) {
+    // Runtime variables are stored in the global Redux store
+    const entity = selectRuntimeVariablesEntity(reduxStore.getState());
+    return {
+      entityType: ApiClientEntityType.RUNTIME_VARIABLES,
+      entityId: entity.id,
+      data: entity,
     };
   }
 

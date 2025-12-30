@@ -8,17 +8,21 @@ import { MdOutlineDeleteForever } from "@react-icons/all-files/md/MdOutlineDelet
 import { KEYBOARD_SHORTCUTS } from "../../../../../../constants/keyboardShortcuts";
 interface RuntimeVariablesHeaderProps {
   searchValue: string;
-  variables: any[];
+  hasVariables: boolean;
   onSearchValueChange: (value: string) => void;
   onDeleteAll: () => void;
   onSave: () => Promise<void>;
+  hasUnsavedChanges?: boolean;
+  isSaving?: boolean;
 }
 export const RuntimeVariablesHeader: React.FC<RuntimeVariablesHeaderProps> = ({
   searchValue,
-  variables,
+  hasVariables,
   onSearchValueChange,
   onDeleteAll,
   onSave,
+  hasUnsavedChanges = false,
+  isSaving = false,
 }) => {
   return (
     <div className="runtime-variables-list-header">
@@ -58,7 +62,7 @@ export const RuntimeVariablesHeader: React.FC<RuntimeVariablesHeaderProps> = ({
         />
         <div className="runtime-variables-list-action-btn">
           <RQButton
-            disabled={variables.length < 1}
+            disabled={!hasVariables}
             className="delete-btn"
             icon={<MdOutlineDeleteForever />}
             onClick={onDeleteAll}
@@ -67,11 +71,13 @@ export const RuntimeVariablesHeader: React.FC<RuntimeVariablesHeaderProps> = ({
           </RQButton>
           <RQButton
             showHotKeyText
-            hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SAVE_RUNTIME_VARIABLES.hotKey}
+            hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SAVE_RUNTIME_VARIABLES?.hotKey}
             type="primary"
             onClick={() => {
               onSave();
             }}
+            disabled={!hasUnsavedChanges}
+            loading={isSaving}
           >
             Save
           </RQButton>

@@ -1,26 +1,28 @@
 import React from "react";
 import { VariablesList } from "../../VariablesList/VariablesList";
+import { EnvironmentVariables } from "backend/environment/types";
+import { ApiClientVariables } from "features/apiClient/slices/entities/api-client-variables";
 
-interface RuntimeVariableProps {
+interface RuntimeVariablesListProps {
+  variablesData: EnvironmentVariables;
+  variables: ApiClientVariables<any>;
   searchValue: string;
-  onVariablesChange: (variables: any[]) => void;
-  variables: any[];
   onSearchValueChange: (value: string) => void;
 }
 
-export const RuntimeVariablesList: React.FC<RuntimeVariableProps> = ({
-  searchValue,
+export const RuntimeVariablesList: React.FC<RuntimeVariablesListProps> = ({
+  variablesData,
   variables,
-  onVariablesChange,
+  searchValue,
   onSearchValueChange,
 }) => {
   return (
     <VariablesList
-      searchValue={searchValue}
+      variablesData={variablesData}
       variables={variables}
-      onVariablesChange={onVariablesChange}
-      container="runtime"
+      searchValue={searchValue}
       onSearchValueChange={onSearchValueChange}
+      container="runtime"
     />
   );
 };
