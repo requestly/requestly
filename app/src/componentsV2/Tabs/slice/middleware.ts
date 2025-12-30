@@ -1,7 +1,7 @@
 import type { EntityState } from "@reduxjs/toolkit";
 import { createListenerMiddleware } from "@reduxjs/toolkit";
 import { tabsActions } from "./slice";
-import { bufferActions } from "features/apiClient/slices/buffer/slice";
+import { bufferActions, findBufferByReferenceId } from "features/apiClient/slices/buffer/slice";
 import { apiRecordsAdapter } from "features/apiClient/slices/apiRecords/slice";
 import { environmentsAdapter } from "features/apiClient/slices/environments/slice";
 import type { ApiClientStoreState } from "features/apiClient/slices/workspaceView/helpers/ApiClientContextRegistry/types";
@@ -111,13 +111,20 @@ function handleOpenBufferedTab(action: ReturnType<typeof openBufferedTab>) {
   });
   const { entityType, entityId, data } = entityData;
 
+  const existingBuffer = findBufferByReferenceId(state.buffer.entities, entityId);
+
   const payloadAction = apiClientStore.dispatch(
-    bufferActions.open({
-      isNew,
-      entityType: entityType,
-      referenceId: entityId,
-      data: data,
-    })
+    bufferActions.open(
+      {
+        isNew,
+        entityType: entityType,
+        referenceId: entityId,
+        data: data,
+      },
+      {
+        id: existingBuffer?.id,
+      }
+    )
   );
 
   reduxStore.dispatch(

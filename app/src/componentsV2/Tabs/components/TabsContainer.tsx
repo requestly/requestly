@@ -16,9 +16,9 @@ import {
   useTabs,
   useHasAnyUnsavedChanges,
   useIsTabDirty,
-  useTabTitle,
   usePreviewTabId,
   BufferModeTab,
+  useTabTitle,
 } from "../slice";
 import { TabState } from "../slice/types";
 import { DraftRequestContainerTabSource } from "features/apiClient/screens/apiClient/components/views/components/DraftRequestContainer/draftRequestContainerTabSource";
@@ -37,8 +37,6 @@ const BufferedTabLabel: React.FC<BufferedTabLabelProps> = ({ tab, onClose, onDou
   const title = useTabTitle(tab);
   const previewTabId = usePreviewTabId();
   const isPreview = tab.id === previewTabId;
-
-  console.log({ title, tab: tab.source.getSourceId() });
 
   return (
     <div className="tab-title-container" onDoubleClick={onDoubleClick}>
@@ -264,16 +262,11 @@ export const TabsContainer: React.FC = () => {
       label: (
         <TabLabel
           tab={tab}
-          key={tab.source.getSourceId()}
           onClose={() => closeTab({ tabId: tab.id })}
           onDoubleClick={() => handleUnpreviewTab(tab.id)}
         />
       ),
-      children: (
-        <TabItem key={tab.source.getSourceId()} tabId={tab.id}>
-          {tab.source.render()}
-        </TabItem>
-      ),
+      children: <TabItem tabId={tab.id}>{tab.source.render()}</TabItem>,
     }));
   }, [tabs, closeTab, handleUnpreviewTab]);
 
