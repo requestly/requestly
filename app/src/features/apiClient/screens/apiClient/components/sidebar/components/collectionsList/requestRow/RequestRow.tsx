@@ -22,13 +22,15 @@ import { MdMoveDown } from "@react-icons/all-files/md/MdMoveDown";
 import { Conditional } from "components/common/Conditional";
 import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
 import { RequestViewTabSource } from "../../../../views/components/RequestView/requestViewTabSource";
-import { useDrag } from "react-dnd";
+import { useDrag, useDrop } from "react-dnd";
 import { GrGraphQl } from "@react-icons/all-files/gr/GrGraphQl";
 import { useContextId } from "features/apiClient/contexts/contextId.context";
-import { useApiClientRepository } from "features/apiClient/contexts/meta";
+import { useApiClientRepository, useApiClientFeatureContext } from "features/apiClient/contexts/meta";
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
 import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 import { isGraphQLApiRecord, isHttpApiRecord } from "features/apiClient/screens/apiClient/utils";
+import { apiRecordsRankingManager } from "features/apiClient/helpers/ranking";
+import { saveOrUpdateRecord } from "features/apiClient/commands/store.utils";
 
 interface Props {
   record: RQAPI.ApiRecord;
@@ -41,6 +43,8 @@ interface Props {
   };
   handleRecordsToBeDeleted: (records: RQAPI.ApiClientRecord[], context?: ApiClientFeatureContext) => void;
   onItemClick?: (record: RQAPI.ApiClientRecord, event: React.MouseEvent) => void;
+  previousRecord?: RQAPI.ApiRecord | null;
+  nextRecord?: RQAPI.ApiRecord | null;
 }
 
 export const HttpMethodIcon = ({ method }: { method: RequestMethod }) => {
@@ -76,13 +80,17 @@ export const RequestRow: React.FC<Props> = ({
   bulkActionOptions,
   handleRecordsToBeDeleted,
   onItemClick,
+  previousRecord,
+  nextRecord,
 }) => {
   const { selectedRecords, showSelection, recordsSelectionHandler, setShowSelection } = bulkActionOptions || {};
   const [isEditMode, setIsEditMode] = useState(false);
   const [recordToMove, setRecordToMove] = useState<RQAPI.ApiRecord | null>(null);
+  const [dropPosition, setDropPosition] = useState<"before" | "after" | null>(null);
 
   const { apiClientRecordsRepository } = useApiClientRepository();
   const { onSaveRecord } = useNewApiClientContext();
+  const context = useApiClientFeatureContext();
 
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
 
@@ -108,6 +116,75 @@ export const RequestRow: React.FC<Props> = ({
     }),
     [record, contextId]
   );
+
+  const [{ isOverCurrent }, drop] = useDrop(
+    () => ({
+      accept: [RQAPI.RecordType.API, RQAPI.RecordType.COLLECTION],
+      canDrop: (item: { record: RQAPI.ApiClientRecord; contextId: string }) => {
+        if (!item || item.contextId !== contextId) return false;
+        if (item.record.id === record.id) return false;
+        return true;
+      },
+      hover: (item: { record: RQAPI.ApiClientRecord; contextId: string }, monitor) => {
+        if (!monitor.isOver({ shallow: true })) {
+          return;
+        }
+
+        const hoverBoundingRect = monitor.getClientOffset();
+        const targetElement = document.getElementById(`request-row-${record.id}`);
+
+        if (hoverBoundingRect && targetElement) {
+          const targetRect = targetElement.getBoundingClientRect();
+          const hoverMiddleY = (targetRect.bottom - targetRect.top) / 2;
+          const hoverClientY = hoverBoundingRect.y - targetRect.top;
+
+          setDropPosition(hoverClientY < hoverMiddleY ? "before" : "after");
+        }
+      },
+      drop: async (item: { record: RQAPI.ApiClientRecord; contextId: string }, monitor) => {
+        if (!monitor.isOver({ shallow: true })) {
+          setDropPosition(null);
+          return;
+        }
+
+        const currentDropPosition = dropPosition;
+        setDropPosition(null);
+
+        try {
+          const before = currentDropPosition === "before" ? previousRecord ?? null : record;
+          const after = currentDropPosition === "after" ? nextRecord ?? null : record;
+
+          const rank = apiRecordsRankingManager.getRankBetweenRecords(before, after, [item.record])[0];
+          const targetCollectionId = record.collectionId;
+
+          const patch: Partial<RQAPI.ApiRecord> = {
+            id: item.record.id,
+            rank,
+            collectionId: targetCollectionId,
+          };
+
+          const result = await apiClientRecordsRepository.updateRecord(patch, item.record.id);
+
+          if (result.success) {
+            saveOrUpdateRecord(context, result.data);
+          }
+        } catch (error) {
+          console.error("Failed to reorder request:", error);
+        }
+      },
+      collect: (monitor) => ({
+        isOverCurrent: monitor.isOver({ shallow: true }),
+      }),
+    }),
+    [record, contextId, previousRecord, nextRecord, dropPosition, apiClientRecordsRepository, context]
+  );
+
+  // Clear drop position when no longer hovering
+  React.useEffect(() => {
+    if (!isOverCurrent && dropPosition !== null) {
+      setDropPosition(null);
+    }
+  }, [isOverCurrent, dropPosition]);
 
   const handleDropdownVisibleChange = (isOpen: boolean) => {
     setIsDropdownVisible(isOpen);
@@ -229,7 +306,17 @@ export const RequestRow: React.FC<Props> = ({
           }}
         />
       ) : (
-        <div className={`request-row`} ref={drag} style={{ opacity: isDragging ? 0.5 : 1 }}>
+        <div
+          id={`request-row-${record.id}`}
+          className={`request-row ${dropPosition === "before" ? "drop-before" : ""} ${
+            dropPosition === "after" ? "drop-after" : ""
+          }`}
+          ref={(node) => {
+            drag((node as unknown) as HTMLDivElement);
+            drop((node as unknown) as HTMLDivElement);
+          }}
+          style={{ opacity: isDragging ? 0.5 : 1 }}
+        >
           <div
             className={`collections-list-item api ${record.id === activeTabSourceId ? "active" : ""} ${
               selectedRecords.has(record.id) && showSelection ? "selected" : ""

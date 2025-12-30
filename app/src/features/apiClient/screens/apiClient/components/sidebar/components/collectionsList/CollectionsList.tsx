@@ -400,7 +400,10 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
                   </div>
                 )}
 
-              {updatedRecords.requests.map((record) => {
+              {updatedRecords.requests.map((record, index) => {
+                const recordBefore = index > 0 ? updatedRecords.requests[index - 1] : null;
+                const recordAfter =
+                  index < updatedRecords.requests.length - 1 ? updatedRecords.requests[index + 1] : null;
                 return (
                   <RequestRow
                     key={record.id}
@@ -408,6 +411,8 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
                     isReadOnly={!isValidPermission}
                     handleRecordsToBeDeleted={handleRecordsToBeDeleted}
                     onItemClick={handleItemClick}
+                    recordBefore={recordBefore}
+                    recordAfter={recordAfter}
                     bulkActionOptions={{ showSelection, selectedRecords, recordsSelectionHandler, setShowSelection }}
                   />
                 );
