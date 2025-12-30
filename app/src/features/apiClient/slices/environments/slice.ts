@@ -19,7 +19,7 @@ export const environmentsAdapter = createEntityAdapter<EnvironmentEntity>({
 const initialState: EnvironmentsState = {
   environments: environmentsAdapter.getInitialState(),
   globalEnvironment: {
-    id: "global_environment",
+    id: GLOBAL_ENVIRONMENT_ID,
     name: "Global Environment",
     variables: {},
   },
@@ -112,10 +112,10 @@ export const environmentsSlice = createSlice({
         }
       } else if (entityType === ApiClientEntityType.GLOBAL_ENVIRONMENT) {
         if (data) {
-          environmentsAdapter.updateOne(state.environments, {
-            id: GLOBAL_ENVIRONMENT_ID,
-            changes: data,
-          });
+          state.globalEnvironment = {
+            ...state.globalEnvironment,
+            ...data,
+          };
         }
       }
     });
@@ -166,7 +166,7 @@ const globalEnvHydrationTransformer = createTransform<
   (inboundState) => {
     if (!inboundState) {
       return {
-        id: "global_environment",
+        id: GLOBAL_ENVIRONMENT_ID,
         name: "Global Environment",
         variables: {},
       };

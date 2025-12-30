@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { EnvironmentVariableType } from "backend/environment/types";
+import React, { useState, useCallback, useMemo, useRef, useEffect } from "react";
+import { EnvironmentVariableType, EnvironmentVariables } from "backend/environment/types";
 import { useVariablesListColumns } from "./hooks/useVariablesListColumns";
 import { RQButton } from "lib/design-system-v2/components";
 import { MdAdd } from "@react-icons/all-files/md/MdAdd";
@@ -10,37 +10,47 @@ import { trackAddVariableClicked } from "../../analytics";
 import "./variablesList.scss";
 import { VariableData } from "features/apiClient/store/variables/types";
 import EmptySearchResultsView from "./components/emptySearchResultsView/EmptySearchResultsView";
+import { ApiClientVariables } from "features/apiClient/slices/entities/api-client-variables";
+import { mapToEnvironmentArray } from "../../utils";
+import { debounce } from "lodash";
 
 interface VariablesListProps {
-  variables: VariableRow[];
-  searchValue?: string;
-  onVariablesChange: (variables: VariableRow[]) => void;
+  variablesData: EnvironmentVariables;
+  variables: ApiClientVariables<any>;
+  searchValue: string;
+  onSearchValueChange: (value: string) => void;
   isReadOnly?: boolean;
   container: "environments" | "runtime";
-  onSearchValueChange?: (value: string) => void;
 }
 
 export type VariableRow = VariableData & { key: string };
 
-const createNewVariable = (id: number, type: EnvironmentVariableType): VariableRow => ({
-  id,
-  key: "",
-  type,
-  syncValue: "",
-  localValue: "",
-  isPersisted: true,
-});
-
 export const VariablesList: React.FC<VariablesListProps> = ({
-  searchValue = "",
+  variablesData,
   variables,
-  onVariablesChange,
+  searchValue,
+  onSearchValueChange,
   isReadOnly = false,
   container = "environments",
-  onSearchValueChange = () => {},
 }) => {
-  const [dataSource, setDataSource] = useState<VariableRow[]>([]);
-  const [visibleSecretsRowIds, setVisibleSecrets] = useState<number[]>([]);
+  const [visibleSecretsRowIds, setVisibleSecrets] = useState<(number | string)[]>([]);
+
+  const dataSource = useMemo(() => {
+    const arr = mapToEnvironmentArray(variablesData);
+    if (arr.length === 0) {
+      return [
+        {
+          id: "__empty__",
+          key: "",
+          type: EnvironmentVariableType.String,
+          syncValue: "",
+          localValue: "",
+          isPersisted: true,
+        } as VariableRow,
+      ];
+    }
+    return arr;
+  }, [variablesData]);
 
   const filteredDataSource = useMemo(
     () => dataSource.filter((item) => item.key.toLowerCase().includes(searchValue.toLowerCase())),
@@ -52,7 +62,6 @@ export const VariablesList: React.FC<VariablesListProps> = ({
   const duplicateKeyIndices = useMemo(() => {
     const keyIndices = new Map<string, number[]>();
 
-    // Collecting all indices for each key
     dataSource.forEach((row, index) => {
       if (row.key) {
         const lowercaseKey = row.key.toLowerCase();
@@ -62,70 +71,65 @@ export const VariablesList: React.FC<VariablesListProps> = ({
       }
     });
 
-    // Create a set of indices (all except the last occurrence)
-    const overridenIndices = new Set<number>();
+    const overridenIds = new Set<number | string>();
 
     keyIndices.forEach((indices) => {
       if (indices.length > 1) {
-        // Add all indices except the last one to the set
         indices.slice(0, -1).forEach((index) => {
-          overridenIndices.add(dataSource[index].id);
+          const row = dataSource[index];
+          if (row) {
+            overridenIds.add(row.id);
+          }
         });
       }
     });
 
-    return overridenIndices;
+    return overridenIds;
   }, [dataSource]);
 
   const handleVariableChange = useCallback(
     (row: VariableRow, fieldChanged: keyof VariableRow) => {
-      const variableRows = [...dataSource];
-      const index = variableRows.findIndex((variable) => row.id === variable.id);
-      const item = variableRows[index];
-
-      if (row.key !== undefined && row.key !== null) {
-        const updatedRow = { ...item, ...row };
-        variableRows.splice(index, 1, updatedRow);
-        setDataSource(variableRows);
-
-        onVariablesChange(variableRows);
-      }
-    },
-    [dataSource, onVariablesChange]
-  );
-
-  const handleAddNewRow = useCallback(
-    (dataSource: VariableRow[]) => {
-      const newVariable = createNewVariable(dataSource.length, EnvironmentVariableType.String);
-      const newDataSource = [...dataSource, newVariable];
-      setDataSource(newDataSource);
-      if (container === "runtime") {
-        onVariablesChange(newDataSource);
-      }
-    },
-    [container, onVariablesChange]
-  );
-
-  const handleDeleteVariable = useCallback(
-    async (id: number) => {
-      if (isNaN(id)) {
+      if (row.id === "__empty__") {
+        if (row.key) {
+          variables.add({
+            key: row.key,
+            type: row.type,
+            syncValue: row.syncValue,
+            localValue: row.localValue,
+            isPersisted: true,
+          });
+        }
         return;
       }
-      const newData = dataSource.filter((item) => item.id !== id).map((record, index) => ({ ...record, id: index }));
 
-      setDataSource(newData);
-
-      onVariablesChange(newData);
-
-      if (newData.length === 0) {
-        handleAddNewRow([]);
-      }
+      variables.set({ id: row.id, [fieldChanged]: row[fieldChanged] });
     },
-    [dataSource, handleAddNewRow, onVariablesChange]
+    [variables]
+  );
+
+  const handleAddNewRow = useCallback(() => {
+    trackAddVariableClicked(EnvironmentAnalyticsContext.API_CLIENT, EnvironmentAnalyticsSource.VARIABLES_LIST);
+    variables.add({
+      key: "",
+      type: EnvironmentVariableType.String,
+      syncValue: "",
+      localValue: "",
+      isPersisted: true,
+    });
+  }, [variables]);
+
+  const handleDeleteVariable = useCallback(
+    (id: number | string) => {
+      if (id === "__empty__") {
+        return;
+      }
+      variables.delete(id);
+    },
+    [variables]
   );
 
   const handleUpdateVisibleSecretsRowIds = useCallback(
-    (id: number) => {
+    (id: number | string) => {
       if (visibleSecretsRowIds.includes(id)) {
         setVisibleSecrets(visibleSecretsRowIds.filter((secretRowId) => secretRowId !== id));
       } else {
@@ -136,20 +140,13 @@ export const VariablesList: React.FC<VariablesListProps> = ({
   );
 
   const handleUpdatePersisted = useCallback(
-    (id: number, isPersisted: boolean) => {
-      const variableRows = [...dataSource];
-      const index = variableRows.findIndex((variable) => variable.id === id);
-      const item = variableRows[index];
-
-      if (item) {
-        const updatedRow = { ...item, isPersisted };
-        variableRows.splice(index, 1, updatedRow);
-        setDataSource(variableRows);
-
-        onVariablesChange(variableRows);
+    (id: number | string, isPersisted: boolean) => {
+      if (id === "__empty__") {
+        return;
       }
+      variables.set({ id, isPersisted: isPersisted as true });
     },
-    [dataSource, onVariablesChange]
+    [variables]
   );
 
   const columns = useVariablesListColumns({
@@ -163,24 +160,6 @@ export const VariablesList: React.FC<VariablesListProps> = ({
     isReadOnly,
     container,
   });
-
-  useEffect(() => {
-    if (variables) {
-      const formattedDataSource = [...variables].sort((a, b) => {
-        return a.id - b.id; // Sort by id if both ids are defined
-      });
-
-      if (formattedDataSource.length === 0) {
-        formattedDataSource.push(createNewVariable(0, EnvironmentVariableType.String));
-      }
-      setDataSource(formattedDataSource);
-    }
-  }, [variables, container]);
-
-  const handleAddVariable = () => {
-    trackAddVariableClicked(EnvironmentAnalyticsContext.API_CLIENT, EnvironmentAnalyticsSource.VARIABLES_LIST);
-    handleAddNewRow(dataSource);
-  };
 
   return (
     <ContentListTable
@@ -205,7 +184,7 @@ export const VariablesList: React.FC<VariablesListProps> = ({
           ? undefined
           : () => (
               <div className="variables-list-footer">
-                <RQButton icon={<MdAdd />} size="small" onClick={handleAddVariable}>
+                <RQButton icon={<MdAdd />} size="small" onClick={handleAddNewRow}>
                   Add More
                 </RQButton>
               </div>

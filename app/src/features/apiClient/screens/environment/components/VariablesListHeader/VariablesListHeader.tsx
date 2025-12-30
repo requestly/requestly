@@ -15,7 +15,6 @@ import PostmanIcon from "assets/img/brand/postman-icon.svg";
 import { toast } from "utils/Toast";
 import { updateEnvironmentName, useApiClientRepository } from "features/apiClient/slices";
 import { useWorkspaceId } from "features/apiClient/common/WorkspaceProvider";
-import { useDispatch } from "react-redux";
 import { useApiClientDispatch } from "features/apiClient/slices/hooks/base.hooks";
 
 interface VariablesListHeaderProps {
@@ -23,6 +22,9 @@ interface VariablesListHeaderProps {
   currentEnvironmentName: string;
   environmentId: string;
   hideBreadcrumb?: boolean;
+  hasUnsavedChanges: boolean;
+  isSaving: boolean;
+  isNewEnvironment: boolean;
   exportActions?: {
     showExport: boolean;
     enableExport: boolean;
@@ -41,6 +43,9 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
   hideBreadcrumb = false,
   onSave,
   exportActions,
+  hasUnsavedChanges,
+  isSaving,
+  isNewEnvironment,
 }) => {
   // TEMP: Commented out for testing buffer migration - rename functionality needs Zustand context
   // const {
@@ -52,7 +57,6 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
 
   const repos = useApiClientRepository(workspaceId);
   const enableHotKey = true;
-  const isNewEnvironment = true;
 
   const handleNewEnvironmentNameChange = async (newName: string) => {
     try {
@@ -64,11 +68,20 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
           name: updatedName,
           repository: repos.environmentVariablesRepository,
         })
-      ).unwrap()
+      ).unwrap();
 
       console.log("Rename disabled for testing. Would rename to:", updatedName);
     } catch (error) {
       toast.error(error.message || "Could not rename environment!");
+    }
+  };
+
+  const handleSave = async () => {
+    try {
+      await onSave();
+      toast.success("Environment saved successfully");
+    } catch (error) {
+      toast.error(error.message || "Could not save environment!");
     }
   };
 
@@ -147,9 +160,9 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
             hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SAVE_ENVIRONMENT.hotKey}
             enableHotKey={enableHotKey}
             type="primary"
-            onClick={onSave}
-            // disabled={!hasUnsavedChanges}
-            // loading={isSaving}
+            onClick={handleSave}
+            disabled={!hasUnsavedChanges}
+            loading={isSaving}
           >
             Save
           </RQButton>
