@@ -143,12 +143,8 @@ export function useHasAnyUnsavedChanges(): boolean {
       return false;
     }
 
-    try {
-      const { buffer } = getTabBufferedEntity(tab as BufferModeTab);
-      return buffer?.isDirty;
-    } catch {
-      return false;
-    }
+    const { buffer } = getTabBufferedEntity(tab as BufferModeTab);
+    return buffer.isDirty;
   });
 
   return hasUnsaved;
