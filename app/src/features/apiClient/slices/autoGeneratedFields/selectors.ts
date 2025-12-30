@@ -56,14 +56,7 @@ function makeFilledAuthSelector(id: string, scopedVariables: ScopedVariables) {
       if(auth.currentAuthType === Authorization.Type.NO_AUTH) {
         return auth;
       }
-      const templatetisedAuth = auth.authConfigStore[auth.currentAuthType];
-      if(!templatetisedAuth) {
-        return {
-          currentAuthType: Authorization.Type.NO_AUTH,
-          authConfigStore: {},
-        } as RQAPI.Auth
-      }
-      const { renderedTemplate } = renderTemplate(templatetisedAuth as any, lodash.mapValues(scopedVariables, ([v]) => v));
+      const { renderedTemplate } = renderTemplate(auth as any, lodash.mapValues(scopedVariables, ([v]) => v));
       return renderedTemplate as RQAPI.Auth;
     },
   );
