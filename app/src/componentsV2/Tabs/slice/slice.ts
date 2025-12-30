@@ -95,21 +95,18 @@ export const tabsSlice = createSlice({
 
     updateTab(
       state,
-      action: PayloadAction<{
-        tabId: TabId;
-        source: TabSource;
-        modeConfig?: TabState["modeConfig"];
-      }>
+      action: PayloadAction<
+        {
+          tabId: TabId;
+        } & Partial<{ source: TabSource; modeConfig: TabState["modeConfig"] }>
+      >
     ) {
-      const { tabId, source, modeConfig } = action.payload;
+      const { tabId, ...changes } = action.payload;
       const tab = tabsAdapter.getSelectors().selectById(state.tabs, tabId);
       if (tab) {
         tabsAdapter.updateOne(state.tabs, {
           id: tabId,
-          changes: {
-            source,
-            ...(modeConfig ?? {}),
-          },
+          changes,
         });
       }
     },
