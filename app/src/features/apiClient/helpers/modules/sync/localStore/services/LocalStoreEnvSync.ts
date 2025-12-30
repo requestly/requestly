@@ -131,7 +131,7 @@ export class LocalStoreEnvSync implements EnvironmentInterface<ApiClientLocalSto
       }
 
       if (updates.variables) {
-        environment.variables = { ...environment.variables, ...updates.variables };
+        environment.variables = { ...updates.variables };
       }
 
       await this.queryService.updateRecord(environmentId, environment);
