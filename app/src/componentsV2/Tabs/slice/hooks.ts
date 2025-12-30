@@ -144,10 +144,7 @@ export function useHasAnyUnsavedChanges(): boolean {
     }
 
     try {
-      const workspaceId = tab.source.metadata.context?.id;
-      const { store } = getApiClientFeatureContext(workspaceId);
-      const buffer = store.getState().buffer.entities[tab.modeConfig.entityId];
-
+      const { buffer } = getTabBufferedEntity(tab as BufferModeTab);
       return buffer?.isDirty;
     } catch {
       return false;
