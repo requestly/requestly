@@ -73,7 +73,12 @@ export function getEntityDataFromTabSource(
   }
 
   if (isEnvironment) {
-    const environment = environmentsAdapter.getSelectors().selectById(state.environments.environments, sourceId);
+    const globalEnv = state.environments.globalEnvironment;
+
+    const environment =
+      globalEnv.id === sourceId
+        ? globalEnv
+        : environmentsAdapter.getSelectors().selectById(state.environments.environments, sourceId);
 
     if (!environment) {
       throw new EntityNotFound(sourceId, source.type);
