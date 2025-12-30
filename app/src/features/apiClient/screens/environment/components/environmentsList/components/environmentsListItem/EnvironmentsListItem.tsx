@@ -54,18 +54,6 @@ export enum EnvironmentMenuKey {
   DELETE = "delete",
 }
 
-async function renameEnvironment(_params: { environmentId: string; newName: string }) {
-  toast.warn("Rename environment not yet available during migration");
-}
-
-async function duplicateEnvironment(_params: { environmentId: string }) {
-  toast.warn("Duplicate environment not yet available during migration");
-}
-
-async function deleteEnvironment(_params: { environmentId: string }) {
-  toast.warn("Delete environment not yet available during migration");
-}
-
 export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
   isReadOnly,
   environmentId,
@@ -133,7 +121,7 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
       const allEnvironmentsMap = allEnvironments.reduce((acc, env) => {
         acc[env.id] = env;
         return acc;
-      }, {} as Record<string, (typeof allEnvironments)[number]>);
+      }, {} as Record<string, typeof allEnvironments[number]>);
 
       await dispatch(
         duplicateEnvironment({
