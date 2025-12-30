@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useCallback } from "react";
 import { Input, Dropdown } from "antd";
 import { MdOutlineSearch } from "@react-icons/all-files/md/MdOutlineSearch";
 import { RQBreadcrumb, RQButton } from "lib/design-system-v2/components";
@@ -6,7 +6,6 @@ import PATHS from "config/constants/sub/paths";
 import { isGlobalEnvironment } from "../../utils";
 import { KEYBOARD_SHORTCUTS } from "../../../../../../constants/keyboardShortcuts";
 import { RoleBasedComponent } from "features/rbac";
-import { useGenericState } from "hooks/useGenericState";
 // TEMP: Commented out for testing buffer migration
 // import { useCommand } from "features/apiClient/commands";
 import "./variablesListHeader.scss";
@@ -15,7 +14,6 @@ import PostmanIcon from "assets/img/brand/postman-icon.svg";
 import { toast } from "utils/Toast";
 import { updateEnvironmentName, useApiClientRepository } from "features/apiClient/slices";
 import { useWorkspaceId } from "features/apiClient/common/WorkspaceProvider";
-import { useDispatch } from "react-redux";
 import { useApiClientDispatch } from "features/apiClient/slices/hooks/base.hooks";
 
 interface VariablesListHeaderProps {
@@ -76,14 +74,14 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
     }
   };
 
-  const handleSave = async () => {
+  const handleSave = useCallback(async () => {
     try {
       await onSave();
       toast.success("Environment saved successfully");
     } catch (error) {
       toast.error(error.message || "Could not save environment!");
     }
-  };
+  }, [onSave]);
 
   return (
     <div className="variables-list-header">
@@ -157,7 +155,7 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
 
           <RQButton
             showHotKeyText
-            hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SAVE_ENVIRONMENT.hotKey}
+            hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SAVE_ENVIRONMENT?.hotKey}
             enableHotKey={enableHotKey}
             type="primary"
             onClick={handleSave}
