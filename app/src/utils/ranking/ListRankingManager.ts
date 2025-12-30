@@ -63,7 +63,7 @@ export abstract class ListRankingManager<T> {
    * @param records - Array of records to generate ranks for
    * @returns Single rank string or array of rank strings
    */
-  getRankBetweenRecords(before: T | null, after: T | null, records: T[]): string | string[] {
+  getRankBetweenRecords(before: T | null, after: T | null, records: T[]): string[] {
     const count = records.length;
 
     if (count === 0) {
@@ -72,10 +72,6 @@ export abstract class ListRankingManager<T> {
 
     // If both before and after are null (empty list), use generated ranks
     if (before === null && after === null) {
-      // For single record, generate one rank
-      if (count === 1) {
-        return this.getEffectiveRank(records[0]);
-      }
       // For multiple records, return their generated ranks
       return records.map((record) => this.getEffectiveRank(record));
     }
@@ -84,11 +80,21 @@ export abstract class ListRankingManager<T> {
     const beforeRank = before ? this.getEffectiveRank(before) : null;
     const afterRank = after ? this.getEffectiveRank(after) : null;
 
-    // Generate ranks between beforeRank and afterRank
-    const newRanks = generateNKeysBetween(beforeRank, afterRank, count);
+    const newRanks = [];
+    // try generateNKeysBetween(beforeRank, afterRank, count); if it fails then try generateNKeysBetween(afterRank, beforeRank, count); if it also fails then log the error
 
-    // Return single string if only one rank, otherwise array
-    return count === 1 ? newRanks[0] : newRanks;
+    try {
+      newRanks.push(...generateNKeysBetween(beforeRank, afterRank, count));
+    } catch (e) {
+      try {
+        newRanks.push(...generateNKeysBetween(afterRank, beforeRank, count));
+      } catch (e2) {
+        console.error("Failed to generate ranks between ", { beforeRank, afterRank, count }, e2);
+        throw e2;
+      }
+    }
+    // Return the array of new ranks
+    return newRanks;
   }
 
   /**
