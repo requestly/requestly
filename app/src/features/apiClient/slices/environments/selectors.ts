@@ -15,13 +15,18 @@ export const selectAllEnvironments = adapterSelectors.selectAll;
 export const selectEnvironmentsEntities = adapterSelectors.selectEntities;
 export const selectEnvironmentIds = adapterSelectors.selectIds;
 export const selectTotalEnvironments = adapterSelectors.selectTotal;
-export const selectEnvironmentById = adapterSelectors.selectById;
+
+// Select environment by id - checks both entity adapter and global environment
+export const selectEnvironmentById = (state: ApiClientStoreState, id: EntityId): EnvironmentEntity | undefined => {
+  const globalEnv = state.environments.globalEnvironment;
+  if (globalEnv && globalEnv.id === id) {
+    return globalEnv;
+  }
+  return adapterSelectors.selectById(state, id);
+};
 
 // Active environment
-export const selectActiveEnvironmentId = createSelector(
-  selectEnvironmentsSlice,
-  (slice) => slice.activeEnvironmentId
-);
+export const selectActiveEnvironmentId = createSelector(selectEnvironmentsSlice, (slice) => slice.activeEnvironmentId);
 
 export const selectActiveEnvironment = createSelector(
   [selectEnvironmentsEntities, selectActiveEnvironmentId],
@@ -32,10 +37,7 @@ export const selectActiveEnvironment = createSelector(
 );
 
 // Global environment
-export const selectGlobalEnvironment = createSelector(
-  selectEnvironmentsSlice,
-  (slice) => slice.globalEnvironment
-);
+export const selectGlobalEnvironment = createSelector(selectEnvironmentsSlice, (slice) => slice.globalEnvironment);
 
 // Environment by id (parameterized)
 export const selectEnvironmentByIdParam = createSelector(
@@ -77,4 +79,3 @@ export const makeSelectEnvironmentVariables = () =>
     [selectEnvironmentsEntities, (_state: ApiClientStoreState, id: EntityId) => id],
     (entities, id) => entities[id]?.variables ?? {}
   );
-
