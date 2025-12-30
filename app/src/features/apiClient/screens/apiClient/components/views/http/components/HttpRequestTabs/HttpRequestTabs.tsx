@@ -35,6 +35,14 @@ interface Props {
   handleAuthChange: (newAuth: RQAPI.Auth) => void;
   focusPostResponseScriptEditor?: boolean;
   scriptEditorVersion?: number;
+  bulkEditConfigs?: {
+    setIsBulkEditPanelOpen: (isOpen: boolean) => void;
+    setBulkEditTableType: (type: "headers" | "queryParams") => void;
+    showHeadersDescription: boolean;
+    onShowHeadersDescriptionChange: (show: boolean) => void;
+    showQueryParamsDescription: boolean;
+    onShowQueryParamsDescriptionChange: (show: boolean) => void;
+  };
 }
 
 const HttpRequestTabs: React.FC<Props> = ({
@@ -46,6 +54,7 @@ const HttpRequestTabs: React.FC<Props> = ({
   handleAuthChange,
   focusPostResponseScriptEditor,
   scriptEditorVersion,
+  bulkEditConfigs,
 }) => {
   const showCredentialsCheckbox = useFeatureValue("api-client-include-credentials", false);
 
@@ -91,6 +100,12 @@ const HttpRequestTabs: React.FC<Props> = ({
                   },
                 }));
               }}
+              bulkEditConfigs={{
+                setIsBulkEditPanelOpen: bulkEditConfigs?.setIsBulkEditPanelOpen,
+                setBulkEditTableType: bulkEditConfigs?.setBulkEditTableType,
+                showDescription: bulkEditConfigs?.showQueryParamsDescription ?? false,
+                onShowDescriptionChange: bulkEditConfigs?.onShowQueryParamsDescriptionChange,
+              }}
             />
             <PathVariableTable
               recordId={requestId}
@@ -135,6 +150,12 @@ const HttpRequestTabs: React.FC<Props> = ({
                 ...prev,
                 request: { ...prev.request, headers: newHeaders },
               }));
+            }}
+            bulkEditConfigs={{
+              setIsBulkEditPanelOpen: bulkEditConfigs?.setIsBulkEditPanelOpen,
+              setBulkEditTableType: bulkEditConfigs?.setBulkEditTableType,
+              showDescription: bulkEditConfigs?.showHeadersDescription ?? false,
+              onShowDescriptionChange: bulkEditConfigs?.onShowHeadersDescriptionChange,
             }}
           />
         ),
@@ -186,6 +207,7 @@ const HttpRequestTabs: React.FC<Props> = ({
     focusPostResponseScriptEditor,
     scriptEditorVersion,
     getContentTypeWithAlert,
+    bulkEditConfigs,
   ]);
 
   return (
@@ -193,6 +215,9 @@ const HttpRequestTabs: React.FC<Props> = ({
       requestId={requestId}
       items={items}
       defaultActiveKey={RequestTab.QUERY_PARAMS}
+      onChange={() => {
+        bulkEditConfigs?.setIsBulkEditPanelOpen?.(false);
+      }}
       tabBarExtraContent={
         <Conditional
           condition={showCredentialsCheckbox && isFeatureCompatible(FEATURES.API_CLIENT_INCLUDE_CREDENTIALS)}

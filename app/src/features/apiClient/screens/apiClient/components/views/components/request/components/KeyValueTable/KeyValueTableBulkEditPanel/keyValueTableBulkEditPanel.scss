@@ -1,0 +1,41 @@
+.key-value-bulk-edit-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+
+  .bulk-edit-panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+
+    .bulk-edit-panel-close-btn {
+      flex-shrink: 0;
+    }
+
+    .bulk-edit-panel-title {
+      font-size: 12px;
+      color: var(--requestly-color-text-tertiary, #8f8f8f);
+    }
+  }
+
+  .bulk-edit-panel-content {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow: hidden;
+    padding: 0px 8px;
+
+    .bulk-edit-panel-hint {
+      margin-top: 8px;
+      font-size: 12px;
+      color: var(--requestly-color-text-tertiary, #8f8f8f);
+    }
+
+    .code-editor {
+      flex: 1;
+      border-radius: 4px;
+    }
+  }
+}

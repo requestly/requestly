@@ -81,4 +81,45 @@
       padding: 6px;
     }
   }
+
+  // Bulk edit panel split layout
+  .api-client-body-with-bulk-edit {
+    display: flex;
+    height: 100%;
+    gap: 0;
+
+    &.horizontal-split {
+      flex-direction: row;
+
+      .api-client-table-pane {
+        flex: 1;
+        min-width: 300px;
+        overflow: hidden;
+      }
+
+      .api-client-bulk-edit-pane {
+        flex: 1;
+        min-width: 300px;
+        overflow: hidden;
+        border-left: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
+      }
+    }
+
+    &.vertical-split {
+      flex-direction: column;
+
+      .api-client-table-pane {
+        flex: 1;
+        min-height: 200px;
+        overflow: hidden;
+      }
+
+      .api-client-bulk-edit-pane {
+        flex: 1;
+        min-height: 200px;
+        overflow: hidden;
+        border-top: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
+      }
+    }
+  }
 }
