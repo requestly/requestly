@@ -5,8 +5,39 @@ import { entitySynced } from "../common/actions";
 import { ApiClientEntityType } from "../entities/types";
 import { GLOBAL_ENVIRONMENT_ID } from "../common/constants";
 import { environmentsActions } from "./slice";
+import { EnvironmentEntity } from "./types";
 
 type Repository = EnvironmentInterface<Record<string, unknown>>;
+
+export const createEnvironment = createAsyncThunk<
+  { id: string; name: string },
+  {
+    name: string;
+    variables?: EnvironmentVariables;
+    repository: Repository;
+  },
+  { rejectValue: string }
+>("environments/create", async ({ name, variables, repository }, { dispatch, rejectWithValue }) => {
+  try {
+    const newEnvironment = await repository.createNonGlobalEnvironment(name);
+
+    const environmentEntity: EnvironmentEntity = {
+      id: newEnvironment.id,
+      name: newEnvironment.name,
+      variables: variables || {},
+    };
+
+    dispatch(environmentsActions.environmentCreated(environmentEntity));
+
+    if (variables && Object.keys(variables).length > 0) {
+      await repository.updateEnvironment(newEnvironment.id, { variables });
+    }
+
+    return { id: newEnvironment.id, name: newEnvironment.name };
+  } catch (error) {
+    return rejectWithValue(error instanceof Error ? error.message : "Failed to create environment");
+  }
+});
 
 export const updateEnvironmentVariables = createAsyncThunk<
   void,

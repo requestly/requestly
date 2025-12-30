@@ -13,7 +13,6 @@ import {
   trackEnvironmentDuplicated,
   trackEnvironmentRenamed,
 } from "modules/analytics/events/features/apiClient";
-import { EnvironmentViewTabSource } from "../../../environmentView/EnvironmentViewTabSource";
 import { IoChevronForward } from "@react-icons/all-files/io5/IoChevronForward";
 import RequestlyIcon from "assets/img/brand/rq_logo.svg";
 import PostmanIcon from "assets/img/brand/postman-icon.svg";
@@ -32,6 +31,7 @@ import {
   duplicateEnvironment,
 } from "features/apiClient/slices/environments/thunks";
 import { useApiClientRepository } from "features/apiClient/slices";
+import { EnvironmentViewTabSource } from "../../../environmentView/EnvironmentViewTabSource";
 
 export enum ExportType {
   REQUESTLY = "requestly",
@@ -41,6 +41,7 @@ export enum ExportType {
 interface EnvironmentsListItemProps {
   isReadOnly: boolean;
   environmentId: string;
+  isGlobal: boolean;
   onExportClick?: (environment: { id: string; name: string }, exportType: ExportType) => void;
 }
 
@@ -57,6 +58,7 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
   isReadOnly,
   environmentId,
   onExportClick,
+  isGlobal,
 }) => {
   const dispatch = useApiClientDispatch();
   const workspaceId = useWorkspaceId();
@@ -98,6 +100,7 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
           context: {
             id: workspaceId,
           },
+          isGlobal,
         }),
       });
       toast.success("Environment renamed successfully");
@@ -118,7 +121,7 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
       const allEnvironmentsMap = allEnvironments.reduce((acc, env) => {
         acc[env.id] = env;
         return acc;
-      }, {} as Record<string, typeof allEnvironments[number]>);
+      }, {} as Record<string, (typeof allEnvironments)[number]>);
 
       await dispatch(
         duplicateEnvironment({
@@ -186,6 +189,10 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
     ];
   }, [handleEnvironmentDuplicate, onExportClick, environment, handleEnvironmentDelete]);
 
+  if (!environment) {
+    return null;
+  }
+
   if (isRenameInputVisible) {
     return (
       <Input
@@ -211,6 +218,7 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
             context: {
               id: workspaceId,
             },
+            isGlobal,
           }),
         });
       }}

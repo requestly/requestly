@@ -73,19 +73,19 @@ export function getEntityDataFromTabSource(
   }
 
   if (isEnvironment) {
+    const isGlobalEnvironment = source.metadata.isGlobal;
     const globalEnv = state.environments.globalEnvironment;
 
-    const environment =
-      globalEnv.id === sourceId
-        ? globalEnv
-        : environmentsAdapter.getSelectors().selectById(state.environments.environments, sourceId);
+    const environment = isGlobalEnvironment
+      ? globalEnv
+      : environmentsAdapter.getSelectors().selectById(state.environments.environments, sourceId);
 
     if (!environment) {
       throw new EntityNotFound(sourceId, source.type);
     }
 
     return {
-      entityType: ApiClientEntityType.ENVIRONMENT,
+      entityType: isGlobalEnvironment ? ApiClientEntityType.GLOBAL_ENVIRONMENT : ApiClientEntityType.ENVIRONMENT,
       entityId: sourceId,
       data: environment,
     };
