@@ -9,13 +9,12 @@ import { RQButton } from "lib/design-system-v2/components";
 import {
   useTabActions,
   useTabs,
-  getTabBufferedEntity,
   useTabTitle,
   useIsTabDirty,
   BufferModeTab,
+  getTabBufferedEntity,
 } from "componentsV2/Tabs/slice";
 import { TabState, TabId } from "componentsV2/Tabs/slice/types";
-import { getApiClientFeatureContext } from "features/apiClient/slices/workspaceView/helpers/ApiClientContextRegistry/hooks";
 
 interface TabsMorePopoverProps {
   onTabItemClick: (id: TabId) => void;
@@ -108,49 +107,42 @@ export const TabsMorePopover: React.FC<TabsMorePopoverProps> = ({ onTabItemClick
   const inputRef = useRef<InputRef>(null);
   const tabs = useTabs();
 
-  // Helper to get tab title for filtering (non-reactive, just for filtering)
-  const getTabTitle = useCallback((tab: TabState): string => {
-    if (tab.modeConfig.mode !== "buffer") {
-      return tab.source.getDefaultTitle();
+  const getTabTitleForFilter = useCallback((tab: TabState): string => {
+    if (tab.modeConfig.mode === "buffer") {
+      try {
+        const { entity, store } = getTabBufferedEntity(tab as BufferModeTab);
+        return entity.getName(store.getState());
+      } catch {
+        return tab.source.getDefaultTitle();
+      }
     }
 
-    try {
-      const workspaceId = tab.source.metadata.context?.id;
-      if (!workspaceId) return tab.source.getDefaultTitle();
-
-      const { store } = getApiClientFeatureContext(workspaceId);
-      const { entity } = getTabBufferedEntity(tab as BufferModeTab);
-      return entity.getName(store.getState()) || tab.source.getDefaultTitle();
-    } catch {
-      return tab.source.getDefaultTitle();
-    }
-  }, []);
-
-  // Helper to check if tab is dirty (non-reactive, just for counting)
-  const isTabDirty = useCallback((tab: TabState): boolean => {
-    if (tab.modeConfig.mode !== "buffer") {
-      return false;
-    }
-
-    try {
-      const workspaceId = tab.source.metadata.context?.id;
-      if (!workspaceId) return false;
-
-      const { buffer } = getTabBufferedEntity(tab as BufferModeTab);
-      return buffer.isDirty;
-    } catch {
-      return false;
-    }
+    return tab.source.getDefaultTitle();
   }, []);
 
   const filteredTabs = useMemo(
-    () => (query.trim() ? tabs.filter((tab) => getTabTitle(tab).toLowerCase().includes(query.toLowerCase())) : tabs),
-    [tabs, query, getTabTitle]
+    () =>
+      tabs.filter((tab) => {
+        if (!query) return true;
+        return getTabTitleForFilter(tab).toLowerCase().includes(query.toLowerCase());
+      }),
+    [tabs, query, getTabTitleForFilter]
   );
 
   const unSavedTabsCount = useMemo(() => {
-    return tabs.filter(isTabDirty).length;
-  }, [tabs, isTabDirty]);
+    return tabs.filter((tab) => {
+      if (tab.modeConfig.mode !== "buffer") {
+        return false;
+      }
+
+      try {
+        const { buffer } = getTabBufferedEntity(tab as BufferModeTab);
+        return buffer.isDirty;
+      } catch {
+        return false;
+      }
+    }).length;
+  }, [tabs]);
 
   useEffect(() => {
     if (inputRef.current) {

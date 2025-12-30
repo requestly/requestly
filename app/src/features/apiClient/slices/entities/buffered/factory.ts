@@ -35,7 +35,7 @@ export namespace BufferedEntityFactory {
         case ApiClientEntityType.ENVIRONMENT:
           return new BufferedEnvironmentEntity(dispatch, meta);
         case ApiClientEntityType.GLOBAL_ENVIRONMENT:
-          return new BufferedGlobalEnvironmentEntity(dispatch);
+          return new BufferedGlobalEnvironmentEntity(dispatch, meta);
         case ApiClientEntityType.RUNTIME_VARIABLES:
           return new BufferedRuntimeVariablesEntity(dispatch, meta);
       }

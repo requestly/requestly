@@ -18,5 +18,4 @@ export const EnvironmentViewManager: React.FC<EnvironmentViewManagerProps> = (pr
   const entityType = props.isGlobal ? ApiClientEntityType.GLOBAL_ENVIRONMENT : ApiClientEntityType.ENVIRONMENT;
   const entity = useBufferedEntity({ id: environmentId, type: entityType });
   return <EnvironmentView entity={entity} environmentId={environmentId} isGlobal={props.isGlobal} />;
-  return <>Env</>;
 };

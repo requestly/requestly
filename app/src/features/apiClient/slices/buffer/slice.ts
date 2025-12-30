@@ -69,7 +69,7 @@ export const bufferSlice = createSlice({
           referenceId?: string;
           data: unknown;
         },
-        meta?: { id: string }
+        meta?: { id: string | undefined }
       ) {
         return { payload, meta: { id: meta?.id || uuidv4() } };
       },
@@ -106,12 +106,10 @@ export const bufferSlice = createSlice({
       entry.isNew = false;
       entry.isDirty = true;
 
-      if (entry.referenceId) {
-        emitBufferUpdated({
-          entityId: entry.referenceId,
-          entityType: entry.entityType,
-        });
-      }
+      emitBufferUpdated({
+        entityId: action.payload.id,
+        entityType: entry.entityType,
+      });
     },
 
     unsafePatch(
@@ -146,12 +144,10 @@ export const bufferSlice = createSlice({
 
       entry.isDirty = true;
 
-      if (entry.referenceId) {
-        emitBufferUpdated({
-          entityId: entry.referenceId,
-          entityType: entry.entityType,
-        });
-      }
+      emitBufferUpdated({
+        entityId: action.payload.id,
+        entityType: entry.entityType,
+      });
     },
 
     syncFromSource(

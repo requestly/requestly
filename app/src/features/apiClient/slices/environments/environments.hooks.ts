@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import type { EntityId } from "../types";
+import { EntityNotFound, EntityId } from "../types";
 import {
   selectAllEnvironments,
   selectEnvironmentById,
@@ -18,13 +18,20 @@ import type { EnvironmentEntity } from "./types";
 import type { EnvironmentVariables } from "backend/environment/types";
 import { useEntity } from "../entities/hooks";
 import { ApiClientEntityType } from "../entities/types";
+import { GLOBAL_ENVIRONMENT_ID } from "../common/constants";
 
 export function useAllEnvironments(): EnvironmentEntity[] {
   return useApiClientSelector(selectAllEnvironments);
 }
 
-export function useEnvironmentById(id: EntityId): EnvironmentEntity | undefined {
-  return useApiClientSelector((state) => selectEnvironmentById(state, id));
+export function useEnvironmentById(id: EntityId): EnvironmentEntity {
+  const env = useApiClientSelector((state) => selectEnvironmentById(state, id));
+
+  if (!env) {
+    throw new EntityNotFound(id, "environment");
+  }
+
+  return env;
 }
 
 export function useEnvironmentByIdMemoized(id: EntityId): EnvironmentEntity | null {
@@ -67,7 +74,7 @@ export function useTotalEnvironments(): number {
 
 export function useGlobalEnvironmentEntity() {
   return useEntity({
-    id: "global_environment",
+    id: GLOBAL_ENVIRONMENT_ID,
     type: ApiClientEntityType.GLOBAL_ENVIRONMENT,
   });
 }
