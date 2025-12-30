@@ -54,8 +54,6 @@ export const BottomSheetProvider: React.FC<{
           size: newSize,
         })
       );
-
-      trackBottomSheetToggled(nextState, action);
     },
     [isBottomSheetOpen, sheetSize, dispatch, context]
   );
