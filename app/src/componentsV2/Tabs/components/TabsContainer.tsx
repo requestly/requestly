@@ -14,7 +14,6 @@ import {
   useActiveTabId,
   useTabActions,
   useTabs,
-  useHasAnyUnsavedChanges,
   useIsTabDirty,
   usePreviewTabId,
   BufferModeTab,
@@ -25,6 +24,7 @@ import { DraftRequestContainerTabSource } from "features/apiClient/screens/apiCl
 import { getEmptyDraftApiRecord } from "features/apiClient/screens/apiClient/utils";
 import { RQAPI } from "features/apiClient/types";
 import { useMatchedTabSource } from "../hooks/useMatchedTabSource";
+import { getHasActiveWorkflows, getHasAnyUnsavedChanges } from "../slice/utils";
 
 interface BufferedTabLabelProps {
   tab: BufferModeTab;
@@ -174,43 +174,33 @@ export const TabsContainer: React.FC = () => {
     }
   }, [tabs.length, isMorePopoverOpen]);
 
-  const hasUnsavedChanges = useHasAnyUnsavedChanges();
-  const hasActiveWorkflows = useMemo(() => tabs.some((t) => t.activeWorkflows.size > 0), [tabs]);
-
   useEffect(() => {
     const unloadListener = (e: any) => {
-      e.preventDefault();
-      e.returnValue = "Are you sure?";
+      const hasActiveWorkflows = getHasActiveWorkflows();
+      const hasUnsavedChanges = getHasAnyUnsavedChanges();
+
+      if (hasUnsavedChanges || hasActiveWorkflows) {
+        e.preventDefault();
+        e.returnValue = "Are you sure?";
+      }
     };
 
-    if (hasUnsavedChanges || hasActiveWorkflows) {
-      window.addEventListener("beforeunload", unloadListener);
-    }
+    window.addEventListener("beforeunload", unloadListener);
 
     return () => window.removeEventListener("beforeunload", unloadListener);
-  }, [hasUnsavedChanges, hasActiveWorkflows]);
+  }, []);
 
   unstable_useBlocker(({ nextLocation }) => {
     const isNextLocationApiClientView = nextLocation.pathname.startsWith("/api-client");
-    const shouldBlock = !isNextLocationApiClientView && hasUnsavedChanges;
 
     if (isNextLocationApiClientView) {
       return false;
     }
 
-    if (shouldBlock) {
+    const hasUnsavedChanges = getHasAnyUnsavedChanges();
+    if (hasUnsavedChanges) {
       const shouldDiscardChanges = window.confirm("Discard changes? Changes you made will not be saved.");
       return !shouldDiscardChanges;
-    }
-
-    return false;
-  });
-
-  unstable_useBlocker(({ nextLocation }) => {
-    const isNextLocationApiClientView = nextLocation.pathname.startsWith("/api-client");
-
-    if (isNextLocationApiClientView) {
-      return false;
     }
 
     const tabWithWorkflow = tabs.find((t) => t.activeWorkflows.size > 0);

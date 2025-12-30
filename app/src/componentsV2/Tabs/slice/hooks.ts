@@ -134,18 +134,3 @@ export function useIsTabDirty(tab: BufferModeTab) {
 export function useTabTitle(tab: BufferModeTab) {
   return useTabBuffer(tab, ({ entity, state }) => entity.getName(state));
 }
-
-export function useHasAnyUnsavedChanges(): boolean {
-  const tabs = useTabs();
-
-  const hasUnsaved = tabs.some((tab) => {
-    if (tab.modeConfig.mode !== "buffer") {
-      return false;
-    }
-
-    const { buffer } = getTabBufferedEntity(tab as BufferModeTab);
-    return buffer.isDirty;
-  });
-
-  return hasUnsaved;
-}
