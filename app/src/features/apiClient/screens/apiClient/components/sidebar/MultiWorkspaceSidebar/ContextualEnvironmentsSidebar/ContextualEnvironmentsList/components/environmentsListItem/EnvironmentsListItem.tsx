@@ -13,7 +13,6 @@ import {
   trackEnvironmentDuplicated,
   trackEnvironmentRenamed,
 } from "modules/analytics/events/features/apiClient";
-import { EnvironmentViewTabSource } from "../../../environmentView/EnvironmentViewTabSource";
 import { IoChevronForward } from "@react-icons/all-files/io5/IoChevronForward";
 import RequestlyIcon from "assets/img/brand/rq_logo.svg";
 import PostmanIcon from "assets/img/brand/postman-icon.svg";
@@ -32,6 +31,7 @@ import {
   duplicateEnvironment,
 } from "features/apiClient/slices/environments/thunks";
 import { useApiClientRepository } from "features/apiClient/slices";
+import { EnvironmentViewTabSource } from "features/apiClient/screens/environment/components/environmentView/EnvironmentViewTabSource";
 
 export enum ExportType {
   REQUESTLY = "requestly",

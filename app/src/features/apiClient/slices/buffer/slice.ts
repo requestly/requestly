@@ -106,12 +106,10 @@ export const bufferSlice = createSlice({
       entry.isNew = false;
       entry.isDirty = true;
 
-      if (entry.referenceId) {
-        emitBufferUpdated({
-          entityId: entry.referenceId,
-          entityType: entry.entityType,
-        });
-      }
+      emitBufferUpdated({
+        entityId: action.payload.id,
+        entityType: entry.entityType,
+      });
     },
 
     unsafePatch(
@@ -146,12 +144,10 @@ export const bufferSlice = createSlice({
 
       entry.isDirty = true;
 
-      if (entry.referenceId) {
-        emitBufferUpdated({
-          entityId: entry.referenceId,
-          entityType: entry.entityType,
-        });
-      }
+      emitBufferUpdated({
+        entityId: action.payload.id,
+        entityType: entry.entityType,
+      });
     },
 
     syncFromSource(
