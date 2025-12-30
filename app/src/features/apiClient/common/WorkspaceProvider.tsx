@@ -31,7 +31,7 @@ export function useWorkspaceId() {
   return ctx;
 }
 
-export function WorkspaceProvider(props: { workspaceId: string; children: React.ReactNode }) {
+export function WorkspaceProvider(props: { workspaceId: Workspace["id"]; children: React.ReactNode }) {
   const store = useApiClientStore(props.workspaceId);
 
   return (

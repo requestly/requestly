@@ -13,13 +13,13 @@ import {
   trackEnvironmentDuplicated,
   trackEnvironmentRenamed,
 } from "modules/analytics/events/features/apiClient";
-import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
 import { EnvironmentViewTabSource } from "../../../environmentView/EnvironmentViewTabSource";
 import { IoChevronForward } from "@react-icons/all-files/io5/IoChevronForward";
 import RequestlyIcon from "assets/img/brand/rq_logo.svg";
 import PostmanIcon from "assets/img/brand/postman-icon.svg";
 import { useEnvironmentById, useActiveEnvironment } from "features/apiClient/slices/environments/environments.hooks";
-import { useContextId } from "features/apiClient/contexts/contextId.context";
+import { useActiveTabId, useTabActions } from "componentsV2/Tabs/slice";
+import { useWorkspaceId } from "features/apiClient/common/WorkspaceProvider";
 
 export enum ExportType {
   REQUESTLY = "requestly",
@@ -58,7 +58,8 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
   environmentId,
   onExportClick,
 }) => {
-  const contextId = useContextId();
+  const workspaceId = useWorkspaceId();
+  const { openBufferedTab } = useTabActions();
 
   const environment = useEnvironmentById(environmentId);
   const activeEnvironment = useActiveEnvironment();
@@ -66,17 +67,14 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
   const [isRenameInputVisible, setIsRenameInputVisible] = useState(false);
   const [newEnvironmentName, setNewEnvironmentName] = useState(environment?.name || "");
   const [isRenaming, setIsRenaming] = useState(false);
-  const [openTab, closeTabBySource, activeTabSource] = useTabServiceWithSelector((state) => [
-    state.openTab,
-    state.closeTabBySource,
-    state.activeTabSource,
-  ]);
 
-  const activeTabSourceId = useMemo(() => {
-    if (activeTabSource) {
-      return activeTabSource.getSourceId();
-    }
-  }, [activeTabSource]);
+  // const [openTab, closeTabBySource, activeTabSource] = useTabServiceWithSelector((state) => [
+  //   state.openTab,
+  //   state.closeTabBySource,
+  //   state.activeTabSource,
+  // ]);
+
+  const activeTabSourceId = useActiveTabId();
 
   const handleEnvironmentRename = useCallback(async () => {
     if (!environment) return;
@@ -90,15 +88,15 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
       await renameEnvironment({ environmentId: environment.id, newName: newEnvironmentName });
 
       trackEnvironmentRenamed();
-      openTab(
-        new EnvironmentViewTabSource({
-          id: environment.id,
-          title: newEnvironmentName,
-          context: {
-            id: contextId,
-          },
-        })
-      );
+      // openTab(
+      //   new EnvironmentViewTabSource({
+      //     id: environment.id,
+      //     title: newEnvironmentName,
+      //     context: {
+      //       id: workspaceId,
+      //     },
+      //   })
+      // );
       toast.success("Environment renamed successfully");
     } catch (error) {
       toast.error("Failed to rename environment");
@@ -106,7 +104,7 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
       setIsRenaming(false);
       setIsRenameInputVisible(false);
     }
-  }, [newEnvironmentName, environment, renameEnvironment, openTab, contextId]);
+  }, [newEnvironmentName, environment, renameEnvironment, workspaceId]);
 
   const handleEnvironmentDuplicate = useCallback(async () => {
     if (!environment) return;
@@ -127,14 +125,14 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
       toast.loading("Deleting environment...");
       await deleteEnvironment({ environmentId: environment.id });
 
-      closeTabBySource(environment.id, "environments");
+      // closeTabBySource(environment.id, "environments");
 
       trackEnvironmentDeleted();
       toast.success("Environment deleted successfully");
     } catch (error) {
       toast.error("Failed to delete environment");
     }
-  }, [environment, deleteEnvironment, closeTabBySource]);
+  }, [environment, deleteEnvironment]);
 
   const menuItems = useMemo(() => {
     if (!environment) return [];
@@ -190,15 +188,15 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
     <div
       className={`environments-list-item ${environment.id === activeTabSourceId ? "active" : ""}`}
       onClick={() => {
-        openTab(
-          new EnvironmentViewTabSource({
+        openBufferedTab({
+          source: new EnvironmentViewTabSource({
             id: environment.id,
             title: environment.name,
             context: {
-              id: contextId,
+              id: workspaceId,
             },
-          })
-        );
+          }),
+        });
       }}
     >
       <div className="environments-list-item__label">

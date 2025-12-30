@@ -13,15 +13,16 @@ import "./variablesListHeader.scss";
 import RequestlyIcon from "assets/img/brand/rq_logo.svg";
 import PostmanIcon from "assets/img/brand/postman-icon.svg";
 import { toast } from "utils/Toast";
-import { updateEnvironmentName } from "features/apiClient/slices";
+import { updateEnvironmentName, useApiClientRepository } from "features/apiClient/slices";
+import { useWorkspaceId } from "features/apiClient/common/WorkspaceProvider";
+import { useDispatch } from "react-redux";
+import { useApiClientDispatch } from "features/apiClient/slices/hooks/base.hooks";
 
 interface VariablesListHeaderProps {
   searchValue: string;
   currentEnvironmentName: string;
   environmentId: string;
-  hasUnsavedChanges: boolean;
   hideBreadcrumb?: boolean;
-  isSaving: boolean;
   exportActions?: {
     showExport: boolean;
     enableExport: boolean;
@@ -36,8 +37,6 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
   searchValue,
   onSearchValueChange,
   environmentId,
-  hasUnsavedChanges,
-  isSaving,
   currentEnvironmentName = "New",
   hideBreadcrumb = false,
   onSave,
@@ -47,18 +46,27 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
   // const {
   //   env: { renameEnvironment },
   // } = useCommand();
-  const { setTitle, getIsActive, getIsNew, setIsNew } = useGenericState();
-  const enableHotKey = getIsActive();
-  const isNewEnvironment = getIsNew();
+  // const { setTitle, getIsActive, getIsNew, setIsNew } = useGenericState();
+  const dispatch = useApiClientDispatch();
+  const workspaceId = useWorkspaceId();
+
+  const repos = useApiClientRepository(workspaceId);
+  const enableHotKey = true;
+  const isNewEnvironment = true;
 
   const handleNewEnvironmentNameChange = async (newName: string) => {
     try {
       const updatedName = newName || "New Environment";
 
-      // TEMP: Disabled for testing
-      // await updateEnvironmentName({ environmentId, name: updatedName, repository:  });
+      await dispatch(
+        updateEnvironmentName({
+          environmentId,
+          name: updatedName,
+          repository: repos.environmentVariablesRepository,
+        })
+      ).unwrap()
+
       console.log("Rename disabled for testing. Would rename to:", updatedName);
-      setTitle(updatedName);
     } catch (error) {
       toast.error(error.message || "Could not rename environment!");
     }
@@ -74,7 +82,6 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
             recordName={currentEnvironmentName}
             onBlur={(newName) => {
               handleNewEnvironmentNameChange(newName);
-              setIsNew(false);
             }}
             disabled={isGlobalEnvironment(environmentId)}
             defaultBreadcrumbs={[
@@ -141,8 +148,8 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
             enableHotKey={enableHotKey}
             type="primary"
             onClick={onSave}
-            disabled={!hasUnsavedChanges}
-            loading={isSaving}
+            // disabled={!hasUnsavedChanges}
+            // loading={isSaving}
           >
             Save
           </RQButton>
