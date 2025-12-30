@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { BulkActions, RQAPI } from "features/apiClient/types";
 import { notification } from "antd";
 import { useApiClientContext } from "features/apiClient/contexts";
+import { apiRecordsRankingManager } from "features/apiClient/helpers/ranking";
 import { CollectionRow, ExportType } from "./collectionRow/CollectionRow";
 import { RequestRow } from "./requestRow/RequestRow";
 import {
@@ -78,26 +79,23 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
     setShowSelection(false);
 
     updatedRecords.sort((recordA, recordB) => {
-      // If different type, then keep collection first
-      if (recordA.type === RQAPI.RecordType.COLLECTION && recordA.isExample && !recordB.isExample) {
+      // Keep example collections first
+      if (recordA.isExample && !recordB.isExample) {
         return -1;
       }
-
-      if (recordB.type === RQAPI.RecordType.COLLECTION && recordB.isExample && !recordA.isExample) {
+      if (recordB.isExample && !recordA.isExample) {
         return 1;
       }
 
+      // If different type, then keep collection first
       if (recordA.type !== recordB.type) {
         return recordA.type === RQAPI.RecordType.COLLECTION ? -1 : 1;
       }
 
-      // If types are the same, sort lexicographically by name
-      if (recordA.name.toLowerCase() !== recordB.name.toLowerCase()) {
-        return recordA.name.toLowerCase() < recordB.name.toLowerCase() ? -1 : 1;
-      }
-
-      // If names are the same, sort by creation date
-      return recordA.createdTs - recordB.createdTs;
+      // For same type, use ranking manager to sort by rank
+      const aRank = apiRecordsRankingManager.getEffectiveRank(recordA);
+      const bRank = apiRecordsRankingManager.getEffectiveRank(recordB);
+      return apiRecordsRankingManager.compareFn(aRank, bRank);
     });
 
     return {
