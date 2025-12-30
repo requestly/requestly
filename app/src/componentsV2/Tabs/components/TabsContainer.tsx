@@ -175,6 +175,7 @@ export const TabsContainer: React.FC = () => {
   }, [tabs.length, isMorePopoverOpen]);
 
   const hasUnsavedChanges = useHasAnyUnsavedChanges();
+  const hasActiveWorkflows = useMemo(() => tabs.some((t) => t.activeWorkflows.size > 0), [tabs]);
 
   useEffect(() => {
     const unloadListener = (e: any) => {
@@ -182,12 +183,12 @@ export const TabsContainer: React.FC = () => {
       e.returnValue = "Are you sure?";
     };
 
-    if (hasUnsavedChanges) {
+    if (hasUnsavedChanges || hasActiveWorkflows) {
       window.addEventListener("beforeunload", unloadListener);
     }
 
     return () => window.removeEventListener("beforeunload", unloadListener);
-  }, [hasUnsavedChanges]);
+  }, [hasUnsavedChanges, hasActiveWorkflows]);
 
   unstable_useBlocker(({ nextLocation }) => {
     const isNextLocationApiClientView = nextLocation.pathname.startsWith("/api-client");
@@ -198,7 +199,22 @@ export const TabsContainer: React.FC = () => {
     }
 
     if (shouldBlock) {
-      const tabWithWorkflow = tabs.find((t) => t.activeWorkflows.size > 0);
+      const shouldDiscardChanges = window.confirm("Discard changes? Changes you made will not be saved.");
+      return !shouldDiscardChanges;
+    }
+
+    return false;
+  });
+
+  unstable_useBlocker(({ nextLocation }) => {
+    const isNextLocationApiClientView = nextLocation.pathname.startsWith("/api-client");
+
+    if (isNextLocationApiClientView) {
+      return false;
+    }
+
+    const tabWithWorkflow = tabs.find((t) => t.activeWorkflows.size > 0);
+    if (tabWithWorkflow) {
       const firstWorkflow = tabWithWorkflow?.activeWorkflows.values().next().value;
       const shouldDiscardChanges = window.confirm(
         firstWorkflow?.cancelWarning || "Discard changes? Changes you made will not be saved."
@@ -212,11 +228,6 @@ export const TabsContainer: React.FC = () => {
 
   const matchedTabSource = useMatchedTabSource();
   useEffect(() => {
-    // TODO: TBD
-    // const ignorePath = consumeIgnorePath();
-    // if (!matchedTabSource || ignorePath) {
-    //   return;
-    // }
     if (!matchedTabSource) {
       return;
     }
