@@ -3,10 +3,19 @@
     border: none !important;
   }
 
+  .ant-table {
+    border: 1px solid #303030;
+    background: transparent;
+  }
+
   .ant-table-container,
   .ant-table-content,
   .ant-table-body {
     overflow: visible !important;
+  }
+
+  .kv-col-border-right {
+    border-right: 1px solid #303030;
   }
 
   tr {
@@ -30,7 +39,6 @@
   td.ant-table-cell {
     padding: 4px 12px !important;
     max-width: 0;
-    // overflow: hidden;
     overflow: visible !important;
     position: relative;
 
@@ -155,6 +163,17 @@
   .ant-table-thead > tr > th {
     font-weight: 600;
     padding: 8px 16px !important;
+    border-bottom: 1px solid #303030;
+
+    .key-value-bulk-edit-button {
+      background: none;
+      border: 1px solid transparent;
+
+      &:hover {
+        border: 1px solid transparent;
+        transition: ease-in-out;
+      }
+    }
   }
 }
 
@@ -202,9 +221,16 @@
   visibility: visible;
 }
 
-.key-value-settings-header {
+.key-value-table-header-actions {
   display: flex;
-  justify-content: flex-end;
+  gap: 4px;
   align-items: center;
-  width: 100%;
+  justify-content: flex-end;
+  position: absolute;
+  top: 50%;
+  right: 0;
+  left: 0;
+  transform: translateY(-50%);
+  overflow: visible;
+  padding-right: 8px;
 }

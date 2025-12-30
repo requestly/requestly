@@ -31,11 +31,17 @@ interface KeyValueTableProps {
   };
   config?: {
     checkInvalidCharacter?: boolean;
+    bulkEdit?: {
+      setIsBulkEditPanelOpen?: (isOpen: boolean) => void;
+      setBulkEditTableType?: (type: "headers" | "queryParams") => void;
+      bulkEditTableType?: "headers" | "queryParams";
+    };
   };
 }
 
 export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, variables, onChange, extraColumns, config }) => {
-  const { checkInvalidCharacter = false } = config || {};
+  const { checkInvalidCharacter = false, bulkEdit } = config || {};
+  const { setIsBulkEditPanelOpen, setBulkEditTableType, bulkEditTableType } = bulkEdit || {};
 
   const isDescriptionVisible =
     hasDescription(extraColumns) &&
@@ -126,6 +132,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, variables, o
         dataIndex: "isEnabled",
         width: "40px",
         editable: true,
+        className: "kv-col-border-right",
         onCell: (record: KeyValuePair) => ({
           record,
           editable: true,
@@ -140,6 +147,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, variables, o
         dataIndex: "key",
         width: isDescriptionVisible ? "30%" : "50%",
         editable: true,
+        className: "kv-col-border-right",
         onCell: (record: KeyValuePair) => ({
           record,
           editable: true,
@@ -155,6 +163,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, variables, o
         dataIndex: "value",
         editable: true,
         width: isDescriptionVisible ? "30%" : "50%",
+        className: "kv-col-border-right",
         onCell: (record: KeyValuePair) => ({
           record,
           editable: true,
@@ -200,15 +209,29 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, variables, o
           }
         : null,
       {
-        width: "55px",
+        width: "50px",
         fixed: "right",
         title: () =>
           isDataTypeVisible &&
           hasDescription(extraColumns) && (
-            <KeyValueTableSettingsDropdown
-              showDescription={isDescriptionVisible}
-              onToggleDescription={extraColumns.description.onToggle}
-            />
+            <div className="key-value-table-header-actions">
+              <KeyValueTableSettingsDropdown
+                showDescription={isDescriptionVisible}
+                onToggleDescription={extraColumns.description.onToggle}
+              />
+              {setIsBulkEditPanelOpen && setBulkEditTableType && bulkEditTableType && (
+                <RQButton
+                  size="small"
+                  onClick={() => {
+                    setIsBulkEditPanelOpen(true);
+                    setBulkEditTableType(bulkEditTableType);
+                  }}
+                  className="key-value-bulk-edit-button"
+                >
+                  Bulk Edit
+                </RQButton>
+              )}
+            </div>
           ),
         render: (_: any, record: KeyValuePair) => {
           if (record.key === "" && record.value === "" && data.length === 1) {
@@ -236,13 +259,16 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, variables, o
     extraColumns,
     data.length,
     handleDeletePair,
+    bulkEditTableType,
+    setBulkEditTableType,
+    setIsBulkEditPanelOpen,
   ]);
 
   return (
     <ContentListTable
       id="api-key-value-table"
       className="api-key-value-table"
-      bordered
+      bordered={false}
       showHeader={isDataTypeVisible}
       rowKey="id"
       columns={columns as ColumnTypes}
