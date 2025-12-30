@@ -16,6 +16,7 @@ import { ApiClientSidebarTabKey } from "features/apiClient/screens/apiClient/com
 import { EmptyEnvironmentsCreateCard } from "features/apiClient/screens/apiClient/components/sidebar/components/EmptyEnvironmentsCreateCard/EmptyEnvironmentsCreateCard";
 import { Conditional } from "components/common/Conditional";
 import { EnvironmentEntity } from "features/apiClient/slices/environments/types";
+import { useWorkspaceId } from "features/apiClient/common/WorkspaceProvider";
 
 function parseEnvironmentEntityToData(env: EnvironmentEntity): EnvironmentData {
   return {
@@ -26,6 +27,7 @@ function parseEnvironmentEntityToData(env: EnvironmentEntity): EnvironmentData {
 }
 
 export const EnvironmentsList = () => {
+  const workspaceId = useWorkspaceId();
   const globalEnvironment = useGlobalEnvironment();
   const allEnvironments = useAllEnvironments();
   const nonGlobalEnvironments = allEnvironments.filter((env) => env.id !== globalEnvironment.id);
@@ -122,7 +124,7 @@ export const EnvironmentsList = () => {
                 );
               })}
               <Conditional condition={showEmptyCreateCard}>
-                <EmptyEnvironmentsCreateCard contextId={null} isValidPermission={isValidPermission} />
+                <EmptyEnvironmentsCreateCard workspaceId={workspaceId} isValidPermission={isValidPermission} />
               </Conditional>
               <div className="mt-8">
                 {isRecordBeingCreated === RQAPI.RecordType.ENVIRONMENT && (
