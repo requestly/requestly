@@ -1,11 +1,7 @@
 import React, { createContext, useContext, useMemo, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { BottomSheetPlacement, BottomSheetFeatureContext } from "../types";
-import {
-  trackBottomSheetToggled,
-  trackViewBottomSheetOnBottomClicked,
-  trackViewBottomSheetOnRightClicked,
-} from "../analytics";
+import { trackViewBottomSheetOnBottomClicked, trackViewBottomSheetOnRightClicked } from "../analytics";
 import { getBottomSheetState } from "store/selectors";
 import { globalActions } from "store/slices/global/slice";
 
@@ -37,7 +33,7 @@ export const BottomSheetProvider: React.FC<{
   const { open: isBottomSheetOpen, placement: sheetPlacement, size: sheetSize } = sheetOrientation;
 
   const toggleBottomSheet = useCallback(
-    ({ isOpen, action }: ToggleParams) => {
+    ({ isOpen }: ToggleParams) => {
       const nextState = typeof isOpen === "boolean" ? isOpen : !isBottomSheetOpen;
       const newSize: number[] = nextState ? (sheetSize[0] < 80 ? sheetSize : DEFAULT_SIZE) : CLOSED_SIZE;
 
@@ -54,8 +50,6 @@ export const BottomSheetProvider: React.FC<{
           size: newSize,
         })
       );
-
-      trackBottomSheetToggled(nextState, action);
     },
     [isBottomSheetOpen, sheetSize, dispatch, context]
   );

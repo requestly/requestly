@@ -6,7 +6,6 @@ import type {
   BufferedEnvironmentEntity,
   BufferedGlobalEnvironmentEntity,
 } from "features/apiClient/slices/entities/buffered/environment";
-import { useWorkspaceId } from "features/apiClient/common/WorkspaceProvider";
 import { EntityNotFound, entitySynced, useApiClientRepository } from "features/apiClient/slices";
 import { EnvironmentVariablesList } from "../VariablesList/EnvironmentVariablesList";
 import { VariablesListHeader } from "../VariablesListHeader/VariablesListHeader";
@@ -15,7 +14,7 @@ import { isEmpty } from "lodash";
 import { ApiClientExportModal } from "features/apiClient/screens/apiClient/components/modals/exportModal/ApiClientExportModal";
 import { PostmanEnvironmentExportModal } from "features/apiClient/screens/apiClient/components/modals/postmanEnvironmentExportModal/PostmanEnvironmentExportModal";
 import { ApiClientRootState } from "features/apiClient/slices/hooks/types";
-import { useBufferByBufferId, useBufferByReferenceId, useIsBufferDirty } from "features/apiClient/slices/entities";
+import { useBufferByBufferId, useIsBufferDirty } from "features/apiClient/slices/entities";
 
 interface EnvironmentViewProps {
   entity: BufferedEnvironmentEntity | BufferedGlobalEnvironmentEntity;
@@ -28,8 +27,7 @@ export const EnvironmentView: React.FC<EnvironmentViewProps> = ({ entity, enviro
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [isPostmanExportModalOpen, setIsPostmanExportModalOpen] = useState(false);
 
-  const workspaceId = useWorkspaceId();
-  const repositories = useApiClientRepository(workspaceId);
+  const repositories = useApiClientRepository();
   const isNewEnvironment = useApiClientSelector(s => s.buffer.entities[entity.id]?.isNew);
 
   const [searchValue, setSearchValue] = useState("");
