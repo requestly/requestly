@@ -1,16 +1,12 @@
-import { useMemo } from "react";
-import type { FC } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useSelector } from "react-redux";
 import { RuntimeVariablesViewTabSource } from "./runtimevariablesTabSource";
 import "./runtimevariables.scss";
 import { useWorkspaceId } from "features/apiClient/common/WorkspaceProvider";
 import { useTabActions, selectActiveTab } from "componentsV2/Tabs/slice";
+import { RUNTIME_VARIABLES_ENTITY_ID } from "features/apiClient/slices/common/constants";
 
-const tabSource = {
-  RUNTIME_VARIABLES: "runtime",
-};
-
-export const RuntimeVariables: FC = () => {
+export const RuntimeVariables: React.FC = () => {
   const workspaceId = useWorkspaceId();
   const activeTab = useSelector(selectActiveTab);
   const { openBufferedTab } = useTabActions();
@@ -24,7 +20,7 @@ export const RuntimeVariables: FC = () => {
   const handleTabOpen = () => {
     openBufferedTab({
       source: new RuntimeVariablesViewTabSource({
-        id: tabSource.RUNTIME_VARIABLES,
+        id: RUNTIME_VARIABLES_ENTITY_ID,
         title: "Runtime Variables",
         context: {
           id: workspaceId,
@@ -33,11 +29,15 @@ export const RuntimeVariables: FC = () => {
     });
   };
 
+  useEffect(() => {
+    handleTabOpen();
+  }, []);
+
   return (
     <div className="runtime-variables-container" onClick={handleTabOpen}>
       <div
         className={`runtime-variables-text-placeholder ${
-          activeTabSourceId === tabSource.RUNTIME_VARIABLES ? "active" : ""
+          activeTabSourceId === RUNTIME_VARIABLES_ENTITY_ID ? "active" : ""
         }`}
       >
         <span className="text">Runtime variables</span>
