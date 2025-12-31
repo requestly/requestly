@@ -12,6 +12,7 @@ import {
 } from "./thunks";
 import { BufferEntry, EntityNotFound, getApiClientFeatureContext } from "features/apiClient/slices";
 import { BufferedEntityFactory } from "features/apiClient/slices/entities";
+import { selectActiveTab, selectActiveTabId } from "./selectors";
 
 const tabsSelectors = tabsAdapter.getSelectors<RootState>((state) => state.tabs.tabs);
 
@@ -34,7 +35,11 @@ export function useIsActiveTab(tabId: TabId): boolean {
 }
 
 export function useActiveTabId() {
-  return useSelector((state: RootState) => state.tabs.activeTabId);
+  return useSelector(selectActiveTabId);
+}
+
+export function useActiveTab() {
+  return useSelector(selectActiveTab);
 }
 
 export function usePreviewTabId() {
