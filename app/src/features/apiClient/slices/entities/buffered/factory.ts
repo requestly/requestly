@@ -4,6 +4,7 @@ import { BufferedHttpRecordEntity } from "./http";
 import { BufferedGraphQLRecordEntity } from "./graphql";
 import { BufferedEnvironmentEntity, BufferedGlobalEnvironmentEntity } from "./environment";
 import { BufferedRuntimeVariablesEntity } from "./runtime-variables";
+import { BufferedCollectionRecordEntity } from "./collection";
 import type { ApiClientEntityMeta } from "../base";
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -18,6 +19,8 @@ export namespace BufferedEntityFactory {
     ? BufferedGlobalEnvironmentEntity
     : T extends ApiClientEntityType.RUNTIME_VARIABLES
     ? BufferedRuntimeVariablesEntity
+    : T extends ApiClientEntityType.COLLECTION_RECORD
+    ? BufferedCollectionRecordEntity
     : never;
 
   export function from<T extends ApiClientEntityType>(
@@ -38,6 +41,8 @@ export namespace BufferedEntityFactory {
           return new BufferedGlobalEnvironmentEntity(dispatch, meta);
         case ApiClientEntityType.RUNTIME_VARIABLES:
           return new BufferedRuntimeVariablesEntity(dispatch, meta);
+        case ApiClientEntityType.COLLECTION_RECORD:
+          return new BufferedCollectionRecordEntity(dispatch, meta);
       }
     })() as EntityTypeMap<T>;
 

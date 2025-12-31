@@ -11,6 +11,7 @@ import { BufferedEntityFactory } from "./buffered/factory";
 import type { BufferedHttpRecordEntity } from "./buffered/http";
 import type { BufferedGraphQLRecordEntity } from "./buffered/graphql";
 import type { BufferedRuntimeVariablesEntity } from "./buffered/runtime-variables";
+import type { BufferedCollectionRecordEntity } from "./buffered/collection";
 import { useDispatch } from "react-redux";
 import { bufferAdapterSelectors, findBufferByReferenceId } from "../buffer/slice";
 import { EntityNotFound } from "../types";
@@ -165,4 +166,8 @@ export function useBufferedRuntimeVariablesEntity(): BufferedRuntimeVariablesEnt
     id: RUNTIME_VARIABLES_ENTITY_ID,
     type: ApiClientEntityType.RUNTIME_VARIABLES,
   });
+}
+
+export function useBufferedCollectionEntity(id: string): BufferedCollectionRecordEntity {
+  return useBufferedEntity({ id, type: ApiClientEntityType.COLLECTION_RECORD });
 }
