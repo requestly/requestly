@@ -17,6 +17,9 @@ export {
   useBufferedHttpRecordEntity,
   useBufferedGraphQLRecordEntity,
   useBufferEntry,
+  useBufferByReferenceId,
+  useBufferByBufferId,
+  useIsBufferDirty,
   useBufferIsDirty,
   useHasBuffer,
 } from "./hooks";

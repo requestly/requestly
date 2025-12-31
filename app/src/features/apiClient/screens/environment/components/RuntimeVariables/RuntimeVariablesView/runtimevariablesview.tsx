@@ -1,11 +1,11 @@
 import type React from "react";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 import { useDispatch } from "react-redux";
 import { RuntimeVariablesList } from "../RuntimeVariablesList/runtimevariableslist";
 import { RuntimeVariablesHeader } from "../RuntimeVariablesHeader";
 import { useApiClientDispatch, useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
-import { useBufferedRuntimeVariablesEntity } from "features/apiClient/slices/entities/hooks";
-import { bufferActions, bufferAdapterSelectors } from "features/apiClient/slices/buffer/slice";
+import { useBufferedRuntimeVariablesEntity, useIsBufferDirty } from "features/apiClient/slices/entities/hooks";
+import { bufferActions } from "features/apiClient/slices/buffer/slice";
 import { runtimeVariablesActions } from "features/apiClient/slices/runtimeVariables/slice";
 import { toast } from "utils/Toast";
 import { isEmpty } from "lodash";
@@ -17,22 +17,23 @@ export const RuntimeVariablesView: React.FC = () => {
   const globalDispatch = useDispatch();
   const apiClientDispatch = useApiClientDispatch();
   const entity = useBufferedRuntimeVariablesEntity();
-  const state = useApiClientSelector((s) => s);
 
   const [searchValue, setSearchValue] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const variables = entity.variables;
-  const variablesData = useMemo(() => variables.getAll(state), [variables, state]);
+  const variablesData = useApiClientSelector((s) => variables.getAll(s));
 
-  const bufferEntry = useApiClientSelector((s) => bufferAdapterSelectors.selectById(s.buffer, entity.meta.id));
-  const hasUnsavedChanges = useMemo(() => bufferEntry?.isDirty ?? false, [bufferEntry]);
+  const hasUnsavedChanges = useIsBufferDirty({
+    referenceId: entity.meta.id,
+    type: "referenceId",
+  });
 
   const handleSaveVariables = useCallback(async () => {
     try {
       setIsSaving(true);
-      const dataToSave = variables.getAll(state);
+      const dataToSave = variablesData;
 
       globalDispatch(
         runtimeVariablesActions.unsafePatch({
@@ -56,7 +57,7 @@ export const RuntimeVariablesView: React.FC = () => {
     } finally {
       setIsSaving(false);
     }
-  }, [variables, state, globalDispatch, apiClientDispatch, entity.meta.id]);
+  }, [variablesData, globalDispatch, apiClientDispatch, entity.meta.id]);
 
   const handleDeleteAll = useCallback(() => {
     try {
