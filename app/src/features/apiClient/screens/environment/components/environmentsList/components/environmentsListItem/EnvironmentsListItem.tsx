@@ -62,7 +62,7 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
 }) => {
   const dispatch = useApiClientDispatch();
   const workspaceId = useWorkspaceId();
-  const { environmentVariablesRepository } = useApiClientRepository(workspaceId);
+  const { environmentVariablesRepository } = useApiClientRepository();
   const { openBufferedTab, closeTabByEntityId } = useTabActions();
   const activeTabSourceId = useActiveTabId();
 
@@ -110,7 +110,15 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
       setIsRenaming(false);
       setIsRenameInputVisible(false);
     }
-  }, [environment, newEnvironmentName, openBufferedTab, workspaceId, dispatch, environmentVariablesRepository]);
+  }, [
+    environment,
+    newEnvironmentName,
+    dispatch,
+    environmentVariablesRepository,
+    openBufferedTab,
+    workspaceId,
+    isGlobal,
+  ]);
 
   const handleEnvironmentDuplicate = useCallback(async () => {
     if (!environment) return;
@@ -121,7 +129,7 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
       const allEnvironmentsMap = allEnvironments.reduce((acc, env) => {
         acc[env.id] = env;
         return acc;
-      }, {} as Record<string, (typeof allEnvironments)[number]>);
+      }, {} as Record<string, typeof allEnvironments[number]>);
 
       await dispatch(
         duplicateEnvironment({
