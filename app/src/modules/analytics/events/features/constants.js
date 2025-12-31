@@ -302,6 +302,7 @@ export const API_CLIENT = {
   AI_GENERATE_TESTS_ACCEPT_ALL_CLICKED: "ai_generate_tests_accept_all_clicked",
   AI_GENERATE_TESTS_ACCEPT_CLICKED: "ai_generate_tests_accept_clicked",
   AI_GENERATE_TESTS_REJECT_CLICKED: "ai_generate_tests_reject_clicked",
+  AI_GENERATION_REVIEW_COMPLETED: "ai_generation_review_completed",
 };
 
 export const REDIRECT_DESTINATION_OPTION = {
