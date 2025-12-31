@@ -33,7 +33,7 @@ export enum ApiClientSidebarTabKey {
 export const SingleWorkspaceSidebar: React.FC<Props> = () => {
   const { state } = useLocation();
   const { requestId, collectionId } = useParams();
-  const [activeKey, setActiveKey] = useState<ApiClientSidebarTabKey>(ApiClientSidebarTabKey.ENVIRONMENTS);
+  const [activeKey, setActiveKey] = useState<ApiClientSidebarTabKey>(ApiClientSidebarTabKey.COLLECTIONS);
   const [recordTypeToBeCreated, setRecordTypeToBeCreated] = useState<RQAPI.RecordType | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -105,26 +105,26 @@ export const SingleWorkspaceSidebar: React.FC<Props> = () => {
   }, [requestId, collectionId]);
 
   const items: TabsProps["items"] = [
-    // {
-    //   key: ApiClientSidebarTabKey.COLLECTIONS,
-    //   label: (
-    //     <Tooltip title="Collections" placement="right">
-    //       <div
-    //         onClick={() => setActiveKey(ApiClientSidebarTabKey.COLLECTIONS)}
-    //         className={`api-client-tab-link ${activeKey === ApiClientSidebarTabKey.COLLECTIONS ? "active" : ""}`}
-    //       >
-    //         <CgStack />
-    //       </div>
-    //     </Tooltip>
-    //   ),
-    //   children: (
-    //     <CollectionsList
-    //       onNewClick={onNewClick}
-    //       recordTypeToBeCreated={recordTypeToBeCreated}
-    //       handleRecordsToBeDeleted={handleRecordsToBeDeleted}
-    //     />
-    //   ),
-    // },
+    {
+      key: ApiClientSidebarTabKey.COLLECTIONS,
+      label: (
+        <Tooltip title="Collections" placement="right">
+          <div
+            onClick={() => setActiveKey(ApiClientSidebarTabKey.COLLECTIONS)}
+            className={`api-client-tab-link ${activeKey === ApiClientSidebarTabKey.COLLECTIONS ? "active" : ""}`}
+          >
+            <CgStack />
+          </div>
+        </Tooltip>
+      ),
+      children: (
+        <CollectionsList
+          onNewClick={() => {}}
+          recordTypeToBeCreated={recordTypeToBeCreated}
+          handleRecordsToBeDeleted={() => {}}
+        />
+      ),
+    },
     {
       key: ApiClientSidebarTabKey.ENVIRONMENTS,
       label: (

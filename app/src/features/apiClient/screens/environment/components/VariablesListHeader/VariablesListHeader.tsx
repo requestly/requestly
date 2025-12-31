@@ -13,7 +13,6 @@ import RequestlyIcon from "assets/img/brand/rq_logo.svg";
 import PostmanIcon from "assets/img/brand/postman-icon.svg";
 import { toast } from "utils/Toast";
 import { updateEnvironmentName, useApiClientRepository } from "features/apiClient/slices";
-import { useWorkspaceId } from "features/apiClient/common/WorkspaceProvider";
 import { useApiClientDispatch } from "features/apiClient/slices/hooks/base.hooks";
 
 interface VariablesListHeaderProps {
@@ -52,9 +51,7 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
   // } = useCommand();
   // const { setTitle, getIsActive, getIsNew, setIsNew } = useGenericState();
   const dispatch = useApiClientDispatch();
-  const workspaceId = useWorkspaceId();
-
-  const repos = useApiClientRepository(workspaceId);
+  const repos = useApiClientRepository();
   const enableHotKey = true;
 
   const handleNewEnvironmentNameChange = async (newName: string) => {

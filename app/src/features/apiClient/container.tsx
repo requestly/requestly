@@ -58,31 +58,31 @@ const ApiClientFeatureContainer: React.FC = () => {
         {/* <LocalSyncRefreshHandler /> */}
         <div className="api-client-container">
           {/* <Daemon /> */}
-          {/* <ApiClientProvider> */}
-          <Split
-            className="api-client-container__split"
-            direction="horizontal"
-            sizes={[20, 80]}
-            minSize={[300, getSecondPaneMinSize()]}
-            gutter={(index, direction) => {
-              const gutterContainer = document.createElement("div");
-              gutterContainer.style.position = "relative";
-              gutterContainer.className = `api-client-container__split-gutter gutter-container gutter-container-${direction}`;
-              gutterContainer.innerHTML = `<div class="gutter" />`;
-              return gutterContainer;
-            }}
-            gutterStyle={() => {
-              return {
-                height: "100%",
-                width: "0px",
-              };
-            }}
-            gutterAlign="center"
-          >
-            <APIClientSidebar />
-            <TabsContainer />
-          </Split>
-          {/* </ApiClientProvider> */}
+          <ApiClientProvider>
+            <Split
+              className="api-client-container__split"
+              direction="horizontal"
+              sizes={[20, 80]}
+              minSize={[300, getSecondPaneMinSize()]}
+              gutter={(index, direction) => {
+                const gutterContainer = document.createElement("div");
+                gutterContainer.style.position = "relative";
+                gutterContainer.className = `api-client-container__split-gutter gutter-container gutter-container-${direction}`;
+                gutterContainer.innerHTML = `<div class="gutter" />`;
+                return gutterContainer;
+              }}
+              gutterStyle={() => {
+                return {
+                  height: "100%",
+                  width: "0px",
+                };
+              }}
+              gutterAlign="center"
+            >
+              <APIClientSidebar />
+              <TabsContainer />
+            </Split>
+          </ApiClientProvider>
         </div>
       </TabServiceProvider>
     </DndProvider>

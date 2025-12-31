@@ -1,4 +1,4 @@
-import React, { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import React, { createContext, ReactNode, useCallback, useContext, useMemo, useState } from "react";
 import { RQAPI } from "../types";
 import { addToHistoryInStore, clearHistoryFromStore, getHistoryFromStore } from "../screens/apiClient/historyStore";
 import {
@@ -8,18 +8,14 @@ import {
   trackNewCollectionClicked,
   trackNewRequestClicked,
 } from "modules/analytics/events/features/apiClient";
-import { createBlankApiRecord, getEmptyDraftApiRecord, isApiCollection } from "../screens/apiClient/utils";
+import { createBlankApiRecord, getEmptyDraftApiRecord } from "../screens/apiClient/utils";
 import { APIClientWorkloadManager } from "../helpers/modules/scriptsV2/workloadManager/APIClientWorkloadManager";
 import { notification } from "antd";
 import { toast } from "utils/Toast";
-import APP_CONSTANTS from "config/constants";
-import { submitAttrUtil } from "utils/AnalyticsUtils";
-import { debounce } from "lodash";
 import { RBAC, useRBAC } from "features/rbac";
 import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
 import { DraftRequestContainerTabSource } from "../screens/apiClient/components/views/components/DraftRequestContainer/draftRequestContainerTabSource";
 import { EnvironmentViewTabSource } from "../screens/environment/components/environmentView/EnvironmentViewTabSource";
-import { useAPIRecords } from "../store/apiRecords/ApiRecordsContextProvider";
 import { getApiClientFeatureContext, saveOrUpdateRecord } from "../commands/store.utils";
 import { RequestViewTabSource } from "../screens/apiClient/components/views/components/RequestView/requestViewTabSource";
 import { CollectionViewTabSource } from "../screens/apiClient/components/views/components/Collection/collectionViewTabSource";
@@ -84,24 +80,11 @@ interface ApiClientProviderProps {
   children: ReactNode;
 }
 
-const trackUserProperties = (records: RQAPI.ApiClientRecord[]) => {
-  const totalCollections = records.filter((record) => isApiCollection(record)).length;
-  const totalRequests = records.length - totalCollections;
-  submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_COLLECTIONS, totalCollections);
-  submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_REQUESTS, totalRequests);
-};
-
 // suggestion: could be renamed to ApiClientStoreEnabler
 export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }) => {
   const { validatePermission, getRBACValidationFailureErrorMessage } = useRBAC();
   const { isValidPermission } = validatePermission("api_client_request", "create");
-  const [apiClientRecords] = useAPIRecords((state) => [
-    state.apiClientRecords,
-    state.addNewRecord,
-    state.updateRecord,
-    state.updateRecords,
-    state.getData,
-  ]);
+
   const [onNewClickContextId, setOnNewClickContextId] = useState<string | null>(null); // FIXME: temp fix, to be removed
 
   const [history, setHistory] = useState<RQAPI.ApiEntry[]>(getHistoryFromStore());
@@ -110,13 +93,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isRecordBeingCreated, setIsRecordBeingCreated] = useState<RQAPI.RecordType | null>(null);
 
-  const debouncedTrackUserProperties = debounce(() => trackUserProperties(apiClientRecords), 1000);
-
   const [openTab] = useTabServiceWithSelector((state) => [state.openTab]);
-
-  useEffect(() => {
-    debouncedTrackUserProperties();
-  }, [apiClientRecords, debouncedTrackUserProperties]);
 
   const addToHistory = useCallback((apiEntry: RQAPI.ApiEntry) => {
     setHistory((history) => [...history, apiEntry]);
@@ -257,6 +234,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
                   context: {
                     id: context?.id,
                   },
+                  isGlobal: false,
                 })
               );
             })

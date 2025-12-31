@@ -16,8 +16,9 @@ const WorkspaceStoreContext = createContext<ReactReduxContextValue<ApiClientStor
 export const useWorkspaceViewStore = createStoreHook(WorkspaceStoreContext);
 export const useWorkspaceViewDispatch = createDispatchHook(WorkspaceStoreContext);
 
-export const useWorkspaceViewSelector: TypedUseSelectorHook<ApiClientStoreState> =
-  createSelectorHook(WorkspaceStoreContext);
+export const useWorkspaceViewSelector: TypedUseSelectorHook<ApiClientStoreState> = createSelectorHook(
+  WorkspaceStoreContext
+);
 
 const WorkspaceIdContext = createContext<Workspace["id"] | undefined>(undefined);
 
@@ -31,12 +32,20 @@ export function useWorkspaceId() {
   return ctx;
 }
 
-export function WorkspaceProvider(props: { workspaceId: Workspace["id"]; children: React.ReactNode }) {
-  const store = useApiClientStore(props.workspaceId);
+const WorkspaceStoreProvider: React.FC<React.PropsWithChildren> = (props) => {
+  const store = useApiClientStore();
 
   return (
     <Provider context={WorkspaceStoreContext} store={store}>
-      <WorkspaceIdContext.Provider value={props.workspaceId}>{props.children}</WorkspaceIdContext.Provider>
+      {props.children}
     </Provider>
+  );
+};
+
+export function WorkspaceProvider(props: { workspaceId: Workspace["id"]; children: React.ReactNode }) {
+  return (
+    <WorkspaceIdContext.Provider value={props.workspaceId}>
+      <WorkspaceStoreProvider>{props.children}</WorkspaceStoreProvider>
+    </WorkspaceIdContext.Provider>
   );
 }
