@@ -1,27 +1,40 @@
-import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
-import React, { useEffect, useMemo } from "react";
+import { useMemo } from "react";
+import type { FC } from "react";
+import { useSelector } from "react-redux";
 import { RuntimeVariablesViewTabSource } from "./runtimevariablesTabSource";
 import "./runtimevariables.scss";
+import { useWorkspaceId } from "features/apiClient/common/WorkspaceProvider";
+import { useTabActions, selectActiveTab } from "componentsV2/Tabs/slice";
 
 const tabSource = {
   RUNTIME_VARIABLES: "runtime",
 };
 
-export const RuntimeVariables: React.FC = () => {
-  const [openTab, activeTabSource] = useTabServiceWithSelector((state) => [state.openTab, state.activeTabSource]);
-
-  useEffect(() => {
-    openTab(new RuntimeVariablesViewTabSource());
-  }, [openTab]);
+export const RuntimeVariables: FC = () => {
+  const workspaceId = useWorkspaceId();
+  const activeTab = useSelector(selectActiveTab);
+  const { openBufferedTab } = useTabActions();
 
   const activeTabSourceId = useMemo(() => {
-    if (activeTabSource) {
-      return activeTabSource.getSourceId();
+    if (activeTab) {
+      return activeTab.source.getSourceId();
     }
-  }, [activeTabSource]);
+  }, [activeTab]);
+
+  const handleTabOpen = () => {
+    openBufferedTab({
+      source: new RuntimeVariablesViewTabSource({
+        id: tabSource.RUNTIME_VARIABLES,
+        title: "Runtime Variables",
+        context: {
+          id: workspaceId,
+        },
+      }),
+    });
+  };
 
   return (
-    <div className="runtime-variables-container" onClick={() => openTab(new RuntimeVariablesViewTabSource())}>
+    <div className="runtime-variables-container" onClick={handleTabOpen}>
       <div
         className={`runtime-variables-text-placeholder ${
           activeTabSourceId === tabSource.RUNTIME_VARIABLES ? "active" : ""
