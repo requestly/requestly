@@ -1,17 +1,25 @@
 import React, { createContext, ReactNode, useContext, useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 
+interface GenerationMetrics {
+  totalProposedChanges: number;
+  acceptedChanges: number;
+}
+
 export interface AISessionContextValue {
   sessionId: string | null;
   generationId: string | null;
   lastUsedQuery: string | null;
   lastGeneratedCode: string | null;
+  generationMetrics: GenerationMetrics;
+  updateGenerationMetrics: (key: keyof GenerationMetrics, value: number) => void;
   createNewAISession: () => string;
   startNewGeneration: () => string;
   endAISession: () => void;
   getCurrentGenerationId: () => string | null;
   setLastUsedQuery: (query: string) => void;
   setLastGeneratedCode: (code: string) => void;
+  getReivewOutcome: () => "accept_all" | "reject_all" | "partial_accept";
 }
 
 const AISessionContext = createContext<AISessionContextValue | undefined>(undefined);
@@ -26,9 +34,18 @@ export const AISessionProvider: React.FC<AISessionProviderProps> = ({ children }
   const [lastUsedQuery, setLastUsedQuery] = useState<string | null>(null);
   const [lastGeneratedCode, setLastGeneratedCode] = useState<string | null>(null);
 
+  const generationMetricsRef = useRef<GenerationMetrics>({
+    totalProposedChanges: 0,
+    acceptedChanges: 0,
+  });
+
   // generationIdRef is used so async callbacks (like AI onFinish handlers) can always read
   // the latest generationId value instead of a stale one captured in closure.
   const generationIdRef = useRef<string | null>(null);
+
+  const updateGenerationMetrics = (key: keyof GenerationMetrics, value: number) => {
+    generationMetricsRef.current[key] = value;
+  };
 
   const createNewAISession = () => {
     if (sessionId) {
@@ -46,6 +63,10 @@ export const AISessionProvider: React.FC<AISessionProviderProps> = ({ children }
     setLastUsedQuery(null);
     setLastGeneratedCode(null);
     generationIdRef.current = null;
+    generationMetricsRef.current = {
+      totalProposedChanges: 0,
+      acceptedChanges: 0,
+    };
   };
 
   const startNewGeneration = () => {
@@ -57,17 +78,30 @@ export const AISessionProvider: React.FC<AISessionProviderProps> = ({ children }
 
   const getCurrentGenerationId = () => generationIdRef.current;
 
+  const getReivewOutcome = () => {
+    if (generationMetricsRef.current.acceptedChanges === generationMetricsRef.current.totalProposedChanges) {
+      return "accept_all";
+    } else if (generationMetricsRef.current.acceptedChanges === 0) {
+      return "reject_all";
+    } else {
+      return "partial_accept";
+    }
+  };
+
   const value = {
     sessionId,
     generationId,
     lastUsedQuery,
     lastGeneratedCode,
+    generationMetrics: generationMetricsRef.current,
+    updateGenerationMetrics,
     createNewAISession,
     startNewGeneration,
     endAISession,
     getCurrentGenerationId,
     setLastUsedQuery,
     setLastGeneratedCode,
+    getReivewOutcome,
   };
 
   return <AISessionContext.Provider value={value}>{children}</AISessionContext.Provider>;

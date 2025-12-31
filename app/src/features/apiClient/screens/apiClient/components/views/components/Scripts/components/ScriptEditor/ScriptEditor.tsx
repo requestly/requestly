@@ -30,9 +30,11 @@ import {
   trackAITestGenerationAcceptClicked,
   trackAITestGenerationFailed,
   trackAITestGenerationRejectClicked,
+  trackAITestGenerationReviewCompleted,
   trackAITestGenerationSuccessful,
 } from "modules/analytics/events/features/apiClient";
 import { useAISessionContext } from "features/ai/contexts/AISession";
+import { getChunks } from "@codemirror/merge";
 
 const TestGenerationOutputSchema = z.object({
   text: z
@@ -86,10 +88,13 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
     sessionId,
     lastUsedQuery,
     lastGeneratedCode,
+    generationMetrics,
     setLastUsedQuery,
     setLastGeneratedCode,
     getCurrentGenerationId,
     endAISession,
+    updateGenerationMetrics,
+    getReivewOutcome,
   } = useAISessionContext();
 
   const [scriptType, setScriptType] = useState<RQAPI.ScriptType>(activeScriptType);
@@ -146,6 +151,10 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
       }
       setIsTestsStreamingFinished(true);
       dispatch(globalActions.updateHasGeneratedAITests(true));
+      if (editorViewRef.current?.state) {
+        const proposedChanges = getChunks(editorViewRef.current?.state);
+        updateGenerationMetrics("totalProposedChanges", proposedChanges?.chunks?.length ?? 0);
+      }
     },
   });
 
@@ -181,20 +190,26 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
         source: "ai",
         onPartialMerge: (mergedValue: string, newIncomingValue: string, type: "accept" | "reject") => {
           setLastGeneratedCode(newIncomingValue);
-
+          const currentGenerationId = getCurrentGenerationId();
           if (type === "accept") {
             onScriptsChange({
               ...(entry?.scripts || defaultScripts),
               postResponse: mergedValue,
             });
-            const currentGenerationId = getCurrentGenerationId();
+            updateGenerationMetrics("acceptedChanges", generationMetrics.acceptedChanges + 1);
             trackAITestGenerationAcceptClicked(sessionId, currentGenerationId);
           } else {
-            const currentGenerationId = getCurrentGenerationId();
             trackAITestGenerationRejectClicked(sessionId, currentGenerationId);
           }
 
           if (mergedValue === newIncomingValue) {
+            trackAITestGenerationReviewCompleted(
+              sessionId,
+              currentGenerationId,
+              getReivewOutcome(),
+              generationMetrics.totalProposedChanges,
+              generationMetrics.acceptedChanges
+            );
             clear();
             endAISession();
           }
@@ -213,6 +228,9 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
     getCurrentGenerationId,
     endAISession,
     setLastGeneratedCode,
+    generationMetrics,
+    updateGenerationMetrics,
+    getReivewOutcome,
   ]);
 
   const handleAcceptTests = () => {
@@ -220,6 +238,13 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
       preRequest: entry?.scripts?.[RQAPI.ScriptType.PRE_REQUEST] || DEFAULT_SCRIPT_VALUES[RQAPI.ScriptType.PRE_REQUEST],
       postResponse: object?.code?.content as string,
     });
+    trackAITestGenerationReviewCompleted(
+      sessionId,
+      getCurrentGenerationId(),
+      "accept_all",
+      generationMetrics.totalProposedChanges,
+      generationMetrics.totalProposedChanges
+    );
     clear();
     endAISession();
   };
@@ -406,6 +431,13 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
       {isTestsStreamingFinished && object?.code?.content && !error && (
         <AIResultReviewPanel
           onDiscard={() => {
+            trackAITestGenerationReviewCompleted(
+              sessionId,
+              getCurrentGenerationId(),
+              getReivewOutcome(),
+              generationMetrics.totalProposedChanges,
+              generationMetrics.acceptedChanges
+            );
             clear();
             endAISession();
           }}
