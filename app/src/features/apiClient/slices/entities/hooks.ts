@@ -96,6 +96,42 @@ export function useBufferEntry(id: string) {
   return useApiClientSelector((state) => bufferAdapterSelectors.selectById(state.buffer, id) ?? null);
 }
 
+export function useBufferByReferenceId(referenceId: string) {
+  const buffer = useApiClientSelector((state) => findBufferByReferenceId(state.buffer.entities, referenceId));
+  if (!buffer) {
+    throw new EntityNotFound(referenceId, "BUFFER" as ApiClientEntityType);
+  }
+  return buffer;
+}
+
+export function useBufferByBufferId(bufferId: string) {
+  const buffer = useApiClientSelector((state) => bufferAdapterSelectors.selectById(state.buffer, bufferId));
+  if (!buffer) {
+    throw new EntityNotFound(bufferId, "BUFFER" as ApiClientEntityType);
+  }
+  return buffer;
+}
+
+export function useIsBufferDirty(
+  params:
+    | {
+        type: "referenceId";
+        referenceId: string;
+      }
+    | {
+        type: "bufferId";
+        bufferId: string;
+      }
+): boolean {
+  return useApiClientSelector((state) => {
+    const entry =
+      params.type === "referenceId"
+        ? findBufferByReferenceId(state.buffer.entities, params.referenceId)
+        : bufferAdapterSelectors.selectById(state.buffer, params.bufferId);
+    return entry?.isDirty ?? false;
+  });
+}
+
 export function useBufferIsDirty(id: string): boolean {
   return useApiClientSelector((state) => {
     const entry = bufferAdapterSelectors.selectById(state.buffer, id);
@@ -107,12 +143,15 @@ export function useHasBuffer(id: string): boolean {
   return useApiClientSelector((state) => bufferAdapterSelectors.selectById(state.buffer, id) !== undefined);
 }
 
-export function useEnvironmentEntity(id: string, type: ApiClientEntityType.ENVIRONMENT | ApiClientEntityType.GLOBAL_ENVIRONMENT) {
+export function useEnvironmentEntity(
+  id: string,
+  type: ApiClientEntityType.ENVIRONMENT | ApiClientEntityType.GLOBAL_ENVIRONMENT
+) {
   return useEntity({
     id,
-    type
+    type,
   });
-};
+}
 
 export function useBufferedEnvironmentEntity(id: string, isGlobal: boolean) {
   return useBufferedEntity({

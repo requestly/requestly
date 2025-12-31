@@ -1,11 +1,11 @@
-import React from "react";
+import type React from "react";
+import type { EnvironmentVariables } from "backend/environment/types";
+import type { ApiClientVariables } from "features/apiClient/slices/entities/api-client-variables";
 import { VariablesList } from "../../VariablesList/VariablesList";
-import { EnvironmentVariables } from "backend/environment/types";
-import { ApiClientVariables } from "features/apiClient/slices/entities/api-client-variables";
 
 interface RuntimeVariablesListProps {
   variablesData: EnvironmentVariables;
-  variables: ApiClientVariables<any>;
+  variables: ApiClientVariables<any, any>;
   searchValue: string;
   onSearchValueChange: (value: string) => void;
 }
