@@ -133,7 +133,6 @@ export const tabsSlice = createSlice({
       const existingTab = allTabs.find(
         (tab) => tab.source.getSourceId() === sourceId && tab.source.getSourceName() === sourceName
       );
-
       if (existingTab) {
         state.activeTabId = existingTab.id;
         return;

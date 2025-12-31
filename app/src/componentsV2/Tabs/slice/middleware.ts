@@ -99,7 +99,7 @@ export function getEntityDataFromTabSource(
     const entity = selectRuntimeVariablesEntity(reduxStore.getState());
     return {
       entityType: ApiClientEntityType.RUNTIME_VARIABLES,
-      entityId: entity.id,
+      entityId: sourceId,
       data: entity,
     };
   }
@@ -115,7 +115,6 @@ function getApiClientStoreByTabSource(source: TabState["source"]) {
 
 function handleOpenBufferedTab(action: ReturnType<typeof openBufferedTab>) {
   const { source, isNew = false, preview } = action.payload;
-
   const apiClientStore = getApiClientStoreByTabSource(source);
   const state = apiClientStore.getState() as ApiClientStoreState;
   const entityData = getEntityDataFromTabSource(source, {
