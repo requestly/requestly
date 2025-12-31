@@ -94,7 +94,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
     getCurrentGenerationId,
     endAISession,
     updateGenerationMetrics,
-    getReivewOutcome,
+    getReviewOutcome,
   } = useAISessionContext();
 
   const [scriptType, setScriptType] = useState<RQAPI.ScriptType>(activeScriptType);
@@ -206,7 +206,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
             trackAITestGenerationReviewCompleted(
               sessionId,
               currentGenerationId,
-              getReivewOutcome(),
+              getReviewOutcome(),
               generationMetrics.totalProposedChanges,
               generationMetrics.acceptedChanges
             );
@@ -230,7 +230,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
     setLastGeneratedCode,
     generationMetrics,
     updateGenerationMetrics,
-    getReivewOutcome,
+    getReviewOutcome,
   ]);
 
   const handleAcceptTests = () => {
@@ -434,7 +434,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
             trackAITestGenerationReviewCompleted(
               sessionId,
               getCurrentGenerationId(),
-              getReivewOutcome(),
+              getReviewOutcome(),
               generationMetrics.totalProposedChanges,
               generationMetrics.acceptedChanges
             );

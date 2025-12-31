@@ -1,5 +1,5 @@
 import React, { useMemo, useRef } from "react";
-import CodeMirror, { EditorView } from "@uiw/react-codemirror";
+import CodeMirror, { EditorView, ReactCodeMirrorRef } from "@uiw/react-codemirror";
 import { unifiedMergeView, getOriginalDoc } from "@codemirror/merge";
 import { vscodeDark } from "@uiw/codemirror-theme-vscode";
 import { javascript } from "@codemirror/lang-javascript";
@@ -10,7 +10,7 @@ interface Props {
   originalValue: string;
   newValue: string;
   onMergeChunk: (mergedValue: string, newIncomingValue: string, type: "accept" | "reject") => void;
-  onEditorReady: (view: EditorView) => void;
+  onEditorReady: (view: ReactCodeMirrorRef) => void;
 }
 
 export const MergeViewEditor: React.FC<Props> = ({ originalValue, newValue, onMergeChunk, onEditorReady }) => {

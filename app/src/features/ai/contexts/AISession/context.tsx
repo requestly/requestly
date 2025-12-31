@@ -19,7 +19,7 @@ export interface AISessionContextValue {
   getCurrentGenerationId: () => string | null;
   setLastUsedQuery: (query: string) => void;
   setLastGeneratedCode: (code: string) => void;
-  getReivewOutcome: () => "accept_all" | "reject_all" | "partial_accept";
+  getReviewOutcome: () => "accept_all" | "reject_all" | "partial_accept";
 }
 
 const AISessionContext = createContext<AISessionContextValue | undefined>(undefined);
@@ -78,7 +78,7 @@ export const AISessionProvider: React.FC<AISessionProviderProps> = ({ children }
 
   const getCurrentGenerationId = () => generationIdRef.current;
 
-  const getReivewOutcome = () => {
+  const getReviewOutcome = () => {
     if (generationMetricsRef.current.acceptedChanges === generationMetricsRef.current.totalProposedChanges) {
       return "accept_all";
     } else if (generationMetricsRef.current.acceptedChanges === 0) {
@@ -101,7 +101,7 @@ export const AISessionProvider: React.FC<AISessionProviderProps> = ({ children }
     getCurrentGenerationId,
     setLastUsedQuery,
     setLastGeneratedCode,
-    getReivewOutcome,
+    getReviewOutcome,
   };
 
   return <AISessionContext.Provider value={value}>{children}</AISessionContext.Provider>;
