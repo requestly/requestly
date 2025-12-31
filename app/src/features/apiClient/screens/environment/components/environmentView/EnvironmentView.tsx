@@ -6,7 +6,6 @@ import type {
   BufferedEnvironmentEntity,
   BufferedGlobalEnvironmentEntity,
 } from "features/apiClient/slices/entities/buffered/environment";
-import { useWorkspaceId } from "features/apiClient/common/WorkspaceProvider";
 import { EntityNotFound, entitySynced, useApiClientRepository } from "features/apiClient/slices";
 import { EnvironmentVariablesList } from "../VariablesList/EnvironmentVariablesList";
 import { VariablesListHeader } from "../VariablesListHeader/VariablesListHeader";
@@ -14,7 +13,6 @@ import { bufferActions, bufferAdapterSelectors } from "features/apiClient/slices
 import { isEmpty } from "lodash";
 import { ApiClientExportModal } from "features/apiClient/screens/apiClient/components/modals/exportModal/ApiClientExportModal";
 import { PostmanEnvironmentExportModal } from "features/apiClient/screens/apiClient/components/modals/postmanEnvironmentExportModal/PostmanEnvironmentExportModal";
-import { ApiClientEntityType } from "features/apiClient/slices/entities/types";
 
 interface EnvironmentViewProps {
   entity: BufferedEnvironmentEntity | BufferedGlobalEnvironmentEntity;
@@ -27,10 +25,9 @@ export const EnvironmentView: React.FC<EnvironmentViewProps> = ({ entity, enviro
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [isPostmanExportModalOpen, setIsPostmanExportModalOpen] = useState(false);
 
-  const workspaceId = useWorkspaceId();
-  const repositories = useApiClientRepository(workspaceId);
+  const repositories = useApiClientRepository();
   const state = useApiClientSelector((s) => s);
-  const isNewEnvironment = useApiClientSelector(s => s.buffer.entities[entity.id]?.isNew);
+  const isNewEnvironment = useApiClientSelector((s) => s.buffer.entities[entity.id]?.isNew);
 
   const [searchValue, setSearchValue] = useState("");
   const [isSaving, setIsSaving] = useState(false);
@@ -68,7 +65,15 @@ export const EnvironmentView: React.FC<EnvironmentViewProps> = ({ entity, enviro
     } finally {
       setIsSaving(false);
     }
-  }, [repositories, variables, state, environmentId, dispatch, entity.meta.id]);
+  }, [
+    bufferEntry,
+    entity.meta.id,
+    variables,
+    state,
+    repositories.environmentVariablesRepository,
+    environmentId,
+    dispatch,
+  ]);
 
   return (
     <div key={environmentId} className="variables-list-view-container">

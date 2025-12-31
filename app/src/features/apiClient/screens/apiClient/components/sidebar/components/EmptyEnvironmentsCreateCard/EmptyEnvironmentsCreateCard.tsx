@@ -38,6 +38,7 @@ export const EmptyEnvironmentsCreateCard: React.FC<EmptyEnvironmentsCreateCardPr
           title: name,
           isNewTab: true,
           context: workspaceId ? { id: workspaceId } : {},
+          isGlobal: false,
         }),
       });
       toast.success("Environment created");

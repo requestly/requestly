@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { NativeError } from "errors/NativeError";
 import { ApiClientFeatureContext } from "./types";
 import { apiClientContextRegistry } from "./ApiClientContextRegistry";
+import { useWorkspaceId } from "features/apiClient/common/WorkspaceProvider";
 
 export function getApiClientFeatureContext(
   workspaceId?: ApiClientFeatureContext["workspaceId"]
@@ -21,17 +22,16 @@ export function getApiClientFeatureContext(
   return context;
 }
 
-function useApiClientFeatureContext(workspaceId?: ApiClientFeatureContext["workspaceId"]): ApiClientFeatureContext {
+function useApiClientFeatureContext(): ApiClientFeatureContext {
+  const workspaceId = useWorkspaceId();
   const context = useMemo(() => getApiClientFeatureContext(workspaceId), [workspaceId]);
   return context;
 }
 
-export function useApiClientRepository(workspaceId?: ApiClientFeatureContext["workspaceId"]) {
-  const context = useApiClientFeatureContext(workspaceId);
-  return context.repositories;
+export function useApiClientRepository() {
+  return useApiClientFeatureContext().repositories;
 }
 
-export function useApiClientStore(workspaceId: ApiClientFeatureContext["workspaceId"]) {
-  const context = useApiClientFeatureContext(workspaceId);
-  return context.store;
+export function useApiClientStore() {
+  return useApiClientFeatureContext().store;
 }
