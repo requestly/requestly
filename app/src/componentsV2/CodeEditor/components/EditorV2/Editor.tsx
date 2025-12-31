@@ -361,7 +361,12 @@ const Editor: React.FC<EditorProps> = ({
       >
         {toastContainer}
         {mergeView ? (
-          <MergeViewEditor originalValue={value} newValue={mergeView.incomingValue} onMergeChunk={handleMergeChunk} />
+          <MergeViewEditor
+            originalValue={value}
+            newValue={mergeView.incomingValue}
+            onMergeChunk={handleMergeChunk}
+            onEditorReady={editorRefCallback}
+          />
         ) : (
           editor
         )}

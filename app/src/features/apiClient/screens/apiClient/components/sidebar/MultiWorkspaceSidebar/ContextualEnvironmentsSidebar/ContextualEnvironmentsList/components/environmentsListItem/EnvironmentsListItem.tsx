@@ -60,7 +60,7 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
 }) => {
   const dispatch = useApiClientDispatch();
   const workspaceId = useWorkspaceId();
-  const { environmentVariablesRepository } = useApiClientRepository(workspaceId);
+  const { environmentVariablesRepository } = useApiClientRepository();
   const { openBufferedTab, closeTabByEntityId } = useTabActions();
   const activeTabSourceId = useActiveTabId();
 
@@ -98,6 +98,7 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
           context: {
             id: workspaceId,
           },
+          isGlobal: false,
         }),
       });
       toast.success("Environment renamed successfully");
@@ -211,6 +212,7 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
             context: {
               id: workspaceId,
             },
+            isGlobal: isGlobalEnvironment(environment.id),
           }),
         });
       }}
