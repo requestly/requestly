@@ -191,12 +191,15 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
         onPartialMerge: (mergedValue: string, newIncomingValue: string, type: "accept" | "reject") => {
           setLastGeneratedCode(newIncomingValue);
           const currentGenerationId = getCurrentGenerationId();
+          const newAcceptedCount =
+            type === "accept" ? generationMetrics.acceptedChanges + 1 : generationMetrics.acceptedChanges;
+
           if (type === "accept") {
             onScriptsChange({
               ...(entry?.scripts || defaultScripts),
               postResponse: mergedValue,
             });
-            updateGenerationMetrics("acceptedChanges", generationMetrics.acceptedChanges + 1);
+            updateGenerationMetrics("acceptedChanges", newAcceptedCount);
             trackAITestGenerationAcceptClicked(sessionId, currentGenerationId);
           } else {
             trackAITestGenerationRejectClicked(sessionId, currentGenerationId);
@@ -208,7 +211,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
               currentGenerationId,
               getReviewOutcome(),
               generationMetrics.totalProposedChanges,
-              generationMetrics.acceptedChanges
+              newAcceptedCount
             );
             clear();
             endAISession();
