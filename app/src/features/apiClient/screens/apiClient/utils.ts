@@ -35,6 +35,7 @@ import { getFileContents } from "components/mode-specific/desktop/DesktopFilePic
 import { NativeError } from "errors/NativeError";
 import { trackCollectionRunnerRecordLimitExceeded } from "modules/analytics/events/features/apiClient";
 import { getBoundary, parse as multipartParser } from "parse-multipart-data";
+import { TreeIndices } from "features/apiClient/slices";
 
 const createAbortError = (signal: AbortSignal) => {
   if (signal && signal.reason === AbortReason.USER_CANCELLED) {
@@ -763,12 +764,13 @@ export const apiRequestToHarRequestAdapter = (apiRequest: RQAPI.HttpRequest): Ha
 
 export const filterOutChildrenRecords = (
   selectedRecords: Set<RQAPI.ApiClientRecord["id"]>,
-  childParentMap: Map<RQAPI.ApiClientRecord["id"], RQAPI.ApiClientRecord["id"]>,
+  childParentMap: TreeIndices["childToParent"],
   recordsMap: Record<RQAPI.ApiClientRecord["id"], RQAPI.ApiClientRecord>
 ) =>
   [...selectedRecords]
-    .filter((id) => !childParentMap.get(id) || !selectedRecords.has(childParentMap.get(id) ?? ""))
-    .map((id) => recordsMap[id]);
+    .filter((id) => !childParentMap[id] || !selectedRecords.has(childParentMap[id] ?? ""))
+    .map((id) => recordsMap[id])
+    .filter((r) => !!r);
 
 export const processRecordsForDuplication = (
   recordsToProcess: RQAPI.ApiClientRecord[],

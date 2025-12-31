@@ -22,7 +22,7 @@ export function getApiClientFeatureContext(
   return context;
 }
 
-function useApiClientFeatureContext(): ApiClientFeatureContext {
+export function useApiClientFeatureContext(): ApiClientFeatureContext {
   const workspaceId = useWorkspaceId();
   const context = useMemo(() => getApiClientFeatureContext(workspaceId), [workspaceId]);
   return context;

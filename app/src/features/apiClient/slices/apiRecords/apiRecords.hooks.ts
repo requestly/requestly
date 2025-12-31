@@ -17,6 +17,7 @@ import {
   makeSelectRecordById,
   makeSelectChildrenIds,
   makeSelectAncestorIds,
+  selectChildToParent,
 } from "./selectors";
 import { useApiClientSelector } from "../hooks/base.hooks";
 
@@ -81,4 +82,8 @@ export function useTotalRecords(): number {
 
 export function useCollectionPath(id: EntityId): RQAPI.ApiClientRecord[] {
   return useApiClientSelector((state) => selectCollectionPath(state, id));
+}
+
+export function useChildToParent() {
+  return useApiClientSelector(selectChildToParent);
 }
