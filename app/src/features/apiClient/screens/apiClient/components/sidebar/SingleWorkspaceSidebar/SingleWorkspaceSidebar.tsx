@@ -156,24 +156,24 @@ export const SingleWorkspaceSidebar: React.FC<Props> = () => {
     //     />
     //   ),
     // },
-    // {
-    //   key: ApiClientSidebarTabKey.RUNTIME_VARIABLES,
-    //   label: (
-    //     <>
-    //       <Tooltip title="Runtime variables" placement="right">
-    //         <div
-    //           onClick={() => setActiveKey(ApiClientSidebarTabKey.RUNTIME_VARIABLES)}
-    //           className={`api-client-tab-link ${
-    //             activeKey === ApiClientSidebarTabKey.RUNTIME_VARIABLES ? "active" : ""
-    //           }`}
-    //         >
-    //           <MdOutlineSpaceDashboard />
-    //         </div>
-    //       </Tooltip>
-    //     </>
-    //   ),
-    //   children: <RuntimeVariables />,
-    // },
+    {
+      key: ApiClientSidebarTabKey.RUNTIME_VARIABLES,
+      label: (
+        <>
+          <Tooltip title="Runtime variables" placement="right">
+            <div
+              onClick={() => setActiveKey(ApiClientSidebarTabKey.RUNTIME_VARIABLES)}
+              className={`api-client-tab-link ${
+                activeKey === ApiClientSidebarTabKey.RUNTIME_VARIABLES ? "active" : ""
+              }`}
+            >
+              <MdOutlineSpaceDashboard />
+            </div>
+          </Tooltip>
+        </>
+      ),
+      children: <RuntimeVariables />,
+    },
   ];
 
   const handleActiveTabChange = (activeKey: ApiClientSidebarTabKey) => {
