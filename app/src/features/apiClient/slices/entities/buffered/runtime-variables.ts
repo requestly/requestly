@@ -4,13 +4,13 @@ import { bufferAdapterSelectors, bufferActions } from "../../buffer/slice";
 import type { ApiClientRootState } from "../../hooks/types";
 import { RuntimeVariablesEntity } from "../runtime-variables";
 import { ApiClientVariables } from "../api-client-variables";
-import { ApiClientEntityMeta } from "../base";
-import { EntityDispatch } from "../types";
-import { RootState } from "store/types";
+import type { ApiClientEntityMeta } from "../base";
+import type { EntityDispatch } from "../types";
 
 
 export class BufferedRuntimeVariablesEntity extends RuntimeVariablesEntity {
-  override readonly variables = new ApiClientVariables<RuntimeVariablesRecord, RootState>(
+  // @ts-expect-error - Shadowing parent's variables with buffered version that uses ApiClientRootState instead of RootState
+  override readonly variables = new ApiClientVariables<RuntimeVariablesRecord, ApiClientRootState>(
     (e) => e.variables,
     this.unsafePatch.bind(this),
     this.getEntityFromStateBuffered.bind(this)
