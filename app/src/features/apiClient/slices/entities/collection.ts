@@ -5,8 +5,9 @@ import { ApiClientStoreState } from "../workspaceView/helpers/ApiClientContextRe
 import { ApiClientRecordEntity } from "./api-client-record-entity";
 import { ApiClientEntityType } from "./types";
 import { ApiClientVariables } from "./api-client-variables";
+import { ApiClientEntityMeta } from "./base";
 
-export class CollectionRecordEntity extends ApiClientRecordEntity<RQAPI.CollectionRecord> {
+export class CollectionRecordEntity<M extends ApiClientEntityMeta = ApiClientEntityMeta> extends ApiClientRecordEntity<RQAPI.CollectionRecord, M> {
   public readonly variables = new ApiClientVariables<RQAPI.CollectionRecord>(
     (e) => e.data.variables,
     this.unsafePatch.bind(this),
@@ -25,15 +26,5 @@ export class CollectionRecordEntity extends ApiClientRecordEntity<RQAPI.Collecti
 
     return record as RQAPI.CollectionRecord;
   }
-
-
-  setVariables() {
-    this.SET({
-      data: {
-        variables: {},
-      }
-    })
-  }
-
 }
 

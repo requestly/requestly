@@ -4,8 +4,9 @@ import { selectRecordById } from "../apiRecords/selectors";
 import { ApiClientStoreState } from "../workspaceView/helpers/ApiClientContextRegistry/types";
 import { ApiClientRecordEntity } from "./api-client-record-entity";
 import { ApiClientEntityType } from "./types";
+import { ApiClientEntityMeta } from "./base";
 
-export class HttpRecordEntity extends ApiClientRecordEntity<RQAPI.HttpApiRecord> {
+export class HttpRecordEntity<M extends ApiClientEntityMeta = ApiClientEntityMeta> extends ApiClientRecordEntity<RQAPI.HttpApiRecord, M> {
   readonly type = ApiClientEntityType.HTTP_RECORD;
   getEntityFromState(state: ApiClientStoreState): RQAPI.HttpApiRecord {
     const record = selectRecordById(state, this.meta.id);

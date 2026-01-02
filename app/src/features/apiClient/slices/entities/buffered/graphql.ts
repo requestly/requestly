@@ -3,8 +3,10 @@ import { InvalidEntityShape, EntityNotFound, UpdateCommand } from "../../types";
 import { bufferActions, bufferAdapterSelectors } from "../../buffer/slice";
 import { ApiClientRootState } from "../../hooks/types";
 import { GraphQLRecordEntity } from "../graphql";
+import { BufferedApiClientEntity, BufferedApiClientEntityMeta } from "./factory";
 
-export class BufferedGraphQLRecordEntity extends GraphQLRecordEntity {
+export class BufferedGraphQLRecordEntity extends GraphQLRecordEntity<BufferedApiClientEntityMeta> implements BufferedApiClientEntity {
+  origin = new GraphQLRecordEntity(this.dispatch, { id: this.meta.referenceId });
   override dispatchCommand(command: UpdateCommand<RQAPI.GraphQLApiRecord>): void {
     this.dispatch(bufferActions.applyPatch({ id: this.meta.id, command }));
   }
