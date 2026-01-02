@@ -10,7 +10,6 @@ import {
 } from "modules/analytics/events/features/apiClient";
 import { createBlankApiRecord, getEmptyDraftApiRecord } from "../screens/apiClient/utils";
 import { APIClientWorkloadManager } from "../helpers/modules/scriptsV2/workloadManager/APIClientWorkloadManager";
-import { notification } from "antd";
 import { toast } from "utils/Toast";
 import { RBAC, useRBAC } from "features/rbac";
 import { DraftRequestContainerTabSource } from "../screens/apiClient/components/views/components/DraftRequestContainer/draftRequestContainerTabSource";
@@ -160,96 +159,92 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
           }
 
           setIsRecordBeingCreated(recordType);
-          return createBlankApiRecord(recordType, collectionId, apiClientRecordsRepository, entryType).then(
-            (result) => {
-              setIsRecordBeingCreated(null);
-              if (!result.success) {
-                toast.error(result.message || "Failed to create record!");
-                return;
-              }
 
+          try {
+            const result = await createBlankApiRecord(recordType, collectionId, apiClientRecordsRepository, entryType);
+            setIsRecordBeingCreated(null);
+            if (!result.success) {
+              toast.error(result.message || "Failed to create record!");
+              return;
+            }
+
+            saveOrUpdateRecord(context, result.data);
+
+            openBufferedTab({
+              isNew: true,
+              source: new RequestViewTabSource({
+                id: result.data.id,
+                apiEntryDetails: result.data as RQAPI.ApiRecord,
+                title: result.data.name,
+                context: {
+                  id: context.workspaceId,
+                },
+              }),
+            });
+          } catch (error) {
+            toast.error("Failed to create record!");
+          }
+
+          return;
+        }
+
+        case RQAPI.RecordType.COLLECTION: {
+          setIsRecordBeingCreated(recordType);
+          trackNewCollectionClicked(analyticEventSource);
+
+          try {
+            const result = await createBlankApiRecord(recordType, collectionId, apiClientRecordsRepository);
+
+            setIsRecordBeingCreated(null);
+            if (result.success) {
               saveOrUpdateRecord(context, result.data);
-
               openBufferedTab({
                 isNew: true,
-                source: new RequestViewTabSource({
+                source: new CollectionViewTabSource({
                   id: result.data.id,
-                  apiEntryDetails: result.data as RQAPI.ApiRecord,
                   title: result.data.name,
                   context: {
                     id: context.workspaceId,
                   },
                 }),
               });
-              return;
+            } else {
+              toast.error(result.message || "Could not create collection.", 5);
             }
-          );
-        }
-
-        case RQAPI.RecordType.COLLECTION: {
-          setIsRecordBeingCreated(recordType);
-          trackNewCollectionClicked(analyticEventSource);
-          return createBlankApiRecord(recordType, collectionId, apiClientRecordsRepository)
-            .then((result) => {
-              setIsRecordBeingCreated(null);
-              if (result.success) {
-                saveOrUpdateRecord(context, result.data);
-                openBufferedTab({
-                  isNew: true,
-                  source: new CollectionViewTabSource({
-                    id: result.data.id,
-                    title: result.data.name,
-                    context: {
-                      id: context.workspaceId,
-                    },
-                  }),
-                });
-              } else {
-                toast.error(result.message || "Could not create collection.", 5);
-
-                notification.error({
-                  message: "Could not create collection!",
-                  description: result?.message,
-                  placement: "bottomRight",
-                });
-              }
-            })
-            .catch((error) => {
-              notification.error({
-                message: "Could not create collection!",
-                description: error.message,
-                placement: "bottomRight",
-              });
-              console.error("Error adding new collection", error);
-            });
+          } catch (error) {
+            toast.error("Could not create collection!", 5);
+          }
+          return;
         }
 
         case RQAPI.RecordType.ENVIRONMENT: {
           setIsRecordBeingCreated(recordType);
           trackNewEnvironmentClicked("api_client_sidebar_header");
 
-          return context.store
-            .dispatch(createEnvironment({ name: "New Environment", repository: environmentVariablesRepository }) as any)
-            .unwrap()
-            .then((newEnvironment: { id: string; name: string }) => {
-              setIsRecordBeingCreated(null);
-              openBufferedTab({
-                isNew: true,
-                source: new EnvironmentViewTabSource({
-                  id: newEnvironment.id,
-                  title: newEnvironment.name,
-                  context: {
-                    id: context.workspaceId,
-                  },
-                  isGlobal: false,
-                }),
-              });
-            })
-            .catch((error: any) => {
-              setIsRecordBeingCreated(null);
-              toast.error(error.message);
-              console.error("Error adding new environment", error);
+          try {
+            const newEnvironment = await context.store
+              .dispatch(
+                createEnvironment({ name: "New Environment", repository: environmentVariablesRepository }) as any
+              )
+              .unwrap();
+
+            setIsRecordBeingCreated(null);
+            openBufferedTab({
+              isNew: true,
+              source: new EnvironmentViewTabSource({
+                id: newEnvironment.id,
+                title: newEnvironment.name,
+                context: {
+                  id: context.workspaceId,
+                },
+                isGlobal: false,
+              }),
             });
+          } catch (error) {
+            setIsRecordBeingCreated(null);
+            toast.error(error.message);
+          }
+          return;
         }
 
         default: {
