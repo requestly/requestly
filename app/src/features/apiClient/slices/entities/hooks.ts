@@ -60,6 +60,7 @@ export function useBufferedEntity<T extends ApiClientEntityType>(params: { id: s
     {
       id: buffer.id,
       type: params.type,
+      referenceId: params.id,
     },
     dispatch
   );

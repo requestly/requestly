@@ -13,7 +13,20 @@ export class ApiClientVariables<T, State = ApiClientStoreState> {
     private readonly getVariableObject: (entity: T) => EnvironmentVariables,
     private readonly unsafePatch: (patcher: (state: T) => void) => void,
     private readonly getEntityFromState: (state: State) => T
-  ) {}
+  ) { }
+
+  refresh(params: EnvironmentVariables) {
+    this.clearAll();
+    this.unsafePatch((s) => {
+      const variables = this.getVariableObject(s);
+      for (const key in params) {
+        if (!params[key]) {
+          continue;
+        }
+        variables[key] = params[key];
+      }
+    });
+  }
 
   add(params: Omit<Variable, "id"> & { key: string }) {
     const id = uuidv4();

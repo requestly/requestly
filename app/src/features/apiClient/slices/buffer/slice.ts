@@ -176,15 +176,15 @@ export const bufferSlice = createSlice({
       state,
       action: PayloadAction<{
         id: string;
-        savedData: unknown;
-        referenceId: string;
+        referenceId?: string;
       }>
     ) {
       const entry = state.entities[action.payload.id];
       if (!entry) return;
 
-      entry.referenceId = action.payload.referenceId;
-      entry.current = merge(entry.current, action.payload.savedData);
+      if(action.payload.referenceId) {
+        entry.referenceId = action.payload.referenceId;
+      }
       entry.diff = {};
       entry.isDirty = false;
     },

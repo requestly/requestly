@@ -6,15 +6,15 @@ import type {
   BufferedEnvironmentEntity,
   BufferedGlobalEnvironmentEntity,
 } from "features/apiClient/slices/entities/buffered/environment";
-import { EntityNotFound, entitySynced, useApiClientRepository } from "features/apiClient/slices";
+import { useApiClientRepository } from "features/apiClient/slices";
 import { EnvironmentVariablesList } from "../VariablesList/EnvironmentVariablesList";
 import { VariablesListHeader } from "../VariablesListHeader/VariablesListHeader";
-import { bufferActions } from "features/apiClient/slices/buffer/slice";
 import { isEmpty } from "lodash";
 import { ApiClientExportModal } from "features/apiClient/screens/apiClient/components/modals/exportModal/ApiClientExportModal";
 import { PostmanEnvironmentExportModal } from "features/apiClient/screens/apiClient/components/modals/postmanEnvironmentExportModal/PostmanEnvironmentExportModal";
 import { ApiClientRootState } from "features/apiClient/slices/hooks/types";
 import { useBufferByBufferId, useIsBufferDirty } from "features/apiClient/slices/entities";
+import { useSaveBuffer } from "features/apiClient/slices/buffer/hooks";
 
 interface EnvironmentViewProps {
   entity: BufferedEnvironmentEntity | BufferedGlobalEnvironmentEntity;
@@ -41,34 +41,32 @@ export const EnvironmentView: React.FC<EnvironmentViewProps> = ({ entity, enviro
     referenceId: environmentId,
     type: "referenceId",
   });
-  
-  const bufferEntry = useBufferByBufferId(entity.meta.id);
 
+  const bufferEntry = useBufferByBufferId(entity.meta.id);
+  const saveBuffer = useSaveBuffer();
   const handleSaveVariables = useCallback(async () => {
-    try {
-      if (!bufferEntry) throw new EntityNotFound(entity.meta.id, "buffer");
-      setIsSaving(true);
-      const dataToSave = variablesData;
-      await repositories.environmentVariablesRepository.updateEnvironment(environmentId, { variables: dataToSave });
-      dispatch(
-        entitySynced({
-          entityType: bufferEntry.entityType,
-          entityId: environmentId,
-          data: { variables: dataToSave },
-        })
-      );
-      dispatch(
-        bufferActions.markSaved({
-          id: entity.meta.id,
-          referenceId: environmentId,
-          savedData: { variables: dataToSave },
-        })
-      );
-    } catch (error) {
-      console.error("Failed to update variables", error);
-    } finally {
-      setIsSaving(false);
-    }
+    saveBuffer(
+      {
+        entity,
+        produceChanges(entity, state) {
+            return entity.variables.getAll(state);
+        },
+        async save(changes, repositories) {
+          await repositories.environmentVariablesRepository.updateEnvironment(environmentId, { variables: changes });
+        },
+      },
+      {
+        beforeSave() {
+          setIsSaving(true);
+        },
+        afterSave() {
+          setIsSaving(false);
+        },
+        onError(error) {
+           console.error("Failed to update variables", error);
+        },
+      }
+    );
   }, [repositories,bufferEntry, variablesData, environmentId, dispatch, entity.meta.id]);
 
   return (

@@ -6,9 +6,12 @@ import { RuntimeVariablesEntity } from "../runtime-variables";
 import { ApiClientVariables } from "../api-client-variables";
 import type { ApiClientEntityMeta } from "../base";
 import type { EntityDispatch } from "../types";
+import { BufferedApiClientEntity, BufferedApiClientEntityMeta } from "./factory";
+import { reduxStore } from "store";
 
 
-export class BufferedRuntimeVariablesEntity extends RuntimeVariablesEntity {
+export class BufferedRuntimeVariablesEntity extends RuntimeVariablesEntity<BufferedApiClientEntityMeta> implements BufferedApiClientEntity {
+  origin = new RuntimeVariablesEntity(reduxStore.dispatch)
   // @ts-expect-error - Shadowing parent's variables with buffered version that uses ApiClientRootState instead of RootState
   override readonly variables = new ApiClientVariables<RuntimeVariablesRecord, ApiClientRootState>(
     (e) => e.variables,
