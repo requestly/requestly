@@ -12,7 +12,7 @@ import { ApiClientEntityType } from "../entities/types";
 import { PersistConfig } from "redux-deep-persist/lib/types";
 import persistReducer from "redux-persist/es/persistReducer";
 import createTransform from "redux-persist/es/createTransform";
-import storage from 'redux-persist/lib/storage';
+import storage from "redux-persist/lib/storage";
 import { ApiClientVariables } from "../entities/api-client-variables";
 
 export const apiRecordsAdapter = createEntityAdapter<RQAPI.ApiClientRecord>({
@@ -47,7 +47,7 @@ export const apiRecordsSlice = createSlice({
       rebuildTreeIndices(state);
     },
 
-    recordUpserted(state, action: PayloadAction<RQAPI.ApiClientRecord>) {
+    upsertRecord(state, action: PayloadAction<RQAPI.ApiClientRecord>) {
       apiRecordsAdapter.upsertOne(state.records, action.payload);
       rebuildTreeIndices(state);
     },
@@ -156,11 +156,10 @@ export const apiRecordsSlice = createSlice({
   },
 });
 
-
 const hydrationTransformer = createTransform<
-  ApiRecordsState['records'],
+  ApiRecordsState["records"],
   {
-    entities: {[key: string]: DeepPartial<RQAPI.ApiClientRecord>},
+    entities: { [key: string]: DeepPartial<RQAPI.ApiClientRecord> };
   },
   ApiRecordsState
 >(
@@ -174,31 +173,34 @@ const hydrationTransformer = createTransform<
             isPersisted: true, // always persist collection variables
           }),
         },
-      }
+      };
 
       return data;
     });
 
     return {
       entities,
-    }
+    };
   },
   (o) => {
     // We have to case here since redux-persist doesn't know that we are handling hydration ourselves
-    return {ids: [], entities: o.entities as ApiRecordsState['records']['entities']};
+    return { ids: [], entities: o.entities as ApiRecordsState["records"]["entities"] };
   },
   {
-    whitelist: ['records', 'entities'],
+    whitelist: ["records", "entities"],
   }
 );
-export const createApiClientRecordsPersistConfig: (contextId: string) => PersistConfig<ApiRecordsState, {[key: string]: DeepPartial<RQAPI.ApiClientRecord>}, any, any> = (contextId) => ({
+export const createApiClientRecordsPersistConfig: (
+  contextId: string
+) => PersistConfig<ApiRecordsState, { [key: string]: DeepPartial<RQAPI.ApiClientRecord> }, any, any> = (contextId) => ({
   key: `${contextId}:api_client_records`,
   storage: storage,
   transforms: [hydrationTransformer],
-  whitelist: ['records', 'entities'],
+  whitelist: ["records", "entities"],
 });
 
-export const createApiClientRecordsPersistedReducer = (contextId: string) => persistReducer(createApiClientRecordsPersistConfig(contextId), apiRecordsSlice.reducer);
+export const createApiClientRecordsPersistedReducer = (contextId: string) =>
+  persistReducer(createApiClientRecordsPersistConfig(contextId), apiRecordsSlice.reducer);
 
 export const apiRecordsActions = apiRecordsSlice.actions;
 export const apiRecordsReducer = apiRecordsSlice.reducer;

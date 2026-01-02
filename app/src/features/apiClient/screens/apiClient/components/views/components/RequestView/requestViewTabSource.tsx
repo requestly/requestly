@@ -13,11 +13,16 @@ interface RequestViewTabSourceMetadata extends TabSourceMetadata {
   apiEntryDetails?: RQAPI.ApiRecord;
 }
 
+function Record(props: { id: string }) {
+  return <>Record {props.id}</>;
+}
+
 export class RequestViewTabSource extends BaseTabSource {
   constructor(metadata: RequestViewTabSourceMetadata) {
     super();
     this.component = (
-      <RequestView key={metadata.id} requestId={metadata.id} apiEntryDetails={metadata.apiEntryDetails} />
+      <Record id={metadata.id} />
+      // <RequestView key={metadata.id} requestId={metadata.id} apiEntryDetails={metadata.apiEntryDetails} />
     );
     this.metadata = {
       ...metadata,
