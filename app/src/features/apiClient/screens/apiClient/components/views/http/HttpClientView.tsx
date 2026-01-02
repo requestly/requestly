@@ -71,8 +71,6 @@ import HttpRequestTabs, { RequestTab } from "./components/HttpRequestTabs/HttpRe
 import "./httpClientView.scss";
 import { QueryParamsProvider } from "features/apiClient/store/QueryParamsContextProvider";
 import { MdOutlineSyncAlt } from "@react-icons/all-files/md/MdOutlineSyncAlt";
-import { useLocation } from "react-router-dom";
-import PATHS from "config/constants/sub/paths";
 import { useAPIRecords, useAPIRecordsStore } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 import { Authorization } from "../components/request/components/AuthorizationView/types/AuthConfig";
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
@@ -93,6 +91,7 @@ type Props = {
   openInModal?: boolean;
   onSaveCallback: (apiEntryDetails: RQAPI.HttpApiRecord) => void;
   notifyApiRequestFinished: (apiEntry: RQAPI.HttpApiEntry) => void;
+  isHistoryView?: boolean;
 };
 
 const HttpClientView: React.FC<Props> = ({
@@ -101,9 +100,9 @@ const HttpClientView: React.FC<Props> = ({
   onSaveCallback,
   notifyApiRequestFinished,
   apiEntryDetails,
+  isHistoryView = false,
 }) => {
   const dispatch = useDispatch();
-  const location = useLocation();
   const appMode = useSelector(getAppMode);
   const isExtensionEnabled = useSelector(getIsExtensionEnabled);
   const user = useSelector(getUserAuthDetails);
@@ -224,8 +223,6 @@ const HttpClientView: React.FC<Props> = ({
     sanitizeEntry({ ...entryWithoutResponse, response: null }, false)
   );
 
-  const isHistoryView = location.pathname.includes(PATHS.API_CLIENT.HISTORY.RELATIVE);
-
   const [purgeAndAdd] = useAutogenerateStore((state) => [state.purgeAndAdd, state.purgeAndAddHeaders]);
   const [getData, getParentChain] = useAPIRecords((state) => [state.getData, state.getParentChain]);
 
@@ -290,7 +287,7 @@ const HttpClientView: React.FC<Props> = ({
       setTitle(apiEntryDetails?.name || "Untitled request");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [setTitle, isHistoryView]);
+  }, [setTitle, isHistoryView, apiEntryDetails?.name]);
 
   useEffect(() => {
     //on mount run this

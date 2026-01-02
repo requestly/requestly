@@ -72,6 +72,7 @@ export const HistoryView: React.FC = () => {
       onSaveCallback={handleSaveCallback}
       apiEntryDetails={entry}
       handleAppRequestFinished={handleAppRequestFinished}
+      isHistoryView={true}
     />
   );
 };

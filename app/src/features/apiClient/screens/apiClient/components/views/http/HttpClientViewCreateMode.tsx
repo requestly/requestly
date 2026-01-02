@@ -8,6 +8,7 @@ type BaseProps = {
   openInModal?: boolean;
   onSaveCallback: (apiEntryDetails: RQAPI.HttpApiRecord) => void;
   notifyApiRequestFinished: (apiEntry: RQAPI.HttpApiEntry) => void;
+  isHistoryView?: boolean;
 };
 
 type CreateModeProps = BaseProps & {
