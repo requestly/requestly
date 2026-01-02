@@ -92,6 +92,9 @@ export class FirebaseEnvSync implements EnvironmentInterface<ApiClientCloudMeta>
     environmentId: string,
     updates: Partial<Pick<EnvironmentData, "name" | "variables">>
   ): Promise<void> {
+    if (updates.variables) {
+      updates.variables = Object.fromEntries(Object.entries(updates.variables).filter(([key]) => key !== ""));
+    }
     await updateEnvironmentInDB(this.getPrimaryId(), environmentId, updates);
   }
 

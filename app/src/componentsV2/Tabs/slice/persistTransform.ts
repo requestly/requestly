@@ -4,6 +4,7 @@ import { TAB_SOURCES_MAP } from "../constants";
 import type { TabState } from "./types";
 import type { TabSourceMetadata } from "../types";
 import type { EntityState } from "@reduxjs/toolkit";
+import { NativeError } from "errors/NativeError";
 
 interface TabStateSerialized {
   id: string;
@@ -36,7 +37,8 @@ function deserializeTab(serialized: TabStateSerialized): TabState | null {
         tags: { error_type: "tab_persistence_issue" },
         extra: { serializedTab: serialized },
       });
-      return null;
+
+      throw new NativeError(`Unknown tab source type: ${serialized.sourceType}`);
     }
 
     // Each TabSource constructor has different metadata signature
@@ -54,7 +56,8 @@ function deserializeTab(serialized: TabStateSerialized): TabState | null {
       tags: { error_type: "tab_persistence_issue" },
       extra: { serializedTab: serialized },
     });
-    return null;
+
+    throw new NativeError(error);
   }
 }
 

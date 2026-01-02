@@ -10,10 +10,12 @@ import type { GraphQLRecordEntity } from "./graphql";
 import { BufferedEntityFactory } from "./buffered/factory";
 import type { BufferedHttpRecordEntity } from "./buffered/http";
 import type { BufferedGraphQLRecordEntity } from "./buffered/graphql";
+import type { BufferedRuntimeVariablesEntity } from "./buffered/runtime-variables";
+import type { BufferedCollectionRecordEntity } from "./buffered/collection";
 import { useDispatch } from "react-redux";
 import { bufferAdapterSelectors, findBufferByReferenceId } from "../buffer/slice";
 import { EntityNotFound } from "../types";
-import { GLOBAL_ENVIRONMENT_ID } from "../common/constants";
+import { GLOBAL_ENVIRONMENT_ID, RUNTIME_VARIABLES_ENTITY_ID } from "../common/constants";
 
 export function useEntity<T extends ApiClientEntityType>(params: { id: string; type: T }) {
   const dispatch = EntityFactory.GlobalStateOverrideConfig[params.type] ? useDispatch() : useApiClientDispatch();
@@ -95,6 +97,42 @@ export function useBufferEntry(id: string) {
   return useApiClientSelector((state) => bufferAdapterSelectors.selectById(state.buffer, id) ?? null);
 }
 
+export function useBufferByReferenceId(referenceId: string) {
+  const buffer = useApiClientSelector((state) => findBufferByReferenceId(state.buffer.entities, referenceId));
+  if (!buffer) {
+    throw new EntityNotFound(referenceId, "BUFFER" as ApiClientEntityType);
+  }
+  return buffer;
+}
+
+export function useBufferByBufferId(bufferId: string) {
+  const buffer = useApiClientSelector((state) => bufferAdapterSelectors.selectById(state.buffer, bufferId));
+  if (!buffer) {
+    throw new EntityNotFound(bufferId, "BUFFER" as ApiClientEntityType);
+  }
+  return buffer;
+}
+
+export function useIsBufferDirty(
+  params:
+    | {
+        type: "referenceId";
+        referenceId: string;
+      }
+    | {
+        type: "bufferId";
+        bufferId: string;
+      }
+): boolean {
+  return useApiClientSelector((state) => {
+    const entry =
+      params.type === "referenceId"
+        ? findBufferByReferenceId(state.buffer.entities, params.referenceId)
+        : bufferAdapterSelectors.selectById(state.buffer, params.bufferId);
+    return entry?.isDirty ?? false;
+  });
+}
+
 export function useBufferIsDirty(id: string): boolean {
   return useApiClientSelector((state) => {
     const entry = bufferAdapterSelectors.selectById(state.buffer, id);
@@ -106,16 +144,30 @@ export function useHasBuffer(id: string): boolean {
   return useApiClientSelector((state) => bufferAdapterSelectors.selectById(state.buffer, id) !== undefined);
 }
 
-export function useEnvironmentEntity(id: string, type: ApiClientEntityType.ENVIRONMENT | ApiClientEntityType.GLOBAL_ENVIRONMENT) {
+export function useEnvironmentEntity(
+  id: string,
+  type: ApiClientEntityType.ENVIRONMENT | ApiClientEntityType.GLOBAL_ENVIRONMENT
+) {
   return useEntity({
     id,
-    type
+    type,
   });
-};
+}
 
 export function useBufferedEnvironmentEntity(id: string, isGlobal: boolean) {
   return useBufferedEntity({
     id,
     type: isGlobal ? ApiClientEntityType.GLOBAL_ENVIRONMENT : ApiClientEntityType.ENVIRONMENT,
   });
+}
+
+export function useBufferedRuntimeVariablesEntity(): BufferedRuntimeVariablesEntity {
+  return useBufferedEntity({
+    id: RUNTIME_VARIABLES_ENTITY_ID,
+    type: ApiClientEntityType.RUNTIME_VARIABLES,
+  });
+}
+
+export function useBufferedCollectionEntity(id: string): BufferedCollectionRecordEntity {
+  return useBufferedEntity({ id, type: ApiClientEntityType.COLLECTION_RECORD });
 }

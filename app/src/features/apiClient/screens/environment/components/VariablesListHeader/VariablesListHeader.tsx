@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useCallback } from "react";
 import { Input, Dropdown } from "antd";
 import { MdOutlineSearch } from "@react-icons/all-files/md/MdOutlineSearch";
 import { RQBreadcrumb, RQButton } from "lib/design-system-v2/components";
@@ -20,9 +20,9 @@ interface VariablesListHeaderProps {
   currentEnvironmentName: string;
   environmentId: string;
   hideBreadcrumb?: boolean;
-  hasUnsavedChanges: boolean;
-  isSaving: boolean;
-  isNewEnvironment: boolean;
+  hasUnsavedChanges?: boolean;
+  isSaving?: boolean;
+  isNewEnvironment?: boolean;
   exportActions?: {
     showExport: boolean;
     enableExport: boolean;
@@ -43,7 +43,7 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
   exportActions,
   hasUnsavedChanges,
   isSaving,
-  isNewEnvironment,
+  isNewEnvironment
 }) => {
   // TEMP: Commented out for testing buffer migration - rename functionality needs Zustand context
   // const {
@@ -72,14 +72,14 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
     }
   };
 
-  const handleSave = async () => {
+  const handleSave = useCallback(async () => {
     try {
       await onSave();
       toast.success("Environment saved successfully");
     } catch (error) {
       toast.error(error.message || "Could not save environment!");
     }
-  };
+  }, [onSave]);
 
   return (
     <div className="variables-list-header">
@@ -153,7 +153,7 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
 
           <RQButton
             showHotKeyText
-            hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SAVE_ENVIRONMENT.hotKey}
+            hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SAVE_ENVIRONMENT?.hotKey}
             enableHotKey={enableHotKey}
             type="primary"
             onClick={handleSave}

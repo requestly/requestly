@@ -1,5 +1,7 @@
-import React, { useState, useCallback, useMemo, useRef, useEffect } from "react";
-import { EnvironmentVariableType, EnvironmentVariables } from "backend/environment/types";
+import type React from "react";
+import { useState, useCallback, useMemo } from "react";
+import { EnvironmentVariableType } from "backend/environment/types";
+import type { EnvironmentVariables } from "backend/environment/types";
 import { useVariablesListColumns } from "./hooks/useVariablesListColumns";
 import { RQButton } from "lib/design-system-v2/components";
 import { MdAdd } from "@react-icons/all-files/md/MdAdd";
@@ -8,15 +10,14 @@ import { EditableCell, EditableRow } from "./components/customTableRow/CustomTab
 import { EnvironmentAnalyticsContext, EnvironmentAnalyticsSource } from "../../types";
 import { trackAddVariableClicked } from "../../analytics";
 import "./variablesList.scss";
-import { VariableData } from "features/apiClient/store/variables/types";
+import type { VariableData } from "features/apiClient/store/variables/types";
 import EmptySearchResultsView from "./components/emptySearchResultsView/EmptySearchResultsView";
-import { ApiClientVariables } from "features/apiClient/slices/entities/api-client-variables";
+import type { ApiClientVariables } from "features/apiClient/slices/entities/api-client-variables";
 import { mapToEnvironmentArray } from "../../utils";
-import { debounce } from "lodash";
 
 interface VariablesListProps {
   variablesData: EnvironmentVariables;
-  variables: ApiClientVariables<any>;
+  variables: ApiClientVariables<any, any>;
   searchValue: string;
   onSearchValueChange: (value: string) => void;
   isReadOnly?: boolean;
