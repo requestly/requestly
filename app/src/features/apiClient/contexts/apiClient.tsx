@@ -234,10 +234,10 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
             .then((newEnvironment: { id: string; name: string }) => {
               setIsRecordBeingCreated(null);
               openBufferedTab({
+                isNew: true,
                 source: new EnvironmentViewTabSource({
                   id: newEnvironment.id,
                   title: newEnvironment.name,
-                  isNewTab: true,
                   context: {
                     id: context.workspaceId,
                   },
