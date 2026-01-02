@@ -10,6 +10,7 @@ interface Props {
   onSaveCallback: (apiEntryDetails: RQAPI.ApiRecord) => void;
   isCreateMode: boolean;
   isOpenInModal?: boolean;
+  isHistoryView?: boolean;
 }
 
 export const ClientViewFactory = ({
@@ -18,6 +19,7 @@ export const ClientViewFactory = ({
   onSaveCallback,
   isCreateMode,
   isOpenInModal,
+  isHistoryView = false,
 }: Props) => {
   if (isHttpApiRecord(apiRecord)) {
     if (isCreateMode) {
@@ -27,6 +29,7 @@ export const ClientViewFactory = ({
           onSaveCallback={onSaveCallback}
           openInModal={isOpenInModal}
           notifyApiRequestFinished={handleRequestFinished}
+          isHistoryView={isHistoryView}
         />
       );
     }
@@ -38,6 +41,7 @@ export const ClientViewFactory = ({
         onSaveCallback={onSaveCallback}
         isCreateMode={isCreateMode}
         openInModal={isOpenInModal}
+        isHistoryView={isHistoryView}
       />
     );
   }
@@ -51,6 +55,7 @@ export const ClientViewFactory = ({
         onSaveCallback={onSaveCallback}
         isCreateMode={isCreateMode}
         openInModal={isOpenInModal}
+        isHistoryView={isHistoryView}
       />
     );
   }
@@ -62,6 +67,7 @@ export const ClientViewFactory = ({
       onSaveCallback={onSaveCallback}
       isCreateMode={isCreateMode}
       openInModal={isOpenInModal}
+      isHistoryView={isHistoryView}
     />
   );
 };
