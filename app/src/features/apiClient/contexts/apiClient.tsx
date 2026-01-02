@@ -170,33 +170,35 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
           }
 
           setIsRecordBeingCreated(recordType);
-          return createBlankApiRecord(recordType, collectionId, recordsRepository, entryType).then((result) => {
-            setIsRecordBeingCreated(null);
-            if (!result.success) {
-              toast.error(result.message || "Failed to create record!");
+          return createBlankApiRecord(recordType, collectionId, recordsRepository, entryType, apiClientRecords).then(
+            (result) => {
+              setIsRecordBeingCreated(null);
+              if (!result.success) {
+                toast.error(result.message || "Failed to create record!");
+                return;
+              }
+              saveOrUpdateRecord(context, result.data);
+
+              openTab(
+                new RequestViewTabSource({
+                  id: result.data.id,
+                  apiEntryDetails: result.data as RQAPI.ApiRecord,
+                  title: result.data.name,
+                  isNewTab: true,
+                  context: {
+                    id: context.id,
+                  },
+                })
+              );
               return;
             }
-            saveOrUpdateRecord(context, result.data);
-
-            openTab(
-              new RequestViewTabSource({
-                id: result.data.id,
-                apiEntryDetails: result.data as RQAPI.ApiRecord,
-                title: result.data.name,
-                isNewTab: true,
-                context: {
-                  id: context.id,
-                },
-              })
-            );
-            return;
-          });
+          );
         }
 
         case RQAPI.RecordType.COLLECTION: {
           setIsRecordBeingCreated(recordType);
           trackNewCollectionClicked(analyticEventSource);
-          return createBlankApiRecord(recordType, collectionId, recordsRepository)
+          return createBlankApiRecord(recordType, collectionId, recordsRepository, undefined, apiClientRecords)
             .then((result) => {
               setIsRecordBeingCreated(null);
               if (result.success) {
@@ -260,7 +262,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
         }
       }
     },
-    [isValidPermission, getRBACValidationFailureErrorMessage, openTab]
+    [isValidPermission, getRBACValidationFailureErrorMessage, openTab, apiClientRecords]
   );
 
   const onNewClick = useCallback(

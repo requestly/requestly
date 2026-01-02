@@ -78,6 +78,7 @@ import PATHS from "config/constants/sub/paths";
 import { useAPIRecords, useAPIRecordsStore } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 import { Authorization } from "../components/request/components/AuthorizationView/types/AuthConfig";
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
+import { apiRecordsRankingManager } from "features/apiClient/helpers/ranking";
 import ErrorBoundary from "features/apiClient/components/ErrorBoundary/ErrorBoundary";
 import { useHttpRequestExecutor } from "features/apiClient/hooks/requestExecutors/useHttpRequestExecutor";
 import { PathVariablesProvider } from "features/apiClient/store/pathVariables/PathVariablesContextProvider";
@@ -230,7 +231,11 @@ const HttpClientView: React.FC<Props> = ({
     state.purgeAndAdd,
     state.purgeAndAddHeaders,
   ]);
-  const [getData, getParentChain] = useAPIRecords((state) => [state.getData, state.getParentChain]);
+  const [getData, getParentChain, apiClientRecords] = useAPIRecords((state) => [
+    state.getData,
+    state.getParentChain,
+    state.apiClientRecords,
+  ]);
 
   const isDefaultPlacementRef = useRef(false);
 
@@ -525,7 +530,7 @@ const HttpClientView: React.FC<Props> = ({
       return;
     }
 
-    const record: Partial<RQAPI.ApiRecord> = {
+    let record: Partial<RQAPI.ApiRecord> = {
       type: RQAPI.RecordType.API,
       data: { ...entry },
     };
@@ -537,6 +542,12 @@ const HttpClientView: React.FC<Props> = ({
 
     if (isCreateMode) {
       record.name = requestName;
+    }
+
+    // If record doesn't have a rank, generate one using getEffectiveRank
+    if (!isCreateMode && apiEntryDetails && !apiEntryDetails.rank) {
+      const effectiveRank = apiRecordsRankingManager.getEffectiveRank(apiEntryDetails);
+      record = { ...record, rank: effectiveRank };
     }
 
     const result = isCreateMode
@@ -597,7 +608,7 @@ const HttpClientView: React.FC<Props> = ({
       return;
     }
 
-    const record: Partial<RQAPI.ApiRecord> = {
+    let record: Partial<RQAPI.ApiRecord> = {
       type: RQAPI.RecordType.API,
       data: { ...sanitizeEntry(entryToSave, false) },
     };
@@ -605,11 +616,25 @@ const HttpClientView: React.FC<Props> = ({
     if (isCreateMode) {
       const requestId = apiClientRecordsRepository.generateApiRecordId();
       record.id = requestId;
+
+      // For new requests: use getNextRank to place at bottom of collection
+      const collectionId = apiEntryDetails?.collectionId || "";
+      const siblingsInCollection = apiClientRecords.filter(
+        (r) => r.collectionId === collectionId && r.id !== record.id
+      );
+      const newRank = apiRecordsRankingManager.getNextRank(siblingsInCollection, [record as RQAPI.ApiRecord])[0];
+      record = { ...record, rank: newRank };
     }
 
     //  Is this check necessary?
     if (apiEntryDetails?.id) {
       record.id = apiEntryDetails?.id;
+
+      // For existing requests: use getEffectiveRank if no rank exists
+      if (!apiEntryDetails.rank) {
+        const effectiveRank = apiRecordsRankingManager.getEffectiveRank(apiEntryDetails);
+        record = { ...record, rank: effectiveRank };
+      }
     }
 
     const result = isCreateMode
@@ -653,6 +678,7 @@ const HttpClientView: React.FC<Props> = ({
     resetChanges,
     queryParams,
     getPathVariables,
+    apiClientRecords,
   ]);
 
   const handleCancelRequest = useCallback(() => {

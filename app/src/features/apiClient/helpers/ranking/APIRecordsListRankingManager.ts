@@ -33,7 +33,7 @@ export class APIRecordsListRankingManager extends ListRankingManager<RecordMetad
       .padEnd(5, "0"); // Pad with zeros if less than 5 chars
 
     // Combine prefix + name + timestamp for deterministic ordering
-    return `a${namePart}${record.createdTs}`;
+    return `a${namePart}${record.createdTs}1`;
   }
 }
 
