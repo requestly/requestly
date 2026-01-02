@@ -3,8 +3,10 @@ import { InvalidEntityShape, EntityNotFound, UpdateCommand } from "../../types";
 import { bufferActions, bufferAdapterSelectors } from "../../buffer/slice";
 import { ApiClientRootState } from "../../hooks/types";
 import { HttpRecordEntity } from "../http";
+import { BufferedApiClientEntity, BufferedApiClientEntityMeta } from "./factory";
 
-export class BufferedHttpRecordEntity extends HttpRecordEntity {
+export class BufferedHttpRecordEntity extends HttpRecordEntity<BufferedApiClientEntityMeta> implements BufferedApiClientEntity {
+  origin = new HttpRecordEntity(this.dispatch, { id: this.meta.referenceId });
   override dispatchCommand(command: UpdateCommand<RQAPI.HttpApiRecord>): void {
     this.dispatch(bufferActions.applyPatch({ id: this.meta.id, command }));
   }
@@ -20,7 +22,7 @@ export class BufferedHttpRecordEntity extends HttpRecordEntity {
       throw new InvalidEntityShape({
         id: this.id,
         expectedType: RQAPI.RecordType.API,
-        foundType: record.type, 
+        foundType: record.type,
       });
     }
     if (record.data?.type !== RQAPI.ApiEntryType.HTTP) {

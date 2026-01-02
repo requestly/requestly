@@ -5,13 +5,11 @@ import { RuntimeVariablesList } from "../RuntimeVariablesList/runtimevariablesli
 import { RuntimeVariablesHeader } from "../RuntimeVariablesHeader";
 import { useApiClientDispatch, useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
 import { useBufferedRuntimeVariablesEntity, useIsBufferDirty } from "features/apiClient/slices/entities/hooks";
-import { bufferActions } from "features/apiClient/slices/buffer/slice";
-import { runtimeVariablesActions } from "features/apiClient/slices/runtimeVariables/slice";
 import { toast } from "utils/Toast";
 import { isEmpty } from "lodash";
 import "./runtimevariableview.scss";
 import { DeleteAllRuntimeVariablesModal } from "features/apiClient/screens/apiClient/components/modals/DeleteAllRuntimeVariablesModal/deleteAllRuntimeVariablesModal";
-import { RUNTIME_VARIABLES_ENTITY_ID } from "features/apiClient/slices/common/constants";
+import { useSaveBuffer } from "features/apiClient/slices/buffer/hooks";
 
 export const RuntimeVariablesView: React.FC = () => {
   const globalDispatch = useDispatch();
@@ -30,33 +28,34 @@ export const RuntimeVariablesView: React.FC = () => {
     type: "bufferId",
   });
 
+  const saveBuffer = useSaveBuffer();
+
   const handleSaveVariables = useCallback(async () => {
-    try {
-      setIsSaving(true);
-      const dataToSave = variablesData;
-
-      globalDispatch(
-        runtimeVariablesActions.unsafePatch({
-          patcher: (entity) => {
-            entity.variables = dataToSave;
-          },
-        })
-      );
-
-      apiClientDispatch(
-        bufferActions.markSaved({
-          id: entity.meta.id,
-          referenceId: RUNTIME_VARIABLES_ENTITY_ID,
-          savedData: { variables: dataToSave },
-        })
-      );
-      toast.success("Variables updated successfully");
-    } catch (error) {
-      console.error("Failed to update variables", error);
-      toast.error("Failed to update variables");
-    } finally {
-      setIsSaving(false);
-    }
+    saveBuffer(
+      {
+        entity,
+        produceChanges(entity, state) {
+            return entity.variables.getAll(state);
+        },
+        async save() {
+        },
+      },
+      {
+        beforeSave() {
+          setIsSaving(true);
+        },
+        afterSave() {
+          setIsSaving(false);
+        },
+        onError(error) {
+          console.error("Failed to update variables", error);
+          toast.error("Failed to update variables");
+        },
+        onSuccess(changes, entity) {
+          toast.success("Variables updated successfully");
+        },
+      }
+    );
   }, [variablesData, globalDispatch, apiClientDispatch, entity.meta.id]);
 
   const handleDeleteAll = useCallback(() => {
