@@ -8,10 +8,17 @@ import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatu
 
 interface CollectionViewTabSourceMetadata extends TabSourceMetadata {}
 
+function Collection(props: { id: string }) {
+  return <>Collection {props.id}</>;
+}
+
 export class CollectionViewTabSource extends BaseTabSource {
   constructor(metadata: CollectionViewTabSourceMetadata) {
     super();
-    this.component = <CollectionView key={metadata.id} collectionId={metadata.id} />;
+    this.component = (
+      <Collection id={metadata.id} />
+      // <CollectionView key={metadata.id} collectionId={metadata.id} />
+    );
     this.metadata = {
       ...metadata,
       name: "collection",

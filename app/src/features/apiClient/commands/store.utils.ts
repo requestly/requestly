@@ -1,5 +1,4 @@
 import {
-  ApiClientFeatureContext,
   apiClientFeatureContextProviderStore,
   NoopContext,
   NoopContextId,
@@ -10,6 +9,7 @@ import {
   ApiClientViewMode,
 } from "../store/multiWorkspaceView/multiWorkspaceView.store";
 import { NativeError } from "errors/NativeError";
+import { ApiClientFeatureContext, apiRecordsActions } from "../slices";
 
 export function getStores(ctx: ApiClientFeatureContext) {
   return ctx.stores;
@@ -83,15 +83,7 @@ export function getChildParentMap(context: ApiClientFeatureContext) {
 }
 
 export function saveOrUpdateRecord(context: ApiClientFeatureContext, apiClientRecord: RQAPI.ApiClientRecord) {
-  const recordId = apiClientRecord.id;
-  const apiRecordsStore = context.stores.records;
-  const doesRecordExist = !!apiRecordsStore.getState().getData(recordId);
-
-  if (doesRecordExist) {
-    apiRecordsStore.getState().updateRecord(apiClientRecord);
-  } else {
-    apiRecordsStore.getState().addNewRecord(apiClientRecord);
-  }
+  context.store.dispatch(apiRecordsActions.upsertRecord(apiClientRecord));
 }
 
 export function saveBulkRecords(context: ApiClientFeatureContext, records: RQAPI.ApiClientRecord[]) {
