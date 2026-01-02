@@ -13,13 +13,11 @@ import { useApiClientContext } from "features/apiClient/contexts";
 import { DeleteApiRecordModal, ImportFromCurlModal } from "../../modals";
 import { getEmptyApiEntry } from "../../../utils";
 import { ErrorFilesList } from "../components/ErrorFilesList/ErrorFileslist";
-import { useApiClientRepository } from "features/apiClient/contexts/meta";
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
 import "./singleWorkspaceSidebar.scss";
-import { useApiClientFeatureContext } from "features/apiClient/contexts/meta";
-import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 import { MdOutlineSpaceDashboard } from "@react-icons/all-files/md/MdOutlineSpaceDashboard";
 import { RuntimeVariables } from "features/apiClient/screens/environment/components/RuntimeVariables/runtimevariables";
+import { ApiClientFeatureContext, useApiClientFeatureContext, useApiClientRepository } from "features/apiClient/slices";
 
 interface Props {}
 
@@ -37,64 +35,64 @@ export const SingleWorkspaceSidebar: React.FC<Props> = () => {
   const [recordTypeToBeCreated, setRecordTypeToBeCreated] = useState<RQAPI.RecordType | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  // const {
-  //   history,
-  //   clearHistory,
-  //   onNewClick,
-  //   onImportClick,
-  //   setCurrentHistoryIndex,
-  //   selectedHistoryIndex,
-  //   isImportModalOpen,
-  //   onImportRequestModalClose,
-  //   setIsImportModalOpen,
-  // } = useApiClientContext();
+  const {
+    history,
+    clearHistory,
+    onNewClick,
+    onImportClick,
+    setCurrentHistoryIndex,
+    selectedHistoryIndex,
+    isImportModalOpen,
+    onImportRequestModalClose,
+    setIsImportModalOpen,
+  } = useApiClientContext();
 
-  // const { onSaveRecord } = useNewApiClientContext();
-  // const { apiClientRecordsRepository } = useApiClientRepository();
-  // const context = useApiClientFeatureContext();
+  const { onSaveRecord } = useNewApiClientContext();
+  const { apiClientRecordsRepository } = useApiClientRepository();
+  const context = useApiClientFeatureContext();
 
   const [recordsToBeDeleted, setRecordsToBeDeleted] = useState<RQAPI.ApiClientRecord[]>([]);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
-  // const handleRecordsToBeDeleted = useCallback((records: RQAPI.ApiClientRecord[]) => {
-  //   setRecordsToBeDeleted(records);
-  //   setIsDeleteModalOpen(true);
-  // }, []);
+  const handleRecordsToBeDeleted = useCallback((records: RQAPI.ApiClientRecord[]) => {
+    setRecordsToBeDeleted(records);
+    setIsDeleteModalOpen(true);
+  }, []);
 
-  // const onDeleteModalClose = useCallback(() => {
-  //   setRecordsToBeDeleted([]);
-  //   setIsDeleteModalOpen(false);
-  // }, []);
+  const onDeleteModalClose = useCallback(() => {
+    setRecordsToBeDeleted([]);
+    setIsDeleteModalOpen(false);
+  }, []);
 
-  // const handleNewRecordClick = useCallback(
-  //   (recordType: RQAPI.RecordType, analyticEventSource: RQAPI.AnalyticsEventSource, entryType?: RQAPI.ApiEntryType) => {
-  //     setRecordTypeToBeCreated(recordType);
+  const handleNewRecordClick = useCallback(
+    (recordType: RQAPI.RecordType, analyticEventSource: RQAPI.AnalyticsEventSource, entryType?: RQAPI.ApiEntryType) => {
+      setRecordTypeToBeCreated(recordType);
 
-  //     switch (recordType) {
-  //       case RQAPI.RecordType.API: {
-  //         setActiveKey(ApiClientSidebarTabKey.COLLECTIONS);
-  //         onNewClick(analyticEventSource, RQAPI.RecordType.API, "", entryType);
-  //         return;
-  //       }
+      switch (recordType) {
+        case RQAPI.RecordType.API: {
+          setActiveKey(ApiClientSidebarTabKey.COLLECTIONS);
+          onNewClick(analyticEventSource, RQAPI.RecordType.API, "", entryType);
+          return;
+        }
 
-  //       case RQAPI.RecordType.COLLECTION: {
-  //         setActiveKey(ApiClientSidebarTabKey.COLLECTIONS);
-  //         onNewClick(analyticEventSource, RQAPI.RecordType.COLLECTION);
-  //         return;
-  //       }
+        case RQAPI.RecordType.COLLECTION: {
+          setActiveKey(ApiClientSidebarTabKey.COLLECTIONS);
+          onNewClick(analyticEventSource, RQAPI.RecordType.COLLECTION);
+          return;
+        }
 
-  //       case RQAPI.RecordType.ENVIRONMENT: {
-  //         setActiveKey(ApiClientSidebarTabKey.ENVIRONMENTS);
-  //         onNewClick(analyticEventSource, RQAPI.RecordType.ENVIRONMENT);
-  //         return;
-  //       }
+        case RQAPI.RecordType.ENVIRONMENT: {
+          setActiveKey(ApiClientSidebarTabKey.ENVIRONMENTS);
+          onNewClick(analyticEventSource, RQAPI.RecordType.ENVIRONMENT);
+          return;
+        }
 
-  //       default:
-  //         return;
-  //     }
-  //   },
-  //   [onNewClick]
-  // );
+        default:
+          return;
+      }
+    },
+    [onNewClick]
+  );
 
   useEffect(() => {
     if (requestId === "new") {
@@ -119,9 +117,9 @@ export const SingleWorkspaceSidebar: React.FC<Props> = () => {
       ),
       children: (
         <CollectionsList
-          onNewClick={() => {}}
+          onNewClick={onNewClick}
           recordTypeToBeCreated={recordTypeToBeCreated}
-          handleRecordsToBeDeleted={() => {}}
+          handleRecordsToBeDeleted={handleRecordsToBeDeleted}
         />
       ),
     },
@@ -181,63 +179,62 @@ export const SingleWorkspaceSidebar: React.FC<Props> = () => {
   };
 
   // TODO: Move this import logic and the import modal to the api client container which wraps all the routes.
-  // const handleImportRequest = useCallback(
-  //   async (request: RQAPI.Request) => {
-  //     setIsLoading(true);
+  const handleImportRequest = useCallback(
+    async (request: RQAPI.Request) => {
+      setIsLoading(true);
 
-  //     try {
-  //       // TODO: handle import for graphql requests
-  //       const apiEntry = getEmptyApiEntry(RQAPI.ApiEntryType.HTTP, request);
+      try {
+        // TODO: handle import for graphql requests
+        const apiEntry = getEmptyApiEntry(RQAPI.ApiEntryType.HTTP, request);
 
-  //       const record: Partial<RQAPI.ApiRecord> = {
-  //         type: RQAPI.RecordType.API,
-  //         data: apiEntry,
-  //       };
+        const record: Partial<RQAPI.ApiRecord> = {
+          type: RQAPI.RecordType.API,
+          data: apiEntry,
+        };
 
-  //       const result = await apiClientRecordsRepository.createRecord(record);
+        const result = await apiClientRecordsRepository.createRecord(record);
 
-  //       if (result.success) {
-  //         onSaveRecord(result.data, "open");
+        if (result.success) {
+          onSaveRecord(result.data, "open");
 
-  //         setIsImportModalOpen(false);
-  //       } else {
-  //         throw new Error(result.message);
-  //       }
-  //       return result.data;
-  //     } catch (error) {
-  //       console.error("Error importing request", error);
-  //       notification.error({
-  //         message: `Error importing request`,
-  //         description: error?.message,
-  //         placement: "bottomRight",
-  //       });
-  //       throw error;
-  //     } finally {
-  //       setIsLoading(false);
-  //     }
-  //   },
-  //   [onSaveRecord, setIsImportModalOpen, apiClientRecordsRepository]
-  // );
+          setIsImportModalOpen(false);
+        } else {
+          throw new Error(result.message);
+        }
+        return result.data;
+      } catch (error) {
+        console.error("Error importing request", error);
+        notification.error({
+          message: `Error importing request`,
+          description: error?.message,
+          placement: "bottomRight",
+        });
+        throw error;
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [onSaveRecord, setIsImportModalOpen, apiClientRecordsRepository]
+  );
 
-  // useEffect(() => {
-  //   if (state?.modal === ApiClientImporterType.CURL) {
-  //     setIsImportModalOpen(true);
-  //   }
-  // }, [state?.modal, setIsImportModalOpen]);
+  useEffect(() => {
+    if (state?.modal === ApiClientImporterType.CURL) {
+      setIsImportModalOpen(true);
+    }
+  }, [state?.modal, setIsImportModalOpen]);
 
-  // const getSelectedRecords = useCallback((): {
-  //   context: ApiClientFeatureContext | undefined;
-  //   records: RQAPI.ApiClientRecord[];
-  // }[] => {
-  //   return [{ context, records: recordsToBeDeleted }];
-  // }, [context, recordsToBeDeleted]);
+  const getSelectedRecords = useCallback((): {
+    context: ApiClientFeatureContext | undefined;
+    records: RQAPI.ApiClientRecord[];
+  }[] => {
+    return [{ context, records: recordsToBeDeleted }];
+  }, [context, recordsToBeDeleted]);
 
   return (
     <>
       <div className="api-client-sidebar">
         <div className="api-client-sidebar-content">
-          {/* TODO: fix in HTTPClientView */}
-          {/* <ApiClientSidebarHeader
+          <ApiClientSidebarHeader
             activeTab={activeKey}
             history={history}
             onClearHistory={clearHistory}
@@ -245,7 +242,7 @@ export const SingleWorkspaceSidebar: React.FC<Props> = () => {
             onNewClick={(recordType, entryType) =>
               handleNewRecordClick(recordType, "api_client_sidebar_header", entryType)
             }
-          /> */}
+          />
 
           <Tabs
             items={items}
