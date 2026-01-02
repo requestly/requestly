@@ -411,8 +411,8 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
                     isReadOnly={!isValidPermission}
                     handleRecordsToBeDeleted={handleRecordsToBeDeleted}
                     onItemClick={handleItemClick}
-                    recordBefore={recordBefore}
-                    recordAfter={recordAfter}
+                    previousRecord={recordBefore}
+                    nextRecord={recordAfter}
                     bulkActionOptions={{ showSelection, selectedRecords, recordsSelectionHandler, setShowSelection }}
                   />
                 );
