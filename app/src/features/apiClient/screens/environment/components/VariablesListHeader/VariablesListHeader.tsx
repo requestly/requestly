@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from "react";
+import React from "react";
 import { Input, Dropdown } from "antd";
 import { MdOutlineSearch } from "@react-icons/all-files/md/MdOutlineSearch";
 import { RQBreadcrumb, RQButton } from "lib/design-system-v2/components";
@@ -72,14 +72,6 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
     }
   };
 
-  const handleSave = useCallback(async () => {
-    try {
-      await onSave();
-      toast.success("Environment saved successfully");
-    } catch (error) {
-      toast.error(error.message || "Could not save environment!");
-    }
-  }, [onSave]);
 
   return (
     <div className="variables-list-header">
@@ -156,7 +148,7 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
             hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SAVE_ENVIRONMENT?.hotKey}
             enableHotKey={enableHotKey}
             type="primary"
-            onClick={handleSave}
+            onClick={onSave}
             disabled={!hasUnsavedChanges}
             loading={isSaving}
           >

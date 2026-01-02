@@ -1,18 +1,13 @@
-import { Dispatch } from "@reduxjs/toolkit";
 import { ApiClientStoreState } from "../workspaceView/helpers/ApiClientContextRegistry/types";
 import { ApiClientVariables } from "./api-client-variables";
 import { EnvironmentEntity as EnvironmentRecord } from "../environments/types";
 import { selectEnvironmentById, selectGlobalEnvironment } from "../environments/selectors";
 import { environmentsActions } from "../environments/slice";
-import { EntityNotFound } from "../types";
+import { EntityNotFound, UpdateCommand } from "../types";
 import { ApiClientEntityType, EntityDispatch } from "./types";
 import { GLOBAL_ENVIRONMENT_ID } from "../common/constants";
-
-
-
-export type EnvironmentEntityMeta = {
-  id: string;
-};
+import { ApiClientEntity, ApiClientEntityMeta } from "./base";
+import { Dispatch } from "@reduxjs/toolkit";
 
 /**
  * Abstract base class for environment entities.
@@ -20,15 +15,17 @@ export type EnvironmentEntityMeta = {
  * since environments are homogeneous and don't need applyPatch.
  */
 export abstract class ApiClientEnvironmentEntity<
-  M extends EnvironmentEntityMeta = EnvironmentEntityMeta
-> {
+  M extends ApiClientEntityMeta = ApiClientEntityMeta
+> extends ApiClientEntity<EnvironmentRecord, M> {
   abstract readonly type: ApiClientEntityType;
   abstract readonly variables: ApiClientVariables<EnvironmentRecord>;
 
   constructor(
-    protected readonly dispatch: EntityDispatch,
+    public readonly dispatch: EntityDispatch,
     public readonly meta: M
-  ) {}
+  ) {
+    super(dispatch, meta);
+  }
 
   get id(): string {
     return this.meta.id;
@@ -65,7 +62,10 @@ export abstract class ApiClientEnvironmentEntity<
  * Entity class for regular (non-global) environments.
  * Supports full CRUD operations including delete.
  */
-export class EnvironmentEntity extends ApiClientEnvironmentEntity {
+export class EnvironmentEntity<M extends ApiClientEntityMeta = ApiClientEntityMeta> extends ApiClientEnvironmentEntity<M> {
+  dispatchCommand(command: UpdateCommand<{}>): void {
+      throw new Error("Method not implemented.");
+  }
   readonly type = ApiClientEntityType.ENVIRONMENT;
 
   public readonly variables = new ApiClientVariables<EnvironmentRecord>(
@@ -97,7 +97,7 @@ export class EnvironmentEntity extends ApiClientEnvironmentEntity {
    * Update environment properties via the slice action.
    * Preferred over unsafePatch for standard property updates.
    */
-  update(changes: Partial<Omit<EnvironmentRecord, "id" | "variables">>): void {
+  private update(changes: Partial<Omit<EnvironmentRecord, "id" | "variables">>): void {
     this.dispatch(
       environmentsActions.environmentUpdated({
         id: this.id,
@@ -132,7 +132,10 @@ export class EnvironmentEntity extends ApiClientEnvironmentEntity {
  * Entity class for the global environment.
  * Has limited operations compared to regular environments (no delete, no set as active).
  */
-export class GlobalEnvironmentEntity extends ApiClientEnvironmentEntity {
+export class GlobalEnvironmentEntity<M extends ApiClientEntityMeta = ApiClientEntityMeta> extends ApiClientEnvironmentEntity<M> {
+  dispatchCommand(command: UpdateCommand<{}>): void {
+      throw new Error("Method not implemented.");
+  }
   readonly type = ApiClientEntityType.GLOBAL_ENVIRONMENT;
 
   public readonly variables = new ApiClientVariables<EnvironmentRecord>(
@@ -144,7 +147,7 @@ export class GlobalEnvironmentEntity extends ApiClientEnvironmentEntity {
   constructor(dispatch: Dispatch) {
       super(dispatch, {
         id: GLOBAL_ENVIRONMENT_ID,
-      });
+      } as M);
   }
 
   getEntityFromState(state: ApiClientStoreState): EnvironmentRecord {

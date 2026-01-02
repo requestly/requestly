@@ -5,7 +5,13 @@ import { BufferedGraphQLRecordEntity } from "./graphql";
 import { BufferedEnvironmentEntity, BufferedGlobalEnvironmentEntity } from "./environment";
 import { BufferedRuntimeVariablesEntity } from "./runtime-variables";
 import { BufferedCollectionRecordEntity } from "./collection";
-import type { ApiClientEntityMeta } from "../base";
+import type { ApiClientEntity, ApiClientEntityMeta } from "../base";
+
+export type BufferedApiClientEntityMeta = ApiClientEntityMeta & {referenceId: string};
+export interface BufferedApiClientEntity {
+  meta: BufferedApiClientEntityMeta,
+  origin: ApiClientEntity<any, any, any>
+};
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace BufferedEntityFactory {
@@ -24,10 +30,10 @@ export namespace BufferedEntityFactory {
     : never;
 
   export function from<T extends ApiClientEntityType>(
-    params: { id: string; type: T },
+    params: { id: string; type: T, referenceId: string, },
     dispatch: EntityDispatch
   ): EntityTypeMap<T> {
-    const meta: ApiClientEntityMeta = { id: params.id };
+    const meta: BufferedApiClientEntityMeta = { id: params.id, referenceId: params.referenceId };
 
     const entity = (() => {
       switch (params.type) {
