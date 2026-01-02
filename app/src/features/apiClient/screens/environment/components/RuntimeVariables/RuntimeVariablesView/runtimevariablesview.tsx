@@ -26,8 +26,8 @@ export const RuntimeVariablesView: React.FC = () => {
   const variablesData = useApiClientSelector((s) => variables.getAll(s));
 
   const hasUnsavedChanges = useIsBufferDirty({
-    referenceId: entity.meta.id,
-    type: "referenceId",
+    bufferId: entity.meta.id,
+    type: "bufferId",
   });
 
   const handleSaveVariables = useCallback(async () => {
