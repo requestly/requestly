@@ -1,9 +1,8 @@
 import { useMemo } from "react";
 import { matchPath } from "react-router-dom";
 import { tabRoutes } from "../routes";
-import { MatchedTabSource } from "../types";
 
-export const useMatchedTabSource = (): MatchedTabSource | null => {
+export const useMatchedTabSource = () => {
   const matchedRoute = useMemo(() => {
     for (const route of tabRoutes) {
       const matchedPath = matchPath(route.path, window.location.pathname);

@@ -1,5 +1,5 @@
 import type React from "react";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 import "./environmentView.scss";
 import { useApiClientDispatch, useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
 import type {
@@ -9,10 +9,12 @@ import type {
 import { EntityNotFound, entitySynced, useApiClientRepository } from "features/apiClient/slices";
 import { EnvironmentVariablesList } from "../VariablesList/EnvironmentVariablesList";
 import { VariablesListHeader } from "../VariablesListHeader/VariablesListHeader";
-import { bufferActions, bufferAdapterSelectors } from "features/apiClient/slices/buffer/slice";
+import { bufferActions } from "features/apiClient/slices/buffer/slice";
 import { isEmpty } from "lodash";
 import { ApiClientExportModal } from "features/apiClient/screens/apiClient/components/modals/exportModal/ApiClientExportModal";
 import { PostmanEnvironmentExportModal } from "features/apiClient/screens/apiClient/components/modals/postmanEnvironmentExportModal/PostmanEnvironmentExportModal";
+import { ApiClientRootState } from "features/apiClient/slices/hooks/types";
+import { useBufferByBufferId, useIsBufferDirty } from "features/apiClient/slices/entities";
 
 interface EnvironmentViewProps {
   entity: BufferedEnvironmentEntity | BufferedGlobalEnvironmentEntity;
@@ -26,25 +28,27 @@ export const EnvironmentView: React.FC<EnvironmentViewProps> = ({ entity, enviro
   const [isPostmanExportModalOpen, setIsPostmanExportModalOpen] = useState(false);
 
   const repositories = useApiClientRepository();
-  const state = useApiClientSelector((s) => s);
-  const isNewEnvironment = useApiClientSelector((s) => s.buffer.entities[entity.id]?.isNew);
+  const isNewEnvironment = useApiClientSelector(s => s.buffer.entities[entity.id]?.isNew);
 
   const [searchValue, setSearchValue] = useState("");
   const [isSaving, setIsSaving] = useState(false);
 
-  const environmentName = entity.getName(state);
+  const environmentName = useApiClientSelector((s: ApiClientRootState) => entity.getName(s));
   const variables = entity.variables;
-  const variablesData = useMemo(() => variables.getAll(state), [variables, state]);
+  const variablesData = useApiClientSelector((state: ApiClientRootState) => variables.getAll(state));
 
-  // key prop should be id
-  const bufferEntry = useApiClientSelector((s) => bufferAdapterSelectors.selectById(s.buffer, entity.meta.id));
-  const hasUnsavedChanges = useMemo(() => bufferEntry?.isDirty ?? false, [bufferEntry]);
+  const hasUnsavedChanges = useIsBufferDirty({
+    referenceId: environmentId,
+    type: "referenceId",
+  });
+  
+  const bufferEntry = useBufferByBufferId(entity.meta.id);
 
   const handleSaveVariables = useCallback(async () => {
     try {
       if (!bufferEntry) throw new EntityNotFound(entity.meta.id, "buffer");
       setIsSaving(true);
-      const dataToSave = variables.getAll(state);
+      const dataToSave = variablesData;
       await repositories.environmentVariablesRepository.updateEnvironment(environmentId, { variables: dataToSave });
       dispatch(
         entitySynced({
@@ -65,15 +69,7 @@ export const EnvironmentView: React.FC<EnvironmentViewProps> = ({ entity, enviro
     } finally {
       setIsSaving(false);
     }
-  }, [
-    bufferEntry,
-    entity.meta.id,
-    variables,
-    state,
-    repositories.environmentVariablesRepository,
-    environmentId,
-    dispatch,
-  ]);
+  }, [repositories,bufferEntry, variablesData, environmentId, dispatch, entity.meta.id]);
 
   return (
     <div key={environmentId} className="variables-list-view-container">
