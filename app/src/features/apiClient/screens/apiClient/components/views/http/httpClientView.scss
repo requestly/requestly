@@ -39,6 +39,7 @@
 }
 
 .http-client-view {
+  height: 100%;
   // HEADER URL AND METHOD SELECTOR
   .api-client-header__url {
     .api-client-url-container {
@@ -82,44 +83,10 @@
     }
   }
 
-  // Bulk edit panel split layout
-  .api-client-body-with-bulk-edit {
-    display: flex;
+  .non-scrollable-tab-content {
     height: 100%;
-    gap: 0;
-
-    &.horizontal-split {
-      flex-direction: row;
-
-      .api-client-table-pane {
-        flex: 1;
-        min-width: 300px;
-        overflow: hidden;
-      }
-
-      .api-client-bulk-edit-pane {
-        flex: 1;
-        min-width: 300px;
-        overflow: hidden;
-        border-left: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
-      }
-    }
-
-    &.vertical-split {
-      flex-direction: column;
-
-      .api-client-table-pane {
-        flex: 1;
-        min-height: 200px;
-        overflow: hidden;
-      }
-
-      .api-client-bulk-edit-pane {
-        flex: 1;
-        min-height: 200px;
-        overflow: hidden;
-        border-top: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
-      }
-    }
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
   }
 }

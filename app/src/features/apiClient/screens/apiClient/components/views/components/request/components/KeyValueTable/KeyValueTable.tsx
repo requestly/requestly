@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import type { TableProps } from "antd";
 import { ContentListTable } from "componentsV2/ContentList";
 import { MdAdd } from "@react-icons/all-files/md/MdAdd";
@@ -13,6 +13,10 @@ import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
 import { doesValueMatchDataType } from "features/apiClient/screens/apiClient/utils";
 import { capitalize } from "lodash";
+import { AutoScrollContainer } from "../AutoScrollContainer";
+import Split from "react-split";
+import { BottomSheetPlacement, useBottomSheetContext } from "componentsV2/BottomSheet";
+import { KeyValueBulkEditor } from "./KeyValueBulkEditor/KeyValueBulkEditor";
 
 type ColumnTypes = Exclude<TableProps<KeyValuePair>["columns"], undefined>;
 
@@ -31,17 +35,11 @@ interface KeyValueTableProps {
   };
   config?: {
     checkInvalidCharacter?: boolean;
-    bulkEdit?: {
-      setIsBulkEditPanelOpen?: (isOpen: boolean) => void;
-      setBulkEditTableType?: (type: "headers" | "queryParams") => void;
-      bulkEditTableType?: "headers" | "queryParams";
-    };
   };
 }
 
 export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, variables, onChange, extraColumns, config }) => {
-  const { checkInvalidCharacter = false, bulkEdit } = config || {};
-  const { setIsBulkEditPanelOpen, setBulkEditTableType, bulkEditTableType } = bulkEdit || {};
+  const { checkInvalidCharacter = false } = config || {};
 
   const isDescriptionVisible =
     hasDescription(extraColumns) &&
@@ -51,6 +49,19 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, variables, o
     hasDataType(extraColumns) &&
     extraColumns.dataType.visible &&
     isFeatureCompatible(FEATURES.API_CLIENT_KEY_VALUE_TABLE_DATA_TYPE_COMPATIBILITY);
+  const [showBulkEditPanel, setShowBulkEditPanel] = useState(false);
+
+  const { sheetPlacement } = useBottomSheetContext();
+  const isBottomSheetAtBottom = sheetPlacement === BottomSheetPlacement.BOTTOM;
+  const minSizes = useMemo(() => {
+    if (!showBulkEditPanel) return [0, 0];
+
+    if (isBottomSheetAtBottom) {
+      return [600, 340];
+    } else {
+      return [200, 300];
+    }
+  }, [showBulkEditPanel, isBottomSheetAtBottom]);
 
   const createEmptyPair = useCallback(
     () => ({
@@ -219,18 +230,15 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, variables, o
                 showDescription={isDescriptionVisible}
                 onToggleDescription={extraColumns.description.onToggle}
               />
-              {setIsBulkEditPanelOpen && setBulkEditTableType && bulkEditTableType && (
-                <RQButton
-                  size="small"
-                  onClick={() => {
-                    setIsBulkEditPanelOpen(true);
-                    setBulkEditTableType(bulkEditTableType);
-                  }}
-                  className="key-value-bulk-edit-button"
-                >
-                  Bulk Edit
-                </RQButton>
-              )}
+              <RQButton
+                size="small"
+                onClick={() => {
+                  setShowBulkEditPanel(!showBulkEditPanel);
+                }}
+                className="key-value-bulk-edit-button"
+              >
+                Bulk Edit
+              </RQButton>
             </div>
           ),
         render: (_: any, record: KeyValuePair) => {
@@ -259,36 +267,61 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, variables, o
     extraColumns,
     data.length,
     handleDeletePair,
-    bulkEditTableType,
-    setBulkEditTableType,
-    setIsBulkEditPanelOpen,
+    showBulkEditPanel,
   ]);
 
   return (
-    <ContentListTable
-      id="api-key-value-table"
-      className="api-key-value-table"
-      bordered={false}
-      showHeader={isDataTypeVisible}
-      rowKey="id"
-      columns={columns as ColumnTypes}
-      data={memoizedData}
-      locale={{ emptyText: `No entries found` }}
-      components={{
-        body: {
-          row: KeyValueTableEditableRow,
-          cell: KeyValueTableEditableCell,
-        },
-      }}
-      scroll={{ x: 550 }}
-      footer={() => (
-        <div className="api-key-value-table-footer">
-          <RQButton icon={<MdAdd />} size="small" onClick={handleAddPair} className="key-value-add-more-btn">
-            Add More
-          </RQButton>
-        </div>
-      )}
-    />
+    <Split
+      key={isBottomSheetAtBottom ? "horizontal" : "vertical"}
+      className={`key-value-split-${isBottomSheetAtBottom ? "horizontal" : "vertical"}`}
+      direction={isBottomSheetAtBottom ? "horizontal" : "vertical"}
+      sizes={showBulkEditPanel ? [75, 25] : [100, 0]}
+      minSize={minSizes}
+      gutterSize={showBulkEditPanel ? 6 : 0}
+      snapOffset={30}
+      dragInterval={1}
+    >
+      <div
+        className="key-value-table"
+        style={isBottomSheetAtBottom ? { minWidth: minSizes[0] } : { minHeight: minSizes[0] }}
+      >
+        <AutoScrollContainer trigger={memoizedData.length}>
+          <ContentListTable
+            id="api-key-value-table"
+            className="api-key-value-table"
+            bordered={false}
+            showHeader={isDataTypeVisible}
+            rowKey="id"
+            columns={columns as ColumnTypes}
+            data={memoizedData}
+            locale={{ emptyText: `No entries found` }}
+            components={{
+              body: {
+                row: KeyValueTableEditableRow,
+                cell: KeyValueTableEditableCell,
+              },
+            }}
+            scroll={{ x: 550 }}
+            footer={() => (
+              <div className="api-key-value-table-footer">
+                <RQButton icon={<MdAdd />} size="small" onClick={handleAddPair} className="key-value-add-more-btn">
+                  Add More
+                </RQButton>
+              </div>
+            )}
+          />
+        </AutoScrollContainer>
+      </div>
+
+      <div
+        className="key-value-bulk-editor"
+        style={isBottomSheetAtBottom ? { minWidth: minSizes[1] } : { minHeight: minSizes[1] }}
+      >
+        {showBulkEditPanel && (
+          <KeyValueBulkEditor data={memoizedData} onChange={onChange} onClose={() => setShowBulkEditPanel(false)} />
+        )}
+      </div>
+    </Split>
   );
 };
 

@@ -3,6 +3,7 @@
   flex-direction: column;
   height: 100%;
   width: 100%;
+  min-width: 340px;
 
   .bulk-edit-panel-header {
     display: flex;
@@ -27,15 +28,15 @@
     overflow: hidden;
     padding: 0px 8px;
 
-    .bulk-edit-panel-hint {
-      margin-top: 8px;
-      font-size: 12px;
-      color: var(--requestly-color-text-tertiary, #8f8f8f);
+    .cm-editor .cm-content {
+      color: #ffffff;
     }
+  }
 
-    .code-editor {
-      flex: 1;
-      border-radius: 4px;
-    }
+  .bulk-edit-panel-hint {
+    margin-top: 8px;
+    font-size: 12px;
+    padding: 8px;
+    color: var(--requestly-color-text-tertiary, #8f8f8f);
   }
 }
