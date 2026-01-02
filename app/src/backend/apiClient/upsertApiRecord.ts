@@ -5,6 +5,7 @@ import Logger from "lib/logger";
 import lodash from "lodash";
 import { RQAPI } from "features/apiClient/types";
 import { captureException } from "./utils";
+import { apiRecordsRankingManager } from "features/apiClient/helpers/ranking";
 
 export function sanitizeRecord(record: Partial<RQAPI.ApiClientRecord>) {
   const sanitizedRecord = lodash.cloneDeep(record);
@@ -64,6 +65,7 @@ const createApiRecord = async (
     updatedBy: uid,
     createdTs: Timestamp.now().toMillis(),
     updatedTs: Timestamp.now().toMillis(),
+    rank: apiRecordsRankingManager.getEffectiveRank(record as RQAPI.RecordMetadata),
   } as RQAPI.ApiClientRecord;
 
   if (record.type === RQAPI.RecordType.COLLECTION) {

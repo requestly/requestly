@@ -3,6 +3,7 @@ import { RQAPI } from "features/apiClient/types";
 import { omit } from "lodash";
 import { saveBulkRecords, saveOrUpdateRecord } from "../store.utils";
 import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
+import { apiRecordsRankingManager } from "features/apiClient/helpers/ranking";
 
 export async function moveRecords(
   context: ApiClientFeatureContext,
@@ -14,10 +15,20 @@ export async function moveRecords(
   const { collectionId, recordsToMove } = params;
   const { apiClientRecordsRepository } = context.repositories;
 
-  const updatedRequests = recordsToMove.map((record) => {
-    return isApiCollection(record)
+  // Get existing records in the destination collection
+  const allRecords = context.stores.records.getState().apiClientRecords;
+  const existingRecordsInCollection = allRecords.filter((record) => record.collectionId === collectionId);
+
+  // Generate ranks for records being moved
+  const ranks = apiRecordsRankingManager.getNextRank(existingRecordsInCollection, recordsToMove);
+
+  const updatedRequests = recordsToMove.map((record, index) => {
+    const baseUpdate = isApiCollection(record)
       ? { ...record, collectionId, data: omit(record.data, "children") }
       : { ...record, collectionId };
+
+    // Add rank to the record
+    return { ...baseUpdate, rank: ranks[index] };
   });
 
   const result = await apiClientRecordsRepository.moveAPIEntities(updatedRequests, collectionId);
@@ -27,7 +38,6 @@ export async function moveRecords(
   } else {
     saveBulkRecords(context, result);
   }
-
 
   return result;
 }
