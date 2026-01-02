@@ -171,11 +171,11 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
               saveOrUpdateRecord(context, result.data);
 
               openBufferedTab({
+                isNew: true,
                 source: new RequestViewTabSource({
                   id: result.data.id,
                   apiEntryDetails: result.data as RQAPI.ApiRecord,
                   title: result.data.name,
-                  isNewTab: true,
                   context: {
                     id: context.workspaceId,
                   },
@@ -195,10 +195,10 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
               if (result.success) {
                 saveOrUpdateRecord(context, result.data);
                 openBufferedTab({
+                  isNew: true,
                   source: new CollectionViewTabSource({
                     id: result.data.id,
                     title: result.data.name,
-                    isNewTab: true,
                     context: {
                       id: context.workspaceId,
                     },
