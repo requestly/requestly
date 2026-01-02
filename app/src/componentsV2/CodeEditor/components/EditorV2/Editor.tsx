@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import CodeMirror, { EditorView, ReactCodeMirrorRef } from "@uiw/react-codemirror";
+import CodeMirror, { EditorView, Extension, ReactCodeMirrorRef } from "@uiw/react-codemirror";
 import { javascript } from "@codemirror/lang-javascript";
 import { json } from "@codemirror/lang-json";
 import { html } from "@codemirror/lang-html";
@@ -57,6 +57,7 @@ interface EditorProps {
     onPartialMerge: (mergedValue: string, newIncomingValue: string, type: "accept" | "reject") => void;
   };
   autocompletion?: boolean;
+  customTheme?: Extension;
 }
 const Editor: React.FC<EditorProps> = ({
   value,
@@ -79,6 +80,7 @@ const Editor: React.FC<EditorProps> = ({
   onEditorReady,
   mergeView,
   autocompletion = true,
+  customTheme,
 }) => {
   const location = useLocation();
   const dispatch = useDispatch();
@@ -269,6 +271,7 @@ const Editor: React.FC<EditorProps> = ({
       theme={vscodeDark}
       extensions={[
         editorLanguage,
+        customTheme,
         customKeyBinding,
         EditorView.lineWrapping,
         envVariables

@@ -87,7 +87,7 @@ const HttpRequestTabs: React.FC<Props> = ({
         key: RequestTab.QUERY_PARAMS,
         label: <RequestTabLabel label="Params" count={queryParams.length || pathVariables.length} showDot={true} />,
         children: (
-          <>
+          <div className="non-scrollable-tab-content">
             <div className="params-table-title">Query Params</div>
             <QueryParamsTable
               recordId={requestId}
@@ -100,12 +100,6 @@ const HttpRequestTabs: React.FC<Props> = ({
                   },
                 }));
               }}
-              bulkEditConfigs={{
-                setIsBulkEditPanelOpen: bulkEditConfigs?.setIsBulkEditPanelOpen,
-                setBulkEditTableType: bulkEditConfigs?.setBulkEditTableType,
-                showDescription: bulkEditConfigs?.showQueryParamsDescription ?? false,
-                onShowDescriptionChange: bulkEditConfigs?.onShowQueryParamsDescriptionChange,
-              }}
             />
             <PathVariableTable
               recordId={requestId}
@@ -116,7 +110,7 @@ const HttpRequestTabs: React.FC<Props> = ({
                 }));
               }}
             />
-          </>
+          </div>
         ),
       },
       {
@@ -142,22 +136,18 @@ const HttpRequestTabs: React.FC<Props> = ({
         key: RequestTab.HEADERS,
         label: <RequestTabLabel label="Headers" count={sanitizeKeyValuePairs(requestEntry.request.headers).length} />,
         children: (
-          <HeadersTable
-            recordId={requestId}
-            headers={requestEntry.request.headers}
-            onHeadersChange={(newHeaders) => {
-              setRequestEntry((prev) => ({
-                ...prev,
-                request: { ...prev.request, headers: newHeaders },
-              }));
-            }}
-            bulkEditConfigs={{
-              setIsBulkEditPanelOpen: bulkEditConfigs?.setIsBulkEditPanelOpen,
-              setBulkEditTableType: bulkEditConfigs?.setBulkEditTableType,
-              showDescription: bulkEditConfigs?.showHeadersDescription ?? false,
-              onShowDescriptionChange: bulkEditConfigs?.onShowHeadersDescriptionChange,
-            }}
-          />
+          <div className="non-scrollable-tab-content">
+            <HeadersTable
+              recordId={requestId}
+              headers={requestEntry.request.headers}
+              onHeadersChange={(newHeaders) => {
+                setRequestEntry((prev) => ({
+                  ...prev,
+                  request: { ...prev.request, headers: newHeaders },
+                }));
+              }}
+            />
+          </div>
         ),
       },
       {
@@ -207,7 +197,6 @@ const HttpRequestTabs: React.FC<Props> = ({
     focusPostResponseScriptEditor,
     scriptEditorVersion,
     getContentTypeWithAlert,
-    bulkEditConfigs,
   ]);
 
   return (

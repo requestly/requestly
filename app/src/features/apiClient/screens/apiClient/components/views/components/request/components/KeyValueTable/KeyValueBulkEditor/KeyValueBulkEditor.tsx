@@ -1,16 +1,25 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useState, useEffect } from "react"; // useRef removed
+import { EditorView } from "codemirror";
 import Editor, { EditorLanguage } from "componentsV2/CodeEditor";
 import { KeyValuePair, KeyValueDataType } from "features/apiClient/types";
 import { RQButton } from "lib/design-system-v2/components";
 import { MdClose } from "@react-icons/all-files/md/MdClose";
-import "./keyValueTableBulkEditPanel.scss";
+import "./KeyValueBulkEditor.scss";
 
-interface KeyValueTableBulkEditPanelProps {
+interface KeyValueBulkEditorProps {
   data: KeyValuePair[];
   onChange: (updatedPairs: KeyValuePair[]) => void;
   onClose: () => void;
-  onDataChanged?: (dataLength: number) => void;
 }
+
+const whiteTextTheme = EditorView.theme({
+  "& .cm-line span": {
+    color: "#ffffff",
+    fontStyle: "normal",
+    fontWeight: "normal",
+    textDecoration: "none",
+  },
+});
 
 const parseKeyValueText = (text: string, originalData: KeyValuePair[]): KeyValuePair[] => {
   const existingDataMap = new Map(originalData.map((item) => [item.key, item]));
@@ -19,7 +28,7 @@ const parseKeyValueText = (text: string, originalData: KeyValuePair[]): KeyValue
     .split("\n")
     .map((line) => line.trim())
     .filter(Boolean)
-    .map((line, idx) => {
+    .map((line, index) => {
       const isCommented = line.startsWith("//");
       const cleanLine = isCommented ? line.slice(2).trim() : line;
       const colonIndex = cleanLine.indexOf(":");
@@ -32,13 +41,13 @@ const parseKeyValueText = (text: string, originalData: KeyValuePair[]): KeyValue
       if (existingItem) {
         return {
           ...existingItem,
+          id: Date.now() + index,
           value: value,
           isEnabled: !isCommented,
         };
       }
-
       return {
-        id: Date.now() + idx,
+        id: Date.now() + index,
         key: key,
         value: value,
         isEnabled: !isCommented,
@@ -51,29 +60,33 @@ const parseKeyValueText = (text: string, originalData: KeyValuePair[]): KeyValue
 const formatKeyValueText = (pairs: KeyValuePair[]): string => {
   return pairs
     .map((pair) => {
-      if (!pair.key) return "";
-      return `${pair.key}:${pair.value}`;
+      if (!pair.key && !pair.value) return "";
+      const line = `${pair.key}:${pair.value}`;
+      return pair.isEnabled ? line : `// ${line}`;
     })
     .filter((line) => line.length > 0)
     .join("\n");
 };
 
-export const KeyValueTableBulkEditPanel: React.FC<KeyValueTableBulkEditPanelProps> = ({
-  data,
-  onChange,
-  onClose,
-  onDataChanged,
-}) => {
+export const KeyValueBulkEditor: React.FC<KeyValueBulkEditorProps> = ({ data, onChange, onClose }) => {
   const [editorValue, setEditorValue] = useState(() => formatKeyValueText(data));
+
+  useEffect(() => {
+    const incomingDataString = formatKeyValueText(data);
+    const currentParsed = parseKeyValueText(editorValue, data);
+    const currentEffectiveString = formatKeyValueText(currentParsed);
+    if (incomingDataString !== currentEffectiveString) {
+      setEditorValue(incomingDataString);
+    }
+  }, [data, editorValue]);
 
   const handleEditorChange = useCallback(
     (value: string) => {
       setEditorValue(value);
       const parsed = parseKeyValueText(value, data);
       onChange(parsed);
-      onDataChanged?.(parsed.length);
     },
-    [onChange, onDataChanged, data]
+    [onChange, data]
   );
 
   return (
@@ -93,13 +106,14 @@ export const KeyValueTableBulkEditPanel: React.FC<KeyValueTableBulkEditPanelProp
           value={editorValue}
           language={EditorLanguage.JAVASCRIPT}
           handleChange={handleEditorChange}
+          customTheme={whiteTextTheme}
           hideToolbar
           hideCharacterCount
           autoFocus={true}
           autocompletion={false}
         />
-        <div className="bulk-edit-panel-hint">Format: key:value | One row per line | Prepend // to disable a row</div>
       </div>
+      <div className="bulk-edit-panel-hint">Format: key:value | One row per line | Prepend // to disable a row</div>
     </div>
   );
 };
