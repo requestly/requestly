@@ -29,6 +29,8 @@ export const createEnvironment = createAsyncThunk<
 
     dispatch(environmentsActions.environmentCreated(environmentEntity));
 
+    // TODO: if first env then mark it as active
+
     if (variables && Object.keys(variables).length > 0) {
       await repository.updateEnvironment(newEnvironment.id, { variables });
     }
