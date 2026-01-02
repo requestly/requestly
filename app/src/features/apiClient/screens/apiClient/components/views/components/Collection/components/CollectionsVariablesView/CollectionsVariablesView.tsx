@@ -8,7 +8,6 @@ import "./collectionsVariablesView.scss";
 import { useApiClientDispatch, useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
 import {
   useBufferedCollectionEntity,
-  useBufferByBufferId,
   useIsBufferDirty,
 } from "features/apiClient/slices/entities/hooks";
 import { bufferActions } from "features/apiClient/slices/buffer/slice";
@@ -17,7 +16,6 @@ import { ApiClientEntityType } from "features/apiClient/slices/entities/types";
 import { useApiClientRepository } from "features/apiClient/slices/workspaceView/helpers/ApiClientContextRegistry";
 import { CollectionsVariablesList } from "../CollectionsVariablesList";
 import type { ApiClientRootState } from "features/apiClient/slices/hooks/types";
-import { EntityNotFound } from "features/apiClient/slices/types";
 
 interface CollectionsVariablesViewProps {
   collection: RQAPI.CollectionRecord;
@@ -43,13 +41,10 @@ export const CollectionsVariablesView: React.FC<CollectionsVariablesViewProps> =
     type: "referenceId",
   });
 
-  // Get buffer entry using dedicated hook
-  const bufferEntry = useBufferByBufferId(entity.meta.id);
 
   // Save handler
   const handleSaveVariables = useCallback(async () => {
     try {
-      if (!bufferEntry) throw new EntityNotFound(entity.meta.id, "buffer");
 
       setIsSaving(true);
       const dataToSave = variablesData;
@@ -92,7 +87,7 @@ export const CollectionsVariablesView: React.FC<CollectionsVariablesViewProps> =
     } finally {
       setIsSaving(false);
     }
-  }, [repositories, collection, dispatch, entity.meta.id, variablesData, bufferEntry]);
+  }, [repositories, collection, dispatch, entity.meta.id, variablesData]);
 
   return (
     <div className="collection-variables-view">
