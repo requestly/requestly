@@ -1,5 +1,5 @@
 import { createSlice, createEntityAdapter, PayloadAction } from "@reduxjs/toolkit";
-import { set, unset, mapValues, filter, pickBy, merge, mergeWith } from "lodash";
+import { set, unset, mapValues, pickBy } from "lodash";
 import { RQAPI } from "features/apiClient/types";
 import { ErroredRecord } from "features/apiClient/helpers/modules/sync/local/services/types";
 import { buildTreeIndices } from "../utils/treeUtils";
@@ -49,6 +49,11 @@ export const apiRecordsSlice = createSlice({
 
     upsertRecord(state, action: PayloadAction<RQAPI.ApiClientRecord>) {
       apiRecordsAdapter.upsertOne(state.records, action.payload);
+      rebuildTreeIndices(state);
+    },
+
+    upsertRecords(state, action: PayloadAction<RQAPI.ApiClientRecord[]>) {
+      apiRecordsAdapter.upsertMany(state.records, action.payload);
       rebuildTreeIndices(state);
     },
 

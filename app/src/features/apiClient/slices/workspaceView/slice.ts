@@ -117,13 +117,19 @@ export const workspaceViewSlice = createSlice({
         });
       })
       .addCase(switchContext.rejected, (state, action) => {
-        throw new NativeError(action.error.message as string).setShowBoundary(true).setSeverity(ErrorSeverity.FATAL);
+        throw new NativeError(action.error.message as string)
+          .setShowBoundary(true)
+          .setSeverity(ErrorSeverity.FATAL)
+          .set("stack", action.error.stack);
       })
       .addCase(setupWorkspaceView.pending, (state) => {
         state.isSetupDone = false;
       })
       .addCase(setupWorkspaceView.rejected, (state, action) => {
-        throw new NativeError(action.error.message as string).setShowBoundary(true).setSeverity(ErrorSeverity.FATAL);
+        throw new NativeError(action.error.message as string)
+          .setShowBoundary(true)
+          .setSeverity(ErrorSeverity.FATAL)
+          .set("stack", action.error.stack);
       })
       .addCase(setupWorkspaceView.fulfilled, (state) => {
         state.isSetupDone = true;

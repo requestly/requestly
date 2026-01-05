@@ -134,26 +134,26 @@ export const SingleWorkspaceSidebar: React.FC<Props> = () => {
       ),
       children: <EnvironmentsList />,
     },
-    // {
-    //   key: ApiClientSidebarTabKey.HISTORY,
-    //   label: (
-    //     <Tooltip title="History" placement="right">
-    //       <div
-    //         onClick={() => setActiveKey(ApiClientSidebarTabKey.HISTORY)}
-    //         className={`api-client-tab-link ${activeKey === ApiClientSidebarTabKey.HISTORY ? "active" : ""}`}
-    //       >
-    //         <MdOutlineHistory />
-    //       </div>
-    //     </Tooltip>
-    //   ),
-    //   children: (
-    //     <HistoryList
-    //       history={history}
-    //       selectedHistoryIndex={selectedHistoryIndex}
-    //       onSelectionFromHistory={setCurrentHistoryIndex}
-    //     />
-    //   ),
-    // },
+    {
+      key: ApiClientSidebarTabKey.HISTORY,
+      label: (
+        <Tooltip title="History" placement="right">
+          <div
+            onClick={() => setActiveKey(ApiClientSidebarTabKey.HISTORY)}
+            className={`api-client-tab-link ${activeKey === ApiClientSidebarTabKey.HISTORY ? "active" : ""}`}
+          >
+            <MdOutlineHistory />
+          </div>
+        </Tooltip>
+      ),
+      children: (
+        <HistoryList
+          history={history}
+          selectedHistoryIndex={selectedHistoryIndex}
+          onSelectionFromHistory={setCurrentHistoryIndex}
+        />
+      ),
+    },
     {
       key: ApiClientSidebarTabKey.RUNTIME_VARIABLES,
       label: (
@@ -257,7 +257,7 @@ export const SingleWorkspaceSidebar: React.FC<Props> = () => {
         {/* <ErrorFilesList /> */}
       </div>
 
-      {/* {isDeleteModalOpen ? (
+      {isDeleteModalOpen ? (
         <DeleteApiRecordModal
           open={isDeleteModalOpen}
           onClose={onDeleteModalClose}
@@ -272,8 +272,8 @@ export const SingleWorkspaceSidebar: React.FC<Props> = () => {
         isRequestLoading={isLoading}
         isOpen={isImportModalOpen}
         handleImportRequest={handleImportRequest}
-        onClose={onImportRequestModalClose} 
-      /> */}
+        onClose={onImportRequestModalClose}
+      />
     </>
   );
 };
