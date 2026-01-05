@@ -20,7 +20,8 @@ import { SiOpenapiinitiative } from "@react-icons/all-files/si/SiOpenapiinitiati
 import { CommonApiClientImportModal } from "../../../modals/CommonApiClientImportModal/CommonApiClientImportModal";
 import { ApiClientImporterMethod, openApiImporter } from "@requestly/alternative-importers";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
-import { useViewMode } from "features/apiClient/slices";
+import { ApiClientViewMode, useViewMode } from "features/apiClient/slices";
+import { EnvironmentSwitcher } from "./components/environmentSwitcher/EnvironmentSwitcher";
 
 interface Props {
   activeTab: ApiClientSidebarTabKey;
@@ -193,7 +194,7 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
           </RQButton>
         ) : null}
 
-        {/* {viewMode === ApiClientViewMode.SINGLE ? <EnvironmentSwitcher /> : null} */}
+        {viewMode === ApiClientViewMode.SINGLE ? <EnvironmentSwitcher /> : null}
       </div>
 
       {isImportModalOpen && (

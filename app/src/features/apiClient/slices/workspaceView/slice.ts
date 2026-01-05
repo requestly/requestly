@@ -8,7 +8,7 @@ import { NativeError } from "errors/NativeError";
 import { ErrorSeverity } from "errors/types";
 
 export const workspaceViewAdapter = createEntityAdapter<WorkspaceState>({
-  selectId: (workspace) => workspace.id as string,
+  selectId: (workspace) => workspace.id,
 });
 
 // selectors
@@ -69,6 +69,11 @@ export const workspaceViewSlice = createSlice({
 
     resetToSingleView(state) {
       state.viewMode = ApiClientViewMode.SINGLE;
+      workspaceViewAdapter.removeAll(state.selectedWorkspaces);
+    },
+
+    resetToMultiView(state) {
+      state.viewMode = ApiClientViewMode.MULTI;
       workspaceViewAdapter.removeAll(state.selectedWorkspaces);
     },
 
