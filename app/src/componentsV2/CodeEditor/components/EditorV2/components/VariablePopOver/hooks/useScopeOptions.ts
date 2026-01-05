@@ -2,13 +2,11 @@ import { useMemo } from "react";
 import React from "react";
 import { VariableScope } from "backend/environment/types";
 import { ScopeOption } from "../types";
-import { useActiveEnvironment } from "features/apiClient/hooks/useActiveEnvironment.hook";
 import { MdOutlineCategory } from "@react-icons/all-files/md/MdOutlineCategory";
 import { BiNote } from "@react-icons/all-files/bi/BiNote";
 import { BsGlobeCentralSouthAsia } from "@react-icons/all-files/bs/BsGlobeCentralSouthAsia";
 import { MdHorizontalSplit } from "@react-icons/all-files/md/MdHorizontalSplit";
-import { useContextId } from "features/apiClient/contexts/contextId.context";
-import { NoopContextId } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
+import { useActiveEnvironment } from "features/apiClient/slices";
 
 interface UseScopeOptionsResult {
   scopeOptions: ScopeOption[];
@@ -68,8 +66,7 @@ export const getScopeIcon = (scope: VariableScope): React.ReactNode => {
 
 export const useScopeOptions = (collectionId?: string): UseScopeOptionsResult => {
   const activeEnvironment = useActiveEnvironment();
-  const contextId = useContextId();
-  const isNoopContext = contextId === NoopContextId;
+  const isNoopContext = false;
 
   return useMemo(() => {
     const options: ScopeOption[] = [
