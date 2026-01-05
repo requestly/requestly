@@ -2,8 +2,6 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import { omit, partition } from "lodash";
 import { RQAPI } from "features/apiClient/types";
 import { ApiClientRecordsInterface } from "../../helpers/modules/sync/interfaces";
-import { entitySynced } from "../common/actions";
-import { ApiClientEntityType } from "../entities/types";
 import { isApiRequest, isApiCollection, processRecordsForDuplication } from "../../screens/apiClient/utils";
 import { getAllRecords } from "../../commands/utils";
 import { apiRecordsActions } from "./slice";
@@ -13,13 +11,12 @@ type Repository = ApiClientRecordsInterface<Record<string, unknown>>;
 export const createRecord = createAsyncThunk<
   RQAPI.ApiRecord,
   {
-    entityType: ApiClientEntityType;
     id: string;
     data: RQAPI.ApiRecord;
     repository: Repository;
   },
   { rejectValue: string }
->("apiRecords/create", async ({ entityType, id, data, repository }, { dispatch, rejectWithValue }) => {
+>("apiRecords/create", async ({ id, data, repository }, { dispatch, rejectWithValue }) => {
   const result = await repository.createRecordWithId(data, id);
 
   if (!result.success || !result.data) {
@@ -28,13 +25,7 @@ export const createRecord = createAsyncThunk<
 
   const record = result.data as RQAPI.ApiRecord;
 
-  dispatch(
-    entitySynced({
-      entityType,
-      entityId: record.id,
-      data: record,
-    })
-  );
+  dispatch(apiRecordsActions.upsertRecord(record));
 
   return record;
 });
@@ -42,13 +33,12 @@ export const createRecord = createAsyncThunk<
 export const updateRecord = createAsyncThunk<
   RQAPI.ApiRecord,
   {
-    entityType: ApiClientEntityType;
     id: string;
     data: Partial<RQAPI.ApiRecord>;
     repository: Repository;
   },
   { rejectValue: string }
->("apiRecords/update", async ({ entityType, id, data, repository }, { dispatch, rejectWithValue }) => {
+>("apiRecords/update", async ({ id, data, repository }, { dispatch, rejectWithValue }) => {
   const result = await repository.updateRecord(data, id);
 
   if (!result.success || !result.data) {
@@ -57,13 +47,7 @@ export const updateRecord = createAsyncThunk<
 
   const record = result.data as RQAPI.ApiRecord;
 
-  dispatch(
-    entitySynced({
-      entityType,
-      entityId: record.id,
-      data: record,
-    })
-  );
+  dispatch(apiRecordsActions.upsertRecord(record));
 
   return record;
 });
