@@ -15,9 +15,10 @@ import { PostmanEnvironmentExportModal } from "features/apiClient/screens/apiCli
 import { ApiClientRootState } from "features/apiClient/slices/hooks/types";
 import { useBufferByBufferId, useIsBufferDirty } from "features/apiClient/slices/entities";
 import { useSaveBuffer } from "features/apiClient/slices/buffer/hooks";
+import { OriginExists } from "features/apiClient/slices/entities/buffered/factory";
 
 interface EnvironmentViewProps {
-  entity: BufferedEnvironmentEntity | BufferedGlobalEnvironmentEntity;
+  entity: OriginExists<BufferedEnvironmentEntity | BufferedGlobalEnvironmentEntity>;
   environmentId: string;
   isGlobal: boolean;
 }
@@ -43,16 +44,13 @@ export const EnvironmentView: React.FC<EnvironmentViewProps> = ({ entity, enviro
   });
 
   const bufferEntry = useBufferByBufferId(entity.meta.id);
-  const saveBuffer = useSaveBuffer();
+  const saveBuffer  = useSaveBuffer();
   const handleSaveVariables = useCallback(async () => {
     saveBuffer(
       {
-        entity,
-        produceChanges(entity, state) {
-            return entity.variables.getAll(state);
-        },
+        entity: entity,
         async save(changes, repositories) {
-          await repositories.environmentVariablesRepository.updateEnvironment(environmentId, { variables: changes });
+          await repositories.environmentVariablesRepository.updateEnvironment(environmentId, changes);
         },
       },
       {

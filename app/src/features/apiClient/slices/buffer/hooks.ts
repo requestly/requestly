@@ -1,4 +1,3 @@
-import lodash from 'lodash';
 import { ApiClientRepositoryInterface } from "features/apiClient/helpers/modules/sync/interfaces";
 import { ApiClientEntity } from "../entities";
 import { ApiClientStore, ApiClientStoreState, useApiClientRepository, useApiClientStore } from "../workspaceView/helpers/ApiClientContextRegistry";
@@ -6,7 +5,7 @@ import { Try } from "utils/try";
 import { useMemo } from "react";
 import { Dispatch } from "@reduxjs/toolkit";
 import { bufferActions, bufferAdapterSelectors } from "./slice";
-import { BufferedApiClientEntity } from "../entities/buffered/factory";
+import { BufferedApiClientEntity, OriginExists } from "../entities/buffered/factory";
 import { EntityNotFound } from "../types";
 import { useApiClientDispatch } from '../hooks/base.hooks';
 
@@ -16,11 +15,11 @@ function createSave(
   store: ApiClientStore,
   dispatch: Dispatch,
 ) {
-  return async function save<T extends BufferedApiClientEntity, C = T extends ApiClientEntity<infer K> ? Partial<K> : never>(
+  async function save<T extends BufferedApiClientEntity, C extends T extends ApiClientEntity<infer K> ? K : never = T extends ApiClientEntity<infer K> ? K : never>(
     params: {
       entity: T,
-      produceChanges: (entity: T, state: ApiClientStoreState) => C,
-      save: (changes:C, repositories: ApiClientRepositoryInterface, entity: T) => Promise<void>,
+      produceChanges?: (entity: T, state: ApiClientStoreState) => C,
+      save: (changes: C, repositories: ApiClientRepositoryInterface, entity: T) => T extends OriginExists<BufferedApiClientEntity> ? Promise<void> : Promise<C & { id: string }>,
     },
     hooks: {
       onError?: (e: Error) => void,
@@ -30,34 +29,35 @@ function createSave(
     } = {},
   ) {
     const {
-      onSuccess = () => {},
-      onError = () => {},
+      onSuccess = () => { },
+      onError = () => { },
     } = hooks;
     const state = store.getState();
-    const changes = params.produceChanges(params.entity, state);
+    const buffer = bufferAdapterSelectors.selectById(state.buffer, params.entity.meta.id);
+    if (!buffer) {
+      throw new EntityNotFound(params.entity.meta.id, "buffer");
+    }
+    const changes = params.produceChanges?.(params.entity, state) || buffer.current as C;
     hooks.beforeSave?.();
     const result = await Try(() => params.save(changes, repositories, params.entity));
     hooks.afterSave?.();
     result
-    .inspectError(onError)
-    .inspect(() => {
-      const buffer = bufferAdapterSelectors.selectById(state.buffer, params.entity.meta.id);
-      if(!buffer) {
-        throw new EntityNotFound(params.entity.meta.id, "buffer");
+      .inspectError(onError)
+      .inspect((savedEntity) => {
+        params.entity.origin.upsert(savedEntity || changes);
+        dispatch(
+          bufferActions.markSaved({
+            id: params.entity.meta.id,
+            referenceId: savedEntity?.id,
+            savedData: savedEntity,
+          })
+        );
+        onSuccess(changes, params.entity)
       }
-      const { diff } = buffer;
-      params.entity.origin.unsafePatch((s) => {
-        lodash.merge(s, diff);
-      });
-      dispatch(
-        bufferActions.markSaved({
-          id: params.entity.meta.id,
-          referenceId: params.entity.meta.referenceId,
-        })
       );
-      onSuccess(changes, params.entity)});
-    return;
+    return result;
   }
+  return save
 };
 
 // t0: click save, e=s1, b=s2

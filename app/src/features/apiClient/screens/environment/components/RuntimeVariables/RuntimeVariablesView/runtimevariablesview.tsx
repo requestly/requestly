@@ -34,9 +34,6 @@ export const RuntimeVariablesView: React.FC = () => {
     saveBuffer(
       {
         entity,
-        produceChanges(entity, state) {
-            return entity.variables.getAll(state);
-        },
         async save() {
         },
       },

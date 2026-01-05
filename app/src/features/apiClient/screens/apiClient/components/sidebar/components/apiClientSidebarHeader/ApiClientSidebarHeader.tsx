@@ -5,7 +5,6 @@ import { BsCollection } from "@react-icons/all-files/bs/BsCollection";
 import { RQButton } from "lib/design-system-v2/components";
 import { ClearOutlined, CodeOutlined } from "@ant-design/icons";
 import { RQAPI, ApiClientImporterType } from "@requestly/shared/types/entities/apiClient";
-import { EnvironmentSwitcher } from "./components/environmentSwitcher/EnvironmentSwitcher";
 import { trackImportStarted } from "modules/analytics/events/features/apiClient";
 import { ApiClientImportModal } from "../../../modals/importModal/ApiClientImportModal";
 import { SiPostman } from "@react-icons/all-files/si/SiPostman";
@@ -21,7 +20,7 @@ import { SiOpenapiinitiative } from "@react-icons/all-files/si/SiOpenapiinitiati
 import { CommonApiClientImportModal } from "../../../modals/CommonApiClientImportModal/CommonApiClientImportModal";
 import { ApiClientImporterMethod, openApiImporter } from "@requestly/alternative-importers";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
-import { ApiClientViewMode, useViewMode } from "features/apiClient/slices";
+import { useViewMode } from "features/apiClient/slices";
 
 interface Props {
   activeTab: ApiClientSidebarTabKey;

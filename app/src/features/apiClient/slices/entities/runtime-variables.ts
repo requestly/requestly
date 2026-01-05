@@ -54,6 +54,10 @@ export class RuntimeVariablesEntity<M extends ApiClientEntityMeta = ApiClientEnt
     return "Runtime Variables";
   }
 
+  upsert(entity: RuntimeVariablesRecord): void {
+    this.variables.refresh(entity.variables)
+  }
+
   /**
    * Clear all runtime variables.
    */

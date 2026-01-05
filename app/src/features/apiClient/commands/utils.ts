@@ -7,8 +7,11 @@ import {
   convertFlatRecordsToNestedRecords,
   filterOutChildrenRecords,
 } from "../screens/apiClient/utils";
-import { getApiClientFeatureContext, getChildParentMap } from "./store.utils";
+import { getChildParentMap } from "./store.utils";
 import { isEmpty } from "lodash";
+import { selectAllRecords as selectAllRecordsFromSlice } from "../slices/apiRecords/selectors";
+import { Workspace } from "features/workspaces/types";
+import { getApiClientFeatureContext } from "../slices";
 
 export function sanitizePatch(patch: EnvironmentVariables) {
   return Object.fromEntries(
@@ -148,9 +151,10 @@ export function getProcessedRecords(contextId: string, selectedRecords: Set<RQAP
   return filterOutChildrenRecords(selectedRecords, childParentMap, records.recordsMap);
 }
 
-export const getCollectionOptionsToMoveIn = (contextId: string, recordsToMove: RQAPI.ApiClientRecord[]) => {
-  const context = getApiClientFeatureContext(contextId);
-  const apiClientRecords = context.stores.records.getState().apiClientRecords;
+export const getCollectionOptionsToMoveIn = (workspaceId: Workspace["id"], recordsToMove: RQAPI.ApiClientRecord[]) => {
+  const context = getApiClientFeatureContext(workspaceId);
+  const state = context.store.getState();
+  const apiClientRecords = selectAllRecordsFromSlice(state);
 
   const exclusions = new Set();
 

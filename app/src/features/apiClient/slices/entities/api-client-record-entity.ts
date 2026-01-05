@@ -23,6 +23,10 @@ export abstract class ApiClientRecordEntity<T extends RQAPI.ApiClientRecord, M e
     this.dispatchCommand(command as UpdateCommand<T>);
   }
 
+  upsert(params: T): void {
+      this.dispatch(apiRecordsActions.upsertRecord(params));
+  }
+
   getName(state: ApiClientStoreState): string {
     return this.getEntityFromState(state).name;
   }
