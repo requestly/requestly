@@ -29,7 +29,7 @@ import { useApiClientRepository, useApiClientFeatureContext } from "features/api
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
 import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 import { isGraphQLApiRecord, isHttpApiRecord } from "features/apiClient/screens/apiClient/utils";
-import { apiRecordsRankingManager } from "features/apiClient/helpers/ranking";
+import { apiRecordsRankingManager } from "features/apiClient/components/sidebar";
 import { saveOrUpdateRecord } from "features/apiClient/commands/store.utils";
 
 interface Props {
@@ -154,7 +154,7 @@ export const RequestRow: React.FC<Props> = ({
           const before = currentDropPosition === "before" ? previousRecord ?? null : record;
           const after = currentDropPosition === "after" ? nextRecord ?? null : record;
 
-          const rank = apiRecordsRankingManager.getRankBetweenRecords(before, after, [item.record])[0];
+          const rank = apiRecordsRankingManager.getRanksBetweenRecords(before, after, [item.record])[0];
           const targetCollectionId = record.collectionId;
 
           const patch: Partial<RQAPI.ApiRecord> = {
