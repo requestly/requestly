@@ -12,7 +12,6 @@ import {
   filterRecordsBySearch,
   getRecordIdsToBeExpanded,
   filterOutChildrenRecords,
-  processRecordsForDuplication,
 } from "../../../../utils";
 import { ApiRecordEmptyState } from "./apiRecordEmptyState/ApiRecordEmptyState";
 import { SidebarPlaceholderItem } from "../SidebarPlaceholderItem/SidebarPlaceholderItem";
@@ -33,7 +32,8 @@ import { ExampleCollectionsNudge } from "../ExampleCollectionsNudge/ExampleColle
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import APP_CONSTANTS from "config/constants";
-import { useAllRecords, useApiClientRepository, useChildToParent } from "features/apiClient/slices";
+import { duplicateRecords, useAllRecords, useApiClientRepository, useChildToParent } from "features/apiClient/slices";
+import { useApiClientDispatch } from "features/apiClient/slices/hooks/base.hooks";
 
 interface Props {
   onNewClick: (src: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType) => Promise<void>;
@@ -56,9 +56,10 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
   const childParentMap = useChildToParent();
 
   const { isRecordBeingCreated } = useApiClientContext();
-  const { onSaveRecord, onSaveBulkRecords } = useNewApiClientContext();
+  const { onSaveRecord } = useNewApiClientContext();
 
   const { apiClientRecordsRepository } = useApiClientRepository();
+  const dispatch = useApiClientDispatch();
 
   const [collectionsToExport, setCollectionsToExport] = useState<RQAPI.ApiClientRecord[]>([]);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
@@ -201,13 +202,18 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
       const processedRecords = filterOutChildrenRecords(selectedRecords, childParentMap, updatedRecords.recordsMap);
       switch (action) {
         case BulkActions.DUPLICATE: {
-          const recordsToDuplicate = processRecordsForDuplication(processedRecords, apiClientRecordsRepository);
-
           try {
-            const result = await apiClientRecordsRepository.duplicateApiEntities(recordsToDuplicate);
+            const { duplicatedRecords } = await dispatch(
+              duplicateRecords({
+                records: processedRecords,
+                repository: apiClientRecordsRepository,
+              })
+            ).unwrap();
 
             toast.success("Records Duplicated successfully");
-            result.length === 1 ? onSaveRecord(head(result)!, "open") : onSaveBulkRecords(result);
+            if (duplicatedRecords.length === 1) {
+              onSaveRecord(head(duplicatedRecords)!, "open");
+            }
           } catch (error) {
             console.error("Error Duplicating records: ", error);
             notification.error({
@@ -274,9 +280,9 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
       updatedRecords.requests,
       handleRecordsToBeDeleted,
       isAllRecordsSelected,
+      dispatch,
       apiClientRecordsRepository,
       onSaveRecord,
-      onSaveBulkRecords,
       addNestedCollection,
     ]
   );
