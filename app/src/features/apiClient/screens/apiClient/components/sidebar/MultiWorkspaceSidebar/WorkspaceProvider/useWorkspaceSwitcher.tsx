@@ -76,6 +76,10 @@ export const useWorkspaceSwitcher = () => {
         workspace: getWorkspaceInfo(workspace),
       });
 
+      // TBD: should we move switchWorkspace inside the switchContext
+      // Issues:
+      // 1. When in multiview and last workspace unchecked, workspace should be switched
+      // 2. When first workspace is checked, it should switch to that if not and then go in multiview
       switchWorkspace(
         {
           teamId: workspace.id,
