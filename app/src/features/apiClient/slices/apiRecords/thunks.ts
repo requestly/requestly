@@ -4,7 +4,7 @@ import { RQAPI } from "features/apiClient/types";
 import { ApiClientRecordsInterface } from "../../helpers/modules/sync/interfaces";
 import { entitySynced } from "../common/actions";
 import { ApiClientEntityType } from "../entities/types";
-import { isApiRequest, isApiCollection } from "../../screens/apiClient/utils";
+import { isApiRequest, isApiCollection, processRecordsForDuplication } from "../../screens/apiClient/utils";
 import { getAllRecords } from "../../commands/utils";
 import { apiRecordsActions } from "./slice";
 
@@ -131,5 +131,25 @@ export const moveRecords = createAsyncThunk<
     return { movedRecords };
   } catch (error) {
     return rejectWithValue("Failed to move records");
+  }
+});
+
+export const duplicateRecords = createAsyncThunk<
+  { duplicatedRecords: RQAPI.ApiClientRecord[] },
+  {
+    records: RQAPI.ApiClientRecord[];
+    repository: Repository;
+  },
+  { rejectValue: string }
+>("apiRecords/duplicate", async ({ records, repository }, { dispatch, rejectWithValue }) => {
+  try {
+    const recordsToDuplicate = processRecordsForDuplication(records, repository);
+    const duplicatedRecords = await repository.duplicateApiEntities(recordsToDuplicate);
+
+    dispatch(apiRecordsActions.upsertRecords(duplicatedRecords));
+
+    return { duplicatedRecords };
+  } catch (error) {
+    return rejectWithValue("Failed to duplicate records");
   }
 });
