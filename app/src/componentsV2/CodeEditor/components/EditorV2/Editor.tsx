@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import CodeMirror, { EditorView, ReactCodeMirrorRef } from "@uiw/react-codemirror";
 import { javascript } from "@codemirror/lang-javascript";
-import { json } from "@codemirror/lang-json";
 import { html } from "@codemirror/lang-html";
+import { json5 } from "codemirror-json5";
 import { css } from "@codemirror/lang-css";
 import { vscodeDark } from "@uiw/codemirror-theme-vscode";
 import { EditorLanguage, EditorCustomToolbar, AnalyticEventProperties } from "componentsV2/CodeEditor/types";
@@ -126,7 +126,7 @@ const Editor: React.FC<EditorProps> = ({
       case EditorLanguage.JAVASCRIPT:
         return javascript({ jsx: false });
       case EditorLanguage.JSON:
-        return json();
+        return json5();
       case EditorLanguage.HTML:
         return html();
       case EditorLanguage.CSS:

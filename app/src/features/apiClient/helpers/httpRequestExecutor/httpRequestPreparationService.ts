@@ -17,6 +17,8 @@ import { ExecutionContext } from "./scriptExecutionContext";
 import { VariableData } from "../../store/variables/types";
 import { getApiClientRecordsStore } from "../../commands/store.utils";
 import { createDummyVariablesStoreFromData } from "features/apiClient/store/variables/variables.store";
+import JSON5 from "json5";
+import { RequestContentType } from "../../types";
 
 export class HttpRequestPreparationService {
   constructor(
@@ -196,6 +198,18 @@ export class HttpRequestPreparationService {
       renderedEntry.request.pathVariables || []
     );
     renderedEntry.request.url = addUrlSchemeIfMissing(renderedEntry.request.url);
+    if (
+      renderedEntry.request.body &&
+      renderedEntry.request.contentType === RequestContentType.JSON &&
+      typeof renderedEntry.request.body === "string"
+    ) {
+      try {
+        const parsed = JSON5.parse(renderedEntry.request.body);
+        renderedEntry.request.body = JSON.stringify(parsed);
+      } catch (error) {
+        console.warn("Failed to parse JSON5 body:", error);
+      }
+    }
 
     // Hacky Fix - When "" or [] is sent along with POST, fetch send content-type=text/plain by default
     // Ideally body should be undefined in db also
