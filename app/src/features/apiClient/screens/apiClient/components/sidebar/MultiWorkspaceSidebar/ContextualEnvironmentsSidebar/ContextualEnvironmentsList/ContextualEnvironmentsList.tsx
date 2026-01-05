@@ -7,39 +7,48 @@ import { SidebarPlaceholderItem } from "features/apiClient/screens/apiClient/com
 import { ApiClientExportModal } from "features/apiClient/screens/apiClient/components/modals/exportModal/ApiClientExportModal";
 import { EnvironmentData } from "backend/environment/types";
 import { useRBAC } from "features/rbac";
-import { useAPIEnvironment } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
-import {
-  parseEnvironmentsStore,
-  parseEnvironmentState,
-  parseEnvironmentStore,
-} from "features/apiClient/commands/environments/utils";
+import { useGlobalEnvironment, useAllEnvironments } from "features/apiClient/slices/environments/environments.hooks";
 import "./contextualEnvironmentsList.scss";
 import { isGlobalEnvironment } from "features/apiClient/screens/environment/utils";
-import { useContextId } from "features/apiClient/contexts/contextId.context";
+import { useWorkspaceId } from "features/apiClient/common/WorkspaceProvider";
 import { EmptyEnvironmentsCreateCard } from "features/apiClient/screens/apiClient/components/sidebar/components/EmptyEnvironmentsCreateCard/EmptyEnvironmentsCreateCard";
 import { Conditional } from "components/common/Conditional";
+import { parseEnvironmentEntityToData } from "features/apiClient/slices/environments/utils";
 
 interface ContextualEnvironmentsListProps {
   searchValue: string;
 }
 
+// TODO: EnvironmentsList can be used directly here with some additional props
 export const ContextualEnvironmentsList: React.FC<ContextualEnvironmentsListProps> = ({ searchValue }) => {
-  const [globalEnvironment, nonGlobalEnvironments, getEnvironment] = useAPIEnvironment((s) => [
-    s.globalEnvironment,
-    s.environments,
-    s.getEnvironment,
+  const globalEnvironment = useGlobalEnvironment();
+  const allEnvironments = useAllEnvironments();
+  const nonGlobalEnvironments = useMemo(() => allEnvironments.filter((env) => env.id !== globalEnvironment.id), [
+    allEnvironments,
+    globalEnvironment.id,
   ]);
 
   const [environmentsToExport, setEnvironmentsToExport] = useState<EnvironmentData[]>([]);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const { isRecordBeingCreated, onNewClickContextId } = useApiClientContext();
-  const contextId = useContextId();
+  const workspaceId = useWorkspaceId();
   const { validatePermission } = useRBAC();
   const { isValidPermission } = validatePermission("api_client_environment", "update");
 
+  const getEnvironment = useCallback(
+    (id: string) => {
+      if (id === globalEnvironment.id) {
+        return globalEnvironment;
+      }
+
+      return allEnvironments.find((env) => env.id === id);
+    },
+    [globalEnvironment, allEnvironments]
+  );
+
   const filteredEnvironments = useMemo(() => {
-    const globalEnv = parseEnvironmentStore(globalEnvironment);
-    const parsedEnvs = parseEnvironmentsStore(nonGlobalEnvironments);
+    const globalEnv = parseEnvironmentEntityToData(globalEnvironment);
+    const parsedEnvs = nonGlobalEnvironments.map(parseEnvironmentEntityToData);
 
     return [
       globalEnv,
@@ -53,13 +62,17 @@ export const ContextualEnvironmentsList: React.FC<ContextualEnvironmentsListProp
 
   const handleExportEnvironments = useCallback(
     (environment: { id: string; name: string }) => {
-      const environmentState = getEnvironment(environment.id);
-      if (!environmentState) {
+      const environmentEntity = getEnvironment(environment.id);
+      if (!environmentEntity) {
         throw new Error("Environment not found!");
       }
-      const variables = parseEnvironmentState(environmentState).variables;
-      setEnvironmentsToExport([{ ...environment, variables }]);
-
+      setEnvironmentsToExport([
+        {
+          id: environmentEntity.id,
+          name: environmentEntity.name,
+          variables: environmentEntity.variables,
+        },
+      ]);
       setIsExportModalOpen(true);
     },
     [getEnvironment]
@@ -88,10 +101,10 @@ export const ContextualEnvironmentsList: React.FC<ContextualEnvironmentsListProp
                 )
               )}
               <Conditional condition={showEmptyCreateCard}>
-                <EmptyEnvironmentsCreateCard contextId={contextId} isValidPermission={isValidPermission} />
+                <EmptyEnvironmentsCreateCard workspaceId={workspaceId} isValidPermission={isValidPermission} />
               </Conditional>
               <div className="mt-8">
-                {isRecordBeingCreated === RQAPI.RecordType.ENVIRONMENT && onNewClickContextId === contextId && (
+                {isRecordBeingCreated === RQAPI.RecordType.ENVIRONMENT && onNewClickContextId === workspaceId && (
                   <SidebarPlaceholderItem name="New Environment" />
                 )}
               </div>
