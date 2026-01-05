@@ -45,7 +45,7 @@ export const CollectionsVariablesView: React.FC<CollectionsVariablesViewProps> =
     type: "referenceId",
   });
 
-  const saveBuffer = useSaveBuffer();
+  const {saveOriginExistsBuffer: saveBuffer} = useSaveBuffer();
 
   // Save handler
   const handleSaveVariables = useCallback(async () => {
