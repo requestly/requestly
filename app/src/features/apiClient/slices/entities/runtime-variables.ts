@@ -6,6 +6,7 @@ import { runtimeVariablesActions } from "../runtimeVariables/slice";
 import { EntityNotFound, UpdateCommand } from "../types";
 import { ApiClientEntityType, EntityDispatch } from "./types";
 import { ApiClientEntity, ApiClientEntityMeta } from "./base";
+import { NativeError } from "errors/NativeError";
 
 const RUNTIME_VARIABLES_ENTITY_ID = "runtime_variables";
 
@@ -52,6 +53,10 @@ export class RuntimeVariablesEntity<M extends ApiClientEntityMeta = ApiClientEnt
 
   getName(_state: RootState): string {
     return "Runtime Variables";
+  }
+
+  upsert(): void {
+    throw new NativeError("Upserting a runtime variable is not supported!");
   }
 
   /**

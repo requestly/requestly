@@ -28,7 +28,7 @@ export const RuntimeVariablesView: React.FC = () => {
     type: "bufferId",
   });
 
-  const saveBuffer = useSaveBuffer();
+  const {saveOriginExistsBuffer: saveBuffer} = useSaveBuffer();
 
   const handleSaveVariables = useCallback(async () => {
     saveBuffer(

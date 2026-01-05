@@ -51,6 +51,10 @@ export abstract class ApiClientEnvironmentEntity<
     this.dispatchUnsafePatch(patcher);
   }
 
+  upsert(params: EnvironmentRecord): void {
+      this.dispatch(environmentsActions.environmentCreated(params));
+  }
+
 
   getName(state: ApiClientStoreState): string {
     return this.getEntityFromState(state).name;

@@ -6,7 +6,7 @@ export type ApiClientEntityMeta = {
   id: string;
 };
 
-export abstract class ApiClientEntity<T, M extends ApiClientEntityMeta = ApiClientEntityMeta, State = ApiClientStoreState> {
+export abstract class ApiClientEntity<T extends {id: string}, M extends ApiClientEntityMeta = ApiClientEntityMeta, State = ApiClientStoreState> {
   abstract readonly type: ApiClientEntityType;
 
   constructor(protected readonly dispatch: EntityDispatch, public readonly meta: M) {}
@@ -21,6 +21,8 @@ export abstract class ApiClientEntity<T, M extends ApiClientEntityMeta = ApiClie
   get id(): string {
     return this.meta.id;
   }
+
+  abstract upsert(params: T): void;
 
   unsafePatch(patcher: (patch: T) => void) {
     this.dispatchUnsafePatch(patcher);
