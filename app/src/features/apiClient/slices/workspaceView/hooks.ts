@@ -1,6 +1,8 @@
 import { createSelector } from "@reduxjs/toolkit";
-import { useSelector } from "react-redux";
+import { useMemo } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { getAllSelectedWorkspaces, getWorkspaceViewSlice } from "./slice";
+import { switchContext, workspaceViewManager } from "./thunks";
 import { ApiClientViewMode } from "./types";
 import { NativeError } from "errors/NativeError";
 
@@ -47,4 +49,22 @@ const selectSingleModeWorkspace = createSelector([getWorkspaceViewSlice], (s) =>
 
 export function useGetSingleModeWorkspace() {
   return useSelector(selectSingleModeWorkspace);
+}
+
+export function useWorkspaceViewActions() {
+  const dispatch = useDispatch();
+
+  const actions = useMemo(() => {
+    return {
+      async switchContext(params: Parameters<typeof switchContext>[0]) {
+        return dispatch(switchContext(params) as any).unwrap();
+      },
+
+      async workspaceViewManager(params: Parameters<typeof workspaceViewManager>[0]) {
+        return dispatch(workspaceViewManager(params) as any).unwrap();
+      },
+    };
+  }, [dispatch]);
+
+  return actions;
 }
