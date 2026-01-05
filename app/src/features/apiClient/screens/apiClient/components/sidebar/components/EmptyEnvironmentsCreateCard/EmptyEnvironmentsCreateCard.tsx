@@ -33,6 +33,7 @@ export const EmptyEnvironmentsCreateCard: React.FC<EmptyEnvironmentsCreateCardPr
       ).unwrap();
 
       openBufferedTab({
+        isNew: true,
         source: new EnvironmentViewTabSource({
           id,
           title: name,

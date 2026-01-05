@@ -21,7 +21,7 @@ import { DeleteApiRecordModal } from "../../../modals";
 import { ContextualCollectionsList } from "./CollectionsList/ContextualCollectionsList";
 import { PostmanExportModal } from "../../../modals/postmanCollectionExportModal/PostmanCollectionExportModal";
 import { WorkspaceProvider } from "../WorkspaceProvider/WorkspaceProvider";
-import { WorkspaceProvider as ReduxWorkspaceProvider } from "features/apiClient/common/WorkspaceProvider";
+
 import "./contextualCollectionsSidebar.scss";
 
 export const ContextualCollectionsSidebar: React.FC<{
@@ -304,22 +304,18 @@ export const ContextualCollectionsSidebar: React.FC<{
 
       <div className="multi-view-collections-sidebar">
         {selectedWorkspaces.map((workspace) => {
-          const workspaceId = workspace.id;
-
           return (
-            <WorkspaceProvider key={workspaceId} workspaceId={workspaceId}>
-              <ReduxWorkspaceProvider key={workspaceId} workspaceId={workspaceId}>
-                <ContextualCollectionsList
-                  selectAll={selectAll}
-                  showSelection={showSelection}
-                  handleShowSelection={handleShowSelection}
-                  searchValue={searchValue}
-                  onNewClick={onNewClick}
-                  recordTypeToBeCreated={recordTypeToBeCreated}
-                  handleRecordSelection={handleRecordSelection}
-                  handleRecordsToBeDeleted={handleRecordsToBeDeleted}
-                />
-              </ReduxWorkspaceProvider>
+            <WorkspaceProvider key={workspace.id} workspaceId={workspace.id}>
+              <ContextualCollectionsList
+                selectAll={selectAll}
+                showSelection={showSelection}
+                handleShowSelection={handleShowSelection}
+                searchValue={searchValue}
+                onNewClick={onNewClick}
+                recordTypeToBeCreated={recordTypeToBeCreated}
+                handleRecordSelection={handleRecordSelection}
+                handleRecordsToBeDeleted={handleRecordsToBeDeleted}
+              />
             </WorkspaceProvider>
           );
         })}
