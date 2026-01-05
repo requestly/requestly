@@ -281,15 +281,6 @@ const HttpClientView: React.FC<Props> = ({
   }, [setIcon]);
 
   useEffect(() => {
-    if (isHistoryView) {
-      setTitle("History");
-    } else {
-      setTitle(apiEntryDetails?.name || "Untitled request");
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [setTitle, isHistoryView, apiEntryDetails?.name]);
-
-  useEffect(() => {
     //on mount run this
     if (!apiEntryDetails) {
       return;
