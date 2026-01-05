@@ -37,7 +37,7 @@ import { PostmanExportModal } from "../../../../modals/postmanCollectionExportMo
 import { CollectionRecordState } from "features/apiClient/store/apiRecords/apiRecords.store";
 import { MdOutlineVideoLibrary } from "@react-icons/all-files/md/MdOutlineVideoLibrary";
 import { CollectionRowOptionsCustomEvent, dispatchCustomEvent } from "./utils";
-import { apiRecordsRankingManager } from "features/apiClient/helpers/ranking";
+import { apiRecordsRankingManager } from "features/apiClient/components/sidebar";
 
 export enum ExportType {
   REQUESTLY = "requestly",
@@ -274,7 +274,7 @@ export const CollectionRow: React.FC<Props> = ({
 
         // Calculate rank to place dropped record at the bottom
         const existingChildren = record.data.children || [];
-        const newRank = apiRecordsRankingManager.getNextRank(existingChildren, [item.record])[0];
+        const newRank = apiRecordsRankingManager.getNextRanks(existingChildren, [item.record])[0];
 
         const destination = {
           contextId: dropContextId,
@@ -304,7 +304,7 @@ export const CollectionRow: React.FC<Props> = ({
         setIsCollectionRowLoading(false);
       }
     },
-    [record.id, expandedRecordIds, setExpandedRecordIds]
+    [record.data.children, record.id, expandedRecordIds, setExpandedRecordIds]
   );
 
   const checkCanDropItem = useCallback(

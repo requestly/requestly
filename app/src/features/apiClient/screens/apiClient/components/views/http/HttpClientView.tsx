@@ -78,7 +78,7 @@ import PATHS from "config/constants/sub/paths";
 import { useAPIRecords, useAPIRecordsStore } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 import { Authorization } from "../components/request/components/AuthorizationView/types/AuthConfig";
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
-import { apiRecordsRankingManager } from "features/apiClient/helpers/ranking";
+import { apiRecordsRankingManager } from "features/apiClient/components/sidebar";
 import ErrorBoundary from "features/apiClient/components/ErrorBoundary/ErrorBoundary";
 import { useHttpRequestExecutor } from "features/apiClient/hooks/requestExecutors/useHttpRequestExecutor";
 import { PathVariablesProvider } from "features/apiClient/store/pathVariables/PathVariablesContextProvider";
@@ -622,7 +622,7 @@ const HttpClientView: React.FC<Props> = ({
       const siblingsInCollection = apiClientRecords.filter(
         (r) => r.collectionId === collectionId && r.id !== record.id
       );
-      const newRank = apiRecordsRankingManager.getNextRank(siblingsInCollection, [record as RQAPI.ApiRecord])[0];
+      const newRank = apiRecordsRankingManager.getNextRanks(siblingsInCollection, [record as RQAPI.ApiRecord])[0];
       record = { ...record, rank: newRank };
     }
 

@@ -3,7 +3,7 @@ import { RQAPI } from "features/apiClient/types";
 import { omit } from "lodash";
 import { saveBulkRecords, saveOrUpdateRecord } from "../store.utils";
 import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
-import { apiRecordsRankingManager } from "features/apiClient/helpers/ranking";
+import { apiRecordsRankingManager } from "features/apiClient/components/sidebar";
 
 export async function moveRecords(
   context: ApiClientFeatureContext,
@@ -20,7 +20,7 @@ export async function moveRecords(
   const existingRecordsInCollection = allRecords.filter((record) => record.collectionId === collectionId);
 
   // Generate ranks for records being moved
-  const ranks = apiRecordsRankingManager.getNextRank(existingRecordsInCollection, recordsToMove);
+  const ranks = apiRecordsRankingManager.getNextRanks(existingRecordsInCollection, recordsToMove);
 
   const updatedRequests = recordsToMove.map((record, index) => {
     const baseUpdate = isApiCollection(record)

@@ -35,7 +35,7 @@ import { getFileContents } from "components/mode-specific/desktop/DesktopFilePic
 import { NativeError } from "errors/NativeError";
 import { trackCollectionRunnerRecordLimitExceeded } from "modules/analytics/events/features/apiClient";
 import { getBoundary, parse as multipartParser } from "parse-multipart-data";
-import { apiRecordsRankingManager } from "features/apiClient/helpers/ranking";
+import { apiRecordsRankingManager } from "features/apiClient/components/sidebar";
 
 const createAbortError = (signal: AbortSignal) => {
   if (signal && signal.reason === AbortReason.USER_CANCELLED) {
@@ -550,7 +550,7 @@ export const createBlankApiRecord = (
 
     if (allRecords && collectionId) {
       const elementsInCollection = allRecords.filter((record) => record.collectionId === collectionId);
-      newRecord.rank = apiRecordsRankingManager.getNextRank(elementsInCollection, [
+      newRecord.rank = apiRecordsRankingManager.getNextRanks(elementsInCollection, [
         newRecord as RQAPI.RecordMetadata,
       ])[0];
     }
