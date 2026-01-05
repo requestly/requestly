@@ -1,10 +1,10 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { partition } from "lodash";
+import { omit, partition } from "lodash";
 import { RQAPI } from "features/apiClient/types";
 import { ApiClientRecordsInterface } from "../../helpers/modules/sync/interfaces";
 import { entitySynced } from "../common/actions";
 import { ApiClientEntityType } from "../entities/types";
-import { isApiRequest } from "../../screens/apiClient/utils";
+import { isApiRequest, isApiCollection } from "../../screens/apiClient/utils";
 import { getAllRecords } from "../../commands/utils";
 import { apiRecordsActions } from "./slice";
 
@@ -106,4 +106,30 @@ export const deleteRecords = createAsyncThunk<
     deletedApiRecords: apiRecords as RQAPI.ApiRecord[],
     deletedCollectionRecords: collectionRecords as RQAPI.CollectionRecord[],
   };
+});
+
+export const moveRecords = createAsyncThunk<
+  { movedRecords: RQAPI.ApiClientRecord[] },
+  {
+    recordsToMove: RQAPI.ApiClientRecord[];
+    collectionId: string;
+    repository: Repository;
+  },
+  { rejectValue: string }
+>("apiRecords/move", async ({ recordsToMove, collectionId, repository }, { dispatch, rejectWithValue }) => {
+  const updatedRecords = recordsToMove.map((record) => {
+    return isApiCollection(record)
+      ? { ...record, collectionId, data: omit(record.data, "children") }
+      : { ...record, collectionId };
+  });
+
+  try {
+    const movedRecords = await repository.moveAPIEntities(updatedRecords, collectionId);
+
+    dispatch(apiRecordsActions.upsertRecords(movedRecords));
+
+    return { movedRecords };
+  } catch (error) {
+    return rejectWithValue("Failed to move records");
+  }
 });
