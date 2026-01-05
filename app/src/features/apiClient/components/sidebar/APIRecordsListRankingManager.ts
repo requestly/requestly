@@ -5,7 +5,7 @@
  * Manages ranking for RecordMetadata objects (API requests and collections).
  */
 
-import { ListRankingManager } from "utils/ranking";
+import { ListRankingManager } from "modules/ranking";
 import { RQAPI } from "features/apiClient/types";
 
 type RecordMetadata = RQAPI.RecordMetadata;
