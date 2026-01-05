@@ -1,23 +1,28 @@
 import React from "react";
 import { Skeleton } from "antd";
-import { useWorkspace } from "features/apiClient/store/multiWorkspaceView/multiWorkspaceView.store";
-import { ContextId } from "features/apiClient/contexts/contextId.context";
-import { useApiClientFeatureContextProvider } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 import { WorkspaceCollapse } from "./WorkspaceCollapse/WorkspaceCollapse";
 import { MultiViewError } from "../MultiViewError/MultiViewError";
+import { useWorkspace, WorkspaceInfo } from "features/apiClient/slices";
 import "./workspaceProvider.scss";
 
 export const WorkspaceProvider: React.FC<{
-  workspaceId: string;
+  workspaceId: WorkspaceInfo["id"];
   showEnvSwitcher?: boolean;
   children: React.ReactNode;
   collapsible?: boolean;
   type?: string;
 }> = ({ workspaceId, showEnvSwitcher = true, children, type, collapsible = true }) => {
-  const state = useWorkspace(workspaceId, (s) => s.state);
-  const [getContext] = useApiClientFeatureContextProvider((s) => [s.getContext]);
+  const workspace = useWorkspace(workspaceId);
 
-  if (state.errored) {
+  if (workspace.status.loading) {
+    return (
+      <div className="workspace-loader-container">
+        <Skeleton paragraph={{ rows: 5 }} title={false} />
+      </div>
+    );
+  }
+
+  if (workspace.status.state.success === false) {
     return (
       <WorkspaceCollapse
         expanded
@@ -31,23 +36,11 @@ export const WorkspaceProvider: React.FC<{
     );
   }
 
-  if (state.loading) {
-    return (
-      <div className="workspace-loader-container">
-        <Skeleton paragraph={{ rows: 5 }} title={false} />
-      </div>
-    );
-  }
-
-  return (
-    <ContextId id={getContext(workspaceId)?.id ?? null}>
-      {collapsible ? (
-        <WorkspaceCollapse showEnvSwitcher={showEnvSwitcher} workspaceId={workspaceId} type={type}>
-          {children}
-        </WorkspaceCollapse>
-      ) : (
-        children
-      )}
-    </ContextId>
+  return collapsible ? (
+    <WorkspaceCollapse showEnvSwitcher={showEnvSwitcher} workspaceId={workspaceId} type={type}>
+      {children}
+    </WorkspaceCollapse>
+  ) : (
+    children
   );
 };

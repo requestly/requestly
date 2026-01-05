@@ -1,7 +1,6 @@
 import { createAsyncThunk, Dispatch } from "@reduxjs/toolkit";
 import { ApiClientViewMode, WorkspaceInfo, WorkspaceState } from "./types";
 import { RootState } from "store/types";
-import { getTabServiceActions } from "componentsV2/Tabs/tabUtils";
 import { apiClientContextService } from "./helpers/ApiClientContextService";
 import { apiClientContextRegistry } from "./helpers/ApiClientContextRegistry";
 import { UserDetails } from "./helpers/ApiClientContextService/ApiClientContextService";
@@ -117,10 +116,8 @@ const removeWorkspacesFromView = createAsyncThunk<
 const singleToMultiView = createAsyncThunk(
   `${SLICE_NAME}/singleToMultiView`,
   async (params: { workspaces: WorkspaceInfo[]; userId?: string }, { dispatch }) => {
-    getTabServiceActions().resetTabs(true);
     apiClientContextRegistry.clearAll();
-
-    dispatch(workspaceViewActions.setViewMode(ApiClientViewMode.MULTI));
+    dispatch(workspaceViewActions.resetToMultiView());
     return dispatch(addWorkspacesIntoMultiView(params)).unwrap();
   }
 );

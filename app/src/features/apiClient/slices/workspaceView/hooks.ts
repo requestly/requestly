@@ -1,15 +1,26 @@
 import { createSelector } from "@reduxjs/toolkit";
 import { useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getAllSelectedWorkspaces, getWorkspaceViewSlice } from "./slice";
+import { getAllSelectedWorkspaces, getWorkspaceById, getWorkspaceViewSlice } from "./slice";
 import { switchContext, workspaceViewManager } from "./thunks";
-import { ApiClientViewMode } from "./types";
+import { ApiClientViewMode, WorkspaceInfo } from "./types";
 import { NativeError } from "errors/NativeError";
+import { RootState } from "store/types";
 
 const selectAllSelectedWorkspaces = createSelector([getWorkspaceViewSlice], (slice) => getAllSelectedWorkspaces(slice));
 
 export function useGetAllSelectedWorkspaces() {
   return useSelector(selectAllSelectedWorkspaces);
+}
+
+export function useWorkspace(workspaceId: WorkspaceInfo["id"]) {
+  const workspace = useSelector((state: RootState) => getWorkspaceById(getWorkspaceViewSlice(state), workspaceId));
+
+  if (!workspace) {
+    throw new NativeError("Workspace not found!").addContext({ workspaceId });
+  }
+
+  return workspace;
 }
 
 const selectIsAllWorkspacesLoaded = createSelector([selectAllSelectedWorkspaces], (workspaces) =>
