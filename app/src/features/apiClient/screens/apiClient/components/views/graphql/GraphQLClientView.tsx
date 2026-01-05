@@ -497,14 +497,6 @@ const GraphQLClientView: React.FC<Props> = ({
   }, [setIcon]);
 
   useEffect(() => {
-    if (isHistoryView) {
-      setTitle("History");
-    } else {
-      setTitle(record.name || "Untitled request");
-    }
-  }, [setTitle, isHistoryView, record.name]);
-
-  useEffect(() => {
     setUnsaved(hasUnsavedChanges);
   }, [hasUnsavedChanges, setUnsaved]);
 
