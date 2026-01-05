@@ -55,19 +55,16 @@ const AuthorizationView: React.FC<Props> = ({
     [selectedAuthType]
   );
 
-  const handleAuthTypeChange = useCallback((value: Authorization.Type) => {
-    setSelectedAuthType(value);
-  }, []);
-
-  useEffect(() => {
-    // for some reason there is a re render outside this component that sends an empty defaults object
-    if (defaultsRef.current) {
+  const handleAuthTypeChange = useCallback(
+    (value: Authorization.Type) => {
+      setSelectedAuthType(value);
       onAuthUpdate({
-        currentAuthType: selectedAuthType,
+        currentAuthType: value,
         authConfigStore: resolvedAuthConfigStore,
       });
-    }
-  }, [selectedAuthType, resolvedAuthConfigStore, onAuthUpdate]);
+    },
+    [resolvedAuthConfigStore, onAuthUpdate]
+  );
 
   return (
     <div className={`authorization-view ${wrapperClass}`}>
