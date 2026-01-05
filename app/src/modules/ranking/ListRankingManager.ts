@@ -63,7 +63,7 @@ export abstract class ListRankingManager<T> {
    * @param records - Array of records to generate ranks for
    * @returns Single rank string or array of rank strings
    */
-  getRankBetweenRecords(before: T | null, after: T | null, records: T[]): string[] {
+  getRanksBetweenRecords(before: T | null, after: T | null, records: T[]): string[] {
     const count = records.length;
 
     if (count === 0) {
@@ -104,7 +104,7 @@ export abstract class ListRankingManager<T> {
    * @param newRecords - Array of new records to generate ranks for
    * @returns Array of rank strings for the new records
    */
-  getNextRank(existingRecords: T[], newRecords: T[]): string[] {
+  getNextRanks(existingRecords: T[], newRecords: T[]): string[] {
     if (newRecords.length === 0) {
       return [];
     }
@@ -116,9 +116,9 @@ export abstract class ListRankingManager<T> {
     const lastRecord = sortedRecords.length > 0 ? sortedRecords[sortedRecords.length - 1] : null;
 
     // Generate ranks after the last record (after = null means append at end)
-    const ranks = this.getRankBetweenRecords(lastRecord, null, newRecords);
+    const ranks = this.getRanksBetweenRecords(lastRecord, null, newRecords);
 
     // Ensure we always return an array
-    return Array.isArray(ranks) ? ranks : [ranks];
+    return ranks;
   }
 }
