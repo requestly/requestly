@@ -5,8 +5,9 @@ import { selectRecordById } from "../apiRecords/selectors";
 import { ApiClientStoreState } from "../workspaceView/helpers/ApiClientContextRegistry/types";
 import { ApiClientRecordEntity } from "./api-client-record-entity";
 import { ApiClientEntityType } from "./types";
+import { ApiClientEntityMeta } from "./base";
 
-export class GraphQLRecordEntity extends ApiClientRecordEntity<RQAPI.GraphQLApiRecord> {
+export class GraphQLRecordEntity<M extends ApiClientEntityMeta = ApiClientEntityMeta> extends ApiClientRecordEntity<RQAPI.GraphQLApiRecord, M> {
   readonly type = ApiClientEntityType.GRAPHQL_RECORD;
 
   dispatchCommand(command: UpdateCommand<RQAPI.GraphQLApiRecord>): void {

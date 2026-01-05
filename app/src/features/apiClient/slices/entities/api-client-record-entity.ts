@@ -1,10 +1,10 @@
 import type { RQAPI } from "features/apiClient/types";
 import type { ApiClientStoreState } from "../workspaceView/helpers/ApiClientContextRegistry/types";
-import { ApiClientEntity } from "./base";
+import { ApiClientEntity, ApiClientEntityMeta } from "./base";
 import type { UpdateCommand, DeepPartial, DeepPartialWithNull } from "../types";
 import { apiRecordsActions } from "../apiRecords";
 
-export abstract class ApiClientRecordEntity<T extends RQAPI.ApiClientRecord> extends ApiClientEntity<T> {
+export abstract class ApiClientRecordEntity<T extends RQAPI.ApiClientRecord, M extends ApiClientEntityMeta = ApiClientEntityMeta> extends ApiClientEntity<T, M> {
   dispatchCommand(command: UpdateCommand<T>): void {
     this.dispatch(apiRecordsActions.applyPatch({ id: this.meta.id, command }));
   }
@@ -21,6 +21,10 @@ export abstract class ApiClientRecordEntity<T extends RQAPI.ApiClientRecord> ext
   protected DELETECOMMON(value: DeepPartialWithNull<RQAPI.ApiClientRecord>): void {
     const command = { type: "DELETE" as const, value };
     this.dispatchCommand(command as UpdateCommand<T>);
+  }
+
+  upsert(params: T): void {
+      this.dispatch(apiRecordsActions.recordUpserted(params));
   }
 
   getName(state: ApiClientStoreState): string {

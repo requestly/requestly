@@ -6,6 +6,7 @@ import { runtimeVariablesActions } from "../runtimeVariables/slice";
 import { EntityNotFound, UpdateCommand } from "../types";
 import { ApiClientEntityType, EntityDispatch } from "./types";
 import { ApiClientEntity, ApiClientEntityMeta } from "./base";
+import { NativeError } from "errors/NativeError";
 
 const RUNTIME_VARIABLES_ENTITY_ID = "runtime_variables";
 
@@ -14,7 +15,7 @@ const RUNTIME_VARIABLES_ENTITY_ID = "runtime_variables";
  * Simple entity with just a variables property.
  * Uses the global Redux store instead of per-workspace API client store.
  */
-export class RuntimeVariablesEntity extends ApiClientEntity<RuntimeVariablesRecord, ApiClientEntityMeta, RootState> {
+export class RuntimeVariablesEntity<M extends ApiClientEntityMeta = ApiClientEntityMeta> extends ApiClientEntity<RuntimeVariablesRecord, M, RootState> {
   readonly type = ApiClientEntityType.RUNTIME_VARIABLES;
 
   public readonly variables = new ApiClientVariables<RuntimeVariablesRecord, RootState>(
@@ -24,7 +25,7 @@ export class RuntimeVariablesEntity extends ApiClientEntity<RuntimeVariablesReco
   );
 
   constructor(dispatch: EntityDispatch) {
-    super(dispatch, { id: RUNTIME_VARIABLES_ENTITY_ID });
+    super(dispatch, { id: RUNTIME_VARIABLES_ENTITY_ID } as M);
   }
 
   dispatchCommand(_command: UpdateCommand<RuntimeVariablesRecord>): void {
@@ -52,6 +53,10 @@ export class RuntimeVariablesEntity extends ApiClientEntity<RuntimeVariablesReco
 
   getName(_state: RootState): string {
     return "Runtime Variables";
+  }
+
+  upsert(): void {
+    throw new NativeError("Upserting a runtime variable is not supported!");
   }
 
   /**
