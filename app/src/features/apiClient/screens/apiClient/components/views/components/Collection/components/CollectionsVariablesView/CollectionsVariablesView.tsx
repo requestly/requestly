@@ -41,11 +41,8 @@ export const CollectionsVariablesView: React.FC<CollectionsVariablesViewProps> =
   const handleSaveVariables = useCallback(async () => {
     saveBuffer({
       entity,
-      produceChanges(entity, state) {
-        return entity.variables.getAll(state)
-      },
       async save(changes, repositories) {
-        await repositories.apiClientRecordsRepository.setCollectionVariables(collectionId, changes);
+        await repositories.apiClientRecordsRepository.updateRecord(changes, changes.id);
       },
     }, {
       onError(error) {
@@ -53,12 +50,11 @@ export const CollectionsVariablesView: React.FC<CollectionsVariablesViewProps> =
         toast.error("Failed to update variables");
 
       },
-      onSuccess(changes, entity) {
-        entity.origin.variables.refresh(changes);
+      onSuccess(changes) {
         toast.success("Variables updated successfully");
         trackVariablesSaved({
           type: "collection_variable",
-          num_variables: Object.keys(changes).length,
+          num_variables: Object.keys(changes.data.variables).length,
         });
 
       },
@@ -69,7 +65,7 @@ export const CollectionsVariablesView: React.FC<CollectionsVariablesViewProps> =
         setIsSaving(false);
       },
     });
-  }, [collectionId, entity, saveBuffer]);
+  }, [entity, saveBuffer]);
 
   return (
     <div className="collection-variables-view">

@@ -4,66 +4,18 @@ import { EnvironmentEntity as EnvironmentRecord } from "../environments/types";
 import { selectEnvironmentById, selectGlobalEnvironment } from "../environments/selectors";
 import { environmentsActions } from "../environments/slice";
 import { EntityNotFound, UpdateCommand } from "../types";
-import { ApiClientEntityType, EntityDispatch } from "./types";
+import { ApiClientEntityType}  from "./types";
 import { GLOBAL_ENVIRONMENT_ID } from "../common/constants";
 import { ApiClientEntity, ApiClientEntityMeta } from "./base";
 import { Dispatch } from "@reduxjs/toolkit";
 
-/**
- * Abstract base class for environment entities.
- * Similar to ApiClientEntity but without SET/DELETE command pattern
- * since environments are homogeneous and don't need applyPatch.
- */
-export abstract class ApiClientEnvironmentEntity<
-  M extends ApiClientEntityMeta = ApiClientEntityMeta
-> extends ApiClientEntity<EnvironmentRecord, M> {
-  abstract readonly type: ApiClientEntityType;
-  abstract readonly variables: ApiClientVariables<EnvironmentRecord>;
-
-  constructor(
-    public readonly dispatch: EntityDispatch,
-    public readonly meta: M
-  ) {
-    super(dispatch, meta);
-  }
-
-  get id(): string {
-    return this.meta.id;
-  }
-
-  /**
-   * Get the environment entity from the store state.
-   * Must be implemented by concrete classes.
-   */
-  abstract getEntityFromState(state: ApiClientStoreState): EnvironmentRecord;
-
-  /**
-   * Dispatch an unsafe patch action.
-   * Must be implemented by concrete classes as they dispatch different actions.
-   */
-  abstract dispatchUnsafePatch(patcher: (env: EnvironmentRecord) => void): void;
-
-  /**
-   * Mutate the environment entity directly via unsafe patch.
-   * Delegates to dispatchUnsafePatch.
-   */
-  unsafePatch(patcher: (env: EnvironmentRecord) => void): void {
-    this.dispatchUnsafePatch(patcher);
-  }
-
-
-  getName(state: ApiClientStoreState): string {
-    return this.getEntityFromState(state).name;
-  }
-
-}
 
 /**
  * Entity class for regular (non-global) environments.
  * Supports full CRUD operations including delete.
  */
-export class EnvironmentEntity<M extends ApiClientEntityMeta = ApiClientEntityMeta> extends ApiClientEnvironmentEntity<M> {
-  dispatchCommand(command: UpdateCommand<{}>): void {
+export class EnvironmentEntity<M extends ApiClientEntityMeta = ApiClientEntityMeta> extends ApiClientEntity<EnvironmentRecord, M> {
+  dispatchCommand(command: UpdateCommand<EnvironmentRecord>): void {
       throw new Error("Method not implemented.");
   }
   readonly type = ApiClientEntityType.ENVIRONMENT;
@@ -74,7 +26,14 @@ export class EnvironmentEntity<M extends ApiClientEntityMeta = ApiClientEntityMe
     this.getEntityFromState.bind(this)
   );
 
+  upsert(params: EnvironmentRecord): void {
+      this.dispatch(environmentsActions.upsertEnvironment(params));
+  }
 
+
+  getName(state: ApiClientStoreState): string {
+    return this.getEntityFromState(state).name;
+  }
 
   getEntityFromState(state: ApiClientStoreState): EnvironmentRecord {
     const env = selectEnvironmentById(state, this.id);
@@ -132,11 +91,20 @@ export class EnvironmentEntity<M extends ApiClientEntityMeta = ApiClientEntityMe
  * Entity class for the global environment.
  * Has limited operations compared to regular environments (no delete, no set as active).
  */
-export class GlobalEnvironmentEntity<M extends ApiClientEntityMeta = ApiClientEntityMeta> extends ApiClientEnvironmentEntity<M> {
-  dispatchCommand(command: UpdateCommand<{}>): void {
+export class GlobalEnvironmentEntity<M extends ApiClientEntityMeta = ApiClientEntityMeta> extends ApiClientEntity<EnvironmentRecord, M> {
+  dispatchCommand(command: UpdateCommand<EnvironmentRecord>): void {
       throw new Error("Method not implemented.");
   }
   readonly type = ApiClientEntityType.GLOBAL_ENVIRONMENT;
+
+  upsert(params: EnvironmentRecord): void {
+      this.dispatch(environmentsActions.updateGlobalEnvironment(params));
+  }
+
+
+  getName(state: ApiClientStoreState): string {
+    return this.getEntityFromState(state).name;
+  }
 
   public readonly variables = new ApiClientVariables<EnvironmentRecord>(
     (e) => e.variables,

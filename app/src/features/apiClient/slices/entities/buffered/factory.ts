@@ -7,11 +7,14 @@ import { BufferedRuntimeVariablesEntity } from "./runtime-variables";
 import { BufferedCollectionRecordEntity } from "./collection";
 import type { ApiClientEntity, ApiClientEntityMeta } from "../base";
 
-export type BufferedApiClientEntityMeta = ApiClientEntityMeta & {referenceId: string};
+export type BufferedApiClientEntityMeta = ApiClientEntityMeta & { referenceId: string } & ({originExists: true} | {originExists: false});
 export interface BufferedApiClientEntity {
   meta: BufferedApiClientEntityMeta,
   origin: ApiClientEntity<any, any, any>
 };
+
+export type OriginExists<T extends BufferedApiClientEntity> = T & {meta: {originExists: true}};
+export type OriginUndfined<T extends BufferedApiClientEntity> = T & {meta: {originExists: false}};
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace BufferedEntityFactory {
@@ -33,7 +36,7 @@ export namespace BufferedEntityFactory {
     params: { id: string; type: T, referenceId: string, },
     dispatch: EntityDispatch
   ): EntityTypeMap<T> {
-    const meta: BufferedApiClientEntityMeta = { id: params.id, referenceId: params.referenceId };
+    const meta: BufferedApiClientEntityMeta = { id: params.id, originExists: true, referenceId: params.referenceId };
 
     const entity = (() => {
       switch (params.type) {

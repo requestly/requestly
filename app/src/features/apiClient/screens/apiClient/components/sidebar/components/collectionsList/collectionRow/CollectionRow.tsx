@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
 import { Checkbox, Collapse, Dropdown, MenuProps, Skeleton, Typography, notification } from "antd";
 import { RQAPI } from "features/apiClient/types";
@@ -18,28 +18,23 @@ import { MdOutlineBorderColor } from "@react-icons/all-files/md/MdOutlineBorderC
 import { MdOutlineDelete } from "@react-icons/all-files/md/MdOutlineDelete";
 import { MdOutlineIosShare } from "@react-icons/all-files/md/MdOutlineIosShare";
 import { Conditional } from "components/common/Conditional";
-import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
 import { CollectionViewTabSource } from "../../../../views/components/Collection/collectionViewTabSource";
 import { useDrag, useDrop } from "react-dnd";
 import { MdAdd } from "@react-icons/all-files/md/MdAdd";
-import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 import RequestlyIcon from "assets/img/brand/rq_logo.svg";
 import PostmanIcon from "assets/img/brand/postman-icon.svg";
 import { NewApiRecordDropdown, NewRecordDropdownItemType } from "../../NewApiRecordDropdown/NewApiRecordDropdown";
 import "./CollectionRow.scss";
 import { ApiClientExportModal } from "../../../../modals/exportModal/ApiClientExportModal";
-import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
-import { moveRecordsAcrossWorkspace } from "features/apiClient/commands/records";
-import { getApiClientFeatureContext } from "features/apiClient/commands/store.utils";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { PostmanExportModal } from "../../../../modals/postmanCollectionExportModal/PostmanCollectionExportModal";
-import { CollectionRecordState } from "features/apiClient/store/apiRecords/apiRecords.store";
 import { MdOutlineVideoLibrary } from "@react-icons/all-files/md/MdOutlineVideoLibrary";
 import { CollectionRowOptionsCustomEvent, dispatchCustomEvent } from "./utils";
-import { useApiClientFeatureContext, useApiClientRepository } from "features/apiClient/slices";
+import { ApiClientFeatureContext, getApiClientFeatureContext, moveRecords } from "features/apiClient/slices";
 import { useWorkspaceId } from "features/apiClient/common/WorkspaceProvider";
 import { useActiveTab, useTabActions } from "componentsV2/Tabs/slice";
-import { getAncestorIds, getRecord } from "features/apiClient/slices/apiRecords/utils";
+import { getAncestorIds } from "features/apiClient/slices/apiRecords/utils";
+import { Workspace } from "features/workspaces/types";
 
 export enum ExportType {
   REQUESTLY = "requestly",
@@ -70,7 +65,7 @@ interface Props {
 
 export type DraggableApiRecord = {
   record: RQAPI.ApiClientRecord;
-  contextId: ApiClientFeatureContext["id"];
+  workspaceId: ApiClientFeatureContext["workspaceId"];
 };
 
 export const CollectionRow: React.FC<Props> = ({
@@ -243,22 +238,27 @@ export const CollectionRow: React.FC<Props> = ({
   }, []);
 
   const handleRecordDrop = useCallback(
-    async (item: DraggableApiRecord, dropContextId: string) => {
+    async (item: DraggableApiRecord, dropWorkspaceId: Workspace["id"]) => {
       try {
-        const sourceContext = getApiClientFeatureContext(item.contextId);
+        const sourceContext = getApiClientFeatureContext(item.workspaceId);
         if (!sourceContext) {
-          throw new Error(`Source context not found for id: ${item.contextId}`);
+          throw new Error(`Source context not found for id: ${item.workspaceId}`);
         }
 
         const destination = {
-          contextId: dropContextId,
+          workspaceId: dropWorkspaceId,
           collectionId: record.id,
         };
 
-        await moveRecordsAcrossWorkspace(sourceContext, {
-          recordsToMove: [item.record],
-          destination,
-        });
+        await sourceContext.store
+          .dispatch(
+            moveRecords({
+              recordsToMove: [item.record],
+              collectionId: destination.collectionId,
+              repository: sourceContext.repositories.apiClientRecordsRepository,
+            }) as any
+          )
+          .unwrap();
 
         if (!expandedRecordIds.includes(record.id)) {
           const newExpandedRecordIds = [...expandedRecordIds, destination.collectionId];
@@ -297,7 +297,7 @@ export const CollectionRow: React.FC<Props> = ({
 
       return true;
     },
-    [getAncestorIds, record.id]
+    [record.id, workspaceId]
   );
 
   const [{ isDragging }, drag] = useDrag(
@@ -305,7 +305,7 @@ export const CollectionRow: React.FC<Props> = ({
       type: RQAPI.RecordType.COLLECTION,
       item: {
         record,
-        contextId: workspaceId,
+        workspaceId,
       },
       collect: (monitor) => ({
         isDragging: monitor.isDragging(),

@@ -7,7 +7,7 @@ import { ApiClientEntityType } from "./types";
 import { EntityFactory } from "./factory";
 import type { HttpRecordEntity } from "./http";
 import type { GraphQLRecordEntity } from "./graphql";
-import { BufferedEntityFactory } from "./buffered/factory";
+import { BufferedEntityFactory, OriginExists, OriginUndfined } from "./buffered/factory";
 import type { BufferedHttpRecordEntity } from "./buffered/http";
 import type { BufferedGraphQLRecordEntity } from "./buffered/graphql";
 import type { BufferedRuntimeVariablesEntity } from "./buffered/runtime-variables";
@@ -15,7 +15,7 @@ import type { BufferedCollectionRecordEntity } from "./buffered/collection";
 import { useDispatch } from "react-redux";
 import { bufferAdapterSelectors, findBufferByReferenceId } from "../buffer/slice";
 import { EntityNotFound } from "../types";
-import { GLOBAL_ENVIRONMENT_ID, RUNTIME_VARIABLES_ENTITY_ID } from "../common/constants";
+import {  RUNTIME_VARIABLES_ENTITY_ID } from "../common/constants";
 
 export function useEntity<T extends ApiClientEntityType>(params: { id: string; type: T }) {
   const dispatch = EntityFactory.GlobalStateOverrideConfig[params.type] ? useDispatch() : useApiClientDispatch();
@@ -63,7 +63,25 @@ export function useBufferedEntity<T extends ApiClientEntityType>(params: { id: s
       referenceId: params.id,
     },
     dispatch
-  );
+  ) as OriginExists<BufferedEntityFactory.EntityTypeMap<T>>;
+  return useMemo(() => entity, [entity]);
+}
+
+export function useOriginUndefinedBufferedEntity<T extends ApiClientEntityType>(params: { bufferId: string }) {
+  const dispatch = useApiClientDispatch();
+  const buffer = useApiClientSelector(s => bufferAdapterSelectors.selectById(s.buffer, params.bufferId));
+  if (!buffer) {
+    throw new EntityNotFound(params.bufferId, "buffer");
+  }
+  const entity = BufferedEntityFactory.from(
+    {
+      id: buffer.id,
+      type: buffer.entityType as T,
+      referenceId: "FAKE_ID",
+    },
+    dispatch
+  ) as OriginUndfined<BufferedEntityFactory.EntityTypeMap<T>>;
+  entity.meta.originExists = false;
   return useMemo(() => entity, [entity]);
 }
 
@@ -162,13 +180,13 @@ export function useBufferedEnvironmentEntity(id: string, isGlobal: boolean) {
   });
 }
 
-export function useBufferedRuntimeVariablesEntity(): BufferedRuntimeVariablesEntity {
+export function useBufferedRuntimeVariablesEntity(): OriginExists<BufferedRuntimeVariablesEntity> {
   return useBufferedEntity({
     id: RUNTIME_VARIABLES_ENTITY_ID,
     type: ApiClientEntityType.RUNTIME_VARIABLES,
   });
 }
 
-export function useBufferedCollectionEntity(id: string): BufferedCollectionRecordEntity {
+ export function useBufferedCollectionEntity(id: string): OriginExists<BufferedCollectionRecordEntity> {
   return useBufferedEntity({ id, type: ApiClientEntityType.COLLECTION_RECORD });
 }

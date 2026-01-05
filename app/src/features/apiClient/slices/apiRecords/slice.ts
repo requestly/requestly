@@ -1,12 +1,12 @@
 import { createSlice, createEntityAdapter, PayloadAction } from "@reduxjs/toolkit";
-import { set, unset, mapValues, filter, pickBy, merge, mergeWith } from "lodash";
+import { set, unset, mapValues, pickBy } from "lodash";
 import { RQAPI } from "features/apiClient/types";
 import { ErroredRecord } from "features/apiClient/helpers/modules/sync/local/services/types";
 import { buildTreeIndices } from "../utils/treeUtils";
 import { objectToSetOperations, objectToDeletePaths } from "../utils/pathConverter";
 import { DeepPartial, EntityId, EntityNotFound, TreeIndices, UpdateCommand } from "../types";
 import { ApiRecordsState } from "./types";
-import { entitySynced } from "../common/actions";
+import { entitySynced, EntitySyncedPayload } from "../common/actions";
 import { API_CLIENT_RECORDS_SLICE_NAME } from "../common/constants";
 import { ApiClientEntityType } from "../entities/types";
 import { PersistConfig } from "redux-deep-persist/lib/types";
@@ -49,6 +49,11 @@ export const apiRecordsSlice = createSlice({
 
     upsertRecord(state, action: PayloadAction<RQAPI.ApiClientRecord>) {
       apiRecordsAdapter.upsertOne(state.records, action.payload);
+      rebuildTreeIndices(state);
+    },
+
+    upsertRecords(state, action: PayloadAction<RQAPI.ApiClientRecord[]>) {
+      apiRecordsAdapter.upsertMany(state.records, action.payload);
       rebuildTreeIndices(state);
     },
 
@@ -137,7 +142,7 @@ export const apiRecordsSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder.addCase(entitySynced, (state, action) => {
-      const { entityType, data } = action.payload;
+      const { entityType, entityId, data: changes } = action.payload as EntitySyncedPayload<RQAPI.ApiClientRecord>;
 
       const recordEntityTypes = [
         ApiClientEntityType.HTTP_RECORD,
@@ -149,8 +154,10 @@ export const apiRecordsSlice = createSlice({
         return;
       }
 
-      const record = data as RQAPI.ApiClientRecord;
-      apiRecordsAdapter.upsertOne(state.records, record);
+      apiRecordsAdapter.updateOne(state.records, {
+        id: entityId,
+        changes,
+      });
       rebuildTreeIndices(state);
     });
   },

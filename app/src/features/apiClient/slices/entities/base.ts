@@ -22,6 +22,8 @@ export abstract class ApiClientEntity<T, M extends ApiClientEntityMeta = ApiClie
     return this.meta.id;
   }
 
+  abstract upsert(params: T): void;
+
   unsafePatch(patcher: (patch: T) => void) {
     this.dispatchUnsafePatch(patcher);
   }
