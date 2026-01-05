@@ -6,7 +6,7 @@ import { Try } from "utils/try";
 import { useMemo } from "react";
 import { Dispatch } from "@reduxjs/toolkit";
 import { bufferActions, bufferAdapterSelectors } from "./slice";
-import { BufferedApiClientEntity } from "../entities/buffered/factory";
+import { BufferedApiClientEntity, OriginExists, OriginUndfined } from "../entities/buffered/factory";
 import { EntityNotFound } from "../types";
 import { useApiClientDispatch } from '../hooks/base.hooks';
 
@@ -16,7 +16,49 @@ function createSave(
   store: ApiClientStore,
   dispatch: Dispatch,
 ) {
-  return async function save<T extends BufferedApiClientEntity, C = T extends ApiClientEntity<infer K> ? Partial<K> : never>(
+  async function saveOriginUndefinedBuffer<T extends OriginUndfined<BufferedApiClientEntity>, C = T extends ApiClientEntity<infer K> ? K : never>(
+    params: {
+      entity: T,
+      produceChanges?: (entity: T, state: ApiClientStoreState) => C,
+      save: (changes:C, repositories: ApiClientRepositoryInterface, entity: T) => Promise<C & {id: string}>,
+    },
+    hooks: {
+      onError?: (e: Error) => void,
+      onSuccess?: (changes: C, entity: T) => void,
+      beforeSave?: () => void,
+      afterSave?: () => void,
+    } = {},
+  ) {
+    const {
+      onSuccess = () => {},
+      onError = () => {},
+    } = hooks;
+    const state = store.getState();
+    const buffer = bufferAdapterSelectors.selectById(state.buffer, params.entity.meta.id);
+    if(!buffer) {
+      throw new EntityNotFound(params.entity.meta.id, "buffer");
+    }
+    const changes = params.produceChanges?.(params.entity, state) || buffer.current as C;
+    hooks.beforeSave?.();
+    const result = await Try(() => params.save(changes, repositories, params.entity));
+    hooks.afterSave?.();
+    result
+    .inspectError(onError)
+    .inspect((savedEntity) => {
+      params.entity.origin.meta.id = savedEntity.id;
+      params.entity.origin.upsert(savedEntity);
+      dispatch(
+        bufferActions.markSaved({
+          id: params.entity.meta.id,
+          referenceId: savedEntity.id,
+          savedData: savedEntity,
+        })
+      );
+      onSuccess(changes, params.entity)});
+    return;
+  }
+
+  async function saveOriginExistsBuffer<T extends OriginExists<BufferedApiClientEntity>, C = T extends ApiClientEntity<infer K> ? Partial<K> : never>(
     params: {
       entity: T,
       produceChanges: (entity: T, state: ApiClientStoreState) => C,
@@ -48,7 +90,6 @@ function createSave(
       }
       const { diff } = buffer;
       params.entity.origin.unsafePatch((s) => {
-        debugger;
         lodash.merge(s, diff);
       });
       dispatch(
@@ -59,6 +100,11 @@ function createSave(
       );
       onSuccess(changes, params.entity)});
     return;
+  }
+
+  return {
+    saveOriginExistsBuffer,
+    saveOriginUndefinedBuffer,
   }
 };
 
