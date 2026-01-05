@@ -1,6 +1,5 @@
 import type React from "react";
 import { useCallback, useState } from "react";
-import type { RQAPI } from "features/apiClient/types";
 import { VariablesListHeader } from "features/apiClient/screens/environment/components/VariablesListHeader/VariablesListHeader";
 import { toast } from "utils/Toast";
 import { trackVariablesSaved } from "modules/analytics/events/features/apiClient";
@@ -10,14 +9,9 @@ import {
   useBufferedCollectionEntity,
   useIsBufferDirty,
 } from "features/apiClient/slices/entities/hooks";
-import { bufferActions } from "features/apiClient/slices/buffer/slice";
-import { entitySynced } from "features/apiClient/slices/common/actions";
-import { ApiClientEntityType } from "features/apiClient/slices/entities/types";
 import { useApiClientRepository } from "features/apiClient/slices/workspaceView/helpers/ApiClientContextRegistry";
 import { CollectionsVariablesList } from "../CollectionsVariablesList";
 import type { ApiClientRootState } from "features/apiClient/slices/hooks/types";
-import { BufferedApiClientEntity } from "features/apiClient/slices/entities/buffered/factory";
-import { ApiClientEntity, BufferedHttpRecordEntity } from "features/apiClient/slices/entities";
 import { useSaveBuffer } from "features/apiClient/slices/buffer/hooks";
 
 interface CollectionsVariablesViewProps {
@@ -45,17 +39,14 @@ export const CollectionsVariablesView: React.FC<CollectionsVariablesViewProps> =
     type: "referenceId",
   });
 
-  const {saveOriginExistsBuffer: saveBuffer} = useSaveBuffer();
+  const saveBuffer = useSaveBuffer();
 
   // Save handler
   const handleSaveVariables = useCallback(async () => {
     saveBuffer({
       entity,
-      produceChanges(entity, state) {
-        return entity.variables.getAll(state)
-      },
       async save(changes, repositories) {
-        await repositories.apiClientRecordsRepository.setCollectionVariables(collectionId, changes);
+        await repositories.apiClientRecordsRepository.updateRecord(changes, changes.id);
       },
     }, {
       onError(error) {
@@ -63,12 +54,11 @@ export const CollectionsVariablesView: React.FC<CollectionsVariablesViewProps> =
         toast.error("Failed to update variables");
 
       },
-      onSuccess(changes, entity) {
-        entity.origin.variables.refresh(changes);
+      onSuccess(changes) {
         toast.success("Variables updated successfully");
         trackVariablesSaved({
           type: "collection_variable",
-          num_variables: Object.keys(changes).length,
+          num_variables: Object.keys(changes.data.variables).length,
         });
 
       },

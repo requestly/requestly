@@ -81,6 +81,7 @@ export function useOriginUndefinedBufferedEntity<T extends ApiClientEntityType>(
     },
     dispatch
   ) as OriginUndfined<BufferedEntityFactory.EntityTypeMap<T>>;
+  entity.meta.originExists = false;
   return useMemo(() => entity, [entity]);
 }
 
