@@ -42,7 +42,7 @@ interface ApiClientContextInterface {
     entryType?: RQAPI.ApiEntryType
   ) => Promise<void>;
   onNewClickV2: (params: {
-    contextId: string;
+    contextId: Workspace["id"];
     analyticEventSource: RQAPI.AnalyticsEventSource;
     recordType: RQAPI.RecordType;
     collectionId?: string;
