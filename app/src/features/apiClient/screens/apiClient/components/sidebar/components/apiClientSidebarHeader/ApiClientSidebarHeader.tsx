@@ -17,14 +17,11 @@ import { useLocation } from "react-router-dom";
 import { RoleBasedComponent } from "features/rbac";
 import { NewApiRecordDropdown } from "../NewApiRecordDropdown/NewApiRecordDropdown";
 import { ApiClientSidebarTabKey } from "../../SingleWorkspaceSidebar/SingleWorkspaceSidebar";
-import {
-  ApiClientViewMode,
-  useApiClientMultiWorkspaceView,
-} from "features/apiClient/store/multiWorkspaceView/multiWorkspaceView.store";
 import { SiOpenapiinitiative } from "@react-icons/all-files/si/SiOpenapiinitiative";
 import { CommonApiClientImportModal } from "../../../modals/CommonApiClientImportModal/CommonApiClientImportModal";
 import { ApiClientImporterMethod, openApiImporter } from "@requestly/alternative-importers";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import { ApiClientViewMode, useViewMode } from "features/apiClient/slices";
 
 interface Props {
   activeTab: ApiClientSidebarTabKey;
@@ -49,8 +46,8 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
   history,
   onClearHistory,
 }) => {
-  const viewMode = useApiClientMultiWorkspaceView((s) => s.viewMode);
   const { state } = useLocation();
+  const viewMode = useViewMode();
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isPostmanImporterModalOpen, setIsPostmanImporterModalOpen] = useState(false);
   const [isBrunoImporterModalOpen, setIsBrunoImporterModalOpen] = useState(false);
@@ -197,7 +194,7 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
           </RQButton>
         ) : null}
 
-        {viewMode === ApiClientViewMode.SINGLE ? <EnvironmentSwitcher /> : null}
+        {/* {viewMode === ApiClientViewMode.SINGLE ? <EnvironmentSwitcher /> : null} */}
       </div>
 
       {isImportModalOpen && (
