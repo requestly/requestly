@@ -56,6 +56,14 @@ export const environmentsSlice = createSlice({
       }
     },
 
+    upsertEnvironment(state, action: PayloadAction<EnvironmentEntity>) {
+      environmentsAdapter.upsertOne(state.environments, action.payload);
+    },
+
+    updateGlobalEnvironment(state, action: PayloadAction<EnvironmentEntity>) {
+      state.globalEnvironment = action.payload;
+    },
+
     setActiveEnvironment(state, action: PayloadAction<EntityId | null>) {
       state.activeEnvironmentId = action.payload;
     },
