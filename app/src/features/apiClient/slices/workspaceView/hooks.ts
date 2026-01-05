@@ -14,6 +14,8 @@ export function useGetAllSelectedWorkspaces() {
 }
 
 export function useWorkspace(workspaceId: WorkspaceInfo["id"]) {
+  // @ts-expect-error workspaceId can be null for private, but entity adapter needs a string
+  // null as a key works in runtime.
   const workspace = useSelector((state: RootState) => getWorkspaceById(getWorkspaceViewSlice(state), workspaceId));
 
   if (!workspace) {
