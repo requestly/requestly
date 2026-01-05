@@ -72,6 +72,7 @@ import { ClientCodeButton } from "../components/ClientCodeButton/ClientCodeButto
 import HttpRequestTabs, { RequestTab } from "./components/HttpRequestTabs/HttpRequestTabs";
 import "./httpClientView.scss";
 import { QueryParamsProvider } from "features/apiClient/store/QueryParamsContextProvider";
+import { HeadersProvider } from "features/apiClient/store/HeadersContextProvider";
 import { MdOutlineSyncAlt } from "@react-icons/all-files/md/MdOutlineSyncAlt";
 import { useLocation } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
@@ -868,7 +869,9 @@ const WithQueryParamsProvider = (Component: React.ComponentType<any>): React.FC<
       <ErrorBoundary boundaryId="http-client-view-error-boundary">
         <PathVariablesProvider pathVariables={entry.request?.pathVariables ?? []}>
           <QueryParamsProvider entry={entry}>
-            <Component {...props} />
+            <HeadersProvider entry={entry}>
+              <Component {...props} entry={entry} />
+            </HeadersProvider>
           </QueryParamsProvider>
         </PathVariablesProvider>
       </ErrorBoundary>

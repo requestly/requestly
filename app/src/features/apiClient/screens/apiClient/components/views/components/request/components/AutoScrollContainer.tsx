@@ -1,17 +1,27 @@
 import React, { useEffect, useRef } from "react";
 
-export const AutoScrollContainer: React.FC<{ children: React.ReactNode; trigger: any }> = ({ children, trigger }) => {
+interface AutoScrollContainerProps {
+  children: React.ReactNode;
+  trigger: any;
+  scrollTargetRef?: React.RefObject<any> | null;
+}
+
+export const AutoScrollContainer: React.FC<AutoScrollContainerProps> = ({ children, trigger, scrollTargetRef }) => {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const container = containerRef.current;
     if (container) {
-      const { scrollHeight, clientHeight } = container;
-      if (scrollHeight > clientHeight) {
-        container.scrollTo({ top: scrollHeight, behavior: "smooth" });
+      if (scrollTargetRef?.current) {
+        scrollTargetRef.current.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      } else {
+        const { scrollHeight, clientHeight } = container;
+        if (scrollHeight > clientHeight) {
+          container.scrollTo({ top: scrollHeight, behavior: "smooth" });
+        }
       }
     }
-  }, [trigger]);
+  }, [trigger, scrollTargetRef]);
 
   return (
     <div ref={containerRef} className="tab-scroll-container">

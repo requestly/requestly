@@ -9,6 +9,7 @@ import { ApiClientRequestTabs } from "../../../components/request/components/Api
 import { sanitizeKeyValuePairs, supportsRequestBody } from "features/apiClient/screens/apiClient/utils";
 import { useFeatureValue } from "@growthbook/growthbook-react";
 import { useQueryParamStore } from "features/apiClient/hooks/useQueryParamStore";
+import { useHeadersStore } from "features/apiClient/hooks/useHeadersStore";
 import { Conditional } from "components/common/Conditional";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
@@ -35,14 +36,6 @@ interface Props {
   handleAuthChange: (newAuth: RQAPI.Auth) => void;
   focusPostResponseScriptEditor?: boolean;
   scriptEditorVersion?: number;
-  bulkEditConfigs?: {
-    setIsBulkEditPanelOpen: (isOpen: boolean) => void;
-    setBulkEditTableType: (type: "headers" | "queryParams") => void;
-    showHeadersDescription: boolean;
-    onShowHeadersDescriptionChange: (show: boolean) => void;
-    showQueryParamsDescription: boolean;
-    onShowQueryParamsDescriptionChange: (show: boolean) => void;
-  };
 }
 
 const HttpRequestTabs: React.FC<Props> = ({
@@ -54,7 +47,6 @@ const HttpRequestTabs: React.FC<Props> = ({
   handleAuthChange,
   focusPostResponseScriptEditor,
   scriptEditorVersion,
-  bulkEditConfigs,
 }) => {
   const showCredentialsCheckbox = useFeatureValue("api-client-include-credentials", false);
 
@@ -78,6 +70,7 @@ const HttpRequestTabs: React.FC<Props> = ({
 
   const pathVariables = usePathVariablesStore((state) => state.pathVariables);
   const queryParams = useQueryParamStore((state) => state.queryParams);
+  const headers = useHeadersStore((state) => state.headers);
 
   const hasScriptError = error?.type === RQAPI.ApiClientErrorType.SCRIPT;
 
@@ -100,16 +93,17 @@ const HttpRequestTabs: React.FC<Props> = ({
                   },
                 }));
               }}
-            />
-            <PathVariableTable
-              recordId={requestId}
-              onChange={(newVariables) => {
-                setRequestEntry((prev) => ({
-                  ...prev,
-                  request: { ...prev.request, pathVariables: newVariables },
-                }));
-              }}
-            />
+            >
+              <PathVariableTable
+                recordId={requestId}
+                onChange={(newVariables) => {
+                  setRequestEntry((prev) => ({
+                    ...prev,
+                    request: { ...prev.request, pathVariables: newVariables },
+                  }));
+                }}
+              />
+            </QueryParamsTable>
           </div>
         ),
       },
@@ -134,7 +128,7 @@ const HttpRequestTabs: React.FC<Props> = ({
       },
       {
         key: RequestTab.HEADERS,
-        label: <RequestTabLabel label="Headers" count={sanitizeKeyValuePairs(requestEntry.request.headers).length} />,
+        label: <RequestTabLabel label="Headers" count={sanitizeKeyValuePairs(headers).length} />,
         children: (
           <div className="non-scrollable-tab-content">
             <HeadersTable
@@ -192,6 +186,7 @@ const HttpRequestTabs: React.FC<Props> = ({
     isRequestBodySupported,
     queryParams.length,
     pathVariables.length,
+    headers,
     requestEntry,
     setRequestEntry,
     focusPostResponseScriptEditor,
@@ -204,9 +199,6 @@ const HttpRequestTabs: React.FC<Props> = ({
       requestId={requestId}
       items={items}
       defaultActiveKey={RequestTab.QUERY_PARAMS}
-      onChange={() => {
-        bulkEditConfigs?.setIsBulkEditPanelOpen?.(false);
-      }}
       tabBarExtraContent={
         <Conditional
           condition={showCredentialsCheckbox && isFeatureCompatible(FEATURES.API_CLIENT_INCLUDE_CREDENTIALS)}
