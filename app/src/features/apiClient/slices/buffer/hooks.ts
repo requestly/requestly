@@ -29,7 +29,6 @@ function createSave(
       afterSave?: () => void,
     } = {},
   ) {
-    debugger;
     const {
       onSuccess = () => {},
       onError = () => {},
@@ -48,7 +47,6 @@ function createSave(
       }
       const { diff } = buffer;
       params.entity.origin.unsafePatch((s) => {
-        debugger;
         lodash.merge(s, diff);
       });
       dispatch(

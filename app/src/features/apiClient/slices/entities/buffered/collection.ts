@@ -1,5 +1,5 @@
 import type { RQAPI } from "features/apiClient/types";
-import { EntityNotFound } from "../../types";
+import { EntityNotFound, UpdateCommand } from "../../types";
 import { bufferAdapterSelectors, bufferActions } from "../../buffer/slice";
 import type { ApiClientRootState } from "../../hooks/types";
 import { CollectionRecordEntity } from "../collection";
@@ -14,6 +14,10 @@ export class BufferedCollectionRecordEntity extends CollectionRecordEntity<Buffe
     this.getEntityFromState.bind(this)
   );
 
+  override dispatchCommand(command: UpdateCommand<RQAPI.CollectionRecord>): void {
+    this.dispatch(bufferActions.applyPatch({ id: this.meta.id, command }));
+  }
+  
   override getEntityFromState(state: ApiClientRootState): RQAPI.CollectionRecord {
     const entry = bufferAdapterSelectors.selectById(state.buffer, this.meta.id);
     if (!entry) {

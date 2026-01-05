@@ -16,8 +16,8 @@ export class CollectionViewTabSource extends BaseTabSource {
   constructor(metadata: CollectionViewTabSourceMetadata) {
     super();
     this.component = (
-      <Collection id={metadata.id} />
-      // <CollectionView key={metadata.id} collectionId={metadata.id} />
+      // <Collection id={metadata.id} />
+      <CollectionView key={metadata.id} collectionId={metadata.id} />
     );
     this.metadata = {
       ...metadata,
