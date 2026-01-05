@@ -22,7 +22,7 @@ interface Props {
 const CollectionAuthorizationView: React.FC<Props> = ({ collectionId }) => {
   const [isSaving, setIsSaving] = useState(false);
   const entity = useBufferedCollectionEntity(collectionId);
-  
+
   const authOptions = useApiClientSelector((s) => entity.getAuth(s));
   const rootLevelRecord = useApiClientSelector((s) => !entity.getCollectionId(s));
 
@@ -45,22 +45,8 @@ const CollectionAuthorizationView: React.FC<Props> = ({ collectionId }) => {
     saveBuffer(
       {
         entity,
-        produceChanges: (entity, state) => {
-          const authChanges = entity.getAuth(state);
-          const collection = entity.getEntityFromState(state);
-          // Ensure we always have an Auth value - use changes if present, otherwise fallback to existing auth
-          const auth: RQAPI.Auth = authChanges ?? collection.data.auth;
-          const record: RQAPI.CollectionRecord = {
-            ...collection,
-            data: {
-              ...collection.data,
-              auth,
-            },
-          };
-          return record;
-        },
         async save(changes, repositories) {
-          const result = await repositories.apiClientRecordsRepository.updateCollectionAuthData(changes);
+          const result = await repositories.apiClientRecordsRepository.updateRecord(changes, collectionId);
           if (!result.success) {
             throw new Error(result.message || "Failed to update authorization");
           }
@@ -82,7 +68,7 @@ const CollectionAuthorizationView: React.FC<Props> = ({ collectionId }) => {
         },
       }
     );
-  }, [entity, saveBuffer]);
+  }, [entity, saveBuffer, collectionId]);
 
   const AuthorizationViewActions = () => (
     <RoleBasedComponent resource="api_client_collection" permission="update">
