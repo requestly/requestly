@@ -176,6 +176,7 @@ export const bufferSlice = createSlice({
       state,
       action: PayloadAction<{
         id: string;
+        savedData?: unknown,
         referenceId?: string;
       }>
     ) {
@@ -184,6 +185,9 @@ export const bufferSlice = createSlice({
 
       if(action.payload.referenceId) {
         entry.referenceId = action.payload.referenceId;
+      }
+      if(action.payload.savedData) {
+        entry.current = action.payload.savedData;
       }
       entry.diff = {};
       entry.isDirty = false;
