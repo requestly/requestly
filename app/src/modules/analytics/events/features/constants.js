@@ -293,6 +293,16 @@ export const API_CLIENT = {
   COLLECTION_RUNNER_FILE_RECORD_LIMIT_EXCEEDED: "api_client_collection_runner_file_record_limit_exceeded",
   COLLECTION_RUNNER_TRUNCATED_FILE_USED: "api_client_collection_runner_truncated_file_used",
   COLLECTION_RUNNER_FILE_CLEARED: "api_client_collection_runner_file_cleared",
+  AI_GENERATE_TESTS_BTN_CLICKED: "ai_generate_tests_btn_clicked",
+  AI_GENERATE_TESTS_POPOVER_GENERATE_CLICKED: "ai_generate_tests_popover_generate_clicked",
+  AI_GENERATE_TESTS_FAILED: "ai_generate_tests_failed",
+  AI_GENERATE_TESTS_SUCCESSFUL: "ai_generate_tests_successful",
+  AI_GENERATE_TESTS_EDIT_PROMPT_CLICKED: "ai_generate_tests_edit_prompt_clicked",
+  AI_GENERATE_TESTS_REJECT_ALL_CLICKED: "ai_generate_tests_reject_all_clicked",
+  AI_GENERATE_TESTS_ACCEPT_ALL_CLICKED: "ai_generate_tests_accept_all_clicked",
+  AI_GENERATE_TESTS_ACCEPT_CLICKED: "ai_generate_tests_accept_clicked",
+  AI_GENERATE_TESTS_REJECT_CLICKED: "ai_generate_tests_reject_clicked",
+  AI_GENERATION_REVIEW_COMPLETED: "ai_generation_review_completed",
 };
 
 export const REDIRECT_DESTINATION_OPTION = {

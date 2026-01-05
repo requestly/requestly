@@ -313,3 +313,55 @@ export const trackCollectionRunnerTruncatedFileUsed = (params) => {
 export const trackCollectionRunnerFileCleared = (params) => {
   trackEvent(API_CLIENT.COLLECTION_RUNNER_FILE_CLEARED, params);
 };
+
+export const trackGenerateTestBtnClicked = (session_id) => {
+  trackEvent(API_CLIENT.AI_GENERATE_TESTS_BTN_CLICKED, { session_id });
+};
+
+export const trackPopoverGenerateTestsClicked = (session_id, generation_id) => {
+  trackEvent(API_CLIENT.AI_GENERATE_TESTS_POPOVER_GENERATE_CLICKED, { session_id, generation_id });
+};
+
+export const trackAITestGenerationFailed = (session_id, generation_id) => {
+  trackEvent(API_CLIENT.AI_GENERATE_TESTS_FAILED, { session_id, generation_id });
+};
+
+export const trackAITestGenerationSuccessful = (session_id, generation_id) => {
+  trackEvent(API_CLIENT.AI_GENERATE_TESTS_SUCCESSFUL, { session_id, generation_id });
+};
+
+export const trackAITestGenerationEditPromptClicked = (session_id, generation_id) => {
+  trackEvent(API_CLIENT.AI_GENERATE_TESTS_EDIT_PROMPT_CLICKED, { session_id, generation_id });
+};
+
+export const trackAITestGenerationRejectAllClicked = (session_id, generation_id) => {
+  trackEvent(API_CLIENT.AI_GENERATE_TESTS_REJECT_ALL_CLICKED, { session_id, generation_id });
+};
+
+export const trackAITestGenerationAcceptAllClicked = (session_id, generation_id) => {
+  trackEvent(API_CLIENT.AI_GENERATE_TESTS_ACCEPT_ALL_CLICKED, { session_id, generation_id });
+};
+
+export const trackAITestGenerationAcceptClicked = (session_id, generation_id) => {
+  trackEvent(API_CLIENT.AI_GENERATE_TESTS_ACCEPT_CLICKED, { session_id, generation_id });
+};
+
+export const trackAITestGenerationRejectClicked = (session_id, generation_id) => {
+  trackEvent(API_CLIENT.AI_GENERATE_TESTS_REJECT_CLICKED, { session_id, generation_id });
+};
+
+export const trackAITestGenerationReviewCompleted = (
+  session_id,
+  generation_id,
+  outcome,
+  num_changes_proposed,
+  num_changes_accepted
+) => {
+  trackEvent(API_CLIENT.AI_GENERATION_REVIEW_COMPLETED, {
+    session_id,
+    generation_id,
+    outcome,
+    num_changes_proposed,
+    num_changes_accepted,
+  });
+};

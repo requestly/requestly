@@ -1,4 +1,4 @@
-import React, { useCallback, useRef } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 import { useDispatch } from "react-redux";
 import { EditorLanguage } from "componentsV2/CodeEditor";
 import { useMemo, useState } from "react";
@@ -19,11 +19,22 @@ import { GenerateTestsButton } from "../AI/components/GenerateTestsButton/Genera
 import { getAIEndpointUrl, AI_ENDPOINTS } from "config/ai.config";
 import { AIResultReviewPanel } from "../AIResultReviewPanel/AIResultReviewPanel";
 import { toast } from "utils/Toast";
-import { useFeatureValue } from "@growthbook/growthbook-react";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { AITestGenerationError } from "../AI/types";
 import { globalActions } from "store/slices/global/slice";
 import { RequestTabLabelIndicator } from "../../../request/components/ApiClientRequestTabs/components/RequestTabLabel/RequestTabLabel";
+import { getAuth } from "firebase/auth";
+import firebaseApp from "firebase";
 import "./scriptEditor.scss";
+import {
+  trackAITestGenerationAcceptClicked,
+  trackAITestGenerationFailed,
+  trackAITestGenerationRejectClicked,
+  trackAITestGenerationReviewCompleted,
+  trackAITestGenerationSuccessful,
+} from "modules/analytics/events/features/apiClient";
+import { useAISessionContext } from "features/ai/contexts/AISession";
+import { getChunks } from "@codemirror/merge";
 
 const TestGenerationOutputSchema = z.object({
   text: z
@@ -43,6 +54,11 @@ const TestGenerationOutputSchema = z.object({
   err: z.string().optional().describe("Error code if user request could not be processed"),
 });
 
+const defaultScripts = {
+  preRequest: DEFAULT_SCRIPT_VALUES[RQAPI.ScriptType.PRE_REQUEST],
+  postResponse: DEFAULT_SCRIPT_VALUES[RQAPI.ScriptType.POST_RESPONSE],
+};
+
 interface ScriptEditorProps {
   requestId: string;
   entry: RQAPI.ApiEntry;
@@ -60,18 +76,26 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
 }) => {
   const dispatch = useDispatch();
 
-  const defaultScripts = {
-    preRequest: DEFAULT_SCRIPT_VALUES[RQAPI.ScriptType.PRE_REQUEST],
-    postResponse: DEFAULT_SCRIPT_VALUES[RQAPI.ScriptType.POST_RESPONSE],
-  };
-
   const activeScriptType = entry?.scripts?.[RQAPI.ScriptType.PRE_REQUEST]
     ? RQAPI.ScriptType.PRE_REQUEST
     : entry?.scripts?.[RQAPI.ScriptType.POST_RESPONSE]
     ? RQAPI.ScriptType.POST_RESPONSE
     : RQAPI.ScriptType.PRE_REQUEST;
 
-  const isAITestsGenerationEnabled = useFeatureValue("ai_tests_generation", false);
+  const isAITestsGenerationEnabled = useFeatureIsOn("ai_tests_generation");
+  const isAIEnabledGlobally = useFeatureIsOn("global_ai_support");
+  const {
+    sessionId,
+    lastUsedQuery,
+    lastGeneratedCode,
+    generationMetrics,
+    setLastUsedQuery,
+    setLastGeneratedCode,
+    getCurrentGenerationId,
+    endAISession,
+    updateGenerationMetrics,
+    getReviewOutcome,
+  } = useAISessionContext();
 
   const [scriptType, setScriptType] = useState<RQAPI.ScriptType>(activeScriptType);
   const [isLibraryPickerOpen, setIsLibraryPickerOpen] = useState(false);
@@ -79,6 +103,9 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
   const [isGenerateTestPopoverOpen, setIsGenerateTestPopoverOpen] = useState(false);
   const [isTestsStreamingFinished, setIsTestsStreamingFinished] = useState(false);
   const [negativeFeedback, setNegativeFeedback] = useState<string | null>(null);
+  const [authToken, setAuthToken] = useState<string | null>(null);
+
+  const auth = getAuth(firebaseApp);
 
   const hasPostResponseScript = Boolean(entry?.scripts?.[RQAPI.ScriptType.POST_RESPONSE]);
 
@@ -87,8 +114,16 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
   const { object, isLoading, error, stop, submit, clear } = useObject({
     api: getAIEndpointUrl(AI_ENDPOINTS.TEST_GENERATION),
     schema: TestGenerationOutputSchema,
+    headers: authToken
+      ? {
+          Authorization: authToken,
+        }
+      : {},
     onFinish: (result) => {
+      const currentGenerationId = getCurrentGenerationId();
       if (result.object?.err) {
+        trackAITestGenerationFailed(sessionId, currentGenerationId);
+        endAISession();
         switch (result.object?.err) {
           case AITestGenerationError.UNRELATED_QUERY:
             if (!isPopoverOpenRef.current) {
@@ -109,9 +144,17 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
       } else {
         setIsGenerateTestPopoverOpen(false);
         isPopoverOpenRef.current = false;
+        if (result.object?.code?.content) {
+          setLastGeneratedCode(result.object.code.content);
+          trackAITestGenerationSuccessful(sessionId, currentGenerationId);
+        }
       }
       setIsTestsStreamingFinished(true);
       dispatch(globalActions.updateHasGeneratedAITests(true));
+      if (editorViewRef.current?.state) {
+        const proposedChanges = getChunks(editorViewRef.current?.state);
+        updateGenerationMetrics("totalProposedChanges", proposedChanges?.chunks?.length ?? 0);
+      }
     },
   });
 
@@ -126,8 +169,15 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
       userQuery: query,
       apiRecord: preparedApiRecord,
       existingScript: entry.scripts?.postResponse ?? "",
-      lastGeneration: { code: object?.code },
+      lastGeneration: {
+        code: {
+          content: lastGeneratedCode,
+          language: "javascript",
+        },
+        query: lastUsedQuery,
+      },
     });
+    setLastUsedQuery(query);
   };
 
   const mergeViewConfig = useMemo(() => {
@@ -138,25 +188,88 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
       return {
         incomingValue: object?.code?.content,
         source: "ai",
+        onPartialMerge: (mergedValue: string, newIncomingValue: string, type: "accept" | "reject") => {
+          setLastGeneratedCode(newIncomingValue);
+          const currentGenerationId = getCurrentGenerationId();
+          const newAcceptedCount =
+            type === "accept" ? generationMetrics.acceptedChanges + 1 : generationMetrics.acceptedChanges;
+
+          if (type === "accept") {
+            onScriptsChange({
+              ...(entry?.scripts || defaultScripts),
+              postResponse: mergedValue,
+            });
+            updateGenerationMetrics("acceptedChanges", newAcceptedCount);
+            trackAITestGenerationAcceptClicked(sessionId, currentGenerationId);
+          } else {
+            trackAITestGenerationRejectClicked(sessionId, currentGenerationId);
+          }
+
+          if (mergedValue === newIncomingValue) {
+            trackAITestGenerationReviewCompleted(
+              sessionId,
+              currentGenerationId,
+              getReviewOutcome(),
+              generationMetrics.totalProposedChanges,
+              newAcceptedCount
+            );
+            clear();
+            endAISession();
+          }
+        },
       };
     }
 
     return undefined;
-  }, [scriptType, object?.code?.content]);
+  }, [
+    scriptType,
+    object?.code?.content,
+    clear,
+    onScriptsChange,
+    entry?.scripts,
+    sessionId,
+    getCurrentGenerationId,
+    endAISession,
+    setLastGeneratedCode,
+    generationMetrics,
+    updateGenerationMetrics,
+    getReviewOutcome,
+  ]);
 
-  const handleAcceptAndRunTests = () => {
+  const handleAcceptTests = () => {
     onScriptsChange({
       preRequest: entry?.scripts?.[RQAPI.ScriptType.PRE_REQUEST] || DEFAULT_SCRIPT_VALUES[RQAPI.ScriptType.PRE_REQUEST],
       postResponse: object?.code?.content as string,
     });
+    trackAITestGenerationReviewCompleted(
+      sessionId,
+      getCurrentGenerationId(),
+      "accept_all",
+      generationMetrics.totalProposedChanges,
+      generationMetrics.totalProposedChanges
+    );
     clear();
+    endAISession();
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (focusPostResponse && hasPostResponseScript) {
       setScriptType(RQAPI.ScriptType.POST_RESPONSE);
     }
   }, [focusPostResponse, hasPostResponseScript]);
+
+  useEffect(() => {
+    if (isGenerateTestPopoverOpen) {
+      auth.currentUser
+        ?.getIdToken()
+        .then((token) => {
+          setAuthToken(token);
+        })
+        .catch(() => {
+          setAuthToken(null);
+        });
+    }
+  }, [isGenerateTestPopoverOpen, auth.currentUser]);
 
   const handleEditorReady = useCallback((view: EditorView) => {
     editorViewRef.current = view;
@@ -226,7 +339,15 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
           {isAITestsGenerationEnabled && (
             <Tooltip
               showArrow={false}
-              title={!entry?.response ? "Send the request first to generate tests from its response." : null}
+              title={
+                !isAIEnabledGlobally ? (
+                  <>
+                    AI features are disabled for your organization, <a>Contact support</a>.
+                  </>
+                ) : !entry?.response ? (
+                  "Send the request first to generate tests from its response."
+                ) : null
+              }
               placement="bottom"
               color="#000"
               overlayClassName="ai-generate-test-btn-tooltip"
@@ -241,7 +362,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
                     isPopoverOpenRef.current = open;
                   }}
                   onGenerateClick={handleGenerateTests}
-                  disabled={scriptType !== RQAPI.ScriptType.POST_RESPONSE || !entry?.response}
+                  disabled={scriptType !== RQAPI.ScriptType.POST_RESPONSE || !entry?.response || !isAIEnabledGlobally}
                   onCancelClick={stop}
                   negativeFeedback={negativeFeedback}
                   label={hasPostResponseScript ? "Update with AI" : "Generate tests"}
@@ -263,6 +384,8 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
       negativeFeedback,
       isAITestsGenerationEnabled,
       entry?.scripts,
+      isAIEnabledGlobally,
+      handleGenerateTests,
     ]
   );
 
@@ -310,8 +433,18 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
       />
       {isTestsStreamingFinished && object?.code?.content && !error && (
         <AIResultReviewPanel
-          onDiscard={() => clear()}
-          onAccept={handleAcceptAndRunTests}
+          onDiscard={() => {
+            trackAITestGenerationReviewCompleted(
+              sessionId,
+              getCurrentGenerationId(),
+              getReviewOutcome(),
+              generationMetrics.totalProposedChanges,
+              generationMetrics.acceptedChanges
+            );
+            clear();
+            endAISession();
+          }}
+          onAccept={handleAcceptTests}
           onEditInstructions={() => {
             setIsGenerateTestPopoverOpen(true);
             isPopoverOpenRef.current = true;

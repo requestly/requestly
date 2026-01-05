@@ -1,9 +1,18 @@
 import React, { useEffect, useRef } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { globalActions } from "store/slices/global/slice";
 import { Input, InputRef, Tooltip } from "antd";
 import { RQButton } from "lib/design-system-v2/components";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
+import { isProfessionalPlan } from "utils/PremiumUtils";
 import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
-import "./aiPromptPopover.scss";
 import { MdOutlineStopCircle } from "@react-icons/all-files/md/MdOutlineStopCircle";
+import { MdOutlineDiamond } from "@react-icons/all-files/md/MdOutlineDiamond";
+import { redirectToUrl } from "utils/RedirectionUtils";
+import LINKS from "config/constants/sub/links";
+import { trackPopoverGenerateTestsClicked } from "modules/analytics/events/features/apiClient";
+import { useAISessionContext } from "features/ai/contexts/AISession";
+import "./aiPromptPopover.scss";
 
 interface PromptPopoverProps {
   isLoading: boolean;
@@ -26,7 +35,11 @@ export const AIPromptPopover: React.FC<PromptPopoverProps> = ({
   onCancelClick,
   onCloseClick,
 }) => {
+  const dispatch = useDispatch();
+  const user = useSelector(getUserAuthDetails);
   const inputRef = useRef<InputRef>(null);
+
+  const { sessionId, startNewGeneration } = useAISessionContext();
 
   useEffect(() => {
     setTimeout(() => {
@@ -35,6 +48,39 @@ export const AIPromptPopover: React.FC<PromptPopoverProps> = ({
       }
     }, 100);
   }, [isPopoverOpen]);
+
+  if (!isProfessionalPlan(user.details?.planDetails?.planId)) {
+    return (
+      <div className="ai-generate-test-popover-content ai-generate-test-popover-premium-feature">
+        <div className="ai-generate-test-popover-content__header">
+          <MdOutlineDiamond /> Premium feature
+        </div>
+        <div className="ai-generate-test-popover-content__description">
+          AI test generation is available on Pro and Team plans. Upgrade to Pro to use this feature without limits.
+        </div>
+        <div className="ai-generate-test-popover-content__actions-container">
+          <RQButton onClick={onCloseClick} size="small">
+            Close
+          </RQButton>
+          <RQButton
+            type="primary"
+            size="small"
+            onClick={() => {
+              dispatch(globalActions.toggleActiveModal({ modalName: "pricingModal", newValue: true }));
+              onCloseClick();
+            }}
+          >
+            Upgrade now
+          </RQButton>
+        </div>
+      </div>
+    );
+  }
+  const handleGenerateClick = () => {
+    const newGenerationId = startNewGeneration();
+    trackPopoverGenerateTestsClicked(sessionId, newGenerationId);
+    onGenerateClick(userQuery);
+  };
 
   return (
     <div className="ai-generate-test-popover-content">
@@ -58,7 +104,7 @@ export const AIPromptPopover: React.FC<PromptPopoverProps> = ({
         autoSize={{ minRows: 2, maxRows: 8 }}
         onKeyDown={(e) => {
           if ((e.metaKey || e.ctrlKey) && e.key === "Enter" && !isLoading) {
-            onGenerateClick(userQuery);
+            handleGenerateClick();
           }
         }}
       />
@@ -74,7 +120,13 @@ export const AIPromptPopover: React.FC<PromptPopoverProps> = ({
             Stop
           </RQButton>
         ) : (
-          <RQButton type="transparent" icon={<MdInfoOutline />} size="small" className="ai-generate-test-help-btn">
+          <RQButton
+            type="transparent"
+            icon={<MdInfoOutline />}
+            size="small"
+            className="ai-generate-test-help-btn"
+            onClick={() => redirectToUrl(LINKS.AI_DOC_LINK, true)}
+          >
             Need help
           </RQButton>
         )}
@@ -82,7 +134,7 @@ export const AIPromptPopover: React.FC<PromptPopoverProps> = ({
           <RQButton onClick={onCloseClick} size="small">
             {isLoading ? "Continue in background" : "Close"}
           </RQButton>
-          <RQButton type="primary" loading={isLoading} onClick={() => onGenerateClick(userQuery)} size="small">
+          <RQButton type="primary" loading={isLoading} onClick={handleGenerateClick} size="small">
             {isLoading ? "Generating..." : "Generate"}
           </RQButton>
         </div>

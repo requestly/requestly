@@ -6,3 +6,7 @@ import { UserAuth } from "./types";
 export const getUserAuthDetails = (state: RootState): UserAuth => {
   return state[ReducerKeys.GLOBAL]["user"];
 };
+
+export const getIsOptedforAIFeatures = (state: RootState): boolean => {
+  return state[ReducerKeys.GLOBAL]["user"].details?.metadata?.ai_consent ?? true;
+};
