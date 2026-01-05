@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useEffect } from "react"; // useRef removed
+import React, { useCallback, useState, useEffect, useRef } from "react";
 import { EditorView } from "codemirror";
 import Editor, { EditorLanguage } from "componentsV2/CodeEditor";
 import { KeyValuePair, KeyValueDataType } from "features/apiClient/types";
@@ -6,11 +6,15 @@ import { RQButton } from "lib/design-system-v2/components";
 import { MdClose } from "@react-icons/all-files/md/MdClose";
 import "./KeyValueBulkEditor.scss";
 
+type StoreHook = (selector: (state: any) => any) => any;
+
 interface KeyValueBulkEditorProps {
   data: KeyValuePair[];
   onChange: (updatedPairs: KeyValuePair[]) => void;
   onClose: () => void;
+  useStore?: StoreHook;
 }
+const useDummyStore = (selector: any) => undefined;
 
 const whiteTextTheme = EditorView.theme({
   "& .cm-line span": {
@@ -68,25 +72,45 @@ const formatKeyValueText = (pairs: KeyValuePair[]): string => {
     .join("\n");
 };
 
-export const KeyValueBulkEditor: React.FC<KeyValueBulkEditorProps> = ({ data, onChange, onClose }) => {
-  const [editorValue, setEditorValue] = useState(() => formatKeyValueText(data));
+export const KeyValueBulkEditor: React.FC<KeyValueBulkEditorProps> = ({
+  data: propsData,
+  onChange: propsOnChange,
+  onClose,
+  useStore,
+}) => {
+  const useStoreHook = useStore || useDummyStore;
+  const storeData = useStoreHook((state: any) => state.queryParams || state.headers);
+  const storeSetData = useStoreHook((state: any) => state.setQueryParams || state.setHeaders);
+
+  const activeData = storeData || propsData;
+  const activeOnChange = propsOnChange;
+  const [editorValue, setEditorValue] = useState(() => formatKeyValueText(activeData));
+
+  const lastEmittedDataRef = useRef<string | null>(null);
+  const dataRef = useRef(activeData);
+  useEffect(() => {
+    dataRef.current = activeData;
+  }, [activeData]);
 
   useEffect(() => {
-    const incomingDataString = formatKeyValueText(data);
-    const currentParsed = parseKeyValueText(editorValue, data);
-    const currentEffectiveString = formatKeyValueText(currentParsed);
-    if (incomingDataString !== currentEffectiveString) {
-      setEditorValue(incomingDataString);
+    const incomingDataString = JSON.stringify(activeData);
+    if (lastEmittedDataRef.current === incomingDataString) {
+      return;
     }
-  }, [data, editorValue]);
+    setEditorValue(formatKeyValueText(activeData));
+  }, [activeData]);
 
   const handleEditorChange = useCallback(
     (value: string) => {
       setEditorValue(value);
-      const parsed = parseKeyValueText(value, data);
-      onChange(parsed);
+      const parsed = parseKeyValueText(value, dataRef.current);
+      lastEmittedDataRef.current = JSON.stringify(parsed);
+      if (storeSetData) {
+        storeSetData(parsed);
+      }
+      activeOnChange(parsed);
     },
-    [onChange, data]
+    [activeOnChange, storeSetData]
   );
 
   return (

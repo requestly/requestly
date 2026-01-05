@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState, useRef, useEffect } from "react";
 import type { TableProps } from "antd";
 import { ContentListTable } from "componentsV2/ContentList";
 import { MdAdd } from "@react-icons/all-files/md/MdAdd";
@@ -36,9 +36,19 @@ interface KeyValueTableProps {
   config?: {
     checkInvalidCharacter?: boolean;
   };
+  children?: React.ReactNode;
+  useStore?: any;
 }
 
-export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, variables, onChange, extraColumns, config }) => {
+export const KeyValueTable: React.FC<KeyValueTableProps> = ({
+  data,
+  variables,
+  onChange,
+  extraColumns,
+  config,
+  children,
+  useStore,
+}) => {
   const { checkInvalidCharacter = false } = config || {};
 
   const isDescriptionVisible =
@@ -270,6 +280,22 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, variables, o
     showBulkEditPanel,
   ]);
 
+  const paramsEndRef = useRef<HTMLDivElement>(null);
+
+  const [scrollState, setScrollState] = useState<{ trigger: any; target: React.RefObject<any> | null }>({
+    trigger: 0,
+    target: null,
+  });
+
+  const prevDataLength = useRef(memoizedData.length);
+
+  useEffect(() => {
+    if (memoizedData.length !== prevDataLength.current) {
+      setScrollState({ trigger: Date.now(), target: paramsEndRef });
+    }
+    prevDataLength.current = memoizedData.length;
+  }, [memoizedData.length]);
+
   return (
     <Split
       key={isBottomSheetAtBottom ? "horizontal" : "vertical"}
@@ -278,14 +304,12 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, variables, o
       sizes={showBulkEditPanel ? [75, 25] : [100, 0]}
       minSize={minSizes}
       gutterSize={showBulkEditPanel ? 6 : 0}
-      snapOffset={30}
-      dragInterval={1}
     >
       <div
         className="key-value-table"
         style={isBottomSheetAtBottom ? { minWidth: minSizes[0] } : { minHeight: minSizes[0] }}
       >
-        <AutoScrollContainer trigger={memoizedData.length}>
+        <AutoScrollContainer trigger={scrollState.trigger} scrollTargetRef={scrollState.target}>
           <ContentListTable
             id="api-key-value-table"
             className="api-key-value-table"
@@ -310,6 +334,8 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, variables, o
               </div>
             )}
           />
+          <div ref={paramsEndRef} />
+          {children}
         </AutoScrollContainer>
       </div>
 
@@ -318,7 +344,12 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, variables, o
         style={isBottomSheetAtBottom ? { minWidth: minSizes[1] } : { minHeight: minSizes[1] }}
       >
         {showBulkEditPanel && (
-          <KeyValueBulkEditor data={memoizedData} onChange={onChange} onClose={() => setShowBulkEditPanel(false)} />
+          <KeyValueBulkEditor
+            data={memoizedData}
+            onChange={onChange}
+            onClose={() => setShowBulkEditPanel(false)}
+            useStore={useStore}
+          />
         )}
       </div>
     </Split>

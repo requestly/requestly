@@ -18,7 +18,6 @@ export const ApiClientRequestTabs: React.FC<Props> = ({ requestId, ...props }) =
       activeKey={selectedTab.tab}
       onChange={(tab) => {
         setSelectedTab({ tab: tab });
-        props.onChange?.(tab);
       }}
       size="small"
       moreIcon={null}
