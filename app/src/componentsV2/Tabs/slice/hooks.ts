@@ -81,6 +81,7 @@ export function getTabActions() {
   };
 }
 
+// TODO: cleanup - no need for a hook
 export function useTabActions() {
   return useMemo(() => getTabActions(), []);
 }
