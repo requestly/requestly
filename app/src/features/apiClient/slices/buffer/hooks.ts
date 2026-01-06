@@ -1,15 +1,26 @@
+import lodash from 'lodash';
 import { ApiClientRepositoryInterface } from "features/apiClient/helpers/modules/sync/interfaces";
 import { ApiClientEntity } from "../entities";
 import { ApiClientStore, ApiClientStoreState, useApiClientRepository, useApiClientStore } from "../workspaceView/helpers/ApiClientContextRegistry";
 import { Try } from "utils/try";
 import { useMemo } from "react";
 import { Dispatch } from "@reduxjs/toolkit";
-import { bufferActions, bufferAdapterSelectors } from "./slice";
+import { bufferActions, bufferAdapterSelectors, getPathsToFilter } from "./slice";
 import { BufferedApiClientEntity, OriginExists } from "../entities/buffered/factory";
 import { EntityNotFound } from "../types";
 import { useApiClientDispatch } from '../hooks/base.hooks';
 import { NativeError } from "errors/NativeError";
+import { ApiClientEntityType } from '../entities/types';
 
+function getDataToSave<T>(entityType: ApiClientEntityType, data: T) {
+  const original = lodash.cloneDeep(data);
+  const pathFilters = getPathsToFilter(entityType);
+  for(const path of pathFilters) {
+    lodash.unset(original as object, path);
+  }
+
+  return original;
+}
 
 function createSave(
   repositories: ApiClientRepositoryInterface,
@@ -39,7 +50,10 @@ function createSave(
       if (!buffer) {
         throw new EntityNotFound(params.entity.meta.id, "buffer");
       }
-      const changes = params.produceChanges?.(params.entity, state) || buffer.current as C;
+      const changes = getDataToSave(
+        buffer.entityType,
+        params.produceChanges?.(params.entity, state) || buffer.current as C
+      );
       hooks.beforeSave?.();
       const result = await Try(() => params.save(changes, repositories, params.entity));
       result
