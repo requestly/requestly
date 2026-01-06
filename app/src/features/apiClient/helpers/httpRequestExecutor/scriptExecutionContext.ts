@@ -22,7 +22,7 @@ export type ExecutionContext = BaseExecutionContext & {
 };
 
 export class ScriptExecutionContext {
-  private context: ExecutionContext;
+  private context: ExecutionContext = {} as any;
   private isMutated = false;
 
   constructor(
