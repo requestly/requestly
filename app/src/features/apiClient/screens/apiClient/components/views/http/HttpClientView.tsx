@@ -62,9 +62,7 @@ import {
 } from "features/apiClient/store/autogenerateStore";
 import { useParentApiRecord } from "features/apiClient/hooks/useParentApiRecord.hook";
 import { useScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
-import { useApiClientRepository } from "features/apiClient/contexts/meta";
 import { renderVariables } from "backend/environment/utils";
-import { useApiClientFeatureContext } from "features/apiClient/contexts/meta";
 import HttpApiClientUrl from "./components/HttpClientUrl/HttpClientUrl";
 import { ApiClientBreadCrumb, BreadcrumbType } from "../components/ApiClientBreadCrumb/ApiClientBreadCrumb";
 import { ClientCodeButton } from "../components/ClientCodeButton/ClientCodeButton";
@@ -74,7 +72,6 @@ import { QueryParamsProvider } from "features/apiClient/store/QueryParamsContext
 import { MdOutlineSyncAlt } from "@react-icons/all-files/md/MdOutlineSyncAlt";
 import { useAPIRecords, useAPIRecordsStore } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 import { Authorization } from "../components/request/components/AuthorizationView/types/AuthConfig";
-import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
 import ErrorBoundary from "features/apiClient/components/ErrorBoundary/ErrorBoundary";
 import { useHttpRequestExecutor } from "features/apiClient/hooks/requestExecutors/useHttpRequestExecutor";
 import { PathVariablesProvider } from "features/apiClient/store/pathVariables/PathVariablesContextProvider";
@@ -84,7 +81,7 @@ import { useEntity } from "features/apiClient/slices/entities/hooks";
 import { BufferedApiClientEntity, OriginExists } from "features/apiClient/slices/entities/buffered/factory";
 import { BufferedHttpRecordEntity, useBufferedEntitySelector, useIsBufferDirty } from "features/apiClient/slices/entities";
 import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
-import { useApiClientStore } from 'features/apiClient/slices';
+import { bufferAdapterSelectors, useApiClientRepository, useApiClientStore } from 'features/apiClient/slices';
 import { saveBulkRecords } from 'features/apiClient/commands/store.utils';
 import { useSaveBuffer } from 'features/apiClient/slices/buffer/hooks';
 import { NativeError } from 'errors/NativeError';
@@ -124,9 +121,9 @@ const HttpClientView: React.FC<Props> = ({
 
   // const { onSaveRecord } = useNewApiClientContext();
 
-    // const ctx = useApiClientFeatureContext();
+  // const ctx = useApiClientFeatureContext();
 
-  // const { apiClientRecordsRepository } = useApiClientRepository();
+  const repositories = useApiClientRepository();
 
   const { endAISession } = useAISessionContext();
   // useBufferedEntitySelector({
@@ -142,6 +139,12 @@ const HttpClientView: React.FC<Props> = ({
   // const [entry, setEntry] = useState<RQAPI.HttpApiEntry>(
   //   apiEntryDetails?.data ?? (getEmptyApiEntry(RQAPI.ApiEntryType.HTTP) as RQAPI.HttpApiEntry)
   // );
+  // const setRequestName = useCallback(
+  //   (name: string) => {
+  //     entity.setName(name);
+  //   },
+  //   [entity]
+  // )
 
   const [isFailed, setIsFailed] = useState(false);
   const [isGeneratingTests, setIsGeneratingTests] = useState(false);
@@ -177,6 +180,8 @@ const HttpClientView: React.FC<Props> = ({
   const url = useApiClientSelector(s => entity.getUrl(s));
   const queryParams = useApiClientSelector(s => entity.getQueryParams(s));
   const testResults = useApiClientSelector(s => entity.getTestResults(s));
+  const name = useApiClientSelector(s => entity.getName(s));
+  const isNew = useApiClientSelector(s => bufferAdapterSelectors.selectById(s.buffer, entity.id)?.isNew);
 
   const saveBuffer = useSaveBuffer();
 
@@ -462,71 +467,21 @@ const HttpClientView: React.FC<Props> = ({
     setIsRequestCancelled(false);
   };
 
-  const handleRecordNameUpdate = async () => {
-    // if (!requestName || requestName === apiEntryDetails?.name) {
-    //   return;
-    // }
-
-    // const isValidHeader = entry.request?.headers?.every((header) => {
-    //   return !header.isEnabled || !INVALID_KEY_CHARACTERS.test(header.key);
-    // });
-
-    // const isValidAuthKey =
-    //   entry.auth?.currentAuthType !== Authorization.Type.API_KEY ||
-    //   !entry.auth?.authConfigStore?.API_KEY?.key ||
-    //   !INVALID_KEY_CHARACTERS.test(entry.auth?.authConfigStore?.API_KEY?.key);
-
-    // if (!isValidHeader || !isValidAuthKey) {
-    //   notification.error({
-    //     message: `Could not save request.`,
-    //     description: "key contains invalid characters.",
-    //     placement: "bottomRight",
-    //   });
-    //   return;
-    // }
-
-    // const record: Partial<RQAPI.ApiRecord> = {
-    //   type: RQAPI.RecordType.API,
-    //   data: { ...entry },
-    // };
-
-    // if (apiEntryDetails?.id) {
-    //   record.id = apiEntryDetails?.id;
-    //   record.name = requestName;
-    // }
-
-    // if (isCreateMode) {
-    //   record.name = requestName;
-    // }
-
-    // const result = isCreateMode
-    //   ? await apiClientRecordsRepository.createRecord(record)
-    //   : await apiClientRecordsRepository.updateRecord(record, record.id!); // not the ideal way but had to assert because record is typed as Partial here
-
-    // if (result.success && result.data.type === RQAPI.RecordType.API) {
-    //   setTitle(requestName);
-    //   const savedRecord: RQAPI.HttpApiRecord = {
-    //     ...(apiEntryDetails ?? {}),
-    //     ...result.data,
-    //     data: { ...result.data.data, ...record.data } as RQAPI.HttpApiEntry,
-    //   };
-    //   onSaveRecord(savedRecord);
-    //   trackRequestRenamed("breadcrumb");
-    //   setRequestName("");
-    //   onSaveCallback(savedRecord);
-
-    //   toast.success("Request name updated!");
-    // } else {
-    //   notification.error({
-    //     message: `Could not rename Request.`,
-    //     description: result?.message,
-    //     placement: "bottomRight",
-    //   });
-    // }
-  };
+  const handleRecordNameUpdate = useCallback(async (name: string) => {
+    const result = await repositories.apiClientRecordsRepository.updateRecord({ name }, entity.meta.referenceId);
+    if (!result.success) {
+      notification.error({
+        message: "Could not rename record",
+        description: result?.message,
+        placement: "bottomRight",
+      });
+      return;
+    }
+    entity.origin.setName(name);
+  }, [entity]);
 
   const onSaveButtonClick = useCallback(async () => {
-    if(!entity.meta.originExists) {
+    if (!entity.meta.originExists) {
       throw new Error('Can not save a buffer from this flow since there is no origin!');
     }
 
@@ -534,34 +489,34 @@ const HttpClientView: React.FC<Props> = ({
       {
         entity: entity as OriginExists<typeof entity>,
         produceChanges(entity, state) {
-            const record = lodash.cloneDeep(entity.getEntityFromState(state));
-            record.data = sanitizeEntry(record.data);
-            const entry = record.data;
+          const record = lodash.cloneDeep(entity.getEntityFromState(state));
+          record.data = sanitizeEntry(record.data);
+          const entry = record.data;
 
-            const isValidHeader = entry.request?.headers?.every((header) => {
-              return !header.isEnabled || !INVALID_KEY_CHARACTERS.test(header.key);
-            });
+          const isValidHeader = entry.request?.headers?.every((header) => {
+            return !header.isEnabled || !INVALID_KEY_CHARACTERS.test(header.key);
+          });
 
-            const isValidAuthKey =
-              entry.auth?.currentAuthType !== Authorization.Type.API_KEY ||
-              !entry.auth?.authConfigStore?.API_KEY?.key ||
-              !INVALID_KEY_CHARACTERS.test(entry.auth?.authConfigStore?.API_KEY?.key) ||
-              entry.auth?.authConfigStore?.API_KEY.addTo === "QUERY";
+          const isValidAuthKey =
+            entry.auth?.currentAuthType !== Authorization.Type.API_KEY ||
+            !entry.auth?.authConfigStore?.API_KEY?.key ||
+            !INVALID_KEY_CHARACTERS.test(entry.auth?.authConfigStore?.API_KEY?.key) ||
+            entry.auth?.authConfigStore?.API_KEY.addTo === "QUERY";
 
-            if (!isValidHeader || !isValidAuthKey) {
-              throw new NativeError("Request contains invalid characters!");
-            }
+          if (!isValidHeader || !isValidAuthKey) {
+            throw new NativeError("Request contains invalid characters!");
+          }
 
-            const base = entry.request.url.split("?")[0];
-            if(base) {
-              entry.request.url = base;
-            }
+          const base = entry.request.url.split("?")[0];
+          if (base) {
+            entry.request.url = base;
+          }
 
-            return record;
+          return record;
         },
         async save(record, repositories, entity) {
           const result = await repositories.apiClientRecordsRepository.updateRecord(record, record.id);
-          if(!result.success) {
+          if (!result.success) {
             throw new NativeError(result.message || "Could not save request!");
           }
         },
@@ -751,12 +706,10 @@ const HttpClientView: React.FC<Props> = ({
               id={entity.meta.referenceId}
               openInModal={openInModal}
               placeholder="Untitled request"
-              // name={apiEntryDetails?.name}
-              // onRecordNameUpdate={setRequestName}
-              // autoFocus={getIsNew()}
-              onBlur={() => {
-                // setIsNew(false);
-                // handleRecordNameUpdate();
+              name={name}
+              autoFocus={isNew}
+              onBlur={(name) => {
+                handleRecordNameUpdate(name);
               }}
               breadCrumbType={BreadcrumbType.API_REQUEST}
             />
@@ -845,9 +798,8 @@ const HttpClientView: React.FC<Props> = ({
         initialSizes={sheetPlacement === BottomSheetPlacement.BOTTOM ? [60, 40] : [50, 50]}
       >
         <div
-          className={`api-client-body ${
-            sheetPlacement === BottomSheetPlacement.BOTTOM ? "api-client-body__vertical" : "api-client-body__horizontal"
-          }`}
+          className={`api-client-body ${sheetPlacement === BottomSheetPlacement.BOTTOM ? "api-client-body__vertical" : "api-client-body__horizontal"
+            }`}
         >
           <HttpRequestTabs
             error={error}
