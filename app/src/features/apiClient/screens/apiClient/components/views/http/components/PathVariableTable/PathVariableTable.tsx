@@ -13,25 +13,21 @@ import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks
 
 interface PathVariableTableProps {
   entity: BufferedHttpRecordEntity,
-  // recordId: string;
-  // onChange: (variables: RQAPI.PathVariable[]) => void;
 }
 
 type ColumnTypes = Exclude<TableProps<RQAPI.PathVariable>["columns"], undefined>;
 
 export const PathVariableTable: React.FC<PathVariableTableProps> = ({ entity }) => {
-  // const [variables, setPathVariables] = usePathVariablesStore((state) => [state.pathVariables, state.setPathVariables]);
   const variables = useApiClientSelector(s => entity.getPathVariables(s) || []);
   const scopedVariables = useScopedVariables(entity.meta.referenceId);
   const [showDescription, setShowDescription] = useState(false);
 
   const handleUpdateVariable = useCallback(
     (variable: RQAPI.PathVariable) => {
-      const updatedVariables = variables.map((item) => (item.id === variable.id ? { ...item, ...variable } : item));
-      entity.setPathVariables(updatedVariables);
-      // onChange(updatedVariables);
+      const { id, key, ...patch } = variable;
+      entity.setPathVariable(key, patch);
     },
-    [variables]
+    []
   );
 
   const columns = useMemo(() => {

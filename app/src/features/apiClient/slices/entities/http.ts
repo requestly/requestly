@@ -1,4 +1,4 @@
-import { KeyValuePair, RequestContentType, RequestMethod, RQAPI } from "features/apiClient/types";
+import { KeyValueDataType, KeyValuePair, RequestContentType, RequestMethod, RQAPI } from "features/apiClient/types";
 import { InvalidEntityShape } from "../types";
 import { selectRecordById } from "../apiRecords/selectors";
 import { ApiClientStoreState } from "../workspaceView/helpers/ApiClientContextRegistry/types";
@@ -8,6 +8,7 @@ import { ApiClientEntityMeta } from "./base";
 import { supportsRequestBody } from "features/apiClient/screens/apiClient/utils";
 import { CONTENT_TYPE_HEADER } from "features/apiClient/constants";
 import { TestResult } from "@requestly/shared/types/entities/apiClient";
+import { v4 } from "uuid";
 
 export class HttpRecordEntity<M extends ApiClientEntityMeta = ApiClientEntityMeta> extends ApiClientRecordEntity<RQAPI.HttpApiRecord, M> {
   readonly type = ApiClientEntityType.HTTP_RECORD;
@@ -68,6 +69,76 @@ export class HttpRecordEntity<M extends ApiClientEntityMeta = ApiClientEntityMet
 
   getTestResults(state: ApiClientStoreState) {
     return this.getEntityFromState(state)?.data.testResults
+  }
+
+  reconcilePathKeys(pathKeys: string[]) {
+    this.unsafePatch((s) => {
+      const existingPathVariables = s.data.request.pathVariables;
+      if (!existingPathVariables) {
+        for (const k of pathKeys) {
+          this.addNewPathVariable(s, k);
+        }
+
+        return;
+      }
+
+      for (const sourceKey of pathKeys) {
+        if (!existingPathVariables.find(v => v.key === sourceKey)) {
+          this.addNewPathVariable(s, sourceKey);
+        }
+      }
+
+      for (const existingKey of existingPathVariables.map(v => v.key)) {
+        if (!pathKeys.includes(existingKey)) {
+          this.deletePathVariable(s, existingKey);
+        }
+      }
+
+    });
+  }
+
+  addNewPathVariable(state: RQAPI.HttpApiRecord, key: string) {
+    if (!state.data.request.pathVariables) {
+      state.data.request.pathVariables = [];
+    }
+    const existingPathVariables = state.data.request.pathVariables;
+    existingPathVariables.push({
+      id: v4(),
+      key,
+      value: "",
+      description: "",
+      dataType: KeyValueDataType.STRING,
+
+    })
+
+  }
+
+  deletePathVariable(state: RQAPI.HttpApiRecord, key: string) {
+    const existingPathVariables = state.data.request.pathVariables;
+    if (!existingPathVariables) {
+      return;
+    }
+    const index = existingPathVariables.findIndex(v => v.key === key);
+    existingPathVariables.splice(index, 1);
+  }
+
+  setPathVariable(key: string, patch: Omit<RQAPI.PathVariable, 'id' | 'key'>) {
+    this.unsafePatch(s => {
+      const existingPathVariables = s.data.request.pathVariables;
+      if (!existingPathVariables) {
+        return;
+      }
+
+      const index = existingPathVariables.findIndex(v => v.key === key);
+      if(index < 0) {
+        return;
+      }
+
+      existingPathVariables[index] = {
+        ...existingPathVariables[index]!,
+        ...patch,
+      }
+    })
   }
 
   setTestResults(testResults?: TestResult[]): void {
