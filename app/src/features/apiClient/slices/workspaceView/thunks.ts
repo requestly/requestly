@@ -8,12 +8,19 @@ import { ReducerKeys } from "store/constants";
 import { reduxStore } from "store";
 import { Err, Ok, Result } from "utils/try";
 import { getAllSelectedWorkspaces, getSelectedWorkspaceCount, getViewMode, workspaceViewActions } from "./slice";
-import { dummyPersonalWorkspace, getWorkspaceById, isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
+import { getWorkspaceInfo } from "./utils";
+import {
+  dummyPersonalWorkspace,
+  getWorkspaceById,
+  isActiveWorkspaceShared,
+  getActiveWorkspace,
+} from "store/slices/workspaces/selectors";
 import { WorkspaceType } from "features/workspaces/types";
 import { FAKE_LOGGED_OUT_WORKSPACE_ID } from "../common/constants";
 import { getAppMode } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { switchWorkspace } from "actions/TeamWorkspaceActions";
+import { NativeError } from "errors/NativeError";
 
 const SLICE_NAME = ReducerKeys.WORKSPACE_VIEW;
 
@@ -24,6 +31,24 @@ function getUserDetails(userId?: string) {
   return userDetails;
 }
 
+function getFallbackWorkspaceInfo(rootState: RootState): WorkspaceInfo {
+  const fallbackWorkspaceId = rootState.workspaceView.fallbackWorkspaceId;
+
+  if (fallbackWorkspaceId !== null && fallbackWorkspaceId !== undefined) {
+    const fallbackWorkspace = getWorkspaceById(fallbackWorkspaceId)(rootState);
+    if (!fallbackWorkspace) {
+      throw new NativeError("Fallback workspace not found").addContext({ fallbackWorkspaceId });
+    }
+
+    return getWorkspaceInfo(fallbackWorkspace);
+  }
+
+  return {
+    id: dummyPersonalWorkspace.id,
+    meta: { type: WorkspaceType.PERSONAL },
+  };
+}
+
 export const workspaceViewManager = createAsyncThunk(
   `${SLICE_NAME}/workspaceViewManager`,
   async (
@@ -32,7 +57,12 @@ export const workspaceViewManager = createAsyncThunk(
   ) => {
     try {
       const { workspaces, action, userId } = params;
-      const viewMode = getViewMode(getState() as RootState);
+      const rootState = getState() as RootState;
+      const viewMode = getViewMode(rootState);
+
+      const activeWorkspace = getActiveWorkspace(rootState);
+      dispatch(workspaceViewActions.setFallbackWorkspaceId(activeWorkspace.id));
+
       if (action === "add") {
         if (viewMode === "SINGLE") {
           return dispatch(singleToMultiView({ workspaces, userId })).unwrap();
@@ -46,11 +76,8 @@ export const workspaceViewManager = createAsyncThunk(
         const remaining = selectedWorkspacesCount - workspaces.length;
         const ids = workspaces.map((w) => w.id);
         if (viewMode === "MULTI" && remaining === 0) {
-          const lastUncheckedWorkspace = workspaces[workspaces.length - 1];
-          if (!lastUncheckedWorkspace) {
-            throw new Error("No workspace to switch to");
-          }
-          return dispatch(switchContext({ workspace: lastUncheckedWorkspace, userId })).unwrap();
+          const workspaceToSwitch = getFallbackWorkspaceInfo(rootState);
+          return dispatch(switchContext({ workspace: workspaceToSwitch, userId })).unwrap();
         }
         if (viewMode === "MULTI" && remaining >= 1) {
           return dispatch(removeWorkspacesFromView({ workspaceIds: ids, userId })).unwrap();
