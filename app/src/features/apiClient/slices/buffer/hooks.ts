@@ -72,7 +72,7 @@ function createSave(
           dispatch(
             bufferActions.markSaved({
               id: params.entity.meta.id,
-              referenceId: savedEntity?.id,
+              referenceId: params.entity.meta.originExists ? undefined : savedEntity?.id,
               savedData: newState,
             })
           );
