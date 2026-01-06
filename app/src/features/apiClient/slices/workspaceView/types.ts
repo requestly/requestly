@@ -31,4 +31,5 @@ export interface WorkspaceViewState {
   isSetupDone: boolean;
   viewMode: ApiClientViewMode;
   selectedWorkspaces: EntityState<WorkspaceState>;
+  fallbackWorkspaceId?: WorkspaceState["id"];
 }

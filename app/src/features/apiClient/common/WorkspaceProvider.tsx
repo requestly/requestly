@@ -22,6 +22,13 @@ export const useWorkspaceViewSelector: TypedUseSelectorHook<ApiClientStoreState>
 
 const WorkspaceIdContext = createContext<Workspace["id"] | undefined>(undefined);
 
+export const WorkspaceIdContextProvider: React.FC<React.PropsWithChildren<{ id: Workspace["id"] }>> = ({
+  id,
+  children,
+}) => {
+  return <WorkspaceIdContext.Provider value={id}>{children}</WorkspaceIdContext.Provider>;
+};
+
 export function useWorkspaceId() {
   const ctx = useContext(WorkspaceIdContext);
 
@@ -42,10 +49,10 @@ const WorkspaceStoreProvider: React.FC<React.PropsWithChildren> = (props) => {
   );
 };
 
-export function WorkspaceProvider(props: { workspaceId: Workspace["id"]; children: React.ReactNode }) {
+export const WorkspaceProvider: React.FC<React.PropsWithChildren<{ workspaceId: Workspace["id"] }>> = (props) => {
   return (
-    <WorkspaceIdContext.Provider value={props.workspaceId}>
+    <WorkspaceIdContextProvider id={props.workspaceId}>
       <WorkspaceStoreProvider>{props.children}</WorkspaceStoreProvider>
-    </WorkspaceIdContext.Provider>
+    </WorkspaceIdContextProvider>
   );
-}
+};

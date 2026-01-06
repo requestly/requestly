@@ -25,7 +25,13 @@ export class ApiClientContextRegistry {
     }
   }
 
-  setLastUsedContext(context?: ApiClientFeatureContext) {
+  setLastUsedContext(id: ApiClientFeatureContext["workspaceId"]) {
+    const context = this.contexts.get(id);
+
+    if (!context) {
+      throw new NativeError("Could not find context!").addContext({ id });
+    }
+
     this.lastUsedContext = context;
   }
 

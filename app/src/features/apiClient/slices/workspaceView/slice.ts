@@ -47,6 +47,10 @@ export const workspaceViewSlice = createSlice({
       state.viewMode = action.payload;
     },
 
+    setFallbackWorkspaceId(state, action: PayloadAction<WorkspaceState["id"]>) {
+      state.fallbackWorkspaceId = action.payload;
+    },
+
     addWorkspace(state, action: PayloadAction<WorkspaceState>) {
       workspaceViewAdapter.addOne(state.selectedWorkspaces, action.payload);
     },
@@ -69,6 +73,11 @@ export const workspaceViewSlice = createSlice({
 
     resetToSingleView(state) {
       state.viewMode = ApiClientViewMode.SINGLE;
+      workspaceViewAdapter.removeAll(state.selectedWorkspaces);
+    },
+
+    resetToMultiView(state) {
+      state.viewMode = ApiClientViewMode.MULTI;
       workspaceViewAdapter.removeAll(state.selectedWorkspaces);
     },
 
