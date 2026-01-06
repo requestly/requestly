@@ -12,10 +12,21 @@ function isNonEmptyRecord(value: unknown): value is Record<string, unknown> {
 }
 
 export function isPathPresent(source: readonly PropertyPath[], element: PropertyPath) {
-  const sourceSet = source.map(s => s.join('.'));
-  const elementPath = element.join('.');
-  const isPathPresent = sourceSet.some(s => elementPath.startsWith(`${s}.`) || s === elementPath);
-  return isPathPresent;
+  const isPresent = source.some(s => {
+    if(s.length > element.length) {
+      return false;
+    }
+    for(let index = 0; index < s.length; index++) {
+      if(s[index] === element[index]) {
+        continue;
+      }
+      return false;
+    }
+
+    return true;
+  });
+
+  return isPresent;
 }
 
 /**
