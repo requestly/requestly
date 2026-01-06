@@ -81,13 +81,14 @@ import { PathVariablesProvider } from "features/apiClient/store/pathVariables/Pa
 import { usePathVariablesStore } from "features/apiClient/hooks/usePathVariables.store";
 import { useAISessionContext } from "features/ai/contexts/AISession";
 import { useEntity } from "features/apiClient/slices/entities/hooks";
-import { BufferedApiClientEntity } from "features/apiClient/slices/entities/buffered/factory";
+import { BufferedApiClientEntity, OriginExists } from "features/apiClient/slices/entities/buffered/factory";
 import { BufferedHttpRecordEntity, useBufferedEntitySelector, useIsBufferDirty } from "features/apiClient/slices/entities";
 import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
 import { useApiClientStore } from 'features/apiClient/slices';
 import { saveBulkRecords } from 'features/apiClient/commands/store.utils';
 import { useSaveBuffer } from 'features/apiClient/slices/buffer/hooks';
 import { NativeError } from 'errors/NativeError';
+import { useHostContext } from 'hooks/useHostContext';
 
 const requestMethodOptions = Object.values(RequestMethod).map((method) => ({
   value: method,
@@ -119,7 +120,9 @@ const HttpClientView: React.FC<Props> = ({
 
   const { toggleBottomSheet, sheetPlacement } = useBottomSheetContext();
 
-  const { onSaveRecord } = useNewApiClientContext();
+  const { getIsActive } = useHostContext();
+
+  // const { onSaveRecord } = useNewApiClientContext();
 
     // const ctx = useApiClientFeatureContext();
 
@@ -298,8 +301,6 @@ const HttpClientView: React.FC<Props> = ({
 
 
   const onSendButtonClick = useCallback(async () => {
-    // updateTab(apiEntryDetails?.id, { isPreview: false });
-
     if (!url) {
       return;
     }
@@ -526,12 +527,12 @@ const HttpClientView: React.FC<Props> = ({
 
   const onSaveButtonClick = useCallback(async () => {
     if(!entity.meta.originExists) {
-      return;
+      throw new Error('Can not save a buffer from this flow since there is no origin!');
     }
 
     saveBuffer(
       {
-        entity,
+        entity: entity as OriginExists<typeof entity>,
         produceChanges(entity, state) {
             const record = lodash.cloneDeep(entity.getEntityFromState(state));
             record.data = sanitizeEntry(record.data);
@@ -563,8 +564,6 @@ const HttpClientView: React.FC<Props> = ({
           if(!result.success) {
             throw new NativeError(result.message || "Could not save request!");
           }
-
-          return result.data as RQAPI.HttpApiRecord;
         },
       },
       {
@@ -666,7 +665,7 @@ const HttpClientView: React.FC<Props> = ({
     endAISession();
   }, [
     onSaveCallback,
-    onSaveRecord,
+    // onSaveRecord,
     queryParams,
     endAISession,
   ]);
@@ -729,7 +728,7 @@ const HttpClientView: React.FC<Props> = ({
   };
 
 
-  // const enableHotkey = getIsActive();
+  const enableHotkey = getIsActive();
 
   return isExtensionEnabled ? (
     <div className="api-client-view http-client-view">
@@ -804,17 +803,17 @@ const HttpClientView: React.FC<Props> = ({
             <Conditional condition={!openInModal}>
               <RBACButton
                 disabled={
-                  // !hasUnsavedChanges ||
+                  !hasUnsavedChanges ||
                   (appMode === "EXTENSION" && request.contentType === RequestContentType.MULTIPART_FORM)
                 }
                 permission="create"
                 resource="api_client_request"
                 showHotKeyText
-                // hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SAVE_REQUEST.hotKey}
+                hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SAVE_REQUEST.hotKey}
                 onClick={onSaveButtonClick}
                 loading={isRequestSaving}
                 tooltipTitle="Saving is not allowed in view-only mode. You can update and view changes but cannot save them."
-                // enableHotKey={enableHotkey}
+                enableHotKey={enableHotkey}
               >
                 Save
               </RBACButton>
@@ -875,7 +874,7 @@ const WithErrorBoundary = (Component: React.ComponentType<any>): React.FC<Props>
   const WrappedComponent: React.FC = (props: any) => {
     return (
       <ErrorBoundary boundaryId="http-client-view-error-boundary">
-            <Component {...props} />
+        <Component {...props} />
       </ErrorBoundary>
     );
   };
