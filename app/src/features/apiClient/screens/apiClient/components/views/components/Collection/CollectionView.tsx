@@ -1,23 +1,17 @@
 import type React from "react";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { notification, Result, Tabs } from "antd";
+import { notification, Tabs } from "antd";
 import { CollectionOverview } from "./components/CollectionOverview/CollectionOverview";
 import { CollectionsVariablesView } from "./components/CollectionsVariablesView/CollectionsVariablesView";
 import CollectionAuthorizationView from "./components/CollectionAuthorizationView/CollectionAuthorizationView";
 import "./collectionView.scss";
-import { isEmpty } from "lodash";
-import {
-  useBufferByReferenceId,
-  useBufferedCollectionEntity,
-  useEntity,
-} from "features/apiClient/slices/entities/hooks";
+import { useBufferByReferenceId, useEntity } from "features/apiClient/slices/entities/hooks";
 import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
 import { useApiClientRepository } from "features/apiClient/slices/workspaceView/helpers/ApiClientContextRegistry";
 import { ApiClientBreadCrumb, BreadcrumbType } from "../ApiClientBreadCrumb/ApiClientBreadCrumb";
 import { trackCollectionRunnerViewed } from "modules/analytics/events/features/apiClient";
 import { CollectionRowOptionsCustomEvent } from "../../../sidebar/components/collectionsList/collectionRow/utils";
 import { ApiClientEntityType } from "features/apiClient/slices/entities/types";
-import { useTabActions } from "componentsV2/Tabs/slice";
 
 const TAB_KEYS = {
   OVERVIEW: "overview",
@@ -105,7 +99,6 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
             name={collectionName}
             onBlur={(newName) => {
               handleCollectionNameChange(newName);
-              // setIsNew(false);
             }}
             autoFocus={collectionBuffer.isNew}
             breadCrumbType={BreadcrumbType.COLLECTION}
