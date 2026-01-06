@@ -10,16 +10,19 @@ import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks
 import { useSaveBuffer } from "features/apiClient/slices/buffer/hooks";
 import { toast } from "utils/Toast";
 import { useHostContext } from "hooks/useHostContext";
+import { notification } from "antd";
+import { TAB_KEYS } from "../../CollectionView";
 
 interface Props {
   collectionId: string;
+  activeTabKey: string;
 }
 
 /**
  * Wrapper component to reuse Authorization View with buffered entity pattern.
  * Uses the buffer system for optimistic updates and dirty tracking.
  */
-const CollectionAuthorizationView: React.FC<Props> = ({ collectionId }) => {
+const CollectionAuthorizationView: React.FC<Props> = ({ collectionId, activeTabKey }) => {
   const [isSaving, setIsSaving] = useState(false);
   const entity = useBufferedCollectionEntity(collectionId);
   const context = useHostContext();
@@ -32,7 +35,7 @@ const CollectionAuthorizationView: React.FC<Props> = ({ collectionId }) => {
     type: "referenceId",
   });
 
-  const isActiveTab = context.getIsActive();
+  const isActiveInnerTab = activeTabKey === TAB_KEYS.AUTHORIZATION;
 
   const saveBuffer = useSaveBuffer();
 
@@ -66,7 +69,11 @@ const CollectionAuthorizationView: React.FC<Props> = ({ collectionId }) => {
         },
         onError(error) {
           console.error("Failed to update Authorization Values: ", error);
-          toast.error("Failed to update authorization");
+          notification.error({
+            message: "Could not update Authorization",
+            description: error?.message,
+            placement: "bottomRight",
+          });
         },
       }
     );
@@ -82,7 +89,7 @@ const CollectionAuthorizationView: React.FC<Props> = ({ collectionId }) => {
           onClick={onSaveAuthData}
           disabled={!hasUnsavedChanges}
           loading={isSaving}
-          enableHotKey={isActiveTab}
+          enableHotKey={context.getIsActive() && isActiveInnerTab}
         >
           Save
         </RQButton>
