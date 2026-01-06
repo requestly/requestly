@@ -204,10 +204,11 @@ export class HttpRequestPreparationService {
       typeof renderedEntry.request.body === "string"
     ) {
       try {
+        // Here we are parsing and then re-stringifying to remove any comments and trailing commas from JSON
         const parsed = JSON5.parse(renderedEntry.request.body);
         renderedEntry.request.body = JSON.stringify(parsed);
       } catch (error) {
-        console.warn("Failed to parse JSON5 body:", error);
+        // No op - If parsing fails, we leave the body as it is
       }
     }
 
