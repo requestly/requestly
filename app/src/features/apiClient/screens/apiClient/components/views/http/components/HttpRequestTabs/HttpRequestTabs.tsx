@@ -4,7 +4,7 @@ import RequestBody from "../../../components/request/RequestBody";
 import { captureException } from "@sentry/react";
 import { HeadersTable } from "../../../components/request/components/HeadersTable/HeadersTable";
 import AuthorizationView from "../../../components/request/components/AuthorizationView";
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useMemo, useEffect } from "react";
 import { ApiClientRequestTabs } from "../../../components/request/components/ApiClientRequestTabs/ApiClientRequestTabs";
 import { sanitizeKeyValuePairs, supportsRequestBody } from "features/apiClient/screens/apiClient/utils";
 import { useFeatureValue } from "@growthbook/growthbook-react";
@@ -71,6 +71,16 @@ const HttpRequestTabs: React.FC<Props> = ({
   const pathVariables = usePathVariablesStore((state) => state.pathVariables);
   const queryParams = useQueryParamStore((state) => state.queryParams);
   const headers = useHeadersStore((state) => state.headers);
+
+  useEffect(() => {
+    setRequestEntry((prev) => ({
+      ...prev,
+      request: {
+        ...prev.request,
+        headers: headers,
+      },
+    }));
+  }, [headers, setRequestEntry]);
 
   const hasScriptError = error?.type === RQAPI.ApiClientErrorType.SCRIPT;
 

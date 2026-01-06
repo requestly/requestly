@@ -290,7 +290,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
   const prevDataLength = useRef(memoizedData.length);
 
   useEffect(() => {
-    if (memoizedData.length !== prevDataLength.current) {
+    if (memoizedData.length > prevDataLength.current) {
       setScrollState({ trigger: Date.now(), target: paramsEndRef });
     }
     prevDataLength.current = memoizedData.length;
