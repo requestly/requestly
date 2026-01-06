@@ -4,7 +4,7 @@ import "./loggedoutPopoverContent.scss";
 import { trackLoginButtonClicked } from "modules/analytics/events/common/auth/login";
 import { trackSignUpButtonClicked } from "modules/analytics/events/common/auth/signup";
 import Link from "antd/lib/typography/Link";
-import { getTabServiceActions } from "componentsV2/Tabs/tabUtils";
+import { getTabActions } from "componentsV2/Tabs/slice";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import { globalActions } from "store/slices/global/slice";
 import { useDispatch } from "react-redux";
@@ -14,7 +14,7 @@ export const LoggedOutPopoverContent = ({ onAuthButtonClick }: { onAuthButtonCli
   const dispatch = useDispatch();
 
   const handleAuthButtonClick = (authMode: string) => {
-    getTabServiceActions().resetTabs(true);
+    getTabActions().resetTabs();
     dispatch(
       globalActions.toggleActiveModal({
         modalName: "authModal",

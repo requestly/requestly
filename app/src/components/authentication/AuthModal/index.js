@@ -6,7 +6,7 @@ import APP_CONSTANTS from "../../../config/constants";
 import { trackAuthModalShownEvent } from "modules/analytics/events/common/auth/authModal";
 import "./AuthModal.css";
 import { AuthScreen } from "features/onboarding";
-import { getTabServiceActions } from "componentsV2/Tabs/tabUtils";
+import { getTabActions } from "componentsV2/Tabs/slice";
 
 const AuthModal = ({
   isOpen,
@@ -28,7 +28,7 @@ const AuthModal = ({
   useEffect(() => {
     if (isOpen) {
       trackAuthModalShownEvent(eventSource);
-      getTabServiceActions().resetTabs(true);
+      getTabActions().resetTabs();
     }
   }, [isOpen, eventSource]);
 

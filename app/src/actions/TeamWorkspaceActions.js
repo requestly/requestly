@@ -16,10 +16,10 @@ import { getRecordsSyncPath, parseRemoteRecords } from "utils/syncing/syncDataUt
 import { setSyncState } from "utils/syncing/SyncUtils";
 import { isArray } from "lodash";
 import { workspaceActions } from "store/slices/workspaces/slice";
-import { getTabServiceActions } from "componentsV2/Tabs/tabUtils";
 import { resetToSingleView } from "features/apiClient/commands/multiView";
 import { WorkspaceType } from "features/workspaces/types";
 import { clientStorageService } from "services/clientStorageService";
+import { getTabActions } from "componentsV2/Tabs/slice";
 
 export const showSwitchWorkspaceSuccessToast = (teamName) => {
   // Show toast
@@ -92,8 +92,7 @@ export const switchWorkspace = async (
     await clientStorageService.clearStorage();
   }
 
-  getTabServiceActions().resetTabs(true);
-
+  getTabActions().resetTabs();
   // Just in case
   window.skipSyncListenerForNextOneTime = false;
   window.isFirstSyncComplete = false;
