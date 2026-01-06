@@ -1,7 +1,10 @@
-import React, { useState, useEffect, useCallback } from "react";
+import type React from "react";
+import { useState, useEffect, useCallback } from "react";
 import { RQButton } from "lib/design-system-v2/components";
-import { EnvironmentVariableType, VariableScope, VariableValueType } from "backend/environment/types";
-import { CreateVariableFormData, VariableUpsertSource } from "../types";
+import { EnvironmentVariableType, VariableScope } from "backend/environment/types";
+import type { VariableValueType } from "backend/environment/types";
+import type { CreateVariableFormData } from "../types";
+import { VariableUpsertSource } from "../types";
 import { useScopeOptions } from "../hooks/useScopeOptions";
 import { captureException } from "backend/apiClient/utils";
 import { VariableFormFields } from "./VariableFormFields";
@@ -9,12 +12,8 @@ import { toast } from "utils/Toast";
 import { useCollectionIdByRecordId } from "features/apiClient/slices/apiRecords/apiRecords.hooks";
 import { trackVariableCreated } from "modules/analytics/events/features/apiClient";
 import { useHostContext } from "hooks/useHostContext";
-import { useEntity, useEnvironmentEntity } from "features/apiClient/slices/entities/hooks";
-import { ApiClientEntityType } from "features/apiClient/slices/entities/types";
-import { GLOBAL_ENVIRONMENT_ID, RUNTIME_VARIABLES_ENTITY_ID } from "features/apiClient/slices/common/constants";
-import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
-import { useActiveEnvironment, useApiClientFeatureContext } from "features/apiClient/slices";
-import { v4 as uuidv4 } from "uuid";
+import { parseRawVariable, mergeVariable } from "../utils/variableUtils";
+import { useVariableScopeAdapter } from "../hooks/useVariableScopeAdapter";
 
 interface CreateVariableViewProps {
   variableName: string;
@@ -27,35 +26,10 @@ export const CreateVariableView: React.FC<CreateVariableViewProps> = ({ variable
   const recordId = getSourceId();
 
   const collectionId = useCollectionIdByRecordId(recordId);
-  const activeEnvironment = useActiveEnvironment();
-  const { repositories } = useApiClientFeatureContext();
 
   const { scopeOptions, defaultScope } = useScopeOptions(collectionId);
 
   const [upserting, setUpserting] = useState(false);
-
-  // Entity hooks for each scope - always call hooks unconditionally
-  const globalEnvEntity = useEntity({
-    id: GLOBAL_ENVIRONMENT_ID,
-    type: ApiClientEntityType.GLOBAL_ENVIRONMENT,
-  });
-
-  // Use a fallback ID to ensure hook is always called
-  const envEntity = useEnvironmentEntity(activeEnvironment?.id || "", ApiClientEntityType.ENVIRONMENT);
-
-  const collectionEntity = useEntity({
-    id: collectionId || "",
-    type: ApiClientEntityType.COLLECTION_RECORD,
-  });
-
-  const runtimeEntity = useEntity({
-    id: RUNTIME_VARIABLES_ENTITY_ID,
-    type: ApiClientEntityType.RUNTIME_VARIABLES,
-  });
-
-  const globalVariables = useApiClientSelector((s) => globalEnvEntity.variables.getAll(s));
-  const environmentVariables = useApiClientSelector((s) => (activeEnvironment ? envEntity.variables.getAll(s) : {}));
-  const collectionVariables = useApiClientSelector((s) => (collectionId ? collectionEntity.variables.getAll(s) : {}));
 
   const [formData, setFormData] = useState({
     scope: defaultScope,
@@ -63,6 +37,8 @@ export const CreateVariableView: React.FC<CreateVariableViewProps> = ({ variable
     initialValue: "" as VariableValueType,
     currentValue: "" as VariableValueType,
   });
+
+  const { entity, saveVariablesToRepository, scopeDisplayName, store } = useVariableScopeAdapter(formData.scope);
 
   useEffect(() => {
     setFormData((prev) => ({ ...prev, scope: defaultScope }));
@@ -72,7 +48,7 @@ export const CreateVariableView: React.FC<CreateVariableViewProps> = ({ variable
     setFormData((prev) => ({ ...prev, ...updates }));
   };
 
-  const getVariableScopeForAnalytics = (scope: VariableScope | string) => {
+  const getVariableScopeForAnalytics = useCallback((scope: VariableScope | string) => {
     switch (scope) {
       case VariableScope.RUNTIME:
         return "runtime";
@@ -85,7 +61,7 @@ export const CreateVariableView: React.FC<CreateVariableViewProps> = ({ variable
       default:
         return "runtime";
     }
-  };
+  }, []);
 
   const handleSave = useCallback(async () => {
     setUpserting(true);
@@ -96,130 +72,33 @@ export const CreateVariableView: React.FC<CreateVariableViewProps> = ({ variable
       };
 
       const { variableName: varName, scope, type, initialValue, currentValue } = variableData;
-      let scopeName: string;
 
-      switch (scope) {
-        case VariableScope.GLOBAL: {
-          const newId = uuidv4();
+      const state = store.getState();
+      const currentVariables = entity.variables.getAll(state);
+      const { key, variable } = parseRawVariable(varName, { type, initialValue, currentValue });
 
-          const updatedVariables = {
-            ...globalVariables,
-            [varName]: {
-              id: newId,
-              type,
-              syncValue: initialValue ?? "",
-              localValue: currentValue ?? "",
-              isPersisted: true as const,
-            },
-          };
-
-          await repositories.environmentVariablesRepository.updateEnvironment(GLOBAL_ENVIRONMENT_ID, {
-            variables: updatedVariables,
-          });
-
-          globalEnvEntity.variables.add({
-            key: varName,
-            type,
-            syncValue: initialValue ?? "",
-            localValue: currentValue ?? "",
-            isPersisted: true,
-          });
-
-          scopeName = "Global";
-          break;
-        }
-
-        case VariableScope.ENVIRONMENT: {
-          if (!activeEnvironment) {
-            throw new Error("No active environment selected");
-          }
-
-          const newId = uuidv4();
-
-          const updatedVariables = {
-            ...environmentVariables,
-            [varName]: {
-              id: newId,
-              type,
-              syncValue: initialValue ?? "",
-              localValue: currentValue ?? "",
-              isPersisted: true as const,
-            },
-          };
-
-          await repositories.environmentVariablesRepository.updateEnvironment(activeEnvironment.id, {
-            variables: updatedVariables,
-          });
-
-          envEntity.variables.add({
-            key: varName,
-            type,
-            syncValue: initialValue ?? "",
-            localValue: currentValue ?? "",
-            isPersisted: true,
-          });
-
-          scopeName = activeEnvironment.name;
-          break;
-        }
-
-        case VariableScope.COLLECTION: {
-          if (!collectionId) {
-            throw new Error("Collection variable creation requires collection context");
-          }
-
-          const newId = uuidv4();
-
-          const updatedVariables = {
-            ...collectionVariables,
-            [varName]: {
-              id: newId,
-              type,
-              syncValue: initialValue ?? "",
-              localValue: currentValue ?? "",
-              isPersisted: true as const,
-            },
-          };
-
-          await repositories.apiClientRecordsRepository.setCollectionVariables(collectionId, updatedVariables);
-
-          collectionEntity.variables.add({
-            key: varName,
-            type,
-            syncValue: initialValue ?? "",
-            localValue: currentValue ?? "",
-            isPersisted: true,
-          });
-
-          scopeName = "Collection";
-          break;
-        }
-
-        case VariableScope.RUNTIME: {
-          const runtimeValue = currentValue ?? initialValue ?? "";
-
-          runtimeEntity.variables.add({
-            key: varName,
-            type,
-            localValue: runtimeValue,
-            isPersisted: true,
-          });
-
-          scopeName = "Runtime";
-          break;
-        }
-
-        default:
-          throw new Error(`Unknown scope: ${scope}`);
+      const updatedVariables = mergeVariable(currentVariables, key, variable);
+      if (scope !== VariableScope.RUNTIME) {
+        await saveVariablesToRepository(updatedVariables);
       }
 
+      entity.variables.add({
+        id: variable.id,
+        key,
+        type: variable.type,
+        syncValue: variable.syncValue,
+        localValue: variable.localValue,
+        isPersisted: variable.isPersisted,
+      });
+
       await onSave(variableData);
-      toast.success(`Variable created in ${scopeName}`);
+      toast.success(`Variable created in ${scopeDisplayName}`);
       trackVariableCreated({
         source: VariableUpsertSource.VARIABLE_POPOVER,
         variable_scope: getVariableScopeForAnalytics(scope),
       });
     } catch (error) {
+      console.log({ error });
       toast.error("Failed to create variable");
       captureException(error);
     } finally {
@@ -228,16 +107,10 @@ export const CreateVariableView: React.FC<CreateVariableViewProps> = ({ variable
   }, [
     variableName,
     formData,
-    globalVariables,
-    environmentVariables,
-    collectionVariables,
-    globalEnvEntity,
-    envEntity,
-    collectionEntity,
-    runtimeEntity,
-    activeEnvironment,
-    collectionId,
-    repositories,
+    store,
+    entity,
+    saveVariablesToRepository,
+    scopeDisplayName,
     onSave,
     getVariableScopeForAnalytics,
   ]);
