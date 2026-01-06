@@ -1,13 +1,36 @@
 import { createSlice, createEntityAdapter, PayloadAction } from "@reduxjs/toolkit";
 import { produceWithPatches, enablePatches, current } from "immer";
 import { v4 as uuidv4 } from "uuid";
-import { set, unset, cloneDeep, merge, get } from "lodash";
-import { objectToSetOperations, objectToDeletePaths } from "../utils/pathConverter";
+import { set, unset, cloneDeep, get } from "lodash";
+import { objectToSetOperations, objectToDeletePaths, isPathPresent } from "../utils/pathConverter";
 import { BufferEntry, BufferState } from "./types";
 import { ApiClientEntityType } from "../entities/types";
 import { BUFFER_SLICE_NAME } from "../common/constants";
 import { emitBufferUpdated } from "componentsV2/Tabs/slice";
-import { EntityNotFound } from "../types";
+import { DeepPartialWithNull, EntityNotFound } from "../types";
+
+const FIELDS_FILTER: {
+  [key in ApiClientEntityType]?: DeepPartialWithNull<Record<string, any>>
+} = {
+  [ApiClientEntityType.HTTP_RECORD]:
+    {
+      data: {
+        response: null,
+        testResults: null,
+      }
+    }
+}
+
+
+
+export function getPathsToFilter(entityType: ApiClientEntityType) {
+  const filter = FIELDS_FILTER[entityType];
+  if(!filter) {
+    return [];
+  }
+
+  return objectToDeletePaths(filter);
+}
 
 enablePatches();
 
@@ -87,12 +110,17 @@ export const bufferSlice = createSlice({
       if (!entry) return;
 
       const { command } = action.payload;
-
+      const pathFilters = getPathsToFilter(entry.entityType);
+      let isMutated = false;
       if (command.type === "SET") {
         const operations = objectToSetOperations(command.value);
         for (const { path, value } of operations) {
           set(entry.current as object, path, value);
+          if(isPathPresent(pathFilters, path)) {
+            continue;
+          }
           set(entry.diff as object, path, value);
+          isMutated = true;
         }
       }
 
@@ -100,8 +128,16 @@ export const bufferSlice = createSlice({
         const paths = objectToDeletePaths(command.value);
         for (const path of paths) {
           unset(entry.current, path);
+          if(isPathPresent(pathFilters, path)) {
+            continue;
+          }
           unset(entry.diff, path);
+          isMutated = true;
         }
+      }
+
+      if(!isMutated) {
+        return;
       }
 
       entry.isNew = false;
@@ -123,26 +159,44 @@ export const bufferSlice = createSlice({
       const entry = state.entities[action.payload.id];
       if (!entry) return;
 
+      const pathFilters = getPathsToFilter(entry.entityType);
+      let isMutated = false;
+
+
       const plain = current(entry.current);
 
-      const [nextCurrent, patches] = produceWithPatches(plain, (draft) => {
+      const [_, patches] = produceWithPatches(plain, (draft) => {
         action.payload.patcher({ current: draft } as BufferEntry);
       });
 
-      entry.current = nextCurrent;
       for (const patch of patches) {
         const path = patch.path;
         switch (patch.op) {
           case "add":
           case "replace":
+            set(entry.current as object, path, patch.value);
+            if(isPathPresent(pathFilters, path)) {
+              continue;
+            }
             set(entry.diff, path, patch.value);
+            isMutated = true;
             break;
           case "remove":
+            unset(entry.current as object, path);
+            if(isPathPresent(pathFilters, path)) {
+              continue;
+            }
             unset(entry.diff, path);
+            isMutated = true;
             break;
         }
       }
 
+      if(!isMutated) {
+        return;
+      }
+
+      entry.isNew = false;
       entry.isDirty = true;
 
       emitBufferUpdated({

@@ -11,6 +11,13 @@ function isNonEmptyRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value) && Object.keys(value).length > 0;
 }
 
+export function isPathPresent(source: readonly PropertyPath[], element: PropertyPath) {
+  const sourceSet = source.map(s => s.join('.'));
+  const elementPath = element.join('.');
+  const isPathPresent = sourceSet.some(s => elementPath.startsWith(`${s}.`) || s === elementPath);
+  return isPathPresent;
+}
+
 /**
  * Converts a nested object structure to an array of SET operations.
  * Each non-null leaf value becomes a path-value pair for lodash.set().
