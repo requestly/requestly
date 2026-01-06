@@ -15,16 +15,8 @@ import "./environmentsList.scss";
 import { ApiClientSidebarTabKey } from "features/apiClient/screens/apiClient/components/sidebar/SingleWorkspaceSidebar/SingleWorkspaceSidebar";
 import { EmptyEnvironmentsCreateCard } from "features/apiClient/screens/apiClient/components/sidebar/components/EmptyEnvironmentsCreateCard/EmptyEnvironmentsCreateCard";
 import { Conditional } from "components/common/Conditional";
-import { EnvironmentEntity } from "features/apiClient/slices/environments/types";
 import { useWorkspaceId } from "features/apiClient/common/WorkspaceProvider";
-
-function parseEnvironmentEntityToData(env: EnvironmentEntity): EnvironmentData {
-  return {
-    id: env.id,
-    name: env.name,
-    variables: env.variables,
-  };
-}
+import { parseEnvironmentEntityToData } from "features/apiClient/slices/environments/utils";
 
 export const EnvironmentsList = () => {
   const workspaceId = useWorkspaceId();
