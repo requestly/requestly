@@ -6,6 +6,8 @@ import { ApiClientEntityType } from "../entities/types";
 import { GLOBAL_ENVIRONMENT_ID } from "../common/constants";
 import { environmentsActions } from "./slice";
 import { EnvironmentEntity } from "./types";
+import { parseEnvironmentEntityToData } from "./utils";
+import { erroredRecordsActions } from "../erroredRecords";
 
 type Repository = EnvironmentInterface<Record<string, unknown>>;
 
@@ -28,8 +30,6 @@ export const createEnvironment = createAsyncThunk<
     };
 
     dispatch(environmentsActions.environmentCreated(environmentEntity));
-
-    // TODO: if first env then mark it as active
 
     if (variables && Object.keys(variables).length > 0) {
       await repository.updateEnvironment(newEnvironment.id, { variables });
@@ -125,3 +125,37 @@ export const duplicateEnvironment = createAsyncThunk<
     return rejectWithValue(error instanceof Error ? error.message : "Failed to duplicate environment");
   }
 });
+
+export const forceRefreshEnvironments = createAsyncThunk<void, { repository: Repository }, { rejectValue: string }>(
+  "environments/forceRefresh",
+  async ({ repository }, { dispatch, rejectWithValue, getState }) => {
+    try {
+      const result = await repository.getAllEnvironments();
+      if (!result.success) {
+        return rejectWithValue("Could not fetch environments!");
+      }
+
+      const globalEnvId = repository.getGlobalEnvironmentId();
+      const { [globalEnvId]: globalEnvironment, ...otherEnvs } = result.data.environments;
+
+      if (!globalEnvironment) {
+        return rejectWithValue("Global Environment doesn't exist");
+      }
+
+      const globalEnvironmentEntity: EnvironmentEntity = parseEnvironmentEntityToData(globalEnvironment);
+      const environmentsEntities: EnvironmentEntity[] = Object.values(otherEnvs).map(parseEnvironmentEntityToData);
+
+      dispatch(
+        environmentsActions.hydrate({
+          environments: environmentsEntities,
+          globalEnvironment: globalEnvironmentEntity,
+        })
+      );
+
+      dispatch(erroredRecordsActions.setEnvironmentErroredRecords(result.data.erroredRecords));
+      // closeCorruptedTabs();
+    } catch (error) {
+      return rejectWithValue(error instanceof Error ? error.message : "Failed to refresh environments");
+    }
+  }
+);

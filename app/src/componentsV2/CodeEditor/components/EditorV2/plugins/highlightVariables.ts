@@ -49,7 +49,7 @@ export const highlightVariablesPlugin = (setters: VariableSetters, variables: Sc
 
           decorations.push(
             Decoration.mark({
-              class: `highlight-${variables.has(variable) ? "defined" : "undefined"}-variable`,
+              class: `highlight-${variables[variable] ? "defined" : "undefined"}-variable`,
             }).range(match.index, match.index + match[0].length)
           );
         }

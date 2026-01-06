@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { Dropdown, MenuProps, Typography, Popover } from "antd";
 import { useLocation } from "react-router-dom";
 import { RQButton } from "lib/design-system-v2/components";
@@ -9,29 +9,29 @@ import { MdNotInterested } from "@react-icons/all-files/md/MdNotInterested";
 import { toast } from "utils/Toast";
 import PATHS from "config/constants/sub/paths";
 import { trackEnvironmentSwitched } from "modules/analytics/events/features/apiClient";
-import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
+import { useTabActions } from "componentsV2/Tabs/slice";
 import { EnvironmentViewTabSource } from "features/apiClient/screens/environment/components/environmentView/EnvironmentViewTabSource";
-import { useAPIEnvironment } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 import "./environmentSwitcher.scss";
 import { CreateEnvironmentPopup } from "../CreateEnvironmentPopup/CreateEnvironmentPopup";
-import { useActiveEnvironment } from "features/apiClient/hooks/useActiveEnvironment.hook";
-import { EnvironmentState } from "features/apiClient/store/environments/environments.store";
-import { useEnvironment } from "features/apiClient/hooks/useEnvironment.hook";
-import { useContextId } from "features/apiClient/contexts/contextId.context";
+import { useAllEnvironments, useActiveEnvironment } from "features/apiClient/slices/environments/environments.hooks";
+import { useEnvironmentByIdMemoized } from "features/apiClient/slices/environments/environments.hooks";
+import { useApiClientDispatch } from "features/apiClient/slices/hooks/base.hooks";
+import { environmentsActions } from "features/apiClient/slices/environments/slice";
+import { useWorkspaceId } from "features/apiClient/common/WorkspaceProvider";
 
-function SwitcherListItemLabel(props: { environmentId: EnvironmentState["id"] }) {
-  const environmentName = useEnvironment(props.environmentId, (s) => s.name);
+function SwitcherListItemLabel(props: { environmentId: string }) {
+  const environment = useEnvironmentByIdMemoized(props.environmentId);
 
   return (
     <Typography.Text
       ellipsis={{
         tooltip: {
-          title: environmentName,
+          title: environment?.name || "",
           placement: "right",
         },
       }}
     >
-      {environmentName}
+      {environment?.name || ""}
     </Typography.Text>
   );
 }
@@ -40,29 +40,34 @@ export const EnvironmentSwitcher = () => {
   const location = useLocation();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-  const [environments, setActiveEnvironment] = useAPIEnvironment((s) => [s.environments, s.setActive]);
-
+  const environments = useAllEnvironments();
   const activeEnvironment = useActiveEnvironment();
+  const dispatch = useApiClientDispatch();
 
-  const contextId = useContextId();
-  const [openTab] = useTabServiceWithSelector((state) => [state.openTab]);
+  const workspaceId = useWorkspaceId();
+  const { openBufferedTab } = useTabActions();
+
+  const setActiveEnvironment = useCallback(
+    (id: string | undefined) => {
+      dispatch(environmentsActions.setActiveEnvironment(id || null));
+    },
+    [dispatch]
+  );
 
   useEffect(() => {
     const handleEvent = (event: any) => {
       const eventContextId = event.detail?.contextId;
-      if (eventContextId === contextId) {
+      if (eventContextId === workspaceId) {
         setIsDropdownOpen(true);
       }
     };
 
     window.addEventListener("trigger-env-switcher", handleEvent);
     return () => window.removeEventListener("trigger-env-switcher", handleEvent);
-  }, [contextId]);
+  }, [workspaceId]);
 
   const dropdownItems: MenuProps["items"] = useMemo(() => {
-    const sorted = environments
-      .map((e) => e.getState())
-      .sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
+    const sorted = [...environments].sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
 
     const noEnvItem = {
       key: "__no_environment__",
@@ -98,15 +103,16 @@ export const EnvironmentSwitcher = () => {
         setActiveEnvironment(environment.id);
         trackEnvironmentSwitched();
         if (location.pathname.includes(PATHS.API_CLIENT.ENVIRONMENTS.RELATIVE)) {
-          openTab(
-            new EnvironmentViewTabSource({
+          openBufferedTab({
+            source: new EnvironmentViewTabSource({
               id: environment.id,
               title: environment.name,
               context: {
-                id: contextId,
+                id: workspaceId,
               },
-            })
-          );
+              isGlobal: false,
+            }),
+          });
         }
         toast.success(`Switched to ${environment.name} environment`);
       },
@@ -115,7 +121,7 @@ export const EnvironmentSwitcher = () => {
     const dividerItem = { type: "divider", key: "__divider__" } as const;
 
     return [noEnvItem, dividerItem, ...environmentItems];
-  }, [environments, activeEnvironment?.id, setActiveEnvironment, location.pathname, openTab, contextId]);
+  }, [environments, activeEnvironment?.id, setActiveEnvironment, location.pathname, openBufferedTab, workspaceId]);
 
   if (environments.length === 0) {
     return (

@@ -2,9 +2,21 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import { omit, partition } from "lodash";
 import { RQAPI } from "features/apiClient/types";
 import { ApiClientRecordsInterface } from "../../helpers/modules/sync/interfaces";
-import { isApiRequest, isApiCollection, processRecordsForDuplication } from "../../screens/apiClient/utils";
-import { getAllRecords } from "../../commands/utils";
+import {
+  isApiRequest,
+  isApiCollection,
+  processRecordsForDuplication,
+  filterOutChildrenRecords,
+} from "../../screens/apiClient/utils";
+import { getAllRecords, getRecordsToRender } from "../../commands/utils";
 import { apiRecordsActions } from "./slice";
+import { selectAllRecords, selectChildToParent } from "./selectors";
+import { ApiClientStoreState } from "../workspaceView/helpers/ApiClientContextRegistry";
+import { reduxStore } from "store";
+import { ApiClientViewMode } from "../workspaceView";
+import { getApiClientFeatureContext } from "../workspaceView/helpers/ApiClientContextRegistry/hooks";
+import { Workspace } from "features/workspaces/types";
+import { erroredRecordsActions } from "../erroredRecords";
 
 type Repository = ApiClientRecordsInterface<Record<string, unknown>>;
 
@@ -92,48 +104,105 @@ export const deleteRecords = createAsyncThunk<
   };
 });
 
+export const forceRefreshRecords = createAsyncThunk<boolean, { repository: Repository }, { rejectValue: string }>(
+  "apiRecords/forceRefresh",
+  async ({ repository }, { dispatch, rejectWithValue }) => {
+    try {
+      const recordsToRefresh = await repository.getRecordsForForceRefresh();
+      if (!recordsToRefresh || !recordsToRefresh.success) {
+        return false;
+      }
+
+      dispatch(
+        apiRecordsActions.hydrate({
+          records: recordsToRefresh.data.records,
+          erroredRecords: recordsToRefresh.data.erroredRecords, // TODO: cleanup
+        })
+      );
+
+      dispatch(erroredRecordsActions.setApiErroredRecords(recordsToRefresh.data.erroredRecords));
+      // closeCorruptedTabs();
+
+      return true;
+    } catch (error) {
+      return rejectWithValue(error instanceof Error ? error.message : "Failed to refresh records");
+    }
+  }
+);
+
 export const moveRecords = createAsyncThunk<
   { movedRecords: RQAPI.ApiClientRecord[] },
   {
     recordsToMove: RQAPI.ApiClientRecord[];
     collectionId: string;
     repository: Repository;
+    sourceWorkspaceId: Workspace["id"];
+    destinationWorkspaceId?: Workspace["id"];
   },
   { rejectValue: string }
->("apiRecords/move", async ({ recordsToMove, collectionId, repository }, { dispatch, rejectWithValue }) => {
-  const updatedRecords = recordsToMove.map((record) => {
-    return isApiCollection(record)
-      ? { ...record, collectionId, data: omit(record.data, "children") }
-      : { ...record, collectionId };
-  });
+>(
+  "apiRecords/move",
+  async (
+    { recordsToMove, collectionId, repository, sourceWorkspaceId, destinationWorkspaceId },
+    { dispatch, rejectWithValue }
+  ) => {
+    const updatedRecords = recordsToMove.map((record) => {
+      return isApiCollection(record)
+        ? { ...record, collectionId, data: omit(record.data, "children") }
+        : { ...record, collectionId };
+    });
 
-  try {
-    const movedRecords = await repository.moveAPIEntities(updatedRecords, collectionId);
+    try {
+      const movedRecords = await repository.moveAPIEntities(updatedRecords, collectionId);
 
-    dispatch(apiRecordsActions.upsertRecords(movedRecords));
+      dispatch(apiRecordsActions.upsertRecords(movedRecords));
 
-    return { movedRecords };
-  } catch (error) {
-    return rejectWithValue("Failed to move records");
+      // TODO: check why we need to refresh for local workspace, when move is in same workspace
+      const sourceContext = getApiClientFeatureContext(sourceWorkspaceId);
+      await sourceContext.store
+        .dispatch(forceRefreshRecords({ repository: sourceContext.repositories.apiClientRecordsRepository }) as any)
+        .unwrap();
+
+      if (destinationWorkspaceId && destinationWorkspaceId !== sourceWorkspaceId) {
+        const destinationContext = getApiClientFeatureContext(destinationWorkspaceId);
+
+        await destinationContext.store
+          .dispatch(
+            forceRefreshRecords({ repository: destinationContext.repositories.apiClientRecordsRepository }) as any
+          )
+          .unwrap();
+      }
+
+      return { movedRecords };
+    } catch (error) {
+      return rejectWithValue("Failed to move records");
+    }
   }
-});
+);
 
 export const duplicateRecords = createAsyncThunk<
   { duplicatedRecords: RQAPI.ApiClientRecord[] },
-  {
-    records: RQAPI.ApiClientRecord[];
-    repository: Repository;
-  },
-  { rejectValue: string }
->("apiRecords/duplicate", async ({ records, repository }, { dispatch, rejectWithValue }) => {
+  { recordIds: Set<string>; repository: Repository },
+  { rejectValue: string; state: ApiClientStoreState }
+>("apiRecords/duplicate", async ({ recordIds, repository }, { dispatch, rejectWithValue, getState }) => {
   try {
-    const recordsToDuplicate = processRecordsForDuplication(records, repository);
+    const apiClientRecords = selectAllRecords(getState());
+    const recordsToRender = getRecordsToRender({ apiClientRecords });
+    const childParentMap = selectChildToParent(getState());
+    const processedRecords = filterOutChildrenRecords(recordIds, childParentMap, recordsToRender.recordsMap);
+    const recordsToDuplicate = processRecordsForDuplication(processedRecords, repository);
+
     const duplicatedRecords = await repository.duplicateApiEntities(recordsToDuplicate);
 
     dispatch(apiRecordsActions.upsertRecords(duplicatedRecords));
 
+    const isMultiView = reduxStore.getState().workspaceView.viewMode === ApiClientViewMode.MULTI;
+    if (isMultiView) {
+      await dispatch(forceRefreshRecords({ repository })).unwrap();
+    }
+
     return { duplicatedRecords };
   } catch (error) {
-    return rejectWithValue("Failed to duplicate records");
+    return rejectWithValue(error instanceof Error ? error.message : "Failed to duplicate records");
   }
 });

@@ -37,9 +37,12 @@ export function generateCompletionSource(
 
 // VARIABLE COMPLETIONS
 function varCompletionSource(envVariables: ScopedVariables): CompletionSource {
-  const varCompletions = Array.from(envVariables.entries()).map(([envId, [variable, source]]) => {
+  const varCompletions = Object.keys(envVariables).map((key) => {
+    const envId = key;
+    const value = envVariables[key]!;
+    const [variable] = value;
     return {
-      label: envId,
+      label: envId.toString(),
       detail:
         variable.type === "secret"
           ? "•".repeat(String(variable.localValue ?? variable.syncValue).length)

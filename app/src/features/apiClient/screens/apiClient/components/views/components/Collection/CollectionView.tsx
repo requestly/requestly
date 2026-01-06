@@ -1,25 +1,20 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { notification, Result, Tabs } from "antd";
-import { RQAPI } from "features/apiClient/types";
+import type React from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { notification, Tabs } from "antd";
 import { CollectionOverview } from "./components/CollectionOverview/CollectionOverview";
 import { CollectionsVariablesView } from "./components/CollectionsVariablesView/CollectionsVariablesView";
 import CollectionAuthorizationView from "./components/CollectionAuthorizationView/CollectionAuthorizationView";
-import { useGenericState } from "hooks/useGenericState";
 import "./collectionView.scss";
-import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
-import { CollectionViewTabSource } from "./collectionViewTabSource";
-import { useApiRecord } from "features/apiClient/hooks/useApiRecord.hook";
-import { isEmpty } from "lodash";
-import { useContextId } from "features/apiClient/contexts/contextId.context";
-import { useCommand } from "features/apiClient/commands";
-import { useApiClientRepository } from "features/apiClient/contexts/meta";
-import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
+import { useBufferByReferenceId, useEntity } from "features/apiClient/slices/entities/hooks";
+import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
+import { useApiClientRepository } from "features/apiClient/slices/workspaceView/helpers/ApiClientContextRegistry";
 import { ApiClientBreadCrumb, BreadcrumbType } from "../ApiClientBreadCrumb/ApiClientBreadCrumb";
-import { CollectionRunnerView } from "./components/CollectionRunnerView/CollectionRunnerView";
 import { trackCollectionRunnerViewed } from "modules/analytics/events/features/apiClient";
 import { CollectionRowOptionsCustomEvent } from "../../../sidebar/components/collectionsList/collectionRow/utils";
+import { ApiClientEntityType } from "features/apiClient/slices/entities/types";
+import { CollectionRunnerView } from "./components/CollectionRunnerView/CollectionRunnerView";
 
-const TAB_KEYS = {
+export const TAB_KEYS = {
   OVERVIEW: "overview",
   VARIABLES: "variables",
   AUTHORIZATION: "authorization",
@@ -32,90 +27,39 @@ interface CollectionViewProps {
 
 export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) => {
   const { apiClientRecordsRepository } = useApiClientRepository();
-  const { onSaveRecord } = useNewApiClientContext();
-  const {
-    api: { forceRefreshRecords: forceRefreshApiClientRecords },
-  } = useCommand();
-  const contextId = useContextId();
   const [activeTabKey, setActiveTabKey] = useState(TAB_KEYS.OVERVIEW);
+  const entity = useEntity({
+    id: collectionId,
+    type: ApiClientEntityType.COLLECTION_RECORD,
+  });
 
-  const closeTab = useTabServiceWithSelector((state) => state.closeTab);
-
-  const { setTitle, getIsNew, setIsNew } = useGenericState();
-
-  const collection = useApiRecord(collectionId) as RQAPI.CollectionRecord;
-
-  useEffect(() => {
-    // To sync title for tabs opened from deeplinks
-    if (!isEmpty(collection)) {
-      setTitle(collection.name);
-    }
-  }, [collection, setTitle]);
-
-  const updateCollectionAuthData = useCallback(
-    async (newAuthOptions: RQAPI.Auth) => {
-      const record = {
-        ...collection,
-        data: {
-          ...collection?.data,
-          auth: newAuthOptions,
-        },
-      };
-      return apiClientRecordsRepository
-        .updateCollectionAuthData(record)
-        .then((result) => {
-          if (result.success) {
-            onSaveRecord(result.data);
-          } else {
-            notification.error({
-              message: `Could not update collection authorization changes!`,
-              description: result?.message,
-              placement: "bottomRight",
-            });
-          }
-        })
-        .catch((e) => {
-          notification.error({
-            message: `Could not update collection authorization changes!`,
-            description: e?.message,
-            placement: "bottomRight",
-          });
-        });
-    },
-    [collection, apiClientRecordsRepository, onSaveRecord]
-  );
+  const collectionName = useApiClientSelector((s) => entity.getName(s));
+  const collectionBuffer = useBufferByReferenceId(collectionId);
 
   const tabItems = useMemo(() => {
     return [
       {
         label: "Overview",
         key: TAB_KEYS.OVERVIEW,
-        children: <CollectionOverview collection={collection} />,
+        children: <CollectionOverview collectionId={collectionId} />,
       },
       {
         label: "Variables",
         key: TAB_KEYS.VARIABLES,
-        children: <CollectionsVariablesView collection={collection} />,
+        children: <CollectionsVariablesView collectionId={collectionId} activeTabKey={activeTabKey} />,
       },
       {
         label: "Authorization",
         key: TAB_KEYS.AUTHORIZATION,
-        children: (
-          <CollectionAuthorizationView
-            collectionId={collectionId}
-            authOptions={collection?.data?.auth}
-            updateAuthData={updateCollectionAuthData}
-            rootLevelRecord={!collection?.collectionId}
-          />
-        ),
+        children: <CollectionAuthorizationView collectionId={collectionId} activeTabKey={activeTabKey} />,
       },
       {
         label: "Runner",
         key: TAB_KEYS.RUNNER,
-        children: <CollectionRunnerView collectionId={collection.id} />,
+        children: <CollectionRunnerView collectionId={collectionId} />,
       },
     ];
-  }, [collection, collectionId, updateCollectionAuthData]);
+  }, [collectionId, activeTabKey]);
 
   useEffect(() => {
     const handler = () => {
@@ -130,81 +74,56 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
 
   const handleCollectionNameChange = useCallback(
     async (name: string) => {
-      const record = { ...collection, name };
-      return apiClientRecordsRepository.renameCollection(record.id, name).then(async (result) => {
-        if (!result.success) {
-          notification.error({
-            message: `Could not rename collection.`,
-            description: result?.message,
-            placement: "bottomRight",
-          });
-          return;
-        }
+      const result = await apiClientRecordsRepository.renameCollection(collectionId, name);
 
-        onSaveRecord(result.data);
-        const wasForceRefreshed = await forceRefreshApiClientRecords();
-        if (wasForceRefreshed) {
-          closeTab(
-            new CollectionViewTabSource({
-              id: record.id,
-              title: "",
-              context: {
-                id: contextId,
-              },
-            })
-          );
-        }
-        setTitle(result.data.name);
-      });
+      if (!result.success) {
+        notification.error({
+          message: "Could not rename collection.",
+          description: result?.message,
+          placement: "bottomRight",
+        });
+        return;
+      }
+
+      entity.setName(name);
     },
-    [collection, contextId, setTitle, apiClientRecordsRepository, onSaveRecord, closeTab, forceRefreshApiClientRecords]
+    [apiClientRecordsRepository, collectionId, entity]
   );
-
-  const collectionName = collection?.name || "New Collection";
 
   return (
     <div className="collection-view-container">
-      {isEmpty(collection) && collectionId !== "new" ? (
-        <Result
-          status="error"
-          title="Collection not found"
-          subTitle="Oops! Looks like this collection doesn't exist."
-        />
-      ) : (
-        <>
-          <div className="collection-view-breadcrumb-container">
-            <ApiClientBreadCrumb
-              id={collection.id}
-              placeholder="New Collection"
-              name={collectionName}
-              onBlur={(newName) => {
-                handleCollectionNameChange(newName);
-                setIsNew(false);
-              }}
-              autoFocus={getIsNew()}
-              breadCrumbType={BreadcrumbType.COLLECTION}
-            />
-          </div>
-          <div className="collection-view-content">
-            <Tabs
-              destroyInactiveTabPane={false}
-              activeKey={activeTabKey}
-              onChange={(key) => setActiveTabKey(key)}
-              items={tabItems}
-              animated={false}
-              moreIcon={null}
-              onTabClick={(key) => {
-                if (key === TAB_KEYS.RUNNER) {
-                  trackCollectionRunnerViewed({
-                    collection_id: collection.id,
-                    source: "collection_overview",
-                  });
-                }
-              }}
-            />
-          </div>
-        </>
-      )}
+      <>
+        <div className="collection-view-breadcrumb-container">
+          <ApiClientBreadCrumb
+            id={collectionId}
+            placeholder="New Collection"
+            name={collectionName}
+            onBlur={(newName) => {
+              handleCollectionNameChange(newName);
+            }}
+            autoFocus={collectionBuffer.isNew}
+            breadCrumbType={BreadcrumbType.COLLECTION}
+          />
+        </div>
+        <div className="collection-view-content">
+          <Tabs
+            destroyInactiveTabPane={false}
+            activeKey={activeTabKey}
+            onChange={(key) => setActiveTabKey(key)}
+            items={tabItems}
+            animated={false}
+            moreIcon={null}
+            onTabClick={(key) => {
+              if (key === TAB_KEYS.RUNNER) {
+                trackCollectionRunnerViewed({
+                  collection_id: collectionId,
+                  source: "collection_overview",
+                });
+              }
+            }}
+          />
+        </div>
+      </>
     </div>
   );
 };
