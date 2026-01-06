@@ -14,6 +14,8 @@ import { selectAllRecords, selectChildToParent } from "./selectors";
 import { ApiClientStoreState } from "../workspaceView/helpers/ApiClientContextRegistry";
 import { reduxStore } from "store";
 import { ApiClientViewMode } from "../workspaceView";
+import { getApiClientFeatureContext } from "../workspaceView/helpers/ApiClientContextRegistry/hooks";
+import { Workspace } from "features/workspaces/types";
 
 type Repository = ApiClientRecordsInterface<Record<string, unknown>>;
 
@@ -101,32 +103,6 @@ export const deleteRecords = createAsyncThunk<
   };
 });
 
-export const moveRecords = createAsyncThunk<
-  { movedRecords: RQAPI.ApiClientRecord[] },
-  {
-    recordsToMove: RQAPI.ApiClientRecord[];
-    collectionId: string;
-    repository: Repository;
-  },
-  { rejectValue: string }
->("apiRecords/move", async ({ recordsToMove, collectionId, repository }, { dispatch, rejectWithValue }) => {
-  const updatedRecords = recordsToMove.map((record) => {
-    return isApiCollection(record)
-      ? { ...record, collectionId, data: omit(record.data, "children") }
-      : { ...record, collectionId };
-  });
-
-  try {
-    const movedRecords = await repository.moveAPIEntities(updatedRecords, collectionId);
-
-    dispatch(apiRecordsActions.upsertRecords(movedRecords));
-
-    return { movedRecords };
-  } catch (error) {
-    return rejectWithValue("Failed to move records");
-  }
-});
-
 export const forceRefreshRecords = createAsyncThunk<boolean, { repository: Repository }, { rejectValue: string }>(
   "apiRecords/forceRefresh",
   async ({ repository }, { dispatch, rejectWithValue }) => {
@@ -146,6 +122,56 @@ export const forceRefreshRecords = createAsyncThunk<boolean, { repository: Repos
       return true;
     } catch (error) {
       return rejectWithValue(error instanceof Error ? error.message : "Failed to refresh records");
+    }
+  }
+);
+
+export const moveRecords = createAsyncThunk<
+  { movedRecords: RQAPI.ApiClientRecord[] },
+  {
+    recordsToMove: RQAPI.ApiClientRecord[];
+    collectionId: string;
+    repository: Repository;
+    sourceWorkspaceId: Workspace["id"];
+    destinationWorkspaceId?: Workspace["id"];
+  },
+  { rejectValue: string }
+>(
+  "apiRecords/move",
+  async (
+    { recordsToMove, collectionId, repository, sourceWorkspaceId, destinationWorkspaceId },
+    { dispatch, rejectWithValue }
+  ) => {
+    const updatedRecords = recordsToMove.map((record) => {
+      return isApiCollection(record)
+        ? { ...record, collectionId, data: omit(record.data, "children") }
+        : { ...record, collectionId };
+    });
+
+    try {
+      const movedRecords = await repository.moveAPIEntities(updatedRecords, collectionId);
+
+      dispatch(apiRecordsActions.upsertRecords(movedRecords));
+
+      // TODO: check why we need to refresh for local workspace, when move is in same workspace
+      const sourceContext = getApiClientFeatureContext(sourceWorkspaceId);
+      await sourceContext.store
+        .dispatch(forceRefreshRecords({ repository: sourceContext.repositories.apiClientRecordsRepository }) as any)
+        .unwrap();
+
+      if (destinationWorkspaceId && destinationWorkspaceId !== sourceWorkspaceId) {
+        const destinationContext = getApiClientFeatureContext(destinationWorkspaceId);
+
+        await destinationContext.store
+          .dispatch(
+            forceRefreshRecords({ repository: destinationContext.repositories.apiClientRecordsRepository }) as any
+          )
+          .unwrap();
+      }
+
+      return { movedRecords };
+    } catch (error) {
+      return rejectWithValue("Failed to move records");
     }
   }
 );
