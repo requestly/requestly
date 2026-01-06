@@ -256,7 +256,7 @@ const HttpClientView: React.FC<Props> = ({
   //   sanitizeEntry({ ...entryWithoutResponse, response: null }, false)
   // );
 
-  const isHistoryView = location.pathname.includes(PATHS.API_CLIENT.HISTORY.RELATIVE);
+  // const isHistoryView = location.pathname.includes(PATHS.API_CLIENT.HISTORY.RELATIVE);
 
   // const [purgeAndAdd] = useAutogenerateStore((state) => [state.purgeAndAdd, state.purgeAndAddHeaders]);
   // const [getData, getParentChain] = useAPIRecords((state) => [state.getData, state.getParentChain]);
@@ -425,6 +425,7 @@ const HttpClientView: React.FC<Props> = ({
 
       notifyApiRequestFinished(executedEntry);
     } catch (e) {
+      console.error(e);
       setIsFailed(true);
       setError({
         type: e.type,
