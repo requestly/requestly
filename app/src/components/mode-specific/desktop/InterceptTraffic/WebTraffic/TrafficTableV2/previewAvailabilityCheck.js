@@ -25,12 +25,34 @@ export function canPreviewAsText(body) {
       // Reject sparse or insane maps
       if (keys.length === 0 || keys.length > 500_000) return false;
 
-      const bytes = new Uint8Array(keys.length);
+      // Parse keys as numeric indices and validate
+      const numericKeys = [];
+      let maxIndex = -1;
 
-      for (let i = 0; i < keys.length; i++) {
-        const v = obj[i];
-        if (typeof v !== "number" || v < 0 || v > 255) return false;
-        bytes[i] = v;
+      for (const key of keys) {
+        const index = parseInt(key, 10);
+        // Validate key is a non-negative integer
+        if (!Number.isInteger(index) || index < 0 || index.toString() !== key) {
+          return false;
+        }
+        numericKeys.push(index);
+        if (index > maxIndex) maxIndex = index;
+      }
+
+      // Compute needed length as (maxIndex + 1)
+      const length = maxIndex + 1;
+      if (length > 500_000) return false; // Safety check
+
+      const bytes = new Uint8Array(length);
+
+      // Iterate numeric keys and validate values
+      for (const index of numericKeys) {
+        const value = obj[index.toString()];
+        // Validate value is a number 0-255
+        if (typeof value !== "number" || value < 0 || value > 255 || !Number.isInteger(value)) {
+          return false;
+        }
+        bytes[index] = value;
       }
 
       text = new TextDecoder("utf-8", { fatal: false }).decode(bytes);
