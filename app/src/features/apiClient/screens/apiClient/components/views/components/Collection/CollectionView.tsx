@@ -12,8 +12,9 @@ import { ApiClientBreadCrumb, BreadcrumbType } from "../ApiClientBreadCrumb/ApiC
 import { trackCollectionRunnerViewed } from "modules/analytics/events/features/apiClient";
 import { CollectionRowOptionsCustomEvent } from "../../../sidebar/components/collectionsList/collectionRow/utils";
 import { ApiClientEntityType } from "features/apiClient/slices/entities/types";
+import { CollectionRunnerView } from "./components/CollectionRunnerView/CollectionRunnerView";
 
-const TAB_KEYS = {
+export const TAB_KEYS = {
   OVERVIEW: "overview",
   VARIABLES: "variables",
   AUTHORIZATION: "authorization",
@@ -45,20 +46,20 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
       {
         label: "Variables",
         key: TAB_KEYS.VARIABLES,
-        children: <CollectionsVariablesView collectionId={collectionId} />,
+        children: <CollectionsVariablesView collectionId={collectionId} activeTabKey={activeTabKey} />,
       },
       {
         label: "Authorization",
         key: TAB_KEYS.AUTHORIZATION,
-        children: <CollectionAuthorizationView collectionId={collectionId} />,
+        children: <CollectionAuthorizationView collectionId={collectionId} activeTabKey={activeTabKey} />,
       },
       {
         label: "Runner",
         key: TAB_KEYS.RUNNER,
-        // children: <CollectionRunnerView collectionId={collection.id} />,
+        children: <CollectionRunnerView collectionId={collectionId} />,
       },
     ];
-  }, [collectionId]);
+  }, [collectionId, activeTabKey]);
 
   useEffect(() => {
     const handler = () => {
