@@ -44,16 +44,13 @@ export const EnvironmentView: React.FC<EnvironmentViewProps> = ({ entity, enviro
   });
 
   const bufferEntry = useBufferByBufferId(entity.meta.id);
-  const { saveOriginExistsBuffer: saveBuffer } = useSaveBuffer();
+  const saveBuffer  = useSaveBuffer();
   const handleSaveVariables = useCallback(async () => {
     saveBuffer(
       {
-        entity,
-        produceChanges(entity, state) {
-            return entity.variables.getAll(state);
-        },
+        entity: entity,
         async save(changes, repositories) {
-          await repositories.environmentVariablesRepository.updateEnvironment(environmentId, { variables: changes });
+          await repositories.environmentVariablesRepository.updateEnvironment(environmentId, changes);
         },
       },
       {

@@ -7,7 +7,7 @@ import { BufferedRuntimeVariablesEntity } from "./runtime-variables";
 import { BufferedCollectionRecordEntity } from "./collection";
 import type { ApiClientEntity, ApiClientEntityMeta } from "../base";
 
-export type BufferedApiClientEntityMeta = ApiClientEntityMeta & ({originExists: true, referenceId: string} | {originExists: false});
+export type BufferedApiClientEntityMeta = ApiClientEntityMeta & { referenceId: string } & ({originExists: true} | {originExists: false});
 export interface BufferedApiClientEntity {
   meta: BufferedApiClientEntityMeta,
   origin: ApiClientEntity<any, any, any>
