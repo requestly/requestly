@@ -47,7 +47,8 @@ export const EditVariableView: React.FC<EditVariableViewProps> = ({
   const [upserting, setUpserting] = useState(false);
 
   const { entity, saveVariablesToRepository, scopeDisplayName, store } = useVariableScopeAdapter(
-    existingVariable.scope
+    existingVariable.scope,
+    scopeOptions
   );
 
   const [formData, setFormData] = useState({
@@ -85,9 +86,7 @@ export const EditVariableView: React.FC<EditVariableViewProps> = ({
 
       const updatedVariables = mergeVariable(currentVariables, key, variable);
 
-      if (scope !== VariableScope.RUNTIME) {
-        await saveVariablesToRepository(updatedVariables);
-      }
+      await saveVariablesToRepository(updatedVariables);
 
       entity.variables.set({
         id: existingId,

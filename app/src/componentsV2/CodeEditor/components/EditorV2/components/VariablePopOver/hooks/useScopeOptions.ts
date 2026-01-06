@@ -9,6 +9,7 @@ import { MdHorizontalSplit } from "@react-icons/all-files/md/MdHorizontalSplit";
 import { useActiveEnvironment } from "features/apiClient/slices";
 import { useWorkspaceId } from "features/apiClient/common/WorkspaceProvider";
 import { NoopContextId } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
+import { GLOBAL_ENVIRONMENT_ID, RUNTIME_VARIABLES_ENTITY_ID } from "features/apiClient/slices/common/constants";
 
 interface UseScopeOptionsResult {
   scopeOptions: ScopeOption[];
@@ -78,24 +79,28 @@ export const useScopeOptions = (collectionId?: string): UseScopeOptionsResult =>
         label: activeEnvironment ? "Current environment" : "No Active Environment",
         icon: getScopeIcon(VariableScope.ENVIRONMENT),
         disabled: !activeEnvironment,
+        id: activeEnvironment?.id,
       },
       {
         value: VariableScope.COLLECTION,
         label: "Current collection",
         icon: getScopeIcon(VariableScope.COLLECTION),
         disabled: !collectionId,
+        id: collectionId,
       },
       {
         value: VariableScope.GLOBAL,
         label: "Global",
         icon: getScopeIcon(VariableScope.GLOBAL),
         disabled: isNoopContext,
+        id: GLOBAL_ENVIRONMENT_ID,
       },
       {
         value: VariableScope.RUNTIME,
         label: "Runtime variables",
         icon: getScopeIcon(VariableScope.RUNTIME),
         disabled: false,
+        id: RUNTIME_VARIABLES_ENTITY_ID,
       },
     ];
 

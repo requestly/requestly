@@ -1,14 +1,14 @@
 import { VariableScope } from "backend/environment/types";
 import type { EnvironmentVariables } from "backend/environment/types";
-import { useEntity, useEnvironmentEntity } from "features/apiClient/slices/entities/hooks";
+import { useEntity } from "features/apiClient/slices/entities/hooks";
 import { ApiClientEntityType } from "features/apiClient/slices/entities/types";
 import { GLOBAL_ENVIRONMENT_ID, RUNTIME_VARIABLES_ENTITY_ID } from "features/apiClient/slices/common/constants";
-import { useActiveEnvironment, useApiClientFeatureContext } from "features/apiClient/slices";
-import { useCollectionIdByRecordId } from "features/apiClient/slices/apiRecords/apiRecords.hooks";
-import { useHostContext } from "hooks/useHostContext";
+import { EntityNotFound, useApiClientFeatureContext } from "features/apiClient/slices";
 import { useStore } from "react-redux";
 import { useWorkspaceViewStore } from "features/apiClient/common/WorkspaceProvider";
 import type { Store } from "@reduxjs/toolkit";
+import { ScopeOption } from "../types";
+import { ApiClientVariables } from "features/apiClient/slices/entities/api-client-variables";
 
 /**
  * Adapter for scope-specific variable operations.
@@ -17,12 +17,7 @@ import type { Store } from "@reduxjs/toolkit";
 export interface VariableScopeAdapter {
   /** Redux entity with variables API (getAll, add, set, delete) */
   entity: {
-    variables: {
-      getAll: (state: unknown) => EnvironmentVariables;
-      add: (params: Record<string, unknown>) => string;
-      set: (params: Record<string, unknown>) => void;
-      delete: (id: string) => void;
-    };
+    variables: ApiClientVariables<any, any>;
   };
   /** Entity ID for repository operations */
   entityId: string;
@@ -49,38 +44,32 @@ export interface VariableScopeAdapter {
  * @returns Adapter with entity, repository function, display name, and store
  * @throws Error if scope context is missing (e.g., no active environment)
  */
-export function useVariableScopeAdapter(scope: VariableScope): VariableScopeAdapter {
-  const { getSourceId } = useHostContext();
-  const recordId = getSourceId();
-  const collectionId = useCollectionIdByRecordId(recordId);
-  const activeEnvironment = useActiveEnvironment();
+export function useVariableScopeAdapter(scope: VariableScope, scopeOptions: ScopeOption[]): VariableScopeAdapter {
+  const selectedScopeOption = scopeOptions.find((option) => option.value === scope && !option.disabled && option.id);
+  if (!selectedScopeOption) {
+    throw new EntityNotFound(scope, "scope");
+  }
+  const entity = useEntity({
+    id: selectedScopeOption.id!,
+    type:
+      scope === VariableScope.ENVIRONMENT
+        ? ApiClientEntityType.ENVIRONMENT
+        : scope === VariableScope.COLLECTION
+        ? ApiClientEntityType.COLLECTION_RECORD
+        : scope === VariableScope.RUNTIME
+        ? ApiClientEntityType.RUNTIME_VARIABLES
+        : ApiClientEntityType.GLOBAL_ENVIRONMENT,
+  });
   const { repositories } = useApiClientFeatureContext();
 
   const globalStore = useStore();
   const workspaceStore = useWorkspaceViewStore();
 
-  const globalEnvEntity = useEntity({
-    id: GLOBAL_ENVIRONMENT_ID,
-    type: ApiClientEntityType.GLOBAL_ENVIRONMENT,
-  });
-
-  const envEntity = useEnvironmentEntity(activeEnvironment?.id || "", ApiClientEntityType.ENVIRONMENT);
-
-  const collectionEntity = useEntity({
-    id: collectionId || "",
-    type: ApiClientEntityType.COLLECTION_RECORD,
-  });
-
-  const runtimeEntity = useEntity({
-    id: RUNTIME_VARIABLES_ENTITY_ID,
-    type: ApiClientEntityType.RUNTIME_VARIABLES,
-  });
-
-  switch (scope) {
-    case VariableScope.GLOBAL:
+  switch (entity.type) {
+    case ApiClientEntityType.GLOBAL_ENVIRONMENT:
       return {
-        entity: { variables: globalEnvEntity.variables },
-        entityId: GLOBAL_ENVIRONMENT_ID,
+        entity: { variables: entity.variables },
+        entityId: entity.id,
         saveVariablesToRepository: async (variables: EnvironmentVariables) => {
           await repositories.environmentVariablesRepository.updateEnvironment(GLOBAL_ENVIRONMENT_ID, { variables });
         },
@@ -88,37 +77,31 @@ export function useVariableScopeAdapter(scope: VariableScope): VariableScopeAdap
         store: workspaceStore,
       };
 
-    case VariableScope.ENVIRONMENT:
-      if (!activeEnvironment) {
-        throw new Error("No active environment selected");
-      }
+    case ApiClientEntityType.ENVIRONMENT:
       return {
-        entity: { variables: envEntity.variables },
-        entityId: activeEnvironment.id,
+        entity: { variables: entity.variables },
+        entityId: entity.id,
         saveVariablesToRepository: async (variables: EnvironmentVariables) => {
-          await repositories.environmentVariablesRepository.updateEnvironment(activeEnvironment.id, { variables });
+          await repositories.environmentVariablesRepository.updateEnvironment(entity.id, { variables });
         },
-        scopeDisplayName: activeEnvironment.name,
+        scopeDisplayName: entity.getName(workspaceStore.getState()),
         store: workspaceStore,
       };
 
-    case VariableScope.COLLECTION:
-      if (!collectionId) {
-        throw new Error("Collection variable operation requires collection context");
-      }
+    case ApiClientEntityType.COLLECTION_RECORD:
       return {
-        entity: { variables: collectionEntity.variables },
-        entityId: collectionId,
+        entity: { variables: entity.variables },
+        entityId: entity.id,
         saveVariablesToRepository: async (variables: EnvironmentVariables) => {
-          await repositories.apiClientRecordsRepository.setCollectionVariables(collectionId, variables);
+          await repositories.apiClientRecordsRepository.setCollectionVariables(entity.id, variables);
         },
         scopeDisplayName: "Collection",
         store: workspaceStore,
       };
 
-    case VariableScope.RUNTIME:
+    case ApiClientEntityType.RUNTIME_VARIABLES:
       return {
-        entity: { variables: runtimeEntity.variables },
+        entity: { variables: entity.variables },
         entityId: RUNTIME_VARIABLES_ENTITY_ID,
         saveVariablesToRepository: async () => {
           // No-op - runtime variables are not persisted to repository

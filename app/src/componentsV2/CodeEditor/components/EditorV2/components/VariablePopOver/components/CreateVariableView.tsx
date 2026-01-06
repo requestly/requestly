@@ -38,7 +38,10 @@ export const CreateVariableView: React.FC<CreateVariableViewProps> = ({ variable
     currentValue: "" as VariableValueType,
   });
 
-  const { entity, saveVariablesToRepository, scopeDisplayName, store } = useVariableScopeAdapter(formData.scope);
+  const { entity, saveVariablesToRepository, scopeDisplayName, store } = useVariableScopeAdapter(
+    formData.scope,
+    scopeOptions
+  );
 
   useEffect(() => {
     setFormData((prev) => ({ ...prev, scope: defaultScope }));
@@ -78,9 +81,7 @@ export const CreateVariableView: React.FC<CreateVariableViewProps> = ({ variable
       const { key, variable } = parseRawVariable(varName, { type, initialValue, currentValue });
 
       const updatedVariables = mergeVariable(currentVariables, key, variable);
-      if (scope !== VariableScope.RUNTIME) {
-        await saveVariablesToRepository(updatedVariables);
-      }
+      await saveVariablesToRepository(updatedVariables);
 
       entity.variables.add({
         id: variable.id,
