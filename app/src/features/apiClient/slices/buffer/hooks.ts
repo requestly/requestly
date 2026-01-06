@@ -33,29 +33,38 @@ function createSave(
       onError = () => { },
     } = hooks;
     const state = store.getState();
-    const buffer = bufferAdapterSelectors.selectById(state.buffer, params.entity.meta.id);
-    if (!buffer) {
-      throw new EntityNotFound(params.entity.meta.id, "buffer");
-    }
-    const changes = params.produceChanges?.(params.entity, state) || buffer.current as C;
-    hooks.beforeSave?.();
-    const result = await Try(() => params.save(changes, repositories, params.entity));
-    hooks.afterSave?.();
-    result
-      .inspectError(onError)
-      .inspect((savedEntity) => {
-        params.entity.origin.upsert(savedEntity || changes);
-        dispatch(
-          bufferActions.markSaved({
-            id: params.entity.meta.id,
-            referenceId: savedEntity?.id,
-            savedData: savedEntity,
-          })
-        );
-        onSuccess(changes, params.entity)
+    try {
+      const buffer = bufferAdapterSelectors.selectById(state.buffer, params.entity.meta.id);
+      if (!buffer) {
+        throw new EntityNotFound(params.entity.meta.id, "buffer");
       }
-      );
-    return result;
+      const changes = params.produceChanges?.(params.entity, state) || buffer.current as C;
+      hooks.beforeSave?.();
+      const result = await Try(() => params.save(changes, repositories, params.entity));
+      result
+        .inspectError(onError)
+        .inspectError(() => {
+          hooks.afterSave?.();
+        })
+        .inspect((savedEntity) => {
+          hooks.afterSave?.();
+          params.entity.origin.upsert(savedEntity || changes);
+          dispatch(
+            bufferActions.markSaved({
+              id: params.entity.meta.id,
+              referenceId: savedEntity?.id,
+              savedData: savedEntity,
+            })
+          );
+          onSuccess(changes, params.entity)
+        }
+        );
+      return result;
+    }
+    catch (e) {
+      hooks.afterSave?.();
+      onError(e);
+    }
   }
   return save
 };

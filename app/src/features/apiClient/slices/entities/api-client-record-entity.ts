@@ -4,6 +4,7 @@ import { ApiClientEntity, ApiClientEntityMeta } from "./base";
 import type { UpdateCommand, DeepPartial, DeepPartialWithNull } from "../types";
 import { apiRecordsActions } from "../apiRecords";
 
+
 export abstract class ApiClientRecordEntity<T extends RQAPI.ApiClientRecord, M extends ApiClientEntityMeta = ApiClientEntityMeta> extends ApiClientEntity<T, M> {
   dispatchCommand(command: UpdateCommand<T>): void {
     this.dispatch(apiRecordsActions.applyPatch({ id: this.meta.id, command }));
@@ -83,7 +84,7 @@ export abstract class ApiClientRecordEntity<T extends RQAPI.ApiClientRecord, M e
     this.DELETECOMMON({ data: { auth: null } });
   }
 
-  setScripts(scripts: { preRequest?: string; postResponse?: string }): void {
+  setScripts(scripts: { preRequest: string; postResponse: string }): void {
     this.SETCOMMON({ data: { scripts } });
   }
 
@@ -94,4 +95,9 @@ export abstract class ApiClientRecordEntity<T extends RQAPI.ApiClientRecord, M e
   setPostResponseScript(script: string): void {
     this.SETCOMMON({ data: { scripts: { postResponse: script } } });
   }
+
+  setResponse(response: RQAPI.HttpResponse): void {
+    this.SETCOMMON({ data: { response } });
+  }
+
 }

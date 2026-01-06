@@ -3,32 +3,35 @@ import type { TableProps } from "antd";
 import { ContentListTable } from "componentsV2/ContentList";
 import { PathVariableTableEditableRow, PathVariableTableEditableCell } from "./PathVariableTableRow";
 import { KeyValueDataType, RQAPI } from "features/apiClient/types";
-import { usePathVariablesStore } from "features/apiClient/hooks/usePathVariables.store";
 import { useScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
 import "./pathVariableTable.scss";
 import { doesValueMatchDataType } from "features/apiClient/screens/apiClient/utils";
 import { KeyValueTableSettingsDropdown } from "../../../components/request/components/KeyValueTable/KeyValueTableSettingsDropdown";
 import { capitalize } from "lodash";
+import { BufferedHttpRecordEntity } from "features/apiClient/slices/entities";
+import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
 
 interface PathVariableTableProps {
-  recordId: string;
-  onChange: (variables: RQAPI.PathVariable[]) => void;
+  entity: BufferedHttpRecordEntity,
+  // recordId: string;
+  // onChange: (variables: RQAPI.PathVariable[]) => void;
 }
 
 type ColumnTypes = Exclude<TableProps<RQAPI.PathVariable>["columns"], undefined>;
 
-export const PathVariableTable: React.FC<PathVariableTableProps> = ({ recordId, onChange }) => {
-  const [variables, setPathVariables] = usePathVariablesStore((state) => [state.pathVariables, state.setPathVariables]);
-  const scopedVariables = useScopedVariables(recordId);
+export const PathVariableTable: React.FC<PathVariableTableProps> = ({ entity }) => {
+  // const [variables, setPathVariables] = usePathVariablesStore((state) => [state.pathVariables, state.setPathVariables]);
+  const variables = useApiClientSelector(s => entity.getPathVariables(s) || []);
+  const scopedVariables = useScopedVariables(entity.meta.referenceId);
   const [showDescription, setShowDescription] = useState(false);
 
   const handleUpdateVariable = useCallback(
     (variable: RQAPI.PathVariable) => {
       const updatedVariables = variables.map((item) => (item.id === variable.id ? { ...item, ...variable } : item));
-      setPathVariables(updatedVariables);
-      onChange(updatedVariables);
+      entity.setPathVariables(updatedVariables);
+      // onChange(updatedVariables);
     },
-    [variables, setPathVariables, onChange]
+    [variables]
   );
 
   const columns = useMemo(() => {
