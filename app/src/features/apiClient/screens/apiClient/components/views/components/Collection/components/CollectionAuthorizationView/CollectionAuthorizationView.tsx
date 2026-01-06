@@ -9,7 +9,7 @@ import { useBufferedCollectionEntity, useIsBufferDirty } from "features/apiClien
 import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
 import { useSaveBuffer } from "features/apiClient/slices/buffer/hooks";
 import { toast } from "utils/Toast";
-import { useActiveTab, useActiveTabId } from "componentsV2/Tabs/slice";
+import { useHostContext } from "hooks/useHostContext";
 
 interface Props {
   collectionId: string;
@@ -22,6 +22,7 @@ interface Props {
 const CollectionAuthorizationView: React.FC<Props> = ({ collectionId }) => {
   const [isSaving, setIsSaving] = useState(false);
   const entity = useBufferedCollectionEntity(collectionId);
+  const context = useHostContext();
 
   const authOptions = useApiClientSelector((s) => entity.getAuth(s));
   const rootLevelRecord = useApiClientSelector((s) => !entity.getCollectionId(s));
@@ -31,9 +32,8 @@ const CollectionAuthorizationView: React.FC<Props> = ({ collectionId }) => {
     type: "referenceId",
   });
 
-  const tab = useActiveTab();
-  const activeTabId = useActiveTabId();
-  const isActiveTab = activeTabId === tab?.id;
+  const isActiveTab = context.getIsActive();
+
   const saveBuffer = useSaveBuffer();
 
   const handleAuthUpdate = useCallback(

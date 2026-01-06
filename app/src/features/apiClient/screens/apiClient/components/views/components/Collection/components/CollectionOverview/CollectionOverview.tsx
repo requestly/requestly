@@ -1,18 +1,15 @@
 import type React from "react";
 import { useCallback, useMemo, useState } from "react";
-import type { RQAPI } from "features/apiClient/types";
 import { InlineInput } from "componentsV2/InlineInput/InlineInput";
-import { Input, Tabs } from "antd";
+import { Input, notification, Tabs } from "antd";
 import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
 import remarkGfm from "remark-gfm";
 import { useOutsideClick } from "hooks";
 import { useRBAC } from "features/rbac";
 import "./collectionOverview.scss";
-import { useBufferedCollectionEntity, useEntity } from "features/apiClient/slices/entities/hooks";
+import { useEntity } from "features/apiClient/slices/entities/hooks";
 import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
-import { useSaveBuffer } from "features/apiClient/slices/buffer/hooks";
-import { toast } from "utils/Toast";
 import { useApiClientRepository } from "features/apiClient/slices";
 import { ApiClientEntityType } from "features/apiClient/slices/entities/types";
 
@@ -36,18 +33,27 @@ export const CollectionOverview: React.FC<CollectionOverviewProps> = ({ collecti
   const collectionName = useApiClientSelector((s) => entity.getName(s));
   const collectionDescription = useApiClientSelector((s) => entity.getDescription(s));
 
-  
   const { ref: collectionDescriptionRef } = useOutsideClick<HTMLDivElement>(() => {
     if (showEditor) {
       setShowEditor(false);
     }
   });
 
-  
   const handleCollectionNameChange = useCallback(
     async (value: string) => {
       const updatedCollectionName = value || "Untitled Collection";
-      await  repositories.apiClientRecordsRepository.renameCollection(collectionId, updatedCollectionName)
+      const result = await repositories.apiClientRecordsRepository.renameCollection(
+        collectionId,
+        updatedCollectionName
+      );
+      if (!result.success) {
+        notification.error({
+          message: `Could not update collection Name.`,
+          description: result?.message,
+          placement: "bottomRight",
+        });
+      }
+
       entity.setName(updatedCollectionName);
     },
     [entity, collectionId, repositories.apiClientRecordsRepository]
@@ -55,7 +61,16 @@ export const CollectionOverview: React.FC<CollectionOverviewProps> = ({ collecti
 
   const handleDescriptionChange = useCallback(
     async (value: string) => {
-      await repositories.apiClientRecordsRepository.updateCollectionDescription(collectionId, value);
+      const result = await repositories.apiClientRecordsRepository.updateCollectionDescription(collectionId, value);
+
+      if (!result.success) {
+        notification.error({
+          message: `Could not update collection description.`,
+          description: result?.message,
+          placement: "bottomRight",
+        });
+      }
+
       entity.setDescription(value);
     },
     [entity, collectionId, repositories.apiClientRecordsRepository]
@@ -69,12 +84,7 @@ export const CollectionOverview: React.FC<CollectionOverviewProps> = ({ collecti
         components={{
           a(props) {
             return (
-              <a
-                {...props}
-                target="_blank"
-                rel="noreferrer"
-                onClick={(e) => e.stopPropagation()}
-              >
+              <a {...props} target="_blank" rel="noreferrer" onClick={(e) => e.stopPropagation()}>
                 {props.children}
               </a>
             );
@@ -106,16 +116,16 @@ export const CollectionOverview: React.FC<CollectionOverviewProps> = ({ collecti
                   key: "markdown",
                   label: "Markdown",
                   children: (
-                      <Input.TextArea
-                        autoFocus
-                        value={collectionDescription}
-                        placeholder={COLLECTION_DETAILS_PLACEHOLDER}
-                        className="collection-overview-description-textarea"
-                        autoSize={{ minRows: 15 }}
-                        onChange={(e) => {
-                          handleDescriptionChange(e.target.value);
-                        }}
-                      />
+                    <Input.TextArea
+                      autoFocus
+                      value={collectionDescription}
+                      placeholder={COLLECTION_DETAILS_PLACEHOLDER}
+                      className="collection-overview-description-textarea"
+                      autoSize={{ minRows: 15 }}
+                      onChange={(e) => {
+                        handleDescriptionChange(e.target.value);
+                      }}
+                    />
                   ),
                 },
                 {
