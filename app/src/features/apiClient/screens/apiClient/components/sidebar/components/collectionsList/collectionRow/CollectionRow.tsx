@@ -256,6 +256,8 @@ export const CollectionRow: React.FC<Props> = ({
               recordsToMove: [item.record],
               collectionId: destination.collectionId,
               repository: sourceContext.repositories.apiClientRecordsRepository,
+              sourceWorkspaceId: item.workspaceId,
+              destinationWorkspaceId: destination.workspaceId,
             }) as any
           )
           .unwrap();
