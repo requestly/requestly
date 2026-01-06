@@ -35,7 +35,7 @@ import {
 } from "features/apiClient/slices/environments";
 import { EnvironmentEntity } from "features/apiClient/slices/environments/types";
 import { bufferActions, bufferSlice, bufferSyncMiddleware } from "features/apiClient/slices/buffer";
-import { erroredRecordsSlice } from "features/apiClient/slices/erroredRecords";
+import { erroredRecordsSlice, ErroredRecordsState } from "features/apiClient/slices/erroredRecords";
 import { getEntityDataFromTabSource, GetEntityDataFromTabSourceState } from "componentsV2/Tabs/slice";
 import { closeTab } from "componentsV2/Tabs/slice/thunks";
 import { groupBy, mapValues } from "lodash";
@@ -256,13 +256,7 @@ class ApiClientContextService {
     });
   }
 
-  private hydrateErroredRecords(params: {
-    erroredRecords: {
-      apiErroredRecords: ErroredRecord[];
-      environmentErroredRecords: ErroredRecord[];
-    };
-    store: ApiClientStore;
-  }): void {
+  private hydrateErroredRecords(params: { erroredRecords: ErroredRecordsState; store: ApiClientStore }): void {
     const { erroredRecords, store } = params;
 
     store.dispatch(

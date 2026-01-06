@@ -133,7 +133,7 @@ export const apiRecordsSlice = createSlice({
       state,
       action: PayloadAction<{
         records: RQAPI.ApiClientRecord[];
-        erroredRecords: ErroredRecord[];
+        erroredRecords: ErroredRecord[]; // TODO: cleanup
       }>
     ) {
       apiRecordsAdapter.setAll(state.records, action.payload.records);

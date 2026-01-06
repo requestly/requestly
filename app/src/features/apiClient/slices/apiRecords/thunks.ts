@@ -16,6 +16,7 @@ import { reduxStore } from "store";
 import { ApiClientViewMode } from "../workspaceView";
 import { getApiClientFeatureContext } from "../workspaceView/helpers/ApiClientContextRegistry/hooks";
 import { Workspace } from "features/workspaces/types";
+import { erroredRecordsActions } from "../erroredRecords";
 
 type Repository = ApiClientRecordsInterface<Record<string, unknown>>;
 
@@ -115,9 +116,12 @@ export const forceRefreshRecords = createAsyncThunk<boolean, { repository: Repos
       dispatch(
         apiRecordsActions.hydrate({
           records: recordsToRefresh.data.records,
-          erroredRecords: recordsToRefresh.data.erroredRecords,
+          erroredRecords: recordsToRefresh.data.erroredRecords, // TODO: cleanup
         })
       );
+
+      dispatch(erroredRecordsActions.setApiErroredRecords(recordsToRefresh.data.erroredRecords));
+      // closeCorruptedTabs();
 
       return true;
     } catch (error) {
