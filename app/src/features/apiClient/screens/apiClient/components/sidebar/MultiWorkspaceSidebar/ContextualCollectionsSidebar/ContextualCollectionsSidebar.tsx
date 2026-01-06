@@ -128,16 +128,10 @@ export const ContextualCollectionsSidebar: React.FC<{
     try {
       const promises = Object.entries(selectedRecordsAcrossWorkspaces.current).map(async ([ctxId, value]) => {
         const context = getApiClientFeatureContext(ctxId);
-        const records = Array.from(value?.recordIds ?? [])
-          .map((id) => getRecord(id, ctxId))
-          .filter((record): record is RQAPI.ApiClientRecord => record !== undefined);
-
-        if (records.length === 0) return;
-
         return context.store
           .dispatch(
             duplicateRecords({
-              records,
+              recordIds: value?.recordIds,
               repository: context.repositories.apiClientRecordsRepository,
             }) as any
           )

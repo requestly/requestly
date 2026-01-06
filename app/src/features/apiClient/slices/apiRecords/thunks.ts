@@ -2,9 +2,18 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import { omit, partition } from "lodash";
 import { RQAPI } from "features/apiClient/types";
 import { ApiClientRecordsInterface } from "../../helpers/modules/sync/interfaces";
-import { isApiRequest, isApiCollection, processRecordsForDuplication } from "../../screens/apiClient/utils";
-import { getAllRecords } from "../../commands/utils";
+import {
+  isApiRequest,
+  isApiCollection,
+  processRecordsForDuplication,
+  filterOutChildrenRecords,
+} from "../../screens/apiClient/utils";
+import { getAllRecords, getRecordsToRender } from "../../commands/utils";
 import { apiRecordsActions } from "./slice";
+import { selectAllRecords, selectChildToParent } from "./selectors";
+import { ApiClientStoreState } from "../workspaceView/helpers/ApiClientContextRegistry";
+import { reduxStore } from "store";
+import { ApiClientViewMode } from "../workspaceView";
 
 type Repository = ApiClientRecordsInterface<Record<string, unknown>>;
 
@@ -118,22 +127,52 @@ export const moveRecords = createAsyncThunk<
   }
 });
 
+export const forceRefreshRecords = createAsyncThunk<boolean, { repository: Repository }, { rejectValue: string }>(
+  "apiRecords/forceRefresh",
+  async ({ repository }, { dispatch, rejectWithValue }) => {
+    try {
+      const recordsToRefresh = await repository.getRecordsForForceRefresh();
+      if (!recordsToRefresh || !recordsToRefresh.success) {
+        return false;
+      }
+
+      dispatch(
+        apiRecordsActions.hydrate({
+          records: recordsToRefresh.data.records,
+          erroredRecords: recordsToRefresh.data.erroredRecords,
+        })
+      );
+
+      return true;
+    } catch (error) {
+      return rejectWithValue(error instanceof Error ? error.message : "Failed to refresh records");
+    }
+  }
+);
+
 export const duplicateRecords = createAsyncThunk<
   { duplicatedRecords: RQAPI.ApiClientRecord[] },
-  {
-    records: RQAPI.ApiClientRecord[];
-    repository: Repository;
-  },
-  { rejectValue: string }
->("apiRecords/duplicate", async ({ records, repository }, { dispatch, rejectWithValue }) => {
+  { recordIds: Set<string>; repository: Repository },
+  { rejectValue: string; state: ApiClientStoreState }
+>("apiRecords/duplicate", async ({ recordIds, repository }, { dispatch, rejectWithValue, getState }) => {
   try {
-    const recordsToDuplicate = processRecordsForDuplication(records, repository);
+    const apiClientRecords = selectAllRecords(getState());
+    const recordsToRender = getRecordsToRender({ apiClientRecords });
+    const childParentMap = selectChildToParent(getState());
+    const processedRecords = filterOutChildrenRecords(recordIds, childParentMap, recordsToRender.recordsMap);
+    const recordsToDuplicate = processRecordsForDuplication(processedRecords, repository);
+
     const duplicatedRecords = await repository.duplicateApiEntities(recordsToDuplicate);
 
     dispatch(apiRecordsActions.upsertRecords(duplicatedRecords));
 
+    const isMultiView = reduxStore.getState().workspaceView.viewMode === ApiClientViewMode.MULTI;
+    if (isMultiView) {
+      await dispatch(forceRefreshRecords({ repository })).unwrap();
+    }
+
     return { duplicatedRecords };
   } catch (error) {
-    return rejectWithValue("Failed to duplicate records");
+    return rejectWithValue(error instanceof Error ? error.message : "Failed to duplicate records");
   }
 });

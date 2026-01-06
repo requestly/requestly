@@ -205,7 +205,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
           try {
             const { duplicatedRecords } = await dispatch(
               duplicateRecords({
-                records: processedRecords,
+                recordIds: selectedRecords,
                 repository: apiClientRecordsRepository,
               })
             ).unwrap();
