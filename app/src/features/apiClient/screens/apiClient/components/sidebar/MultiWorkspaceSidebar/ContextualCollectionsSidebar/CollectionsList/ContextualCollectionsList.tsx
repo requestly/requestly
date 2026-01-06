@@ -241,8 +241,8 @@ export const ContextualCollectionsList: React.FC<Props> = ({
                       setShowSelection: handleShowSelection,
                     }}
                     onItemClick={handleItemClick}
-                    recordBefore={recordBefore}
-                    recordAfter={recordAfter}
+                    previousRecord={recordBefore}
+                    nextRecord={recordAfter}
                     handleRecordsToBeDeleted={(records) => handleRecordsToBeDeleted(records, context)}
                   />
                 );
