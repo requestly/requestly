@@ -6,13 +6,18 @@ import { CollectionsVariablesView } from "./components/CollectionsVariablesView/
 import CollectionAuthorizationView from "./components/CollectionAuthorizationView/CollectionAuthorizationView";
 import "./collectionView.scss";
 import { isEmpty } from "lodash";
-import { useBufferedCollectionEntity, useEntity } from "features/apiClient/slices/entities/hooks";
+import {
+  useBufferByReferenceId,
+  useBufferedCollectionEntity,
+  useEntity,
+} from "features/apiClient/slices/entities/hooks";
 import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
 import { useApiClientRepository } from "features/apiClient/slices/workspaceView/helpers/ApiClientContextRegistry";
 import { ApiClientBreadCrumb, BreadcrumbType } from "../ApiClientBreadCrumb/ApiClientBreadCrumb";
 import { trackCollectionRunnerViewed } from "modules/analytics/events/features/apiClient";
 import { CollectionRowOptionsCustomEvent } from "../../../sidebar/components/collectionsList/collectionRow/utils";
 import { ApiClientEntityType } from "features/apiClient/slices/entities/types";
+import { useTabActions } from "componentsV2/Tabs/slice";
 
 const TAB_KEYS = {
   OVERVIEW: "overview",
@@ -28,13 +33,14 @@ interface CollectionViewProps {
 export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) => {
   const { apiClientRecordsRepository } = useApiClientRepository();
   const [activeTabKey, setActiveTabKey] = useState(TAB_KEYS.OVERVIEW);
-
   const entity = useEntity({
     id: collectionId,
     type: ApiClientEntityType.COLLECTION_RECORD,
   });
 
   const collectionName = useApiClientSelector((s) => entity.getName(s));
+  const collectionBuffer = useBufferByReferenceId(collectionId);
+
   const tabItems = useMemo(() => {
     return [
       {
@@ -58,7 +64,7 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
         // children: <CollectionRunnerView collectionId={collection.id} />,
       },
     ];
-  }, [ collectionId]);
+  }, [collectionId]);
 
   useEffect(() => {
     const handler = () => {
@@ -86,45 +92,44 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
 
       entity.setName(name);
     },
-    [ apiClientRecordsRepository, collectionId, entity ]
+    [apiClientRecordsRepository, collectionId, entity]
   );
-
 
   return (
     <div className="collection-view-container">
-        <>
-          <div className="collection-view-breadcrumb-container">
-            <ApiClientBreadCrumb
-              id={collectionId}
-              placeholder="New Collection"
-              name={collectionName}
-              onBlur={(newName) => {
-                handleCollectionNameChange(newName);
-                // setIsNew(false);
-              }}
-              // autoFocus={getIsNew()}
-              breadCrumbType={BreadcrumbType.COLLECTION}
-            />
-          </div>
-          <div className="collection-view-content">
-            <Tabs
-              destroyInactiveTabPane={false}
-              activeKey={activeTabKey}
-              onChange={(key) => setActiveTabKey(key)}
-              items={tabItems}
-              animated={false}
-              moreIcon={null}
-              onTabClick={(key) => {
-                if (key === TAB_KEYS.RUNNER) {
-                  trackCollectionRunnerViewed({
-                    collection_id: collectionId,
-                    source: "collection_overview",
-                  });
-                }
-              }}
-            />
-          </div>
-        </>
+      <>
+        <div className="collection-view-breadcrumb-container">
+          <ApiClientBreadCrumb
+            id={collectionId}
+            placeholder="New Collection"
+            name={collectionName}
+            onBlur={(newName) => {
+              handleCollectionNameChange(newName);
+              // setIsNew(false);
+            }}
+            autoFocus={collectionBuffer.isNew}
+            breadCrumbType={BreadcrumbType.COLLECTION}
+          />
+        </div>
+        <div className="collection-view-content">
+          <Tabs
+            destroyInactiveTabPane={false}
+            activeKey={activeTabKey}
+            onChange={(key) => setActiveTabKey(key)}
+            items={tabItems}
+            animated={false}
+            moreIcon={null}
+            onTabClick={(key) => {
+              if (key === TAB_KEYS.RUNNER) {
+                trackCollectionRunnerViewed({
+                  collection_id: collectionId,
+                  source: "collection_overview",
+                });
+              }
+            }}
+          />
+        </div>
+      </>
     </div>
   );
 };
