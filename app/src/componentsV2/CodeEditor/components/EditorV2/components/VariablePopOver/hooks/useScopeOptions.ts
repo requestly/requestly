@@ -1,12 +1,14 @@
 import { useMemo } from "react";
 import React from "react";
 import { VariableScope } from "backend/environment/types";
-import { ScopeOption } from "../types";
+import type { ScopeOption } from "../types";
 import { MdOutlineCategory } from "@react-icons/all-files/md/MdOutlineCategory";
 import { BiNote } from "@react-icons/all-files/bi/BiNote";
 import { BsGlobeCentralSouthAsia } from "@react-icons/all-files/bs/BsGlobeCentralSouthAsia";
 import { MdHorizontalSplit } from "@react-icons/all-files/md/MdHorizontalSplit";
 import { useActiveEnvironment } from "features/apiClient/slices";
+import { useWorkspaceId } from "features/apiClient/common/WorkspaceProvider";
+import { NoopContextId } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 
 interface UseScopeOptionsResult {
   scopeOptions: ScopeOption[];
@@ -14,9 +16,9 @@ interface UseScopeOptionsResult {
 }
 
 const createIconWithWrapper = (
-  IconComponent: React.ComponentType<any>,
+  IconComponent: React.ComponentType<{ style?: React.CSSProperties }>,
   iconColor: string,
-  bgColor: string = "transparent"
+  bgColor = "transparent"
 ) => {
   return React.createElement(
     "div",
@@ -66,13 +68,14 @@ export const getScopeIcon = (scope: VariableScope): React.ReactNode => {
 
 export const useScopeOptions = (collectionId?: string): UseScopeOptionsResult => {
   const activeEnvironment = useActiveEnvironment();
-  const isNoopContext = false;
+  const workspaceId = useWorkspaceId();
+  const isNoopContext = workspaceId === NoopContextId;
 
   return useMemo(() => {
     const options: ScopeOption[] = [
       {
         value: VariableScope.ENVIRONMENT,
-        label: activeEnvironment ? `Current environment` : "No Active Environment",
+        label: activeEnvironment ? "Current environment" : "No Active Environment",
         icon: getScopeIcon(VariableScope.ENVIRONMENT),
         disabled: !activeEnvironment,
       },
