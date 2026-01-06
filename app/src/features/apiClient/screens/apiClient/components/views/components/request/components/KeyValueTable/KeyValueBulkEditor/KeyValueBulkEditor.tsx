@@ -26,13 +26,22 @@ const whiteTextTheme = EditorView.theme({
 });
 
 const parseKeyValueText = (text: string, originalData: KeyValuePair[]): KeyValuePair[] => {
-  const existingDataMap = new Map(originalData.map((item) => [item.key, item]));
+  const existingDataMap = new Map<string, KeyValuePair[]>();
+  originalData.forEach((item) => {
+    if (!existingDataMap.has(item.key)) {
+      existingDataMap.set(item.key, []);
+    }
+    existingDataMap.get(item.key)!.push(item);
+  });
+
+  let idCounter = 0;
+  const generateId = () => Date.now() * 1000 + idCounter++;
 
   return text
     .split("\n")
     .map((line) => line.trim())
     .filter(Boolean)
-    .map((line, index) => {
+    .map((line) => {
       const isCommented = line.startsWith("//");
       const cleanLine = isCommented ? line.slice(2).trim() : line;
       const colonIndex = cleanLine.indexOf(":");
@@ -40,18 +49,19 @@ const parseKeyValueText = (text: string, originalData: KeyValuePair[]): KeyValue
 
       const key = hasColon ? cleanLine.slice(0, colonIndex).trim() : cleanLine.trim();
       const value = hasColon ? cleanLine.slice(colonIndex + 1).trim() : "";
-      const existingItem = existingDataMap.get(key);
+      const existingItems = existingDataMap.get(key);
 
-      if (existingItem) {
+      if (existingItems && existingItems.length > 0) {
+        const existingItem = existingItems.shift()!;
         return {
           ...existingItem,
-          id: Date.now() + index,
+          id: generateId(),
           value: value,
           isEnabled: !isCommented,
         };
       }
       return {
-        id: Date.now() + index,
+        id: generateId(),
         key: key,
         value: value,
         isEnabled: !isCommented,
@@ -137,7 +147,7 @@ export const KeyValueBulkEditor: React.FC<KeyValueBulkEditorProps> = ({
           autocompletion={false}
         />
       </div>
-      <div className="bulk-edit-panel-hint">Format: key:value | One row per line | Prepend // to disable a row</div>
+      <div className="bulk-edit-panel-hint">{"Format: key:value | One row per line | Prepend // to disable a row"}</div>
     </div>
   );
 };

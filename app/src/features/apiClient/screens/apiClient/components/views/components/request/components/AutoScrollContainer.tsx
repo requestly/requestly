@@ -1,9 +1,9 @@
 import React, { useEffect, useRef } from "react";
 
-interface AutoScrollContainerProps {
+interface AutoScrollContainerProps<TTrigger = unknown> {
   children: React.ReactNode;
-  trigger: any;
-  scrollTargetRef?: React.RefObject<any> | null;
+  trigger: TTrigger;
+  scrollTargetRef?: React.RefObject<HTMLElement> | null;
 }
 
 export const AutoScrollContainer: React.FC<AutoScrollContainerProps> = ({ children, trigger, scrollTargetRef }) => {

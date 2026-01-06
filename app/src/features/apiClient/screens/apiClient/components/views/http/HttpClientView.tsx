@@ -863,7 +863,10 @@ const HttpClientView: React.FC<Props> = ({
 const WithQueryParamsProvider = (Component: React.ComponentType<any>): React.FC<Props> => {
   const WrappedComponent: React.FC = (props: any) => {
     const record = useAPIRecordsStore().getState().getData(props.apiEntryDetails.id) as RQAPI.ApiClientRecord;
-    const entry = (record?.data as RQAPI.HttpApiEntry) || props.apiEntryDetails.data;
+    const entry = useMemo(() => (record?.data as RQAPI.HttpApiEntry) || props.apiEntryDetails.data, [
+      record,
+      props.apiEntryDetails.data,
+    ]);
 
     return (
       <ErrorBoundary boundaryId="http-client-view-error-boundary">
