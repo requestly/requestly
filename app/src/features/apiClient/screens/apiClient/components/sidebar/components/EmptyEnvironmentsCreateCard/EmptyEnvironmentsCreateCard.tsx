@@ -6,10 +6,11 @@ import { EnvironmentViewTabSource } from "features/apiClient/screens/environment
 import { useTabActions } from "componentsV2/Tabs/slice";
 import { createEnvironment, useApiClientRepository } from "features/apiClient/slices";
 import { useApiClientDispatch } from "features/apiClient/slices/hooks/base.hooks";
+import { Workspace } from "features/workspaces/types";
 import "./emptyEnvironmentsCreateCard.scss";
 
 interface EmptyEnvironmentsCreateCardProps {
-  workspaceId: string | null;
+  workspaceId: Workspace["id"];
   isValidPermission: boolean;
 }
 
@@ -33,6 +34,7 @@ export const EmptyEnvironmentsCreateCard: React.FC<EmptyEnvironmentsCreateCardPr
       ).unwrap();
 
       openBufferedTab({
+        isNew: true,
         source: new EnvironmentViewTabSource({
           id,
           title: name,

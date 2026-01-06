@@ -87,3 +87,24 @@ export function useCollectionPath(id: EntityId): RQAPI.ApiClientRecord[] {
 export function useChildToParent() {
   return useApiClientSelector(selectChildToParent);
 }
+
+export function useCollectionIdByRecordId(recordId: EntityId | undefined): string | undefined {
+  return useApiClientSelector((state) => {
+    if (!recordId) return undefined;
+
+    const record = selectRecordById(state, recordId);
+    if (!record) return undefined;
+
+    // If the current record is a collection, use its ID
+    if (record.type === RQAPI.RecordType.COLLECTION) {
+      return record.id;
+    }
+
+    // If the current record is a request, use its parent collection ID
+    if (record.type === RQAPI.RecordType.API) {
+      return record.collectionId || undefined;
+    }
+
+    return undefined;
+  });
+}
