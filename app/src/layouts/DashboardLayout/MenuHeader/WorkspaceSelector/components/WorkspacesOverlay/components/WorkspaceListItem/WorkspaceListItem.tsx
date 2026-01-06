@@ -156,7 +156,7 @@ const LocalWorkspaceActions = ({
         </Tooltip>
 
         <Checkbox
-          checked={isSelected}
+          checked={isSelected && viewMode !== ApiClientViewMode.SINGLE}
           className="local-workspace-actions__checkbox"
           onChange={(e) => {
             handleMultiWorkspaceCheckbox(e.target.checked);
@@ -213,7 +213,6 @@ export const WorkspaceItem: React.FC<WorkspaceItemProps> = (props) => {
 
   const { workspace } = props;
   const isMultiView = viewMode === ApiClientViewMode.MULTI;
-  // TODO: can be a selector
   const isSelected = selectedWorkspaces.some((w) => w.id === workspace.id);
   const isWorkspaceSwitchDisabled = isMultiView && isSelected;
 

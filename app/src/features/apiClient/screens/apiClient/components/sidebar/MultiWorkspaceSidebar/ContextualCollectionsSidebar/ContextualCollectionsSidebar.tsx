@@ -3,7 +3,6 @@ import { useGetAllSelectedWorkspaces } from "features/apiClient/slices/workspace
 import { BulkActions, RQAPI } from "features/apiClient/types";
 import { useRBAC } from "features/rbac";
 import { SidebarListHeader } from "../../components/sidebarListHeader/SidebarListHeader";
-import { ContextId } from "features/apiClient/contexts/contextId.context";
 import ActionMenu, { ActionMenuProps } from "../../components/collectionsList/BulkActionsMenu";
 import { toast } from "utils/Toast";
 import { MoveToCollectionModal } from "../../../modals/MoveToCollectionModal/MoveToCollectionModal";
@@ -21,7 +20,7 @@ import { DeleteApiRecordModal } from "../../../modals";
 import { ContextualCollectionsList } from "./CollectionsList/ContextualCollectionsList";
 import { PostmanExportModal } from "../../../modals/postmanCollectionExportModal/PostmanCollectionExportModal";
 import { WorkspaceProvider } from "../WorkspaceProvider/WorkspaceProvider";
-
+import { WorkspaceIdContextProvider } from "features/apiClient/common/WorkspaceProvider";
 import "./contextualCollectionsSidebar.scss";
 
 export const ContextualCollectionsSidebar: React.FC<{
@@ -316,8 +315,7 @@ export const ContextualCollectionsSidebar: React.FC<{
       </div>
 
       {isMoveCollectionModalOpen ? (
-        // TODO: TBD on modals
-        <ContextId id={selectedRecordsInSingleContext[0] ?? null}>
+        <WorkspaceIdContextProvider id={selectedRecordsInSingleContext[0] ?? null}>
           <MoveToCollectionModal
             isBulkActionMode={showSelection}
             recordsToMove={selectedRecordsInSingleContext[1]}
@@ -326,7 +324,7 @@ export const ContextualCollectionsSidebar: React.FC<{
               setIsMoveCollectionModalOpen(false);
             }}
           />
-        </ContextId>
+        </WorkspaceIdContextProvider>
       ) : null}
 
       {isExportModalOpen ? (
