@@ -1,9 +1,9 @@
 import React, { useState, useCallback, useMemo } from "react";
 import { Popover } from "antd";
-import { EnvironmentVariableType, VariableScope, VariableValueType } from "backend/environment/types";
+import { EnvironmentVariableType, VariableScope } from "backend/environment/types";
+import type { VariableValueType } from "backend/environment/types";
 import { capitalize } from "lodash";
-import { ScopedVariable, ScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
-import { VariableData } from "features/apiClient/store/variables/types";
+import type { ScopedVariable, ScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
 import { PopoverView } from "./types";
 import { VariableNotFound } from "./components/VariableNotFound";
 import { CreateVariableView } from "./components/CreateVariableView";
@@ -12,10 +12,12 @@ import { RQButton } from "lib/design-system-v2/components";
 import { MdEdit } from "@react-icons/all-files/md/MdEdit";
 import { getScopeIcon } from "./hooks/useScopeOptions";
 import { RevealableSecretField } from "../../../../../RevealableSecretField/RevealableSecretField";
-import { useContextId } from "features/apiClient/contexts/contextId.context";
-import { NoopContextId } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 import { captureMessage } from "@sentry/react";
 import { useRBAC } from "features/rbac";
+import { useWorkspaceId } from "features/apiClient/common/WorkspaceProvider";
+import { NoopContextId } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
+
+type VariableData = ScopedVariable[0];
 
 const PopoverViewTransitions: Record<PopoverView, PopoverView[]> = {
   [PopoverView.IDLE]: [PopoverView.VARIABLE_INFO, PopoverView.NOT_FOUND],
@@ -54,10 +56,9 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
   onClose,
   onPinChange,
 }) => {
-  const variableData = variables.get(hoveredVariable);
-  const contextId = useContextId();
-  const isNoopContext = contextId === NoopContextId;
-
+  const workspaceId = useWorkspaceId();
+  const isNoopContext = workspaceId === NoopContextId;
+  const variableData = variables[hoveredVariable];
   const [currentView, setCurrentView] = useState<PopoverView>(() => {
     return variableData ? PopoverView.VARIABLE_INFO : PopoverView.NOT_FOUND;
   });
@@ -88,9 +89,9 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
   }, [transitionToView, onPinChange]);
 
   const handleSwitchEnvironment = useCallback(() => {
-    window.dispatchEvent(new CustomEvent("trigger-env-switcher", { detail: { contextId } }));
+    window.dispatchEvent(new CustomEvent("trigger-env-switcher", { detail: { contextId: workspaceId } }));
     onClose?.();
-  }, [onClose, contextId]);
+  }, [onClose, workspaceId]);
 
   const handleCancel = useCallback(() => {
     if (currentView === PopoverView.CREATE_FORM) {
@@ -132,8 +133,8 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
         return (
           <VariableNotFound
             isNoopContext={isNoopContext}
-            onCreateClick={handleCreateClick}
             onSwitchEnvironment={handleSwitchEnvironment}
+            onCreateClick={handleCreateClick}
           />
         );
       }
@@ -198,7 +199,7 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
         currentView === PopoverView.CREATE_FORM || currentView === PopoverView.EDIT_FORM ? "create-form-view" : ""
       }`}
     >
-      <div style={popupStyle} className="variable-info-div"></div>
+      <div style={popupStyle} className="variable-info-div" />
     </Popover>
   );
 };

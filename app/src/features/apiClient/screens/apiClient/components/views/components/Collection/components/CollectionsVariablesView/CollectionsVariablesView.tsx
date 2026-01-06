@@ -4,12 +4,11 @@ import { VariablesListHeader } from "features/apiClient/screens/environment/comp
 import { toast } from "utils/Toast";
 import { trackVariablesSaved } from "modules/analytics/events/features/apiClient";
 import "./collectionsVariablesView.scss";
-import { useApiClientDispatch, useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
+import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
 import {
   useBufferedCollectionEntity,
   useIsBufferDirty,
 } from "features/apiClient/slices/entities/hooks";
-import { useApiClientRepository } from "features/apiClient/slices/workspaceView/helpers/ApiClientContextRegistry";
 import { CollectionsVariablesList } from "../CollectionsVariablesList";
 import type { ApiClientRootState } from "features/apiClient/slices/hooks/types";
 import { useSaveBuffer } from "features/apiClient/slices/buffer/hooks";
@@ -19,9 +18,6 @@ interface CollectionsVariablesViewProps {
 }
 
 export const CollectionsVariablesView: React.FC<CollectionsVariablesViewProps> = ({ collectionId }) => {
-  const dispatch = useApiClientDispatch();
-  const repositories = useApiClientRepository();
-
   const [searchValue, setSearchValue] = useState("");
   const [isSaving, setIsSaving] = useState(false);
 
@@ -69,7 +65,7 @@ export const CollectionsVariablesView: React.FC<CollectionsVariablesViewProps> =
         setIsSaving(false);
       },
     });
-  }, [repositories, collectionId, dispatch, entity.meta.id, variablesData]);
+  }, [entity, saveBuffer]);
 
   return (
     <div className="collection-variables-view">

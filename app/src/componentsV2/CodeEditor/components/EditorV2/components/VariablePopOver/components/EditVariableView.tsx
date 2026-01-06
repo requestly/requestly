@@ -1,17 +1,20 @@
-import React, { useState, useMemo } from "react";
+import type React from "react";
+import { useState, useMemo, useCallback } from "react";
 import { RQButton } from "lib/design-system-v2/components";
-import { EnvironmentVariableType, VariableScope, VariableValueType } from "backend/environment/types";
-import { CreateVariableFormData, VariableUpsertSource } from "../types";
-import { useUpsertVariable } from "../hooks/useUpsertVariable";
+import { VariableScope } from "backend/environment/types";
+import type { EnvironmentVariableType, VariableValueType } from "backend/environment/types";
+import type { CreateVariableFormData } from "../types";
+import { VariableUpsertSource } from "../types";
 import { useScopeOptions } from "../hooks/useScopeOptions";
-import { useGenericState } from "hooks/useGenericState";
 import { captureException } from "backend/apiClient/utils";
 import { VariableFormFields } from "./VariableFormFields";
 import { FaListAlt } from "@react-icons/all-files/fa/FaListAlt";
 import { toast } from "utils/Toast";
-import { getCollectionIdByRecordId } from "../utils/utils";
-import { useApiClientFeatureContext } from "features/apiClient/contexts/meta";
+import { useCollectionIdByRecordId } from "features/apiClient/slices/apiRecords/apiRecords.hooks";
 import { trackVariablesSaved } from "modules/analytics/events/features/apiClient";
+import { useHostContext } from "hooks/useHostContext";
+import { parseRawVariable, mergeVariable } from "../utils/variableUtils";
+import { useVariableScopeAdapter } from "../hooks/useVariableScopeAdapter";
 
 interface ExistingVariableData {
   type: EnvironmentVariableType;
@@ -34,16 +37,19 @@ export const EditVariableView: React.FC<EditVariableViewProps> = ({
   onCancel,
   onSave,
 }) => {
-  const genericState = useGenericState();
-  const apiClientCtx = useApiClientFeatureContext();
-  const recordId = genericState.getSourceId();
+  const { getSourceId } = useHostContext();
+  const recordId = getSourceId();
 
-  const collectionId = useMemo(() => {
-    return getCollectionIdByRecordId(apiClientCtx, recordId);
-  }, [apiClientCtx, recordId]);
+  const collectionId = useCollectionIdByRecordId(recordId);
 
   const { scopeOptions } = useScopeOptions(collectionId);
-  const { upsertVariable, status } = useUpsertVariable(collectionId);
+
+  const [upserting, setUpserting] = useState(false);
+
+  const { entity, saveVariablesToRepository, scopeDisplayName, store } = useVariableScopeAdapter(
+    existingVariable.scope,
+    scopeOptions
+  );
 
   const [formData, setFormData] = useState({
     scope: existingVariable.scope,
@@ -56,31 +62,62 @@ export const EditVariableView: React.FC<EditVariableViewProps> = ({
     setFormData((prev) => ({ ...prev, ...updates }));
   };
 
-  const handleSave = async () => {
+  const handleSave = useCallback(async () => {
+    setUpserting(true);
     try {
       const variableData = {
         variableName,
         ...formData,
       };
 
-      const result = await upsertVariable(variableData, "update");
+      const { variableName: varName, scope, type, initialValue, currentValue } = variableData;
 
-      if (!result.success) {
-        toast.error("Failed to update variable");
-        return;
+      const state = store.getState();
+      const currentVariables = entity.variables.getAll(state);
+
+      const existingVariableEntry = Object.entries(currentVariables).find(([key]) => key === varName);
+      if (!existingVariableEntry) {
+        throw new Error("Variable not found");
       }
+      const [, existingVar] = existingVariableEntry;
+      const existingId = String(existingVar.id);
+
+      const { key, variable } = parseRawVariable(varName, { type, initialValue, currentValue }, existingId);
+
+      const updatedVariables = mergeVariable(currentVariables, key, variable);
+
+      await saveVariablesToRepository(updatedVariables);
+
+      entity.variables.set({
+        id: existingId,
+        key,
+        type: variable.type,
+        syncValue: variable.syncValue,
+        localValue: variable.localValue,
+      });
 
       await onSave(variableData);
-      toast.success(`Variable updated in ${result.scopeName || existingVariable.scopeName}`);
+      toast.success(`Variable updated in ${scopeDisplayName || existingVariable.scopeName}`);
       trackVariablesSaved({
         source: VariableUpsertSource.VARIABLE_POPOVER,
-        variable_scope: formData.scope.toLowerCase(),
+        variable_scope: scope.toLowerCase(),
       });
     } catch (error) {
       toast.error("Failed to update variable");
       captureException(error);
+    } finally {
+      setUpserting(false);
     }
-  };
+  }, [
+    variableName,
+    formData,
+    store,
+    entity,
+    saveVariablesToRepository,
+    scopeDisplayName,
+    existingVariable.scopeName,
+    onSave,
+  ]);
 
   const currentScopeOption = useMemo(() => {
     return scopeOptions.find((o) => o.value === existingVariable.scope) || scopeOptions[0];
@@ -94,11 +131,11 @@ export const EditVariableView: React.FC<EditVariableViewProps> = ({
           <span className="scope-name">{existingVariable.scopeName || "Environment"}</span>
         </div>
         <div className="edit-variable-actions">
-          <RQButton size="small" onClick={onCancel} disabled={status.upserting}>
+          <RQButton size="small" onClick={onCancel} disabled={upserting}>
             Cancel
           </RQButton>
-          <RQButton size="small" type="primary" onClick={handleSave} loading={status.upserting}>
-            {status.upserting ? "" : "Save"}
+          <RQButton size="small" type="primary" onClick={handleSave} loading={upserting}>
+            {upserting ? "" : "Save"}
           </RQButton>
         </div>
       </div>

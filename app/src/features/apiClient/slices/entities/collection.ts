@@ -1,4 +1,4 @@
-import {  RQAPI } from "features/apiClient/types";
+import { RQAPI } from "features/apiClient/types";
 import { InvalidEntityShape } from "../types";
 import { selectRecordById } from "../apiRecords/selectors";
 import { ApiClientStoreState } from "../workspaceView/helpers/ApiClientContextRegistry/types";
@@ -7,12 +7,16 @@ import { ApiClientEntityType } from "./types";
 import { ApiClientVariables } from "./api-client-variables";
 import { ApiClientEntityMeta } from "./base";
 
-export class CollectionRecordEntity<M extends ApiClientEntityMeta = ApiClientEntityMeta> extends ApiClientRecordEntity<RQAPI.CollectionRecord, M> {
+export class CollectionRecordEntity<M extends ApiClientEntityMeta = ApiClientEntityMeta> extends ApiClientRecordEntity<
+  RQAPI.CollectionRecord,
+  M
+> {
   public readonly variables = new ApiClientVariables<RQAPI.CollectionRecord>(
     (e) => e.data.variables,
     this.unsafePatch.bind(this),
-    this.getEntityFromState.bind(this),
-  )
+    this.getEntityFromState.bind(this)
+  );
+
   readonly type = ApiClientEntityType.COLLECTION_RECORD;
   getEntityFromState(state: ApiClientStoreState): RQAPI.CollectionRecord {
     const record = selectRecordById(state, this.meta.id);
@@ -27,4 +31,3 @@ export class CollectionRecordEntity<M extends ApiClientEntityMeta = ApiClientEnt
     return record as RQAPI.CollectionRecord;
   }
 }
-
