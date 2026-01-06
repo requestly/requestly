@@ -11,7 +11,6 @@ import { isApiCollection } from "../../../utils";
 import * as Sentry from "@sentry/react";
 import { useTabActions } from "componentsV2/Tabs/slice";
 import { ApiClientFeatureContext } from "features/apiClient/slices";
-import { useApiClientDispatch } from "features/apiClient/slices/hooks/base.hooks";
 
 interface DeleteApiRecordModalProps {
   open: boolean;
@@ -29,7 +28,6 @@ export const DeleteApiRecordModal: React.FC<DeleteApiRecordModalProps> = ({
   onClose,
   onSuccess,
 }) => {
-  const dispatch = useApiClientDispatch();
   const { closeTabByEntityId } = useTabActions();
 
   const recordsWithContext = useMemo(() => {
@@ -54,13 +52,13 @@ export const DeleteApiRecordModal: React.FC<DeleteApiRecordModalProps> = ({
       recordsWithContext.forEach(async ({ context, records }) => {
         if (!context) return;
 
-        // const { dispatch } = context.store;
+        const { dispatch } = context.store;
         const { apiClientRecordsRepository } = context.repositories;
         const result = await dispatch(
           deleteRecords({
             records,
             repository: apiClientRecordsRepository,
-          })
+          }) as any
         ).unwrap();
 
         const { deletedApiRecords, deletedCollectionRecords } = result;

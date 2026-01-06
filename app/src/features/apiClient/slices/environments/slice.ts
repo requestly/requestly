@@ -32,6 +32,10 @@ export const environmentsSlice = createSlice({
   reducers: {
     environmentCreated(state, action: PayloadAction<EnvironmentEntity>) {
       environmentsAdapter.addOne(state.environments, action.payload);
+
+      if (state.environments.ids.length === 1) {
+        state.activeEnvironmentId = action.payload.id;
+      }
     },
 
     environmentsCreated(state, action: PayloadAction<EnvironmentEntity[]>) {

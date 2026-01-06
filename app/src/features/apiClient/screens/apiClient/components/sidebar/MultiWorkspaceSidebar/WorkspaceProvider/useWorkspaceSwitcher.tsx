@@ -4,10 +4,6 @@ import {
   switchWorkspace,
 } from "actions/TeamWorkspaceActions";
 import PATHS from "config/constants/sub/paths";
-import {
-  ApiClientViewMode,
-  useApiClientMultiWorkspaceView,
-} from "features/apiClient/store/multiWorkspaceView/multiWorkspaceView.store";
 import { Workspace, WorkspaceType } from "features/workspaces/types";
 import { useCallback, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -15,10 +11,12 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { getAppMode, getIsCurrentlySelectedRuleHasUnsavedChanges } from "store/selectors";
 import { globalActions } from "store/slices/global/slice";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getActiveWorkspace, isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
+import { dummyPersonalWorkspace, getActiveWorkspace, isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 import { toast } from "utils/Toast";
 import { ExclamationCircleFilled } from "@ant-design/icons";
 import { Modal } from "antd";
+import { ApiClientViewMode, useViewMode, useWorkspaceViewActions } from "features/apiClient/slices";
+import { getWorkspaceInfo } from "features/apiClient/slices/workspaceView/utils";
 
 //TODO: move it into top level hooks
 export const useWorkspaceSwitcher = () => {
@@ -29,6 +27,7 @@ export const useWorkspaceSwitcher = () => {
 
   const appMode = useSelector(getAppMode);
   const user = useSelector(getUserAuthDetails);
+  const userId = user?.details?.profile?.uid;
   const activeWorkspace = useSelector(getActiveWorkspace);
   const isSharedWorkspace = useSelector(isActiveWorkspaceShared);
 
@@ -58,12 +57,11 @@ export const useWorkspaceSwitcher = () => {
     [redirects, pathname]
   );
 
-  const [getViewMode] = useApiClientMultiWorkspaceView((s) => [s.getViewMode, s.getAllSelectedWorkspaces]);
+  const viewMode = useViewMode();
+  const { switchContext } = useWorkspaceViewActions();
 
   const handleWorkspaceSwitch = useCallback(
     async (workspace: Workspace, callback?: () => any) => {
-      const viewMode = getViewMode();
-
       if (viewMode === ApiClientViewMode.SINGLE) {
         if (activeWorkspace?.id === workspace.id) {
           toast.info("Workspace already selected!");
@@ -72,6 +70,16 @@ export const useWorkspaceSwitcher = () => {
       }
 
       setIsWorkspaceLoading(true);
+
+      await switchContext({
+        userId,
+        workspace: getWorkspaceInfo(workspace),
+      });
+
+      // TBD: should we move switchWorkspace inside the switchContext
+      // Issues:
+      // 1. When in multiview and last workspace unchecked, workspace should be switched
+      // 2. When first workspace is checked, it should switch to that if not and then go in multiview
       switchWorkspace(
         {
           teamId: workspace.id,
@@ -108,10 +116,12 @@ export const useWorkspaceSwitcher = () => {
       activeWorkspace?.id,
       appMode,
       dispatch,
-      getViewMode,
       isSharedWorkspace,
       isWorkspaceLoading,
+      switchContext,
       user?.details?.isSyncEnabled,
+      userId,
+      viewMode,
     ]
   );
 
@@ -145,8 +155,6 @@ export const useWorkspaceSwitcher = () => {
   );
 
   const handleSwitchToPrivateWorkspace = useCallback(async () => {
-    const viewMode = getViewMode();
-
     if (viewMode === ApiClientViewMode.SINGLE) {
       if (activeWorkspace?.id === null) {
         toast.info("Workspace already selected!");
@@ -154,6 +162,11 @@ export const useWorkspaceSwitcher = () => {
       }
     }
     setIsWorkspaceLoading(true);
+    await switchContext({
+      userId,
+      workspace: { id: dummyPersonalWorkspace.id, meta: { type: WorkspaceType.PERSONAL } },
+    });
+
     return clearCurrentlyActiveWorkspace(dispatch, appMode)
       .then(() => {
         showSwitchWorkspaceSuccessToast();
@@ -166,7 +179,7 @@ export const useWorkspaceSwitcher = () => {
       .finally(() => {
         setIsWorkspaceLoading(false);
       });
-  }, [appMode, dispatch, activeWorkspace?.id, getViewMode]);
+  }, [viewMode, switchContext, userId, dispatch, appMode, activeWorkspace?.id]);
 
   return {
     handleWorkspaceSwitch,

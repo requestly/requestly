@@ -9,9 +9,9 @@ import {
 } from "../screens/apiClient/utils";
 import { getChildParentMap } from "./store.utils";
 import { isEmpty } from "lodash";
-import { selectAllRecords as selectAllRecordsFromSlice } from "../slices/apiRecords/selectors";
+import { selectAllRecords as selectAllRecordsFromSlice, selectChildToParent } from "../slices/apiRecords/selectors";
 import { Workspace } from "features/workspaces/types";
-import { getApiClientFeatureContext } from "../slices";
+import { getApiClientFeatureContext, WorkspaceInfo } from "../slices";
 
 export function sanitizePatch(patch: EnvironmentVariables) {
   return Object.fromEntries(
@@ -79,7 +79,7 @@ export function prepareRecordsToRender(records: RQAPI.ApiClientRecord[]) {
 }
 
 export function getRecordsToExpandBySearchValue(params: {
-  contextId: string;
+  contextId: WorkspaceInfo["id"];
   apiClientRecords: RQAPI.ApiClientRecord[];
   searchValue?: string;
 }): undefined | RQAPI.ApiClientRecord["id"][] {
@@ -117,13 +117,14 @@ export function getRecordsToRender(params: { apiClientRecords: RQAPI.ApiClientRe
   return recordsToRender;
 }
 
-export function selectAllRecords(params: { contextId: string; searchValue: string }) {
+export function selectAllRecords(params: { contextId: WorkspaceInfo["id"]; searchValue: string }) {
   const { contextId, searchValue } = params;
 
   const newSelectedRecords: Set<RQAPI.ApiClientRecord["id"]> = new Set();
 
   const context = getApiClientFeatureContext(contextId);
-  const apiClientRecords = context.stores.records.getState().apiClientRecords;
+  const state = context.store.getState();
+  const apiClientRecords = selectAllRecordsFromSlice(state);
 
   const records = getRecordsToRender({
     apiClientRecords,
@@ -143,9 +144,10 @@ export function selectAllRecords(params: { contextId: string; searchValue: strin
 
 export function getProcessedRecords(contextId: string, selectedRecords: Set<RQAPI.ApiClientRecord["id"]>) {
   const context = getApiClientFeatureContext(contextId);
+  const state = context.store.getState();
 
-  const childParentMap = getChildParentMap(context);
-  const apiClientRecords = context.stores.records.getState().apiClientRecords;
+  const childParentMap = selectChildToParent(state);
+  const apiClientRecords = selectAllRecordsFromSlice(state);
   const records = getRecordsToRender({ apiClientRecords });
 
   return filterOutChildrenRecords(selectedRecords, childParentMap, records.recordsMap);

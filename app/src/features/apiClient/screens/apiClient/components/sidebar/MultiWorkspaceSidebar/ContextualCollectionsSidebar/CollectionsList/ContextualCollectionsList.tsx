@@ -7,7 +7,7 @@ import "./contextualCollectionsList.scss";
 import { union } from "lodash";
 import { SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY } from "features/apiClient/constants";
 import { useRBAC } from "features/rbac";
-import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
+import { useAllRecords, useChildToParent } from "features/apiClient/slices/apiRecords/apiRecords.hooks";
 import { EXPANDED_RECORD_IDS_UPDATED } from "features/apiClient/exampleCollections/store";
 import { getRecordIdsToBeExpanded, isApiCollection } from "features/apiClient/screens/apiClient/utils";
 import { CollectionRow } from "../../../components/collectionsList/collectionRow/CollectionRow";
@@ -20,9 +20,8 @@ import {
   getRecordsToRender,
   selectAllRecords,
 } from "features/apiClient/commands/utils";
-import { useApiClientFeatureContext } from "features/apiClient/contexts/meta";
-import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 import { updateRecordSelection } from "./utils";
+import { ApiClientFeatureContext, useApiClientFeatureContext, WorkspaceInfo } from "features/apiClient/slices";
 
 interface Props {
   searchValue: string;
@@ -32,7 +31,7 @@ interface Props {
   selectAll: { value: boolean; takeAction: boolean };
   handleShowSelection: (value: boolean) => void;
   handleRecordSelection: (params: {
-    contextId: string;
+    contextId: WorkspaceInfo["id"];
     recordIds?: Set<string>;
     isAllRecordsSelected?: boolean;
   }) => void;
@@ -52,7 +51,8 @@ export const ContextualCollectionsList: React.FC<Props> = ({
   const { collectionId, requestId } = useParams();
   const { validatePermission } = useRBAC();
   const { isValidPermission } = validatePermission("api_client_request", "create");
-  const [apiClientRecords] = useAPIRecords((state) => [state.apiClientRecords]);
+  const apiClientRecords = useAllRecords();
+  const childParentMap = useChildToParent();
 
   const { isRecordBeingCreated, onNewClickV2 } = useApiClientContext();
   const context = useApiClientFeatureContext();
@@ -60,8 +60,6 @@ export const ContextualCollectionsList: React.FC<Props> = ({
   const [expandedRecordIds, setExpandedRecordIds] = useState(
     sessionStorage.getItem(SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY, [])
   );
-
-  const [childParentMap] = useAPIRecords((state) => [state.childParentMap]);
 
   useEffect(() => {
     const handleUpdates = () => {
@@ -78,7 +76,11 @@ export const ContextualCollectionsList: React.FC<Props> = ({
     handleShowSelection(false);
 
     const recordsToRender = getRecordsToRender({ apiClientRecords, searchValue });
-    const recordsToExpand = getRecordsToExpandBySearchValue({ contextId: context.id, apiClientRecords, searchValue });
+    const recordsToExpand = getRecordsToExpandBySearchValue({
+      contextId: context.workspaceId,
+      apiClientRecords,
+      searchValue,
+    });
 
     setExpandedRecordIds((prev: string[]) => {
       const newExpanded = prev.concat(recordsToExpand ?? []);
@@ -86,7 +88,7 @@ export const ContextualCollectionsList: React.FC<Props> = ({
     });
 
     return recordsToRender;
-  }, [context.id, apiClientRecords, handleShowSelection, searchValue]);
+  }, [context.workspaceId, apiClientRecords, handleShowSelection, searchValue]);
 
   const handleRecordToggle = useCallback(
     (record: RQAPI.ApiClientRecord, isChecked: boolean) => {
@@ -96,7 +98,7 @@ export const ContextualCollectionsList: React.FC<Props> = ({
         newSelectedRecords: Set<RQAPI.ApiClientRecord["id"]>
       ) => {
         const { recordsMap } = updatedRecords;
-        let parentId = childParentMap.get(recordId);
+        let parentId = childParentMap[recordId];
         while (parentId) {
           const parentRecord = recordsMap[parentId];
           if (!parentRecord || !isApiCollection(parentRecord)) break;
@@ -107,7 +109,7 @@ export const ContextualCollectionsList: React.FC<Props> = ({
           } else if (!checked && parentRecord.data.children?.some((child) => !newSelectedRecords.has(child.id))) {
             newSelectedRecords.delete(parentId);
           }
-          parentId = childParentMap.get(parentId);
+          parentId = childParentMap[parentId];
         }
       };
 
@@ -122,12 +124,12 @@ export const ContextualCollectionsList: React.FC<Props> = ({
       const isAllRecordsSelected = newSelectedRecords.size === totalRecordsCount;
 
       handleRecordSelection({
-        contextId: context.id,
+        contextId: context.workspaceId,
         recordIds: newSelectedRecords,
         isAllRecordsSelected,
       });
     },
-    [context.id, selectedRecords, updatedRecords, childParentMap, handleRecordSelection]
+    [context.workspaceId, selectedRecords, updatedRecords, childParentMap, handleRecordSelection]
   );
 
   const recordsSelectionHandler = useCallback(
@@ -173,21 +175,21 @@ export const ContextualCollectionsList: React.FC<Props> = ({
     }
 
     if (selectAll.value) {
-      const result = selectAllRecords({ contextId: context?.id, searchValue });
+      const result = selectAllRecords({ contextId: context.workspaceId, searchValue });
       setSelectedRecords(result);
       handleRecordSelection({
-        contextId: context?.id,
+        contextId: context.workspaceId,
         recordIds: result,
         isAllRecordsSelected: true,
       });
     } else {
       setSelectedRecords(new Set());
       handleRecordSelection({
-        contextId: context?.id,
+        contextId: context.workspaceId,
         recordIds: new Set(),
       });
     }
-  }, [selectAll, handleRecordSelection, context?.id, searchValue]);
+  }, [selectAll, handleRecordSelection, context.workspaceId, searchValue]);
 
   return (
     <>
@@ -255,7 +257,13 @@ export const ContextualCollectionsList: React.FC<Props> = ({
               newRecordBtnText="Create a collection"
               message={searchValue ? "No collection or request found" : "No content available yet"}
               onNewClick={(src, recordType, collectionId, entryType) =>
-                onNewClickV2({ contextId: context?.id, analyticEventSource: src, recordType, collectionId, entryType })
+                onNewClickV2({
+                  contextId: context.workspaceId,
+                  analyticEventSource: src,
+                  recordType,
+                  collectionId,
+                  entryType,
+                })
               }
             />
           )}
