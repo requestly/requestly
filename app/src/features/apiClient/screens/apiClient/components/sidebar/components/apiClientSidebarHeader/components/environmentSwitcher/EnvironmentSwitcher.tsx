@@ -17,7 +17,6 @@ import { useAllEnvironments, useActiveEnvironment } from "features/apiClient/sli
 import { useEnvironmentByIdMemoized } from "features/apiClient/slices/environments/environments.hooks";
 import { useApiClientDispatch } from "features/apiClient/slices/hooks/base.hooks";
 import { environmentsActions } from "features/apiClient/slices/environments/slice";
-import { GLOBAL_ENVIRONMENT_ID } from "features/apiClient/slices/common/constants";
 import { useWorkspaceId } from "features/apiClient/common/WorkspaceProvider";
 
 function SwitcherListItemLabel(props: { environmentId: string }) {
@@ -111,7 +110,7 @@ export const EnvironmentSwitcher = () => {
               context: {
                 id: workspaceId,
               },
-              isGlobal: environment.id === GLOBAL_ENVIRONMENT_ID,
+              isGlobal: false,
             }),
           });
         }
