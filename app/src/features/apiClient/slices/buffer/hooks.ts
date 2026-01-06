@@ -8,6 +8,7 @@ import { bufferActions, bufferAdapterSelectors } from "./slice";
 import { BufferedApiClientEntity, OriginExists } from "../entities/buffered/factory";
 import { EntityNotFound } from "../types";
 import { useApiClientDispatch } from '../hooks/base.hooks';
+import { NativeError } from "errors/NativeError";
 
 
 function createSave(
@@ -47,13 +48,18 @@ function createSave(
           hooks.afterSave?.();
         })
         .inspect((savedEntity) => {
+          if(!params.entity.meta.originExists && !savedEntity) {
+            throw new NativeError('The buffer you used does not have an origin, and the save function did not return an entity!');
+          }
           hooks.afterSave?.();
-          params.entity.origin.upsert(savedEntity || changes);
+          //We we will only acknowledge the result if we don't have an origin
+          const newState = params.entity.meta.originExists ? changes : savedEntity;
+          params.entity.origin.upsert(newState);
           dispatch(
             bufferActions.markSaved({
               id: params.entity.meta.id,
               referenceId: savedEntity?.id,
-              savedData: savedEntity,
+              savedData: newState,
             })
           );
           onSuccess(changes, params.entity)
