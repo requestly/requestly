@@ -9,11 +9,16 @@ import { ClientViewFactory } from "./ClientViewFactory";
 import { BottomSheetFeatureContext } from "componentsV2/BottomSheet/types";
 import { AISessionProvider } from "features/ai/contexts/AISession";
 import "../apiClient.scss";
+import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
+import { selectRecordById } from "features/apiClient/slices";
+import { useBufferedEntity } from "features/apiClient/slices/entities/hooks";
+import { ApiClientEntityType } from "features/apiClient/slices/entities/types";
 
 type BaseProps = {
   onSaveCallback?: (apiEntryDetails: RQAPI.ApiRecord) => void;
   apiEntryDetails?: RQAPI.ApiRecord;
   isHistoryMode?: boolean;
+  requestId: string;
 };
 
 type CreateModeProps = BaseProps & {
@@ -22,15 +27,21 @@ type CreateModeProps = BaseProps & {
 
 type EditModeProps = BaseProps & {
   isCreateMode: false;
-  requestId: string;
 };
 
-type Props = CreateModeProps | EditModeProps;
+type Props = BaseProps;
+// CreateModeProps | EditModeProps;
 
 export const ApiClientViewManager: React.FC<Props> = React.memo((props) => {
-  const { isCreateMode, isHistoryMode } = props;
+  const { requestId, isHistoryMode } = props;
+  const recordType = useApiClientSelector(s => (selectRecordById(s, requestId)?.data as RQAPI.ApiEntry).type);
+  const entityType = recordType === RQAPI.ApiEntryType.HTTP ? ApiClientEntityType.HTTP_RECORD : ApiClientEntityType.GRAPHQL_RECORD
+  const entity = useBufferedEntity({
+    id: requestId,
+    type: entityType
+  });
   const { history, addToHistory, setCurrentHistoryIndex } = useApiClientContext();
-  const selectedEntryDetails = useApiRecord(isCreateMode ? "" : (props as EditModeProps).requestId);
+  // const selectedEntryDetails = useApiRecord(isCreateMode ? "" : (props as EditModeProps).requestId);
 
   const onSaveCallback = props.onSaveCallback ?? (() => {});
   const handleAppRequestFinished = useCallback(
@@ -43,13 +54,13 @@ export const ApiClientViewManager: React.FC<Props> = React.memo((props) => {
     [addToHistory, isHistoryMode, setCurrentHistoryIndex, history.length]
   );
 
-  if (selectedEntryDetails.type === RQAPI.RecordType.COLLECTION) {
-    return null;
-  }
+  // if (selectedEntryDetails.type === RQAPI.RecordType.COLLECTION) {
+  //   return null;
+  // }
 
-  if (!selectedEntryDetails.data) {
-    return <Result status="error" title="Request not found" subTitle="Oops! Looks like this request doesn't exist." />;
-  }
+  // if (!selectedEntryDetails.data) {
+  //   return <Result status="error" title="Request not found" subTitle="Oops! Looks like this request doesn't exist." />;
+  // }
 
   return (
     <BottomSheetProvider context={BottomSheetFeatureContext.API_CLIENT}>
@@ -57,10 +68,11 @@ export const ApiClientViewManager: React.FC<Props> = React.memo((props) => {
         <AutogenerateProvider>
           <AISessionProvider>
             <ClientViewFactory
-              apiRecord={selectedEntryDetails}
+              entity={entity}
+              // apiRecord={selectedEntryDetails}
               handleRequestFinished={handleAppRequestFinished}
               onSaveCallback={onSaveCallback}
-              isCreateMode={isCreateMode}
+              // isCreateMode={isCreateMode}
             />
           </AISessionProvider>
         </AutogenerateProvider>

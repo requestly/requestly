@@ -21,8 +21,8 @@ export class RequestViewTabSource extends BaseTabSource {
   constructor(metadata: RequestViewTabSourceMetadata) {
     super();
     this.component = (
-      <Record id={metadata.id} />
-      // <RequestView key={metadata.id} requestId={metadata.id} apiEntryDetails={metadata.apiEntryDetails} />
+      // <Record id={metadata.id} />
+      <RequestView key={metadata.id} requestId={metadata.id} apiEntryDetails={metadata.apiEntryDetails} />
     );
     this.metadata = {
       ...metadata,

@@ -9,23 +9,27 @@ import { KeyValuePair } from "features/apiClient/types";
 import { useCallback, memo } from "react";
 import { ApiClientUrl } from "../../../components/request/components/ApiClientUrl/ApiClientUrl";
 import { usePathVariablesStore } from "features/apiClient/hooks/usePathVariables.store";
+import { BufferedHttpRecordEntity } from "features/apiClient/slices/entities";
+import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
 
 interface ApiClientUrlProps {
+  entity: BufferedHttpRecordEntity
   url: string;
   currentEnvironmentVariables: ScopedVariables;
   onEnterPress: (e: KeyboardEvent) => void;
   onUrlChange: (value: string, finalParams: KeyValuePair[]) => void;
 }
 
-const HttpApiClientUrl = ({ url, currentEnvironmentVariables, onEnterPress, onUrlChange }: ApiClientUrlProps) => {
-  const [queryParams, setQueryParams] = useQueryParamStore((state) => [state.queryParams, state.setQueryParams]);
+const HttpApiClientUrl = ({ entity, url, currentEnvironmentVariables, onEnterPress, onUrlChange }: ApiClientUrlProps) => {
+  const queryParams = useApiClientSelector(s => entity.getQueryParams(s) );
+  // const [queryParams, setQueryParams] = useQueryParamStore((state) => [state.queryParams, state.setQueryParams]);
 
-  const updatePathVariableKeys = usePathVariablesStore((state) => state.updateVariableKeys);
+  // const updatePathVariableKeys = usePathVariablesStore((state) => state.updateVariableKeys);
 
   const handleUrlChange = useCallback(
     (value: string) => {
       const pathVariables = extractPathVariablesFromUrl(value);
-      updatePathVariableKeys(pathVariables);
+      // updatePathVariableKeys(pathVariables);
 
       const paramsFromUrl = extractQueryParams(value);
       const finalParams = [];
@@ -50,10 +54,10 @@ const HttpApiClientUrl = ({ url, currentEnvironmentVariables, onEnterPress, onUr
         }
       }
 
-      setQueryParams(finalParams);
+      entity.setQueryParams(finalParams);
       onUrlChange(value, finalParams);
     },
-    [onUrlChange, queryParams, setQueryParams, updatePathVariableKeys]
+    [onUrlChange, queryParams, ]
   );
 
   return (
