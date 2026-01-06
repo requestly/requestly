@@ -804,10 +804,6 @@ const HttpClientView: React.FC<Props> = ({
           <HttpRequestTabs
             error={error}
             entity={entity}
-            // requestEntry={entry}
-            // requestId={apiEntryDetails?.id}
-            // collectionId={apiEntryDetails?.collectionId}
-            // setRequestEntry={setRequestEntry}
             handleAuthChange={handleAuthChange}
             focusPostResponseScriptEditor={focusPostResponseScriptEditor}
             scriptEditorVersion={scriptEditorVersion}

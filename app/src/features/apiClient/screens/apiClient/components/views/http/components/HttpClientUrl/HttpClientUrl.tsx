@@ -29,6 +29,7 @@ const HttpApiClientUrl = ({ entity, url, currentEnvironmentVariables, onEnterPre
   const handleUrlChange = useCallback(
     (value: string) => {
       const pathVariables = extractPathVariablesFromUrl(value);
+      entity.reconcilePathKeys(pathVariables);
       // updatePathVariableKeys(pathVariables);
 
       const paramsFromUrl = extractQueryParams(value);
