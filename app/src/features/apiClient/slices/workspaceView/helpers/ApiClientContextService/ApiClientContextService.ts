@@ -35,6 +35,7 @@ import {
 } from "features/apiClient/slices/environments";
 import { EnvironmentEntity } from "features/apiClient/slices/environments/types";
 import { bufferActions, bufferSlice, bufferSyncMiddleware } from "features/apiClient/slices/buffer";
+import { erroredRecordsSlice } from "features/apiClient/slices/erroredRecords";
 import { getEntityDataFromTabSource, GetEntityDataFromTabSourceState } from "componentsV2/Tabs/slice";
 import { closeTab } from "componentsV2/Tabs/slice/thunks";
 import { groupBy, mapValues } from "lodash";
@@ -45,8 +46,11 @@ export type UserDetails = { uid: string; loggedIn: true } | { loggedIn: false };
 
 type ContextSetupData = {
   apiClientRecords: { records: RQAPI.ApiClientRecord[]; erroredRecords: ErroredRecord[] };
-  environments: { globalEnvironment: EnvironmentData; nonGlobalEnvironments: EnvironmentMap };
-  erroredRecords: { apiErroredRecords: ErroredRecord[]; environmentErroredRecords: ErroredRecord[] };
+  environments: {
+    globalEnvironment: EnvironmentData;
+    nonGlobalEnvironments: EnvironmentMap;
+    erroredRecords: ErroredRecord[];
+  };
 };
 
 function arrayToEntityState<T extends { id: string }>(items: T[]): EntityState<T> {
@@ -104,6 +108,7 @@ class ApiClientContextService {
       reducer: {
         [apiRecordsSlice.name]: createApiClientRecordsPersistedReducer(workspaceId || "null"),
         [environmentsSlice.name]: createEnvironmentsPersistedReducer(workspaceId || "null"),
+        [erroredRecordsSlice.name]: erroredRecordsSlice.reducer,
         [bufferSlice.name]: bufferSlice.reducer,
       },
       middleware(getDefaultMiddleware) {
@@ -251,6 +256,23 @@ class ApiClientContextService {
     });
   }
 
+  private hydrateErroredRecords(params: {
+    erroredRecords: {
+      apiErroredRecords: ErroredRecord[];
+      environmentErroredRecords: ErroredRecord[];
+    };
+    store: ApiClientStore;
+  }): void {
+    const { erroredRecords, store } = params;
+
+    store.dispatch(
+      erroredRecordsSlice.actions.hydrate({
+        apiErroredRecords: erroredRecords.apiErroredRecords,
+        environmentErroredRecords: erroredRecords.environmentErroredRecords,
+      })
+    );
+  }
+
   private hydrateBuffers(params: {
     workspaceId: WorkspaceInfo["id"];
     store: ApiClientStore;
@@ -354,6 +376,15 @@ class ApiClientContextService {
       })
     );
 
+    // Hydrate errored records slice
+    this.hydrateErroredRecords({
+      store,
+      erroredRecords: {
+        apiErroredRecords: result.apiClientRecords.erroredRecords,
+        environmentErroredRecords: result.environments.erroredRecords,
+      },
+    });
+
     // Hydrate buffer tabs and close tabs with missing entities
     this.hydrateBuffers({
       workspaceId,
@@ -414,10 +445,7 @@ class ApiClientContextService {
     let environments: ContextSetupData["environments"] = {
       globalEnvironment: { id: environmentVariablesRepository.getGlobalEnvironmentId(), name: "Global", variables: {} },
       nonGlobalEnvironments: {},
-    };
-    let erroredRecords: ContextSetupData["erroredRecords"] = {
-      apiErroredRecords: [],
-      environmentErroredRecords: [],
+      erroredRecords: [],
     };
 
     const [fetchedRecordsResult, fetchedEnvResult] = await Promise.all([
@@ -436,7 +464,6 @@ class ApiClientContextService {
         records: fetchedRecordsResult.data.records,
         erroredRecords: fetchedRecordsResult.data.erroredRecords,
       };
-      erroredRecords.apiErroredRecords = fetchedRecordsResult.data.erroredRecords;
     }
 
     if (!fetchedEnvResult.success) {
@@ -457,13 +484,12 @@ class ApiClientContextService {
       environments = {
         globalEnvironment: globalEnv,
         nonGlobalEnvironments: otherEnvs,
+        erroredRecords: fetchedEnvResult.data.erroredRecords,
       };
-      erroredRecords.environmentErroredRecords = fetchedEnvResult.data.erroredRecords;
     }
 
     return {
       apiClientRecords: records,
-      erroredRecords,
       environments,
     };
   }
