@@ -8,7 +8,7 @@ import { NativeError } from "errors/NativeError";
 import { ErrorSeverity } from "errors/types";
 
 export const workspaceViewAdapter = createEntityAdapter<WorkspaceState>({
-  selectId: (workspace) => workspace.id,
+  selectId: (workspace) => workspace.id as string,
 });
 
 // selectors
@@ -45,6 +45,10 @@ export const workspaceViewSlice = createSlice({
   reducers: {
     setViewMode(state, action: PayloadAction<ApiClientViewMode>) {
       state.viewMode = action.payload;
+    },
+
+    setFallbackWorkspaceId(state, action: PayloadAction<WorkspaceState["id"]>) {
+      state.fallbackWorkspaceId = action.payload;
     },
 
     addWorkspace(state, action: PayloadAction<WorkspaceState>) {
