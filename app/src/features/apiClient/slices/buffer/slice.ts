@@ -1,12 +1,13 @@
 import { createSlice, createEntityAdapter, PayloadAction } from "@reduxjs/toolkit";
 import { produceWithPatches, enablePatches, current } from "immer";
 import { v4 as uuidv4 } from "uuid";
-import { set, unset, cloneDeep, merge } from "lodash";
+import { set, unset, cloneDeep, merge, get } from "lodash";
 import { objectToSetOperations, objectToDeletePaths } from "../utils/pathConverter";
 import { BufferEntry, BufferState } from "./types";
 import { ApiClientEntityType } from "../entities/types";
 import { BUFFER_SLICE_NAME } from "../common/constants";
 import { emitBufferUpdated } from "componentsV2/Tabs/slice";
+import { EntityNotFound } from "../types";
 
 enablePatches();
 
@@ -158,16 +159,17 @@ export const bufferSlice = createSlice({
       }>
     ) {
       const entry = findBufferByReferenceId(state.entities, action.payload.referenceId);
-      if (!entry) return;
+      if (!entry) throw new EntityNotFound(action.payload.referenceId,"buffer");
 
       entry.current = cloneDeep(action.payload.sourceData);
 
       const operations = objectToSetOperations(entry.diff);
-      for (const { path, value } of operations) {
-        if (value === null) {
-          unset(entry.current as object, path);
+      for (const { path } of operations) {
+        const value = get(entry.current, path);
+        if (value === undefined ) {
+          unset(entry.diff as object, path);
         } else {
-          set(entry.current as object, path, value);
+          set(entry.diff as object, path, value);
         }
       }
     },
