@@ -13,6 +13,7 @@ import {
 import { BufferEntry, EntityNotFound, getApiClientFeatureContext } from "features/apiClient/slices";
 import { BufferedEntityFactory } from "features/apiClient/slices/entities";
 import { selectActiveTab, selectActiveTabId } from "./selectors";
+import { getIsBuffersDirty } from "./utils";
 
 const tabsSelectors = tabsAdapter.getSelectors<RootState>((state) => state.tabs.tabs);
 
@@ -86,17 +87,28 @@ export function getTabBufferedEntity(tab: BufferModeTab) {
   const workspaceId = tab.source.metadata.context.id;
   const bufferId = tab.modeConfig.entityId;
   const { store } = getApiClientFeatureContext(workspaceId);
+  const bufferState = store.getState().buffer;
 
-  const buffer = store.getState().buffer.entities[bufferId];
+  const primaryBuffer = bufferState.entities[bufferId];
 
-  if (!buffer) {
-    throw new EntityNotFound(bufferId, "buffer");
+  if (!primaryBuffer) {
+    throw new EntityNotFound(bufferId, "Primary buffer not found!");
   }
+
+  const secondaryBuffers = Array.from(tab.secondaryBufferIds).map((id) => {
+    const buffer = bufferState.entities[id];
+
+    if (!buffer) {
+      throw new EntityNotFound(id, "Secondary buffer not found").addContext({ tabId: tab.id, bufferId: id });
+    }
+
+    return buffer;
+  });
 
   const entity = BufferedEntityFactory.from(
     {
-      id: buffer.id,
-      type: buffer.entityType,
+      id: primaryBuffer.id,
+      type: primaryBuffer.entityType,
     },
     store.dispatch
   );
@@ -104,7 +116,8 @@ export function getTabBufferedEntity(tab: BufferModeTab) {
   return {
     store,
     entity,
-    buffer,
+    primaryBuffer,
+    secondaryBuffers,
   };
 }
 
@@ -112,7 +125,8 @@ export function useTabBuffer<T>(
   tab: BufferModeTab,
   selector: (params: {
     entity: ReturnType<typeof getTabBufferedEntity>["entity"];
-    buffer: BufferEntry;
+    primaryBuffer: BufferEntry;
+    secondaryBuffers: BufferEntry[];
     state: ReturnType<ReturnType<typeof getApiClientFeatureContext>["store"]["getState"]>;
   }) => T
 ): T {
@@ -120,12 +134,13 @@ export function useTabBuffer<T>(
   const { store } = getApiClientFeatureContext(workspaceId);
 
   const getSnapshot = useCallback(() => {
-    const { entity, buffer } = getTabBufferedEntity(tab);
+    const { entity, primaryBuffer, secondaryBuffers } = getTabBufferedEntity(tab);
 
     return selector({
       entity,
-      buffer,
+      primaryBuffer,
       state: store.getState(),
+      secondaryBuffers,
     });
   }, [selector, store, tab]);
 
@@ -133,8 +148,8 @@ export function useTabBuffer<T>(
 }
 
 export function useIsTabDirty(tab: BufferModeTab) {
-  return useTabBuffer(tab, ({ buffer }) => {
-    return buffer.isDirty;
+  return useTabBuffer(tab, ({ primaryBuffer, secondaryBuffers }) => {
+    return getIsBuffersDirty({ primaryBuffer, secondaryBuffers });
   });
 }
 
