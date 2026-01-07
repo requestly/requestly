@@ -2,20 +2,25 @@
  * APIRecordsListRankingManager
  *
  * Concrete implementation of ListRankingManager for API Client records.
- * Manages ranking for RecordMetadata objects (API requests and collections).
+ * Manages ranking for RecordData objects (API requests and collections).
  */
 
 import { ListRankingManager } from "modules/ranking";
-import { RQAPI } from "features/apiClient/types";
 
-type RecordMetadata = RQAPI.RecordMetadata;
+type BaseData = {
+  name?: string;
+  createdTs?: number;
+  rank?: string;
+};
 
-export class APIRecordsListRankingManager extends ListRankingManager<RecordMetadata> {
+type RecordData = BaseData & { [key: string]: any };
+
+export class APIRecordsListRankingManager extends ListRankingManager<RecordData> {
   /**
    * Retrieves the saved rank from a record
    * Returns null if rank is not set
    */
-  getSavedRank(record: RecordMetadata): string | null {
+  getSavedRank(record: RecordData): string | null {
     return record.rank ?? null;
   }
 
@@ -24,16 +29,20 @@ export class APIRecordsListRankingManager extends ListRankingManager<RecordMetad
    * Format: "a" + alphanumeric name prefix (5 chars) + createdTs
    * This ensures consistent ordering for records without explicit ranks
    */
-  getGeneratedRank(record: RecordMetadata): string {
+  getGeneratedRank(record: RecordData): string {
     // Extract alphanumeric characters from name, lowercase, max 5 chars
-    const namePart = record.name
+    const name = record.name ?? "Untitled request";
+
+    const namePrefix = name
       .replace(/[^a-zA-Z0-9]/g, "")
       .toLowerCase()
       .slice(0, 5)
       .padEnd(5, "0"); // Pad with zeros if less than 5 chars
 
+    const ts = record.createdTs ?? Date.now();
     // Combine prefix + name + timestamp for deterministic ordering
-    return `a${namePart}${record.createdTs}`;
+    // (fractional indexing does not allow first character to be a digit and last character to be a zero)
+    return `a${namePrefix}${ts}1`;
   }
 }
 
