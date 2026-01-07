@@ -7,15 +7,13 @@ import { RQAPI } from "features/apiClient/types";
 import { GrGraphQl } from "@react-icons/all-files/gr/GrGraphQl";
 import { TabSourceMetadata } from "componentsV2/Tabs/types";
 import { getEmptyDraftApiRecord } from "features/apiClient/screens/apiClient/utils";
+import { apiClientContextRegistry } from "features/apiClient/slices";
 
 interface DraftRequestContainerTabSourceMetadata extends TabSourceMetadata {
   emptyRecord: RQAPI.ApiRecord;
   apiEntryType?: RQAPI.ApiEntryType;
 }
 
-function Draft() {
-  return <>Draft</>;
-}
 
 export class DraftRequestContainerTabSource extends BaseTabSource {
   metadata: DraftRequestContainerTabSourceMetadata;
@@ -25,17 +23,19 @@ export class DraftRequestContainerTabSource extends BaseTabSource {
       id: `${Date.now()}`,
       name: "request",
       title: "Untitled request",
-      // context: {},
       isNewTab: true,
       ...metadata,
+      context: {
+        id: apiClientContextRegistry.getLastUsedContext()?.workspaceId,
+        ...metadata.context,
+      }
     };
     this.component = (
-      <Draft />
-      // <DraftRequestContainer
-      //   key={this.metadata.id}
-      //   draftId={this.metadata.id}
-      //   apiEntryType={metadata?.apiEntryType ?? RQAPI.ApiEntryType.HTTP}
-      // />
+      <DraftRequestContainer
+        key={this.metadata.id}
+        draftId={this.metadata.id}
+        apiEntryType={metadata?.apiEntryType ?? RQAPI.ApiEntryType.HTTP}
+      />
     );
     this.urlPath = `${PATHS.API_CLIENT.ABSOLUTE}/${this.metadata.name}/new`;
     this.icon = this.getTabIcon(
