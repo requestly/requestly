@@ -1,9 +1,8 @@
-import type { RunConfigEntity as RunConfigRecord } from "../../runConfig/types";
+import { parseRunnerConfigKey, RunConfigEntity as RunConfigRecord } from "../../runConfig/types";
 import { EntityNotFound } from "../../types";
 import { bufferAdapterSelectors, bufferActions } from "../../buffer/slice";
 import type { ApiClientRootState } from "../../hooks/types";
 import { RunConfigEntity } from "../runConfig";
-import { parseRunnerConfigBufferReference } from "../../runConfig/types";
 import type { BufferedApiClientEntity, BufferedApiClientEntityMeta } from "./factory";
 import type { EntityDispatch } from "../types";
 
@@ -13,8 +12,7 @@ import type { EntityDispatch } from "../types";
  */
 export class BufferedRunConfigEntity
   extends RunConfigEntity<BufferedApiClientEntityMeta>
-  implements BufferedApiClientEntity
-{
+  implements BufferedApiClientEntity {
   // Origin entity pointing to the actual stored RunConfig
   origin: RunConfigEntity;
 
@@ -22,7 +20,7 @@ export class BufferedRunConfigEntity
     super(dispatch, meta);
 
     // Parse referenceId to get actual RunConfig composite key
-    const { collectionId, configId } = parseRunnerConfigBufferReference(meta.referenceId);
+    const { collectionId, configId } = parseRunnerConfigKey(meta.referenceId);
     const actualId = `${collectionId}::${configId}`;
 
     this.origin = new RunConfigEntity(dispatch, { id: actualId });
@@ -53,7 +51,7 @@ export class BufferedRunConfigEntity
     });
   }
 
-   setDelay(delay: number): void {
+  setDelay(delay: number): void {
     this.unsafePatch((config) => {
       config.delay = delay;
     });
