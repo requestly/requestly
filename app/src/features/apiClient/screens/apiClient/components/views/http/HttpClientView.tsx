@@ -363,11 +363,11 @@ const HttpClientView: React.FC<Props> = ({
     });
 
     try {
-      const rawEntry = entity.getEntityFromState(store.getState()).data;
-      const entry = sanitizeEntry(lodash.cloneDeep(rawEntry));
+      // const rawEntry = entity.getEntityFromState(store.getState()).data;
+      // const entry = sanitizeEntry(lodash.cloneDeep(rawEntry));
       const apiClientExecutionResult = await httpRequestExecutor.execute(
         {
-          entry,
+          entity,
           recordId: entity.meta.referenceId,
         },
         {
@@ -377,11 +377,11 @@ const HttpClientView: React.FC<Props> = ({
       );
 
       const executedEntry = apiClientExecutionResult.executedEntry as RQAPI.HttpApiEntry;
-      const entryWithResponse: RQAPI.HttpApiEntry = {
-        ...entry,
-        response: executedEntry.response,
-        testResults: executedEntry.testResults,
-      };
+      // const entryWithResponse: RQAPI.HttpApiEntry = {
+      //   ...entry,
+      //   response: executedEntry.response,
+      //   testResults: executedEntry.testResults,
+      // };
       entity.setResponse(executedEntry.response);
       entity.setTestResults(executedEntry.testResults);
       // setEntry(entryWithResponse);
@@ -409,21 +409,21 @@ const HttpClientView: React.FC<Props> = ({
           Sentry.withScope((scope) => {
             scope.setTag("error_type", "api_request_failure");
             scope.setContext("request_details", {
-              url: entryWithResponse.request.url,
-              method: entryWithResponse.request.method,
-              headers: entryWithResponse.request.headers,
-              queryParams: entryWithResponse.request.queryParams,
+              url: request.url,
+              method: request.method,
+              headers: request.headers,
+              queryParams: request.queryParams,
             });
-            scope.setFingerprint(["api_request_error", entryWithResponse.request.method, error.source]);
+            scope.setFingerprint(["api_request_error", request.method, error.source]);
             Sentry.captureException(new Error(`API Request Failed: ${error.message || "Unknown error"}`));
           });
         }
         trackRequestFailed(
           error.message,
           error.type,
-          entryWithResponse.request.url,
-          entryWithResponse.request.method,
-          entryWithResponse.response?.status
+          request.url,
+          request.method,
+          response?.status
         );
         trackRQLastActivity(API_CLIENT.REQUEST_FAILED);
         trackRQDesktopLastActivity(API_CLIENT.REQUEST_FAILED);
