@@ -9,6 +9,7 @@ import { runnerConfigActions } from "features/apiClient/slices/runConfig/slice";
 import {
   DEFAULT_RUN_CONFIG_ID,
   DELAY_MAX_LIMIT,
+  getRunnerConfigId,
   ITERATIONS_MAX_LIMIT,
 } from "features/apiClient/slices/runConfig/types";
 import { toast } from "utils/Toast";
@@ -16,6 +17,8 @@ import "./runConfigSettings.scss";
 import { DataFileSelector } from "./DataFileSelector";
 import { getAppMode } from "store/selectors";
 import { useSelector } from "react-redux";
+import { useBufferedEntity } from "features/apiClient/slices/entities/hooks";
+import { ApiClientEntityType } from "features/apiClient/slices/entities/types";
 
 export const RunConfigSettings: React.FC = () => {
   const appMode = useSelector(getAppMode);
@@ -23,24 +26,28 @@ export const RunConfigSettings: React.FC = () => {
   const dispatch = useApiClientDispatch();
 
   // Get config from Redux slice
-  const config = useApiClientSelector((state) => selectRunConfig(state, collectionId, DEFAULT_RUN_CONFIG_ID));
+  // const config = useApiClientSelector((state) => selectRunConfig(state, collectionId, DEFAULT_RUN_CONFIG_ID));
+  const bufferedEntity = useBufferedEntity({
+    id: getRunnerConfigId(collectionId, DEFAULT_RUN_CONFIG_ID),
+    type: ApiClientEntityType.RUN_CONFIG,
+  });
 
-  const iterations = config?.iterations ?? 1;
-  const delay = config?.delay ?? 0;
+  const iterations = useApiClientSelector((state) => bufferedEntity.getIterations(state));
+  const delay = useApiClientSelector((state) => bufferedEntity.getDelay(state));
 
   const handleIterationsChange = (value: number | null) => {
-    if (!config || value === null) return;
+    if (value === null) return;
     try {
-      dispatch(runnerConfigActions.updateIterations(collectionId, config.configId, value));
+      bufferedEntity.setIterations(value);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : String(error));
     }
   };
 
   const handleDelayChange = (value: number | null) => {
-    if (!config || value === null) return;
+    if (value === null) return;
     try {
-      dispatch(runnerConfigActions.updateDelay(collectionId, config.configId, value));
+      bufferedEntity.setDelay(value);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : String(error));
     }

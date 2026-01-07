@@ -54,6 +54,7 @@ import { TAB_KEYS } from "../../../../CollectionView";
 import { useIsBufferDirty } from "features/apiClient/slices/entities";
 import { useBufferedEntity, useBufferedRunConfigEntity, useEntity } from "features/apiClient/slices/entities/hooks";
 import { ApiClientEntityType } from "features/apiClient/slices/entities/types";
+import { entitySynced } from "features/apiClient/slices";
 
 const RunConfigSaveButton: React.FC<{ disabled?: boolean; isRunnerTabActive: boolean }> = ({
   disabled = false,
@@ -100,6 +101,13 @@ const RunConfigSaveButton: React.FC<{ disabled?: boolean; isRunnerTabActive: boo
         })
       ).unwrap();
 
+      dispatch(
+        entitySynced({
+          entityId: bufferedEntity.meta.referenceId,
+          entityType: ApiClientEntityType.RUN_CONFIG,
+          data: config,
+        })
+      );
       dispatch(
         bufferActions.markSaved({
           id: bufferedEntity.meta.id,
