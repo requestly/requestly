@@ -14,13 +14,13 @@ import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks
 
 interface ApiClientUrlProps {
   entity: BufferedHttpRecordEntity
-  url: string;
   currentEnvironmentVariables: ScopedVariables;
   onEnterPress: (e: KeyboardEvent) => void;
   onUrlChange: (value: string, finalParams: KeyValuePair[]) => void;
 }
 
-const HttpApiClientUrl = ({ entity, url, currentEnvironmentVariables, onEnterPress, onUrlChange }: ApiClientUrlProps) => {
+const HttpApiClientUrl = ({ entity, currentEnvironmentVariables, onEnterPress, onUrlChange }: ApiClientUrlProps) => {
+  const url = useApiClientSelector(s => entity.getUrl(s));
   const queryParams = useApiClientSelector(s => entity.getQueryParams(s) );
   // const [queryParams, setQueryParams] = useQueryParamStore((state) => [state.queryParams, state.setQueryParams]);
 
