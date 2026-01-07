@@ -2,9 +2,16 @@ import React from "react";
 import { InputNumber } from "antd";
 import { RQTooltip } from "lib/design-system-v2/components";
 import { MdOutlineInfo } from "@react-icons/all-files/md/MdOutlineInfo";
-import { useRunConfigStore } from "../../../run.context";
+import { useCollectionView } from "../../../../../collectionView.context";
+import { useApiClientSelector, useApiClientDispatch } from "features/apiClient/slices/hooks/base.hooks";
+import { selectRunConfig } from "features/apiClient/slices/runConfig/selectors";
+import { runnerConfigActions } from "features/apiClient/slices/runConfig/slice";
+import {
+  DEFAULT_RUN_CONFIG_ID,
+  DELAY_MAX_LIMIT,
+  ITERATIONS_MAX_LIMIT,
+} from "features/apiClient/slices/runConfig/types";
 import { toast } from "utils/Toast";
-import { DELAY_MAX_LIMIT, ITERATIONS_MAX_LIMIT } from "features/apiClient/store/collectionRunConfig/runConfig.store";
 import "./runConfigSettings.scss";
 import { DataFileSelector } from "./DataFileSelector";
 import { getAppMode } from "store/selectors";
@@ -12,26 +19,30 @@ import { useSelector } from "react-redux";
 
 export const RunConfigSettings: React.FC = () => {
   const appMode = useSelector(getAppMode);
-  const [iterations, setIterations, delay, setDelay] = useRunConfigStore((s) => [
-    s.iterations,
-    s.setIterations,
-    s.delay,
-    s.setDelay,
-  ]);
+  const { collectionId } = useCollectionView();
+  const dispatch = useApiClientDispatch();
 
-  const handleIterationsChange = (value: number) => {
+  // Get config from Redux slice
+  const config = useApiClientSelector((state) => selectRunConfig(state, collectionId, DEFAULT_RUN_CONFIG_ID));
+
+  const iterations = config?.iterations ?? 1;
+  const delay = config?.delay ?? 0;
+
+  const handleIterationsChange = (value: number | null) => {
+    if (!config || value === null) return;
     try {
-      setIterations(value);
+      dispatch(runnerConfigActions.updateIterations(collectionId, config.configId, value));
     } catch (error) {
-      toast.error(error);
+      toast.error(error instanceof Error ? error.message : String(error));
     }
   };
 
-  const handleDelayChange = (value: number) => {
+  const handleDelayChange = (value: number | null) => {
+    if (!config || value === null) return;
     try {
-      setDelay(value);
+      dispatch(runnerConfigActions.updateDelay(collectionId, config.configId, value));
     } catch (error) {
-      toast.error(error);
+      toast.error(error instanceof Error ? error.message : String(error));
     }
   };
 
