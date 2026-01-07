@@ -13,14 +13,14 @@ import { getDefaultRunConfig } from "features/apiClient/slices/runConfig/thunks"
 import { useWorkspaceId } from "features/apiClient/common/WorkspaceProvider";
 import { runnerConfigActions } from "features/apiClient/slices/runConfig/slice";
 import { fromSavedRunConfig, getRunnerConfigId } from "features/apiClient/slices/runConfig/types";
-import { useActiveTabId } from "componentsV2/Tabs/slice/hooks";
+import { useTabActions } from "componentsV2/Tabs/slice/hooks";
 import { bufferActions } from "features/apiClient/slices/buffer";
-import { tabsActions } from "componentsV2/Tabs/slice";
 import { ApiClientEntityType } from "features/apiClient/slices/entities/types";
-import { useApiClientDispatch, useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
+import { useApiClientDispatch } from "features/apiClient/slices/hooks/base.hooks";
 import "./collectionRunnerView.scss";
 import { useApiClientStore } from "features/apiClient/slices";
 import { findBufferByReferenceId } from "features/apiClient/slices/buffer/slice";
+import { useHostContext } from "hooks/useHostContext";
 
 interface Props {
   collectionId: RQAPI.CollectionRecord["id"];
@@ -33,18 +33,19 @@ export const CollectionRunnerView: React.FC<Props> = ({ collectionId, activeTabK
   // } = useCommand();
 
   const workspaceId = useWorkspaceId();
-  const dispatch = useApiClientDispatch();
-  const activeTabId = useActiveTabId();
+  const apiClientDispatch = useApiClientDispatch();
+  const tabActions = useTabActions();
   const [isLoading, setIsLoading] = useState(true);
   const [runResults] = useState<RunResult[]>([]);
   const store = useApiClientStore();
+  const { registerSecondaryBuffer, unregisterSecondaryBuffer } = useHostContext();
 
   useEffect(() => {
-    (async () => {
+    const promise = (async () => {
       try {
         setIsLoading(true);
-        const result = await dispatch(getDefaultRunConfig({ workspaceId, collectionId })).unwrap();
-        dispatch(runnerConfigActions.hydrateRunConfig(collectionId, result));
+        const result = await apiClientDispatch(getDefaultRunConfig({ workspaceId, collectionId })).unwrap();
+        apiClientDispatch(runnerConfigActions.hydrateRunConfig(collectionId, result));
 
         // Create buffer for run config
         const state = store.getState();
@@ -52,7 +53,7 @@ export const CollectionRunnerView: React.FC<Props> = ({ collectionId, activeTabK
         // Need to fix
         const existingBuffer = referenceId ? findBufferByReferenceId(state.buffer.entities, referenceId) : null;
 
-        const bufferAction = dispatch(
+        const bufferAction = apiClientDispatch(
           bufferActions.open(
             {
               entityType: ApiClientEntityType.RUN_CONFIG,
@@ -66,13 +67,9 @@ export const CollectionRunnerView: React.FC<Props> = ({ collectionId, activeTabK
           )
         );
 
-        // Register buffer as secondary buffer to the tab
-        dispatch(
-          tabsActions.registerSecondaryBuffer({
-            tabId: activeTabId,
-            bufferId: bufferAction.meta.id,
-          })
-        );
+        registerSecondaryBuffer(bufferAction.meta.id);
+
+        return bufferAction.meta.id;
       } catch (error) {
         toast.error("Something went wrong!");
         Sentry.captureException(error, { extra: { collectionId } });
@@ -80,7 +77,23 @@ export const CollectionRunnerView: React.FC<Props> = ({ collectionId, activeTabK
         setIsLoading(false);
       }
     })();
-  }, [collectionId, workspaceId, activeTabId, dispatch]);
+
+    return () => {
+      promise.then((id) => {
+        if (id) {
+          unregisterSecondaryBuffer(id);
+        }
+      });
+    };
+  }, [
+    collectionId,
+    workspaceId,
+    apiClientDispatch,
+    store,
+    tabActions,
+    registerSecondaryBuffer,
+    unregisterSecondaryBuffer,
+  ]);
 
   // useEffect(() => {
   //   (async () => {
