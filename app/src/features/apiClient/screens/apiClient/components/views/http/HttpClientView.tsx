@@ -1,5 +1,5 @@
 import lodash from 'lodash';
-import React, { useCallback, useState, useMemo } from "react";
+import React, { useCallback, useState } from "react";
 import { notification, Select, Space } from "antd";
 import { useDispatch } from "react-redux";
 import * as Sentry from "@sentry/react";
@@ -57,10 +57,14 @@ import { useAISessionContext } from "features/ai/contexts/AISession";
 import { OriginExists } from "features/apiClient/slices/entities/buffered/factory";
 import { BufferedHttpRecordEntity, useIsBufferDirty } from "features/apiClient/slices/entities";
 import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
-import { bufferAdapterSelectors, useApiClientRepository } from 'features/apiClient/slices';
+import { ApiClientStore, bufferAdapterSelectors, useApiClientRepository, useApiClientStore } from 'features/apiClient/slices';
 import { useSaveBuffer } from 'features/apiClient/slices/buffer/hooks';
 import { NativeError } from 'errors/NativeError';
 import { useHostContext } from 'hooks/useHostContext';
+
+function getEntry(entity: BufferedHttpRecordEntity, store: ApiClientStore) {
+  return entity.getEntityFromState(store.getState()).data;
+}
 
 const requestMethodOptions = Object.values(RequestMethod).map((method) => ({
   value: method,
@@ -110,18 +114,16 @@ const HttpClientView: React.FC<Props> = ({
   const [isLongRequest, setIsLongRequest] = useState(false);
   const [isRequestCancelled, setIsRequestCancelled] = useState(false);
 
+  const store = useApiClientStore();
+
   const hasUnsavedChanges = useIsBufferDirty({
     type: 'bufferId',
     bufferId: entity.id,
   });
   const collectionId = useApiClientSelector(s => entity.getCollectionId(s));
-  const request = useApiClientSelector(s => entity.getRequest(s));
-  const response = useApiClientSelector(s => entity.getResponse(s));
-  const postResponseScript = useApiClientSelector(s => entity.getPostResponseScript(s));
-  const preRequestScript = useApiClientSelector(s => entity.getPreRequestScript(s));
   const url = useApiClientSelector(s => entity.getUrl(s));
-  const queryParams = useApiClientSelector(s => entity.getQueryParams(s));
-  const testResults = useApiClientSelector(s => entity.getTestResults(s));
+  const contentType = useApiClientSelector(s => entity.getContentType(s));
+  const method = useApiClientSelector(s => entity.getMethod(s));
   const name = useApiClientSelector(s => entity.getName(s));
   const isNew = useApiClientSelector(s => bufferAdapterSelectors.selectById(s.buffer, entity.id)?.isNew);
 
@@ -131,6 +133,12 @@ const HttpClientView: React.FC<Props> = ({
   const httpRequestExecutor = useHttpRequestExecutor(collectionId);
 
   const handleGenerateTests = useCallback(async () => {
+    const entry = getEntry(entity, store);
+    const {
+      response,
+      request,
+      scripts,
+    } = entry;
     if (!response || isGeneratingTests) {
       return;
     }
@@ -150,12 +158,12 @@ const HttpClientView: React.FC<Props> = ({
         const parsed = JSON.parse(response.body || "null");
         hasJsonObjectBody = parsed && typeof parsed === "object" && !Array.isArray(parsed);
       }
-    } catch (_) {
+    } catch {
       hasJsonObjectBody = false;
     }
 
     try {
-      const existingScript = postResponseScript || "";
+      const existingScript = scripts?.postResponse || "";
       if (hasTests(existingScript)) {
         setIsGeneratingTests(false);
         return;
@@ -176,7 +184,7 @@ const HttpClientView: React.FC<Props> = ({
       trackTestGenerationCompleted({
         src: "test_tab_response_panel",
       });
-    } catch (e) {
+    } catch {
       toast.error("Something went wrong while generating tests");
       trackTestGenerationFailed({
         src: "test_tab_response_panel",
@@ -184,15 +192,17 @@ const HttpClientView: React.FC<Props> = ({
     } finally {
       setIsGeneratingTests(false);
     }
-  }, [isGeneratingTests, setDeepLinkState]);
+  }, [isGeneratingTests, setDeepLinkState, entity, store]);
 
-  const canGenerateTests = useMemo(() => {
-    const responseExists = Boolean(postResponseScript);
-    if (!responseExists) return false;
-    return !hasTests(postResponseScript);
-  }, [postResponseScript]);
+  // const canGenerateTests = useMemo(() => {
+  //   const responseExists = Boolean(postResponseScript);
+  //   if (!responseExists) return false;
+  //   return !hasTests(postResponseScript);
+  // }, [postResponseScript]);
 
   const onSendButtonClick = useCallback(async () => {
+    const { request, scripts, auth, response } = getEntry(entity, store);
+    const { url } = request
     if (!url) {
       return;
     }
@@ -227,8 +237,8 @@ const HttpClientView: React.FC<Props> = ({
     }, 5000);
 
     trackAPIRequestSent({
-      has_scripts: Boolean(preRequestScript),
-      // auth_type: entry?.auth?.currentAuthType,
+      has_scripts: Boolean(scripts?.preRequest),
+      auth_type: auth?.currentAuthType,
       // request_type: getRequestTypeForAnalyticEvent(apiEntryDetails?.isExample, entry?.request?.url),
       request_body_type: request?.contentType,
       type: RQAPI.ApiEntryType.HTTP,
@@ -312,9 +322,10 @@ const HttpClientView: React.FC<Props> = ({
     trackRQLastActivity(API_CLIENT.REQUEST_SENT);
     trackRQDesktopLastActivity(API_CLIENT.REQUEST_SENT);
   }, [
+    entity,
+    store,
     toggleBottomSheet,
-    queryParams,
-   dispatch,
+    dispatch,
     httpRequestExecutor,
     notifyApiRequestFinished,
     endAISession,
@@ -338,7 +349,7 @@ const HttpClientView: React.FC<Props> = ({
       return;
     }
     entity.origin.setName(name);
-  }, [entity]);
+  }, [entity, repositories]);
 
   const onSaveButtonClick = useCallback(async () => {
     if (!entity.meta.originExists) {
@@ -374,7 +385,7 @@ const HttpClientView: React.FC<Props> = ({
 
           return record;
         },
-        async save(record, repositories, entity) {
+        async save(record, repositories) {
           const result = await repositories.apiClientRecordsRepository.updateRecord(record, record.id);
           if (!result.success) {
             throw new NativeError(result.message || "Could not save request!");
@@ -388,7 +399,7 @@ const HttpClientView: React.FC<Props> = ({
         afterSave() {
           setIsRequestSaving(false);
         },
-        onSuccess(changes, entity) {
+        onSuccess() {
           toast.success("Request saved!");
         },
         onError(e) {
@@ -404,9 +415,10 @@ const HttpClientView: React.FC<Props> = ({
 
     endAISession();
   }, [
-    onSaveCallback,
-    queryParams,
+    // onSaveCallback,
     endAISession,
+    saveBuffer,
+    entity,
   ]);
 
   const handleCancelRequest = useCallback(() => {
@@ -419,7 +431,7 @@ const HttpClientView: React.FC<Props> = ({
     (newAuth: RQAPI.Auth) => {
       entity.setAuth(newAuth)
     },
-    []
+    [entity]
   );
 
   const onUrlInputEnterPressed = useCallback((evt: KeyboardEvent) => {
@@ -434,10 +446,10 @@ const HttpClientView: React.FC<Props> = ({
       } else {
         setError(result.error);
       }
-    } catch (error) {
+    } catch {
       toast.error("Something went wrong while refreshing test results");
     }
-  }, [httpRequestExecutor]);
+  }, [httpRequestExecutor, entity]);
 
   const handleRevertChanges = () => {
     // setEntry(apiEntryDetails?.data);
@@ -488,12 +500,11 @@ const HttpClientView: React.FC<Props> = ({
                 popupClassName="api-request-method-selector"
                 className="api-request-method-selector"
                 options={requestMethodOptions}
-                value={request.method}
+                value={method}
                 onChange={entity.setMethod.bind(entity)}
               />
               <HttpApiClientUrl
                 entity={entity}
-                url={request.url}
                 onUrlChange={entity.setUrl.bind(entity)}
                 onEnterPress={onUrlInputEnterPressed}
                 currentEnvironmentVariables={scopedVariables}
@@ -507,8 +518,8 @@ const HttpClientView: React.FC<Props> = ({
               className="text-bold"
               enableHotKey={enableHotkey}
               disabled={
-                !request.url ||
-                (appMode === "EXTENSION" && request.contentType === RequestContentType.MULTIPART_FORM)
+                !url ||
+                (appMode === "EXTENSION" && contentType === RequestContentType.MULTIPART_FORM)
               }
             >
               Send
@@ -518,7 +529,7 @@ const HttpClientView: React.FC<Props> = ({
               <RBACButton
                 disabled={
                   !hasUnsavedChanges ||
-                  (appMode === "EXTENSION" && request.contentType === RequestContentType.MULTIPART_FORM)
+                  (appMode === "EXTENSION" && contentType === RequestContentType.MULTIPART_FORM)
                 }
                 permission="create"
                 resource="api_client_request"
@@ -539,11 +550,9 @@ const HttpClientView: React.FC<Props> = ({
         layout={SheetLayout.SPLIT}
         bottomSheet={
           <ApiClientBottomSheet
-            response={response!}
-            testResults={testResults ?? []}
+            entity={entity}
             onGenerateTests={handleGenerateTests}
             isGeneratingTests={isGeneratingTests}
-            canGenerateTests={canGenerateTests}
             isLoading={isLoadingResponse}
             isFailed={isFailed}
             isLongRequest={isLongRequest}
