@@ -5,11 +5,7 @@ import { ApiClientEntityType } from "features/apiClient/slices/entities/types";
 
 interface Props {
   entity: BufferedHttpRecordEntity | BufferedGraphQLRecordEntity,
-  // entityType: ApiClientEntityType.HTTP_RECORD | ApiClientEntityType.HTTP_RECORD,
-  // apiRecord: RQAPI.ApiRecord;
   handleRequestFinished: (entry: RQAPI.ApiEntry) => void;
-  // onSaveCallback: (apiEntryDetails: RQAPI.ApiRecord) => void;
-  // isCreateMode: boolean;
   isOpenInModal?: boolean;
   override?: HttpClientViewProps['override'],
 }
@@ -21,17 +17,6 @@ export const ClientViewFactory = ({
   override,
 }: Props) => {
   if (entity.type === ApiClientEntityType.HTTP_RECORD) {
-    // if (isCreateMode) {
-    //   return (
-    //     <HttpClientViewCreateMode
-    //       apiEntryDetails={apiRecord as RQAPI.HttpApiRecord}
-    //       onSaveCallback={onSaveCallback}
-    //       openInModal={isOpenInModal}
-    //       notifyApiRequestFinished={handleRequestFinished}
-    //     />
-    //   );
-    // }
-
     return (
       <HttpClientView
         entity={entity}

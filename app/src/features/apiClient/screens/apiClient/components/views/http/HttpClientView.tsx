@@ -81,7 +81,6 @@ export type HttpClientViewProps = {
     }
   },
   openInModal?: boolean;
-  // onSaveCallback: (apiEntryDetails: RQAPI.HttpApiRecord) => void;
   notifyApiRequestFinished: (apiEntry: RQAPI.HttpApiEntry) => void;
 };
 

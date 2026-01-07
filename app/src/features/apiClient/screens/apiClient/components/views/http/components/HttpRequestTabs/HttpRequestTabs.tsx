@@ -28,11 +28,7 @@ export enum RequestTab {
 
 interface Props {
   error: RQAPI.ExecutionError | null;
-  // requestEntry: RQAPI.HttpApiEntry;
-  // requestId: RQAPI.ApiRecord["id"];
   entity: BufferedHttpRecordEntity,
-  // collectionId: RQAPI.ApiRecord["collectionId"];
-  // setRequestEntry: (updater: (prev: RQAPI.HttpApiEntry) => RQAPI.HttpApiEntry) => void;
   handleAuthChange: (newAuth: RQAPI.Auth) => void;
   focusPostResponseScriptEditor?: boolean;
   scriptEditorVersion?: number;
@@ -40,11 +36,7 @@ interface Props {
 
 const HttpRequestTabs: React.FC<Props> = ({
   error,
-  // requestEntry,
-  // requestId,
   entity,
-  // collectionId,
-  // setRequestEntry,
   handleAuthChange,
   focusPostResponseScriptEditor,
   scriptEditorVersion,
@@ -77,10 +69,6 @@ const HttpRequestTabs: React.FC<Props> = ({
   );
 
   const isRequestBodySupported = supportsRequestBody(method);
-
-  // const pathVariables = usePathVariablesStore((state) => state.pathVariables);
-  // const queryParams = useQueryParamStore((state) => state.queryParams);
-
   const hasScriptError = error?.type === RQAPI.ApiClientErrorType.SCRIPT;
 
   const items = useMemo(() => {
@@ -93,26 +81,9 @@ const HttpRequestTabs: React.FC<Props> = ({
             <div className="params-table-title">Query Params</div>
             <QueryParamsTable
               entity={entity}
-              // recordId={requestId}
-              // onQueryParamsChange={(newParams) => {
-              //   setRequestEntry((prev) => ({
-              //     ...prev,
-              //     request: {
-              //       ...prev.request,
-              //       queryParams: newParams,
-              //     },
-              //   }));
-              // }}
             />
             <PathVariableTable
               entity={entity}
-              // recordId={requestId}
-              // onChange={(newVariables) => {
-              //   setRequestEntry((prev) => ({
-              //     ...prev,
-              //     request: { ...prev.request, pathVariables: newVariables },
-              //   }));
-              // }}
             />
           </>
         ),
@@ -129,10 +100,6 @@ const HttpRequestTabs: React.FC<Props> = ({
         children: (
           <RequestBody
             entity={entity}
-            // recordId={requestId}
-            // body={requestEntry.request.body ?? ""}
-            // contentType={getContentTypeWithAlert(requestEntry.request.contentType)}
-            // setRequestEntry={setRequestEntry}
           />
         ),
         disabled: !isRequestBodySupported,
@@ -143,14 +110,6 @@ const HttpRequestTabs: React.FC<Props> = ({
         children: (
           <HeadersTable
             entity={entity}
-            // recordId={requestId}
-            // headers={requestEntry.request.headers}
-            // onHeadersChange={(newHeaders) => {
-            //   setRequestEntry((prev) => ({
-            //     ...prev,
-            //     request: { ...prev.request, headers: newHeaders },
-            //   }));
-            // }}
           />
         ),
       },
@@ -195,14 +154,10 @@ const HttpRequestTabs: React.FC<Props> = ({
     ];
   }, [
     hasScriptError,
-    // requestId,
-    // collectionId,
     handleAuthChange,
     isRequestBodySupported,
     queryParams.length,
-    // pathVariables.length,
     requestEntry,
-    // setRequestEntry,
     focusPostResponseScriptEditor,
     scriptEditorVersion,
     getContentTypeWithAlert,
@@ -219,13 +174,7 @@ const HttpRequestTabs: React.FC<Props> = ({
         >
           <Checkbox
             onChange={(e) => {
-              // setRequestEntry((prev) => ({
-              //   ...prev,
-              //   request: {
-              //     ...prev.request,
-              //     includeCredentials: e.target.checked,
-              //   },
-              // }));
+              entity.setIncludeCredentials(e.target.checked);
             }}
             checked={requestEntry.request.includeCredentials}
           >

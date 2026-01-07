@@ -12,9 +12,7 @@ import { HttpClientViewProps } from "../components/views/http/HttpClientView";
 type Props = {
   entity: BufferedHttpRecordEntity | BufferedGraphQLRecordEntity,
   override?: HttpClientViewProps['override'],
-  // onSaveCallback: (apiEntryDetails: RQAPI.ApiRecord) => void;
   handleAppRequestFinished: (entry: RQAPI.ApiEntry) => void;
-  // isCreateMode: boolean;
   isOpenInModal?: boolean;
 };
 
@@ -29,8 +27,6 @@ export const GenericApiClient: React.FC<Props> = React.memo(
                 entity={entity}
                 handleRequestFinished={handleAppRequestFinished}
                 override={override}
-                // onSaveCallback={onSaveCallback}
-                // isCreateMode={isCreateMode}
                 isOpenInModal={isOpenInModal}
               />
             </AISessionProvider>
