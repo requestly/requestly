@@ -14,14 +14,6 @@ export const parseRunnerConfigKey = (key: RunnerConfigKey): { collectionId: stri
   return { collectionId: collectionId || "", configId: configId || "" };
 };
 
-export const getRunnerConfigBufferReferenceId = (collectionId: string, configId: string): string =>
-  `${getRunnerConfigKey(collectionId, configId)}__runnerConfig`;
-
-export const parseRunnerConfigBufferReference = (referenceId: string): { collectionId: string; configId: string } => {
-  const key = referenceId.replace("__runnerConfig", "");
-  return parseRunnerConfigKey(key);
-};
-
 export const DELAY_MIN = 0;
 export const DELAY_MAX_LIMIT = 50000; // ms
 export const ITERATIONS_MIN = 1;
@@ -52,16 +44,13 @@ export interface RunnerConfigState {
   configs: EntityState<RunConfigEntity>;
 }
 
-
 export const isValidDelay = (delay: number): boolean => {
   return Number.isInteger(delay) && delay >= DELAY_MIN && delay <= DELAY_MAX_LIMIT;
 };
 
-
 export const isValidIterations = (iterations: number): boolean => {
   return Number.isInteger(iterations) && iterations >= ITERATIONS_MIN && iterations <= ITERATIONS_MAX_LIMIT;
 };
-
 
 export const toSavedRunConfig = (entity: RunConfigEntity): SavedRunConfig => {
   return {
@@ -72,7 +61,6 @@ export const toSavedRunConfig = (entity: RunConfigEntity): SavedRunConfig => {
     dataFile: entity.dataFile,
   };
 };
-
 
 export const fromSavedRunConfig = (
   collectionId: string,
