@@ -22,7 +22,7 @@ import { BaseExecutionContext, ExecutionContext, ScriptExecutionContext } from "
 import { APIClientWorkloadManager } from "../modules/scriptsV2/workloadManager/APIClientWorkloadManager";
 import { BaseExecutionMetadata, IterationContext } from "../modules/scriptsV2/worker/script-internals/types";
 import { ApiClientFeatureContext, selectRecordById } from "features/apiClient/slices";
-import { ApiClientEntity } from "features/apiClient/slices/entities";
+import { ApiClientEntity, HttpRecordEntity } from "features/apiClient/slices/entities";
 
 enum RQErrorHeaderValue {
   DNS_RESOLUTION_ERROR = "ERR_NAME_NOT_RESOLVED",
@@ -152,7 +152,7 @@ export class HttpRequestExecutor {
 
   async prepareRequestWithValidation(
     recordId: string,
-    entity: ApiClientEntity<RQAPI.HttpApiRecord>,
+    entity: HttpRecordEntity,
     scopes?: Scope[],
     executionContext?: ExecutionContext
   ): Promise<Result<PreparedRequest>> {
@@ -185,7 +185,7 @@ export class HttpRequestExecutor {
 
   async execute(
     entryDetails: {
-      entity: ApiClientEntity<RQAPI.HttpApiRecord>;
+      entity: HttpRecordEntity;
       recordId: string;
     },
     iterationContext: IterationContext,
