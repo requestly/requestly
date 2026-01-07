@@ -39,4 +39,8 @@
     padding: 8px;
     color: var(--requestly-color-text-tertiary, #8f8f8f);
   }
+
+  &:has(.cm-search) .bulk-edit-panel-hint {
+    display: none;
+  }
 }

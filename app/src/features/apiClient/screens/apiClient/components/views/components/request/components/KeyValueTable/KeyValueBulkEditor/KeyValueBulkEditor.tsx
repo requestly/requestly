@@ -1,5 +1,6 @@
 import React, { useCallback, useState, useEffect, useRef } from "react";
 import { EditorView } from "codemirror";
+import { EditorSelection, Transaction } from "@codemirror/state";
 import Editor, { EditorLanguage } from "componentsV2/CodeEditor";
 import { KeyValuePair, KeyValueDataType } from "features/apiClient/types";
 import { RQButton } from "lib/design-system-v2/components";
@@ -14,7 +15,6 @@ interface KeyValueBulkEditorProps {
   onClose: () => void;
   useStore?: StoreHook;
 }
-const useDummyStore = (selector: any) => undefined;
 
 const whiteTextTheme = EditorView.theme({
   "& .cm-line span": {
@@ -88,39 +88,67 @@ export const KeyValueBulkEditor: React.FC<KeyValueBulkEditorProps> = ({
   onClose,
   useStore,
 }) => {
-  const useStoreHook = useStore || useDummyStore;
-  const storeData = useStoreHook((state: any) => state.queryParams || state.headers);
-  const storeSetData = useStoreHook((state: any) => state.setQueryParams || state.setHeaders);
+  const useStoreHook = useStore ?? (() => undefined);
+  const storeData = useStoreHook((state: any) => state?.queryParams ?? state?.headers);
+  const activeData = storeData ?? propsData;
 
-  const activeData = storeData || propsData;
-  const activeOnChange = propsOnChange;
   const [editorValue, setEditorValue] = useState(() => formatKeyValueText(activeData));
 
-  const lastEmittedDataRef = useRef<string | null>(null);
+  const editorViewRef = useRef<EditorView | null>(null);
   const dataRef = useRef(activeData);
+  const isInternalChange = useRef(false);
+  const lastSyncedText = useRef<string | null>(null);
+
+  const handleEditorReady = useCallback((view: EditorView) => {
+    editorViewRef.current = view;
+  }, []);
+
   useEffect(() => {
     dataRef.current = activeData;
   }, [activeData]);
 
+  // Sync from Table -> Editor
   useEffect(() => {
-    const incomingDataString = JSON.stringify(activeData);
-    if (lastEmittedDataRef.current === incomingDataString) {
+    // Changing this flag allows the value inside the Editor to be changed by our formatter and chnages passed down from Table
+    if (isInternalChange.current) {
+      isInternalChange.current = false;
       return;
     }
-    setEditorValue(formatKeyValueText(activeData));
+
+    const newText = formatKeyValueText(activeData);
+    lastSyncedText.current = newText;
+
+    const view = editorViewRef.current;
+    if (view) {
+      const currentDoc = view.state.doc.toString();
+      if (currentDoc !== newText) {
+        const mainSelection = view.state.selection.main;
+        const safeAnchor = Math.min(mainSelection.anchor, newText.length);
+        const safeHead = Math.min(mainSelection.head, newText.length);
+
+        view.dispatch({
+          changes: { from: 0, to: currentDoc.length, insert: newText },
+          selection: EditorSelection.single(safeAnchor, safeHead),
+          annotations: Transaction.remote.of(true),
+        });
+      }
+    }
+    setEditorValue(newText);
   }, [activeData]);
 
   const handleEditorChange = useCallback(
     (value: string) => {
-      setEditorValue(value);
-      const parsed = parseKeyValueText(value, dataRef.current);
-      lastEmittedDataRef.current = JSON.stringify(parsed);
-      if (storeSetData) {
-        storeSetData(parsed);
+      if (value === lastSyncedText.current) {
+        return;
       }
-      activeOnChange(parsed);
+
+      isInternalChange.current = true;
+      setEditorValue(value);
+
+      const parsed = parseKeyValueText(value, dataRef.current);
+      propsOnChange(parsed);
     },
-    [activeOnChange, storeSetData]
+    [propsOnChange]
   );
 
   return (
@@ -140,6 +168,7 @@ export const KeyValueBulkEditor: React.FC<KeyValueBulkEditorProps> = ({
           value={editorValue}
           language={EditorLanguage.JAVASCRIPT}
           handleChange={handleEditorChange}
+          onEditorReady={handleEditorReady}
           customTheme={whiteTextTheme}
           hideToolbar
           hideCharacterCount
