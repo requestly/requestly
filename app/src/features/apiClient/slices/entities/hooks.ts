@@ -15,7 +15,7 @@ import type { BufferedCollectionRecordEntity } from "./buffered/collection";
 import { useDispatch } from "react-redux";
 import { bufferAdapterSelectors, findBufferByReferenceId } from "../buffer/slice";
 import { EntityNotFound } from "../types";
-import {  RUNTIME_VARIABLES_ENTITY_ID } from "../common/constants";
+import { RUNTIME_VARIABLES_ENTITY_ID } from "../common/constants";
 
 export function useEntity<T extends ApiClientEntityType>(params: { id: string; type: T }) {
   const dispatch = EntityFactory.GlobalStateOverrideConfig[params.type] ? useDispatch() : useApiClientDispatch();
@@ -69,7 +69,7 @@ export function useBufferedEntity<T extends ApiClientEntityType>(params: { id: s
 
 export function useOriginUndefinedBufferedEntity<T extends ApiClientEntityType>(params: { bufferId: string }) {
   const dispatch = useApiClientDispatch();
-  const buffer = useApiClientSelector(s => bufferAdapterSelectors.selectById(s.buffer, params.bufferId));
+  const buffer = useApiClientSelector((s) => bufferAdapterSelectors.selectById(s.buffer, params.bufferId));
   if (!buffer) {
     throw new EntityNotFound(params.bufferId, "buffer");
   }
@@ -187,6 +187,16 @@ export function useBufferedRuntimeVariablesEntity(): OriginExists<BufferedRuntim
   });
 }
 
- export function useBufferedCollectionEntity(id: string): OriginExists<BufferedCollectionRecordEntity> {
+export function useBufferedCollectionEntity(id: string): OriginExists<BufferedCollectionRecordEntity> {
   return useBufferedEntity({ id, type: ApiClientEntityType.COLLECTION_RECORD });
+}
+
+export function useRunConfigEntity(collectionId: string, configId: string) {
+  const id = `${collectionId}::${configId}`;
+  return useEntity({ id, type: ApiClientEntityType.RUN_CONFIG });
+}
+
+export function useBufferedRunConfigEntity(collectionId: string, configId: string) {
+  const id = `${collectionId}::${configId}`;
+  return useBufferedEntity({ id, type: ApiClientEntityType.RUN_CONFIG });
 }
