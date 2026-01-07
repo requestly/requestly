@@ -50,12 +50,12 @@ function createSave(
       if (!buffer) {
         throw new EntityNotFound(params.entity.meta.id, "buffer");
       }
-      const changes = getDataToSave(
+      const dataToSave = getDataToSave(
         buffer.entityType,
         params.produceChanges?.(params.entity, state) || buffer.current as C
       );
       hooks.beforeSave?.();
-      const result = await Try(() => params.save(changes, repositories, params.entity));
+      const result = await Try(() => params.save(dataToSave, repositories, params.entity));
       result
         .inspectError(onError)
         .inspectError(() => {
@@ -67,7 +67,7 @@ function createSave(
           }
           hooks.afterSave?.();
           //We we will only acknowledge the result if we don't have an origin
-          const newState = params.entity.meta.originExists ? changes : savedEntity;
+          const newState = params.entity.meta.originExists ? buffer.current as C : savedEntity;
           params.entity.origin.upsert(newState);
           dispatch(
             bufferActions.markSaved({
@@ -76,7 +76,7 @@ function createSave(
               savedData: newState,
             })
           );
-          onSuccess(changes, params.entity)
+          onSuccess(dataToSave, params.entity)
         }
         );
       return result;
