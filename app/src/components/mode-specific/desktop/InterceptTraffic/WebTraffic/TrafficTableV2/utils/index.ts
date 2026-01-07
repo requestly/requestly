@@ -277,6 +277,7 @@ export function canPreviewAsText(body: any): boolean {
       }
 
       text = new TextDecoder("utf-8", { fatal: false }).decode(bytes);
+      if (text.length === 0) return false;
     } catch {
       return false;
     }
