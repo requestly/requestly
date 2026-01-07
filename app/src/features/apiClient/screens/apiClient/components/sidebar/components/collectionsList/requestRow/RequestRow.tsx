@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import { Typography, Dropdown, MenuProps, Checkbox, notification } from "antd";
 import { REQUEST_METHOD_BACKGROUND_COLORS, REQUEST_METHOD_COLORS } from "../../../../../../../../../constants";
 import { RequestMethod, RQAPI } from "features/apiClient/types";
@@ -84,6 +84,7 @@ export const RequestRow: React.FC<Props> = ({
   const [isEditMode, setIsEditMode] = useState(false);
   const [recordToMove, setRecordToMove] = useState<RQAPI.ApiRecord | null>(null);
   const [dropPosition, setDropPosition] = useState<"before" | "after" | null>(null);
+  const requestRowRef = useRef<HTMLDivElement>(null);
 
   // Get siblings from parent collection
   const siblings = useChildren(record.collectionId || "");
@@ -133,7 +134,7 @@ export const RequestRow: React.FC<Props> = ({
         }
 
         const hoverBoundingRect = monitor.getClientOffset();
-        const targetElement = document.getElementById(`request-row-${record.id}`);
+        const targetElement = requestRowRef.current;
 
         if (hoverBoundingRect && targetElement) {
           const targetRect = targetElement.getBoundingClientRect();
@@ -323,8 +324,9 @@ export const RequestRow: React.FC<Props> = ({
             dropPosition === "after" ? "drop-after" : ""
           }`}
           ref={(node) => {
-            drag((node as unknown) as HTMLDivElement);
-            drop((node as unknown) as HTMLDivElement);
+            requestRowRef.current = node;
+            drag(node);
+            drop(node);
           }}
           style={{ opacity: isDragging ? 0.5 : 1 }}
         >
