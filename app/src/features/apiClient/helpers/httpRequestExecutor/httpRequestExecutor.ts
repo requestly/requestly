@@ -368,9 +368,9 @@ export class HttpRequestExecutor {
     return executionResult;
   }
 
-  async rerun(recordId: string, entry: RQAPI.HttpApiEntry): Promise<RQAPI.RerunResult> {
+  async rerun(recordId: string, entity: ApiClientEntity<RQAPI.HttpApiRecord>): Promise<RQAPI.RerunResult> {
     this.abortController = new AbortController();
-
+    const entry = this.getEntry(entity);
     const executionContext = new ScriptExecutionContext(this.ctx, recordId, entry);
     const recordName = selectRecordById(this.ctx.store.getState(), recordId)?.name ?? "";
     const executionMetadata: BaseExecutionMetadata = {
