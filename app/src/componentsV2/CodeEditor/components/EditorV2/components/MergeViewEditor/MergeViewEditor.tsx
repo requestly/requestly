@@ -1,5 +1,5 @@
 import React, { useMemo, useRef } from "react";
-import CodeMirror, { EditorView } from "@uiw/react-codemirror";
+import CodeMirror, { EditorView, ReactCodeMirrorRef } from "@uiw/react-codemirror";
 import { unifiedMergeView, getOriginalDoc } from "@codemirror/merge";
 import { vscodeDark } from "@uiw/codemirror-theme-vscode";
 import { javascript } from "@codemirror/lang-javascript";
@@ -10,9 +10,10 @@ interface Props {
   originalValue: string;
   newValue: string;
   onMergeChunk: (mergedValue: string, newIncomingValue: string, type: "accept" | "reject") => void;
+  onEditorReady: (view: ReactCodeMirrorRef) => void;
 }
 
-export const MergeViewEditor: React.FC<Props> = ({ originalValue, newValue, onMergeChunk }) => {
+export const MergeViewEditor: React.FC<Props> = ({ originalValue, newValue, onMergeChunk, onEditorReady }) => {
   const viewRef = useRef<EditorView | null>(null);
 
   const mergeViewExtension = useMemo(() => {
@@ -42,6 +43,7 @@ export const MergeViewEditor: React.FC<Props> = ({ originalValue, newValue, onMe
   return (
     <CodeMirror
       className="code-editor merge-view-editor"
+      ref={onEditorReady}
       value={newValue}
       onCreateEditor={(view) => {
         viewRef.current = view;
