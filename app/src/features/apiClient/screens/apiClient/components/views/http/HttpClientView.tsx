@@ -513,7 +513,7 @@ const HttpClientView: React.FC<Props> = ({
       return;
     }
 
-    let record: Partial<RQAPI.ApiRecord> = {
+    const record: Partial<RQAPI.ApiRecord> = {
       type: RQAPI.RecordType.API,
       data: { ...entry },
     };
@@ -528,9 +528,16 @@ const HttpClientView: React.FC<Props> = ({
     }
 
     // If record doesn't have a rank, generate one using getEffectiveRank
-    if (!isCreateMode && apiEntryDetails && !apiEntryDetails.rank) {
+    if (!isCreateMode && !apiEntryDetails.rank) {
       const effectiveRank = apiRecordsRankingManager.getEffectiveRank(apiEntryDetails);
-      record = { ...record, rank: effectiveRank };
+      record.rank = effectiveRank;
+    }
+
+    if (isCreateMode && !apiEntryDetails.rank) {
+      const newRank = apiRecordsRankingManager.getRanksForNewApis(ctx, apiEntryDetails?.collectionId || "", [
+        record as RQAPI.ApiClientRecord,
+      ])[0];
+      record.rank = newRank;
     }
 
     const result = isCreateMode
@@ -591,7 +598,7 @@ const HttpClientView: React.FC<Props> = ({
       return;
     }
 
-    let record: Partial<RQAPI.ApiRecord> = {
+    const record: Partial<RQAPI.ApiRecord> = {
       type: RQAPI.RecordType.API,
       data: { ...sanitizeEntry(entryToSave, false) },
     };
@@ -599,14 +606,8 @@ const HttpClientView: React.FC<Props> = ({
     if (isCreateMode) {
       const requestId = apiClientRecordsRepository.generateApiRecordId();
       record.id = requestId;
-
-      // For new requests: use getNextRank to place at bottom of collection
       const collectionId = apiEntryDetails?.collectionId || "";
-      const siblingsInCollection = apiClientRecords.filter(
-        (r) => r.collectionId === collectionId && r.id !== record.id
-      );
-      const newRank = apiRecordsRankingManager.getNextRanks(siblingsInCollection, [record as RQAPI.ApiRecord])[0];
-      record = { ...record, rank: newRank };
+      record.rank = apiRecordsRankingManager.getRanksForNewApis(ctx, collectionId, [record])[0];
     }
 
     //  Is this check necessary?
@@ -616,7 +617,7 @@ const HttpClientView: React.FC<Props> = ({
       // For existing requests: use getEffectiveRank if no rank exists
       if (!apiEntryDetails.rank) {
         const effectiveRank = apiRecordsRankingManager.getEffectiveRank(apiEntryDetails);
-        record = { ...record, rank: effectiveRank };
+        record.rank = effectiveRank;
       }
     }
 
@@ -653,17 +654,17 @@ const HttpClientView: React.FC<Props> = ({
     setIsRequestSaving(false);
     endAISession();
   }, [
-    apiClientRecordsRepository,
-    apiEntryDetails,
     entry,
-    isCreateMode,
-    onSaveCallback,
-    onSaveRecord,
-    resetChanges,
     queryParams,
     getPathVariables,
-    apiClientRecords,
+    isCreateMode,
+    apiEntryDetails,
+    apiClientRecordsRepository,
     endAISession,
+    ctx,
+    onSaveRecord,
+    resetChanges,
+    onSaveCallback,
   ]);
 
   const handleCancelRequest = useCallback(() => {
