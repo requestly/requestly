@@ -8,9 +8,11 @@ import { RequestIcon } from "features/apiClient/screens/apiClient/components/sid
 import { useCollectionView } from "../../../../../../collectionView.context";
 import { useApiClientDispatch, useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
 import { runnerConfigActions } from "features/apiClient/slices/runConfig/slice";
-import { DEFAULT_RUN_CONFIG_ID } from "features/apiClient/slices/runConfig/types";
+import { DEFAULT_RUN_CONFIG_ID, getRunnerConfigId } from "features/apiClient/slices/runConfig/types";
 import { selectRunConfig } from "features/apiClient/slices/runConfig/selectors";
 import { useRecordById } from "features/apiClient/slices";
+import { useBufferedEntity } from "features/apiClient/slices/entities/hooks";
+import { ApiClientEntityType } from "features/apiClient/slices/entities/types";
 
 enum ReorderableItemType {
   REQUEST = "request",
@@ -72,7 +74,11 @@ export const ReorderableListItem: React.FC<ReorderableListItemProps> = ({ index,
   const dispatch = useApiClientDispatch();
 
   // Get config to access configId
-  const config = useApiClientSelector((state) => selectRunConfig(state, collectionId, DEFAULT_RUN_CONFIG_ID));
+  // const config = useApiClientSelector((state) => selectRunConfig(state, collectionId, DEFAULT_RUN_CONFIG_ID));
+  const bufferedEntity = useBufferedEntity({
+    id: getRunnerConfigId(collectionId, DEFAULT_RUN_CONFIG_ID),
+    type: ApiClientEntityType.RUN_CONFIG,
+  });
 
   const ref = useRef<HTMLDivElement>(null);
 
@@ -129,16 +135,7 @@ export const ReorderableListItem: React.FC<ReorderableListItemProps> = ({ index,
       <Checkbox
         checked={orderedRequest.isSelected}
         onChange={(e) => {
-          if (config) {
-            dispatch(
-              runnerConfigActions.setRequestSelection(
-                collectionId,
-                config.configId,
-                orderedRequest.record.id,
-                e.target.checked
-              )
-            );
-          }
+          bufferedEntity.toggleRequestSelection(orderedRequest.record.id);
         }}
       />
       <CollectionChain key={orderedRequest.record.collectionId} recordId={orderedRequest.record.id} />

@@ -36,7 +36,7 @@ export const CollectionRunnerView: React.FC<Props> = ({ collectionId, activeTabK
   const workspaceId = useWorkspaceId();
   const dispatch = useApiClientDispatch();
   const activeTabId = useActiveTabId();
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [runResults] = useState<RunResult[]>([]);
 
   useEffect(() => {
@@ -47,27 +47,25 @@ export const CollectionRunnerView: React.FC<Props> = ({ collectionId, activeTabK
         dispatch(runnerConfigActions.hydrateRunConfig(collectionId, result));
 
         // Create buffer for run config
-        if (activeTabId) {
-          const referenceId = getRunnerConfigId(collectionId, result.id);
 
-          const ctx = getApiClientFeatureContext(workspaceId);
-          const bufferAction = ctx.store.dispatch(
-            bufferActions.open({
-              entityType: ApiClientEntityType.RUN_CONFIG,
-              isNew: false,
-              referenceId,
-              data: fromSavedRunConfig(collectionId, result),
-            })
-          );
+        const referenceId = getRunnerConfigId(collectionId, result.id);
 
-          // Register buffer as secondary buffer to the tab
-          dispatch(
-            tabsActions.registerSecondaryBuffer({
-              tabId: activeTabId,
-              bufferId: bufferAction.meta.id,
-            })
-          );
-        }
+        const bufferAction = dispatch(
+          bufferActions.open({
+            entityType: ApiClientEntityType.RUN_CONFIG,
+            isNew: false,
+            referenceId,
+            data: fromSavedRunConfig(collectionId, result),
+          })
+        );
+
+        // Register buffer as secondary buffer to the tab
+        dispatch(
+          tabsActions.registerSecondaryBuffer({
+            tabId: activeTabId,
+            bufferId: bufferAction.meta.id,
+          })
+        );
       } catch (error) {
         toast.error("Something went wrong!");
         Sentry.captureException(error, { extra: { collectionId } });

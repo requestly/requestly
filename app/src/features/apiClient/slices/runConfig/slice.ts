@@ -1,9 +1,7 @@
 import { createSlice, createEntityAdapter, PayloadAction } from "@reduxjs/toolkit";
-import type { SavedRunConfig } from "features/apiClient/commands/collectionRunner/types";
 import {
-  getRunnerConfigId,
   RunConfigEntity,
-  RunnerConfigKey,
+  RunnerConfigId,
   RunnerConfigState as RunConfigState,
   RunOrder,
   RunDataFile,
@@ -11,12 +9,14 @@ import {
   isValidIterations,
   fromSavedRunConfig,
 } from "./types";
+import type { SavedRunConfig } from "features/apiClient/commands/collectionRunner/types";
 import { API_CLIENT_RUNNER_CONFIG_SLICE_NAME } from "../common/constants";
-import { EntityNotFound } from "../types";
 import { patchRunOrder } from "./utils";
+import { entitySynced } from "../common";
+import { ApiClientEntityType } from "../entities/types";
 
 export const runConfigAdapter = createEntityAdapter<RunConfigEntity>({
-  selectId: (config) => config.id,
+  selectId: (config) => config.collectionId + "::" + config.configId,
   sortComparer: (a, b) => (a.createdTs || 0) - (b.createdTs || 0),
 });
 
@@ -37,199 +37,104 @@ export const runnerConfigSlice = createSlice({
     upsertConfigs(state, action: PayloadAction<RunConfigEntity[]>) {
       runConfigAdapter.upsertMany(state.configs, action.payload);
     },
-    removeConfig(state, action: PayloadAction<RunnerConfigKey>) {
+    removeConfig(state, action: PayloadAction<RunnerConfigId>) {
       runConfigAdapter.removeOne(state.configs, action.payload);
     },
-    removeConfigsForCollection: {
-      reducer(state, action: PayloadAction<{ keys: RunnerConfigKey[] }>) {
-        runConfigAdapter.removeMany(state.configs, action.payload.keys);
-      },
-      prepare(collectionId: string) {
-        return { payload: { keys: [] } }; // Placeholder
-      },
+    removeConfigsForCollection(state, action: PayloadAction<RunnerConfigId[]>) {
+      runConfigAdapter.removeMany(state.configs, action.payload);
     },
-    updateRunOrder: {
-      reducer(state, action: PayloadAction<{ key: RunnerConfigKey; runOrder: RunOrder }>) {
-        const config = state.configs.entities[action.payload.key];
-        if (config) {
-          config.runOrder = action.payload.runOrder;
-          // TODO: Phase 4 - Persist via repository: toSavedRunConfig(config) -> repository.save()
-        }
-      },
-      prepare(collectionId: string, configId: string, runOrder: RunOrder) {
-        return {
-          payload: {
-            key: getRunnerConfigId(collectionId, configId),
-            runOrder,
-          },
-        };
-      },
+    updateRunOrder(state, action: PayloadAction<{ key: RunnerConfigId; runOrder: RunOrder }>) {
+      const config = state.configs.entities[action.payload.key];
+      if (config) {
+        config.runOrder = action.payload.runOrder;
+      }
     },
-    updateDelay: {
-      reducer(state, action: PayloadAction<{ key: RunnerConfigKey; delay: number }>) {
-        const { key, delay } = action.payload;
-        const config = state.configs.entities[key];
+    updateDelay(state, action: PayloadAction<{ key: RunnerConfigId; delay: number }>) {
+      const { key, delay } = action.payload;
+      const config = state.configs.entities[key];
 
-        if (!config) return;
-        if (!isValidDelay(delay)) {
-          console.error(`Invalid delay: ${delay}`);
-          return;
-        }
-
+      if (config && isValidDelay(delay)) {
         config.delay = delay;
-        // TODO: Phase 4 - Persist via repository: toSavedRunConfig(config) -> repository.save()
-      },
-      prepare(collectionId: string, configId: string, delay: number) {
-        return {
-          payload: {
-            key: getRunnerConfigId(collectionId, configId),
-            delay,
-          },
-        };
-      },
+      }
     },
-    updateIterations: {
-      reducer(state, action: PayloadAction<{ key: RunnerConfigKey; iterations: number }>) {
-        const { key, iterations } = action.payload;
-        const config = state.configs.entities[key];
+    updateIterations(state, action: PayloadAction<{ key: RunnerConfigId; iterations: number }>) {
+      const { key, iterations } = action.payload;
+      const config = state.configs.entities[key];
 
-        if (!config) return;
-        if (!isValidIterations(iterations)) {
-          console.error(`Invalid iterations: ${iterations}`);
-          return;
-        }
-
+      if (config && isValidIterations(iterations)) {
         config.iterations = iterations;
-        // TODO: Phase 4 - Persist via repository: toSavedRunConfig(config) -> repository.save()
-      },
-      prepare(collectionId: string, configId: string, iterations: number) {
-        return {
-          payload: {
-            key: getRunnerConfigId(collectionId, configId),
-            iterations,
-          },
-        };
-      },
+      }
     },
-    updateDataFile: {
-      reducer(state, action: PayloadAction<{ key: RunnerConfigKey; dataFile: RunDataFile | null }>) {
-        const config = state.configs.entities[action.payload.key];
-        if (config) {
-          config.dataFile = action.payload.dataFile;
-          // TODO: Phase 4 - Persist via repository: toSavedRunConfig(config) -> repository.save()
-        }
-      },
-      prepare(collectionId: string, configId: string, dataFile: RunDataFile | null) {
-        return {
-          payload: {
-            key: getRunnerConfigId(collectionId, configId),
-            dataFile,
-          },
-        };
-      },
+    updateDataFile(state, action: PayloadAction<{ key: RunnerConfigId; dataFile: RunDataFile | null }>) {
+      const config = state.configs.entities[action.payload.key];
+      if (config) {
+        config.dataFile = action.payload.dataFile;
+      }
     },
-    toggleRequestSelection: {
-      reducer(state, action: PayloadAction<{ key: RunnerConfigKey; requestId: string }>) {
-        const { key, requestId } = action.payload;
-        const config = state.configs.entities[key];
+    toggleRequestSelection(state, action: PayloadAction<{ key: RunnerConfigId; requestId: string }>) {
+      const { key, requestId } = action.payload;
+      const config = state.configs.entities[key];
 
-        if (!config) return;
-
+      if (config) {
         config.runOrder = config.runOrder.map((item) =>
           item.id === requestId ? { ...item, isSelected: !item.isSelected } : item
         );
-        // TODO: Phase 4 - Persist via repository: toSavedRunConfig(config) -> repository.save()
-      },
-      prepare(collectionId: string, configId: string, requestId: string) {
-        return {
-          payload: {
-            key: getRunnerConfigId(collectionId, configId),
-            requestId,
-          },
-        };
-      },
+      }
     },
-    setRequestSelection: {
-      reducer(
-        state,
-        action: PayloadAction<{
-          key: RunnerConfigKey;
-          requestId: string;
-          isSelected: boolean;
-        }>
-      ) {
-        const { key, requestId, isSelected } = action.payload;
-        const config = state.configs.entities[key];
+    setRequestSelection(
+      state,
+      action: PayloadAction<{
+        key: RunnerConfigId;
+        requestId: string;
+        isSelected: boolean;
+      }>
+    ) {
+      const { key, requestId, isSelected } = action.payload;
+      const config = state.configs.entities[key];
 
-        if (!config) return;
-
+      if (config) {
         config.runOrder = config.runOrder.map((item) => (item.id === requestId ? { ...item, isSelected } : item));
-        // TODO: Phase 4 - Persist via repository: toSavedRunConfig(config) -> repository.save()
-      },
-      prepare(collectionId: string, configId: string, requestId: string, isSelected: boolean) {
-        return {
-          payload: {
-            key: getRunnerConfigId(collectionId, configId),
-            requestId,
-            isSelected,
-          },
-        };
-      },
+      }
     },
-    toggleAllSelections: {
-      reducer(state, action: PayloadAction<{ key: RunnerConfigKey; isSelected: boolean }>) {
-        const { key, isSelected } = action.payload;
-        const config = state.configs.entities[key];
+    toggleAllSelections(state, action: PayloadAction<{ key: RunnerConfigId; isSelected: boolean }>) {
+      const { key, isSelected } = action.payload;
+      const config = state.configs.entities[key];
 
-        if (!config) return;
-
+      if (config) {
         config.runOrder = config.runOrder.map((item) => ({
           ...item,
           isSelected,
         }));
-        // TODO: Phase 4 - Persist via repository: toSavedRunConfig(config) -> repository.save()
-      },
-      prepare(collectionId: string, configId: string, isSelected: boolean) {
-        return {
-          payload: {
-            key: getRunnerConfigId(collectionId, configId),
-            isSelected,
-          },
-        };
-      },
+      }
     },
-    patchRunOrder: {
-      reducer(
-        state,
-        action: PayloadAction<{
-          id: RunnerConfigKey;
-          requestIds: string[];
-        }>
-      ) {
-        const { id, requestIds } = action.payload;
-        const config = state.configs.entities[id];
+    patchRunOrder(
+      state,
+      action: PayloadAction<{
+        id: RunnerConfigId;
+        requestIds: string[];
+      }>
+    ) {
+      const { id, requestIds } = action.payload;
+      const config = state.configs.entities[id];
 
-        if (!config) {
-          throw new EntityNotFound(id, "Collection run config not found");
-        }
-
+      if (config) {
         config.runOrder = patchRunOrder(config.runOrder, requestIds);
-      },
-      prepare(collectionId: string, configId: string, requestIds: string[]) {
-        return {
-          payload: {
-            id: getRunnerConfigId(collectionId, configId),
-            requestIds,
-          },
-        };
-      },
+      }
     },
 
-    /**
-     * Hydrates Redux store from backend SavedRunConfig format
-     * Used when loading configs from Firebase/local storage
-     * TODO: Phase 4 - This will be called by sync layer when loading configs
-     */
+    unsafePatch(
+      state,
+      action: PayloadAction<{
+        id: RunnerConfigId;
+        patcher: (config: RunConfigEntity) => void;
+      }>
+    ) {
+      const config = state.configs.entities[action.payload.id];
+      if (config) {
+        action.payload.patcher(config);
+      }
+    },
+
     hydrateRunConfig: {
       reducer(
         state,
@@ -250,6 +155,19 @@ export const runnerConfigSlice = createSlice({
         };
       },
     },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(entitySynced, (state, action) => {
+      const { entityType, entityId, data } = action.payload;
+      if (entityType === ApiClientEntityType.RUN_CONFIG) {
+        if (data) {
+          runConfigAdapter.updateOne(state.configs, {
+            id: entityId,
+            changes: data,
+          });
+        }
+      }
+    });
   },
 });
 export const runnerConfigActions = runnerConfigSlice.actions;

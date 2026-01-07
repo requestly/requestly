@@ -2,16 +2,19 @@ import type { EntityState } from "@reduxjs/toolkit";
 import type { RQAPI } from "features/apiClient/types";
 import type { SavedRunConfig } from "features/apiClient/commands/collectionRunner/types";
 
-export type RunnerConfigKey = string;
+export type RunnerConfigId = string;
 
 export const DEFAULT_RUN_CONFIG_ID = "default";
 
-export const getRunnerConfigId = (collectionId: string, configId: string): RunnerConfigKey =>
+export const getRunnerConfigId = (collectionId: string, configId: string): RunnerConfigId =>
   `${collectionId}::${configId}`;
 
-export const parseRunnerConfigKey = (key: RunnerConfigKey): { collectionId: string; configId: string } => {
+export const parseRunnerConfigKey = (key: RunnerConfigId): { collectionId: string; configId: string } => {
   const [collectionId, configId] = key.split("::");
-  return { collectionId: collectionId || "", configId: configId || "" };
+  if (!collectionId || !configId) {
+    throw new Error(`Invalid RunnerConfigId: ${key}`);
+  }
+  return { collectionId, configId };
 };
 
 export const DELAY_MIN = 0;
@@ -29,7 +32,6 @@ export type RunOrder = RunOrderItem[];
 export type RunDataFile = RQAPI.RunConfig["dataFile"];
 
 export interface RunConfigEntity {
-  id: RunnerConfigKey;
   collectionId: RQAPI.CollectionRecord["id"];
   configId: string;
   runOrder: RunOrder;
@@ -68,7 +70,6 @@ export const fromSavedRunConfig = (
   timestamps?: { createdTs?: number; updatedTs?: number }
 ): RunConfigEntity => {
   return {
-    id: getRunnerConfigId(collectionId, saved.id),
     collectionId,
     configId: saved.id,
     runOrder: saved.runOrder,
