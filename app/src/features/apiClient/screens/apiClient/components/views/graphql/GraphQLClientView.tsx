@@ -1,7 +1,7 @@
 import { useGraphQLRecordStore } from "features/apiClient/hooks/useGraphQLRecordStore";
 import { RequestContentType, RQAPI } from "features/apiClient/types";
 import GraphQLClientUrl from "./components/GraphQLClientUrl/GraphQLClientUrl";
-import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "utils/Toast";
 import { useDispatch, useSelector } from "react-redux";
 import { useGraphQLIntrospection } from "features/apiClient/hooks/useGraphQLIntrospection";
@@ -56,6 +56,7 @@ import {
 } from "features/apiClient/helpers/testGeneration/buildPostResponseTests";
 import { useDeepLinkState } from "hooks";
 import { RequestTab } from "../http/components/HttpRequestTabs/HttpRequestTabs";
+import { useAISessionContext } from "features/ai/contexts/AISession";
 
 interface Props {
   recordId: string;
@@ -115,7 +116,7 @@ const GraphQLClientView: React.FC<Props> = ({
 
   const { apiClientRecordsRepository } = useApiClientRepository();
   const { onSaveRecord } = useNewApiClientContext();
-  const { sheetPlacement, toggleSheetPlacement } = useBottomSheetContext();
+  const { sheetPlacement } = useBottomSheetContext();
 
   const location = useLocation();
   const dispatch = useDispatch();
@@ -148,6 +149,7 @@ const GraphQLClientView: React.FC<Props> = ({
   const isHistoryView = location.pathname.includes(PATHS.API_CLIENT.HISTORY.RELATIVE);
 
   const scopedVariables = useScopedVariables(recordId);
+  const { endAISession } = useAISessionContext();
 
   const handleGenerateTests = useCallback(async () => {
     const entry = getEntry();
@@ -295,7 +297,17 @@ const GraphQLClientView: React.FC<Props> = ({
       toast.error("Something went wrong while saving the request");
     }
     setIsSaving(false);
-  }, [getEntry, record, isCreateMode, apiClientRecordsRepository, onSaveRecord, onSaveCallback, setHasUnsavedChanges]);
+    endAISession();
+  }, [
+    getEntry,
+    record,
+    isCreateMode,
+    apiClientRecordsRepository,
+    onSaveRecord,
+    onSaveCallback,
+    setHasUnsavedChanges,
+    endAISession,
+  ]);
 
   const handleRecordNameUpdate = useCallback(
     async (newName: string) => {
@@ -443,6 +455,7 @@ const GraphQLClientView: React.FC<Props> = ({
         setError(error as RQAPI.ExecutionError);
       } finally {
         setIsSending(false);
+        endAISession();
       }
     },
     [
@@ -455,6 +468,7 @@ const GraphQLClientView: React.FC<Props> = ({
       updateEntryTestResults,
       notifyApiRequestFinished,
       dispatch,
+      endAISession,
     ]
   );
 
@@ -495,18 +509,6 @@ const GraphQLClientView: React.FC<Props> = ({
   useEffect(() => {
     setUnsaved(hasUnsavedChanges);
   }, [hasUnsavedChanges, setUnsaved]);
-
-  const isDefaultPlacementRef = useRef(false);
-
-  useLayoutEffect(() => {
-    if (isDefaultPlacementRef.current) {
-      return;
-    }
-
-    isDefaultPlacementRef.current = true;
-    const bottomSheetPlacement = window.innerWidth <= 1280 ? BottomSheetPlacement.BOTTOM : BottomSheetPlacement.RIGHT;
-    toggleSheetPlacement(bottomSheetPlacement);
-  }, [toggleSheetPlacement]);
 
   return (
     <div className="api-client-view gql-client-view">
