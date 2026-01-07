@@ -715,8 +715,8 @@ const HttpClientView: React.FC<Props> = ({
             />
 
             <ClientCodeButton
-              requestPreparer={() => ({} as any)
-                // httpRequestExecutor.requestPreparer.prepareRequest(apiEntryDetails?.id, entry).preparedEntry.request
+              requestPreparer={() =>
+              httpRequestExecutor.requestPreparer.prepareRequest(entity.meta.referenceId, entity).preparedEntry.request
               }
             />
           </div>
