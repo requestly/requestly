@@ -12,13 +12,15 @@ import {
   parseMultipartFormDataString,
 } from "features/apiClient/screens/apiClient/utils";
 import { CONTENT_TYPE_HEADER } from "features/apiClient/constants";
-import { BottomSheetPlacement, BottomSheetProvider } from "componentsV2/BottomSheet";
+import { BottomSheetProvider } from "componentsV2/BottomSheet";
 import "./apiClient.scss";
 import { WindowsAndLinuxGatedHoc } from "componentsV2/WindowsAndLinuxGatedHoc";
 import { AutogenerateProvider } from "features/apiClient/store/autogenerateContextProvider";
 import { ClientViewFactory } from "features/apiClient/screens/apiClient/clientView/ClientViewFactory";
 import { ContextId } from "features/apiClient/contexts/contextId.context";
 import { NoopContextId } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
+import { BottomSheetFeatureContext } from "componentsV2/BottomSheet/types";
+import { AISessionProvider } from "features/ai/contexts/AISession";
 
 interface Props {
   request: string | APIClientRequest; // string for cURL request
@@ -135,16 +137,18 @@ export const APIClientModal: React.FC<Props> = ({ request, isModalOpen, onModalC
       destroyOnClose
     >
       <WindowsAndLinuxGatedHoc featureName="API client">
-        <BottomSheetProvider defaultPlacement={BottomSheetPlacement.BOTTOM}>
+        <BottomSheetProvider context={BottomSheetFeatureContext.API_CLIENT}>
           <ContextId id={NoopContextId}>
             <AutogenerateProvider>
-              <ClientViewFactory
-                isOpenInModal
-                apiRecord={apiRecord}
-                handleRequestFinished={() => {}}
-                onSaveCallback={() => {}}
-                isCreateMode={true}
-              />
+              <AISessionProvider>
+                <ClientViewFactory
+                  isOpenInModal
+                  apiRecord={apiRecord}
+                  handleRequestFinished={() => {}}
+                  onSaveCallback={() => {}}
+                  isCreateMode={true}
+                />
+              </AISessionProvider>
             </AutogenerateProvider>
           </ContextId>
         </BottomSheetProvider>
