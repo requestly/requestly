@@ -4,6 +4,9 @@ import type { RunnerConfigId, RunConfigEntity, RunOrderItem } from "./types";
 import { selectRecordsEntities } from "../apiRecords/selectors";
 import type { RQAPI } from "features/apiClient/types";
 import type { ApiClientStoreState } from "../workspaceView/helpers/ApiClientContextRegistry";
+import { findBufferByReferenceId } from "../buffer/slice";
+import { isApiRequest } from "features/apiClient/screens/apiClient/utils";
+import { EntityNotFound } from "../types";
 
 const selectRunConfigSlice = (state: ApiClientStoreState) => {
   return state.runConfig;
@@ -201,3 +204,29 @@ export const makeSelectSelectedRequests = () =>
 
     return result.runOrderWithRecords.filter((entry) => entry.item.isSelected && entry.record !== null);
   });
+
+export const selectBufferedRunConfigOrderedRequests = createSelector(
+  [
+    (state: ApiClientStoreState) => state.buffer,
+    selectRecordsEntities,
+    (_state: ApiClientStoreState, referenceId: string) => referenceId,
+  ],
+  (bufferState, recordsEntities, referenceId): RQAPI.OrderedRequest[] => {
+    const bufferEntry = findBufferByReferenceId(bufferState.entities, referenceId);
+
+    if (!bufferEntry) {
+      throw new EntityNotFound(referenceId, "Buffer not found!");
+    }
+
+    const runConfig = bufferEntry.current as RunConfigEntity;
+    if (!runConfig || !runConfig.runOrder) {
+      return [];
+    }
+
+    return runConfig.runOrder
+      .map(({ id, isSelected }) => {
+        return { record: recordsEntities[id], isSelected };
+      })
+      .filter((item) => !!item.record && isApiRequest(item.record)) as RQAPI.OrderedRequest[];
+  }
+);
