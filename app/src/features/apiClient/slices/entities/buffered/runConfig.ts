@@ -6,24 +6,14 @@ import { RunConfigEntity } from "../runConfig";
 import type { BufferedApiClientEntity, BufferedApiClientEntityMeta } from "./factory";
 import type { EntityDispatch } from "../types";
 
-/**
- * Buffered entity class for RunConfig.
- * Works with the buffer system for unsaved changes.
- */
 export class BufferedRunConfigEntity
   extends RunConfigEntity<BufferedApiClientEntityMeta>
   implements BufferedApiClientEntity {
-  // Origin entity pointing to the actual stored RunConfig
   origin: RunConfigEntity;
 
-  constructor(public readonly dispatch: EntityDispatch, public readonly meta: BufferedApiClientEntityMeta) {
+  constructor(dispatch: EntityDispatch, meta: BufferedApiClientEntityMeta) {
     super(dispatch, meta);
-
-    // Parse referenceId to get actual RunConfig composite key
-    const { collectionId, configId } = parseRunnerConfigKey(meta.referenceId);
-    const actualId = `${collectionId}::${configId}`;
-
-    this.origin = new RunConfigEntity(dispatch, { id: actualId });
+    this.origin = new RunConfigEntity(dispatch, { id: meta.referenceId });
   }
 
   getEntityFromState(state: ApiClientRootState): RunConfigRecord {
@@ -43,52 +33,5 @@ export class BufferedRunConfigEntity
         },
       })
     );
-  }
-
-  setRunOrder(runOrder: RunConfigRecord["runOrder"]): void {
-    this.unsafePatch((config) => {
-      config.runOrder = runOrder;
-    });
-  }
-
-  setDelay(delay: number): void {
-    this.unsafePatch((config) => {
-      config.delay = delay;
-    });
-  }
-
-  setIterations(iterations: number): void {
-    this.unsafePatch((config) => {
-      config.iterations = iterations;
-    });
-  }
-
-  setDataFile(dataFile: RunConfigRecord["dataFile"]): void {
-    this.unsafePatch((config) => {
-      config.dataFile = dataFile;
-    });
-  }
-
-  toggleRequestSelection(requestId: string): void {
-    this.unsafePatch((config) => {
-      config.runOrder = config.runOrder.map((item) =>
-        item.id === requestId ? { ...item, isSelected: !item.isSelected } : item
-      );
-    });
-  }
-
-  setRequestSelection(requestId: string, isSelected: boolean): void {
-    this.unsafePatch((config) => {
-      config.runOrder = config.runOrder.map((item) => (item.id === requestId ? { ...item, isSelected } : item));
-    });
-  }
-
-  toggleAllSelections(isSelected: boolean): void {
-    this.unsafePatch((config) => {
-      config.runOrder = config.runOrder.map((item) => ({
-        ...item,
-        isSelected,
-      }));
-    });
   }
 }

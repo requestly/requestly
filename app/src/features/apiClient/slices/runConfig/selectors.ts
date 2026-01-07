@@ -1,20 +1,17 @@
 import { createSelector } from "@reduxjs/toolkit";
 import { runConfigAdapter } from "./slice";
-import type { RunnerConfigKey, RunConfigEntity, RunOrderItem } from "./types";
+import type { RunnerConfigId, RunConfigEntity, RunOrderItem } from "./types";
 import { selectRecordsEntities } from "../apiRecords/selectors";
 import type { RQAPI } from "features/apiClient/types";
 import type { ApiClientStoreState } from "../workspaceView/helpers/ApiClientContextRegistry";
-
 
 const selectRunConfigSlice = (state: ApiClientStoreState) => {
   return state.runConfig;
 };
 
-
 const selectRunConfigEntityState = createSelector(selectRunConfigSlice, (slice) => slice?.configs);
 
 const adapterSelectors = runConfigAdapter.getSelectors(selectRunConfigEntityState);
-
 
 export const selectAllRunConfigs = adapterSelectors.selectAll;
 
@@ -26,7 +23,7 @@ export const selectTotalRunConfigs = adapterSelectors.selectTotal;
 export const selectRunConfigById = adapterSelectors.selectById;
 
 export const selectRunConfigByKey = createSelector(
-  [selectRunConfigEntities, (_state: ApiClientStoreState, key: RunnerConfigKey) => key],
+  [selectRunConfigEntities, (_state: ApiClientStoreState, key: RunnerConfigId) => key],
   (entities, key) => entities[key] ?? null
 );
 
@@ -64,7 +61,6 @@ export const selectRunConfigWithRecords = createSelector(
   }
 );
 
-
 export const selectRunConfigWithRecordsByArgs = createSelector(
   [selectRunConfig, selectRecordsEntities],
   (config, recordsEntities): { config: RunConfigEntity; runOrderWithRecords: RunOrderWithRecord[] } | null => {
@@ -82,13 +78,11 @@ export const selectRunConfigWithRecordsByArgs = createSelector(
   }
 );
 
-
 export const selectSelectedRequests = createSelector([selectRunConfigWithRecords], (result): RunOrderWithRecord[] => {
   if (!result) return [];
 
   return result.runOrderWithRecords.filter((entry) => entry.item.isSelected && entry.record !== null);
 });
-
 
 export const selectSelectedRequestsByArgs = createSelector(
   [selectRunConfigWithRecordsByArgs],
@@ -99,13 +93,11 @@ export const selectSelectedRequestsByArgs = createSelector(
   }
 );
 
-
 export const selectSelectedRequestIds = createSelector([selectRunConfigByKey], (config): string[] => {
   if (!config) return [];
 
   return config.runOrder.filter((item) => item.isSelected).map((item) => item.id);
 });
-
 
 export const selectSelectedRequestCount = createSelector([selectRunConfigByKey], (config): number => {
   if (!config) return 0;
@@ -131,7 +123,6 @@ export const selectHasAnySelectedRequests = createSelector([selectRunConfigByKey
   return config.runOrder.some((item) => item.isSelected);
 });
 
-
 export interface SelectionStats {
   total: number;
   selected: number;
@@ -141,32 +132,34 @@ export interface SelectionStats {
   someSelected: boolean;
 }
 
-export const selectSelectionStats = createSelector([selectRunConfigByKey], (config): SelectionStats => {
-  if (!config) {
+export const selectSelectionStats = createSelector(
+  [selectRunConfigByKey],
+  (config): SelectionStats => {
+    if (!config) {
+      return {
+        total: 0,
+        selected: 0,
+        unselected: 0,
+        allSelected: false,
+        noneSelected: true,
+        someSelected: false,
+      };
+    }
+
+    const total = config.runOrder.length;
+    const selected = config.runOrder.filter((item) => item.isSelected).length;
+    const unselected = total - selected;
+
     return {
-      total: 0,
-      selected: 0,
-      unselected: 0,
-      allSelected: false,
-      noneSelected: true,
-      someSelected: false,
+      total,
+      selected,
+      unselected,
+      allSelected: total > 0 && selected === total,
+      noneSelected: selected === 0,
+      someSelected: selected > 0 && selected < total,
     };
   }
-
-  const total = config.runOrder.length;
-  const selected = config.runOrder.filter((item) => item.isSelected).length;
-  const unselected = total - selected;
-
-  return {
-    total,
-    selected,
-    unselected,
-    allSelected: total > 0 && selected === total,
-    noneSelected: selected === 0,
-    someSelected: selected > 0 && selected < total,
-  };
-});
-
+);
 
 export const selectRunConfigsByCollectionId = createSelector(
   [selectAllRunConfigs, (_state: ApiClientStoreState, collectionId: string) => collectionId],
@@ -178,32 +171,29 @@ export const selectRunConfigCountForCollection = createSelector(
   (configs) => configs.length
 );
 
-
 export const makeSelectRunConfigByKey = () =>
   createSelector(
-    [selectRunConfigEntities, (_state: ApiClientStoreState, key: RunnerConfigKey) => key],
+    [selectRunConfigEntities, (_state: ApiClientStoreState, key: RunnerConfigId) => key],
     (entities, key) => entities[key] ?? null
   );
 
-
 export const makeSelectRunConfigWithRecords = () =>
-  createSelector(
-    [makeSelectRunConfigByKey(), selectRecordsEntities],
-    (config, recordsEntities): { config: RunConfigEntity; runOrderWithRecords: RunOrderWithRecord[] } | null => {
-      if (!config) return null;
+  createSelector([makeSelectRunConfigByKey(), selectRecordsEntities], (config, recordsEntities): {
+    config: RunConfigEntity;
+    runOrderWithRecords: RunOrderWithRecord[];
+  } | null => {
+    if (!config) return null;
 
-      const runOrderWithRecords: RunOrderWithRecord[] = config.runOrder.map((item) => ({
-        item,
-        record: (recordsEntities[item.id] as RQAPI.ApiRecord) ?? null,
-      }));
+    const runOrderWithRecords: RunOrderWithRecord[] = config.runOrder.map((item) => ({
+      item,
+      record: (recordsEntities[item.id] as RQAPI.ApiRecord) ?? null,
+    }));
 
-      return {
-        config,
-        runOrderWithRecords,
-      };
-    }
-  );
-
+    return {
+      config,
+      runOrderWithRecords,
+    };
+  });
 
 export const makeSelectSelectedRequests = () =>
   createSelector([makeSelectRunConfigWithRecords()], (result): RunOrderWithRecord[] => {

@@ -52,6 +52,8 @@ import { getAppMode } from "store/selectors";
 import { useHostContext } from "hooks/useHostContext";
 import { TAB_KEYS } from "../../../../CollectionView";
 import { useIsBufferDirty } from "features/apiClient/slices/entities";
+import { useBufferedEntity, useBufferedRunConfigEntity, useEntity } from "features/apiClient/slices/entities/hooks";
+import { ApiClientEntityType } from "features/apiClient/slices/entities/types";
 
 const RunConfigSaveButton: React.FC<{ disabled?: boolean; isRunnerTabActive: boolean }> = ({
   disabled = false,
@@ -65,23 +67,27 @@ const RunConfigSaveButton: React.FC<{ disabled?: boolean; isRunnerTabActive: boo
   const activeTabId = useActiveTabId();
 
   // Get config from Redux slice
-  const config = useApiClientSelector((state) => selectRunConfig(state, collectionId, DEFAULT_RUN_CONFIG_ID));
+  // const config = useApiClientSelector((state) => selectRunConfig(state, collectionId, DEFAULT_RUN_CONFIG_ID));
+
+  const bufferedEntity = useBufferedEntity({
+    id: getRunnerConfigId(collectionId, DEFAULT_RUN_CONFIG_ID),
+    type: ApiClientEntityType.RUN_CONFIG,
+  });
 
   const hasUnsavedChanges = useIsBufferDirty({
-    referenceId: getRunnerConfigId(collectionId, config?.configId!),
+    referenceId: getRunnerConfigId(collectionId, DEFAULT_RUN_CONFIG_ID),
     type: "referenceId",
   });
 
-  const iterations = config?.iterations ?? 1;
-  const delay = config?.delay ?? 0;
+  const iterations = useApiClientSelector((state) => bufferedEntity.getIterations(state));
+  const delay = useApiClientSelector((state) => bufferedEntity.getDelay(state));
 
   const { getIsActive } = useHostContext();
 
   const isActiveTab = getIsActive();
 
+  const config = useApiClientSelector((state) => bufferedEntity.getEntityFromState(state));
   const handleSaveClick = useCallback(async () => {
-    if (!config) return;
-
     setIsSaving(true);
     const configToSave = toSavedRunConfig(config);
 
@@ -93,6 +99,14 @@ const RunConfigSaveButton: React.FC<{ disabled?: boolean; isRunnerTabActive: boo
           configToSave,
         })
       ).unwrap();
+
+      dispatch(
+        bufferActions.markSaved({
+          id: bufferedEntity.meta.id,
+          referenceId: bufferedEntity.meta.referenceId,
+          savedData: fromSavedRunConfig(collectionId, configToSave),
+        })
+      );
 
       // Mark buffer as clean after successful save
       // if (buffer && activeTabId) {
@@ -220,37 +234,39 @@ export const RunConfigView: React.FC<Props> = ({ activeTabKey }) => {
   const { collectionId } = useCollectionView();
 
   // Get config from Redux slice
-  const config = useApiClientSelector((state) => selectRunConfig(state, collectionId, DEFAULT_RUN_CONFIG_ID));
+  // const config = useApiClientSelector((state) => selectRunConfig(state, collectionId, DEFAULT_RUN_CONFIG_ID));
 
+  const bufferedEntity = useBufferedEntity({
+    id: getRunnerConfigId(collectionId, DEFAULT_RUN_CONFIG_ID),
+    type: ApiClientEntityType.RUN_CONFIG,
+  });
   const isRunnerTabActive = activeTabKey === TAB_KEYS.RUNNER;
   // Get run order count
-  const runOrderCount = useApiClientSelector((state) => {
-    const config = selectRunConfig(state, collectionId, DEFAULT_RUN_CONFIG_ID);
-    if (!config) return 0;
-    const key = getRunnerConfigId(collectionId, config.configId);
-    return selectTotalRequestCount(state, key);
-  });
+  const runOrderCount = useApiClientSelector((state) => bufferedEntity.getRunOrder(state).length);
 
   // Get all descendant IDs for reset functionality
   const descendantIds = useApiClientSelector((state) => selectAllDescendantIds(state, collectionId));
 
   const handleSelectAllClick = () => {
-    if (config) {
-      dispatch(runnerConfigActions.toggleAllSelections(collectionId, config.configId, true));
-    }
+    // if (config) {
+    // dispatch(runnerConfigActions.toggleAllSelections(collectionId, config.configId, true));
+    bufferedEntity.toggleAllSelections(true);
+    // }
   };
 
   const handleDeselectAllClick = () => {
-    if (config) {
-      dispatch(runnerConfigActions.toggleAllSelections(collectionId, config.configId, false));
-    }
+    // if (config) {
+    // dispatch(runnerConfigActions.toggleAllSelections(collectionId, config.configId, false));
+    bufferedEntity.toggleAllSelections(false);
+    // }
   };
 
   const handleResetClick = () => {
-    if (!config) return;
+    // if (!config) return;
 
     const resetRunOrder = descendantIds.map((id: string) => ({ id, isSelected: true }));
-    dispatch(runnerConfigActions.updateRunOrder(collectionId, config.configId, resetRunOrder));
+    bufferedEntity.setRunOrder(resetRunOrder);
+    // dispatch(runnerConfigActions.updateRunOrder(collectionId, config.configId, resetRunOrder));
   };
 
   const isEmpty = runOrderCount === 0;
