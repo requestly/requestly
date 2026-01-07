@@ -8,6 +8,7 @@ export const DraftRequestView: React.FC<{
   apiEntryType: RQAPI.ApiEntryType;
 }> = ({ onSaveCallback, apiEntryType }) => {
   const apiEntryDetails: RQAPI.ApiRecord = useMemo(() => getEmptyDraftApiRecord(apiEntryType), [apiEntryType]);
+
   return (
     <GenericApiClient
       isCreateMode

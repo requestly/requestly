@@ -30,8 +30,11 @@ import {
   trackAITestGenerationAcceptClicked,
   trackAITestGenerationFailed,
   trackAITestGenerationRejectClicked,
+  trackAITestGenerationReviewCompleted,
   trackAITestGenerationSuccessful,
 } from "modules/analytics/events/features/apiClient";
+import { useAISessionContext } from "features/ai/contexts/AISession";
+import { getChunks } from "@codemirror/merge";
 
 const TestGenerationOutputSchema = z.object({
   text: z
@@ -81,6 +84,18 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
 
   const isAITestsGenerationEnabled = useFeatureIsOn("ai_tests_generation");
   const isAIEnabledGlobally = useFeatureIsOn("global_ai_support");
+  const {
+    sessionId,
+    lastUsedQuery,
+    lastGeneratedCode,
+    generationMetrics,
+    setLastUsedQuery,
+    setLastGeneratedCode,
+    getCurrentGenerationId,
+    endAISession,
+    updateGenerationMetrics,
+    getReviewOutcome,
+  } = useAISessionContext();
 
   const [scriptType, setScriptType] = useState<RQAPI.ScriptType>(activeScriptType);
   const [isLibraryPickerOpen, setIsLibraryPickerOpen] = useState(false);
@@ -95,8 +110,6 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
   const hasPostResponseScript = Boolean(entry?.scripts?.[RQAPI.ScriptType.POST_RESPONSE]);
 
   const isPopoverOpenRef = useRef(isGenerateTestPopoverOpen);
-  const lastGeneratedCodeRef = useRef<string | null>(null);
-  const lastUsedQueryRef = useRef<string | null>(null);
 
   const { object, isLoading, error, stop, submit, clear } = useObject({
     api: getAIEndpointUrl(AI_ENDPOINTS.TEST_GENERATION),
@@ -107,8 +120,10 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
         }
       : {},
     onFinish: (result) => {
+      const currentGenerationId = getCurrentGenerationId();
       if (result.object?.err) {
-        trackAITestGenerationFailed();
+        trackAITestGenerationFailed(sessionId, currentGenerationId);
+        endAISession();
         switch (result.object?.err) {
           case AITestGenerationError.UNRELATED_QUERY:
             if (!isPopoverOpenRef.current) {
@@ -130,12 +145,16 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
         setIsGenerateTestPopoverOpen(false);
         isPopoverOpenRef.current = false;
         if (result.object?.code?.content) {
-          lastGeneratedCodeRef.current = result.object.code.content;
-          trackAITestGenerationSuccessful();
+          setLastGeneratedCode(result.object.code.content);
+          trackAITestGenerationSuccessful(sessionId, currentGenerationId);
         }
       }
       setIsTestsStreamingFinished(true);
       dispatch(globalActions.updateHasGeneratedAITests(true));
+      if (editorViewRef.current?.state) {
+        const proposedChanges = getChunks(editorViewRef.current?.state);
+        updateGenerationMetrics("totalProposedChanges", proposedChanges?.chunks?.length ?? 0);
+      }
     },
   });
 
@@ -152,13 +171,13 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
       existingScript: entry.scripts?.postResponse ?? "",
       lastGeneration: {
         code: {
-          content: lastGeneratedCodeRef.current,
+          content: lastGeneratedCode,
           language: "javascript",
         },
-        query: lastUsedQueryRef.current,
+        query: lastUsedQuery,
       },
     });
-    lastUsedQueryRef.current = query;
+    setLastUsedQuery(query);
   };
 
   const mergeViewConfig = useMemo(() => {
@@ -170,38 +189,67 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
         incomingValue: object?.code?.content,
         source: "ai",
         onPartialMerge: (mergedValue: string, newIncomingValue: string, type: "accept" | "reject") => {
-          lastGeneratedCodeRef.current = newIncomingValue;
+          setLastGeneratedCode(newIncomingValue);
+          const currentGenerationId = getCurrentGenerationId();
+          const newAcceptedCount =
+            type === "accept" ? generationMetrics.acceptedChanges + 1 : generationMetrics.acceptedChanges;
 
           if (type === "accept") {
             onScriptsChange({
               ...(entry?.scripts || defaultScripts),
               postResponse: mergedValue,
             });
-            trackAITestGenerationAcceptClicked();
+            updateGenerationMetrics("acceptedChanges", newAcceptedCount);
+            trackAITestGenerationAcceptClicked(sessionId, currentGenerationId);
           } else {
-            trackAITestGenerationRejectClicked();
+            trackAITestGenerationRejectClicked(sessionId, currentGenerationId);
           }
 
           if (mergedValue === newIncomingValue) {
+            trackAITestGenerationReviewCompleted(
+              sessionId,
+              currentGenerationId,
+              getReviewOutcome(),
+              generationMetrics.totalProposedChanges,
+              newAcceptedCount
+            );
             clear();
-            lastGeneratedCodeRef.current = null;
-            lastUsedQueryRef.current = null;
+            endAISession();
           }
         },
       };
     }
 
     return undefined;
-  }, [scriptType, object?.code?.content, clear, onScriptsChange, entry?.scripts]);
+  }, [
+    scriptType,
+    object?.code?.content,
+    clear,
+    onScriptsChange,
+    entry?.scripts,
+    sessionId,
+    getCurrentGenerationId,
+    endAISession,
+    setLastGeneratedCode,
+    generationMetrics,
+    updateGenerationMetrics,
+    getReviewOutcome,
+  ]);
 
   const handleAcceptTests = () => {
     onScriptsChange({
       preRequest: entry?.scripts?.[RQAPI.ScriptType.PRE_REQUEST] || DEFAULT_SCRIPT_VALUES[RQAPI.ScriptType.PRE_REQUEST],
       postResponse: object?.code?.content as string,
     });
+    trackAITestGenerationReviewCompleted(
+      sessionId,
+      getCurrentGenerationId(),
+      "accept_all",
+      generationMetrics.totalProposedChanges,
+      generationMetrics.totalProposedChanges
+    );
     clear();
-    lastGeneratedCodeRef.current = null;
-    lastUsedQueryRef.current = null;
+    endAISession();
   };
 
   useEffect(() => {
@@ -336,6 +384,8 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
       negativeFeedback,
       isAITestsGenerationEnabled,
       entry?.scripts,
+      isAIEnabledGlobally,
+      handleGenerateTests,
     ]
   );
 
@@ -384,9 +434,15 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
       {isTestsStreamingFinished && object?.code?.content && !error && (
         <AIResultReviewPanel
           onDiscard={() => {
+            trackAITestGenerationReviewCompleted(
+              sessionId,
+              getCurrentGenerationId(),
+              getReviewOutcome(),
+              generationMetrics.totalProposedChanges,
+              generationMetrics.acceptedChanges
+            );
             clear();
-            lastGeneratedCodeRef.current = null;
-            lastUsedQueryRef.current = null;
+            endAISession();
           }}
           onAccept={handleAcceptTests}
           onEditInstructions={() => {
