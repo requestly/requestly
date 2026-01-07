@@ -46,6 +46,14 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
   const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
   const [isPopoverPinned, setIsPopoverPinned] = useState(false);
 
+  const handleSetVariable = (variable: string | null) => {
+    if (!variable) {
+      handleMouseLeave();
+    } else {
+      setHoveredVariable(variable);
+    }
+  };
+
   useEffect(() => {
     if (editorViewRef.current) {
       editorViewRef.current.destroy();
@@ -94,7 +102,7 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
           }),
           highlightVariablesPlugin(
             {
-              setHoveredVariable,
+              handleSetVariable,
               setPopupPosition,
             },
             variables || emptyVariables
@@ -112,7 +120,7 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
     //Need to disable to implement the onChange handler
     // Shouldn't be recreated every render
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [placeholder, variables]);
+  }, [placeholder, variables, handleSetVariable]);
 
   useEffect(() => {
     if (defaultValue !== previousDefaultValueRef.current) {
@@ -139,10 +147,11 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
   }, [defaultValue]);
 
   const handleMouseLeave = useCallback(() => {
+    if (!hoveredVariable) return;
     if (!isPopoverPinned) {
       setHoveredVariable(null);
     }
-  }, [isPopoverPinned]);
+  }, [isPopoverPinned, hoveredVariable]);
 
   const handleClosePopover = useCallback(() => {
     setHoveredVariable(null);
