@@ -18,7 +18,6 @@ import { Ok, Result, Try } from "utils/try";
 import { NativeError } from "errors/NativeError";
 import { WorkResult, WorkResultType } from "../modules/scriptsV2/workloadManager/workLoadTypes";
 import { BaseExecutionContext, ExecutionContext, ScriptExecutionContext } from "./scriptExecutionContext";
-// import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 import { APIClientWorkloadManager } from "../modules/scriptsV2/workloadManager/APIClientWorkloadManager";
 import { BaseExecutionMetadata, IterationContext } from "../modules/scriptsV2/worker/script-internals/types";
 import { ApiClientFeatureContext, selectRecordById } from "features/apiClient/slices";
@@ -211,7 +210,6 @@ export class HttpRequestExecutor {
     let { preparedEntry, renderedVariables } = preparationResult.unwrap();
 
     const recordName = selectRecordById(this.ctx.store.getState(), recordId)?.name ?? "";
-    // this.ctx.stores.records.getState().getData(recordId)?.name ?? "";
     const scriptExecutionContext = new ScriptExecutionContext(
       this.ctx,
       recordId,

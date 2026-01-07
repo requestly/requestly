@@ -14,9 +14,6 @@ interface DraftRequestContainerTabSourceMetadata extends TabSourceMetadata {
   apiEntryType?: RQAPI.ApiEntryType;
 }
 
-function Draft() {
-  return <>Draft</>;
-}
 
 export class DraftRequestContainerTabSource extends BaseTabSource {
   metadata: DraftRequestContainerTabSourceMetadata;
@@ -26,7 +23,6 @@ export class DraftRequestContainerTabSource extends BaseTabSource {
       id: `${Date.now()}`,
       name: "request",
       title: "Untitled request",
-      // context: {},
       isNewTab: true,
       ...metadata,
       context: {
@@ -35,7 +31,6 @@ export class DraftRequestContainerTabSource extends BaseTabSource {
       }
     };
     this.component = (
-      // <Draft />
       <DraftRequestContainer
         key={this.metadata.id}
         draftId={this.metadata.id}

@@ -1,5 +1,4 @@
 import { ScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
-import { useQueryParamStore } from "features/apiClient/hooks/useQueryParamStore";
 import {
   extractPathVariablesFromUrl,
   extractQueryParams,
@@ -8,7 +7,6 @@ import {
 import { KeyValuePair } from "features/apiClient/types";
 import { useCallback, memo } from "react";
 import { ApiClientUrl } from "../../../components/request/components/ApiClientUrl/ApiClientUrl";
-import { usePathVariablesStore } from "features/apiClient/hooks/usePathVariables.store";
 import { BufferedHttpRecordEntity } from "features/apiClient/slices/entities";
 import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
 
@@ -22,15 +20,11 @@ interface ApiClientUrlProps {
 const HttpApiClientUrl = ({ entity, currentEnvironmentVariables, onEnterPress, onUrlChange }: ApiClientUrlProps) => {
   const url = useApiClientSelector(s => entity.getUrl(s));
   const queryParams = useApiClientSelector(s => entity.getQueryParams(s) );
-  // const [queryParams, setQueryParams] = useQueryParamStore((state) => [state.queryParams, state.setQueryParams]);
-
-  // const updatePathVariableKeys = usePathVariablesStore((state) => state.updateVariableKeys);
 
   const handleUrlChange = useCallback(
     (value: string) => {
       const pathVariables = extractPathVariablesFromUrl(value);
       entity.reconcilePathKeys(pathVariables);
-      // updatePathVariableKeys(pathVariables);
 
       const paramsFromUrl = extractQueryParams(value);
       const finalParams = [];

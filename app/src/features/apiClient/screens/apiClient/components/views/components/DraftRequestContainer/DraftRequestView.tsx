@@ -12,7 +12,6 @@ import { useApiClientDispatch } from "features/apiClient/slices/hooks/base.hooks
 
 export const DraftRequestView: React.FC<{
   onSaveCallback: (apiEntryDetails: RQAPI.ApiRecord) => void;
-  // apiEntryType: RQAPI.ApiEntryType;
 }> = ({ onSaveCallback }) => {
   const bufferId = useHostContext().getBufferId();
   if (!bufferId) {
@@ -59,23 +58,9 @@ export const DraftRequestView: React.FC<{
 
   }, []);
 
-  // const apiEntryDetails: RQAPI.ApiRecord = useMemo(() => getEmptyDraftApiRecord(apiEntryType), [apiEntryType]);
-  return (
-    // <HttpClientView
-    //   notifyApiRequestFinished={() => {}}
-    //   entity={scratchBuffer}
-    //   override={{
-    //   handleNameChange: handleRecordNameUpdate,
 
-    //   onSaveClick: {
-    //     save,
-    //     onSuccess: onSaveCallback,
-    //   }
-    // }}
-    // />
+  return (
     <GenericApiClient
-      // isCreateMode
-      // onSaveCallback={onSaveCallback}
       override={{
         handleNameChange: handleRecordNameUpdate,
 

@@ -149,6 +149,14 @@ export class HttpRecordEntity<M extends ApiClientEntityMeta = ApiClientEntityMet
     this.SET({ data: { request: { url } } });
   }
 
+  setIncludeCredentials(includeCredentials: boolean) {
+    this.SET({data: {
+      request: {
+        includeCredentials
+      }
+    }});
+  }
+
   setMethod(method: RequestMethod): void {
     if (!supportsRequestBody(method)) {
       this.deleteBody();
