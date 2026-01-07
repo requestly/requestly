@@ -76,7 +76,7 @@ function createSave(
               savedData: newState,
             })
           );
-          onSuccess(dataToSave, params.entity)
+          onSuccess(newState!, params.entity)
         }
         );
       return result;

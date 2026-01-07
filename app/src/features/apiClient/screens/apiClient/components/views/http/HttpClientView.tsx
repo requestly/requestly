@@ -71,21 +71,21 @@ const requestMethodOptions = Object.values(RequestMethod).map((method) => ({
   label: method,
 }));
 
-type Props = {
+export type HttpClientViewProps = {
   entity: BufferedHttpRecordEntity,
   override?: {
     handleNameChange?: (name: string) => Promise<void>,
     onSaveClick?: {
       save: (record: RQAPI.HttpApiRecord, repositories: ApiClientRepositoryInterface) => Promise<RQAPI.HttpApiRecord>,
-      onSuccess: () => void,
+      onSuccess: (record: RQAPI.HttpApiRecord) => void,
     }
   },
   openInModal?: boolean;
-  onSaveCallback: (apiEntryDetails: RQAPI.HttpApiRecord) => void;
+  // onSaveCallback: (apiEntryDetails: RQAPI.HttpApiRecord) => void;
   notifyApiRequestFinished: (apiEntry: RQAPI.HttpApiEntry) => void;
 };
 
-const HttpClientView: React.FC<Props> = ({
+const HttpClientView: React.FC<HttpClientViewProps> = ({
   openInModal = false,
   notifyApiRequestFinished,
   entity,
@@ -400,9 +400,9 @@ const HttpClientView: React.FC<Props> = ({
         afterSave() {
           setIsRequestSaving(false);
         },
-        onSuccess() {
+        onSuccess(result) {
           toast.success("Request saved!");
-          override?.onSaveClick?.onSuccess();
+          override?.onSaveClick?.onSuccess(result);
         },
         onError(e) {
           notification.error({
@@ -594,7 +594,7 @@ const HttpClientView: React.FC<Props> = ({
   );
 };
 
-const WithErrorBoundary = (Component: React.ComponentType<any>): React.FC<Props> => {
+const WithErrorBoundary = (Component: React.ComponentType<any>): React.FC<HttpClientViewProps> => {
   const WrappedComponent: React.FC = (props: any) => {
     return (
       <ErrorBoundary boundaryId="http-client-view-error-boundary">

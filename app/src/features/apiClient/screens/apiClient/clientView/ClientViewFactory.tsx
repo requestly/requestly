@@ -1,8 +1,5 @@
 import { RQAPI } from "features/apiClient/types";
-import { isGraphQLApiRecord, isHttpApiRecord } from "../utils";
-import GraphQLClientView from "../components/views/graphql/GraphQLClientView";
-import HttpClientView from "../components/views/http/HttpClientView";
-import { HttpClientViewCreateMode } from "../components/views/http/HttpClientViewCreateMode";
+import HttpClientView, { HttpClientViewProps } from "../components/views/http/HttpClientView";
 import { BufferedGraphQLRecordEntity, BufferedHttpRecordEntity } from "features/apiClient/slices/entities";
 import { ApiClientEntityType } from "features/apiClient/slices/entities/types";
 
@@ -11,19 +8,17 @@ interface Props {
   // entityType: ApiClientEntityType.HTTP_RECORD | ApiClientEntityType.HTTP_RECORD,
   // apiRecord: RQAPI.ApiRecord;
   handleRequestFinished: (entry: RQAPI.ApiEntry) => void;
-  onSaveCallback: (apiEntryDetails: RQAPI.ApiRecord) => void;
+  // onSaveCallback: (apiEntryDetails: RQAPI.ApiRecord) => void;
   // isCreateMode: boolean;
   isOpenInModal?: boolean;
+  override?: HttpClientViewProps['override'],
 }
 
 export const ClientViewFactory = ({
   entity,
-  // entityType
-  // apiRecord,
   handleRequestFinished,
-  onSaveCallback,
-  // isCreateMode,
   isOpenInModal,
+  override,
 }: Props) => {
   if (entity.type === ApiClientEntityType.HTTP_RECORD) {
     // if (isCreateMode) {
@@ -40,11 +35,9 @@ export const ClientViewFactory = ({
     return (
       <HttpClientView
         entity={entity}
-        // apiEntryDetails={apiRecord}
         notifyApiRequestFinished={handleRequestFinished}
-        onSaveCallback={onSaveCallback}
-        // isCreateMode={isCreateMode}
         openInModal={isOpenInModal}
+        override={override}
       />
     );
   }
