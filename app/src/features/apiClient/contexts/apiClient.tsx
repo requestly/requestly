@@ -154,6 +154,8 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
                 context: { id: context.workspaceId },
                 emptyRecord: getEmptyDraftApiRecord(entryType),
               }),
+              isNew: true,
+              preview: false,
             });
             return;
           }

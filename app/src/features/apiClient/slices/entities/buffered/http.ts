@@ -35,5 +35,16 @@ export class BufferedHttpRecordEntity extends HttpRecordEntity<BufferedApiClient
 
     return record as RQAPI.HttpApiRecord;
   }
+
+  dispatchUnsafePatch(patcher: (record: RQAPI.HttpApiRecord) => void): void {
+    this.dispatch(
+      bufferActions.unsafePatch({
+        id: this.meta.id,
+        patcher: (entry) => {
+          patcher(entry.current as RQAPI.HttpApiRecord);
+        },
+      })
+    );
+  }
 }
 

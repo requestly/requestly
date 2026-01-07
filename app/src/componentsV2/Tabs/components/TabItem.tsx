@@ -34,6 +34,12 @@ export const TabItem: React.FC<React.PropsWithChildren<{ tabId: TabId }>> = Reac
           return tab.source.getSourceId();
         }, [tab]),
 
+        getBufferId: useCallback(() => {
+          if(tab.modeConfig.mode === 'buffer') {
+            return tab.modeConfig.entityId;
+          }
+        }, [tab]),
+
         registerWorkflow: useCallback(
           (w: ActiveWorkflow) => {
             dispatch(tabsActions.addActiveWorkflow({ tabId: props.tabId, workflow: w }));
