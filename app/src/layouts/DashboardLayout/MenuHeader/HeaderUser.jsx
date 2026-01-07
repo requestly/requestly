@@ -24,7 +24,7 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { isSafariBrowser } from "actions/ExtensionActions";
 import { isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 import { RQButton } from "lib/design-system-v2/components";
-import { getTabServiceActions } from "componentsV2/Tabs/tabUtils";
+import { getTabActions } from "componentsV2/Tabs/slice";
 import { useIsBrowserStackIntegrationOn } from "hooks/useIsBrowserStackIntegrationOn";
 import { trackLoginButtonClicked } from "modules/analytics/events/common/auth/login";
 import { trackSignUpButtonClicked } from "modules/analytics/events/common/auth/signup";
@@ -103,7 +103,7 @@ export default function HeaderUser() {
                 })
               );
 
-              getTabServiceActions().resetTabs(true);
+              getTabActions().resetTabs();
             })
             .finally(() => setLoading(false));
         },
@@ -113,7 +113,7 @@ export default function HeaderUser() {
   );
 
   const handleAuthButtonClick = (authMode) => {
-    getTabServiceActions().resetTabs(true);
+    getTabActions().resetTabs();
     dispatch(
       globalActions.toggleActiveModal({
         modalName: "authModal",
@@ -142,7 +142,7 @@ export default function HeaderUser() {
   }
 
   const handleSignupClick = () => {
-    getTabServiceActions().resetTabs(true);
+    getTabActions().resetTabs();
     trackSignUpButtonClicked(SOURCE.NAVBAR);
     if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
       handleAuthButtonClick(APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP);

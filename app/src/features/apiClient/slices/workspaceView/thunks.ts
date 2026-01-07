@@ -21,6 +21,7 @@ import { getAppMode } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { switchWorkspace } from "actions/TeamWorkspaceActions";
 import { NativeError } from "errors/NativeError";
+import { getTabActions } from "componentsV2/Tabs/slice";
 
 const SLICE_NAME = ReducerKeys.WORKSPACE_VIEW;
 
@@ -115,7 +116,7 @@ function removeWorkspaceFromView(params: { workspaceId: WorkspaceState["id"] }):
   const { workspaceId } = params;
 
   try {
-    // getTabServiceActions().closeTabsByContext(workspaceId);
+    getTabActions().resetTabs();
     apiClientContextRegistry.removeContext(workspaceId);
     reduxStore.dispatch(workspaceViewActions.removeWorkspace(workspaceId));
 
@@ -143,6 +144,7 @@ const removeWorkspacesFromView = createAsyncThunk<
 const singleToMultiView = createAsyncThunk(
   `${SLICE_NAME}/singleToMultiView`,
   async (params: { workspaces: WorkspaceInfo[]; userId?: string }, { dispatch }) => {
+    getTabActions().resetTabs();
     apiClientContextRegistry.clearAll();
     dispatch(workspaceViewActions.resetToMultiView());
     return dispatch(addWorkspacesIntoMultiView(params)).unwrap();
@@ -153,6 +155,7 @@ export const switchContext = createAsyncThunk(
   `${SLICE_NAME}/switchContext`,
   async (params: { workspace: WorkspaceInfo; userId?: string }, { dispatch }) => {
     const { workspace, userId } = params;
+    getTabActions().resetTabs();
     apiClientContextRegistry.clearAll();
     dispatch(workspaceViewActions.resetToSingleView());
 
@@ -287,8 +290,8 @@ export const setupWorkspaceView = createAsyncThunk(
 
 export const resetWorkspaceView = () => {
   return (dispatch: Dispatch, getState: () => RootState) => {
+    getTabActions().resetTabs();
     apiClientContextRegistry.clearAll();
-    // getTabServiceActions().resetTabs(true);
     dispatch(workspaceViewActions.reset());
   };
 };

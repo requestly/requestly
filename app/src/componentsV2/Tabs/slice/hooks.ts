@@ -1,4 +1,4 @@
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { tabsActions, tabsAdapter } from "./slice";
 import { TabId, TabState } from "./types";
 import { RootState } from "store/types";
@@ -13,6 +13,7 @@ import {
 import { BufferEntry, EntityNotFound, getApiClientFeatureContext } from "features/apiClient/slices";
 import { BufferedEntityFactory } from "features/apiClient/slices/entities";
 import { selectActiveTab, selectActiveTabId } from "./selectors";
+import { reduxStore } from "store";
 
 const tabsSelectors = tabsAdapter.getSelectors<RootState>((state) => state.tabs.tabs);
 
@@ -46,38 +47,43 @@ export function usePreviewTabId() {
   return useSelector((state: RootState) => state.tabs.previewTabId);
 }
 
+export function getTabActions() {
+  const dispatch = reduxStore.dispatch;
+
+  return {
+    resetTabs() {
+      return dispatch(tabsActions.resetTabs());
+    },
+
+    openBufferedTab(params: Parameters<typeof _openBufferedTab>[0]) {
+      return dispatch(_openBufferedTab(params));
+    },
+
+    closeTab(params: Parameters<typeof _closeTab>[0]) {
+      return dispatch(_closeTab(params) as any);
+    },
+
+    closeAllTabs(params: Parameters<typeof _closeAllTabs>[0]) {
+      return dispatch(_closeAllTabs(params) as any);
+    },
+
+    closeTabByEntityId(params: Parameters<typeof _closeTabByEntityId>[0]) {
+      return dispatch(_closeTabByEntityId(params) as any);
+    },
+
+    setActiveTab(params: Parameters<typeof tabsActions.setActiveTab>[0]) {
+      return dispatch(tabsActions.setActiveTab(params));
+    },
+
+    setPreviewTab(params: Parameters<typeof tabsActions.setPreviewTab>[0]) {
+      return dispatch(tabsActions.setPreviewTab(params));
+    },
+  };
+}
+
+// TODO: cleanup - no need for a hook
 export function useTabActions() {
-  const dispatch = useDispatch();
-
-  const actions = useMemo(() => {
-    return {
-      openBufferedTab(params: Parameters<typeof _openBufferedTab>[0]) {
-        return dispatch(_openBufferedTab(params));
-      },
-
-      closeTab(params: Parameters<typeof _closeTab>[0]) {
-        return dispatch(_closeTab(params) as any);
-      },
-
-      closeAllTabs(params: Parameters<typeof _closeAllTabs>[0]) {
-        return dispatch(_closeAllTabs(params) as any);
-      },
-
-      closeTabByEntityId(params: Parameters<typeof _closeTabByEntityId>[0]) {
-        return dispatch(_closeTabByEntityId(params) as any);
-      },
-
-      setActiveTab(params: Parameters<typeof tabsActions.setActiveTab>[0]) {
-        return dispatch(tabsActions.setActiveTab(params));
-      },
-
-      setPreviewTab(params: Parameters<typeof tabsActions.setPreviewTab>[0]) {
-        return dispatch(tabsActions.setPreviewTab(params));
-      },
-    };
-  }, [dispatch]);
-
-  return actions;
+  return useMemo(() => getTabActions(), []);
 }
 
 export type BufferModeTab = TabState & { modeConfig: { mode: "buffer" } };
