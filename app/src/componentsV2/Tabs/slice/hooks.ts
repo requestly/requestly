@@ -133,7 +133,9 @@ export function useTabBuffer<T>(
 }
 
 export function useIsTabDirty(tab: BufferModeTab) {
-  return useTabBuffer(tab, ({ buffer }) => buffer.isDirty);
+  return useTabBuffer(tab, ({ buffer }) => {
+    return buffer.isDirty;
+  });
 }
 
 export function useTabTitle(tab: BufferModeTab) {

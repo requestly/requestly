@@ -1,7 +1,7 @@
 import { createSlice, createEntityAdapter, PayloadAction } from "@reduxjs/toolkit";
 import type { SavedRunConfig } from "features/apiClient/commands/collectionRunner/types";
 import {
-  getRunnerConfigKey,
+  getRunnerConfigId,
   RunConfigEntity,
   RunnerConfigKey,
   RunnerConfigState as RunConfigState,
@@ -11,6 +11,9 @@ import {
   isValidIterations,
   fromSavedRunConfig,
 } from "./types";
+import { API_CLIENT_RUNNER_CONFIG_SLICE_NAME } from "../common/constants";
+import { EntityNotFound } from "../types";
+import { patchRunOrder } from "./utils";
 
 export const runConfigAdapter = createEntityAdapter<RunConfigEntity>({
   selectId: (config) => config.id,
@@ -22,7 +25,7 @@ const initialState: RunConfigState = {
 };
 
 export const runnerConfigSlice = createSlice({
-  name: "runnerConfig",
+  name: API_CLIENT_RUNNER_CONFIG_SLICE_NAME,
   initialState,
   reducers: {
     setAllConfigs(state, action: PayloadAction<RunConfigEntity[]>) {
@@ -56,7 +59,7 @@ export const runnerConfigSlice = createSlice({
       prepare(collectionId: string, configId: string, runOrder: RunOrder) {
         return {
           payload: {
-            key: getRunnerConfigKey(collectionId, configId),
+            key: getRunnerConfigId(collectionId, configId),
             runOrder,
           },
         };
@@ -79,7 +82,7 @@ export const runnerConfigSlice = createSlice({
       prepare(collectionId: string, configId: string, delay: number) {
         return {
           payload: {
-            key: getRunnerConfigKey(collectionId, configId),
+            key: getRunnerConfigId(collectionId, configId),
             delay,
           },
         };
@@ -102,7 +105,7 @@ export const runnerConfigSlice = createSlice({
       prepare(collectionId: string, configId: string, iterations: number) {
         return {
           payload: {
-            key: getRunnerConfigKey(collectionId, configId),
+            key: getRunnerConfigId(collectionId, configId),
             iterations,
           },
         };
@@ -119,7 +122,7 @@ export const runnerConfigSlice = createSlice({
       prepare(collectionId: string, configId: string, dataFile: RunDataFile | null) {
         return {
           payload: {
-            key: getRunnerConfigKey(collectionId, configId),
+            key: getRunnerConfigId(collectionId, configId),
             dataFile,
           },
         };
@@ -140,7 +143,7 @@ export const runnerConfigSlice = createSlice({
       prepare(collectionId: string, configId: string, requestId: string) {
         return {
           payload: {
-            key: getRunnerConfigKey(collectionId, configId),
+            key: getRunnerConfigId(collectionId, configId),
             requestId,
           },
         };
@@ -166,7 +169,7 @@ export const runnerConfigSlice = createSlice({
       prepare(collectionId: string, configId: string, requestId: string, isSelected: boolean) {
         return {
           payload: {
-            key: getRunnerConfigKey(collectionId, configId),
+            key: getRunnerConfigId(collectionId, configId),
             requestId,
             isSelected,
           },
@@ -189,8 +192,34 @@ export const runnerConfigSlice = createSlice({
       prepare(collectionId: string, configId: string, isSelected: boolean) {
         return {
           payload: {
-            key: getRunnerConfigKey(collectionId, configId),
+            key: getRunnerConfigId(collectionId, configId),
             isSelected,
+          },
+        };
+      },
+    },
+    patchRunOrder: {
+      reducer(
+        state,
+        action: PayloadAction<{
+          id: RunnerConfigKey;
+          requestIds: string[];
+        }>
+      ) {
+        const { id, requestIds } = action.payload;
+        const config = state.configs.entities[id];
+
+        if (!config) {
+          throw new EntityNotFound(id, "Collection run config not found");
+        }
+
+        config.runOrder = patchRunOrder(config.runOrder, requestIds);
+      },
+      prepare(collectionId: string, configId: string, requestIds: string[]) {
+        return {
+          payload: {
+            id: getRunnerConfigId(collectionId, configId),
+            requestIds,
           },
         };
       },

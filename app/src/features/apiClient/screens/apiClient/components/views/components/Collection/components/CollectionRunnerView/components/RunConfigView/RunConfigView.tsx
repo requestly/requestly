@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
 import { MdOutlineSave } from "@react-icons/all-files/md/MdOutlineSave";
 import { MdOutlineVideoLibrary } from "@react-icons/all-files/md/MdOutlineVideoLibrary";
@@ -7,9 +7,28 @@ import { MdOutlineRestartAlt } from "@react-icons/all-files/md/MdOutlineRestartA
 import { MdOutlineStopCircle } from "@react-icons/all-files/md/MdOutlineStopCircle";
 import { RunConfigOrderedRequests } from "./RunConfigOrderedRequests/RunConfigOrderedRequests";
 import { RunConfigSettings } from "./RunConfigSettings/RunConfigSettings";
-import { useCommand } from "features/apiClient/commands";
 import { useCollectionView } from "../../../../collectionView.context";
-import { useRunConfigStore, useRunContext, useRunResultStore } from "../../run.context";
+import { useRunContext, useRunResultStore } from "../../run.context";
+import { useApiClientSelector, useApiClientDispatch } from "features/apiClient/slices/hooks/base.hooks";
+import { selectRunConfig, selectTotalRequestCount } from "features/apiClient/slices/runConfig/selectors";
+import {
+  getRunnerConfigId,
+  DEFAULT_RUN_CONFIG_ID,
+  toSavedRunConfig,
+  fromSavedRunConfig,
+} from "features/apiClient/slices/runConfig/types";
+import { saveRunConfig as saveRunConfigThunk } from "features/apiClient/slices/runConfig/thunks";
+import { useWorkspaceId } from "features/apiClient/common/WorkspaceProvider";
+import { useActiveTabId } from "componentsV2/Tabs/slice/hooks";
+import {
+  getApiClientFeatureContext,
+  useApiClientFeatureContext,
+} from "features/apiClient/slices/workspaceView/helpers/ApiClientContextRegistry/hooks";
+import { findBufferByReferenceId } from "features/apiClient/slices/buffer/slice";
+import { bufferActions } from "features/apiClient/slices/buffer";
+import { runnerConfigActions } from "features/apiClient/slices/runConfig/slice";
+import { selectAllDescendantIds } from "features/apiClient/slices/apiRecords/selectors";
+import { useCommand } from "features/apiClient/commands";
 import { toast } from "utils/Toast";
 import * as Sentry from "@sentry/react";
 import { useBatchRequestExecutor } from "features/apiClient/hooks/requestExecutors/useBatchRequestExecutor";
@@ -17,7 +36,6 @@ import { useGenericState } from "hooks/useGenericState";
 import { KEYBOARD_SHORTCUTS } from "../../../../../../../../../../../../../src/constants/keyboardShortcuts";
 import { RunStatus } from "features/apiClient/store/collectionRunResult/runResult.store";
 import { EmptyState } from "../EmptyState/EmptyState";
-import { useApiClientFeatureContext } from "features/apiClient/contexts/meta";
 import { Conditional } from "components/common/Conditional";
 import "./runConfigView.scss";
 import { isExtensionInstalled } from "actions/ExtensionActions";
@@ -31,46 +49,63 @@ import {
 } from "modules/analytics/events/features/apiClient";
 import { ApiClientLocalRepository } from "features/apiClient/helpers/modules/sync/local";
 import { getAppMode } from "store/selectors";
+import { useHostContext } from "hooks/useHostContext";
+import { TAB_KEYS } from "../../../../CollectionView";
+import { useIsBufferDirty } from "features/apiClient/slices/entities";
 
-const RunConfigSaveButton: React.FC<{ disabled?: boolean }> = ({ disabled = false }) => {
+const RunConfigSaveButton: React.FC<{ disabled?: boolean; isRunnerTabActive: boolean }> = ({
+  disabled = false,
+  isRunnerTabActive,
+}) => {
   const [isSaving, setIsSaving] = useState(false);
 
   const { collectionId } = useCollectionView();
-  const [getConfigToSave, hasUnsavedChanges, setHasUnsavedChanges, iterations, delay] = useRunConfigStore((s) => [
-    s.getConfigToSave,
-    s.hasUnsavedChanges,
-    s.setHasUnsavedChanges,
-    s.iterations,
-    s.delay,
-  ]);
+  const workspaceId = useWorkspaceId();
+  const dispatch = useApiClientDispatch();
+  const activeTabId = useActiveTabId();
 
-  const {
-    runner: { saveRunConfig },
-  } = useCommand();
+  // Get config from Redux slice
+  const config = useApiClientSelector((state) => selectRunConfig(state, collectionId, DEFAULT_RUN_CONFIG_ID));
 
-  const { setPreview, setUnsaved, getIsActive } = useGenericState();
+  const hasUnsavedChanges = useIsBufferDirty({
+    referenceId: getRunnerConfigId(collectionId, config?.configId!),
+    type: "referenceId",
+  });
+
+  const iterations = config?.iterations ?? 1;
+  const delay = config?.delay ?? 0;
+
+  const { getIsActive } = useHostContext();
 
   const isActiveTab = getIsActive();
 
-  useEffect(() => {
-    setUnsaved(hasUnsavedChanges);
-
-    if (hasUnsavedChanges) {
-      setPreview(false);
-    }
-  }, [setUnsaved, setPreview, hasUnsavedChanges]);
-
   const handleSaveClick = useCallback(async () => {
+    if (!config) return;
+
     setIsSaving(true);
-    const configToSave = getConfigToSave();
+    const configToSave = toSavedRunConfig(config);
 
     try {
-      await saveRunConfig({ collectionId, configToSave });
+      await dispatch(
+        saveRunConfigThunk({
+          workspaceId,
+          collectionId,
+          configToSave,
+        })
+      ).unwrap();
+
+      // Mark buffer as clean after successful save
+      // if (buffer && activeTabId) {
+      //   const ctx = getApiClientFeatureContext(workspaceId);
+      //   ctx.store.dispatch(
+      //     bufferActions.markSaved({ id: buffer.id, savedData: fromSavedRunConfig(collectionId, configToSave) })
+      //   );
+      // }
+
       toast.success("Configuration saved");
-      setHasUnsavedChanges(false);
       trackCollectionRunnerConfigSaved({
         collection_id: collectionId,
-        request_count: configToSave.runOrder.filter((r) => r.isSelected).length,
+        request_count: configToSave.runOrder.filter((r: { isSelected: boolean }) => r.isSelected).length,
         iteration_count: iterations,
         delay: delay,
       });
@@ -79,14 +114,14 @@ const RunConfigSaveButton: React.FC<{ disabled?: boolean }> = ({ disabled = fals
       Sentry.captureException(error, { extra: { collectionId, configToSave } });
       trackCollectionRunnerConfigSaveFailed({
         collection_id: collectionId,
-        request_count: configToSave.runOrder.filter((r) => r.isSelected).length,
+        request_count: configToSave.runOrder.filter((r: { isSelected: boolean }) => r.isSelected).length,
         iteration_count: iterations,
         delay: delay,
       });
     } finally {
       setIsSaving(false);
     }
-  }, [getConfigToSave, saveRunConfig, collectionId, setHasUnsavedChanges, iterations, delay]);
+  }, [config, dispatch, workspaceId, collectionId, iterations, delay]);
 
   return (
     <RQTooltip
@@ -99,8 +134,8 @@ const RunConfigSaveButton: React.FC<{ disabled?: boolean }> = ({ disabled = fals
     >
       <RQButton
         disabled={disabled}
-        enableHotKey={isActiveTab}
-        hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SAVE_COLLECTION.hotKey}
+        enableHotKey={isRunnerTabActive && isActiveTab}
+        hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SAVE_COLLECTION?.hotKey}
         size="small"
         loading={isSaving}
         icon={hasUnsavedChanges ? <div className="unsaved-changes-indicator" /> : <MdOutlineSave />}
@@ -174,29 +209,48 @@ const RunCollectionButton: React.FC<{ disabled?: boolean }> = ({ disabled = fals
   );
 };
 
-export const RunConfigView: React.FC = () => {
+interface Props {
+  activeTabKey: string;
+}
+
+export const RunConfigView: React.FC<Props> = ({ activeTabKey }) => {
   const ctx = useApiClientFeatureContext();
+  const dispatch = useApiClientDispatch();
 
   const { collectionId } = useCollectionView();
-  const [setRunOrder, runOrderCount, setSelectionForAll] = useRunConfigStore((s) => [
-    s.setRunOrder,
-    s.runOrder.length,
-    s.setSelectionForAll,
-  ]);
-  const {
-    runner: { resetRunOrder },
-  } = useCommand();
+
+  // Get config from Redux slice
+  const config = useApiClientSelector((state) => selectRunConfig(state, collectionId, DEFAULT_RUN_CONFIG_ID));
+
+  const isRunnerTabActive = activeTabKey === TAB_KEYS.RUNNER;
+  // Get run order count
+  const runOrderCount = useApiClientSelector((state) => {
+    const config = selectRunConfig(state, collectionId, DEFAULT_RUN_CONFIG_ID);
+    if (!config) return 0;
+    const key = getRunnerConfigId(collectionId, config.configId);
+    return selectTotalRequestCount(state, key);
+  });
+
+  // Get all descendant IDs for reset functionality
+  const descendantIds = useApiClientSelector((state) => selectAllDescendantIds(state, collectionId));
 
   const handleSelectAllClick = () => {
-    setSelectionForAll(true);
+    if (config) {
+      dispatch(runnerConfigActions.toggleAllSelections(collectionId, config.configId, true));
+    }
   };
 
   const handleDeselectAllClick = () => {
-    setSelectionForAll(false);
+    if (config) {
+      dispatch(runnerConfigActions.toggleAllSelections(collectionId, config.configId, false));
+    }
   };
 
   const handleResetClick = () => {
-    resetRunOrder({ collectionId, setRunOrder });
+    if (!config) return;
+
+    const resetRunOrder = descendantIds.map((id: string) => ({ id, isSelected: true }));
+    dispatch(runnerConfigActions.updateRunOrder(collectionId, config.configId, resetRunOrder));
   };
 
   const isEmpty = runOrderCount === 0;
@@ -214,9 +268,9 @@ export const RunConfigView: React.FC = () => {
 
         <div className="actions">
           <Conditional condition={!(ctx.repositories instanceof ApiClientLocalRepository)}>
-            <RunConfigSaveButton disabled={isEmpty} />
+            <RunConfigSaveButton disabled={isEmpty} isRunnerTabActive={isRunnerTabActive} />
           </Conditional>
-          <RunCollectionButton disabled={isEmpty} />
+          {/* <RunCollectionButton disabled={isEmpty} /> */}
         </div>
       </div>
 

@@ -5,8 +5,12 @@ import { RQAPI } from "features/apiClient/types";
 import { useDrag, useDrop } from "react-dnd";
 import { CollectionChain } from "./CollectionChain";
 import { RequestIcon } from "features/apiClient/screens/apiClient/components/sidebar/components/collectionsList/requestRow/RequestRow";
-import { useRunConfigStore } from "../../../../run.context";
-import { useApiRecord } from "features/apiClient/hooks/useApiRecord.hook";
+import { useCollectionView } from "../../../../../../collectionView.context";
+import { useApiClientDispatch, useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
+import { runnerConfigActions } from "features/apiClient/slices/runConfig/slice";
+import { DEFAULT_RUN_CONFIG_ID } from "features/apiClient/slices/runConfig/types";
+import { selectRunConfig } from "features/apiClient/slices/runConfig/selectors";
+import { useRecordById } from "features/apiClient/slices";
 
 enum ReorderableItemType {
   REQUEST = "request",
@@ -26,7 +30,8 @@ enum DragDirection {
 const RequestInfo: React.FC<{
   recordId: RQAPI.ApiRecord["id"];
 }> = ({ recordId }) => {
-  const request = useApiRecord(recordId) as RQAPI.ApiRecord;
+  const record = useRecordById(recordId);
+  const request = record?.type === RQAPI.RecordType.API ? record : null;
 
   if (!request) {
     return (
@@ -63,7 +68,12 @@ interface ReorderableListItemProps {
 }
 
 export const ReorderableListItem: React.FC<ReorderableListItemProps> = ({ index, orderedRequest, reorder }) => {
-  const [setSelected] = useRunConfigStore((s) => [s.setSelected]);
+  const { collectionId } = useCollectionView();
+  const dispatch = useApiClientDispatch();
+
+  // Get config to access configId
+  const config = useApiClientSelector((state) => selectRunConfig(state, collectionId, DEFAULT_RUN_CONFIG_ID));
+
   const ref = useRef<HTMLDivElement>(null);
 
   const [{ isDragging }, drag] = useDrag({
@@ -119,7 +129,16 @@ export const ReorderableListItem: React.FC<ReorderableListItemProps> = ({ index,
       <Checkbox
         checked={orderedRequest.isSelected}
         onChange={(e) => {
-          setSelected(orderedRequest.record.id, e.target.checked);
+          if (config) {
+            dispatch(
+              runnerConfigActions.setRequestSelection(
+                collectionId,
+                config.configId,
+                orderedRequest.record.id,
+                e.target.checked
+              )
+            );
+          }
         }}
       />
       <CollectionChain key={orderedRequest.record.collectionId} recordId={orderedRequest.record.id} />

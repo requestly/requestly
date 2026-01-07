@@ -6,7 +6,7 @@ export type RunnerConfigKey = string;
 
 export const DEFAULT_RUN_CONFIG_ID = "default";
 
-export const getRunnerConfigKey = (collectionId: string, configId: string): RunnerConfigKey =>
+export const getRunnerConfigId = (collectionId: string, configId: string): RunnerConfigKey =>
   `${collectionId}::${configId}`;
 
 export const parseRunnerConfigKey = (key: RunnerConfigKey): { collectionId: string; configId: string } => {
@@ -68,7 +68,7 @@ export const fromSavedRunConfig = (
   timestamps?: { createdTs?: number; updatedTs?: number }
 ): RunConfigEntity => {
   return {
-    id: getRunnerConfigKey(collectionId, saved.id),
+    id: getRunnerConfigId(collectionId, saved.id),
     collectionId,
     configId: saved.id,
     runOrder: saved.runOrder,
