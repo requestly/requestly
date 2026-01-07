@@ -54,13 +54,13 @@ import { Authorization } from "../components/request/components/AuthorizationVie
 import ErrorBoundary from "features/apiClient/components/ErrorBoundary/ErrorBoundary";
 import { useHttpRequestExecutor } from "features/apiClient/hooks/requestExecutors/useHttpRequestExecutor";
 import { useAISessionContext } from "features/ai/contexts/AISession";
-import { OriginExists } from "features/apiClient/slices/entities/buffered/factory";
 import { BufferedHttpRecordEntity, useIsBufferDirty } from "features/apiClient/slices/entities";
 import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
 import { ApiClientStore, bufferAdapterSelectors, useApiClientRepository, useApiClientStore } from 'features/apiClient/slices';
 import { useSaveBuffer } from 'features/apiClient/slices/buffer/hooks';
 import { NativeError } from 'errors/NativeError';
 import { useHostContext } from 'hooks/useHostContext';
+import { ApiClientRepositoryInterface } from 'features/apiClient/helpers/modules/sync/interfaces';
 
 function getEntry(entity: BufferedHttpRecordEntity, store: ApiClientStore) {
   return entity.getEntityFromState(store.getState()).data;
@@ -73,6 +73,13 @@ const requestMethodOptions = Object.values(RequestMethod).map((method) => ({
 
 type Props = {
   entity: BufferedHttpRecordEntity,
+  override?: {
+    handleNameChange?: (name: string) => Promise<void>,
+    onSaveClick?: {
+      save: (record: RQAPI.HttpApiRecord, repositories: ApiClientRepositoryInterface) => Promise<RQAPI.HttpApiRecord>,
+      onSuccess: () => void,
+    }
+  },
   openInModal?: boolean;
   onSaveCallback: (apiEntryDetails: RQAPI.HttpApiRecord) => void;
   notifyApiRequestFinished: (apiEntry: RQAPI.HttpApiEntry) => void;
@@ -80,9 +87,9 @@ type Props = {
 
 const HttpClientView: React.FC<Props> = ({
   openInModal = false,
-  onSaveCallback,
   notifyApiRequestFinished,
   entity,
+  override,
 }) => {
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
@@ -193,12 +200,6 @@ const HttpClientView: React.FC<Props> = ({
       setIsGeneratingTests(false);
     }
   }, [isGeneratingTests, setDeepLinkState, entity, store]);
-
-  // const canGenerateTests = useMemo(() => {
-  //   const responseExists = Boolean(postResponseScript);
-  //   if (!responseExists) return false;
-  //   return !hasTests(postResponseScript);
-  // }, [postResponseScript]);
 
   const onSendButtonClick = useCallback(async () => {
     const { request, scripts, auth, response } = getEntry(entity, store);
@@ -352,13 +353,9 @@ const HttpClientView: React.FC<Props> = ({
   }, [entity, repositories]);
 
   const onSaveButtonClick = useCallback(async () => {
-    if (!entity.meta.originExists) {
-      throw new Error('Can not save a buffer from this flow since there is no origin!');
-    }
-
     saveBuffer(
       {
-        entity: entity as OriginExists<typeof entity>,
+        entity,
         produceChanges(entity, state) {
           const record = lodash.cloneDeep(entity.getEntityFromState(state));
           record.data = sanitizeEntry(record.data);
@@ -386,10 +383,14 @@ const HttpClientView: React.FC<Props> = ({
           return record;
         },
         async save(record, repositories) {
+          if(override?.onSaveClick) {
+            return override.onSaveClick.save(record, repositories);
+          }
           const result = await repositories.apiClientRecordsRepository.updateRecord(record, record.id);
           if (!result.success) {
             throw new NativeError(result.message || "Could not save request!");
           }
+          return result.data as RQAPI.HttpApiRecord;
         },
       },
       {
@@ -401,6 +402,7 @@ const HttpClientView: React.FC<Props> = ({
         },
         onSuccess() {
           toast.success("Request saved!");
+          override?.onSaveClick?.onSuccess();
         },
         onError(e) {
           notification.error({
@@ -415,7 +417,7 @@ const HttpClientView: React.FC<Props> = ({
 
     endAISession();
   }, [
-    // onSaveCallback,
+    override,
     endAISession,
     saveBuffer,
     entity,
@@ -482,6 +484,10 @@ const HttpClientView: React.FC<Props> = ({
               name={name}
               autoFocus={isNew}
               onBlur={(name) => {
+                if (override?.handleNameChange) {
+                  override.handleNameChange(name);
+                  return;
+                }
                 handleRecordNameUpdate(name);
               }}
               breadCrumbType={BreadcrumbType.API_REQUEST}
