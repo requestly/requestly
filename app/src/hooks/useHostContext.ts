@@ -9,6 +9,7 @@ export interface HostContext {
 
   getIsActive: () => boolean;
   getSourceId: () => string | undefined;
+  getBufferId: () => string | undefined;
 
   registerWorkflow: (workflow: ActiveWorkflow) => void;
   registerSecondaryBuffer: (bufferId: string) => void;

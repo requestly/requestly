@@ -1,5 +1,4 @@
 import { ScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
-import { useQueryParamStore } from "features/apiClient/hooks/useQueryParamStore";
 import {
   extractPathVariablesFromUrl,
   extractQueryParams,
@@ -8,24 +7,24 @@ import {
 import { KeyValuePair } from "features/apiClient/types";
 import { useCallback, memo } from "react";
 import { ApiClientUrl } from "../../../components/request/components/ApiClientUrl/ApiClientUrl";
-import { usePathVariablesStore } from "features/apiClient/hooks/usePathVariables.store";
+import { BufferedHttpRecordEntity } from "features/apiClient/slices/entities";
+import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
 
 interface ApiClientUrlProps {
-  url: string;
+  entity: BufferedHttpRecordEntity
   currentEnvironmentVariables: ScopedVariables;
   onEnterPress: (e: KeyboardEvent) => void;
   onUrlChange: (value: string, finalParams: KeyValuePair[]) => void;
 }
 
-const HttpApiClientUrl = ({ url, currentEnvironmentVariables, onEnterPress, onUrlChange }: ApiClientUrlProps) => {
-  const [queryParams, setQueryParams] = useQueryParamStore((state) => [state.queryParams, state.setQueryParams]);
-
-  const updatePathVariableKeys = usePathVariablesStore((state) => state.updateVariableKeys);
+const HttpApiClientUrl = ({ entity, currentEnvironmentVariables, onEnterPress, onUrlChange }: ApiClientUrlProps) => {
+  const url = useApiClientSelector(s => entity.getUrl(s));
+  const queryParams = useApiClientSelector(s => entity.getQueryParams(s) );
 
   const handleUrlChange = useCallback(
     (value: string) => {
       const pathVariables = extractPathVariablesFromUrl(value);
-      updatePathVariableKeys(pathVariables);
+      entity.reconcilePathKeys(pathVariables);
 
       const paramsFromUrl = extractQueryParams(value);
       const finalParams = [];
@@ -50,10 +49,10 @@ const HttpApiClientUrl = ({ url, currentEnvironmentVariables, onEnterPress, onUr
         }
       }
 
-      setQueryParams(finalParams);
+      entity.setQueryParams(finalParams);
       onUrlChange(value, finalParams);
     },
-    [onUrlChange, queryParams, setQueryParams, updatePathVariableKeys]
+    [onUrlChange, queryParams, ]
   );
 
   return (
