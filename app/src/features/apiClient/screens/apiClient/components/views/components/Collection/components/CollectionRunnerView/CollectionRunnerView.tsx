@@ -7,8 +7,6 @@ import { toast } from "utils/Toast";
 import * as Sentry from "@sentry/react";
 import { RunnerViewLoader } from "./components/RunnerViewLoader/RunnerViewLoader";
 import { RunConfigView } from "./components/RunConfigView/RunConfigView";
-import { RunViewContextProvider } from "./run.context";
-import { RunResultView } from "./components/RunResultView/RunResultView";
 import { RunResult } from "features/apiClient/store/collectionRunResult/runResult.store";
 import { DataFileModalProvider } from "./components/RunConfigView/ParseFileModal/Modals/DataFileModalContext";
 import { getDefaultRunConfig } from "features/apiClient/slices/runConfig/thunks";
@@ -16,12 +14,13 @@ import { useWorkspaceId } from "features/apiClient/common/WorkspaceProvider";
 import { runnerConfigActions } from "features/apiClient/slices/runConfig/slice";
 import { fromSavedRunConfig, getRunnerConfigId } from "features/apiClient/slices/runConfig/types";
 import { useActiveTabId } from "componentsV2/Tabs/slice/hooks";
-import { getApiClientFeatureContext } from "features/apiClient/slices/workspaceView/helpers/ApiClientContextRegistry/hooks";
 import { bufferActions } from "features/apiClient/slices/buffer";
 import { tabsActions } from "componentsV2/Tabs/slice";
 import { ApiClientEntityType } from "features/apiClient/slices/entities/types";
-import { useApiClientDispatch } from "features/apiClient/slices/hooks/base.hooks";
+import { useApiClientDispatch, useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
 import "./collectionRunnerView.scss";
+import { useApiClientStore } from "features/apiClient/slices";
+import { findBufferByReferenceId } from "features/apiClient/slices/buffer/slice";
 
 interface Props {
   collectionId: RQAPI.CollectionRecord["id"];
@@ -38,6 +37,7 @@ export const CollectionRunnerView: React.FC<Props> = ({ collectionId, activeTabK
   const activeTabId = useActiveTabId();
   const [isLoading, setIsLoading] = useState(true);
   const [runResults] = useState<RunResult[]>([]);
+  const store = useApiClientStore();
 
   useEffect(() => {
     (async () => {
@@ -47,16 +47,23 @@ export const CollectionRunnerView: React.FC<Props> = ({ collectionId, activeTabK
         dispatch(runnerConfigActions.hydrateRunConfig(collectionId, result));
 
         // Create buffer for run config
-
+        const state = store.getState();
         const referenceId = getRunnerConfigId(collectionId, result.id);
+        // Need to fix
+        const existingBuffer = referenceId ? findBufferByReferenceId(state.buffer.entities, referenceId) : null;
 
         const bufferAction = dispatch(
-          bufferActions.open({
-            entityType: ApiClientEntityType.RUN_CONFIG,
-            isNew: false,
-            referenceId,
-            data: fromSavedRunConfig(collectionId, result),
-          })
+          bufferActions.open(
+            {
+              entityType: ApiClientEntityType.RUN_CONFIG,
+              isNew: false,
+              referenceId,
+              data: fromSavedRunConfig(collectionId, result),
+            },
+            {
+              id: existingBuffer?.id,
+            }
+          )
         );
 
         // Register buffer as secondary buffer to the tab
