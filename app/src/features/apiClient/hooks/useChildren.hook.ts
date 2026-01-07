@@ -4,6 +4,7 @@ import { Subscription } from "../helpers/apiClientTreeBus/subscription";
 import { ApiClientEventTopic } from "../helpers/apiClientTreeBus/types";
 import { RQAPI } from "../types";
 import { ApiClientFeatureContext } from "../store/apiClientFeatureContext/apiClientFeatureContext.store";
+import { apiRecordsRankingManager } from "../components/sidebar";
 
 export const getAllChildrenRecords = (ctx: ApiClientFeatureContext, nodeId: string) => {
   const children = ctx.stores.records.getState().getAllChildren(nodeId);
@@ -12,26 +13,23 @@ export const getAllChildrenRecords = (ctx: ApiClientFeatureContext, nodeId: stri
     .map((child) => getRecord(child))
     .filter((record): record is RQAPI.ApiClientRecord => Boolean(record))
     .sort((recordA, recordB) => {
-      // If different type, then keep collection first
-      if (recordA.type === RQAPI.RecordType.COLLECTION && recordA.isExample && !recordB.isExample) {
+      // Keep example collections first
+      if (recordA.isExample && !recordB.isExample) {
         return -1;
       }
-
-      if (recordB.type === RQAPI.RecordType.COLLECTION && recordB.isExample && !recordA.isExample) {
+      if (recordB.isExample && !recordA.isExample) {
         return 1;
       }
 
+      // If different type, then keep collection first
       if (recordA.type !== recordB.type) {
         return recordA.type === RQAPI.RecordType.COLLECTION ? -1 : 1;
       }
 
-      // If types are the same, sort lexicographically by name
-      if (recordA.name.toLowerCase() !== recordB.name.toLowerCase()) {
-        return recordA.name.toLowerCase() < recordB.name.toLowerCase() ? -1 : 1;
-      }
-
-      // If names are the same, sort by creation date
-      return recordA.createdTs - recordB.createdTs;
+      // For same type, use ranking manager to sort by rank
+      const aRank = apiRecordsRankingManager.getEffectiveRank(recordA);
+      const bRank = apiRecordsRankingManager.getEffectiveRank(recordB);
+      return apiRecordsRankingManager.compareFn(aRank, bRank);
     });
 };
 
