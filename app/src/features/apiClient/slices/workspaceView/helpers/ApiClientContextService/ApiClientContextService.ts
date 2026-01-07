@@ -36,6 +36,7 @@ import {
 import { EnvironmentEntity } from "features/apiClient/slices/environments/types";
 import { bufferActions, bufferSlice, bufferSyncMiddleware } from "features/apiClient/slices/buffer";
 import { erroredRecordsSlice, ErroredRecordsState } from "features/apiClient/slices/erroredRecords";
+import { runnerConfigReducer } from "features/apiClient/slices/runConfig/slice";
 import { getEntityDataFromTabSource, GetEntityDataFromTabSourceState } from "componentsV2/Tabs/slice";
 import { closeTab } from "componentsV2/Tabs/slice/thunks";
 import { groupBy, mapValues } from "lodash";
@@ -110,6 +111,7 @@ class ApiClientContextService {
         [environmentsSlice.name]: createEnvironmentsPersistedReducer(workspaceId || "null"),
         [erroredRecordsSlice.name]: erroredRecordsSlice.reducer,
         [bufferSlice.name]: bufferSlice.reducer,
+        runConfig: runnerConfigReducer,
       },
       middleware(getDefaultMiddleware) {
         return getDefaultMiddleware({

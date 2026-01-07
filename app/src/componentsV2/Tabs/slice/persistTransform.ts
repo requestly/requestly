@@ -49,6 +49,7 @@ function deserializeTab(serialized: TabStateSerialized): TabState | null {
       id: serialized.id,
       source,
       activeWorkflows: new Set(),
+      secondaryBufferIds: new Set(),
       modeConfig: serialized.modeConfig,
     };
   } catch (error) {

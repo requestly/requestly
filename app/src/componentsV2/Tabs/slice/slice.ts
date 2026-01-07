@@ -66,6 +66,9 @@ export const tabsSlice = createSlice({
       const tab = state.tabs.entities[tabId];
 
       if (tab) {
+        if (!tab.activeWorkflows) {
+          tab.activeWorkflows = new Set();
+        }
         tab.activeWorkflows.add(workflow);
       }
     },
@@ -75,7 +78,46 @@ export const tabsSlice = createSlice({
       const tab = state.tabs.entities[tabId];
 
       if (tab) {
+        if (!tab.activeWorkflows) {
+          tab.activeWorkflows = new Set();
+        }
         tab.activeWorkflows.delete(workflow);
+      }
+    },
+
+    registerSecondaryBuffer(state, action: PayloadAction<{ tabId: TabId; bufferId: string }>) {
+      const { tabId, bufferId } = action.payload;
+      const tab = state.tabs.entities[tabId];
+
+      if (tab) {
+        if (!tab.secondaryBufferIds) {
+          tab.secondaryBufferIds = new Set();
+        }
+        tab.secondaryBufferIds.add(bufferId);
+      }
+    },
+
+    unregisterSecondaryBuffer(state, action: PayloadAction<{ tabId: TabId; bufferId: string }>) {
+      const { tabId, bufferId } = action.payload;
+      const tab = state.tabs.entities[tabId];
+
+      if (tab) {
+        if (!tab.secondaryBufferIds) {
+          tab.secondaryBufferIds = new Set();
+        }
+        tab.secondaryBufferIds.delete(bufferId);
+      }
+    },
+
+    clearSecondaryBuffers(state, action: PayloadAction<{ tabId: TabId }>) {
+      const { tabId } = action.payload;
+      const tab = state.tabs.entities[tabId];
+
+      if (tab) {
+        if (!tab.secondaryBufferIds) {
+          tab.secondaryBufferIds = new Set();
+        }
+        tab.secondaryBufferIds.clear();
       }
     },
 
@@ -144,6 +186,7 @@ export const tabsSlice = createSlice({
         source,
         modeConfig,
         activeWorkflows: new Set(),
+        secondaryBufferIds: new Set(),
       };
 
       if (preview) {
