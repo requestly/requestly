@@ -226,9 +226,6 @@ export const ContextualCollectionsList: React.FC<Props> = ({
                 )}
 
               {updatedRecords.requests.map((record, index) => {
-                const recordBefore = index > 0 ? updatedRecords.requests[index - 1] : null;
-                const recordAfter =
-                  index < updatedRecords.requests.length - 1 ? updatedRecords.requests[index + 1] : null;
                 return (
                   <RequestRow
                     key={record.id}
@@ -241,8 +238,6 @@ export const ContextualCollectionsList: React.FC<Props> = ({
                       setShowSelection: handleShowSelection,
                     }}
                     onItemClick={handleItemClick}
-                    previousRecord={recordBefore}
-                    nextRecord={recordAfter}
                     handleRecordsToBeDeleted={(records) => handleRecordsToBeDeleted(records, context)}
                   />
                 );
