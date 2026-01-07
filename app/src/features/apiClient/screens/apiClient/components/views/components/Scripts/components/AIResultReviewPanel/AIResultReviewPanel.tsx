@@ -10,6 +10,7 @@ import {
   trackAITestGenerationRejectAllClicked,
 } from "modules/analytics/events/features/apiClient";
 import "./aiResultReviewPanel.scss";
+import { useAISessionContext } from "features/ai/contexts/AISession";
 
 interface AIResultReviewPanelProps {
   onDiscard: () => void;
@@ -22,6 +23,8 @@ export const AIResultReviewPanel: React.FC<AIResultReviewPanelProps> = ({
   onAccept,
   onEditInstructions,
 }) => {
+  const { sessionId, generationId, endAISession } = useAISessionContext();
+
   return (
     <div className="ai-result-review-panel-container">
       <div className="ai-result-review-panel-content">
@@ -30,7 +33,7 @@ export const AIResultReviewPanel: React.FC<AIResultReviewPanelProps> = ({
           icon={<MdOutlineAutoAwesome />}
           onClick={() => {
             onEditInstructions();
-            trackAITestGenerationEditPromptClicked();
+            trackAITestGenerationEditPromptClicked(sessionId, generationId);
           }}
         >
           Edit prompt
@@ -42,7 +45,8 @@ export const AIResultReviewPanel: React.FC<AIResultReviewPanelProps> = ({
               icon={<MdClose />}
               onClick={() => {
                 onDiscard();
-                trackAITestGenerationRejectAllClicked();
+                trackAITestGenerationRejectAllClicked(sessionId, generationId);
+                endAISession();
               }}
             >
               Discard
@@ -55,7 +59,8 @@ export const AIResultReviewPanel: React.FC<AIResultReviewPanelProps> = ({
               icon={<MdCheck />}
               onClick={() => {
                 onAccept();
-                trackAITestGenerationAcceptAllClicked();
+                trackAITestGenerationAcceptAllClicked(sessionId, generationId);
+                endAISession();
               }}
             >
               Accept
