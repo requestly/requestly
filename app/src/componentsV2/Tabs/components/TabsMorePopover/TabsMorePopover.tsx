@@ -15,7 +15,7 @@ import {
   getTabBufferedEntity,
 } from "componentsV2/Tabs/slice";
 import { TabState, TabId } from "componentsV2/Tabs/slice/types";
-import { getIsBuffersDirty } from "componentsV2/Tabs/slice/utils";
+import { getIsTabDirty } from "componentsV2/Tabs/slice/utils";
 
 interface TabsMorePopoverProps {
   onTabItemClick: (id: TabId) => void;
@@ -132,13 +132,8 @@ export const TabsMorePopover: React.FC<TabsMorePopoverProps> = ({ onTabItemClick
 
   const unSavedTabsCount = useMemo(() => {
     return tabs.filter((tab) => {
-      if (tab.modeConfig.mode !== "buffer") {
-        return false;
-      }
-
       try {
-        const { primaryBuffer, secondaryBuffers } = getTabBufferedEntity(tab as BufferModeTab);
-        return getIsBuffersDirty({ primaryBuffer, secondaryBuffers });
+        return getIsTabDirty(tab);
       } catch {
         return false;
       }
