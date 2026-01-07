@@ -46,7 +46,6 @@ export const DraftRequestContainer: React.FC<{ draftId: string; apiEntryType: RQ
 
   const onSaveCallback = useCallback(
     (apiEntryDetails: RQAPI.ApiRecord) => {
-      debugger;
       updateTabSource(apiEntryDetails);
       setRequestViewState({
         isCreateMode: false,
@@ -59,7 +58,6 @@ export const DraftRequestContainer: React.FC<{ draftId: string; apiEntryType: RQ
   if (requestViewState.isCreateMode === true) {
     return <DraftRequestView onSaveCallback={onSaveCallback}/>;
   } else {
-    debugger;
     return <RequestView requestId={requestViewState.entryDetails.id}  />;
   }
 };

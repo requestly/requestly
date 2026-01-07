@@ -247,6 +247,7 @@ export const bufferSlice = createSlice({
       }
       entry.diff = {};
       entry.isDirty = false;
+      entry.isNew = false;
     },
 
     close(state, action: PayloadAction<string>) {
