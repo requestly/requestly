@@ -42,7 +42,7 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({ recordTo
       return;
     }
 
-    let record: RQAPI.ApiClientRecord = {
+    const record: RQAPI.ApiClientRecord = {
       ...recordToBeEdited,
       name: recordName,
     };
@@ -50,7 +50,7 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({ recordTo
     // If record doesn't have a rank, generate one using getEffectiveRank
     if (!record.rank) {
       const effectiveRank = apiRecordsRankingManager.getEffectiveRank(recordToBeEdited);
-      record = { ...record, rank: effectiveRank };
+      record.rank = effectiveRank;
     }
 
     const result =

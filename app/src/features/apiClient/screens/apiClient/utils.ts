@@ -36,6 +36,7 @@ import { NativeError } from "errors/NativeError";
 import { trackCollectionRunnerRecordLimitExceeded } from "modules/analytics/events/features/apiClient";
 import { getBoundary, parse as multipartParser } from "parse-multipart-data";
 import { apiRecordsRankingManager } from "features/apiClient/components/sidebar";
+import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 
 const createAbortError = (signal: AbortSignal) => {
   if (signal && signal.reason === AbortReason.USER_CANCELLED) {
@@ -537,7 +538,7 @@ export const createBlankApiRecord = (
   collectionId: string,
   apiClientRecordsRepository: ApiClientRecordsInterface<any>,
   entryType?: RQAPI.ApiEntryType,
-  allRecords?: RQAPI.ApiClientRecord[]
+  context?: ApiClientFeatureContext
 ) => {
   const newRecord: Partial<RQAPI.ApiClientRecord> = {};
 
@@ -548,11 +549,8 @@ export const createBlankApiRecord = (
     newRecord.deleted = false;
     newRecord.collectionId = collectionId;
 
-    if (allRecords && collectionId) {
-      const elementsInCollection = allRecords.filter((record) => record.collectionId === collectionId);
-      newRecord.rank = apiRecordsRankingManager.getNextRanks(elementsInCollection, [
-        newRecord as RQAPI.RecordMetadata,
-      ])[0];
+    if (context && collectionId) {
+      newRecord.rank = apiRecordsRankingManager.getRanksForNewApis(context, collectionId, [newRecord])[0];
     }
   }
 

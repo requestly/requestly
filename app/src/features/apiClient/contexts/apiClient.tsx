@@ -170,7 +170,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
           }
 
           setIsRecordBeingCreated(recordType);
-          return createBlankApiRecord(recordType, collectionId, recordsRepository, entryType, apiClientRecords).then(
+          return createBlankApiRecord(recordType, collectionId, recordsRepository, entryType, context).then(
             (result) => {
               setIsRecordBeingCreated(null);
               if (!result.success) {
@@ -198,7 +198,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
         case RQAPI.RecordType.COLLECTION: {
           setIsRecordBeingCreated(recordType);
           trackNewCollectionClicked(analyticEventSource);
-          return createBlankApiRecord(recordType, collectionId, recordsRepository, undefined, apiClientRecords)
+          return createBlankApiRecord(recordType, collectionId, recordsRepository, undefined, context)
             .then((result) => {
               setIsRecordBeingCreated(null);
               if (result.success) {

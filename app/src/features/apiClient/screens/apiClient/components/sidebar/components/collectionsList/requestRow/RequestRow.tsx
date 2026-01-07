@@ -88,9 +88,14 @@ export const RequestRow: React.FC<Props> = ({
 
   // Get siblings from parent collection
   const siblings = useChildren(record.collectionId || "");
-  const apiRecordSiblings = useMemo(() => siblings.filter((sibling) => sibling.type === RQAPI.RecordType.API), [
-    siblings,
-  ]);
+  const apiRecordSiblings = useMemo(
+    () =>
+      siblings.filter(
+        (sibling) => sibling.type === RQAPI.RecordType.API && sibling.collectionId === record.collectionId
+      ),
+    [siblings, record.collectionId]
+  );
+
   const { apiClientRecordsRepository } = useApiClientRepository();
   const { onSaveRecord } = useNewApiClientContext();
   const context = useApiClientFeatureContext();
