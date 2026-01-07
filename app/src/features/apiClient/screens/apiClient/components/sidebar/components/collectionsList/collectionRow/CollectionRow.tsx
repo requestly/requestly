@@ -354,10 +354,10 @@ export const CollectionRow: React.FC<Props> = ({
         }
 
         // Check if collection is collapsed
-        const isCollapsed = !expandedRecordIds.includes(record.id);
+        const IsTargetCollectionCollapsed = !expandedRecordIds.includes(record.id);
 
         // If collapsed and not already expanding, set timeout to expand
-        if (isCollapsed && !hoverExpandTimeoutRef.current) {
+        if (IsTargetCollectionCollapsed && !hoverExpandTimeoutRef.current) {
           hoverExpandTimeoutRef.current = setTimeout(() => {
             const newExpandedRecordIds = [...expandedRecordIds, record.id];
             setExpandedRecordIds(newExpandedRecordIds);
