@@ -7,6 +7,7 @@ import { enableMapSet } from "immer";
 import persistReducer from "redux-persist/es/persistReducer";
 import { tabsPersistTransform } from "./persistTransform";
 import storage from "redux-persist/lib/storage";
+import { EntityNotFound } from "features/apiClient/slices";
 
 enableMapSet();
 
@@ -65,60 +66,52 @@ export const tabsSlice = createSlice({
       const { tabId, workflow } = action.payload;
       const tab = state.tabs.entities[tabId];
 
-      if (tab) {
-        if (!tab.activeWorkflows) {
-          tab.activeWorkflows = new Set();
-        }
-        tab.activeWorkflows.add(workflow);
+      if (!tab) {
+        throw new EntityNotFound(tabId, "Tab");
       }
+
+      tab.activeWorkflows.add(workflow);
     },
 
     removeActiveWorkflow(state, action: PayloadAction<{ tabId: TabId; workflow: ActiveWorkflow }>) {
       const { tabId, workflow } = action.payload;
       const tab = state.tabs.entities[tabId];
 
-      if (tab) {
-        if (!tab.activeWorkflows) {
-          tab.activeWorkflows = new Set();
-        }
-        tab.activeWorkflows.delete(workflow);
+      if (!tab) {
+        return;
       }
+      tab.activeWorkflows.delete(workflow);
     },
 
     registerSecondaryBuffer(state, action: PayloadAction<{ tabId: TabId; bufferId: string }>) {
       const { tabId, bufferId } = action.payload;
       const tab = state.tabs.entities[tabId];
-
-      if (tab) {
-        if (!tab.secondaryBufferIds) {
-          tab.secondaryBufferIds = new Set();
-        }
-        tab.secondaryBufferIds.add(bufferId);
+      if (!tab) {
+        throw new EntityNotFound(tabId, "Tab");
       }
+
+      tab.secondaryBufferIds.add(bufferId);
     },
 
     unregisterSecondaryBuffer(state, action: PayloadAction<{ tabId: TabId; bufferId: string }>) {
       const { tabId, bufferId } = action.payload;
       const tab = state.tabs.entities[tabId];
 
-      if (tab) {
-        if (!tab.secondaryBufferIds) {
-          tab.secondaryBufferIds = new Set();
-        }
-        tab.secondaryBufferIds.delete(bufferId);
+      if (!tab) {
+        return;
       }
+
+      tab.secondaryBufferIds.delete(bufferId);
     },
 
     clearSecondaryBuffers(state, action: PayloadAction<{ tabId: TabId }>) {
       const { tabId } = action.payload;
       const tab = state.tabs.entities[tabId];
 
-      if (tab) {
-        if (!tab.secondaryBufferIds) {
-          tab.secondaryBufferIds = new Set();
-        }
-        tab.secondaryBufferIds.clear();
+      if (!tab) {
+        throw new EntityNotFound(tabId, "Tab");
       }
+      tab.secondaryBufferIds.clear();
     },
 
     updateTabModeConfig(
