@@ -296,6 +296,8 @@ export const TabsContainer: React.FC = () => {
                 emptyRecord: getEmptyDraftApiRecord(RQAPI.ApiEntryType.HTTP),
                 context: {},
               }),
+              isNew: true,
+              preview: false,
             });
           }
         }}
