@@ -18,9 +18,10 @@ import { Ok, Result, Try } from "utils/try";
 import { NativeError } from "errors/NativeError";
 import { WorkResult, WorkResultType } from "../modules/scriptsV2/workloadManager/workLoadTypes";
 import { BaseExecutionContext, ExecutionContext, ScriptExecutionContext } from "./scriptExecutionContext";
-import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 import { APIClientWorkloadManager } from "../modules/scriptsV2/workloadManager/APIClientWorkloadManager";
 import { BaseExecutionMetadata, IterationContext } from "../modules/scriptsV2/worker/script-internals/types";
+import { ApiClientFeatureContext, selectRecordById } from "features/apiClient/slices";
+import { ApiClientEntity, HttpRecordEntity } from "features/apiClient/slices/entities";
 
 enum RQErrorHeaderValue {
   DNS_RESOLUTION_ERROR = "ERR_NAME_NOT_RESOLVED",
@@ -98,6 +99,10 @@ export class HttpRequestExecutor {
     );
   }
 
+  private getEntry(entity: ApiClientEntity<RQAPI.HttpApiRecord>) {
+    return entity.getEntityFromState(this.ctx.store.getState()).data;
+  }
+
   private buildErrorObjectFromHeader(header: KeyValuePair): RQAPI.ExecutionError {
     switch (header.value) {
       case RQErrorHeaderValue.DNS_RESOLUTION_ERROR:
@@ -146,12 +151,12 @@ export class HttpRequestExecutor {
 
   async prepareRequestWithValidation(
     recordId: string,
-    entry: RQAPI.HttpApiEntry,
+    entity: HttpRecordEntity,
     scopes?: Scope[],
     executionContext?: ExecutionContext
   ): Promise<Result<PreparedRequest>> {
     const preparationResult = Try(() => {
-      const result = this.requestPreparer.prepareRequest(recordId, entry, scopes, executionContext);
+      const result = this.requestPreparer.prepareRequest(recordId, entity, scopes, executionContext);
       result.preparedEntry.response = null; // cannot do this in preparation as it would break other features. Preparation is also used in curl export, rerun etc.
       return result;
     });
@@ -179,7 +184,7 @@ export class HttpRequestExecutor {
 
   async execute(
     entryDetails: {
-      entry: RQAPI.HttpApiEntry;
+      entity: HttpRecordEntity;
       recordId: string;
     },
     iterationContext: IterationContext,
@@ -189,14 +194,14 @@ export class HttpRequestExecutor {
       executionContext?: ExecutionContext;
     }
   ): Promise<RQAPI.ExecutionResult> {
-    const { entry, recordId } = entryDetails;
+    const { entity, recordId } = entryDetails;
     const { abortController, scopes, executionContext } = executionConfig ?? {};
 
     this.abortController = abortController || new AbortController();
 
     const preparationResult = (
-      await this.prepareRequestWithValidation(recordId, entry, scopes, executionContext)
-    ).mapError((error) => new ExecutionError(entry, error));
+      await this.prepareRequestWithValidation(recordId, entity, scopes, executionContext)
+    ).mapError((error) => new ExecutionError(this.getEntry(entity), error));
 
     if (preparationResult.isError()) {
       return preparationResult.unwrapError().result;
@@ -204,7 +209,7 @@ export class HttpRequestExecutor {
 
     let { preparedEntry, renderedVariables } = preparationResult.unwrap();
 
-    const recordName = this.ctx.stores.records.getState().getData(recordId)?.name ?? "";
+    const recordName = selectRecordById(this.ctx.store.getState(), recordId)?.name ?? "";
     const scriptExecutionContext = new ScriptExecutionContext(
       this.ctx,
       recordId,
@@ -258,11 +263,11 @@ export class HttpRequestExecutor {
       const rePreparationResult = (
         await this.prepareRequestWithValidation(
           recordId,
-          entry,
+          entity,
           scopes,
           scriptExecutionContext.getContext() // Pass execution context to use runtime-modified variables
         )
-      ).mapError((error) => new ExecutionError(entry, error));
+      ).mapError((error) => new ExecutionError(this.getEntry(entity), error));
 
       if (rePreparationResult.isError()) {
         return rePreparationResult.unwrapError().result;
@@ -361,13 +366,14 @@ export class HttpRequestExecutor {
     return executionResult;
   }
 
-  async rerun(recordId: string, entry: RQAPI.HttpApiEntry): Promise<RQAPI.RerunResult> {
+  async rerun(recordId: string, entity: ApiClientEntity<RQAPI.HttpApiRecord>): Promise<RQAPI.RerunResult> {
     this.abortController = new AbortController();
-
+    const entry = this.getEntry(entity);
     const executionContext = new ScriptExecutionContext(this.ctx, recordId, entry);
+    const recordName = selectRecordById(this.ctx.store.getState(), recordId)?.name ?? "";
     const executionMetadata: BaseExecutionMetadata = {
       requestId: recordId,
-      requestName: this.ctx.stores.records.getState().getData(recordId)?.name ?? "",
+      requestName: recordName,
       iterationContext: { iteration: 0, iterationCount: 1 },
     };
     const scriptExecutor = new HttpRequestScriptExecutionService(

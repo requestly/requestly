@@ -6,27 +6,27 @@ import { BottomSheetProvider } from "componentsV2/BottomSheet";
 import "../apiClient.scss";
 import { BottomSheetFeatureContext } from "componentsV2/BottomSheet/types";
 import { AISessionProvider } from "features/ai/contexts/AISession";
+import { BufferedGraphQLRecordEntity, BufferedHttpRecordEntity } from "features/apiClient/slices/entities";
+import { HttpClientViewProps } from "../components/views/http/HttpClientView";
 
 type Props = {
-  apiEntryDetails: RQAPI.ApiRecord;
-  onSaveCallback: (apiEntryDetails: RQAPI.ApiRecord) => void;
+  entity: BufferedHttpRecordEntity | BufferedGraphQLRecordEntity,
+  override?: HttpClientViewProps['override'],
   handleAppRequestFinished: (entry: RQAPI.ApiEntry) => void;
-  isCreateMode: boolean;
   isOpenInModal?: boolean;
 };
 
 export const GenericApiClient: React.FC<Props> = React.memo(
-  ({ apiEntryDetails, onSaveCallback, handleAppRequestFinished, isCreateMode, isOpenInModal = false }) => {
+  ({ entity, override, handleAppRequestFinished, isOpenInModal = false }) => {
     return (
       <BottomSheetProvider context={BottomSheetFeatureContext.API_CLIENT}>
         <div className="api-client-container-content">
           <AutogenerateProvider>
             <AISessionProvider>
               <ClientViewFactory
-                apiRecord={apiEntryDetails}
+                entity={entity}
                 handleRequestFinished={handleAppRequestFinished}
-                onSaveCallback={onSaveCallback}
-                isCreateMode={isCreateMode}
+                override={override}
                 isOpenInModal={isOpenInModal}
               />
             </AISessionProvider>

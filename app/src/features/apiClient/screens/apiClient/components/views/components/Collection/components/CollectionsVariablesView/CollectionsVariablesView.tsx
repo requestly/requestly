@@ -4,8 +4,12 @@ import { VariablesListHeader } from "features/apiClient/screens/environment/comp
 import { toast } from "utils/Toast";
 import { trackVariablesSaved } from "modules/analytics/events/features/apiClient";
 import "./collectionsVariablesView.scss";
-import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
-import { useBufferedCollectionEntity, useIsBufferDirty } from "features/apiClient/slices/entities/hooks";
+import { useApiClientDispatch, useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
+import {
+  useBufferedCollectionEntity,
+  useIsBufferDirty,
+} from "features/apiClient/slices/entities/hooks";
+import { useApiClientRepository } from "features/apiClient/slices/workspaceView/helpers/ApiClientContextRegistry";
 import { CollectionsVariablesList } from "../CollectionsVariablesList";
 import type { ApiClientRootState } from "features/apiClient/slices/hooks/types";
 import { useSaveBuffer } from "features/apiClient/slices/buffer/hooks";
