@@ -137,10 +137,6 @@ export const CollectionRow: React.FC<Props> = ({
     }
   }, [activeTabSource]);
 
-  const apiRecords = useMemo(() => {
-    return (record.data.children?.filter((child) => child.type === RQAPI.RecordType.API) as RQAPI.ApiRecord[]) || [];
-  }, [record.data.children]);
-
   const getCollectionOptions = useCallback(
     (record: RQAPI.CollectionRecord) => {
       const items: MenuProps["items"] = [
@@ -596,9 +592,6 @@ export const CollectionRow: React.FC<Props> = ({
                   ) : (
                     record.data.children?.map((apiRecord, index) => {
                       if (apiRecord.type === RQAPI.RecordType.API) {
-                        const apiIndex = apiRecords.findIndex((r) => r.id === apiRecord.id);
-                        const recordBefore = apiIndex > 0 ? apiRecords[apiIndex - 1] : null;
-                        const recordAfter = apiIndex < apiRecords.length - 1 ? apiRecords[apiIndex + 1] : null;
                         return (
                           <RequestRow
                             isReadOnly={isReadOnly}
@@ -606,8 +599,6 @@ export const CollectionRow: React.FC<Props> = ({
                             record={apiRecord}
                             bulkActionOptions={bulkActionOptions}
                             handleRecordsToBeDeleted={handleRecordsToBeDeleted}
-                            previousRecord={recordBefore as RQAPI.ApiRecord | null}
-                            nextRecord={recordAfter as RQAPI.ApiRecord | null}
                             onItemClick={onItemClick}
                           />
                         );

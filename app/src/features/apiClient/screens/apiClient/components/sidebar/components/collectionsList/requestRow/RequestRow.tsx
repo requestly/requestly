@@ -27,6 +27,7 @@ import { GrGraphQl } from "@react-icons/all-files/gr/GrGraphQl";
 import { useContextId } from "features/apiClient/contexts/contextId.context";
 import { useApiClientRepository, useApiClientFeatureContext } from "features/apiClient/contexts/meta";
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
+import { useChildren } from "features/apiClient/hooks/useChildren.hook";
 import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 import { isGraphQLApiRecord, isHttpApiRecord } from "features/apiClient/screens/apiClient/utils";
 import { apiRecordsRankingManager } from "features/apiClient/components/sidebar";
@@ -43,8 +44,6 @@ interface Props {
   };
   handleRecordsToBeDeleted: (records: RQAPI.ApiClientRecord[], context?: ApiClientFeatureContext) => void;
   onItemClick?: (record: RQAPI.ApiClientRecord, event: React.MouseEvent) => void;
-  previousRecord?: RQAPI.ApiRecord | null;
-  nextRecord?: RQAPI.ApiRecord | null;
 }
 
 export const HttpMethodIcon = ({ method }: { method: RequestMethod }) => {
@@ -80,14 +79,17 @@ export const RequestRow: React.FC<Props> = ({
   bulkActionOptions,
   handleRecordsToBeDeleted,
   onItemClick,
-  previousRecord,
-  nextRecord,
 }) => {
   const { selectedRecords, showSelection, recordsSelectionHandler, setShowSelection } = bulkActionOptions || {};
   const [isEditMode, setIsEditMode] = useState(false);
   const [recordToMove, setRecordToMove] = useState<RQAPI.ApiRecord | null>(null);
   const [dropPosition, setDropPosition] = useState<"before" | "after" | null>(null);
 
+  // Get siblings from parent collection
+  const siblings = useChildren(record.collectionId || "");
+  const apiRecordSiblings = useMemo(() => siblings.filter((sibling) => sibling.type === RQAPI.RecordType.API), [
+    siblings,
+  ]);
   const { apiClientRecordsRepository } = useApiClientRepository();
   const { onSaveRecord } = useNewApiClientContext();
   const context = useApiClientFeatureContext();
@@ -151,8 +153,17 @@ export const RequestRow: React.FC<Props> = ({
         setDropPosition(null);
 
         try {
-          const before = currentDropPosition === "before" ? previousRecord ?? null : record;
-          const after = currentDropPosition === "after" ? nextRecord ?? null : record;
+          let before: RQAPI.ApiClientRecord | null = null;
+          let after: RQAPI.ApiClientRecord | null = null;
+          const recordIndex = apiRecordSiblings.findIndex((sibling) => sibling.id === record.id);
+
+          if (currentDropPosition === "before") {
+            before = record;
+            after = apiRecordSiblings[recordIndex - 1] || null;
+          } else if (currentDropPosition === "after") {
+            after = record;
+            before = apiRecordSiblings[recordIndex + 1] || null;
+          }
 
           const rank = apiRecordsRankingManager.getRanksBetweenRecords(before, after, [item.record])[0];
           const targetCollectionId = record.collectionId;
@@ -169,14 +180,14 @@ export const RequestRow: React.FC<Props> = ({
             saveOrUpdateRecord(context, result.data);
           }
         } catch (error) {
-          console.error("Failed to reorder request:", error);
+          toast.error("Error moving record");
         }
       },
       collect: (monitor) => ({
         isOverCurrent: monitor.isOver({ shallow: true }),
       }),
     }),
-    [record, contextId, previousRecord, nextRecord, dropPosition, apiClientRecordsRepository, context]
+    [record, contextId, dropPosition, apiClientRecordsRepository, context]
   );
 
   // Clear drop position when no longer hovering
