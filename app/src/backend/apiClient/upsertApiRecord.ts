@@ -66,7 +66,7 @@ const createApiRecord = async (
     createdTs: Timestamp.now().toMillis(),
     updatedTs: Timestamp.now().toMillis(),
   } as RQAPI.ApiClientRecord;
-  newRecord.rank = apiRecordsRankingManager.getEffectiveRank(newRecord);
+  newRecord.rank = apiRecordsRankingManager.getEffectiveRank(record);
 
   if (record.type === RQAPI.RecordType.COLLECTION) {
     newRecord.description = record.description || "";
