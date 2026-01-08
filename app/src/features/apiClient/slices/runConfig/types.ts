@@ -14,15 +14,13 @@ export interface RunnerConfigState {
   configs: EntityState<RunConfigEntity>;
 }
 
-export type RunDataFile = RQAPI.RunConfig["dataFile"];
-
 export interface RunConfigEntity {
   collectionId: RQAPI.CollectionRecord["id"];
   configId: string;
   runOrder: RQAPI.RunOrder;
   delay: number;
   iterations: number;
-  dataFile: RunDataFile | null;
+  dataFile: RQAPI.RunConfig["dataFile"];
   createdTs?: number;
   updatedTs?: number;
 }
