@@ -32,6 +32,8 @@ import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatu
 import { isGraphQLApiRecord, isHttpApiRecord } from "features/apiClient/screens/apiClient/utils";
 import { apiRecordsRankingManager } from "features/apiClient/components/sidebar";
 import { saveOrUpdateRecord } from "features/apiClient/commands/store.utils";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import FEATURES from "config/constants/sub/features";
 
 interface Props {
   record: RQAPI.ApiRecord;
@@ -135,6 +137,11 @@ export const RequestRow: React.FC<Props> = ({
           return;
         }
 
+        // Check if custom sorting feature is enabled
+        if (!isFeatureCompatible(FEATURES.API_CLIENT_CUSTOM_SORTING)) {
+          return;
+        }
+
         const hoverBoundingRect = monitor.getClientOffset();
         const targetElement = requestRowRef.current;
 
@@ -148,6 +155,12 @@ export const RequestRow: React.FC<Props> = ({
       },
       drop: async (item: { record: RQAPI.ApiClientRecord; contextId: string }, monitor) => {
         if (!monitor.isOver({ shallow: true })) {
+          setDropPosition(null);
+          return;
+        }
+
+        // Check if custom sorting feature is enabled
+        if (!isFeatureCompatible(FEATURES.API_CLIENT_CUSTOM_SORTING)) {
           setDropPosition(null);
           return;
         }

@@ -41,6 +41,8 @@ import { apiRecordsRankingManager } from "features/apiClient/components/sidebar"
 import { useChildren } from "features/apiClient/hooks/useChildren.hook";
 import { saveOrUpdateRecord } from "features/apiClient/commands/store.utils";
 import { useApiClientRepository } from "features/apiClient/contexts/meta";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import FEATURES from "config/constants/sub/features";
 
 export enum ExportType {
   REQUESTLY = "requestly",
@@ -424,10 +426,26 @@ export const CollectionRow: React.FC<Props> = ({
         const hoverClientY = pointer.y - rect.top;
         const hoverHeight = rect.bottom - rect.top;
 
-        if (record.collectionId === "") {
-          setDropPosition(null);
+        // Check if custom sorting feature is enabled and collection has a parent
+        const isCustomSortingEnabled = isFeatureCompatible(FEATURES.API_CLIENT_CUSTOM_SORTING);
+        const canReorderAssibling = isCustomSortingEnabled && record.collectionId !== "";
+
+        if (!canReorderAssibling) {
+          // If custom sorting is not enabled or collection has no parent, only allow "inside" drop
+          setDropPosition("inside");
+          const IsTargetCollectionCollapsed = !expandedRecordIds.includes(record.id);
+          if (IsTargetCollectionCollapsed && !hoverExpandTimeoutRef.current) {
+            hoverExpandTimeoutRef.current = setTimeout(() => {
+              const newExpandedRecordIds = [...expandedRecordIds, record.id];
+              setExpandedRecordIds(newExpandedRecordIds);
+              sessionStorage.setItem(SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY, newExpandedRecordIds);
+              hoverExpandTimeoutRef.current = null;
+            }, 600);
+          }
           return;
-        } else if (hoverClientY < hoverHeight * 0.25) {
+        }
+
+        if (hoverClientY < hoverHeight * 0.25) {
           setDropPosition("before");
           if (hoverExpandTimeoutRef.current) {
             clearTimeout(hoverExpandTimeoutRef.current);
