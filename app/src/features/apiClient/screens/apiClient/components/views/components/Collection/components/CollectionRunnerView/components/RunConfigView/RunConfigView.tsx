@@ -219,8 +219,7 @@ const RunCollectionButton: React.FC<{ disabled?: boolean }> = ({ disabled = fals
     apiClientDispatch(cancelRunThunk({ runContext }));
   }, [runContext, apiClientDispatch]);
 
-  // const isRunning = runStatus === RunStatus.RUNNING;
-  const isRunning = false;
+  const isRunning = runStatus === RunStatus.RUNNING;
   return isRunning ? (
     <RQButton
       disabled={disabled}
