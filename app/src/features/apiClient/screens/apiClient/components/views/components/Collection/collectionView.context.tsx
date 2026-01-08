@@ -3,13 +3,15 @@ import { RQAPI } from "features/apiClient/types";
 import { NativeError } from "errors/NativeError";
 import { OriginExists } from "features/apiClient/slices/entities/buffered/factory";
 import { BufferedRunConfigEntity } from "features/apiClient/slices/entities/buffered/runConfig";
-import { useBufferedEntity } from "features/apiClient/slices/entities/hooks";
+import { useBufferedEntity, useEntity } from "features/apiClient/slices/entities/hooks";
 import { ApiClientEntityType } from "features/apiClient/slices/entities/types";
 import { getRunnerConfigId } from "features/apiClient/slices/runConfig/utils";
+import { LiveRunResultEntity } from "features/apiClient/slices/entities";
 
 const CollectionViewContext = createContext<{
   collectionId: RQAPI.CollectionRecord["id"];
   bufferedEntity: OriginExists<BufferedRunConfigEntity>;
+  liveRunResultsEntity: LiveRunResultEntity;
 } | null>(null);
 
 export function useCollectionView() {
@@ -32,7 +34,16 @@ export const CollectionViewContextProvider: React.FC<{
     type: ApiClientEntityType.RUN_CONFIG,
   });
 
-  const value = useMemo(() => ({ collectionId, bufferedEntity }), [collectionId, bufferedEntity]);
+  const liveRunResultsEntity = useEntity({
+    id: getRunnerConfigId(collectionId, configId),
+    type: ApiClientEntityType.LIVE_RUN_RESULT,
+  });
+
+  const value = useMemo(() => ({ collectionId, bufferedEntity, liveRunResultsEntity }), [
+    collectionId,
+    liveRunResultsEntity,
+    bufferedEntity,
+  ]);
 
   return <CollectionViewContext.Provider value={value}>{children}</CollectionViewContext.Provider>;
 };

@@ -30,7 +30,7 @@ const initialState: LiveRunResultsSliceState = liveRunResultsAdapter.getInitialS
 
 export class InvalidLiveRunStateTransition extends NativeError {}
 
-const createEmptyRunEntry = (compositeId: CollectionRunCompositeId): LiveRunEntryState => ({
+export const createEmptyRunEntry = (compositeId: CollectionRunCompositeId): LiveRunEntryState => ({
   id: compositeId,
   startTime: null,
   endTime: null,
