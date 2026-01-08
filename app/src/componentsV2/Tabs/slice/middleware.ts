@@ -154,6 +154,10 @@ function handleOpenBufferedTab(action: ReturnType<typeof openBufferedTab>) {
 function closeBufferByTab(tab: TabState) {
   const apiClientStore = getApiClientStoreByTabSource(tab.source);
   apiClientStore.dispatch(bufferActions.close(tab.modeConfig.entityId));
+
+  tab.secondaryBufferIds.forEach((id) => {
+    apiClientStore.dispatch(bufferActions.close(id));
+  });
 }
 
 function handleCloseTabFulfilled(action: ReturnType<typeof closeTab.fulfilled>) {
