@@ -7,19 +7,17 @@ import * as Sentry from "@sentry/react";
  */
 export const wrapWithCustomSpan = <T, Args extends any[] = []>(
   options: Parameters<typeof Sentry.startSpan>[0],
-  callback: (...args: Args) => T,
-  forceTransaction: boolean = false
+  callback: (...args: Args) => T
 ) => {
   return (...args: Args) => {
     return Sentry.startSpan(
       {
         ...options,
-        forceTransaction,
       },
       (span) => {
         // Important to tag error with the current transaction for dashboarding
         // https://docs.sentry.io/platforms/javascript/enriching-events/transaction-name/
-        if (forceTransaction) {
+        if (options?.forceTransaction) {
           Sentry.getCurrentScope().setTransactionName(options.name);
         }
 

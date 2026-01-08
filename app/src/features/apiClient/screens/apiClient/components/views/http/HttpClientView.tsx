@@ -641,8 +641,7 @@ const HttpClientView: React.FC<Props> = ({
 
         setIsRequestSaving(false);
         endAISession();
-      },
-      true
+      }
     )();
     // Little bit weird syntax but we need to call function to actually execute the wrapped function
   }, [
