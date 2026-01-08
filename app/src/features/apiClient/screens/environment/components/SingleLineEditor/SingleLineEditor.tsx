@@ -52,11 +52,10 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
   }, [isPopoverPinned]);
 
   const handleMouseLeave = useCallback(() => {
-    if (!hoveredVariable) return;
     if (!isPopoverPinnedRef.current) {
       setHoveredVariable(null);
     }
-  }, [hoveredVariable]);
+  }, []);
 
   const handleSetVariable = useCallback(
     (variable: string | null) => {
