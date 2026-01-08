@@ -1,6 +1,5 @@
 import type { RQAPI } from "features/apiClient/types";
 import type { CollectionRunCompositeId } from "./types";
-import { RunStatus, HistorySaveStatus } from "./types";
 
 export const COLLECTION_RUN_ID_DELIMITER = "::" as const;
 
@@ -33,18 +32,3 @@ export function parseCollectionRunCompositeId(
 
   return { collectionId: collectionId as RQAPI.CollectionRecord["id"], configId };
 }
-
-export const RunStatusStateMachine = {
-  [RunStatus.IDLE]: [RunStatus.RUNNING],
-  [RunStatus.RUNNING]: [RunStatus.CANCELLED, RunStatus.COMPLETED, RunStatus.ERRORED],
-  [RunStatus.CANCELLED]: [RunStatus.IDLE],
-  [RunStatus.COMPLETED]: [RunStatus.IDLE],
-  [RunStatus.ERRORED]: [RunStatus.IDLE],
-} as const;
-
-export const HistorySaveStateMachine: Record<HistorySaveStatus, readonly HistorySaveStatus[]> = {
-  [HistorySaveStatus.IDLE]: [HistorySaveStatus.IDLE, HistorySaveStatus.SAVING],
-  [HistorySaveStatus.SAVING]: [HistorySaveStatus.IDLE, HistorySaveStatus.SUCCESS, HistorySaveStatus.FAILED],
-  [HistorySaveStatus.SUCCESS]: [HistorySaveStatus.IDLE],
-  [HistorySaveStatus.FAILED]: [HistorySaveStatus.IDLE],
-};
