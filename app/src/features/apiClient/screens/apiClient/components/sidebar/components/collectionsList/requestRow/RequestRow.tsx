@@ -30,7 +30,7 @@ import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClient
 import { useChildren } from "features/apiClient/hooks/useChildren.hook";
 import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 import { isGraphQLApiRecord, isHttpApiRecord } from "features/apiClient/screens/apiClient/utils";
-import { apiRecordsRankingManager } from "features/apiClient/components/sidebar";
+import { apiRecordsRankingManager } from "features/apiClient/helpers/RankingManager";
 import { saveOrUpdateRecord } from "features/apiClient/commands/store.utils";
 
 interface Props {
