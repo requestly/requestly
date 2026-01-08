@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo, useState, useRef, useEffect } from "react";
 import type { TableProps } from "antd";
+import { Tooltip } from "antd";
 import { ContentListTable } from "componentsV2/ContentList";
 import { MdAdd } from "@react-icons/all-files/md/MdAdd";
 import { RQButton } from "lib/design-system-v2/components";
@@ -231,15 +232,22 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
                 showDescription={isDescriptionVisible}
                 onToggleDescription={extraColumns.description.onToggle}
               />
-              <RQButton
-                size="small"
-                onClick={() => {
-                  setShowBulkEditPanel(!showBulkEditPanel);
-                }}
-                className="key-value-bulk-edit-button"
+              <Tooltip
+                title="Bulk edit params as key:value pairs"
+                color="#000000"
+                mouseEnterDelay={0.2}
+                overlayClassName="key-value-bulk-edit-tooltip"
               >
-                Bulk Edit
-              </RQButton>
+                <RQButton
+                  size="small"
+                  onClick={() => {
+                    setShowBulkEditPanel(!showBulkEditPanel);
+                  }}
+                  className="key-value-bulk-edit-button"
+                >
+                  Bulk edit
+                </RQButton>
+              </Tooltip>
             </div>
           ),
         render: (_: any, record: KeyValuePair) => {

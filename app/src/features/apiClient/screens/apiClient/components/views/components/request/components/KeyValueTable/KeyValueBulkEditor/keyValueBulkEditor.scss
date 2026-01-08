@@ -28,13 +28,32 @@
     overflow: hidden;
     padding: 0px 8px;
 
-    .cm-editor .cm-content {
-      color: #ffffff;
+    .react-resizable {
+      height: 100% !important;
+    }
+
+    .cm-editor {
+      .cm-content {
+        color: #ffffff;
+      }
+
+      .cm-placeholder {
+        color: var(--requestly-color-text-placeholder, #8f8f8f);
+      }
+
+      .cm-search {
+        font-size: 12px;
+
+        input,
+        button,
+        label {
+          font-size: 12px;
+        }
+      }
     }
   }
 
   .bulk-edit-panel-hint {
-    margin-top: 8px;
     font-size: 12px;
     padding: 8px;
     color: var(--requestly-color-text-tertiary, #8f8f8f);

@@ -109,7 +109,7 @@ export const KeyValueBulkEditor: React.FC<KeyValueBulkEditorProps> = ({
 
   // Sync from Table -> Editor
   useEffect(() => {
-    // Changing this flag allows the value inside the Editor to be changed by our formatter and chnages passed down from Table
+    // Changing this flag allows the value inside the Editor to be changed by our formatter and changes passed down from Table
     if (isInternalChange.current) {
       isInternalChange.current = false;
       lastSyncedText.current = formatKeyValueText(activeData);
@@ -152,6 +152,10 @@ export const KeyValueBulkEditor: React.FC<KeyValueBulkEditorProps> = ({
     [propsOnChange]
   );
 
+  const showHintPanel = editorValue.trim().length > 0;
+  const placeholderText =
+    "Add or edit params in key:value format\n- Separate each row by a new line\n- Add parameters separated by a colon (:)\n- Prepend // to any row to disable it";
+
   return (
     <div className="key-value-bulk-edit-panel">
       <div className="bulk-edit-panel-header">
@@ -171,13 +175,18 @@ export const KeyValueBulkEditor: React.FC<KeyValueBulkEditorProps> = ({
           handleChange={handleEditorChange}
           onEditorReady={handleEditorReady}
           customTheme={whiteTextTheme}
+          placeholder={placeholderText}
           hideToolbar
           hideCharacterCount
           autoFocus={true}
           disableDefaultAutoCompletions={true}
         />
       </div>
-      <div className="bulk-edit-panel-hint">{"Format: key:value | One row per line | Prepend // to disable a row"}</div>
+      {showHintPanel && (
+        <div className="bulk-edit-panel-hint">
+          {"Format: key:value | One row per line | Prepend // to disable a row"}
+        </div>
+      )}
     </div>
   );
 };
