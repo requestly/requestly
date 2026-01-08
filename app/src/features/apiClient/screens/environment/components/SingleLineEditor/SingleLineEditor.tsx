@@ -34,6 +34,7 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
   const onBlurRef = useRef(onBlur);
   const onChangeRef = useRef(onChange);
   const previousDefaultValueRef = useRef(defaultValue);
+  const isPopoverPinnedRef = useRef(false);
 
   const emptyVariables = useMemo(() => new Map(), []);
 
@@ -46,12 +47,16 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
   const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
   const [isPopoverPinned, setIsPopoverPinned] = useState(false);
 
+  useEffect(() => {
+    isPopoverPinnedRef.current = isPopoverPinned;
+  }, [isPopoverPinned]);
+
   const handleMouseLeave = useCallback(() => {
     if (!hoveredVariable) return;
-    if (!isPopoverPinned) {
+    if (!isPopoverPinnedRef.current) {
       setHoveredVariable(null);
     }
-  }, [isPopoverPinned, hoveredVariable]);
+  }, [hoveredVariable]);
 
   const handleSetVariable = useCallback(
     (variable: string | null) => {
@@ -65,6 +70,7 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
   );
 
   useEffect(() => {
+    console.log("Entire useeffect being called ffs");
     if (editorViewRef.current) {
       editorViewRef.current.destroy();
       editorViewRef.current = null;
