@@ -1,4 +1,13 @@
-import { RunOrder } from "./types";
+import { SavedRunConfig } from "features/apiClient/commands/collectionRunner/types";
+import {
+  DELAY_MAX_LIMIT,
+  DELAY_MIN,
+  ITERATIONS_MAX_LIMIT,
+  ITERATIONS_MIN,
+  RunConfigEntity,
+  RunnerConfigId,
+} from "./types";
+import type { RQAPI } from "features/apiClient/types";
 
 /**
  * Patches the runOrder by filtering out stale IDs and adding new ones
@@ -6,14 +15,14 @@ import { RunOrder } from "./types";
  * @param requestIds - Array of request IDs to patch with
  * @returns The patched run order
  */
-export const patchRunOrder = (currentRunOrder: RunOrder, requestIds: string[]): RunOrder => {
+export const patchRunOrder = (currentRunOrder: RQAPI.RunOrder, requestIds: string[]): RQAPI.RunOrder => {
   const incomingRequestSet = new Set(requestIds);
   // Remove stale ids from existing order
   const filteredRunOrder = currentRunOrder.filter((value) => incomingRequestSet.has(value.id));
   const filteredRunOrderIds = filteredRunOrder.map((value) => value.id);
 
   const filteredRunOrderSet = new Set(filteredRunOrderIds);
-  const patch: RunOrder = [];
+  const patch: RQAPI.RunOrder = [];
   for (const requestId of requestIds) {
     if (!filteredRunOrderSet.has(requestId)) {
       // Assuming all incoming requests are selected
@@ -22,4 +31,50 @@ export const patchRunOrder = (currentRunOrder: RunOrder, requestIds: string[]): 
   }
 
   return [...filteredRunOrder, ...patch];
+};
+
+export const getRunnerConfigId = (collectionId: string, configId: string): RunnerConfigId =>
+  `${collectionId}::${configId}`;
+
+export const parseRunnerConfigKey = (key: RunnerConfigId): { collectionId: string; configId: string } => {
+  const [collectionId, configId] = key.split("::");
+  if (!collectionId || !configId) {
+    throw new Error(`Invalid RunnerConfigId: ${key}`);
+  }
+  return { collectionId, configId };
+};
+
+export const isValidDelay = (delay: number): boolean => {
+  return Number.isInteger(delay) && delay >= DELAY_MIN && delay <= DELAY_MAX_LIMIT;
+};
+
+export const isValidIterations = (iterations: number): boolean => {
+  return Number.isInteger(iterations) && iterations >= ITERATIONS_MIN && iterations <= ITERATIONS_MAX_LIMIT;
+};
+
+export const toSavedRunConfig = (entity: RunConfigEntity): SavedRunConfig => {
+  return {
+    id: entity.configId, // Use just configId, not composite key
+    runOrder: entity.runOrder,
+    delay: entity.delay,
+    iterations: entity.iterations,
+    dataFile: entity.dataFile,
+  };
+};
+
+export const fromSavedRunConfig = (
+  collectionId: string,
+  saved: SavedRunConfig,
+  timestamps?: { createdTs?: number; updatedTs?: number }
+): RunConfigEntity => {
+  return {
+    collectionId,
+    configId: saved.id,
+    runOrder: saved.runOrder,
+    delay: saved.delay,
+    iterations: saved.iterations,
+    dataFile: saved.dataFile,
+    ...(timestamps?.createdTs && { createdTs: timestamps.createdTs }),
+    ...(timestamps?.updatedTs && { updatedTs: timestamps.updatedTs }),
+  };
 };
