@@ -112,7 +112,7 @@ export abstract class ListRankingManager<T> {
     const lastRecord = sortedRecords.length > 0 ? sortedRecords[sortedRecords.length - 1] : null;
 
     // Generate ranks after the last record (after = null means append at end)
-    const ranks = this.getRanksBetweenRecords(lastRecord, null, newRecords);
+    const ranks = this.getRanksBetweenRecords(null, lastRecord, newRecords);
 
     // Ensure we always return an array
     return ranks;
