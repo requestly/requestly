@@ -481,11 +481,7 @@ export const isApiCollection = (record: RQAPI.ApiClientRecord) => {
 
 const sortRecords = (records: RQAPI.ApiClientRecord[]) => {
   return records.sort((a, b) => {
-    // Sort by type first (collections before requests)
-    const typeComparison = a.type.localeCompare(b.type);
-    if (typeComparison !== 0) return typeComparison;
-
-    // If types are the same, use ranking manager to sort by rank
+    // use ranking manager to sort by rank
     const aRank = apiRecordsRankingManager.getEffectiveRank(a);
     const bRank = apiRecordsRankingManager.getEffectiveRank(b);
     return apiRecordsRankingManager.compareFn(aRank, bRank);
