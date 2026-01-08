@@ -543,7 +543,7 @@ const HttpClientView: React.FC<Props> = ({
   const onSaveButtonClick = useCallback(async () => {
     return wrapWithCustomSpan(
       {
-        name: "api_client.save",
+        name: "[Transaction] api_client.save",
         op: "api_client.save",
         forceTransaction: true,
         attributes: {
@@ -579,7 +579,7 @@ const HttpClientView: React.FC<Props> = ({
             placement: "bottomRight",
           });
           setIsRequestSaving(false);
-          Sentry.captureException(new Error("Invalid Auth Header"));
+          Sentry.captureException(new Error("Invalid Header or Auth Key"));
           Sentry.getActiveSpan()?.setStatus({
             code: SPAN_STATUS_ERROR,
             // message: "invalid_auth_header", // This somehow is breaking the status of the span on sentry. Comes as unknown if set
