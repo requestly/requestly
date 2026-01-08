@@ -3,8 +3,9 @@ import { EntityNotFound, UpdateCommand } from "../types";
 import { ApiClientEntityType } from "./types";
 import { ApiClientEntity, ApiClientEntityMeta } from "./base";
 import { runnerConfigActions, runConfigAdapter } from "../runConfig/slice";
-import { RunConfigEntity as RunConfigRecord, RunOrder, RunDataFile } from "../runConfig/types";
-import { apiClientFileStore } from "features/apiClient/store/apiClientFilesStore";
+import { RunConfigEntity as RunConfigRecord } from "../runConfig/types";
+import { ApiClientFile, apiClientFileStore, FileFeature } from "features/apiClient/store/apiClientFilesStore";
+import { RQAPI } from "features/apiClient/types";
 
 export class RunConfigEntity<M extends ApiClientEntityMeta = ApiClientEntityMeta> extends ApiClientEntity<
   RunConfigRecord,
@@ -50,7 +51,7 @@ export class RunConfigEntity<M extends ApiClientEntityMeta = ApiClientEntityMeta
     this.dispatchUnsafePatch(patcher);
   }
 
-  setRunOrder(runOrder: RunOrder): void {
+  setRunOrder(runOrder: RQAPI.RunOrder): void {
     this.unsafePatch((config) => {
       config.runOrder = runOrder;
     });
@@ -68,9 +69,19 @@ export class RunConfigEntity<M extends ApiClientEntityMeta = ApiClientEntityMeta
     });
   }
 
-  setDataFile(dataFile: RunDataFile | null): void {
+  setDataFile(dataFile: RunConfigRecord["dataFile"] & { id: string }): void {
     this.unsafePatch((config) => {
       config.dataFile = dataFile;
+
+      const apiClientFile: Omit<ApiClientFile, "isFileValid"> = {
+        name: dataFile.name,
+        path: dataFile.path,
+        source: dataFile.source,
+        size: dataFile.size,
+        fileFeature: FileFeature.COLLECTION_RUNNER,
+      };
+
+      apiClientFileStore.getState().addFile(dataFile.id, apiClientFile);
     });
   }
 
@@ -109,7 +120,7 @@ export class RunConfigEntity<M extends ApiClientEntityMeta = ApiClientEntityMeta
     this.dispatch(runnerConfigActions.removeConfig(this.id));
   }
 
-  getRunOrder(state: ApiClientStoreState): RunOrder {
+  getRunOrder(state: ApiClientStoreState): RQAPI.RunOrder {
     return this.getEntityFromState(state).runOrder;
   }
 
@@ -121,7 +132,7 @@ export class RunConfigEntity<M extends ApiClientEntityMeta = ApiClientEntityMeta
     return this.getEntityFromState(state).iterations;
   }
 
-  getDataFile(state: ApiClientStoreState): RunDataFile | null {
+  getDataFile(state: ApiClientStoreState) {
     return this.getEntityFromState(state).dataFile;
   }
 
