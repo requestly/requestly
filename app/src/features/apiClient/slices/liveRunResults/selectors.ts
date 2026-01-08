@@ -1,9 +1,8 @@
 import { createSelector } from "@reduxjs/toolkit";
 import { ApiClientStoreState } from "../workspaceView/helpers/ApiClientContextRegistry/types";
 import { liveRunResultsAdapter, LiveRunResultsSliceState } from "./slice";
-import { CollectionRunCompositeId } from "../common/runResults/types";
-import { LiveRunResultSummary } from "./types";
 import { EntityNotFound } from "../types";
+import type { RQAPI } from "features/apiClient/types";
 
 const selectLiveRunResultsSlice = (state: ApiClientStoreState): LiveRunResultsSliceState => state.liveRunResults;
 
@@ -15,62 +14,113 @@ export const selectAllLiveRunResults = adapterSelectors.selectAll;
 
 export const selectLiveRunResultEntities = adapterSelectors.selectEntities;
 
-export const makeSelectLiveRunResultById = () =>
+export const selectLiveRunResultByCollectionId = (
+  state: ApiClientStoreState,
+  collectionId: RQAPI.CollectionRecord["id"]
+) => {
+  return selectLiveRunResultEntities(state)[collectionId] ?? null;
+};
+
+export const selectLiveRunResultByCollectionAndConfig = (
+  state: ApiClientStoreState,
+  collectionId: RQAPI.CollectionRecord["id"],
+  configId?: string
+) => {
+  const entry = selectLiveRunResultEntities(state)[collectionId];
+
+  if (!entry) return null;
+
+  if (configId && entry.configId !== configId) {
+    return null;
+  }
+
+  return entry;
+};
+
+export const selectLiveRunResultsByConfigId = createSelector(
+  [selectAllLiveRunResults, (_state: ApiClientStoreState, configId: string) => configId],
+  (allResults, configId) => {
+    return allResults.filter((result) => result.configId === configId);
+  }
+);
+
+export const makeSelectLiveRunResultByCollectionId = () =>
   createSelector(
-    [selectLiveRunResultEntities, (_state: ApiClientStoreState, id: CollectionRunCompositeId) => id],
-    (entities, id) => entities[id] ?? null
+    [
+      selectLiveRunResultEntities,
+      (_state: ApiClientStoreState, collectionId: RQAPI.CollectionRecord["id"]) => collectionId,
+    ],
+    (entities, collectionId) => entities[collectionId] ?? null
   );
 
 export const makeSelectLiveRunResultIterations = () =>
   createSelector(
-    [selectLiveRunResultEntities, (_state: ApiClientStoreState, id: CollectionRunCompositeId) => id],
-    (entities, id) => {
-      const entry = entities[id];
+    [
+      selectLiveRunResultEntities,
+      (_state: ApiClientStoreState, collectionId: RQAPI.CollectionRecord["id"]) => collectionId,
+    ],
+    (entities, collectionId) => {
+      const entry = entities[collectionId];
       return entry?.iterations ?? null;
     }
   );
 
 export const makeSelectLiveRunResultStartTime = () =>
   createSelector(
-    [selectLiveRunResultEntities, (_state: ApiClientStoreState, id: CollectionRunCompositeId) => id],
-    (entities, id) => {
-      const entry = entities[id];
+    [
+      selectLiveRunResultEntities,
+      (_state: ApiClientStoreState, collectionId: RQAPI.CollectionRecord["id"]) => collectionId,
+    ],
+    (entities, collectionId) => {
+      const entry = entities[collectionId];
       return entry?.startTime ?? null;
     }
   );
 
 export const makeSelectLiveRunResultRunStatus = () =>
   createSelector(
-    [selectLiveRunResultEntities, (_state: ApiClientStoreState, id: CollectionRunCompositeId) => id],
-    (entities, id) => {
-      const entry = entities[id];
+    [
+      selectLiveRunResultEntities,
+      (_state: ApiClientStoreState, collectionId: RQAPI.CollectionRecord["id"]) => collectionId,
+    ],
+    (entities, collectionId) => {
+      const entry = entities[collectionId];
       return entry?.runStatus ?? null;
     }
   );
 
 export const makeSelectLiveRunResultError = () =>
   createSelector(
-    [selectLiveRunResultEntities, (_state: ApiClientStoreState, id: CollectionRunCompositeId) => id],
-    (entities, id) => {
-      const entry = entities[id];
+    [
+      selectLiveRunResultEntities,
+      (_state: ApiClientStoreState, collectionId: RQAPI.CollectionRecord["id"]) => collectionId,
+    ],
+    (entities, collectionId) => {
+      const entry = entities[collectionId];
       return entry?.error ?? null;
     }
   );
 
 export const makeSelectLiveRunResultCurrentlyExecutingRequest = () =>
   createSelector(
-    [selectLiveRunResultEntities, (_state: ApiClientStoreState, id: CollectionRunCompositeId) => id],
-    (entities, id) => {
-      const entry = entities[id];
+    [
+      selectLiveRunResultEntities,
+      (_state: ApiClientStoreState, collectionId: RQAPI.CollectionRecord["id"]) => collectionId,
+    ],
+    (entities, collectionId) => {
+      const entry = entities[collectionId];
       return entry?.currentlyExecutingRequest ?? null;
     }
   );
 
 export const makeSelectLiveRunResultSummary = () =>
   createSelector(
-    [selectLiveRunResultEntities, (_state: ApiClientStoreState, id: CollectionRunCompositeId) => id],
-    (entities, id): LiveRunResultSummary | null => {
-      const entry = entities[id];
+    [
+      selectLiveRunResultEntities,
+      (_state: ApiClientStoreState, collectionId: RQAPI.CollectionRecord["id"]) => collectionId,
+    ],
+    (entities, collectionId) => {
+      const entry = entities[collectionId];
       if (!entry) return null;
 
       return {
@@ -83,42 +133,48 @@ export const makeSelectLiveRunResultSummary = () =>
   );
 
 // Simple selectors that can be used directly with useApiClientSelector
-export const selectLiveRunResultIterations = (state: ApiClientStoreState, id: CollectionRunCompositeId) => {
-  const entry = selectLiveRunResultEntities(state)[id];
+export const selectLiveRunResultIterations = (
+  state: ApiClientStoreState,
+  collectionId: RQAPI.CollectionRecord["id"]
+) => {
+  const entry = selectLiveRunResultEntities(state)[collectionId];
   return entry?.iterations ?? null;
 };
 
-export const selectLiveRunResultStartTime = (state: ApiClientStoreState, id: CollectionRunCompositeId) => {
-  const entry = selectLiveRunResultEntities(state)[id];
+export const selectLiveRunResultStartTime = (
+  state: ApiClientStoreState,
+  collectionId: RQAPI.CollectionRecord["id"]
+) => {
+  const entry = selectLiveRunResultEntities(state)[collectionId];
   return entry?.startTime ?? null;
 };
 
-export const selectLiveRunResultRunStatus = (state: ApiClientStoreState, id: CollectionRunCompositeId) => {
-  const entry = selectLiveRunResultEntities(state)[id];
+export const selectLiveRunResultRunStatus = (
+  state: ApiClientStoreState,
+  collectionId: RQAPI.CollectionRecord["id"]
+) => {
+  const entry = selectLiveRunResultEntities(state)[collectionId];
   return entry?.runStatus ?? null;
 };
 
-export const selectLiveRunResultError = (state: ApiClientStoreState, id: CollectionRunCompositeId) => {
-  const entry = selectLiveRunResultEntities(state)[id];
+export const selectLiveRunResultError = (state: ApiClientStoreState, collectionId: RQAPI.CollectionRecord["id"]) => {
+  const entry = selectLiveRunResultEntities(state)[collectionId];
   return entry?.error ?? null;
 };
 
 export const selectLiveRunResultCurrentlyExecutingRequest = (
   state: ApiClientStoreState,
-  id: CollectionRunCompositeId
+  collectionId: RQAPI.CollectionRecord["id"]
 ) => {
-  const entry = selectLiveRunResultEntities(state)[id];
+  const entry = selectLiveRunResultEntities(state)[collectionId];
   return entry?.currentlyExecutingRequest ?? null;
 };
 
-export const selectLiveRunResultSummary = (
-  state: ApiClientStoreState,
-  id: CollectionRunCompositeId
-): LiveRunResultSummary => {
-  const entry = selectLiveRunResultEntities(state)[id];
+export const selectLiveRunResultSummary = (state: ApiClientStoreState, collectionId: RQAPI.CollectionRecord["id"]) => {
+  const entry = selectLiveRunResultEntities(state)[collectionId];
 
   if (!entry) {
-    throw new EntityNotFound(id, "Live collection run result summary not found!");
+    throw new EntityNotFound(collectionId, "Live collection run result summary not found!");
   }
 
   return {
@@ -127,4 +183,9 @@ export const selectLiveRunResultSummary = (
     runStatus: entry.runStatus,
     iterations: entry.iterations,
   };
+};
+
+export const selectLiveRunResultConfigId = (state: ApiClientStoreState, collectionId: RQAPI.CollectionRecord["id"]) => {
+  const entry = selectLiveRunResultEntities(state)[collectionId];
+  return entry?.configId ?? null;
 };

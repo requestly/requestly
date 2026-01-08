@@ -3,6 +3,7 @@ import { BatchRequestExecutor } from "features/apiClient/helpers/batchRequestExe
 import {
   CurrentlyExecutingRequest,
   RequestExecutionResult,
+  RunResult,
 } from "features/apiClient/store/collectionRunResult/runResult.store";
 import { isHTTPApiEntry, parseCollectionRunnerDataFile } from "features/apiClient/screens/apiClient/utils";
 import { NativeError } from "errors/NativeError";
@@ -25,7 +26,7 @@ import { tabsActions } from "componentsV2/Tabs/slice";
 import { getAppMode } from "store/selectors";
 import { RunContext } from "../thunks";
 import { liveRunResultsActions } from "../../liveRunResults/slice";
-import { createCollectionRunCompositeId } from "../../common/runResults/utils";
+
 import { runHistoryActions } from "../../runHistory/slice";
 import { HistorySaveStatus, RunHistoryEntry } from "../../runHistory/types";
 import { selectLiveRunResultSummary } from "../../liveRunResults/selectors";
@@ -88,7 +89,8 @@ class Runner {
   private activeWorkflow: ActiveWorkflow | null = null;
   private workflowPromiseResolve: (() => void) | null = null;
   private workflowPromiseReject: (() => void) | null = null;
-  private id: string;
+  private collectionId: RQAPI.CollectionRecord["id"];
+  private configId: string;
 
   constructor(
     readonly ctx: ApiClientFeatureContext,
@@ -99,7 +101,8 @@ class Runner {
     const { runConfigEntity } = this.runContext;
     const runConfig = runConfigEntity.getEntityFromState(this.ctx.store.getState());
     const { collectionId, configId } = runConfig;
-    this.id = createCollectionRunCompositeId(collectionId, configId);
+    this.collectionId = collectionId;
+    this.configId = configId;
   }
 
   private get abortController() {
@@ -166,7 +169,12 @@ class Runner {
     const { runConfigEntity } = this.runContext;
     const runConfig = runConfigEntity.getEntityFromState(this.ctx.store.getState());
 
-    this.ctx.store.dispatch(liveRunResultsActions.startRun({ id: this.id }));
+    this.ctx.store.dispatch(
+      liveRunResultsActions.startRun({
+        collectionId: this.collectionId,
+        configId: this.configId,
+      })
+    );
 
     // Reset history save status to IDLE
     this.ctx.store.dispatch(
@@ -238,7 +246,7 @@ class Runner {
 
     this.ctx.store.dispatch(
       liveRunResultsActions.setCurrentlyExecutingRequest({
-        id: this.id,
+        collectionId: this.collectionId,
         request: currentExecutingRequest,
       })
     );
@@ -254,7 +262,7 @@ class Runner {
 
     this.ctx.store.dispatch(
       liveRunResultsActions.setCurrentlyExecutingRequest({
-        id: this.id,
+        collectionId: this.collectionId,
         request: null,
       })
     );
@@ -266,7 +274,7 @@ class Runner {
 
     this.ctx.store.dispatch(
       liveRunResultsActions.addIterationResult({
-        id: this.id,
+        collectionId: this.collectionId,
         result: executionResult,
       })
     );
@@ -279,7 +287,7 @@ class Runner {
 
     this.ctx.store.dispatch(
       liveRunResultsActions.finalizeRun({
-        id: this.id,
+        collectionId: this.collectionId,
         status: RunStatus.COMPLETED,
         endTime: Date.now(),
       })
@@ -287,18 +295,27 @@ class Runner {
 
     // Get the run summary from liveRunResults
     const state = this.ctx.store.getState();
-    const summary = selectLiveRunResultSummary(state, this.id);
+    const summary = selectLiveRunResultSummary(state, this.collectionId);
 
-    const runResult: RunHistoryEntry = {
-      collectionId,
-      startTime: summary.startTime,
-      endTime: summary.endTime,
-      runStatus: summary.runStatus,
+    // Create RunResult for API (with Map)
+    const runResult: RunResult = {
+      startTime: summary.startTime!,
+      endTime: summary.endTime!,
+      runStatus: summary.runStatus as RunStatus.COMPLETED | RunStatus.CANCELLED,
       iterations: summary.iterations,
     };
 
+    // Convert Map to Array for history store
+    const iterationsArray = Array.from(summary.iterations.values());
+    const runHistoryEntry: RunHistoryEntry = {
+      startTime: summary.startTime!,
+      endTime: summary.endTime!,
+      runStatus: summary.runStatus as RunStatus.COMPLETED | RunStatus.CANCELLED,
+      iterations: iterationsArray,
+    };
+
     // Set history save status to SAVING
-    this.ctx.store.dispatch(runHistoryActions.addHistoryEntry({ collectionId, entry: runResult }));
+    this.ctx.store.dispatch(runHistoryActions.addHistoryEntry({ collectionId, entry: runHistoryEntry }));
 
     try {
       this.ctx.store.dispatch(
@@ -355,7 +372,7 @@ class Runner {
 
     this.ctx.store.dispatch(
       liveRunResultsActions.finalizeRun({
-        id: this.id,
+        collectionId: this.collectionId,
         error,
         status: RunStatus.CANCELLED,
         endTime: Date.now(),
@@ -366,7 +383,7 @@ class Runner {
   private onRunCancelled() {
     this.ctx.store.dispatch(
       liveRunResultsActions.finalizeRun({
-        id: this.id,
+        collectionId: this.collectionId,
         status: RunStatus.CANCELLED,
         endTime: Date.now(),
       })

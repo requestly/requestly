@@ -4,11 +4,10 @@ import type {
   IterationDetails,
   RunMetadata,
   Timestamp,
-  CollectionRunCompositeId,
   RunStatus,
 } from "../common/runResults/types";
 
-export type { CollectionRunCompositeId, RunStatus, RunMetadata, Timestamp };
+export type { RunStatus, RunMetadata, Timestamp };
 
 export type LiveIterationMap = Map<Iteration, IterationDetails>;
 
@@ -19,6 +18,6 @@ export type CurrentlyExecutingRequest =
     });
 
 export interface LiveRunResultSummary extends RunMetadata {
-  runStatus: RunStatus.COMPLETED | RunStatus.CANCELLED;
+  runStatus: RunStatus;
   iterations: LiveIterationMap;
 }
