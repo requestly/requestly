@@ -21,6 +21,7 @@ import { getAppMode } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { switchWorkspace } from "actions/TeamWorkspaceActions";
 import { NativeError } from "errors/NativeError";
+import { closeAllTabs } from "componentsV2/Tabs/slice";
 
 const SLICE_NAME = ReducerKeys.WORKSPACE_VIEW;
 
@@ -212,7 +213,13 @@ export const setupWorkspaceView = createAsyncThunk(
     }
 
     if (getViewMode(rootState) === ApiClientViewMode.SINGLE) {
-      const selectedWorkspace = selectedWorkspaces[0];
+      const selectedWorkspace = (() => {
+        const resurrected = selectedWorkspaces[0];
+        if(resurrected?.id === FAKE_LOGGED_OUT_WORKSPACE_ID) {
+          return;
+        }
+        return resurrected;
+      })();
       if (!selectedWorkspace) {
         const activeWorkspaceId = rootState.workspace.activeWorkspaceIds[0];
         const activeWorkspace = getWorkspaceById(activeWorkspaceId)(rootState);
@@ -288,7 +295,7 @@ export const setupWorkspaceView = createAsyncThunk(
 export const resetWorkspaceView = () => {
   return (dispatch: Dispatch, getState: () => RootState) => {
     apiClientContextRegistry.clearAll();
-    // getTabServiceActions().resetTabs(true);
+    reduxStore.dispatch(closeAllTabs({skipUnsavedPrompt: true}));
     dispatch(workspaceViewActions.reset());
   };
 };
