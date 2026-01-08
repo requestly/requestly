@@ -3,7 +3,7 @@ import { API_CLIENT_DOCS } from "features/apiClient/constants";
 import { getFileExtension } from "features/apiClient/screens/apiClient/utils";
 import { useBufferedEntity } from "features/apiClient/slices/entities/hooks";
 import { ApiClientEntityType } from "features/apiClient/slices/entities/types";
-import { DEFAULT_RUN_CONFIG_ID, getRunnerConfigId } from "features/apiClient/slices/runConfig/types";
+import { DEFAULT_RUN_CONFIG_ID } from "features/apiClient/slices/runConfig/types";
 import { FileFeature } from "features/apiClient/store/apiClientFilesStore";
 import { RQButton } from "lib/design-system-v2/components";
 import { RQModal } from "lib/design-system/components";
@@ -20,6 +20,7 @@ import { ErroredStateView } from "./ErroredStateView";
 import { LargeFileView } from "./LargeFileView";
 import { LoadingView } from "./LoadingView";
 import { WarningView } from "./WarningView";
+import { getRunnerConfigId } from "features/apiClient/slices/runConfig/utils";
 
 interface buttonSchema {
   label: string;

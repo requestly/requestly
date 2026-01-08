@@ -7,7 +7,6 @@ import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks
 import {
   DEFAULT_RUN_CONFIG_ID,
   DELAY_MAX_LIMIT,
-  getRunnerConfigId,
   ITERATIONS_MAX_LIMIT,
 } from "features/apiClient/slices/runConfig/types";
 import { toast } from "utils/Toast";
@@ -17,6 +16,7 @@ import { getAppMode } from "store/selectors";
 import { useSelector } from "react-redux";
 import { useBufferedEntity } from "features/apiClient/slices/entities/hooks";
 import { ApiClientEntityType } from "features/apiClient/slices/entities/types";
+import { getRunnerConfigId } from "features/apiClient/slices/runConfig/utils";
 
 export const RunConfigSettings: React.FC = () => {
   const appMode = useSelector(getAppMode);
