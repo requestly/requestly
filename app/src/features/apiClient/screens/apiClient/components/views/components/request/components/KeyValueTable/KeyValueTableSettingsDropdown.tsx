@@ -1,6 +1,6 @@
 import React from "react";
 import { Dropdown, Checkbox } from "antd";
-import { MdMoreHoriz } from "@react-icons/all-files/Md/MdMoreHoriz";
+import { MdMoreHoriz } from "@react-icons/all-files/md/MdMoreHoriz";
 import { RQButton } from "lib/design-system-v2/components";
 
 interface KeyValueTableSettingsDropdownProps {
