@@ -138,16 +138,24 @@ export type ApiRecordsState = {
    * calls mergeAndUpdate on the collectionVariables store of that collection
    */
   updateCollectionVariables: (variables: CollectionVariableMap) => void;
+
+  /**
+   * Gets the immediate children of a given collection
+   */
+
+  getDirectChildren: (id: string) => string[];
 };
+
+const getImmediateChildren = (id: string, childParentMap: Map<string, string>) =>
+  Array.from(childParentMap.entries())
+    .filter(([_, v]) => v === id)
+    .map(([k, _]) => k);
 
 export function getAllChildren(initalId: string, childParentMap: Map<string, string>) {
   const result: string[] = [];
-  const getImmediateChildren = (id: string) =>
-    Array.from(childParentMap.entries())
-      .filter(([_, v]) => v === id)
-      .map(([k, _]) => k);
+
   const parseRecursively = (id: string) => {
-    const children = getImmediateChildren(id);
+    const children = getImmediateChildren(id, childParentMap);
     result.push(...children);
     children.forEach(parseRecursively);
   };
@@ -409,5 +417,7 @@ export const createApiRecordsStore = (
     },
 
     getAllChildren: (id: string) => getAllChildren(id, get().childParentMap),
+
+    getDirectChildren: (id: string) => getImmediateChildren(id, get().childParentMap),
   }));
 };

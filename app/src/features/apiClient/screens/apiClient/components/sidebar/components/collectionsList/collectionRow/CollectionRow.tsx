@@ -37,7 +37,7 @@ import { PostmanExportModal } from "../../../../modals/postmanCollectionExportMo
 import { CollectionRecordState } from "features/apiClient/store/apiRecords/apiRecords.store";
 import { MdOutlineVideoLibrary } from "@react-icons/all-files/md/MdOutlineVideoLibrary";
 import { CollectionRowOptionsCustomEvent, dispatchCustomEvent } from "./utils";
-import { apiRecordsRankingManager } from "features/apiClient/components/sidebar";
+import { apiRecordsRankingManager } from "features/apiClient/helpers/RankingManager";
 import { useChildren } from "features/apiClient/hooks/useChildren.hook";
 import { saveOrUpdateRecord } from "features/apiClient/commands/store.utils";
 import { useApiClientRepository } from "features/apiClient/contexts/meta";

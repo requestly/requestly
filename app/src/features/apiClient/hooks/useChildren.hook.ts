@@ -4,7 +4,7 @@ import { Subscription } from "../helpers/apiClientTreeBus/subscription";
 import { ApiClientEventTopic } from "../helpers/apiClientTreeBus/types";
 import { RQAPI } from "../types";
 import { ApiClientFeatureContext } from "../store/apiClientFeatureContext/apiClientFeatureContext.store";
-import { apiRecordsRankingManager } from "../components/sidebar";
+import { apiRecordsRankingManager } from "../helpers/RankingManager";
 
 export const getAllChildrenRecords = (ctx: ApiClientFeatureContext, nodeId: string) => {
   const children = ctx.stores.records.getState().getAllChildren(nodeId);
@@ -26,6 +26,12 @@ export const getAllChildrenRecords = (ctx: ApiClientFeatureContext, nodeId: stri
       const bRank = apiRecordsRankingManager.getEffectiveRank(recordB);
       return apiRecordsRankingManager.compareFn(aRank, bRank);
     });
+};
+
+export const getImmediateChildrenRecords = (ctx: ApiClientFeatureContext, nodeId: string) => {
+  const children = ctx.stores.records.getState().getDirectChildren(nodeId);
+  const getRecord = ctx.stores.records.getState().getData;
+  return children.map((child) => getRecord(child)).filter((child) => !!child);
 };
 
 export const useChildren = (nodeId: string) => {
