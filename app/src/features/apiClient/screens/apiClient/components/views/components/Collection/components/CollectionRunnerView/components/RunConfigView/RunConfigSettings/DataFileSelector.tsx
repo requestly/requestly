@@ -4,10 +4,7 @@ import { MdOutlineInfo } from "@react-icons/all-files/md/MdOutlineInfo";
 import { MdOutlineRemoveRedEye } from "@react-icons/all-files/md/MdOutlineRemoveRedEye";
 import { RxCross2 } from "@react-icons/all-files/rx/RxCross2";
 import { getFileExtension, truncateString } from "features/apiClient/screens/apiClient/utils";
-import { useBufferedEntity } from "features/apiClient/slices/entities/hooks";
-import { ApiClientEntityType } from "features/apiClient/slices/entities/types";
 import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
-import { DEFAULT_RUN_CONFIG_ID } from "features/apiClient/slices/runConfig/types";
 import { useApiClientFileStore } from "features/apiClient/store/apiClientFilesStore";
 import { RQButton, RQTooltip } from "lib/design-system-v2/components";
 import {
@@ -19,7 +16,6 @@ import { useCollectionView } from "../../../../../collectionView.context";
 import { useCollectionRunnerFileSelection } from "../hooks/useCollectionRunnerFileSelection.hook";
 import { DataFileModalViewMode, useDataFileModalContext } from "../ParseFileModal/Modals/DataFileModalContext";
 import { DataFileModalWrapper } from "../ParseFileModal/Modals/DataFileModalWrapper";
-import { getRunnerConfigId } from "features/apiClient/slices/runConfig/utils";
 
 export const DataFileSelector: React.FC = () => {
   const {
@@ -31,12 +27,7 @@ export const DataFileSelector: React.FC = () => {
     setShowModal,
   } = useDataFileModalContext();
 
-  const { collectionId } = useCollectionView();
-
-  const bufferedEntity = useBufferedEntity({
-    id: getRunnerConfigId(collectionId, DEFAULT_RUN_CONFIG_ID),
-    type: ApiClientEntityType.RUN_CONFIG,
-  });
+  const { bufferedEntity } = useCollectionView();
 
   const dataFile = useApiClientSelector((state) => bufferedEntity.getDataFile(state));
 

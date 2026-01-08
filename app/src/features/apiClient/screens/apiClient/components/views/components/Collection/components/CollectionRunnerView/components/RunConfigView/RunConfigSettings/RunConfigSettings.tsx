@@ -4,28 +4,16 @@ import { RQTooltip } from "lib/design-system-v2/components";
 import { MdOutlineInfo } from "@react-icons/all-files/md/MdOutlineInfo";
 import { useCollectionView } from "../../../../../collectionView.context";
 import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
-import {
-  DEFAULT_RUN_CONFIG_ID,
-  DELAY_MAX_LIMIT,
-  ITERATIONS_MAX_LIMIT,
-} from "features/apiClient/slices/runConfig/types";
+import { DELAY_MAX_LIMIT, ITERATIONS_MAX_LIMIT } from "features/apiClient/slices/runConfig/types";
 import { toast } from "utils/Toast";
 import "./runConfigSettings.scss";
 import { DataFileSelector } from "./DataFileSelector";
 import { getAppMode } from "store/selectors";
 import { useSelector } from "react-redux";
-import { useBufferedEntity } from "features/apiClient/slices/entities/hooks";
-import { ApiClientEntityType } from "features/apiClient/slices/entities/types";
-import { getRunnerConfigId } from "features/apiClient/slices/runConfig/utils";
 
 export const RunConfigSettings: React.FC = () => {
   const appMode = useSelector(getAppMode);
-  const { collectionId } = useCollectionView();
-
-  const bufferedEntity = useBufferedEntity({
-    id: getRunnerConfigId(collectionId, DEFAULT_RUN_CONFIG_ID),
-    type: ApiClientEntityType.RUN_CONFIG,
-  });
+  const { bufferedEntity } = useCollectionView();
 
   const iterations = useApiClientSelector((state) => bufferedEntity.getIterations(state));
   const delay = useApiClientSelector((state) => bufferedEntity.getDelay(state));

@@ -14,10 +14,6 @@ function cleanupTabActiveWorkflows(tab: TabState) {
   });
 }
 
-function cleanupTabSecondaryBuffers(tab: TabState) {
-  reduxStore.dispatch(tabsActions.clearSecondaryBuffers({ tabId: tab.id }));
-}
-
 export const closeTab = createAsyncThunk<
   { tab: TabState } | void,
   { tabId: TabId; skipUnsavedPrompt?: boolean },
@@ -41,9 +37,6 @@ export const closeTab = createAsyncThunk<
       cleanupTabActiveWorkflows(tab);
     }
   }
-
-  // Clear secondary buffers before closing
-  cleanupTabSecondaryBuffers(tab);
 
   dispatch(tabsActions.closeTab(tabId));
   return { tab };
