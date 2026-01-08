@@ -143,8 +143,8 @@ const RunConfigSaveButton: React.FC<{ disabled?: boolean; isRunnerTabActive: boo
 };
 
 const RunCollectionButton: React.FC<{ disabled?: boolean }> = ({ disabled = false }) => {
-  const { collectionId } = useCollectionView();
-  // const [runStatus] = useRunResultStore((s) => [s.runStatus]);
+  const { collectionId, liveRunResultsEntity } = useCollectionView();
+  const runStatus = useApiClientSelector((state) => liveRunResultsEntity.getRunStatus(state));
 
   const dispatch = useDispatch();
   const apiClientDispatch = useApiClientDispatch();
@@ -206,8 +206,7 @@ const RunCollectionButton: React.FC<{ disabled?: boolean }> = ({ disabled = fals
     apiClientDispatch(cancelRunThunk({ runContext }));
   }, [runContext, apiClientDispatch]);
 
-  // const isRunning = runStatus === RunStatus.RUNNING;
-  const isRunning = false;
+  const isRunning = runStatus === RunStatus.RUNNING;
   return isRunning ? (
     <RQButton
       disabled={disabled}

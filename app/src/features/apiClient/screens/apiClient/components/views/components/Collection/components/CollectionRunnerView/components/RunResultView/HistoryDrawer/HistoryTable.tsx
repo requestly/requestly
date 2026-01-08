@@ -1,18 +1,24 @@
-import React, { useMemo } from "react";
 import { Skeleton, Table } from "antd";
-import "./historyTable.scss";
-import { useRunResultStore } from "../../../run.context";
-import { getAllTestSummary, getRunMetrics } from "features/apiClient/store/collectionRunResult/utils";
+import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
+import { useCollectionHistory } from "features/apiClient/slices/runHistory";
 import { LiveRunResult, RunResult, RunStatus } from "features/apiClient/store/collectionRunResult/runResult.store";
+import { getAllTestSummary, getRunMetrics } from "features/apiClient/store/collectionRunResult/utils";
+import React, { useMemo } from "react";
+import { useCollectionView } from "../../../../../collectionView.context";
 import { EmptyState } from "../../EmptyState/EmptyState";
 import { getFormattedStartTime, getFormattedTime } from "../utils";
+import "./historyTable.scss";
 
 const LoadingSkeleton: React.FC = () => <Skeleton.Button className="history-row-skeleton" shape="round" size="small" />;
 
 export const HistoryTable: React.FC<{ onHistoryClick: (result: RunResult) => void }> = ({ onHistoryClick }) => {
-  const [runStatus, runStartTime] = useRunResultStore((s) => [s.runStatus, s.startTime]);
+  const { liveRunResultsEntity, collectionId } = useCollectionView();
 
-  const [history] = useRunResultStore((s) => [s.history]);
+  const runStatus = useApiClientSelector((s) => liveRunResultsEntity.getRunStatus(s));
+  const runStartTime = useApiClientSelector((s) => liveRunResultsEntity.getStartTime(s));
+
+  const history = useCollectionHistory(collectionId);
+
   const formattedHistory = useMemo(() => {
     const sortedHistory = [...history].sort((a, b) => (b.startTime ?? 0) - (a.startTime ?? 0));
     return sortedHistory;

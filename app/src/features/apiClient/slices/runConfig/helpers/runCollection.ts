@@ -290,7 +290,6 @@ class Runner {
     const summary = selectLiveRunResultSummary(state, this.id);
 
     const runResult: RunHistoryEntry = {
-      id: this.id,
       collectionId,
       startTime: summary.startTime,
       endTime: summary.endTime,

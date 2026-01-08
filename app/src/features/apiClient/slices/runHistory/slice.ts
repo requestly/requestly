@@ -7,21 +7,15 @@ import { API_CLIENT_RUN_HISTORY_SLICE_NAME } from "../common/constants";
 
 export const runHistoryAdapter = createEntityAdapter<RunHistoryEntry>({
   selectId: (entry) => entry.id,
-  sortComparer: (a, b) => (b.startTime || 0) - (a.startTime || 0),
+  sortComparer: (a, b) => (b.startTime || 0) - (a.startTime || 0), // Newest first
 });
 
 export type RunHistoryListStatus = "idle" | "loading" | "success" | "error";
-
-export interface RunHistoryPaginationState {
-  cursor: string | null;
-  hasMore: boolean;
-}
 
 export interface CollectionHistoryBucket {
   entries: EntityState<RunHistoryEntry>;
   status: RunHistoryListStatus;
   error: string | null;
-  pagination: RunHistoryPaginationState;
 }
 
 export interface RunHistorySliceState {
@@ -43,7 +37,6 @@ const createEmptyBucket = (): CollectionHistoryBucket => ({
   entries: runHistoryAdapter.getInitialState(),
   status: "idle",
   error: null,
-  pagination: { cursor: null, hasMore: true },
 });
 
 const ensureBucket = (
@@ -67,6 +60,7 @@ export const runHistorySlice = createSlice({
   name: API_CLIENT_RUN_HISTORY_SLICE_NAME,
   initialState,
   reducers: {
+    // Load history from API (replaces existing)
     loadHistoryRequested(state, action: PayloadAction<{ collectionId: RQAPI.CollectionRecord["id"] }>) {
       const bucket = ensureBucket(state, action.payload.collectionId);
       bucket.status = "loading";
@@ -78,27 +72,14 @@ export const runHistorySlice = createSlice({
       action: PayloadAction<{
         collectionId: RQAPI.CollectionRecord["id"];
         entries: RunHistoryEntry[];
-        pagination?: Partial<RunHistoryPaginationState>;
-        mergeStrategy?: "replace" | "append" | "prepend";
       }>
     ) {
-      const { collectionId, entries, pagination, mergeStrategy = "replace" } = action.payload;
+      const { collectionId, entries } = action.payload;
       const bucket = ensureBucket(state, collectionId);
 
-      if (mergeStrategy === "replace") {
-        runHistoryAdapter.setAll(bucket.entries, entries);
-      } else if (mergeStrategy === "prepend") {
-        runHistoryAdapter.upsertMany(bucket.entries, entries);
-      } else {
-        runHistoryAdapter.upsertMany(bucket.entries, entries);
-      }
-
+      runHistoryAdapter.setAll(bucket.entries, entries);
       bucket.status = "success";
       bucket.error = null;
-      bucket.pagination = {
-        cursor: pagination?.cursor ?? bucket.pagination.cursor,
-        hasMore: pagination?.hasMore ?? bucket.pagination.hasMore,
-      };
     },
 
     loadHistoryFailure(state, action: PayloadAction<{ collectionId: RQAPI.CollectionRecord["id"]; error: string }>) {
@@ -107,27 +88,34 @@ export const runHistorySlice = createSlice({
       bucket.error = action.payload.error;
     },
 
+    // Add single entry to history (like Zustand's addToHistory)
     addHistoryEntry(
       state,
       action: PayloadAction<{
         collectionId: RQAPI.CollectionRecord["id"];
         entry: RunHistoryEntry;
-        limit?: number;
       }>
     ) {
-      const { collectionId, entry, limit } = action.payload;
+      const { collectionId, entry } = action.payload;
       const bucket = ensureBucket(state, collectionId);
 
-      runHistoryAdapter.upsertOne(bucket.entries, entry);
-      bucket.status = "success";
-      bucket.error = null;
-
-      if (typeof limit === "number" && limit >= 0 && bucket.entries.ids.length > limit) {
-        const idsToRemove = bucket.entries.ids.slice(limit);
-        runHistoryAdapter.removeMany(bucket.entries, idsToRemove);
-      }
+      runHistoryAdapter.addOne(bucket.entries, entry);
     },
 
+    addHistoryEntries(
+      state,
+      action: PayloadAction<{
+        collectionId: RQAPI.CollectionRecord["id"];
+        entries: RunHistoryEntry[];
+      }>
+    ) {
+      const { collectionId, entries } = action.payload;
+      const bucket = ensureBucket(state, collectionId);
+
+      runHistoryAdapter.addMany(bucket.entries, entries);
+    },
+
+    // Remove old entries beyond a limit
     pruneHistory(state, action: PayloadAction<{ collectionId: RQAPI.CollectionRecord["id"]; keepLatest: number }>) {
       const { collectionId, keepLatest } = action.payload;
       if (keepLatest < 0) {
@@ -143,6 +131,16 @@ export const runHistorySlice = createSlice({
       runHistoryAdapter.removeMany(bucket.entries, idsToRemove);
     },
 
+    // Clear all history for a collection
+    clearHistory(state, action: PayloadAction<{ collectionId: RQAPI.CollectionRecord["id"] }>) {
+      const { collectionId } = action.payload;
+      const bucket = state.collections[collectionId];
+      if (bucket) {
+        runHistoryAdapter.removeAll(bucket.entries);
+      }
+    },
+
+    // History save status management (matches Zustand's setHistorySaveStatus)
     setHistorySaveStatus(state, action: PayloadAction<{ status: HistorySaveStatus; error?: string | null }>) {
       const { status, error } = action.payload;
       const allowedTransitions = HistorySaveStateMachine[state.historySaveStatus];

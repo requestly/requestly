@@ -2,11 +2,12 @@ import type { ApiClientStoreState } from "../workspaceView/helpers/ApiClientCont
 import { EntityNotFound, UpdateCommand } from "../types";
 import { ApiClientEntityType } from "./types";
 import { ApiClientEntity, ApiClientEntityMeta } from "./base";
-import { liveRunResultsActions, liveRunResultsAdapter } from "../liveRunResults/slice";
+import { createEmptyRunEntry, liveRunResultsActions, liveRunResultsAdapter } from "../liveRunResults/slice";
 import type {
   CollectionRunCompositeId,
   CurrentlyExecutingRequest,
   LiveIterationMap,
+  LiveRunResultSummary,
   RunMetadata,
   RunStatus,
   Timestamp,
@@ -18,7 +19,7 @@ export interface LiveRunResultRecord extends RunMetadata {
   iterations: LiveIterationMap;
   currentlyExecutingRequest: CurrentlyExecutingRequest;
   abortController: AbortController;
-  error: Error | null;
+  error: Error | undefined;
 }
 
 export class LiveRunResultEntity<M extends ApiClientEntityMeta = ApiClientEntityMeta> extends ApiClientEntity<
@@ -47,7 +48,8 @@ export class LiveRunResultEntity<M extends ApiClientEntityMeta = ApiClientEntity
 
     const result = liveRunResultsAdapter.getSelectors().selectById(liveRunResultsState, this.id);
     if (!result) {
-      throw new EntityNotFound(this.id, "live_run_result");
+      const entry = createEmptyRunEntry(this.id);
+      return entry;
     }
     return result;
   }
@@ -61,7 +63,7 @@ export class LiveRunResultEntity<M extends ApiClientEntityMeta = ApiClientEntity
   startRun(params?: { startTime?: Timestamp }): void {
     this.dispatch(
       liveRunResultsActions.startRun({
-        id: this.id as CollectionRunCompositeId,
+        id: this.id,
         startTime: params?.startTime,
       })
     );
@@ -70,7 +72,7 @@ export class LiveRunResultEntity<M extends ApiClientEntityMeta = ApiClientEntity
   setRunStatus(status: RunStatus, error?: Error | null): void {
     this.dispatch(
       liveRunResultsActions.setRunStatus({
-        id: this.id as CollectionRunCompositeId,
+        id: this.id,
         status,
         error,
       })
@@ -80,7 +82,7 @@ export class LiveRunResultEntity<M extends ApiClientEntityMeta = ApiClientEntity
   setCurrentlyExecutingRequest(request: CurrentlyExecutingRequest): void {
     this.dispatch(
       liveRunResultsActions.setCurrentlyExecutingRequest({
-        id: this.id as CollectionRunCompositeId,
+        id: this.id,
         request,
       })
     );
@@ -89,7 +91,7 @@ export class LiveRunResultEntity<M extends ApiClientEntityMeta = ApiClientEntity
   addIterationResult(result: RequestExecutionResult): void {
     this.dispatch(
       liveRunResultsActions.addIterationResult({
-        id: this.id as CollectionRunCompositeId,
+        id: this.id,
         result,
       })
     );
@@ -102,7 +104,7 @@ export class LiveRunResultEntity<M extends ApiClientEntityMeta = ApiClientEntity
   }): void {
     this.dispatch(
       liveRunResultsActions.finalizeRun({
-        id: this.id as CollectionRunCompositeId,
+        id: this.id,
         ...params,
       })
     );
@@ -111,7 +113,7 @@ export class LiveRunResultEntity<M extends ApiClientEntityMeta = ApiClientEntity
   resetRun(): void {
     this.dispatch(
       liveRunResultsActions.resetRun({
-        id: this.id as CollectionRunCompositeId,
+        id: this.id,
       })
     );
   }
@@ -119,7 +121,7 @@ export class LiveRunResultEntity<M extends ApiClientEntityMeta = ApiClientEntity
   cancelRun(params?: { reason?: Error; cancelledAt?: Timestamp }): void {
     this.dispatch(
       liveRunResultsActions.cancelRun({
-        id: this.id as CollectionRunCompositeId,
+        id: this.id,
         reason: params?.reason,
         cancelledAt: params?.cancelledAt,
       })
@@ -156,7 +158,7 @@ export class LiveRunResultEntity<M extends ApiClientEntityMeta = ApiClientEntity
     return this.getEntityFromState(state).abortController;
   }
 
-  getError(state: ApiClientStoreState): Error | null {
+  getError(state: ApiClientStoreState): Error | undefined {
     return this.getEntityFromState(state).error;
   }
 
@@ -202,5 +204,21 @@ export class LiveRunResultEntity<M extends ApiClientEntityMeta = ApiClientEntity
       total += iteration.result.length;
     });
     return total;
+  }
+
+  getRunSummary(state: ApiClientStoreState): LiveRunResultSummary {
+    try {
+      const entity = this.getEntityFromState(state);
+      return {
+        startTime: entity.startTime,
+        endTime: entity.endTime,
+        runStatus: entity.runStatus,
+        iterations: entity.iterations,
+      };
+    } catch (e) {
+      return {
+        iterations: new Map(),
+      };
+    }
   }
 }

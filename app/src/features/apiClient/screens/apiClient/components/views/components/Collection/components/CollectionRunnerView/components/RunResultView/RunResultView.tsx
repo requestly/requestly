@@ -1,7 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { RQButton } from "lib/design-system-v2/components";
 import { MdOutlineHistory } from "@react-icons/all-files/md/MdOutlineHistory";
-import { useRunConfigStore, useRunResultStore } from "../../run.context";
 import { RunResultContainer } from "./RunResultContainer/RunResultContainer";
 import { TestsRunningLoader } from "./TestsRunningLoader/TestsRunningLoader";
 import { HistorySaveStatus, RunStatus } from "features/apiClient/store/collectionRunResult/runResult.store";
@@ -12,25 +11,27 @@ import { trackCollectionRunHistoryViewed } from "modules/analytics/events/featur
 import { HistoryNotSavedBanner } from "./HistoryNotSavedBanner/HistoryNotSavedBanner";
 import { RenderableError } from "errors/RenderableError";
 import DefaultErrorComponent from "./errors/DefaultCollectionRunnerErrorComponent/DefaultCollectionRunnerErrorComponent";
+import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
+import { selectHistorySaveStatus } from "features/apiClient/slices/runHistory";
 
 export const RunResultView: React.FC = () => {
-  const [iterations, startTime, getRunSummary, runStatus, historySaveStatus, error] = useRunResultStore((s) => [
-    s.iterations,
-    s.startTime,
-    s.getRunSummary,
-    s.runStatus,
-    s.historySaveStatus,
-    s.error,
-  ]);
-  const [totalIterationCount] = useRunConfigStore((s) => [s.iterations]);
+  const { collectionId, bufferedEntity, liveRunResultsEntity } = useCollectionView();
+
+  const runSummary = useApiClientSelector((s) => liveRunResultsEntity.getRunSummary(s));
+  const iterations = useApiClientSelector((s) => liveRunResultsEntity.getIterationCount(s));
+  const startTime = useApiClientSelector((s) => liveRunResultsEntity.getStartTime(s));
+  const runStatus = useApiClientSelector((s) => liveRunResultsEntity.getRunStatus(s));
+  const historySaveStatus = useApiClientSelector((s) => selectHistorySaveStatus(s));
+  const error = useApiClientSelector((s) => liveRunResultsEntity.getError(s));
+
+  const totalIterationCount = useApiClientSelector((state) => bufferedEntity.getIterations(state));
 
   const testResults = useMemo(
-    () => getRunSummary(),
+    () => runSummary,
     // eslint-disable-next-line react-hooks/exhaustive-deps -- need `iterations` for reactivity
-    [getRunSummary, iterations]
+    [runSummary, iterations]
   );
 
-  const { collectionId } = useCollectionView();
   const [isHistoryDrawerOpen, setIsHistoryDrawerOpen] = useState(false);
 
   return (
