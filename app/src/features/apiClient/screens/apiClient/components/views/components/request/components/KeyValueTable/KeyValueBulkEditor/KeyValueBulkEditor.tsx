@@ -5,7 +5,7 @@ import Editor, { EditorLanguage } from "componentsV2/CodeEditor";
 import { KeyValuePair, KeyValueDataType } from "features/apiClient/types";
 import { RQButton } from "lib/design-system-v2/components";
 import { MdClose } from "@react-icons/all-files/md/MdClose";
-import "./KeyValueBulkEditor.scss";
+import "./keyValueBulkEditor.scss";
 
 type StoreHook = (selector: (state: any) => any) => any;
 
