@@ -28,7 +28,7 @@ export class ApiClientVariables<T, State = ApiClientStoreState> {
     });
   }
 
-  add(params: Omit<Variable, "id"> & { key: string; id?: string }) {
+  add(params: Omit<Variable, "id"> & { key: string; id?: string | number }) {
     const id = params.id ?? uuidv4();
     const { key, id: _id, ...variableData } = params;
     const variable: Variable = {
@@ -37,8 +37,14 @@ export class ApiClientVariables<T, State = ApiClientStoreState> {
     };
     this.unsafePatch((s) => {
       const variables = this.getVariableObject(s);
-      // lodash.extend(variables, {[key]: variable});
-      variables[key] = variable;
+      if(!variables[key]) {
+        variables[key] = variable;
+      } else {
+        variables[key] = {
+          ...variables[key],
+          ...variable,
+        }
+      }
     });
 
     return id;

@@ -126,7 +126,7 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
     type: 'bufferId',
     bufferId: entity.id,
   });
-  const collectionId = useApiClientSelector(s => entity.getCollectionId(s));
+  // const collectionId = useApiClientSelector(s => entity.getCollectionId(s));
   const url = useApiClientSelector(s => entity.getUrl(s));
   const contentType = useApiClientSelector(s => entity.getContentType(s));
   const method = useApiClientSelector(s => entity.getMethod(s));
@@ -136,7 +136,7 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
   const saveBuffer = useSaveBuffer();
 
 
-  const httpRequestExecutor = useHttpRequestExecutor(collectionId);
+  const httpRequestExecutor = useHttpRequestExecutor(entity.meta.referenceId);
 
   const handleGenerateTests = useCallback(async () => {
     const entry = getEntry(entity, store);
