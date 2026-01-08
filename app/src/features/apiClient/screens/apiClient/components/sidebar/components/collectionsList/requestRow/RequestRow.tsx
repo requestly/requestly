@@ -118,7 +118,7 @@ export const RequestRow: React.FC<Props> = ({
 
   const [{ isOverCurrent }, drop] = useDrop(
     () => ({
-      accept: [RQAPI.RecordType.API],
+      accept: [RQAPI.RecordType.API, RQAPI.RecordType.COLLECTION],
       canDrop: (item: { record: RQAPI.ApiClientRecord; contextId: string }) => {
         if (!item || item.contextId !== contextId) return false;
         if (item.record.id === record.id) return false;

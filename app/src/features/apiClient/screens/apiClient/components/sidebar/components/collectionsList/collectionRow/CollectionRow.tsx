@@ -38,7 +38,8 @@ import { CollectionRecordState } from "features/apiClient/store/apiRecords/apiRe
 import { MdOutlineVideoLibrary } from "@react-icons/all-files/md/MdOutlineVideoLibrary";
 import { CollectionRowOptionsCustomEvent, dispatchCustomEvent } from "./utils";
 import { apiRecordsRankingManager } from "features/apiClient/helpers/RankingManager";
-import { useChildren } from "features/apiClient/hooks/useChildren.hook";
+import { RecordData } from "features/apiClient/helpers/RankingManager/APIRecordsListRankingManager";
+import { getImmediateChildrenRecords } from "features/apiClient/hooks/useChildren.hook";
 import { saveOrUpdateRecord } from "features/apiClient/commands/store.utils";
 import { useApiClientRepository } from "features/apiClient/contexts/meta";
 
@@ -105,12 +106,6 @@ export const CollectionRow: React.FC<Props> = ({
   const context = useApiClientFeatureContext();
   const [openTab, activeTabSource] = useTabServiceWithSelector((state) => [state.openTab, state.activeTabSource]);
 
-  // Get siblings from parent collection for before/after positioning
-  const siblings = useChildren(record.collectionId || "");
-  const collectionSiblings = useMemo(() => siblings.filter((sibling) => sibling.collectionId === record.collectionId), [
-    siblings,
-    record.collectionId,
-  ]);
   const { apiClientRecordsRepository } = useApiClientRepository();
 
   const [getParentChain, getRecordStore] = useAPIRecords((state) => [state.getParentChain, state.getRecordStore]);
@@ -286,6 +281,11 @@ export const CollectionRow: React.FC<Props> = ({
         }
 
         if (currentDropPosition === "inside") {
+          // Prevent dropping inside the parent collection (would be a no-op)
+          if (item.record.collectionId === record.id) {
+            return;
+          }
+
           // Drop inside the collection (existing behavior)
           const existingChildren = record.data.children || [];
           const newRank = apiRecordsRankingManager.getNextRanks(existingChildren, [item.record])[0];
@@ -309,16 +309,19 @@ export const CollectionRow: React.FC<Props> = ({
           }
         } else if (currentDropPosition === "before" || currentDropPosition === "after") {
           // Drop before or after the collection (as a sibling)
-          let before: RQAPI.ApiClientRecord | null = null;
-          let after: RQAPI.ApiClientRecord | null = null;
-          const recordIndex = collectionSiblings.findIndex((sibling) => sibling.id === record.id);
+          const sortedSiblings = apiRecordsRankingManager.sort(
+            getImmediateChildrenRecords(context, record.collectionId ?? "")
+          );
+          let before: RecordData | null = null;
+          let after: RecordData | null = null;
+          const recordIndex = sortedSiblings.findIndex((sibling) => sibling.id === record.id);
 
           if (currentDropPosition === "before") {
             before = record;
-            after = collectionSiblings[recordIndex - 1] || null;
+            after = sortedSiblings[recordIndex - 1] || null;
           } else if (currentDropPosition === "after") {
             after = record;
-            before = collectionSiblings[recordIndex + 1] || null;
+            before = sortedSiblings[recordIndex + 1] || null;
           }
 
           const rank = apiRecordsRankingManager.getRanksBetweenRecords(before, after, [item.record])[0];
@@ -346,16 +349,12 @@ export const CollectionRow: React.FC<Props> = ({
         setIsCollectionRowLoading(false);
       }
     },
-    [record, expandedRecordIds, setExpandedRecordIds, collectionSiblings, apiClientRecordsRepository, context]
+    [record, expandedRecordIds, setExpandedRecordIds, apiClientRecordsRepository, context]
   );
 
   const checkCanDropItem = useCallback(
     (item: DraggableApiRecord): boolean => {
       if (item.record.id === record.id) {
-        return false;
-      }
-
-      if (item.record.collectionId === record.id) {
         return false;
       }
 
