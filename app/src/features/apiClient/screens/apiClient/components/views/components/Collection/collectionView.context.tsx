@@ -39,11 +39,10 @@ export const CollectionViewContextProvider: React.FC<{
     type: ApiClientEntityType.LIVE_RUN_RESULT,
   });
 
-  const value = useMemo(() => ({ collectionId, bufferedEntity, liveRunResultEntity }), [
-    collectionId,
-    liveRunResultEntity,
-    bufferedEntity,
-  ]);
+  const value = useMemo(
+    () => ({ collectionId, bufferedEntity, liveRunResultEntity }),
+    [collectionId, liveRunResultEntity, bufferedEntity]
+  );
 
   return <CollectionViewContext.Provider value={value}>{children}</CollectionViewContext.Provider>;
 };

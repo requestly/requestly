@@ -57,6 +57,7 @@ export const runHistorySlice = createSlice({
       runHistoryAdapter.updateOne(state, { id: collectionId, changes });
     },
 
+    // Add single entry to history (like Zustand's addToHistory)
     addHistoryEntry(
       state,
       action: PayloadAction<{
