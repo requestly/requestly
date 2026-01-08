@@ -7,7 +7,6 @@ import { ApiClientEntityType } from "./types";
 import { ApiClientEntityMeta } from "./base";
 import { supportsRequestBody } from "features/apiClient/screens/apiClient/utils";
 import { CONTENT_TYPE_HEADER } from "features/apiClient/constants";
-import { TestResult } from "@requestly/shared/types/entities/apiClient";
 import { v4 } from "uuid";
 
 export class HttpRecordEntity<M extends ApiClientEntityMeta = ApiClientEntityMeta> extends ApiClientRecordEntity<RQAPI.HttpApiRecord, M> {
@@ -67,9 +66,6 @@ export class HttpRecordEntity<M extends ApiClientEntityMeta = ApiClientEntityMet
     return this.getRequest(state).pathVariables;
   }
 
-  getTestResults(state: ApiClientStoreState) {
-    return this.getEntityFromState(state)?.data.testResults
-  }
 
   reconcilePathKeys(pathKeys: string[]) {
     this.unsafePatch((s) => {
@@ -139,10 +135,6 @@ export class HttpRecordEntity<M extends ApiClientEntityMeta = ApiClientEntityMet
         ...patch,
       }
     })
-  }
-
-  setTestResults(testResults?: TestResult[]): void {
-    this.SETCOMMON({ data: { testResults } });
   }
 
   setUrl(url: string): void {

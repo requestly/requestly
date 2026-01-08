@@ -44,7 +44,6 @@ import { KEYBOARD_SHORTCUTS } from "../../../../../../../constants/keyboardShort
 import { useDeepLinkState } from "hooks";
 import { RBACButton, RevertViewModeChangesAlert, RoleBasedComponent } from "features/rbac";
 import { Conditional } from "components/common/Conditional";
-import { useScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
 import HttpApiClientUrl from "./components/HttpClientUrl/HttpClientUrl";
 import { ApiClientBreadCrumb, BreadcrumbType } from "../components/ApiClientBreadCrumb/ApiClientBreadCrumb";
 import { ClientCodeButton } from "../components/ClientCodeButton/ClientCodeButton";
@@ -105,7 +104,6 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
   const repositories = useApiClientRepository();
 
   const { endAISession } = useAISessionContext();
-  const scopedVariables = useScopedVariables(entity.meta.referenceId);
 
 
   const [isFailed, setIsFailed] = useState(false);
@@ -515,7 +513,6 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
                 entity={entity}
                 onUrlChange={entity.setUrl.bind(entity)}
                 onEnterPress={onUrlInputEnterPressed}
-                currentEnvironmentVariables={scopedVariables}
               />
             </Space.Compact>
             <RQButton

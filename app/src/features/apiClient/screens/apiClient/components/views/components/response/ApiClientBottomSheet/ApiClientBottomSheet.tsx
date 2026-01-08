@@ -20,12 +20,12 @@ import { MdDataObject } from "@react-icons/all-files/md/MdDataObject";
 import { PiTag } from "@react-icons/all-files/pi/PiTag";
 import { MdOutlineScience } from "@react-icons/all-files/md/MdOutlineScience";
 import { BottomSheetTabLabel } from "componentsV2/BottomSheet/components/BottomSheetLayout/components/BottomSheetTabLabel/BottomSheetTabLabel";
-import { HttpRecordEntity } from "features/apiClient/slices/entities";
+import { GraphQLRecordEntity, HttpRecordEntity } from "features/apiClient/slices/entities";
 import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
 import { hasTests } from "features/apiClient/helpers/testGeneration/buildPostResponseTests";
 
 interface Props {
-  entity: HttpRecordEntity,
+  entity: HttpRecordEntity | GraphQLRecordEntity,
   onGenerateTests?: () => void;
   isGeneratingTests?: boolean;
   isLoading: boolean;
