@@ -157,24 +157,6 @@ const RunCollectionButton: React.FC<{ disabled?: boolean }> = ({ disabled = fals
     };
   }, [bufferedEntity, liveRunResultEntity]);
 
-  const bufferedEntity = useBufferedEntity({
-    id: getRunnerConfigId(collectionId, DEFAULT_RUN_CONFIG_ID),
-    type: ApiClientEntityType.RUN_CONFIG,
-  });
-
-  const liveRunResultEntity = useEntity({
-    id: getRunnerConfigId(collectionId, DEFAULT_RUN_CONFIG_ID),
-    type: ApiClientEntityType.LIVE_RUN_RESULT,
-  });
-
-  const runContext: RunContext = useMemo(
-    () => ({
-      liveRunResultEntity,
-      runConfigEntity: bufferedEntity,
-    }),
-    [bufferedEntity, liveRunResultEntity]
-  );
-
   const handleRunClick = useCallback(async () => {
     if (!isExtensionInstalled() && !isDesktopMode()) {
       const modalProps = {
