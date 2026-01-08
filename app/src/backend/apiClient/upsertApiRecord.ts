@@ -5,7 +5,7 @@ import Logger from "lib/logger";
 import lodash from "lodash";
 import { RQAPI } from "features/apiClient/types";
 import { captureException } from "./utils";
-import { apiRecordsRankingManager } from "features/apiClient/components/sidebar";
+import { apiRecordsRankingManager } from "features/apiClient/helpers/RankingManager";
 
 export function sanitizeRecord(record: Partial<RQAPI.ApiClientRecord>) {
   const sanitizedRecord = lodash.cloneDeep(record);
