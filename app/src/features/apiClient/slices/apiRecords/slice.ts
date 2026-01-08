@@ -128,6 +128,9 @@ export const apiRecordsSlice = createSlice({
       apiRecordsAdapter.removeAll(state.records);
       state.tree = emptyTreeIndices;
     },
+    clearRecords: (state, action: PayloadAction<string[]>) => {
+      apiRecordsAdapter.removeMany(state.records, action.payload);
+    },
 
     hydrate(
       state,
