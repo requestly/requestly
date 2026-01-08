@@ -1,16 +1,15 @@
-import type { IterationDetails, RunMetadata, RunStatus } from "../common/runResults/types";
+import { RunResult } from "../common/runResults";
 
-export enum HistorySaveStatus {
+export enum RunHistorySaveStatus {
   IDLE = "idle",
   SAVING = "saving",
   SUCCESS = "success",
   FAILED = "failed",
 }
 
-export type PersistedIterationList = IterationDetails[];
-
-export interface RunHistoryEntry extends RunMetadata {
-  id: string;
-  runStatus: RunStatus.COMPLETED | RunStatus.CANCELLED;
-  iterations: PersistedIterationList;
-}
+export type RunHistoryEntry = {
+  collectionId: string;
+  history: RunResult[];
+  status: RunHistorySaveStatus;
+  error: string | null;
+};
