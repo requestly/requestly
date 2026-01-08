@@ -72,16 +72,6 @@ const HttpRequestTabs: React.FC<Props> = ({
   const queryParams = useQueryParamStore((state) => state.queryParams);
   const headers = useHeadersStore((state) => state.headers);
 
-  useEffect(() => {
-    setRequestEntry((prev) => ({
-      ...prev,
-      request: {
-        ...prev.request,
-        headers: headers,
-      },
-    }));
-  }, [headers, setRequestEntry]);
-
   const hasScriptError = error?.type === RQAPI.ApiClientErrorType.SCRIPT;
 
   const items = useMemo(() => {

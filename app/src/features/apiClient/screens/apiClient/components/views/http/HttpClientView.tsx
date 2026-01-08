@@ -864,7 +864,7 @@ const WithQueryParamsProvider = (Component: React.ComponentType<any>): React.FC<
   const WrappedComponent: React.FC = (props: any) => {
     const record = useAPIRecordsStore().getState().getData(props.apiEntryDetails.id) as RQAPI.ApiClientRecord;
     const entry = useMemo(() => (record?.data as RQAPI.HttpApiEntry) || props.apiEntryDetails.data, [
-      record,
+      record?.data,
       props.apiEntryDetails.data,
     ]);
 

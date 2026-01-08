@@ -4,7 +4,7 @@
   }
 
   .ant-table {
-    border: 1px solid #303030;
+    border: 1px solid var(--border-dark);
     background: transparent;
   }
 
@@ -15,7 +15,7 @@
   }
 
   .kv-col-border-right {
-    border-right: 1px solid #303030;
+    border-right: 1px solid var(--border-dark);
   }
 
   tr {
@@ -31,7 +31,7 @@
       }
 
       td.ant-table-cell:nth-last-child(2) {
-        border-right: 1px solid #303030 !important;
+        border-right: 1px solid var(--border-dark) !important;
       }
     }
   }
@@ -163,7 +163,7 @@
   .ant-table-thead > tr > th {
     font-weight: 600;
     padding: 8px 16px !important;
-    border-bottom: 1px solid #303030;
+    border-bottom: 1px solid var(--border-dark);
 
     .key-value-bulk-edit-button {
       background: none;
@@ -293,14 +293,14 @@
 .key-value-split-horizontal {
   flex-direction: row;
   .key-value-bulk-editor {
-    border-left: 1px solid #303030;
+    border-left: 1px solid var(--border-dark);
   }
 }
 
 .key-value-split-vertical {
   flex-direction: column;
   .key-value-bulk-editor {
-    border-top: 1px solid #303030;
+    border-top: 1px solid var(--border-dark);
   }
 }
 

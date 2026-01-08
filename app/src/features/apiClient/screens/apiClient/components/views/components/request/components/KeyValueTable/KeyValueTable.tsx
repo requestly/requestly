@@ -63,15 +63,6 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
 
   const { sheetPlacement } = useBottomSheetContext();
   const isBottomSheetAtBottom = sheetPlacement === BottomSheetPlacement.BOTTOM;
-  const minSizes = useMemo(() => {
-    if (!showBulkEditPanel) return [0, 0];
-
-    if (isBottomSheetAtBottom) {
-      return [600, 340];
-    } else {
-      return [200, 300];
-    }
-  }, [showBulkEditPanel, isBottomSheetAtBottom]);
 
   const createEmptyPair = useCallback(
     () => ({
@@ -280,10 +271,10 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
     showBulkEditPanel,
   ]);
 
-  const paramsEndRef = useRef<HTMLDivElement>(null);
+  const lastEntryRef = useRef<HTMLDivElement>(null);
 
-  const [scrollState, setScrollState] = useState<{ trigger: any; target: React.RefObject<any> | null }>({
-    trigger: 0,
+  const [scrollFocus, setScrollFocus] = useState<{ triggerTs: any; target: React.RefObject<any> | null }>({
+    triggerTs: -1,
     target: null,
   });
 
@@ -291,10 +282,20 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
 
   useEffect(() => {
     if (memoizedData.length > prevDataLength.current) {
-      setScrollState({ trigger: Date.now(), target: paramsEndRef });
+      setScrollFocus({ triggerTs: Date.now(), target: lastEntryRef });
     }
     prevDataLength.current = memoizedData.length;
   }, [memoizedData.length]);
+
+  const minSplitPanelSizes = useMemo(() => {
+    if (!showBulkEditPanel) return [0, 0];
+
+    if (isBottomSheetAtBottom) {
+      return [600, 340];
+    } else {
+      return [200, 300];
+    }
+  }, [showBulkEditPanel, isBottomSheetAtBottom]);
 
   return (
     <Split
@@ -302,14 +303,14 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
       className={`key-value-split-${isBottomSheetAtBottom ? "horizontal" : "vertical"}`}
       direction={isBottomSheetAtBottom ? "horizontal" : "vertical"}
       sizes={showBulkEditPanel ? [75, 25] : [100, 0]}
-      minSize={minSizes}
+      minSize={minSplitPanelSizes}
       gutterSize={showBulkEditPanel ? 6 : 0}
     >
       <div
         className="key-value-table"
-        style={isBottomSheetAtBottom ? { minWidth: minSizes[0] } : { minHeight: minSizes[0] }}
+        style={isBottomSheetAtBottom ? { minWidth: minSplitPanelSizes[0] } : { minHeight: minSplitPanelSizes[0] }}
       >
-        <AutoScrollContainer trigger={scrollState.trigger} scrollTargetRef={scrollState.target}>
+        <AutoScrollContainer trigger={scrollFocus.triggerTs} scrollTargetRef={scrollFocus.target}>
           <ContentListTable
             id="api-key-value-table"
             className="api-key-value-table"
@@ -334,14 +335,14 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
               </div>
             )}
           />
-          <div ref={paramsEndRef} />
+          <div ref={lastEntryRef} />
           {children}
         </AutoScrollContainer>
       </div>
 
       <div
         className="key-value-bulk-editor"
-        style={isBottomSheetAtBottom ? { minWidth: minSizes[1] } : { minHeight: minSizes[1] }}
+        style={isBottomSheetAtBottom ? { minWidth: minSplitPanelSizes[1] } : { minHeight: minSplitPanelSizes[1] }}
       >
         {showBulkEditPanel && (
           <KeyValueBulkEditor
