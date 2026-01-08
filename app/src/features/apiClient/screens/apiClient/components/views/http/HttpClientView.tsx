@@ -80,7 +80,7 @@ import { useHttpRequestExecutor } from "features/apiClient/hooks/requestExecutor
 import { PathVariablesProvider } from "features/apiClient/store/pathVariables/PathVariablesContextProvider";
 import { usePathVariablesStore } from "features/apiClient/hooks/usePathVariables.store";
 import { useAISessionContext } from "features/ai/contexts/AISession";
-import { wrapWithCustomTransaction } from "utils/sentry";
+import { wrapWithCustomSpan } from "utils/sentry";
 
 const requestMethodOptions = Object.values(RequestMethod).map((method) => ({
   value: method,
@@ -541,13 +541,13 @@ const HttpClientView: React.FC<Props> = ({
   };
 
   const onSaveButtonClick = useCallback(async () => {
-    return wrapWithCustomTransaction(
+    return wrapWithCustomSpan(
       {
         name: "api_client.save",
         op: "api_client.save",
         forceTransaction: true,
         attributes: {
-          "attribute.is_create_mode": isCreateMode,
+          "_attribute.is_create_mode": isCreateMode,
         },
       },
       async () => {
@@ -636,13 +636,13 @@ const HttpClientView: React.FC<Props> = ({
           Sentry.captureException(new Error(`Could not save request: ${result?.message}`));
           Sentry.getActiveSpan()?.setStatus({
             code: SPAN_STATUS_ERROR,
-            message: result?.message,
           });
         }
 
         setIsRequestSaving(false);
         endAISession();
-      }
+      },
+      true
     )();
     // Little bit weird syntax but we need to call function to actually execute the wrapped function
   }, [
