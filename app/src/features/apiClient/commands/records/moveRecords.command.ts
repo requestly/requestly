@@ -3,7 +3,7 @@ import { RQAPI } from "features/apiClient/types";
 import { omit } from "lodash";
 import { saveBulkRecords, saveOrUpdateRecord } from "../store.utils";
 import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
-import { apiRecordsRankingManager } from "features/apiClient/components/sidebar";
+import { apiRecordsRankingManager } from "features/apiClient/helpers/RankingManager";
 
 export async function moveRecords(
   context: ApiClientFeatureContext,
