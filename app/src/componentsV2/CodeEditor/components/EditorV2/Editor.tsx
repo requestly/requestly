@@ -30,6 +30,8 @@ import {
   highlightVariablesPlugin,
   generateCompletionsForVariables,
 } from "componentsV2/CodeEditor/components/EditorV2/plugins";
+import { placeholder as placeholderExtension } from "@codemirror/view";
+
 interface EditorProps {
   value: string;
   language: EditorLanguage | null;
@@ -58,6 +60,7 @@ interface EditorProps {
   };
   disableDefaultAutoCompletions?: boolean;
   customTheme?: Extension;
+  placeholder?: string;
 }
 const Editor: React.FC<EditorProps> = ({
   value,
@@ -81,6 +84,7 @@ const Editor: React.FC<EditorProps> = ({
   mergeView,
   disableDefaultAutoCompletions = false,
   customTheme,
+  placeholder,
 }) => {
   const location = useLocation();
   const dispatch = useDispatch();
@@ -272,6 +276,7 @@ const Editor: React.FC<EditorProps> = ({
       extensions={[
         editorLanguage,
         customTheme,
+        placeholder ? placeholderExtension(placeholder) : null,
         customKeyBinding,
         EditorView.lineWrapping,
         envVariables

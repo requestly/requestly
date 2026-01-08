@@ -168,6 +168,7 @@
     .key-value-bulk-edit-button {
       background: none;
       border: 1px solid transparent;
+      color: var(--alias-tokens-color-text-subtle, #bbb);
 
       &:hover {
         border: 1px solid transparent;
