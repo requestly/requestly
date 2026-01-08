@@ -211,12 +211,7 @@ interface Props {
 
 export const RunConfigView: React.FC<Props> = ({ activeTabKey }) => {
   const ctx = useApiClientFeatureContext();
-  const { collectionId } = useCollectionView();
-
-  const bufferedEntity = useBufferedEntity({
-    id: getRunnerConfigId(collectionId, DEFAULT_RUN_CONFIG_ID),
-    type: ApiClientEntityType.RUN_CONFIG,
-  });
+  const { collectionId, bufferedEntity } = useCollectionView();
 
   const isRunnerTabActive = activeTabKey === TAB_KEYS.RUNNER;
   const runOrderCount = useApiClientSelector((state) => bufferedEntity.getRunOrder(state).length);
