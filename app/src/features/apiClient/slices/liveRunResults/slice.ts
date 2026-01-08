@@ -1,6 +1,6 @@
 import { createSlice, createEntityAdapter, PayloadAction, EntityState } from "@reduxjs/toolkit";
 import { NativeError } from "errors/NativeError";
-import type {
+import {
   CurrentlyExecutingRequest,
   RequestExecutionResult,
   RunMetadata,
@@ -9,11 +9,17 @@ import type {
   Iteration,
   IterationDetails,
 } from "../common/runResults/types";
-import { RunStatusStateMachine } from "../common/runResults/utils";
-import { RunStatus as RunStatusEnum } from "../common/runResults/types";
 import { API_CLIENT_LIVE_RUN_RESULTS_SLICE_NAME } from "../common/constants";
 import type { RQAPI } from "features/apiClient/types";
 import { EntityNotFound } from "../types";
+
+const RunStatusStateMachine = {
+  [RunStatus.IDLE]: [RunStatus.RUNNING],
+  [RunStatus.RUNNING]: [RunStatus.CANCELLED, RunStatus.COMPLETED, RunStatus.ERRORED],
+  [RunStatus.CANCELLED]: [RunStatus.IDLE],
+  [RunStatus.COMPLETED]: [RunStatus.IDLE],
+  [RunStatus.ERRORED]: [RunStatus.IDLE],
+};
 
 export interface LiveRunEntryState extends RunMetadata {
   id: RQAPI.CollectionRecord["id"];
@@ -37,7 +43,7 @@ export const createEmptyRunEntry = (collectionId: RQAPI.CollectionRecord["id"]):
   id: collectionId,
   startTime: null,
   endTime: null,
-  runStatus: RunStatusEnum.IDLE,
+  runStatus: RunStatus.IDLE,
   iterations: new Map(),
   currentlyExecutingRequest: null,
   abortController: new AbortController(),
@@ -67,7 +73,7 @@ export const liveRunResultsSlice = createSlice({
       const entry: LiveRunEntryState = {
         ...createEmptyRunEntry(collectionId),
         startTime: startTime ?? Date.now(),
-        runStatus: RunStatusEnum.RUNNING,
+        runStatus: RunStatus.RUNNING,
       };
 
       liveRunResultsAdapter.setOne(state, entry);
@@ -90,7 +96,7 @@ export const liveRunResultsSlice = createSlice({
       assertTransition(entry.runStatus, status);
 
       entry.runStatus = status;
-      entry.error = status === RunStatusEnum.ERRORED ? error ?? undefined : undefined;
+      entry.error = status === RunStatus.ERRORED ? error ?? undefined : undefined;
     },
 
     setCurrentlyExecutingRequest(
@@ -135,7 +141,7 @@ export const liveRunResultsSlice = createSlice({
       state,
       action: PayloadAction<{
         collectionId: RQAPI.CollectionRecord["id"];
-        status: Extract<RunStatus, RunStatusEnum.COMPLETED | RunStatusEnum.ERRORED | RunStatusEnum.CANCELLED>;
+        status: Extract<RunStatus, RunStatus.COMPLETED | RunStatus.ERRORED | RunStatus.CANCELLED>;
         endTime?: Timestamp;
         error?: Error | null;
       }>
@@ -151,7 +157,7 @@ export const liveRunResultsSlice = createSlice({
       entry.runStatus = status;
       entry.endTime = endTime ?? Date.now();
       entry.currentlyExecutingRequest = null;
-      entry.error = status === RunStatusEnum.ERRORED ? error ?? undefined : undefined;
+      entry.error = status === RunStatus.ERRORED ? error ?? undefined : undefined;
     },
 
     resetRun(
@@ -179,10 +185,10 @@ export const liveRunResultsSlice = createSlice({
         throw new EntityNotFound(collectionId, "Collection not found!");
       }
 
-      assertTransition(entry.runStatus, RunStatusEnum.CANCELLED);
+      assertTransition(entry.runStatus, RunStatus.CANCELLED);
 
       entry.abortController.abort();
-      entry.runStatus = RunStatusEnum.CANCELLED;
+      entry.runStatus = RunStatus.CANCELLED;
       entry.endTime = cancelledAt ?? Date.now();
       entry.currentlyExecutingRequest = null;
       entry.error = reason;
