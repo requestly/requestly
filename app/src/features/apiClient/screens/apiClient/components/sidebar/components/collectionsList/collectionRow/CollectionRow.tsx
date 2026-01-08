@@ -38,6 +38,9 @@ import { CollectionRecordState } from "features/apiClient/store/apiRecords/apiRe
 import { MdOutlineVideoLibrary } from "@react-icons/all-files/md/MdOutlineVideoLibrary";
 import { CollectionRowOptionsCustomEvent, dispatchCustomEvent } from "./utils";
 import { apiRecordsRankingManager } from "features/apiClient/components/sidebar";
+import { useChildren } from "features/apiClient/hooks/useChildren.hook";
+import { saveOrUpdateRecord } from "features/apiClient/commands/store.utils";
+import { useApiClientRepository } from "features/apiClient/contexts/meta";
 
 export enum ExportType {
   REQUESTLY = "requestly",
@@ -91,6 +94,8 @@ export const CollectionRow: React.FC<Props> = ({
   const [hoveredId, setHoveredId] = useState("");
   const [isCollectionRowLoading, setIsCollectionRowLoading] = useState(false);
   const hoverExpandTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
+  const [dropPosition, setDropPosition] = useState<"before" | "after" | "inside" | null>(null);
+  const collectionRowRef = React.useRef<HTMLDivElement>(null);
 
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [isPostmanExportModalOpen, setIsPostmanExportModalOpen] = useState(false);
@@ -99,6 +104,14 @@ export const CollectionRow: React.FC<Props> = ({
   const { onNewClickV2 } = useApiClientContext();
   const context = useApiClientFeatureContext();
   const [openTab, activeTabSource] = useTabServiceWithSelector((state) => [state.openTab, state.activeTabSource]);
+
+  // Get siblings from parent collection for before/after positioning
+  const siblings = useChildren(record.collectionId || "");
+  const collectionSiblings = useMemo(() => siblings.filter((sibling) => sibling.collectionId === record.collectionId), [
+    siblings,
+    record.collectionId,
+  ]);
+  const { apiClientRecordsRepository } = useApiClientRepository();
 
   const [getParentChain, getRecordStore] = useAPIRecords((state) => [state.getParentChain, state.getRecordStore]);
   const handleCollectionExport = useCallback(
@@ -261,34 +274,67 @@ export const CollectionRow: React.FC<Props> = ({
   }, []);
 
   const handleRecordDrop = useCallback(
-    async (item: DraggableApiRecord, dropContextId: string) => {
+    async (
+      item: DraggableApiRecord,
+      dropContextId: string,
+      currentDropPosition: "before" | "after" | "inside" | null
+    ) => {
       try {
         const sourceContext = getApiClientFeatureContext(item.contextId);
         if (!sourceContext) {
           throw new Error(`Source context not found for id: ${item.contextId}`);
         }
 
-        // Calculate rank to place dropped record at the bottom
-        const existingChildren = record.data.children || [];
-        const newRank = apiRecordsRankingManager.getNextRanks(existingChildren, [item.record])[0];
+        if (currentDropPosition === "inside") {
+          // Drop inside the collection (existing behavior)
+          const existingChildren = record.data.children || [];
+          const newRank = apiRecordsRankingManager.getNextRanks(existingChildren, [item.record])[0];
 
-        const destination = {
-          contextId: dropContextId,
-          collectionId: record.id,
-        };
+          const destination = {
+            contextId: dropContextId,
+            collectionId: record.id,
+          };
 
-        // Add rank to the record being moved
-        const recordWithRank = { ...item.record, rank: newRank };
+          const recordWithRank = { ...item.record, rank: newRank };
 
-        await moveRecordsAcrossWorkspace(sourceContext, {
-          recordsToMove: [recordWithRank],
-          destination,
-        });
+          await moveRecordsAcrossWorkspace(sourceContext, {
+            recordsToMove: [recordWithRank],
+            destination,
+          });
 
-        if (!expandedRecordIds.includes(record.id)) {
-          const newExpandedRecordIds = [...expandedRecordIds, destination.collectionId];
-          setExpandedRecordIds(newExpandedRecordIds);
-          sessionStorage.setItem(SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY, newExpandedRecordIds);
+          if (!expandedRecordIds.includes(record.id)) {
+            const newExpandedRecordIds = [...expandedRecordIds, destination.collectionId];
+            setExpandedRecordIds(newExpandedRecordIds);
+            sessionStorage.setItem(SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY, newExpandedRecordIds);
+          }
+        } else if (currentDropPosition === "before" || currentDropPosition === "after") {
+          // Drop before or after the collection (as a sibling)
+          let before: RQAPI.ApiClientRecord | null = null;
+          let after: RQAPI.ApiClientRecord | null = null;
+          const recordIndex = collectionSiblings.findIndex((sibling) => sibling.id === record.id);
+
+          if (currentDropPosition === "before") {
+            before = record;
+            after = collectionSiblings[recordIndex - 1] || null;
+          } else if (currentDropPosition === "after") {
+            after = record;
+            before = collectionSiblings[recordIndex + 1] || null;
+          }
+
+          const rank = apiRecordsRankingManager.getRanksBetweenRecords(before, after, [item.record])[0];
+          const targetCollectionId = record.collectionId;
+
+          const patch: Partial<RQAPI.ApiClientRecord> = {
+            id: item.record.id,
+            rank,
+            collectionId: targetCollectionId,
+          };
+
+          const result = await apiClientRecordsRepository.updateRecord(patch, item.record.id);
+
+          if (result.success) {
+            saveOrUpdateRecord(context, result.data);
+          }
         }
       } catch (error) {
         notification.error({
@@ -300,7 +346,7 @@ export const CollectionRow: React.FC<Props> = ({
         setIsCollectionRowLoading(false);
       }
     },
-    [record.data.children, record.id, expandedRecordIds, setExpandedRecordIds]
+    [record, expandedRecordIds, setExpandedRecordIds, collectionSiblings, apiClientRecordsRepository, context]
   );
 
   const checkCanDropItem = useCallback(
@@ -343,27 +389,64 @@ export const CollectionRow: React.FC<Props> = ({
     () => ({
       accept: [RQAPI.RecordType.API, RQAPI.RecordType.COLLECTION],
       hover: (item: DraggableApiRecord, monitor) => {
-        const isOverCurrent = monitor.isOver({ shallow: true });
-        if (!isOverCurrent) {
-          // Clear timeout if no longer hovering
+        const isOverAny = monitor.isOver();
+        if (!isOverAny) {
           if (hoverExpandTimeoutRef.current) {
             clearTimeout(hoverExpandTimeoutRef.current);
             hoverExpandTimeoutRef.current = null;
           }
+          setDropPosition(null);
           return;
         }
 
-        // Check if collection is collapsed
-        const IsTargetCollectionCollapsed = !expandedRecordIds.includes(record.id);
+        const pointer = monitor.getClientOffset();
+        const containerEl = collectionRowRef.current;
+        const headerEl = containerEl?.querySelector(".ant-collapse-header");
 
-        // If collapsed and not already expanding, set timeout to expand
-        if (IsTargetCollectionCollapsed && !hoverExpandTimeoutRef.current) {
-          hoverExpandTimeoutRef.current = setTimeout(() => {
-            const newExpandedRecordIds = [...expandedRecordIds, record.id];
-            setExpandedRecordIds(newExpandedRecordIds);
-            sessionStorage.setItem(SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY, newExpandedRecordIds);
+        // Only compute dropzones when hovering over the header; ignore children area
+        if (!pointer || !headerEl) {
+          setDropPosition(null);
+          return;
+        }
+
+        const rect = headerEl.getBoundingClientRect();
+
+        // If pointer is outside header bounds, do not show borders/highlights
+        if (pointer.y < rect.top || pointer.y > rect.bottom) {
+          if (hoverExpandTimeoutRef.current) {
+            clearTimeout(hoverExpandTimeoutRef.current);
             hoverExpandTimeoutRef.current = null;
-          }, 600); // 600ms delay before auto-expanding
+          }
+          setDropPosition(null);
+          return;
+        }
+
+        const hoverClientY = pointer.y - rect.top;
+        const hoverHeight = rect.bottom - rect.top;
+
+        if (hoverClientY < hoverHeight * 0.25) {
+          setDropPosition("before");
+          if (hoverExpandTimeoutRef.current) {
+            clearTimeout(hoverExpandTimeoutRef.current);
+            hoverExpandTimeoutRef.current = null;
+          }
+        } else if (hoverClientY > hoverHeight * 0.75) {
+          setDropPosition("after");
+          if (hoverExpandTimeoutRef.current) {
+            clearTimeout(hoverExpandTimeoutRef.current);
+            hoverExpandTimeoutRef.current = null;
+          }
+        } else {
+          setDropPosition("inside");
+          const IsTargetCollectionCollapsed = !expandedRecordIds.includes(record.id);
+          if (IsTargetCollectionCollapsed && !hoverExpandTimeoutRef.current) {
+            hoverExpandTimeoutRef.current = setTimeout(() => {
+              const newExpandedRecordIds = [...expandedRecordIds, record.id];
+              setExpandedRecordIds(newExpandedRecordIds);
+              sessionStorage.setItem(SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY, newExpandedRecordIds);
+              hoverExpandTimeoutRef.current = null;
+            }, 600);
+          }
         }
       },
       drop: (item: DraggableApiRecord, monitor) => {
@@ -374,18 +457,36 @@ export const CollectionRow: React.FC<Props> = ({
         }
 
         const isOverCurrent = monitor.isOver({ shallow: true });
-        if (!isOverCurrent) return;
+        if (!isOverCurrent) {
+          setDropPosition(null);
+          return;
+        }
 
-        if (item.record.id === record.id) return;
+        if (item.record.id === record.id) {
+          setDropPosition(null);
+          return;
+        }
+
+        const currentDropPosition = dropPosition;
+        setDropPosition(null);
         setIsCollectionRowLoading(true);
-        handleRecordDrop(item, context.id);
+        handleRecordDrop(item, context.id, currentDropPosition);
       },
       canDrop: checkCanDropItem,
       collect: (monitor) => ({
         isOver: monitor.isOver({ shallow: true }),
       }),
     }),
-    [handleRecordDrop, checkCanDropItem, context.id, expandedRecordIds, record.id, setExpandedRecordIds]
+    [
+      handleRecordDrop,
+      checkCanDropItem,
+      context.id,
+      expandedRecordIds,
+      record.id,
+      setExpandedRecordIds,
+      dropPosition,
+      collapseChangeHandler,
+    ]
   );
 
   return (
@@ -423,7 +524,21 @@ export const CollectionRow: React.FC<Props> = ({
           }}
         />
       ) : (
-        <div ref={drop} className={isOver ? "collection-drop-target" : ""}>
+        <div
+          ref={(node) => {
+            collectionRowRef.current = node;
+            drop(node);
+          }}
+          className={`${
+            dropPosition === "before"
+              ? "collection-drop-before"
+              : dropPosition === "after"
+              ? "collection-drop-after"
+              : dropPosition === "inside"
+              ? "collection-drop-inside"
+              : ""
+          } ${isOver && dropPosition === "inside" ? "collection-drop-target" : ""}`}
+        >
           <Collapse
             activeKey={activeKey}
             onChange={collapseChangeHandler}
