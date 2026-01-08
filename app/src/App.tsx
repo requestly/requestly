@@ -10,7 +10,7 @@ declare global {
 
 /** Common things which do not depend on routes for App **/
 const App = () => {
-  const router = Sentry.wrapCreateBrowserRouter(createBrowserRouter)(routesV2);
+  const router = Sentry.wrapCreateBrowserRouterV6(createBrowserRouter)(routesV2);
 
   return <RouterProvider router={router} />;
 };
