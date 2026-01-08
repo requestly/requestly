@@ -2,7 +2,7 @@ import type { ApiClientStoreState } from "../workspaceView/helpers/ApiClientCont
 import { EntityNotFound, UpdateCommand } from "../types";
 import { ApiClientEntityType } from "./types";
 import { ApiClientEntity, ApiClientEntityMeta } from "./base";
-import { createEmptyRunEntry, liveRunResultsActions, liveRunResultsAdapter } from "../liveRunResults/slice";
+import { liveRunResultsActions, liveRunResultsAdapter } from "../liveRunResults/slice";
 import type { CurrentlyExecutingRequest, LiveIterationMap, RunMetadata, Timestamp } from "../liveRunResults/types";
 import type { RQAPI } from "features/apiClient/types";
 import type { RequestExecutionResult } from "../common/runResults/types";
@@ -10,7 +10,6 @@ import { RunStatus } from "../common/runResults/types";
 
 export interface LiveRunResultRecord extends RunMetadata {
   id: RQAPI.CollectionRecord["id"]; // collectionId
-  configId: string;
   iterations: LiveIterationMap;
   currentlyExecutingRequest: CurrentlyExecutingRequest;
   abortController: AbortController;
@@ -42,10 +41,11 @@ export class LiveRunResultEntity<M extends ApiClientEntityMeta = ApiClientEntity
     }
 
     const result = liveRunResultsAdapter.getSelectors().selectById(liveRunResultsState, this.id);
+
     if (!result) {
-      return createEmptyRunEntry(this.id, "default");
-      // throw new EntityNotFound(this.id, "Live run result not found");
+      throw new EntityNotFound(this.id, "Live run result not found");
     }
+
     return result;
   }
 
@@ -59,7 +59,6 @@ export class LiveRunResultEntity<M extends ApiClientEntityMeta = ApiClientEntity
     this.dispatch(
       liveRunResultsActions.startRun({
         collectionId: this.id,
-        configId: params.configId,
         startTime: params?.startTime,
       })
     );
@@ -106,11 +105,10 @@ export class LiveRunResultEntity<M extends ApiClientEntityMeta = ApiClientEntity
     );
   }
 
-  resetRun(configId: string): void {
+  resetRun(): void {
     this.dispatch(
       liveRunResultsActions.resetRun({
         collectionId: this.id,
-        configId,
       })
     );
   }
@@ -125,14 +123,8 @@ export class LiveRunResultEntity<M extends ApiClientEntityMeta = ApiClientEntity
     );
   }
 
-  delete(configId: string): void {
-    this.resetRun(configId);
-  }
-
-  // Getter methods
-
-  getConfigId(state: ApiClientStoreState): string {
-    return this.getEntityFromState(state).configId;
+  delete(): void {
+    this.resetRun();
   }
 
   getRunStatus(state: ApiClientStoreState): RunStatus {
@@ -162,8 +154,6 @@ export class LiveRunResultEntity<M extends ApiClientEntityMeta = ApiClientEntity
   getError(state: ApiClientStoreState): Error | undefined {
     return this.getEntityFromState(state).error;
   }
-
-  // Computed properties
 
   isRunning(state: ApiClientStoreState): boolean {
     return this.getRunStatus(state) === "running";
