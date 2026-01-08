@@ -70,7 +70,6 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
   );
 
   useEffect(() => {
-    console.log("Entire useeffect being called ffs");
     if (editorViewRef.current) {
       editorViewRef.current.destroy();
       editorViewRef.current = null;
