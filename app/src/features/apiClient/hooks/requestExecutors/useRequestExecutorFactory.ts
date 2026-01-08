@@ -100,9 +100,6 @@ export const useRequestExecutorFactory = <T>(
       }
     },
     [  store,
-      // getActiveEnvironment,
-      // setCollectionVariables,
-      // setEnvironmentVariables,
     ]
   );
 
