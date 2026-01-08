@@ -46,14 +46,6 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
   const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
   const [isPopoverPinned, setIsPopoverPinned] = useState(false);
 
-  const handleSetVariable = (variable: string | null) => {
-    if (!variable) {
-      handleMouseLeave();
-    } else {
-      setHoveredVariable(variable);
-    }
-  };
-
   useEffect(() => {
     if (editorViewRef.current) {
       editorViewRef.current.destroy();
@@ -152,6 +144,17 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
       setHoveredVariable(null);
     }
   }, [isPopoverPinned, hoveredVariable]);
+
+  const handleSetVariable = useCallback(
+    (variable: string | null) => {
+      if (!variable) {
+        handleMouseLeave();
+      } else {
+        setHoveredVariable(variable);
+      }
+    },
+    [handleMouseLeave]
+  );
 
   const handleClosePopover = useCallback(() => {
     setHoveredVariable(null);
