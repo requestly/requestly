@@ -28,10 +28,6 @@ interface Props {
 }
 
 export const CollectionRunnerView: React.FC<Props> = ({ collectionId, activeTabKey }) => {
-  // const {
-  //   runner: { getDefaultRunConfig, getRunResults },
-  // } = useCommand();
-
   const workspaceId = useWorkspaceId();
   const apiClientDispatch = useApiClientDispatch();
   const tabActions = useTabActions();
@@ -115,7 +111,6 @@ export const CollectionRunnerView: React.FC<Props> = ({ collectionId, activeTabK
   return (
     <CollectionViewContextProvider key={collectionId} collectionId={collectionId}>
       <AutogenerateProvider>
-        {/* <RunViewContextProvider runConfig={config} history={runResults}> */}
         <div className="collection-runner-view">
           <Split
             gutterSize={4}
@@ -130,7 +125,6 @@ export const CollectionRunnerView: React.FC<Props> = ({ collectionId, activeTabK
             </DataFileModalProvider>
           </Split>
         </div>
-        {/* </RunViewContextProvider> */}
       </AutogenerateProvider>
     </CollectionViewContextProvider>
   );

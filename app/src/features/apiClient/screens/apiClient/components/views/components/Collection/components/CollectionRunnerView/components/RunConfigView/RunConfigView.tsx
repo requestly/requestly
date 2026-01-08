@@ -1,60 +1,58 @@
-import React, { useCallback, useState } from "react";
 import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
-import { MdOutlineSave } from "@react-icons/all-files/md/MdOutlineSave";
-import { MdOutlineVideoLibrary } from "@react-icons/all-files/md/MdOutlineVideoLibrary";
-import { RQButton, RQTooltip } from "lib/design-system-v2/components";
 import { MdOutlineRestartAlt } from "@react-icons/all-files/md/MdOutlineRestartAlt";
+import { MdOutlineSave } from "@react-icons/all-files/md/MdOutlineSave";
 import { MdOutlineStopCircle } from "@react-icons/all-files/md/MdOutlineStopCircle";
-import { RunConfigOrderedRequests } from "./RunConfigOrderedRequests/RunConfigOrderedRequests";
-import { RunConfigSettings } from "./RunConfigSettings/RunConfigSettings";
-import { useCollectionView } from "../../../../collectionView.context";
-import { useRunContext, useRunResultStore } from "../../run.context";
-import { useApiClientSelector, useApiClientDispatch } from "features/apiClient/slices/hooks/base.hooks";
-import { selectRunConfig, selectTotalRequestCount } from "features/apiClient/slices/runConfig/selectors";
-import {
-  getRunnerConfigId,
-  DEFAULT_RUN_CONFIG_ID,
-  toSavedRunConfig,
-  fromSavedRunConfig,
-} from "features/apiClient/slices/runConfig/types";
-import { saveRunConfig as saveRunConfigThunk } from "features/apiClient/slices/runConfig/thunks";
+import { MdOutlineVideoLibrary } from "@react-icons/all-files/md/MdOutlineVideoLibrary";
+import * as Sentry from "@sentry/react";
+import { isExtensionInstalled } from "actions/ExtensionActions";
+import { Conditional } from "components/common/Conditional";
+import { useCommand } from "features/apiClient/commands";
 import { useWorkspaceId } from "features/apiClient/common/WorkspaceProvider";
-import { useActiveTabId } from "componentsV2/Tabs/slice/hooks";
+import { ApiClientLocalRepository } from "features/apiClient/helpers/modules/sync/local";
+import { useBatchRequestExecutor } from "features/apiClient/hooks/requestExecutors/useBatchRequestExecutor";
+import { entitySynced } from "features/apiClient/slices";
+import { selectAllDescendantIds } from "features/apiClient/slices/apiRecords/selectors";
+import { bufferActions } from "features/apiClient/slices/buffer";
+import { useIsBufferDirty } from "features/apiClient/slices/entities";
+import { useBufferedEntity } from "features/apiClient/slices/entities/hooks";
+import { ApiClientEntityType } from "features/apiClient/slices/entities/types";
+import { useApiClientDispatch, useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
+import { saveRunConfig as saveRunConfigThunk } from "features/apiClient/slices/runConfig/thunks";
+import {
+  DEFAULT_RUN_CONFIG_ID,
+  fromSavedRunConfig,
+  getRunnerConfigId,
+  toSavedRunConfig,
+} from "features/apiClient/slices/runConfig/types";
 import {
   getApiClientFeatureContext,
   useApiClientFeatureContext,
+  useApiClientStore,
 } from "features/apiClient/slices/workspaceView/helpers/ApiClientContextRegistry/hooks";
-import { findBufferByReferenceId } from "features/apiClient/slices/buffer/slice";
-import { bufferActions } from "features/apiClient/slices/buffer";
-import { runnerConfigActions } from "features/apiClient/slices/runConfig/slice";
-import { selectAllDescendantIds } from "features/apiClient/slices/apiRecords/selectors";
-import { useCommand } from "features/apiClient/commands";
-import { toast } from "utils/Toast";
-import * as Sentry from "@sentry/react";
-import { useBatchRequestExecutor } from "features/apiClient/hooks/requestExecutors/useBatchRequestExecutor";
-import { useGenericState } from "hooks/useGenericState";
-import { KEYBOARD_SHORTCUTS } from "../../../../../../../../../../../../../src/constants/keyboardShortcuts";
 import { RunStatus } from "features/apiClient/store/collectionRunResult/runResult.store";
-import { EmptyState } from "../EmptyState/EmptyState";
-import { Conditional } from "components/common/Conditional";
-import "./runConfigView.scss";
-import { isExtensionInstalled } from "actions/ExtensionActions";
-import { isDesktopMode } from "utils/AppUtils";
-import { useDispatch, useSelector } from "react-redux";
-import { globalActions } from "store/slices/global/slice";
+import { useGenericState } from "hooks/useGenericState";
+import { useHostContext } from "hooks/useHostContext";
+import { RQButton, RQTooltip } from "lib/design-system-v2/components";
 import {
   trackCollectionRunnerConfigSaved,
   trackCollectionRunnerConfigSaveFailed,
   trackInstallExtensionDialogShown,
 } from "modules/analytics/events/features/apiClient";
-import { ApiClientLocalRepository } from "features/apiClient/helpers/modules/sync/local";
+import React, { useCallback, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { getAppMode } from "store/selectors";
-import { useHostContext } from "hooks/useHostContext";
+import { globalActions } from "store/slices/global/slice";
+import { isDesktopMode } from "utils/AppUtils";
+import { toast } from "utils/Toast";
+import { KEYBOARD_SHORTCUTS } from "../../../../../../../../../../../../../src/constants/keyboardShortcuts";
 import { TAB_KEYS } from "../../../../CollectionView";
-import { useIsBufferDirty } from "features/apiClient/slices/entities";
-import { useBufferedEntity, useBufferedRunConfigEntity, useEntity } from "features/apiClient/slices/entities/hooks";
-import { ApiClientEntityType } from "features/apiClient/slices/entities/types";
-import { entitySynced } from "features/apiClient/slices";
+import { useCollectionView } from "../../../../collectionView.context";
+import { useRunContext, useRunResultStore } from "../../run.context";
+import { EmptyState } from "../EmptyState/EmptyState";
+import { RunConfigOrderedRequests } from "./RunConfigOrderedRequests/RunConfigOrderedRequests";
+import { RunConfigSettings } from "./RunConfigSettings/RunConfigSettings";
+import "./runConfigView.scss";
+import { getAllDescendantApiRecordIds } from "features/apiClient/slices/apiRecords/utils";
 
 const RunConfigSaveButton: React.FC<{ disabled?: boolean; isRunnerTabActive: boolean }> = ({
   disabled = false,
@@ -65,11 +63,6 @@ const RunConfigSaveButton: React.FC<{ disabled?: boolean; isRunnerTabActive: boo
   const { collectionId } = useCollectionView();
   const workspaceId = useWorkspaceId();
   const dispatch = useApiClientDispatch();
-  const activeTabId = useActiveTabId();
-
-  // Get config from Redux slice
-  // const config = useApiClientSelector((state) => selectRunConfig(state, collectionId, DEFAULT_RUN_CONFIG_ID));
-
   const bufferedEntity = useBufferedEntity({
     id: getRunnerConfigId(collectionId, DEFAULT_RUN_CONFIG_ID),
     type: ApiClientEntityType.RUN_CONFIG,
@@ -87,9 +80,10 @@ const RunConfigSaveButton: React.FC<{ disabled?: boolean; isRunnerTabActive: boo
 
   const isActiveTab = getIsActive();
 
-  const config = useApiClientSelector((state) => bufferedEntity.getEntityFromState(state));
   const handleSaveClick = useCallback(async () => {
     setIsSaving(true);
+    const state = getApiClientFeatureContext(workspaceId).store.getState();
+    const config = bufferedEntity.getEntityFromState(state);
     const configToSave = toSavedRunConfig(config);
 
     try {
@@ -116,14 +110,6 @@ const RunConfigSaveButton: React.FC<{ disabled?: boolean; isRunnerTabActive: boo
         })
       );
 
-      // Mark buffer as clean after successful save
-      // if (buffer && activeTabId) {
-      //   const ctx = getApiClientFeatureContext(workspaceId);
-      //   ctx.store.dispatch(
-      //     bufferActions.markSaved({ id: buffer.id, savedData: fromSavedRunConfig(collectionId, configToSave) })
-      //   );
-      // }
-
       toast.success("Configuration saved");
       trackCollectionRunnerConfigSaved({
         collection_id: collectionId,
@@ -143,7 +129,7 @@ const RunConfigSaveButton: React.FC<{ disabled?: boolean; isRunnerTabActive: boo
     } finally {
       setIsSaving(false);
     }
-  }, [config, dispatch, workspaceId, collectionId, iterations, delay]);
+  }, [bufferedEntity, dispatch, workspaceId, collectionId, iterations, delay]);
 
   return (
     <RQTooltip
@@ -237,44 +223,28 @@ interface Props {
 
 export const RunConfigView: React.FC<Props> = ({ activeTabKey }) => {
   const ctx = useApiClientFeatureContext();
-  const dispatch = useApiClientDispatch();
-
   const { collectionId } = useCollectionView();
-
-  // Get config from Redux slice
-  // const config = useApiClientSelector((state) => selectRunConfig(state, collectionId, DEFAULT_RUN_CONFIG_ID));
 
   const bufferedEntity = useBufferedEntity({
     id: getRunnerConfigId(collectionId, DEFAULT_RUN_CONFIG_ID),
     type: ApiClientEntityType.RUN_CONFIG,
   });
+
   const isRunnerTabActive = activeTabKey === TAB_KEYS.RUNNER;
-  // Get run order count
   const runOrderCount = useApiClientSelector((state) => bufferedEntity.getRunOrder(state).length);
 
-  // Get all descendant IDs for reset functionality
-  const descendantIds = useApiClientSelector((state) => selectAllDescendantIds(state, collectionId));
-
   const handleSelectAllClick = () => {
-    // if (config) {
-    // dispatch(runnerConfigActions.toggleAllSelections(collectionId, config.configId, true));
     bufferedEntity.toggleAllSelections(true);
-    // }
   };
 
   const handleDeselectAllClick = () => {
-    // if (config) {
-    // dispatch(runnerConfigActions.toggleAllSelections(collectionId, config.configId, false));
     bufferedEntity.toggleAllSelections(false);
-    // }
   };
 
   const handleResetClick = () => {
-    // if (!config) return;
-
+    const descendantIds = getAllDescendantApiRecordIds(collectionId, ctx.workspaceId);
     const resetRunOrder = descendantIds.map((id: string) => ({ id, isSelected: true }));
     bufferedEntity.setRunOrder(resetRunOrder);
-    // dispatch(runnerConfigActions.updateRunOrder(collectionId, config.configId, resetRunOrder));
   };
 
   const isEmpty = runOrderCount === 0;

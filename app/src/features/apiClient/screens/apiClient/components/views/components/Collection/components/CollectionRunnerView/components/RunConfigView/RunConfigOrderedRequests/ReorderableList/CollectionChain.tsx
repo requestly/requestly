@@ -33,8 +33,6 @@ export const CollectionChain: React.FC<Props> = ({ recordId }) => {
   const ancestorRecords = useAncestorRecords(recordId);
 
   const collections = useMemo(() => {
-    // Filter for collection records only and reverse (ancestors go from root to immediate parent,
-    // but we want to show from immediate parent to root)
     return ancestorRecords
       .filter((record): record is RQAPI.CollectionRecord => record.type === RQAPI.RecordType.COLLECTION)
       .reverse();

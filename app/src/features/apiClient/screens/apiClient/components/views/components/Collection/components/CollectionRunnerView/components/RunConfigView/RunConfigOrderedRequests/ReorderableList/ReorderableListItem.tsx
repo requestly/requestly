@@ -1,18 +1,15 @@
-import React, { useRef } from "react";
 import { MdDragIndicator } from "@react-icons/all-files/md/MdDragIndicator";
 import { Checkbox, Typography } from "antd";
-import { RQAPI } from "features/apiClient/types";
-import { useDrag, useDrop } from "react-dnd";
-import { CollectionChain } from "./CollectionChain";
 import { RequestIcon } from "features/apiClient/screens/apiClient/components/sidebar/components/collectionsList/requestRow/RequestRow";
-import { useCollectionView } from "../../../../../../collectionView.context";
-import { useApiClientDispatch, useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
-import { runnerConfigActions } from "features/apiClient/slices/runConfig/slice";
-import { DEFAULT_RUN_CONFIG_ID, getRunnerConfigId } from "features/apiClient/slices/runConfig/types";
-import { selectRunConfig } from "features/apiClient/slices/runConfig/selectors";
 import { useRecordById } from "features/apiClient/slices";
 import { useBufferedEntity } from "features/apiClient/slices/entities/hooks";
 import { ApiClientEntityType } from "features/apiClient/slices/entities/types";
+import { DEFAULT_RUN_CONFIG_ID, getRunnerConfigId } from "features/apiClient/slices/runConfig/types";
+import { RQAPI } from "features/apiClient/types";
+import React, { useRef } from "react";
+import { useDrag, useDrop } from "react-dnd";
+import { useCollectionView } from "../../../../../../collectionView.context";
+import { CollectionChain } from "./CollectionChain";
 
 enum ReorderableItemType {
   REQUEST = "request",
@@ -71,10 +68,7 @@ interface ReorderableListItemProps {
 
 export const ReorderableListItem: React.FC<ReorderableListItemProps> = ({ index, orderedRequest, reorder }) => {
   const { collectionId } = useCollectionView();
-  const dispatch = useApiClientDispatch();
 
-  // Get config to access configId
-  // const config = useApiClientSelector((state) => selectRunConfig(state, collectionId, DEFAULT_RUN_CONFIG_ID));
   const bufferedEntity = useBufferedEntity({
     id: getRunnerConfigId(collectionId, DEFAULT_RUN_CONFIG_ID),
     type: ApiClientEntityType.RUN_CONFIG,

@@ -3,9 +3,7 @@ import { InputNumber } from "antd";
 import { RQTooltip } from "lib/design-system-v2/components";
 import { MdOutlineInfo } from "@react-icons/all-files/md/MdOutlineInfo";
 import { useCollectionView } from "../../../../../collectionView.context";
-import { useApiClientSelector, useApiClientDispatch } from "features/apiClient/slices/hooks/base.hooks";
-import { selectRunConfig } from "features/apiClient/slices/runConfig/selectors";
-import { runnerConfigActions } from "features/apiClient/slices/runConfig/slice";
+import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
 import {
   DEFAULT_RUN_CONFIG_ID,
   DELAY_MAX_LIMIT,
@@ -23,10 +21,7 @@ import { ApiClientEntityType } from "features/apiClient/slices/entities/types";
 export const RunConfigSettings: React.FC = () => {
   const appMode = useSelector(getAppMode);
   const { collectionId } = useCollectionView();
-  const dispatch = useApiClientDispatch();
 
-  // Get config from Redux slice
-  // const config = useApiClientSelector((state) => selectRunConfig(state, collectionId, DEFAULT_RUN_CONFIG_ID));
   const bufferedEntity = useBufferedEntity({
     id: getRunnerConfigId(collectionId, DEFAULT_RUN_CONFIG_ID),
     type: ApiClientEntityType.RUN_CONFIG,

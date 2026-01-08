@@ -4,6 +4,7 @@ import { ApiClientEntityType } from "./types";
 import { ApiClientEntity, ApiClientEntityMeta } from "./base";
 import { runnerConfigActions, runConfigAdapter } from "../runConfig/slice";
 import { RunConfigEntity as RunConfigRecord, RunOrder, RunDataFile } from "../runConfig/types";
+import { apiClientFileStore } from "features/apiClient/store/apiClientFilesStore";
 
 export class RunConfigEntity<M extends ApiClientEntityMeta = ApiClientEntityMeta> extends ApiClientEntity<
   RunConfigRecord,
@@ -70,6 +71,14 @@ export class RunConfigEntity<M extends ApiClientEntityMeta = ApiClientEntityMeta
   setDataFile(dataFile: RunDataFile | null): void {
     this.unsafePatch((config) => {
       config.dataFile = dataFile;
+    });
+  }
+
+  removeDataFile(): void {
+    this.unsafePatch((config) => {
+      if (!config.dataFile) return;
+      apiClientFileStore.getState().removeFile(config.dataFile.id);
+      config.dataFile = null;
     });
   }
 
