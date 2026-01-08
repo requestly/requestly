@@ -1,8 +1,7 @@
 import { useMemo } from "react";
 import { useApiClientSelector } from "../hooks/base.hooks";
 import type { RQAPI } from "features/apiClient/types";
-import type { RunHistoryEntry } from "./types";
-import type { HistorySaveStatus } from "./types";
+import type { RunResult, HistorySaveStatus } from "../common/runResults/types";
 import type { RunHistoryListStatus } from "./slice";
 import {
   selectCollectionHistory,
@@ -24,14 +23,14 @@ import {
 } from "./selectors";
 
 // Collection history hooks
-export function useCollectionHistory(collectionId: RQAPI.CollectionRecord["id"]): RunHistoryEntry[] {
+export function useCollectionHistory(collectionId: RQAPI.CollectionRecord["id"]): RunResult[] {
   return useApiClientSelector((state) => selectCollectionHistory(state, collectionId));
 }
 
 export function useCollectionHistoryById(
   collectionId: RQAPI.CollectionRecord["id"],
   historyId: string
-): RunHistoryEntry | null {
+): RunResult | null {
   return useApiClientSelector((state) => selectCollectionHistoryById(state, collectionId, historyId));
 }
 
@@ -59,7 +58,7 @@ export function useHasCollectionHistoryError(collectionId: RQAPI.CollectionRecor
   return useApiClientSelector((state) => selectHasCollectionHistoryError(state, collectionId));
 }
 
-export function useLatestHistoryEntry(collectionId: RQAPI.CollectionRecord["id"]): RunHistoryEntry | null {
+export function useLatestHistoryEntry(collectionId: RQAPI.CollectionRecord["id"]): RunResult | null {
   return useApiClientSelector((state) => selectLatestHistoryEntry(state, collectionId));
 }
 
@@ -85,7 +84,7 @@ export function useIsHistorySaveFailed(): boolean {
 }
 
 // Optimized hooks using memoized selectors
-export function useCollectionHistoryOptimized(collectionId: RQAPI.CollectionRecord["id"]): RunHistoryEntry[] {
+export function useCollectionHistoryOptimized(collectionId: RQAPI.CollectionRecord["id"]): RunResult[] {
   const selector = useMemo(() => makeSelectCollectionHistory(collectionId), [collectionId]);
   return useApiClientSelector(selector);
 }

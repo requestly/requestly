@@ -3,6 +3,7 @@ import { ApiClientStoreState } from "../workspaceView/helpers/ApiClientContextRe
 import { liveRunResultsAdapter, LiveRunResultsSliceState } from "./slice";
 import { EntityNotFound } from "../types";
 import type { RQAPI } from "features/apiClient/types";
+import { RunStatus } from "./types";
 
 const selectLiveRunResultsSlice = (state: ApiClientStoreState): LiveRunResultsSliceState => state.liveRunResults;
 
@@ -20,29 +21,6 @@ export const selectLiveRunResultByCollectionId = (
 ) => {
   return selectLiveRunResultEntities(state)[collectionId] ?? null;
 };
-
-export const selectLiveRunResultByCollectionAndConfig = (
-  state: ApiClientStoreState,
-  collectionId: RQAPI.CollectionRecord["id"],
-  configId?: string
-) => {
-  const entry = selectLiveRunResultEntities(state)[collectionId];
-
-  if (!entry) return null;
-
-  if (configId && entry.configId !== configId) {
-    return null;
-  }
-
-  return entry;
-};
-
-export const selectLiveRunResultsByConfigId = createSelector(
-  [selectAllLiveRunResults, (_state: ApiClientStoreState, configId: string) => configId],
-  (allResults, configId) => {
-    return allResults.filter((result) => result.configId === configId);
-  }
-);
 
 export const makeSelectLiveRunResultByCollectionId = () =>
   createSelector(
@@ -178,14 +156,9 @@ export const selectLiveRunResultSummary = (state: ApiClientStoreState, collectio
   }
 
   return {
-    startTime: entry.startTime,
-    endTime: entry.endTime,
-    runStatus: entry.runStatus,
+    startTime: entry.startTime ?? 0,
+    endTime: entry.endTime ?? 0,
+    runStatus: entry.runStatus as RunStatus.CANCELLED | RunStatus.COMPLETED,
     iterations: entry.iterations,
   };
-};
-
-export const selectLiveRunResultConfigId = (state: ApiClientStoreState, collectionId: RQAPI.CollectionRecord["id"]) => {
-  const entry = selectLiveRunResultEntities(state)[collectionId];
-  return entry?.configId ?? null;
 };

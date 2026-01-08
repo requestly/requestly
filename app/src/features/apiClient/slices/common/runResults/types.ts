@@ -1,17 +1,9 @@
 import type { RQAPI } from "features/apiClient/types";
 
-export type Timestamp = number;
 export type Iteration = number;
+export type Timestamp = number;
 
-export enum RunStatus {
-  IDLE = "idle",
-  RUNNING = "running",
-  CANCELLED = "cancelled",
-  COMPLETED = "completed",
-  ERRORED = "errored",
-}
-
-export type BaseRequestExecutionResult = {
+type BaseRequestExecutionResult = {
   iteration: Iteration;
   recordId: RQAPI.ApiRecord["id"];
   recordName: RQAPI.ApiRecord["name"];
@@ -50,7 +42,48 @@ export type RequestExecutionResult =
       testResults: null;
     });
 
-export type IterationDetails = { result: RequestExecutionResult[] };
+export enum RunStatus {
+  IDLE = "idle",
+  RUNNING = "running",
+  CANCELLED = "cancelled",
+  COMPLETED = "completed",
+  ERRORED = "errored",
+}
+
+export type CurrentlyExecutingRequest =
+  | null
+  | (BaseRequestExecutionResult & {
+      startTime: Timestamp;
+    });
+
+export type IterationDetails = {
+  result: RequestExecutionResult[];
+};
+
+export type LiveRunResult = {
+  startTime: Timestamp | null;
+  endTime: Timestamp | null;
+  runStatus: RunStatus;
+  iterations: Map<Iteration, IterationDetails>;
+};
+
+export type RunResult = LiveRunResult & {
+  iterations: Map<Iteration, IterationDetails>;
+  runStatus: RunStatus.COMPLETED | RunStatus.CANCELLED;
+};
+
+export type SavedRunResult = RunResult & {
+  id: string;
+  iterations: IterationDetails[];
+  runStatus: RunStatus.COMPLETED;
+};
+
+export enum HistorySaveStatus {
+  IDLE = "idle",
+  SAVING = "saving",
+  SUCCESS = "success",
+  FAILED = "failed",
+}
 
 export type RunMetadata = {
   startTime: Timestamp | null;

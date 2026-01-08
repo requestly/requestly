@@ -5,7 +5,7 @@ import {
   LiveRunResult,
   RequestExecutionResult,
   RunResult,
-} from "features/apiClient/store/collectionRunResult/runResult.store";
+} from "features/apiClient/slices/common/runResults/types";
 import { getAllTestSummary, getRunMetrics, TestSummary } from "features/apiClient/store/collectionRunResult/utils";
 import { TestResultItem } from "../../../../../../response/TestsView/components/TestResult/TestResult";
 import { RQAPI } from "features/apiClient/types";
@@ -14,18 +14,20 @@ import {
   HttpMethodIcon,
 } from "features/apiClient/screens/apiClient/components/sidebar/components/collectionsList/requestRow/RequestRow";
 import { EmptyState } from "../../EmptyState/EmptyState";
-import { useRunResultStore } from "../../../run.context";
 import { LoadingOutlined } from "@ant-design/icons";
 import { MdOutlineArrowForwardIos } from "@react-icons/all-files/md/MdOutlineArrowForwardIos";
-import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
 import { RequestViewTabSource } from "../../../../../../RequestView/requestViewTabSource";
-import { useApiClientFeatureContext } from "features/apiClient/contexts/meta";
 import "./runResultContainer.scss";
 import { getFormattedStartTime, getFormattedTime } from "../utils";
 import { MdOutlineWarningAmber } from "@react-icons/all-files/md/MdOutlineWarningAmber";
 import { RQTooltip } from "lib/design-system-v2/components";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import NetworkStatusField from "components/misc/NetworkStatusField";
+import { useWorkspaceId } from "features/apiClient/common/WorkspaceProvider";
+import { useTabActions } from "componentsV2/Tabs/slice";
+import { useCollectionView } from "../../../../../collectionView.context";
+import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
+import { selectLiveRunResultCurrentlyExecutingRequest } from "features/apiClient/slices/liveRunResults/selectors";
 
 enum RunResultTabKey {
   ALL = "all",
@@ -86,8 +88,8 @@ const RunningRequestPlaceholder: React.FC<{
 const TestDetails: React.FC<{
   requestExecutionResult: RequestExecutionResult;
 }> = React.memo(({ requestExecutionResult }) => {
-  const context = useApiClientFeatureContext();
-  const [openTab] = useTabServiceWithSelector((s) => [s.openTab]);
+  const workspaceId = useWorkspaceId();
+  const { openBufferedTab } = useTabActions();
 
   const responseDetails = useMemo(() => {
     return (
@@ -122,15 +124,16 @@ const TestDetails: React.FC<{
           className="request-name"
           title={requestExecutionResult.recordName}
           onClick={() => {
-            openTab(
-              new RequestViewTabSource({
+            openBufferedTab({
+              preview: false,
+              source: new RequestViewTabSource({
                 id: requestExecutionResult.recordId,
                 title: requestExecutionResult.recordName,
                 context: {
-                  id: context.id,
+                  id: workspaceId,
                 },
-              })
-            );
+              }),
+            });
           }}
         >
           {requestExecutionResult.recordName}
@@ -138,11 +141,11 @@ const TestDetails: React.FC<{
       </>
     );
   }, [
-    context.id,
-    openTab,
     requestExecutionResult.collectionName,
-    requestExecutionResult.recordId,
     requestExecutionResult.recordName,
+    requestExecutionResult.recordId,
+    openBufferedTab,
+    workspaceId,
   ]);
 
   return (
@@ -186,7 +189,11 @@ const TestResultList: React.FC<{
   results: TestSummary;
   totalIterationCount?: number;
 }> = ({ tabKey, results, totalIterationCount }) => {
-  const [currentlyExecutingRequest] = useRunResultStore((s) => [s.currentlyExecutingRequest]);
+  const { collectionId } = useCollectionView();
+  const currentlyExecutingRequest = useApiClientSelector((state) =>
+    selectLiveRunResultCurrentlyExecutingRequest(state, collectionId)
+  );
+
   const parentRef = useRef<HTMLDivElement>(null);
   const resultsToShow = useMemo(() => Array.from(results), [results]);
 

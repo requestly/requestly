@@ -8,9 +8,9 @@ import { Workspace } from "features/workspaces/types";
 import { runCollection } from "features/apiClient/slices/runConfig/helpers/runCollection";
 import { BatchRequestExecutor } from "features/apiClient/helpers/batchRequestExecutor";
 import { ApiClientFeatureContext, getApiClientFeatureContext } from "../workspaceView/helpers/ApiClientContextRegistry";
-import { HostContext } from "hooks/useHostContext";
 import { BufferedRunConfigEntity } from "../entities/buffered/runConfig";
 import { LiveRunResultEntity } from "../entities/liveRunResult";
+import { DEFAULT_RUN_CONFIG_ID } from "./constants";
 
 function getDefaultRunOrderByCollectionId(
   ctx: ApiClientFeatureContext,
@@ -44,7 +44,6 @@ export const getDefaultRunConfig = createAsyncThunk<
   async ({ workspaceId, collectionId }, { rejectWithValue }) => {
     try {
       const ctx = getApiClientFeatureContext(workspaceId);
-      const DEFAULT_RUN_CONFIG_ID = "default"; // In future configId will be provided
 
       const result = await ctx.repositories.apiClientRecordsRepository.getRunConfig(
         collectionId,
@@ -160,18 +159,16 @@ export const runCollectionThunk = createAsyncThunk<
   void,
   {
     workspaceId: Workspace["id"];
-    hostContext: HostContext;
     executor: BatchRequestExecutor;
     runContext: RunContext;
   },
   { rejectValue: string }
 >(
   `${API_CLIENT_RUNNER_CONFIG_SLICE_NAME}/runCollection`,
-  async ({ workspaceId, hostContext, executor, runContext }, { rejectWithValue }) => {
+  async ({ workspaceId, executor, runContext }, { rejectWithValue }) => {
     try {
       await runCollection({
         executor,
-        hostContext,
         runContext,
         ctx: getApiClientFeatureContext(workspaceId),
       });

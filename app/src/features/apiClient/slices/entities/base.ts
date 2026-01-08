@@ -6,7 +6,11 @@ export type ApiClientEntityMeta = {
   id: string;
 };
 
-export abstract class ApiClientEntity<T, M extends ApiClientEntityMeta = ApiClientEntityMeta, State = ApiClientStoreState> {
+export abstract class ApiClientEntity<
+  T,
+  M extends ApiClientEntityMeta = ApiClientEntityMeta,
+  State = ApiClientStoreState
+> {
   abstract readonly type: ApiClientEntityType;
 
   constructor(protected readonly dispatch: EntityDispatch, public readonly meta: M) {}

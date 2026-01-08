@@ -10,21 +10,19 @@ import { useWorkspaceId } from "features/apiClient/common/WorkspaceProvider";
 import { ApiClientLocalRepository } from "features/apiClient/helpers/modules/sync/local";
 import { useBatchRequestExecutor } from "features/apiClient/hooks/requestExecutors/useBatchRequestExecutor";
 import { useIsBufferDirty } from "features/apiClient/slices/entities";
-import { useBufferedEntity, useEntity } from "features/apiClient/slices/entities/hooks";
-import { ApiClientEntityType } from "features/apiClient/slices/entities/types";
 import { useApiClientDispatch, useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
+import { selectLiveRunResultRunStatus } from "features/apiClient/slices/liveRunResults/selectors";
 import {
   saveRunConfig as saveRunConfigThunk,
   runCollectionThunk,
   cancelRunThunk,
   RunContext,
 } from "features/apiClient/slices/runConfig/thunks";
-import { DEFAULT_RUN_CONFIG_ID } from "features/apiClient/slices/runConfig/types";
 import {
   getApiClientFeatureContext,
   useApiClientFeatureContext,
 } from "features/apiClient/slices/workspaceView/helpers/ApiClientContextRegistry/hooks";
-import { RunStatus } from "features/apiClient/store/collectionRunResult/runResult.store";
+import { RunStatus } from "features/apiClient/slices/common/runResults/types";
 import { useHostContext } from "hooks/useHostContext";
 import { RQButton, RQTooltip } from "lib/design-system-v2/components";
 import {
@@ -40,14 +38,14 @@ import { toast } from "utils/Toast";
 import { KEYBOARD_SHORTCUTS } from "../../../../../../../../../../../../../src/constants/keyboardShortcuts";
 import { TAB_KEYS } from "../../../../CollectionView";
 import { useCollectionView } from "../../../../collectionView.context";
-import { useRunResultStore } from "../../run.context";
 import { EmptyState } from "../EmptyState/EmptyState";
 import { RunConfigOrderedRequests } from "./RunConfigOrderedRequests/RunConfigOrderedRequests";
 import { RunConfigSettings } from "./RunConfigSettings/RunConfigSettings";
-import "./runConfigView.scss";
 import { getAllDescendantApiRecordIds } from "features/apiClient/slices/apiRecords/utils";
 import { getRunnerConfigId, toSavedRunConfig } from "features/apiClient/slices/runConfig/utils";
 import { useSaveBuffer } from "features/apiClient/slices/buffer/hooks";
+import { DEFAULT_RUN_CONFIG_ID } from "features/apiClient/slices/runConfig/constants";
+import "./runConfigView.scss";
 
 const RunConfigSaveButton: React.FC<{ disabled?: boolean; isRunnerTabActive: boolean }> = ({
   disabled = false,
@@ -143,32 +141,21 @@ const RunConfigSaveButton: React.FC<{ disabled?: boolean; isRunnerTabActive: boo
 };
 
 const RunCollectionButton: React.FC<{ disabled?: boolean }> = ({ disabled = false }) => {
-  const { collectionId, liveRunResultsEntity } = useCollectionView();
-  const runStatus = useApiClientSelector((state) => liveRunResultsEntity.getRunStatus(state));
+  const { collectionId, bufferedEntity, liveRunResultEntity } = useCollectionView();
+  const runStatus = useApiClientSelector((s) => selectLiveRunResultRunStatus(s, collectionId));
 
   const dispatch = useDispatch();
   const apiClientDispatch = useApiClientDispatch();
   const workspaceId = useWorkspaceId();
-  const hostContext = useHostContext();
   const executor = useBatchRequestExecutor(collectionId);
+  const { registerWorkflow } = useHostContext();
 
-  const bufferedEntity = useBufferedEntity({
-    id: getRunnerConfigId(collectionId, DEFAULT_RUN_CONFIG_ID),
-    type: ApiClientEntityType.RUN_CONFIG,
-  });
-
-  const liveRunResultEntity = useEntity({
-    id: getRunnerConfigId(collectionId, DEFAULT_RUN_CONFIG_ID),
-    type: ApiClientEntityType.LIVE_RUN_RESULT,
-  });
-
-  const runContext: RunContext = useMemo(
-    () => ({
+  const runContext: RunContext = useMemo(() => {
+    return {
       liveRunResultEntity,
       runConfigEntity: bufferedEntity,
-    }),
-    [bufferedEntity, liveRunResultEntity]
-  );
+    };
+  }, [bufferedEntity, liveRunResultEntity]);
 
   const handleRunClick = useCallback(async () => {
     if (!isExtensionInstalled() && !isDesktopMode()) {
@@ -184,14 +171,15 @@ const RunCollectionButton: React.FC<{ disabled?: boolean }> = ({ disabled = fals
     }
 
     try {
-      await apiClientDispatch(
+      const promise = apiClientDispatch(
         runCollectionThunk({
           workspaceId,
-          hostContext,
           executor,
           runContext,
         })
       ).unwrap();
+
+      // registerWorkflow("Collection run is in progress, still want to close?", promise);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Unable to run collection!");
       Sentry.captureException(error, {
@@ -200,7 +188,7 @@ const RunCollectionButton: React.FC<{ disabled?: boolean }> = ({ disabled = fals
         },
       });
     }
-  }, [workspaceId, hostContext, executor, runContext, apiClientDispatch, dispatch]);
+  }, [dispatch, apiClientDispatch, workspaceId, executor, runContext]);
 
   const handleCancelRunClick = useCallback(() => {
     apiClientDispatch(cancelRunThunk({ runContext }));

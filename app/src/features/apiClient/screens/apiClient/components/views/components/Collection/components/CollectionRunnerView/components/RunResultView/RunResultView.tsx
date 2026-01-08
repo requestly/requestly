@@ -3,7 +3,7 @@ import { RQButton } from "lib/design-system-v2/components";
 import { MdOutlineHistory } from "@react-icons/all-files/md/MdOutlineHistory";
 import { RunResultContainer } from "./RunResultContainer/RunResultContainer";
 import { TestsRunningLoader } from "./TestsRunningLoader/TestsRunningLoader";
-import { HistorySaveStatus, RunStatus } from "features/apiClient/store/collectionRunResult/runResult.store";
+import { HistorySaveStatus, RunStatus } from "features/apiClient/slices/common/runResults/types";
 import "./runResultView.scss";
 import { HistoryDrawer } from "./HistoryDrawer/HistoryDrawer";
 import { useCollectionView } from "../../../../collectionView.context";
@@ -13,16 +13,43 @@ import { RenderableError } from "errors/RenderableError";
 import DefaultErrorComponent from "./errors/DefaultCollectionRunnerErrorComponent/DefaultCollectionRunnerErrorComponent";
 import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
 import { selectHistorySaveStatus } from "features/apiClient/slices/runHistory";
+import {
+  selectLiveRunResultIterations,
+  selectLiveRunResultStartTime,
+  selectLiveRunResultRunStatus,
+  selectLiveRunResultError,
+  selectLiveRunResultByCollectionId,
+} from "features/apiClient/slices/liveRunResults/selectors";
 
 export const RunResultView: React.FC = () => {
-  const { collectionId, bufferedEntity, liveRunResultsEntity } = useCollectionView();
+  const { collectionId, bufferedEntity } = useCollectionView();
 
-  const runSummary = useApiClientSelector((s) => liveRunResultsEntity.getRunSummary(s));
-  const iterations = useApiClientSelector((s) => liveRunResultsEntity.getIterationCount(s));
-  const startTime = useApiClientSelector((s) => liveRunResultsEntity.getStartTime(s));
-  const runStatus = useApiClientSelector((s) => liveRunResultsEntity.getRunStatus(s));
+  const liveRunResultEntry = useApiClientSelector((s) => selectLiveRunResultByCollectionId(s, collectionId));
+  const runSummary = useMemo(() => {
+    if (!liveRunResultEntry) {
+      // Return empty run summary when no entry exists
+      return {
+        startTime: null,
+        endTime: null,
+        runStatus: RunStatus.IDLE,
+        iterations: new Map(),
+      };
+    }
+
+    return {
+      startTime: liveRunResultEntry.startTime,
+      endTime: liveRunResultEntry.endTime,
+      runStatus: liveRunResultEntry.runStatus,
+      iterations: liveRunResultEntry.iterations,
+    };
+  }, [liveRunResultEntry]);
+
+  const iterationsMap = useApiClientSelector((s) => selectLiveRunResultIterations(s, collectionId));
+  const iterations = iterationsMap?.size ?? 0;
+  const startTime = useApiClientSelector((s) => selectLiveRunResultStartTime(s, collectionId));
+  const runStatus = useApiClientSelector((s) => selectLiveRunResultRunStatus(s, collectionId));
   const historySaveStatus = useApiClientSelector((s) => selectHistorySaveStatus(s));
-  const error = useApiClientSelector((s) => liveRunResultsEntity.getError(s));
+  const error = useApiClientSelector((s) => selectLiveRunResultError(s, collectionId));
 
   const totalIterationCount = useApiClientSelector((state) => bufferedEntity.getIterations(state));
 
@@ -54,7 +81,7 @@ export const RunResultView: React.FC = () => {
       </div>
 
       {historySaveStatus === HistorySaveStatus.FAILED ? <HistoryNotSavedBanner /> : null}
-      {runStatus === RunStatus.ERRORED ? (
+      {runStatus === RunStatus.ERRORED && error ? (
         error instanceof RenderableError ? (
           error.render()
         ) : (

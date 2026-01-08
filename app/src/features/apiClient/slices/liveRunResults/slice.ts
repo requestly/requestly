@@ -1,16 +1,23 @@
 import { createSlice, createEntityAdapter, PayloadAction, EntityState } from "@reduxjs/toolkit";
 import { NativeError } from "errors/NativeError";
-import type { CurrentlyExecutingRequest, LiveIterationMap } from "./types";
-import type { RequestExecutionResult, RunMetadata, RunStatus, Timestamp } from "../common/runResults/types";
+import type {
+  CurrentlyExecutingRequest,
+  RequestExecutionResult,
+  RunMetadata,
+  RunStatus,
+  Timestamp,
+  Iteration,
+  IterationDetails,
+} from "../common/runResults/types";
 import { RunStatusStateMachine } from "../common/runResults/utils";
 import { RunStatus as RunStatusEnum } from "../common/runResults/types";
 import { API_CLIENT_LIVE_RUN_RESULTS_SLICE_NAME } from "../common/constants";
 import type { RQAPI } from "features/apiClient/types";
+import { EntityNotFound } from "../types";
 
 export interface LiveRunEntryState extends RunMetadata {
   id: RQAPI.CollectionRecord["id"];
-  configId: string;
-  iterations: LiveIterationMap;
+  iterations: Map<Iteration, IterationDetails>;
   currentlyExecutingRequest: CurrentlyExecutingRequest;
   abortController: AbortController;
   error?: Error;
@@ -26,12 +33,8 @@ const initialState: LiveRunResultsSliceState = liveRunResultsAdapter.getInitialS
 
 export class InvalidLiveRunStateTransition extends NativeError {}
 
-export const createEmptyRunEntry = (
-  collectionId: RQAPI.CollectionRecord["id"],
-  configId: string
-): LiveRunEntryState => ({
+export const createEmptyRunEntry = (collectionId: RQAPI.CollectionRecord["id"]): LiveRunEntryState => ({
   id: collectionId,
-  configId,
   startTime: null,
   endTime: null,
   runStatus: RunStatusEnum.IDLE,
@@ -56,14 +59,13 @@ export const liveRunResultsSlice = createSlice({
       state,
       action: PayloadAction<{
         collectionId: RQAPI.CollectionRecord["id"];
-        configId: string;
         startTime?: Timestamp;
       }>
     ) {
-      const { collectionId, configId, startTime } = action.payload;
+      const { collectionId, startTime } = action.payload;
 
       const entry: LiveRunEntryState = {
-        ...createEmptyRunEntry(collectionId, configId),
+        ...createEmptyRunEntry(collectionId),
         startTime: startTime ?? Date.now(),
         runStatus: RunStatusEnum.RUNNING,
       };
@@ -81,7 +83,9 @@ export const liveRunResultsSlice = createSlice({
     ) {
       const { collectionId, status, error } = action.payload;
       const entry = state.entities[collectionId];
-      if (!entry) return;
+      if (!entry) {
+        throw new EntityNotFound(collectionId, "Collection not found!");
+      }
 
       assertTransition(entry.runStatus, status);
 
@@ -98,7 +102,9 @@ export const liveRunResultsSlice = createSlice({
     ) {
       const { collectionId, request } = action.payload;
       const entry = state.entities[collectionId];
-      if (!entry) return;
+      if (!entry) {
+        throw new EntityNotFound(collectionId, "Collection not found!");
+      }
 
       entry.currentlyExecutingRequest = request;
     },
@@ -112,7 +118,9 @@ export const liveRunResultsSlice = createSlice({
     ) {
       const { collectionId, result } = action.payload;
       const entry = state.entities[collectionId];
-      if (!entry) return;
+      if (!entry) {
+        throw new EntityNotFound(collectionId, "Collection not found!");
+      }
 
       const iterationBucket = entry.iterations.get(result.iteration);
 
@@ -134,7 +142,9 @@ export const liveRunResultsSlice = createSlice({
     ) {
       const { collectionId, status, endTime, error } = action.payload;
       const entry = state.entities[collectionId];
-      if (!entry) return;
+      if (!entry) {
+        throw new EntityNotFound(collectionId, "Collection not found!");
+      }
 
       assertTransition(entry.runStatus, status);
 
@@ -148,11 +158,10 @@ export const liveRunResultsSlice = createSlice({
       state,
       action: PayloadAction<{
         collectionId: RQAPI.CollectionRecord["id"];
-        configId: string;
       }>
     ) {
-      const { collectionId, configId } = action.payload;
-      liveRunResultsAdapter.setOne(state, createEmptyRunEntry(collectionId, configId));
+      const { collectionId } = action.payload;
+      liveRunResultsAdapter.setOne(state, createEmptyRunEntry(collectionId));
     },
 
     cancelRun(
@@ -165,7 +174,10 @@ export const liveRunResultsSlice = createSlice({
     ) {
       const { collectionId, reason, cancelledAt } = action.payload;
       const entry = state.entities[collectionId];
-      if (!entry) return;
+
+      if (!entry) {
+        throw new EntityNotFound(collectionId, "Collection not found!");
+      }
 
       assertTransition(entry.runStatus, RunStatusEnum.CANCELLED);
 
