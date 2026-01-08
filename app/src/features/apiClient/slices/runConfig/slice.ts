@@ -1,19 +1,11 @@
 import { createSlice, createEntityAdapter, PayloadAction } from "@reduxjs/toolkit";
-import {
-  RunConfigEntity,
-  RunnerConfigId,
-  RunnerConfigState as RunConfigState,
-  RunOrder,
-  RunDataFile,
-  isValidDelay,
-  isValidIterations,
-  fromSavedRunConfig,
-} from "./types";
+import { RunConfigEntity, RunnerConfigId, RunnerConfigState as RunConfigState, RunDataFile } from "./types";
 import type { SavedRunConfig } from "features/apiClient/commands/collectionRunner/types";
 import { API_CLIENT_RUNNER_CONFIG_SLICE_NAME } from "../common/constants";
-import { patchRunOrder } from "./utils";
+import { fromSavedRunConfig, isValidDelay, isValidIterations, patchRunOrder } from "./utils";
 import { entitySynced } from "../common";
 import { ApiClientEntityType } from "../entities/types";
+import { RQAPI } from "features/apiClient/types";
 
 export const runConfigAdapter = createEntityAdapter<RunConfigEntity>({
   selectId: (config) => config.collectionId + "::" + config.configId,
@@ -43,7 +35,7 @@ export const runnerConfigSlice = createSlice({
     removeConfigsForCollection(state, action: PayloadAction<RunnerConfigId[]>) {
       runConfigAdapter.removeMany(state.configs, action.payload);
     },
-    updateRunOrder(state, action: PayloadAction<{ key: RunnerConfigId; runOrder: RunOrder }>) {
+    updateRunOrder(state, action: PayloadAction<{ key: RunnerConfigId; runOrder: RQAPI.RunOrder }>) {
       const config = state.configs.entities[action.payload.key];
       if (config) {
         config.runOrder = action.payload.runOrder;
