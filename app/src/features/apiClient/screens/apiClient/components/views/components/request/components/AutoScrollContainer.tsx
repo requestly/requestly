@@ -1,11 +1,15 @@
 import React, { useEffect, useRef } from "react";
 
-interface AutoScrollContainerProps<TTrigger = unknown> {
+interface AutoScrollContainerProps<Trigger = unknown> {
   children: React.ReactNode;
-  trigger: TTrigger;
+  trigger: Trigger;
   scrollTargetRef?: React.RefObject<HTMLElement> | null;
 }
 
+/**
+ * Container that handles automatic scrolling behavior when the trigger prop changes.
+ * * Note: The `ref` object passed to `scrollTargetRef` needs to be stable, else it might cause bugs/rerenders/unnecessary auto scrolls.
+ */
 export const AutoScrollContainer: React.FC<AutoScrollContainerProps> = ({ children, trigger, scrollTargetRef }) => {
   const containerRef = useRef<HTMLDivElement>(null);
 

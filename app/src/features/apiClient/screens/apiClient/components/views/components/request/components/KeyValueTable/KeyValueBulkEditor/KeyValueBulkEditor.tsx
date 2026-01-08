@@ -112,6 +112,7 @@ export const KeyValueBulkEditor: React.FC<KeyValueBulkEditorProps> = ({
     // Changing this flag allows the value inside the Editor to be changed by our formatter and chnages passed down from Table
     if (isInternalChange.current) {
       isInternalChange.current = false;
+      lastSyncedText.current = formatKeyValueText(activeData);
       return;
     }
 
@@ -173,7 +174,7 @@ export const KeyValueBulkEditor: React.FC<KeyValueBulkEditorProps> = ({
           hideToolbar
           hideCharacterCount
           autoFocus={true}
-          autocompletion={false}
+          disableDefaultAutoCompletions={true}
         />
       </div>
       <div className="bulk-edit-panel-hint">{"Format: key:value | One row per line | Prepend // to disable a row"}</div>

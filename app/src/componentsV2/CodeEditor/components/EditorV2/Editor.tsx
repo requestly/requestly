@@ -56,7 +56,7 @@ interface EditorProps {
     source: "ai" | "user";
     onPartialMerge: (mergedValue: string, newIncomingValue: string, type: "accept" | "reject") => void;
   };
-  autocompletion?: boolean;
+  disableDefaultAutoCompletions?: boolean;
   customTheme?: Extension;
 }
 const Editor: React.FC<EditorProps> = ({
@@ -79,7 +79,7 @@ const Editor: React.FC<EditorProps> = ({
   onFocus,
   onEditorReady,
   mergeView,
-  autocompletion = true,
+  disableDefaultAutoCompletions = false,
   customTheme,
 }) => {
   const location = useLocation();
@@ -290,7 +290,7 @@ const Editor: React.FC<EditorProps> = ({
         bracketMatching: true,
         closeBrackets: true,
         allowMultipleSelections: true,
-        autocompletion,
+        autocompletion: !disableDefaultAutoCompletions,
       }}
       data-enable-grammarly="false"
       data-gramm_editor="false"
