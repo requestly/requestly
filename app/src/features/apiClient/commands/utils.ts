@@ -9,7 +9,7 @@ import {
 } from "../screens/apiClient/utils";
 import { getApiClientFeatureContext, getChildParentMap } from "./store.utils";
 import { isEmpty } from "lodash";
-import { apiRecordsRankingManager } from "../components/sidebar";
+import { apiRecordsRankingManager } from "../helpers/RankingManager";
 
 export function sanitizePatch(patch: EnvironmentVariables) {
   return Object.fromEntries(
