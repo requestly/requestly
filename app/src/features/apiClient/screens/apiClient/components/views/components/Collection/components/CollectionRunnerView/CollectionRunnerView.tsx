@@ -21,6 +21,7 @@ import { useHostContext } from "hooks/useHostContext";
 import { fromSavedRunConfig, getRunnerConfigId } from "features/apiClient/slices/runConfig/utils";
 import { getAllDescendantApiRecordIds } from "features/apiClient/slices/apiRecords/utils";
 import "./collectionRunnerView.scss";
+import { DEFAULT_RUN_CONFIG_ID } from "features/apiClient/slices/runConfig/types";
 
 interface Props {
   collectionId: RQAPI.CollectionRecord["id"];
@@ -103,7 +104,7 @@ export const CollectionRunnerView: React.FC<Props> = ({ collectionId, activeTabK
   }
 
   return (
-    <CollectionViewContextProvider key={collectionId} collectionId={collectionId}>
+    <CollectionViewContextProvider key={collectionId} collectionId={collectionId} configId={DEFAULT_RUN_CONFIG_ID}>
       <AutogenerateProvider>
         <div className="collection-runner-view">
           <Split

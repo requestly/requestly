@@ -2,15 +2,11 @@ import { MdDragIndicator } from "@react-icons/all-files/md/MdDragIndicator";
 import { Checkbox, Typography } from "antd";
 import { RequestIcon } from "features/apiClient/screens/apiClient/components/sidebar/components/collectionsList/requestRow/RequestRow";
 import { useRecordById } from "features/apiClient/slices";
-import { useBufferedEntity } from "features/apiClient/slices/entities/hooks";
-import { ApiClientEntityType } from "features/apiClient/slices/entities/types";
-import { DEFAULT_RUN_CONFIG_ID } from "features/apiClient/slices/runConfig/types";
 import { RQAPI } from "features/apiClient/types";
 import React, { useRef } from "react";
 import { useDrag, useDrop } from "react-dnd";
 import { useCollectionView } from "../../../../../../collectionView.context";
 import { CollectionChain } from "./CollectionChain";
-import { getRunnerConfigId } from "features/apiClient/slices/runConfig/utils";
 
 enum ReorderableItemType {
   REQUEST = "request",
@@ -68,12 +64,7 @@ interface ReorderableListItemProps {
 }
 
 export const ReorderableListItem: React.FC<ReorderableListItemProps> = ({ index, orderedRequest, reorder }) => {
-  const { collectionId } = useCollectionView();
-
-  const bufferedEntity = useBufferedEntity({
-    id: getRunnerConfigId(collectionId, DEFAULT_RUN_CONFIG_ID),
-    type: ApiClientEntityType.RUN_CONFIG,
-  });
+  const { bufferedEntity } = useCollectionView();
 
   const ref = useRef<HTMLDivElement>(null);
 
