@@ -3,3 +3,4 @@ export type { RunHistorySliceState, CollectionHistoryBucket, RunHistoryListStatu
 export * from "./types";
 export * from "./selectors";
 export * from "./hooks";
+export * from "./utils";

@@ -92,11 +92,16 @@ const TestDetails: React.FC<{
   const responseDetails = useMemo(() => {
     return (
       <div className="response-details">
-        <span className="response-time">{Math.round(requestExecutionResult.entry.responseTime)}ms</span>
+        <span className="response-time">
+          {requestExecutionResult.entry.responseTime != null
+            ? Math.round(requestExecutionResult.entry.responseTime)
+            : 0}
+          ms
+        </span>
         {requestExecutionResult.entry.statusCode ? (
           <NetworkStatusField
             status={requestExecutionResult.entry.statusCode}
-            statusText={requestExecutionResult.entry.statusText}
+            statusText={requestExecutionResult.entry.statusText ?? undefined}
           />
         ) : null}
       </div>
@@ -228,7 +233,7 @@ const TestResultList: React.FC<{
   }
 
   // For single iteration, render without virtualization
-  if (results.size === 1) {
+  if (results.size === 1 && resultsToShow[0]) {
     return (
       <div className="tests-results-view-container">
         {resultsToShow[0][1].map(({ requestExecutionResult }) => {
@@ -252,7 +257,10 @@ const TestResultList: React.FC<{
         }}
       >
         {items.map((virtualItem) => {
-          const [iteration, details] = resultsToShow[virtualItem.index];
+          const result = resultsToShow[virtualItem.index];
+          if (!result) return null;
+
+          const [iteration, details] = result;
           const isCurrentIteration = iteration === currentlyExecutingRequest?.iteration;
 
           return (

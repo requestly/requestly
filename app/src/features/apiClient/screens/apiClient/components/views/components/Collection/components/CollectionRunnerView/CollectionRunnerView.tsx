@@ -11,7 +11,7 @@ import { getDefaultRunConfig, getRunResults } from "features/apiClient/slices/ru
 import { DEFAULT_RUN_CONFIG_ID } from "features/apiClient/slices/runConfig/types";
 import { fromSavedRunConfig, getRunnerConfigId } from "features/apiClient/slices/runConfig/utils";
 import { AutogenerateProvider } from "features/apiClient/store/autogenerateContextProvider";
-import { RunResult } from "features/apiClient/store/collectionRunResult/runResult.store";
+
 import { RQAPI } from "features/apiClient/types";
 import { useHostContext } from "hooks/useHostContext";
 import React, { useEffect, useState } from "react";
@@ -24,6 +24,7 @@ import { RunConfigView } from "./components/RunConfigView/RunConfigView";
 import { RunnerViewLoader } from "./components/RunnerViewLoader/RunnerViewLoader";
 import { RunResultView } from "./components/RunResultView/RunResultView";
 import { runHistoryActions, RunHistoryEntry } from "features/apiClient/slices/runHistory";
+import { REGISTER, REHYDRATE } from "redux-persist";
 
 interface Props {
   collectionId: RQAPI.CollectionRecord["id"];
@@ -93,10 +94,20 @@ export const CollectionRunnerView: React.FC<Props> = ({ collectionId, activeTabK
       try {
         setIsResultsLoading(true);
         const results = await apiClientDispatch(getRunResults({ workspaceId, collectionId })).unwrap();
+
+        // Convert SavedRunResult to RunHistoryEntry format (Map to Array)
+        const historyEntries: RunHistoryEntry[] = results.map((result) => ({
+          id: result.id,
+          startTime: result.startTime,
+          endTime: result.endTime,
+          runStatus: result.runStatus,
+          iterations: Array.from(result.iterations.values()),
+        }));
+
         apiClientDispatch(
           runHistoryActions.addHistoryEntries({
             collectionId,
-            entries: results as RunHistoryEntry[],
+            entries: historyEntries,
           })
         );
         setIsResultsLoading(false);
