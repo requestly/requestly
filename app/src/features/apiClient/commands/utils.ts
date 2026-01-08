@@ -9,6 +9,7 @@ import {
 } from "../screens/apiClient/utils";
 import { getApiClientFeatureContext, getChildParentMap } from "./store.utils";
 import { isEmpty } from "lodash";
+import { apiRecordsRankingManager } from "../helpers/RankingManager";
 
 export function sanitizePatch(patch: EnvironmentVariables) {
   return Object.fromEntries(
@@ -45,26 +46,23 @@ export function prepareRecordsToRender(records: RQAPI.ApiClientRecord[]) {
   const { updatedRecords, recordsMap } = convertFlatRecordsToNestedRecords(records);
 
   updatedRecords.sort((recordA, recordB) => {
+    // Keep example collections first
+    if (recordA.isExample && !recordB.isExample) {
+      return -1;
+    }
+    if (recordB.isExample && !recordA.isExample) {
+      return 1;
+    }
+
     // If different type, then keep collection first
-    if (recordA.type === RQAPI.RecordType.COLLECTION && recordA.isExample) {
-      return -1;
-    }
-
-    if (recordB.type === RQAPI.RecordType.COLLECTION && recordB.isExample) {
-      return -1;
-    }
-
     if (recordA.type !== recordB.type) {
       return recordA.type === RQAPI.RecordType.COLLECTION ? -1 : 1;
     }
 
-    // If types are the same, sort lexicographically by name
-    if (recordA.name.toLowerCase() !== recordB.name.toLowerCase()) {
-      return recordA.name.toLowerCase() < recordB.name.toLowerCase() ? -1 : 1;
-    }
-
-    // If names are the same, sort by creation date
-    return recordA.createdTs - recordB.createdTs;
+    // For same type, use ranking manager to sort by rank
+    const aRank = apiRecordsRankingManager.getEffectiveRank(recordA);
+    const bRank = apiRecordsRankingManager.getEffectiveRank(recordB);
+    return apiRecordsRankingManager.compareFn(aRank, bRank);
   });
 
   return {
