@@ -247,7 +247,7 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
     try {
       const apiClientExecutionResult = await httpRequestExecutor.execute(
         {
-          entity,
+          entry: getEntry(entity, store),
           recordId: entity.meta.referenceId,
         },
         {
@@ -441,7 +441,7 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
 
   const handleTestResultRefresh = useCallback(async () => {
     try {
-      const result = await httpRequestExecutor.rerun(entity.meta.referenceId, entity);
+      const result = await httpRequestExecutor.rerun(entity.meta.referenceId, getEntry(entity, store));
       if (result.status === RQAPI.ExecutionStatus.SUCCESS) {
         entity.setTestResults(result.artifacts.testResults);
       } else {
@@ -450,7 +450,7 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
     } catch {
       toast.error("Something went wrong while refreshing test results");
     }
-  }, [httpRequestExecutor, entity]);
+  }, [httpRequestExecutor, entity, store]);
 
   const handleRevertChanges = () => {
     // setEntry(apiEntryDetails?.data);
@@ -494,7 +494,10 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
 
             <ClientCodeButton
               requestPreparer={() =>
-                httpRequestExecutor.requestPreparer.prepareRequest(entity.meta.referenceId, entity).preparedEntry.request
+                {
+                  const entry = entity.getEntityFromState(store.getState()).data;
+                  return httpRequestExecutor.requestPreparer.prepareRequest(entity.meta.referenceId, entry).preparedEntry.request
+                }
               }
             />
           </div>
