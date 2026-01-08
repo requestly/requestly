@@ -33,6 +33,12 @@ export const getAllChildrenRecords = (ctx: ApiClientFeatureContext, nodeId: stri
     });
 };
 
+export const getImmediateChildrenRecords = (ctx: ApiClientFeatureContext, nodeId: string) => {
+  const children = ctx.stores.records.getState().getDirectChildren(nodeId);
+  const getRecord = ctx.stores.records.getState().getData;
+  return children.map((child) => getRecord(child)).filter((child) => !!child);
+};
+
 export const useChildren = (nodeId: string) => {
   const ctx = useApiClientFeatureContext();
   const treeBus = useMemo(() => ctx.treeBus, [ctx]);
