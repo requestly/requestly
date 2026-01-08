@@ -10,6 +10,7 @@ export enum HistorySaveStatus {
 export type PersistedIterationList = IterationDetails[];
 
 export interface RunHistoryEntry extends RunMetadata {
+  id: string;
   runStatus: RunStatus.COMPLETED | RunStatus.CANCELLED;
   iterations: PersistedIterationList;
 }

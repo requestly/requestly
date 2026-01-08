@@ -305,18 +305,7 @@ class Runner {
       iterations: summary.iterations,
     };
 
-    // Convert Map to Array for history store
-    const iterationsArray = Array.from(summary.iterations.values());
-    const runHistoryEntry: RunHistoryEntry = {
-      startTime: summary.startTime!,
-      endTime: summary.endTime!,
-      runStatus: summary.runStatus as RunStatus.COMPLETED | RunStatus.CANCELLED,
-      iterations: iterationsArray,
-    };
-
     // Set history save status to SAVING
-    this.ctx.store.dispatch(runHistoryActions.addHistoryEntry({ collectionId, entry: runHistoryEntry }));
-
     try {
       this.ctx.store.dispatch(
         runHistoryActions.setHistorySaveStatus({
@@ -325,12 +314,23 @@ class Runner {
       );
 
       const result = await this.ctx.repositories.apiClientRecordsRepository.addRunResult(collectionId, runResult);
-      if (result.success === false && result.error.type === "INTERNAL_SERVER_ERROR") {
+      if (result.success === false || !result.data) {
         throw new NativeError("Something went wrong while saving run result!").addContext({
           collectionId,
           runResult,
         });
       }
+
+      // Add to history store with the returned id from Firebase
+      const iterationsArray = Array.from(summary.iterations.values());
+      const runHistoryEntry: RunHistoryEntry = {
+        id: result.data.id,
+        startTime: summary.startTime!,
+        endTime: summary.endTime!,
+        runStatus: summary.runStatus as RunStatus.COMPLETED | RunStatus.CANCELLED,
+        iterations: iterationsArray,
+      };
+      this.ctx.store.dispatch(runHistoryActions.addHistoryEntry({ collectionId, entry: runHistoryEntry }));
 
       this.ctx.store.dispatch(
         runHistoryActions.setHistorySaveStatus({
