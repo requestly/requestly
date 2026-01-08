@@ -1,8 +1,9 @@
-import type { RQAPI } from "features/apiClient/types";
+import { RQAPI } from "features/apiClient/types";
 import type { ApiClientStoreState } from "../workspaceView/helpers/ApiClientContextRegistry/types";
 import { ApiClientEntity, ApiClientEntityMeta } from "./base";
 import type { UpdateCommand, DeepPartial, DeepPartialWithNull } from "../types";
 import { apiRecordsActions } from "../apiRecords";
+import { TestResult } from "@requestly/shared/types/entities/apiClient";
 
 
 export abstract class ApiClientRecordEntity<T extends RQAPI.ApiClientRecord, M extends ApiClientEntityMeta = ApiClientEntityMeta> extends ApiClientEntity<T, M> {
@@ -54,6 +55,18 @@ export abstract class ApiClientRecordEntity<T extends RQAPI.ApiClientRecord, M e
 
   getPostResponseScript(state: ApiClientStoreState): string | undefined {
     return this.getScripts(state)?.postResponse;
+  }
+
+  getTestResults(state: ApiClientStoreState) {
+    const record = this.getEntityFromState(state);
+    if(record.type !== RQAPI.RecordType.API) {
+      return;
+    }
+    return record.data.testResults;
+  }
+
+  setTestResults(testResults?: TestResult[]): void {
+    this.SETCOMMON({ data: { testResults } });
   }
 
   setName(name: string): void {
