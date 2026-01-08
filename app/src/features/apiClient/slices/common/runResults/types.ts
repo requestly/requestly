@@ -68,7 +68,6 @@ export type LiveRunResult = {
 };
 
 export type RunResult = LiveRunResult & {
-  iterations: Map<Iteration, IterationDetails>;
   runStatus: RunStatus.COMPLETED | RunStatus.CANCELLED;
 };
 
@@ -77,13 +76,6 @@ export type SavedRunResult = RunResult & {
   iterations: IterationDetails[];
   runStatus: RunStatus.COMPLETED;
 };
-
-export enum HistorySaveStatus {
-  IDLE = "idle",
-  SAVING = "saving",
-  SUCCESS = "success",
-  FAILED = "failed",
-}
 
 export type RunMetadata = {
   startTime: Timestamp | null;

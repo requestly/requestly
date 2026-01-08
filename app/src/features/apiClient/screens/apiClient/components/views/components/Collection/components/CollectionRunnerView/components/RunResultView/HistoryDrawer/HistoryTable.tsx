@@ -1,7 +1,7 @@
 import { Skeleton, Table } from "antd";
 import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
 import { useCollectionHistory } from "features/apiClient/slices/runHistory";
-import { LiveRunResult, RunResult, RunStatus } from "features/apiClient/store/collectionRunResult/runResult.store";
+import { LiveRunResult, RunResult, RunStatus } from "features/apiClient/slices/common/runResults/types";
 import { getAllTestSummary, getRunMetrics } from "features/apiClient/store/collectionRunResult/utils";
 import React, { useMemo } from "react";
 import { useCollectionView } from "../../../../../collectionView.context";
@@ -12,10 +12,10 @@ import "./historyTable.scss";
 const LoadingSkeleton: React.FC = () => <Skeleton.Button className="history-row-skeleton" shape="round" size="small" />;
 
 export const HistoryTable: React.FC<{ onHistoryClick: (result: RunResult) => void }> = ({ onHistoryClick }) => {
-  const { liveRunResultsEntity, collectionId } = useCollectionView();
+  const { liveRunResultEntity, collectionId } = useCollectionView();
 
-  const runStatus = useApiClientSelector((s) => liveRunResultsEntity.getRunStatus(s));
-  const runStartTime = useApiClientSelector((s) => liveRunResultsEntity.getStartTime(s));
+  const runStatus = useApiClientSelector((s) => liveRunResultEntity.getRunStatus(s));
+  const runStartTime = useApiClientSelector((s) => liveRunResultEntity.getStartTime(s));
 
   const history = useCollectionHistory(collectionId);
 

@@ -17,7 +17,7 @@ import {
   API_CLIENT_RUN_HISTORY_SLICE_NAME,
 } from "features/apiClient/slices/common/constants";
 import { LiveRunResultsSliceState } from "features/apiClient/slices/liveRunResults/slice";
-import { RunHistorySliceState } from "features/apiClient/slices/runHistory";
+import { RunHistorySliceState } from "features/apiClient/slices/runHistory/slice";
 
 export interface ApiClientStoreState {
   [API_CLIENT_RECORDS_SLICE_NAME]: ApiRecordsState;

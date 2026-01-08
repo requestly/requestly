@@ -3,7 +3,7 @@ import { RQButton } from "lib/design-system-v2/components";
 import { MdOutlineHistory } from "@react-icons/all-files/md/MdOutlineHistory";
 import { RunResultContainer } from "./RunResultContainer/RunResultContainer";
 import { TestsRunningLoader } from "./TestsRunningLoader/TestsRunningLoader";
-import { HistorySaveStatus, RunStatus } from "features/apiClient/slices/common/runResults/types";
+import { RunStatus } from "features/apiClient/slices/common/runResults/types";
 import "./runResultView.scss";
 import { HistoryDrawer } from "./HistoryDrawer/HistoryDrawer";
 import { useCollectionView } from "../../../../collectionView.context";
@@ -12,7 +12,6 @@ import { HistoryNotSavedBanner } from "./HistoryNotSavedBanner/HistoryNotSavedBa
 import { RenderableError } from "errors/RenderableError";
 import DefaultErrorComponent from "./errors/DefaultCollectionRunnerErrorComponent/DefaultCollectionRunnerErrorComponent";
 import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
-import { selectHistorySaveStatus } from "features/apiClient/slices/runHistory";
 import {
   selectLiveRunResultIterations,
   selectLiveRunResultStartTime,
@@ -20,6 +19,8 @@ import {
   selectLiveRunResultError,
   selectLiveRunResultByCollectionId,
 } from "features/apiClient/slices/liveRunResults/selectors";
+import { selectCollectionHistoryStatus } from "features/apiClient/slices/runHistory/selectors";
+import { RunHistorySaveStatus } from "features/apiClient/slices/runHistory/types";
 
 export const RunResultView: React.FC = () => {
   const { collectionId, bufferedEntity } = useCollectionView();
@@ -48,7 +49,7 @@ export const RunResultView: React.FC = () => {
   const iterations = iterationsMap?.size ?? 0;
   const startTime = useApiClientSelector((s) => selectLiveRunResultStartTime(s, collectionId));
   const runStatus = useApiClientSelector((s) => selectLiveRunResultRunStatus(s, collectionId));
-  const historySaveStatus = useApiClientSelector((s) => selectHistorySaveStatus(s));
+  const historySaveStatus = useApiClientSelector((s) => selectCollectionHistoryStatus(s, collectionId));
   const error = useApiClientSelector((s) => selectLiveRunResultError(s, collectionId));
 
   const totalIterationCount = useApiClientSelector((state) => bufferedEntity.getIterations(state));
@@ -80,7 +81,7 @@ export const RunResultView: React.FC = () => {
         </RQButton>
       </div>
 
-      {historySaveStatus === HistorySaveStatus.FAILED ? <HistoryNotSavedBanner /> : null}
+      {historySaveStatus === RunHistorySaveStatus.FAILED ? <HistoryNotSavedBanner /> : null}
       {runStatus === RunStatus.ERRORED && error ? (
         error instanceof RenderableError ? (
           error.render()

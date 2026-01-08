@@ -25,10 +25,10 @@ import { RunContext } from "../thunks";
 import { liveRunResultsActions } from "../../liveRunResults/slice";
 
 import { runHistoryActions } from "../../runHistory/slice";
-import { HistorySaveStatus } from "../../common/runResults/types";
 import { selectLiveRunResultSummary } from "../../liveRunResults/selectors";
 import { RunStatus } from "../../common/runResults/types";
 import { DELAY_MIN_LIMIT, ITERATIONS_MAX_LIMIT } from "../constants";
+import { RunHistorySaveStatus } from "../../runHistory/types";
 
 function parseExecutingRequestEntry(entry: RQAPI.ApiEntry): RequestExecutionResult["entry"] {
   return isHTTPApiEntry(entry)
@@ -161,9 +161,10 @@ class Runner {
     const runConfig = runConfigEntity.getEntityFromState(this.ctx.store.getState());
 
     this.ctx.store.dispatch(liveRunResultsActions.startRun({ collectionId: this.collectionId }));
-
-    // Reset history save status to IDLE
-    this.ctx.store.dispatch(runHistoryActions.setHistorySaveStatus({ status: HistorySaveStatus.IDLE }));
+    this.ctx.store.dispatch(runHistoryActions.init({ collectionId: this.collectionId }));
+    this.ctx.store.dispatch(
+      runHistoryActions.setHistoryStatus({ collectionId: this.collectionId, status: RunHistorySaveStatus.IDLE })
+    );
 
     // this.variables = [];
 
@@ -255,8 +256,9 @@ class Runner {
 
     try {
       this.ctx.store.dispatch(
-        runHistoryActions.setHistorySaveStatus({
-          status: HistorySaveStatus.SAVING,
+        runHistoryActions.setHistoryStatus({
+          collectionId: this.collectionId,
+          status: RunHistorySaveStatus.SAVING,
         })
       );
 
@@ -270,8 +272,9 @@ class Runner {
       this.ctx.store.dispatch(runHistoryActions.addHistoryEntry({ collectionId, entry: summary }));
 
       this.ctx.store.dispatch(
-        runHistoryActions.setHistorySaveStatus({
-          status: HistorySaveStatus.SUCCESS,
+        runHistoryActions.setHistoryStatus({
+          collectionId: this.collectionId,
+          status: RunHistorySaveStatus.SUCCESS,
         })
       );
 
@@ -283,8 +286,9 @@ class Runner {
       });
     } catch (e) {
       this.ctx.store.dispatch(
-        runHistoryActions.setHistorySaveStatus({
-          status: HistorySaveStatus.FAILED,
+        runHistoryActions.setHistoryStatus({
+          collectionId: this.collectionId,
+          status: RunHistorySaveStatus.FAILED,
           error: e instanceof Error ? e.message : null,
         })
       );

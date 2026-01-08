@@ -23,6 +23,7 @@ import { RunnerViewLoader } from "./components/RunnerViewLoader/RunnerViewLoader
 import { RunResultView } from "./components/RunResultView/RunResultView";
 import { runHistoryActions } from "features/apiClient/slices/runHistory";
 import { DEFAULT_RUN_CONFIG_ID } from "features/apiClient/slices/runConfig/constants";
+import { RunHistorySaveStatus } from "features/apiClient/slices/runHistory/types";
 
 interface Props {
   collectionId: RQAPI.CollectionRecord["id"];
@@ -96,7 +97,9 @@ export const CollectionRunnerView: React.FC<Props> = ({ collectionId, activeTabK
         apiClientDispatch(
           runHistoryActions.addHistoryEntries({
             collectionId,
-            entries: results,
+            history: results,
+            status: RunHistorySaveStatus.IDLE,
+            error: null,
           })
         );
         setIsResultsLoading(false);
