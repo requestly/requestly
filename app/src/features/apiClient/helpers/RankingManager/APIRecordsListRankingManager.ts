@@ -5,7 +5,6 @@
  * Manages ranking for RecordData objects (API requests and collections).
  */
 
-import { RQAPI } from "@requestly/shared/types/entities/apiClient";
 import { getAllChildrenRecords } from "features/apiClient/hooks/useChildren.hook";
 import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 import { ListRankingManager } from "modules/ranking";
@@ -51,9 +50,7 @@ export class APIRecordsListRankingManager extends ListRankingManager<RecordData>
   // add a function to generate new ranks for new requests being added to a list
   getRanksForNewApis(context: ApiClientFeatureContext, collectionID: string, newRecords: RecordData[]): string[] {
     const siblings = getAllChildrenRecords(context, collectionID);
-    const sibilngAPIRecords = siblings.filter(
-      (sibling) => sibling.type === RQAPI.RecordType.API && sibling.collectionId === collectionID
-    );
+    const sibilngAPIRecords = siblings.filter((sibling) => sibling.collectionId === collectionID);
     return this.getNextRanks(sibilngAPIRecords, newRecords);
   }
 }

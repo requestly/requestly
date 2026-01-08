@@ -35,8 +35,8 @@ import { getFileContents } from "components/mode-specific/desktop/DesktopFilePic
 import { NativeError } from "errors/NativeError";
 import { trackCollectionRunnerRecordLimitExceeded } from "modules/analytics/events/features/apiClient";
 import { getBoundary, parse as multipartParser } from "parse-multipart-data";
-import { apiRecordsRankingManager } from "features/apiClient/components/sidebar";
 import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
+import { apiRecordsRankingManager } from "features/apiClient/helpers/RankingManager";
 
 const createAbortError = (signal: AbortSignal) => {
   if (signal && signal.reason === AbortReason.USER_CANCELLED) {
