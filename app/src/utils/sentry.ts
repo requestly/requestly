@@ -9,9 +9,9 @@ export const wrapWithCustomSpan = <T, Args extends any[] = []>(
   options: Parameters<typeof Sentry.startSpan>[0],
   callback: (...args: Args) => T,
   forceTransaction: boolean = false
-): ((...args: Args) => T) => {
+) => {
   return (...args: Args) => {
-    const wrappedCallback = Sentry.startSpan(
+    return Sentry.startSpan(
       {
         ...options,
         forceTransaction,
@@ -23,10 +23,9 @@ export const wrapWithCustomSpan = <T, Args extends any[] = []>(
           Sentry.getCurrentScope().setTransactionName(options.name);
         }
 
-        // To get access to span within callback, use Sentry.getCurrentSpan()
+        // This needs to return the promise from the callback else span won't register async callbacks
         return callback(...args);
       }
     );
-    return wrappedCallback;
   };
 };
