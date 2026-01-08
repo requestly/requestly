@@ -105,7 +105,7 @@ export class LiveRunResultEntity<M extends ApiClientEntityMeta = ApiClientEntity
     );
   }
 
-  resetRun(): void {
+  resetRun(configId: string): void {
     this.dispatch(
       liveRunResultsActions.resetRun({
         collectionId: this.id,
@@ -123,8 +123,8 @@ export class LiveRunResultEntity<M extends ApiClientEntityMeta = ApiClientEntity
     );
   }
 
-  delete(): void {
-    this.resetRun();
+  delete(configId: string): void {
+    this.resetRun(configId);
   }
 
   getRunStatus(state: ApiClientStoreState): RunStatus {

@@ -163,3 +163,8 @@ export const selectLiveRunResultSummary = (state: ApiClientStoreState, collectio
     iterations: entry.iterations,
   };
 };
+
+export const selectLiveRunResultConfigId = (state: ApiClientStoreState, collectionId: RQAPI.CollectionRecord["id"]) => {
+  const entry = selectLiveRunResultEntities(state)[collectionId];
+  return entry?.configId ?? null;
+};
