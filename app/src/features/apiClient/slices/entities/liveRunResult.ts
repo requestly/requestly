@@ -2,7 +2,7 @@ import type { ApiClientStoreState } from "../workspaceView/helpers/ApiClientCont
 import { EntityNotFound, UpdateCommand } from "../types";
 import { ApiClientEntityType } from "./types";
 import { ApiClientEntity, ApiClientEntityMeta } from "./base";
-import { liveRunResultsActions, liveRunResultsAdapter } from "../liveRunResults/slice";
+import { createEmptyRunEntry, liveRunResultsActions, liveRunResultsAdapter } from "../liveRunResults/slice";
 import type { CurrentlyExecutingRequest, LiveIterationMap, RunMetadata, Timestamp } from "../liveRunResults/types";
 import type { RQAPI } from "features/apiClient/types";
 import type { RequestExecutionResult } from "../common/runResults/types";
@@ -43,7 +43,8 @@ export class LiveRunResultEntity<M extends ApiClientEntityMeta = ApiClientEntity
 
     const result = liveRunResultsAdapter.getSelectors().selectById(liveRunResultsState, this.id);
     if (!result) {
-      throw new EntityNotFound(this.id, "Live run result not found");
+      return createEmptyRunEntry(this.id, "default");
+      // throw new EntityNotFound(this.id, "Live run result not found");
     }
     return result;
   }
