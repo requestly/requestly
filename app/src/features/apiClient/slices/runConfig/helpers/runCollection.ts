@@ -1,39 +1,35 @@
 import { RQAPI } from "features/apiClient/types";
-import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 import { BatchRequestExecutor } from "features/apiClient/helpers/batchRequestExecutor";
-import { RunContext } from "features/apiClient/screens/apiClient/components/views/components/Collection/components/CollectionRunnerView/run.context";
 import {
   CurrentlyExecutingRequest,
-  HistorySaveStatus,
   RequestExecutionResult,
-  RunResult,
-  RunStatus,
 } from "features/apiClient/store/collectionRunResult/runResult.store";
-import {
-  isHTTPApiEntry,
-  parseCollectionRunnerDataFile,
-  parseHttpRequestEntry,
-} from "features/apiClient/screens/apiClient/utils";
+import { isHTTPApiEntry, parseCollectionRunnerDataFile } from "features/apiClient/screens/apiClient/utils";
 import { NativeError } from "errors/NativeError";
 import { notification } from "antd";
-import { saveRunResult } from "./saveRunResult.command";
 import {
   trackCollectionRunSaveHistoryFailed,
   trackCollectionRunStarted,
   trackCollectionRunStopped,
 } from "modules/analytics/events/features/apiClient";
-import { GenericState } from "hooks/useGenericState";
-import { CloseTopic } from "componentsV2/Tabs/store/tabStore";
-import { cancelRun } from "./cancelRun.command";
-import { Scope } from "features/apiClient/helpers/variableResolver/variable-resolver";
-import { VariableScope } from "backend/environment/types";
+import { Abortable, ActiveWorkflow } from "componentsV2/Tabs/slice/types";
 import { apiClientFileStore } from "features/apiClient/store/apiClientFilesStore";
 import { RunnerFileMissingError } from "features/apiClient/screens/apiClient/components/views/components/Collection/components/CollectionRunnerView/components/RunResultView/errors/RunnerFileMissingError/RunnerFileMissingError";
 import { DataFileParseError } from "features/apiClient/screens/apiClient/components/views/components/Collection/components/CollectionRunnerView/components/RunResultView/errors/DataFileParseError/DataFileParseError";
 import { ITERATIONS_MAX_LIMIT } from "features/apiClient/store/collectionRunConfig/runConfig.store";
-import { renderVariables } from "backend/environment/utils";
-import { createDummyVariablesStoreFromPrimitives } from "features/apiClient/store/variables/variables.store";
 import { ExecutionContext } from "features/apiClient/helpers/httpRequestExecutor/scriptExecutionContext";
+import { ApiClientFeatureContext, selectRecordById } from "features/apiClient/slices";
+import { HostContext } from "hooks/useHostContext";
+import { reduxStore } from "store";
+import { tabsActions } from "componentsV2/Tabs/slice";
+import { getAppMode } from "store/selectors";
+import { RunContext } from "../thunks";
+import { liveRunResultsActions } from "../../liveRunResults/slice";
+import { createCollectionRunCompositeId } from "../../common/runResults/utils";
+import { runHistoryActions } from "../../runHistory/slice";
+import { HistorySaveStatus, RunHistoryEntry } from "../../runHistory/types";
+import { selectLiveRunResultSummary } from "../../liveRunResults/selectors";
+import { RunStatus } from "../../common/runResults/types";
 
 function parseExecutingRequestEntry(entry: RQAPI.ApiEntry): RequestExecutionResult["entry"] {
   return isHTTPApiEntry(entry)
@@ -89,16 +85,25 @@ class RunCancelled extends NativeError {}
 
 class Runner {
   private variables: Record<string, any>[] = [];
+  private activeWorkflow: ActiveWorkflow | null = null;
+  private workflowPromiseResolve: (() => void) | null = null;
+  private workflowPromiseReject: (() => void) | null = null;
+  private id: string;
+
   constructor(
     readonly ctx: ApiClientFeatureContext,
-    readonly runContext: RunContext,
     readonly executor: BatchRequestExecutor,
-    readonly genericState: GenericState,
-    readonly appMode: "DESKTOP" | "EXTENSION"
-  ) {}
+    readonly hostContext: HostContext,
+    readonly runContext: RunContext
+  ) {
+    const { runConfigEntity } = this.runContext;
+    const runConfig = runConfigEntity.getEntityFromState(this.ctx.store.getState());
+    const { collectionId, configId } = runConfig;
+    this.id = createCollectionRunCompositeId(collectionId, configId);
+  }
 
   private get abortController() {
-    return this.runContext.runResultStore.getState().abortController;
+    return this.runContext.liveRunResultEntity.getAbortController(this.ctx.store.getState());
   }
 
   private throwIfRunCancelled() {
@@ -108,12 +113,13 @@ class Runner {
   }
 
   private getRequest(requestIndex: number): RQAPI.ApiRecord | undefined {
-    const { runOrder } = this.runContext.runConfigStore.getState();
+    const runOrder = this.runContext.runConfigEntity.getRunOrder(this.ctx.store.getState());
 
-    if (!runOrder[requestIndex].isSelected) {
+    if (runOrder[requestIndex] && !runOrder[requestIndex].isSelected) {
       return;
     }
-    const request = this.ctx.stores.records.getState().getData(runOrder[requestIndex].id);
+
+    const request = selectRecordById(this.ctx.store.getState(), runOrder[requestIndex]!.id);
 
     if (request?.type !== RQAPI.RecordType.API) {
       return;
@@ -123,14 +129,14 @@ class Runner {
   }
 
   private async parseDataFile() {
-    const dataFile = this.runContext.runConfigStore.getState().getConfig().dataFile;
+    const dataFile = this.runContext.runConfigEntity.getDataFile(this.ctx.store.getState());
     if (!dataFile) {
       return;
     }
 
     const apiClientFilesStore = apiClientFileStore.getState();
 
-    const collectionId = this.runContext.collectionId;
+    const { collectionId } = this.runContext.runConfigEntity.getEntityFromState(this.ctx.store.getState());
     if (!(await apiClientFilesStore.isFilePresentLocally(dataFile.id))) {
       throw new RunnerFileMissingError(
         `The selected data file was moved, renamed, or deleted. Please re-upload the file to continue.`
@@ -155,71 +161,69 @@ class Runner {
   }
 
   private async beforeStart() {
-    this.genericState.setPreview(false);
-    this.runContext.runResultStore.getState().reset();
-    this.runContext.runResultStore.getState().setRunStatus(RunStatus.RUNNING);
-    this.runContext.runResultStore.getState().setHistorySaveStatus(HistorySaveStatus.IDLE);
-    this.runContext.runResultStore.getState().setStartTime(Date.now());
-    this.runContext.runResultStore.getState().setEndtime(null);
+    reduxStore.dispatch(tabsActions.setPreviewTab(undefined));
+
+    const { runConfigEntity } = this.runContext;
+    const runConfig = runConfigEntity.getEntityFromState(this.ctx.store.getState());
+
+    this.ctx.store.dispatch(liveRunResultsActions.startRun({ id: this.id }));
+
+    // Reset history save status to IDLE
+    this.ctx.store.dispatch(
+      runHistoryActions.setHistorySaveStatus({
+        status: HistorySaveStatus.IDLE,
+      })
+    );
+
     this.variables = [];
 
-    const runConfig = this.runContext.runConfigStore.getState().getConfig();
-    const collectionId = this.runContext.collectionId;
+    const rootState = reduxStore.getState();
+    const appMode = getAppMode(rootState);
 
-    if (this.appMode === "DESKTOP") {
+    if (appMode === "DESKTOP") {
       const variables = await this.parseDataFile();
       this.variables = variables ?? [];
     }
 
     trackCollectionRunStarted({
-      collection_id: collectionId,
+      collection_id: runConfig.collectionId,
       iteration_count: runConfig.iterations,
       delay: runConfig.delay,
       request_count: runConfig.runOrder.filter((r) => r.isSelected).length,
     });
 
-    const selectedRequestsCount = this.runContext.runConfigStore.getState().runOrder.filter((r) => r.isSelected).length;
+    const selectedRequestsCount = runConfig.runOrder.filter((r) => r.isSelected).length;
     if (selectedRequestsCount === 0) {
       throw new NativeError("No requests were selected to run!");
     }
 
-    const configId = this.runContext.runConfigStore.getState().getConfig().id;
-    this.genericState.addCloseBlocker(CloseTopic.COLLECTION_RUNNING, configId, {
-      title: "Collection run is in progress, still want to close?",
-      onConfirm: () => {
-        cancelRun(this.ctx, { runContext: this.runContext });
+    // Create an abortable workflow wrapper
+    const workflow: Abortable = {
+      abort: () => {
+        // cancelRun(this.ctx, { runContext: this.runContext });
+        this.abortController.abort();
       },
-    });
-  }
-
-  private populateAutogenerateStore(recordId: string, scopes: Scope[]) {
-    const { getData, getParentChain } = this.ctx.stores.records.getState();
-    const apiRecord = getData(recordId);
-
-    if (!apiRecord || !apiRecord.data) {
-      return;
-    }
-
-    const childDetails = {
-      id: apiRecord.id,
-      parentId: apiRecord.collectionId,
+      then: (cb: () => void) => {
+        return workflow;
+      },
+      catch: (cb: () => void) => {
+        this.abortController.abort();
+        return workflow;
+      },
     };
 
-    const resolver = <T extends Record<string, any>>(template: T) => {
-      return renderVariables(template, apiRecord.id, this.ctx, scopes).result;
+    // Store the workflow and register it
+    this.activeWorkflow = {
+      cancelWarning: "Collection run is in progress, still want to close?",
+      workflow,
     };
 
-    const newNamespaces = parseHttpRequestEntry(apiRecord.data as RQAPI.HttpApiEntry, childDetails, {
-      getParentChain,
-      getData,
-      resolver,
-    });
-
-    this.runContext.autogenerateStore.getState().initialize(newNamespaces);
+    // TBD
+    this.hostContext.registerWorkflow(this.activeWorkflow);
   }
 
   private beforeRequestExecutionStart(iteration: number, request: RQAPI.ApiRecord, startTime: number) {
-    const collection = this.ctx.stores.records.getState().getData(request.collectionId);
+    const collection = selectRecordById(this.ctx.store.getState(), request.collectionId!);
 
     const currentExecutingRequest: CurrentlyExecutingRequest = {
       startTime,
@@ -231,27 +235,15 @@ class Runner {
     };
 
     this.throwIfRunCancelled();
-    this.runContext.runResultStore.getState().setCurrentlyExecutingRequest(currentExecutingRequest);
 
-    const scopes: Scope[] = [];
-    if (iteration <= this.variables.length) {
-      scopes.push([
-        {
-          scope: VariableScope.DATA_FILE,
-          scopeId: "data_file",
-          name: "Data File",
-          level: 0,
-        },
-        createDummyVariablesStoreFromPrimitives(this.variables[iteration - 1]),
-      ]);
-    }
+    this.ctx.store.dispatch(
+      liveRunResultsActions.setCurrentlyExecutingRequest({
+        id: this.id,
+        request: currentExecutingRequest,
+      })
+    );
 
-    this.populateAutogenerateStore(request.id, scopes);
-
-    return {
-      currentExecutingRequest,
-      scopes,
-    };
+    return { currentExecutingRequest };
   }
 
   private afterRequestExecutionComplete(
@@ -259,42 +251,96 @@ class Runner {
     result: RQAPI.ExecutionResult
   ) {
     this.throwIfRunCancelled();
-    this.runContext.runResultStore.getState().setCurrentlyExecutingRequest(null);
+
+    this.ctx.store.dispatch(
+      liveRunResultsActions.setCurrentlyExecutingRequest({
+        id: this.id,
+        request: null,
+      })
+    );
 
     const executionResult = prepareExecutionResult({
       result,
       currentExecutingRequest,
     });
 
-    this.runContext.runResultStore.getState().addResult(executionResult);
+    this.ctx.store.dispatch(
+      liveRunResultsActions.addIterationResult({
+        id: this.id,
+        result: executionResult,
+      })
+    );
   }
 
   private async afterComplete() {
-    const collectionId = this.runContext.collectionId;
+    const { collectionId } = this.runContext.runConfigEntity.getEntityFromState(this.ctx.store.getState());
 
     this.throwIfRunCancelled();
-    this.runContext.runResultStore.getState().setRunStatus(RunStatus.COMPLETED);
-    this.runContext.runResultStore.getState().setEndtime(Date.now());
 
-    const runResult = this.runContext.runResultStore.getState().getRunSummary() as RunResult;
-    this.runContext.runResultStore.getState().addToHistory(runResult);
+    this.ctx.store.dispatch(
+      liveRunResultsActions.finalizeRun({
+        id: this.id,
+        status: RunStatus.COMPLETED,
+        endTime: Date.now(),
+      })
+    );
+
+    // Get the run summary from liveRunResults
+    const state = this.ctx.store.getState();
+    const summary = selectLiveRunResultSummary(state, this.id);
+
+    const runResult: RunHistoryEntry = {
+      id: this.id,
+      collectionId,
+      startTime: summary.startTime,
+      endTime: summary.endTime,
+      runStatus: summary.runStatus,
+      iterations: summary.iterations,
+    };
+
+    // Set history save status to SAVING
+    this.ctx.store.dispatch(runHistoryActions.addHistoryEntry({ collectionId, entry: runResult }));
 
     try {
-      this.runContext.runResultStore.getState().setHistorySaveStatus(HistorySaveStatus.SAVING);
-      await saveRunResult(this.ctx, {
-        collectionId,
-        runResult: runResult,
-      });
+      this.ctx.store.dispatch(
+        runHistoryActions.setHistorySaveStatus({
+          status: HistorySaveStatus.SAVING,
+        })
+      );
 
-      this.runContext.runResultStore.getState().setHistorySaveStatus(HistorySaveStatus.SUCCESS);
+      const result = await this.ctx.repositories.apiClientRecordsRepository.addRunResult(collectionId, runResult);
+      if (result.success === false && result.error.type === "INTERNAL_SERVER_ERROR") {
+        throw new NativeError("Something went wrong while saving run result!").addContext({
+          collectionId,
+          runResult,
+        });
+      }
+
+      this.ctx.store.dispatch(
+        runHistoryActions.setHistorySaveStatus({
+          status: HistorySaveStatus.SUCCESS,
+        })
+      );
+
       notification.success({
         message: "Run completed!",
         placement: "bottomRight",
         className: "collection-runner-notification",
         duration: 3,
       });
+
+      // Resolve the workflow promise on success
+      if (this.workflowPromiseResolve) {
+        this.workflowPromiseResolve();
+      }
     } catch (e) {
-      this.runContext.runResultStore.getState().setHistorySaveStatus(HistorySaveStatus.FAILED);
+      // Set history save status to FAILED
+      this.ctx.store.dispatch(
+        runHistoryActions.setHistorySaveStatus({
+          status: HistorySaveStatus.FAILED,
+          error: e instanceof Error ? e.message : null,
+        })
+      );
 
       trackCollectionRunSaveHistoryFailed({
         collection_id: collectionId,
@@ -303,14 +349,30 @@ class Runner {
   }
 
   private onError(error: Error) {
-    this.runContext.runResultStore.getState().setError(error);
-    this.runContext.runResultStore.getState().setEndtime(null);
+    // Reject the workflow promise on error
+    if (this.workflowPromiseReject) {
+      this.workflowPromiseReject();
+    }
+
+    this.ctx.store.dispatch(
+      liveRunResultsActions.finalizeRun({
+        id: this.id,
+        error,
+        status: RunStatus.CANCELLED,
+        endTime: Date.now(),
+      })
+    );
   }
 
   private onRunCancelled() {
-    this.runContext.runResultStore.getState().setRunStatus(RunStatus.CANCELLED);
-    this.runContext.runResultStore.getState().setCurrentlyExecutingRequest(null);
-    this.runContext.runResultStore.getState().setEndtime(null);
+    this.ctx.store.dispatch(
+      liveRunResultsActions.finalizeRun({
+        id: this.id,
+        status: RunStatus.CANCELLED,
+        endTime: Date.now(),
+      })
+    );
+
     notification.error({
       message: "Run stopped!",
       placement: "bottomRight",
@@ -318,8 +380,8 @@ class Runner {
       duration: 3,
     });
 
-    const runConfig = this.runContext.runConfigStore.getState().getConfig();
-    const collectionId = this.runContext.collectionId;
+    const runConfig = this.runContext.runConfigEntity.getEntityFromState(this.ctx.store.getState());
+    const { collectionId } = runConfig;
 
     trackCollectionRunStopped({
       collection_id: collectionId,
@@ -327,18 +389,23 @@ class Runner {
       delay: runConfig.delay,
       request_count: runConfig.runOrder.filter((r) => r.isSelected).length,
     });
+
+    // Reject the workflow promise on cancellation
+    if (this.workflowPromiseReject) {
+      this.workflowPromiseReject();
+    }
   }
 
   private cleanup() {
-    const configId = this.runContext.runConfigStore.getState().getConfig().id;
-    this.genericState.removeCloseBlocker(CloseTopic.COLLECTION_RUNNING, configId);
+    // Workflow cleanup is handled automatically by registerWorkflow when promise resolves/rejects
+    // The workflow is stored in this.activeWorkflow for reference if needed
+    this.activeWorkflow = null;
+    this.workflowPromiseResolve = null;
+    this.workflowPromiseReject = null;
   }
 
   private async delay(iterationIndex: number, executingRequestIndex: number): Promise<void> {
-    const { runContext } = this;
-    const { runConfigStore } = runContext;
-    const { getConfig } = runConfigStore.getState();
-    const { delay } = getConfig();
+    const delay = this.runContext.runConfigEntity.getDelay(this.ctx.store.getState());
 
     const isFirstIteration = iterationIndex === 0;
     const isFirstExecutingRequestInIteration = executingRequestIndex === 0;
@@ -366,12 +433,9 @@ class Runner {
   }
 
   private async *iterate() {
-    const { runContext } = this;
-    const { runConfigStore } = runContext;
-    const { getConfig, runOrder } = runConfigStore.getState();
-
-    const { iterations } = getConfig();
-    const requestsCount = runOrder.length;
+    const runConfig = this.runContext.runConfigEntity.getEntityFromState(this.ctx.store.getState());
+    const iterations = runConfig.iterations;
+    const requestsCount = runConfig.runOrder.length;
 
     for (let iterationIndex = 0; iterationIndex < iterations; iterationIndex++) {
       let executingRequestIndex = 0; // Track index among executing requests only
@@ -399,18 +463,18 @@ class Runner {
   async run() {
     try {
       await this.beforeStart();
-      const iterationCount = this.runContext.runConfigStore.getState().getConfig().iterations;
+      const iterationCount = this.runContext.runConfigEntity.getIterations(this.ctx.store.getState());
       const executionContext: ExecutionContext = {} as ExecutionContext; // Empty object that will be filled and shared across iterations
 
       for await (const { request, iteration, startTime } of this.iterate()) {
-        const { currentExecutingRequest, scopes } = this.beforeRequestExecutionStart(iteration, request, startTime);
+        const { currentExecutingRequest } = this.beforeRequestExecutionStart(iteration, request, startTime);
         const result = await this.executor.executeSingleRequest(
           { entry: request.data as RQAPI.ApiEntry, recordId: request.id },
           {
             iteration: iteration - 1, // We want 0-based index for usage in scripts
             iterationCount,
           },
-          { abortController: this.abortController, scopes, executionContext }
+          { abortController: this.abortController, executionContext }
         );
 
         this.afterRequestExecutionComplete(currentExecutingRequest, result);
@@ -431,15 +495,12 @@ class Runner {
   }
 }
 
-export async function runCollection(
-  ctx: ApiClientFeatureContext,
-  params: {
-    runContext: RunContext;
-    executor: BatchRequestExecutor;
-    genericState: GenericState;
-    appMode: "DESKTOP" | "EXTENSION";
-  }
-) {
-  const runner = new Runner(ctx, params.runContext, params.executor, params.genericState, params.appMode);
+export async function runCollection(params: {
+  ctx: ApiClientFeatureContext;
+  executor: BatchRequestExecutor;
+  hostContext: HostContext;
+  runContext: RunContext;
+}) {
+  const runner = new Runner(params.ctx, params.executor, params.hostContext, params.runContext);
   return runner.run();
 }

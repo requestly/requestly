@@ -19,5 +19,6 @@ export type CurrentlyExecutingRequest =
     });
 
 export interface LiveRunResultSummary extends RunMetadata {
+  runStatus: RunStatus.COMPLETED | RunStatus.CANCELLED;
   iterations: LiveIterationMap;
 }

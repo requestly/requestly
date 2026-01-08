@@ -12,7 +12,7 @@ import { RunStatusStateMachine } from "../common/runResults/utils";
 import { RunStatus as RunStatusEnum } from "../common/runResults/types";
 import { API_CLIENT_LIVE_RUN_RESULT_SLICE_NAME } from "../common/constants";
 
-interface LiveRunEntryState extends RunMetadata {
+export interface LiveRunEntryState extends RunMetadata {
   id: CollectionRunCompositeId;
   iterations: LiveIterationMap;
   currentlyExecutingRequest: CurrentlyExecutingRequest;
@@ -24,7 +24,7 @@ export const liveRunResultsAdapter = createEntityAdapter<LiveRunEntryState>({
   selectId: (entry) => entry.id,
 });
 
-interface LiveRunResultsSliceState extends EntityState<LiveRunEntryState> {}
+export interface LiveRunResultsSliceState extends EntityState<LiveRunEntryState> {}
 
 const initialState: LiveRunResultsSliceState = liveRunResultsAdapter.getInitialState();
 
@@ -37,7 +37,7 @@ const createEmptyRunEntry = (compositeId: CollectionRunCompositeId): LiveRunEntr
   runStatus: RunStatusEnum.IDLE,
   iterations: new Map(),
   currentlyExecutingRequest: null,
-  abortController: null,
+  abortController: new AbortController(),
   error: null,
 });
 
@@ -57,16 +57,14 @@ const slice = createSlice({
       action: PayloadAction<{
         id: CollectionRunCompositeId;
         startTime?: Timestamp;
-        abortController?: AbortController;
       }>
     ) {
-      const { id, startTime, abortController } = action.payload;
+      const { id, startTime } = action.payload;
 
       const entry: LiveRunEntryState = {
         ...createEmptyRunEntry(id),
         startTime: startTime ?? Date.now(),
         runStatus: RunStatusEnum.RUNNING,
-        abortController: abortController ?? new AbortController(),
       };
 
       liveRunResultsAdapter.setOne(state, entry);
@@ -164,6 +162,7 @@ const slice = createSlice({
 
       assertTransition(entry.runStatus, RunStatusEnum.CANCELLED);
 
+      entry.abortController?.abort();
       entry.runStatus = RunStatusEnum.CANCELLED;
       entry.endTime = cancelledAt ?? Date.now();
       entry.currentlyExecutingRequest = null;

@@ -14,6 +14,7 @@ import {
   API_CLIENT_ERRORED_RECORDS_SLICE_NAME,
   BUFFER_SLICE_NAME,
   API_CLIENT_LIVE_RUN_RESULT_SLICE_NAME,
+  API_CLIENT_RUN_CONFIGS_SLICE_NAME,
 } from "features/apiClient/slices/common/constants";
 
 export interface ApiClientStoreState {
@@ -21,7 +22,7 @@ export interface ApiClientStoreState {
   [API_CLIENT_ENVIRONMENTS_SLICE_NAME]: EnvironmentsState;
   [API_CLIENT_ERRORED_RECORDS_SLICE_NAME]: ErroredRecordsState;
   [BUFFER_SLICE_NAME]: BufferState;
-  runConfig: RunnerConfigState;
+  [API_CLIENT_RUN_CONFIGS_SLICE_NAME]: RunnerConfigState;
   [API_CLIENT_LIVE_RUN_RESULT_SLICE_NAME]: EntityState<LiveRunResultRecord>;
 }
 
