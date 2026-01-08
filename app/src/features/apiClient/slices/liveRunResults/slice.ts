@@ -10,7 +10,7 @@ import type {
 } from "../common/runResults/types";
 import { RunStatusStateMachine } from "../common/runResults/utils";
 import { RunStatus as RunStatusEnum } from "../common/runResults/types";
-import { API_CLIENT_LIVE_RUN_RESULT_SLICE_NAME } from "../common/constants";
+import { API_CLIENT_LIVE_RUN_RESULTS_SLICE_NAME } from "../common/constants";
 
 export interface LiveRunEntryState extends RunMetadata {
   id: CollectionRunCompositeId;
@@ -48,8 +48,8 @@ const assertTransition = (current: RunStatus, next: RunStatus) => {
   }
 };
 
-const slice = createSlice({
-  name: API_CLIENT_LIVE_RUN_RESULT_SLICE_NAME,
+export const liveRunResultsSlice = createSlice({
+  name: API_CLIENT_LIVE_RUN_RESULTS_SLICE_NAME,
   initialState,
   reducers: {
     startRun(
@@ -175,6 +175,6 @@ const slice = createSlice({
   },
 });
 
-export const liveRunResultsActions = slice.actions;
-export const liveRunResultsReducer = slice.reducer;
+export const liveRunResultsActions = liveRunResultsSlice.actions;
+export const liveRunResultsReducer = liveRunResultsSlice.reducer;
 export const liveRunResultsAdapterSelectors = liveRunResultsAdapter.getSelectors();

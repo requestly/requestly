@@ -3,11 +3,9 @@ import { ApiClientStoreState } from "../workspaceView/helpers/ApiClientContextRe
 import { liveRunResultsAdapter, LiveRunResultsSliceState } from "./slice";
 import { CollectionRunCompositeId } from "../common/runResults/types";
 import { LiveRunResultSummary } from "./types";
-import { API_CLIENT_LIVE_RUN_RESULT_SLICE_NAME } from "../common/constants";
 import { EntityNotFound } from "../types";
 
-const selectLiveRunResultsSlice = (state: ApiClientStoreState): LiveRunResultsSliceState =>
-  (state as any)[API_CLIENT_LIVE_RUN_RESULT_SLICE_NAME] as LiveRunResultsSliceState;
+const selectLiveRunResultsSlice = (state: ApiClientStoreState): LiveRunResultsSliceState => state.liveRunResults;
 
 const adapterSelectors = liveRunResultsAdapter.getSelectors(selectLiveRunResultsSlice);
 

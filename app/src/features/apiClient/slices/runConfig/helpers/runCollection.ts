@@ -201,13 +201,13 @@ class Runner {
     const workflow: Abortable = {
       abort: () => {
         // cancelRun(this.ctx, { runContext: this.runContext });
-        this.abortController.abort();
+        // this.abortController.abort();
       },
       then: (cb: () => void) => {
         return workflow;
       },
       catch: (cb: () => void) => {
-        this.abortController.abort();
+        // this.abortController.abort();
         return workflow;
       },
     };
@@ -482,6 +482,7 @@ class Runner {
 
       await this.afterComplete();
     } catch (e) {
+      console.error({ e });
       if (e instanceof RunCancelled) {
         this.onRunCancelled();
         return;
