@@ -9,7 +9,7 @@ import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceSto
 import { useCommand } from "features/apiClient/commands";
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
 import { useApiClientRepository } from "features/apiClient/contexts/meta";
-import { apiRecordsRankingManager } from "features/apiClient/components/sidebar";
+import { apiRecordsRankingManager } from "features/apiClient/helpers/RankingManager";
 
 export interface NewRecordNameInputProps {
   recordToBeEdited: RQAPI.ApiClientRecord;
