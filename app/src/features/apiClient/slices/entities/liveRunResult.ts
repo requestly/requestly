@@ -17,7 +17,7 @@ export interface LiveRunResultRecord extends RunMetadata {
   id: CollectionRunCompositeId;
   iterations: LiveIterationMap;
   currentlyExecutingRequest: CurrentlyExecutingRequest;
-  abortController: AbortController | null;
+  abortController: AbortController;
   error: Error | null;
 }
 
@@ -58,12 +58,11 @@ export class LiveRunResultEntity<M extends ApiClientEntityMeta = ApiClientEntity
 
   // Core run lifecycle methods
 
-  startRun(params?: { startTime?: Timestamp; abortController?: AbortController }): void {
+  startRun(params?: { startTime?: Timestamp }): void {
     this.dispatch(
       liveRunResultsActions.startRun({
         id: this.id as CollectionRunCompositeId,
         startTime: params?.startTime,
-        abortController: params?.abortController,
       })
     );
   }
@@ -153,7 +152,7 @@ export class LiveRunResultEntity<M extends ApiClientEntityMeta = ApiClientEntity
     return this.getEntityFromState(state).currentlyExecutingRequest;
   }
 
-  getAbortController(state: ApiClientStoreState): AbortController | null {
+  getAbortController(state: ApiClientStoreState): AbortController {
     return this.getEntityFromState(state).abortController;
   }
 

@@ -10,6 +10,7 @@ import { BatchRequestExecutor } from "features/apiClient/helpers/batchRequestExe
 import { ApiClientFeatureContext, getApiClientFeatureContext } from "../workspaceView/helpers/ApiClientContextRegistry";
 import { HostContext } from "hooks/useHostContext";
 import { BufferedRunConfigEntity } from "../entities/buffered/runConfig";
+import { LiveRunResultEntity } from "../entities/liveRunResult";
 
 function getDefaultRunOrderByCollectionId(
   ctx: ApiClientFeatureContext,
@@ -152,6 +153,7 @@ export const saveRunResult = createAsyncThunk<
 
 export interface RunContext {
   runConfigEntity: BufferedRunConfigEntity;
+  liveRunResultEntity: LiveRunResultEntity;
 }
 
 export const runCollectionThunk = createAsyncThunk<
@@ -182,14 +184,12 @@ export const runCollectionThunk = createAsyncThunk<
 export const cancelRunThunk = createAsyncThunk<
   void,
   {
-    workspaceId: Workspace["id"];
     runContext: RunContext;
   },
   { rejectValue: string }
->(`${API_CLIENT_RUNNER_CONFIG_SLICE_NAME}/cancelRun`, async ({ workspaceId, runContext }, { rejectWithValue }) => {
+>(`${API_CLIENT_RUNNER_CONFIG_SLICE_NAME}/cancelRun`, async ({ runContext }, { rejectWithValue }) => {
   try {
-    const ctx = getApiClientFeatureContext(workspaceId);
-    // await cancelRun(ctx, { runContext });
+    runContext.liveRunResultEntity.cancelRun();
   } catch (error) {
     return rejectWithValue(error instanceof Error ? error.message : "Failed to cancel run");
   }

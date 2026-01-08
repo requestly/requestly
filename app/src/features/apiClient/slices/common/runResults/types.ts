@@ -58,4 +58,4 @@ export type RunMetadata = {
   runStatus: RunStatus;
 };
 
-export type CollectionRunCompositeId = `${RQAPI.CollectionRecord["id"]}::${string}`;
+export type CollectionRunCompositeId = string;
