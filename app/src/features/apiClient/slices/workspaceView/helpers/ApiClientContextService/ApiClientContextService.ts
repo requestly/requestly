@@ -41,6 +41,7 @@ import { closeTab } from "componentsV2/Tabs/slice/thunks";
 import { groupBy, mapValues } from "lodash";
 import { RootState } from "store/types";
 import { EntityNotFound } from "features/apiClient/slices/types";
+import { runnerConfigSlice } from "features/apiClient/slices/runConfig/slice";
 
 export type UserDetails = { uid: string; loggedIn: true } | { loggedIn: false };
 
@@ -110,6 +111,7 @@ class ApiClientContextService {
         [environmentsSlice.name]: createEnvironmentsPersistedReducer(workspaceId || "null"),
         [erroredRecordsSlice.name]: erroredRecordsSlice.reducer,
         [bufferSlice.name]: bufferSlice.reducer,
+        [runnerConfigSlice.name]: runnerConfigSlice.reducer,
       },
       middleware(getDefaultMiddleware) {
         return getDefaultMiddleware({

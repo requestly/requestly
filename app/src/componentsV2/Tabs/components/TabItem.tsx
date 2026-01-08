@@ -56,6 +56,20 @@ export const TabItem: React.FC<React.PropsWithChildren<{ tabId: TabId }>> = Reac
           },
           [props.tabId, dispatch]
         ),
+
+        registerSecondaryBuffer: useCallback(
+          (bufferId: string) => {
+            dispatch(tabsActions.registerSecondaryBuffer({ tabId: props.tabId, bufferId }));
+          },
+          [props.tabId, dispatch]
+        ),
+
+        unregisterSecondaryBuffer: useCallback(
+          (bufferId: string) => {
+            dispatch(tabsActions.unregisterSecondaryBuffer({ tabId: props.tabId, bufferId }));
+          },
+          [props.tabId, dispatch]
+        ),
       }}
     >
       {props.children}

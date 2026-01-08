@@ -1,92 +1,123 @@
-import React, { useCallback, useEffect, useState } from "react";
 import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
-import { MdOutlineSave } from "@react-icons/all-files/md/MdOutlineSave";
-import { MdOutlineVideoLibrary } from "@react-icons/all-files/md/MdOutlineVideoLibrary";
-import { RQButton, RQTooltip } from "lib/design-system-v2/components";
 import { MdOutlineRestartAlt } from "@react-icons/all-files/md/MdOutlineRestartAlt";
+import { MdOutlineSave } from "@react-icons/all-files/md/MdOutlineSave";
 import { MdOutlineStopCircle } from "@react-icons/all-files/md/MdOutlineStopCircle";
-import { RunConfigOrderedRequests } from "./RunConfigOrderedRequests/RunConfigOrderedRequests";
-import { RunConfigSettings } from "./RunConfigSettings/RunConfigSettings";
-import { useCommand } from "features/apiClient/commands";
-import { useCollectionView } from "../../../../collectionView.context";
-import { useRunConfigStore, useRunContext, useRunResultStore } from "../../run.context";
-import { toast } from "utils/Toast";
+import { MdOutlineVideoLibrary } from "@react-icons/all-files/md/MdOutlineVideoLibrary";
 import * as Sentry from "@sentry/react";
-import { useBatchRequestExecutor } from "features/apiClient/hooks/requestExecutors/useBatchRequestExecutor";
-import { useGenericState } from "hooks/useGenericState";
-import { KEYBOARD_SHORTCUTS } from "../../../../../../../../../../../../../src/constants/keyboardShortcuts";
-import { RunStatus } from "features/apiClient/store/collectionRunResult/runResult.store";
-import { EmptyState } from "../EmptyState/EmptyState";
-import { useApiClientFeatureContext } from "features/apiClient/contexts/meta";
-import { Conditional } from "components/common/Conditional";
-import "./runConfigView.scss";
 import { isExtensionInstalled } from "actions/ExtensionActions";
-import { isDesktopMode } from "utils/AppUtils";
-import { useDispatch, useSelector } from "react-redux";
-import { globalActions } from "store/slices/global/slice";
+import { Conditional } from "components/common/Conditional";
+import { useCommand } from "features/apiClient/commands";
+import { useWorkspaceId } from "features/apiClient/common/WorkspaceProvider";
+import { ApiClientLocalRepository } from "features/apiClient/helpers/modules/sync/local";
+import { useBatchRequestExecutor } from "features/apiClient/hooks/requestExecutors/useBatchRequestExecutor";
+import { entitySynced } from "features/apiClient/slices";
+import { bufferActions } from "features/apiClient/slices/buffer";
+import { useIsBufferDirty } from "features/apiClient/slices/entities";
+import { useBufferedEntity } from "features/apiClient/slices/entities/hooks";
+import { ApiClientEntityType } from "features/apiClient/slices/entities/types";
+import { useApiClientDispatch, useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
+import { saveRunConfig as saveRunConfigThunk } from "features/apiClient/slices/runConfig/thunks";
+import { DEFAULT_RUN_CONFIG_ID } from "features/apiClient/slices/runConfig/types";
+import {
+  getApiClientFeatureContext,
+  useApiClientFeatureContext,
+  useApiClientStore,
+} from "features/apiClient/slices/workspaceView/helpers/ApiClientContextRegistry/hooks";
+import { RunStatus } from "features/apiClient/store/collectionRunResult/runResult.store";
+import { useHostContext } from "hooks/useHostContext";
+import { RQButton, RQTooltip } from "lib/design-system-v2/components";
 import {
   trackCollectionRunnerConfigSaved,
   trackCollectionRunnerConfigSaveFailed,
   trackInstallExtensionDialogShown,
 } from "modules/analytics/events/features/apiClient";
-import { ApiClientLocalRepository } from "features/apiClient/helpers/modules/sync/local";
+import React, { useCallback, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { getAppMode } from "store/selectors";
+import { globalActions } from "store/slices/global/slice";
+import { isDesktopMode } from "utils/AppUtils";
+import { toast } from "utils/Toast";
+import { KEYBOARD_SHORTCUTS } from "../../../../../../../../../../../../../src/constants/keyboardShortcuts";
+import { TAB_KEYS } from "../../../../CollectionView";
+import { useCollectionView } from "../../../../collectionView.context";
+import { useRunContext, useRunResultStore } from "../../run.context";
+import { EmptyState } from "../EmptyState/EmptyState";
+import { RunConfigOrderedRequests } from "./RunConfigOrderedRequests/RunConfigOrderedRequests";
+import { RunConfigSettings } from "./RunConfigSettings/RunConfigSettings";
+import "./runConfigView.scss";
+import { getAllDescendantApiRecordIds } from "features/apiClient/slices/apiRecords/utils";
+import { fromSavedRunConfig, getRunnerConfigId, toSavedRunConfig } from "features/apiClient/slices/runConfig/utils";
+import { useGenericState } from "hooks/useGenericState";
+import { useSaveBuffer } from "features/apiClient/slices/buffer/hooks";
 
-const RunConfigSaveButton: React.FC<{ disabled?: boolean }> = ({ disabled = false }) => {
+const RunConfigSaveButton: React.FC<{ disabled?: boolean; isRunnerTabActive: boolean }> = ({
+  disabled = false,
+  isRunnerTabActive,
+}) => {
   const [isSaving, setIsSaving] = useState(false);
 
-  const { collectionId } = useCollectionView();
-  const [getConfigToSave, hasUnsavedChanges, setHasUnsavedChanges, iterations, delay] = useRunConfigStore((s) => [
-    s.getConfigToSave,
-    s.hasUnsavedChanges,
-    s.setHasUnsavedChanges,
-    s.iterations,
-    s.delay,
-  ]);
+  const { collectionId, bufferedEntity } = useCollectionView();
+  const workspaceId = useWorkspaceId();
+  const dispatch = useApiClientDispatch();
 
-  const {
-    runner: { saveRunConfig },
-  } = useCommand();
+  const hasUnsavedChanges = useIsBufferDirty({
+    referenceId: getRunnerConfigId(collectionId, DEFAULT_RUN_CONFIG_ID),
+    type: "referenceId",
+  });
 
-  const { setPreview, setUnsaved, getIsActive } = useGenericState();
+  const iterations = useApiClientSelector((state) => bufferedEntity.getIterations(state));
+  const delay = useApiClientSelector((state) => bufferedEntity.getDelay(state));
+
+  const { getIsActive } = useHostContext();
+  const saveBuffer = useSaveBuffer();
 
   const isActiveTab = getIsActive();
 
-  useEffect(() => {
-    setUnsaved(hasUnsavedChanges);
-
-    if (hasUnsavedChanges) {
-      setPreview(false);
-    }
-  }, [setUnsaved, setPreview, hasUnsavedChanges]);
-
   const handleSaveClick = useCallback(async () => {
-    setIsSaving(true);
-    const configToSave = getConfigToSave();
-
-    try {
-      await saveRunConfig({ collectionId, configToSave });
-      toast.success("Configuration saved");
-      setHasUnsavedChanges(false);
-      trackCollectionRunnerConfigSaved({
-        collection_id: collectionId,
-        request_count: configToSave.runOrder.filter((r) => r.isSelected).length,
-        iteration_count: iterations,
-        delay: delay,
-      });
-    } catch (error) {
-      toast.error("Something went wrong while saving!");
-      Sentry.captureException(error, { extra: { collectionId, configToSave } });
-      trackCollectionRunnerConfigSaveFailed({
-        collection_id: collectionId,
-        request_count: configToSave.runOrder.filter((r) => r.isSelected).length,
-        iteration_count: iterations,
-        delay: delay,
-      });
-    } finally {
-      setIsSaving(false);
-    }
-  }, [getConfigToSave, saveRunConfig, collectionId, setHasUnsavedChanges, iterations, delay]);
+    saveBuffer(
+      {
+        entity: bufferedEntity,
+        async save(changes, repositories) {
+          await dispatch(
+            saveRunConfigThunk({
+              workspaceId,
+              collectionId,
+              configToSave: toSavedRunConfig(changes),
+            })
+          ).unwrap();
+        },
+      },
+      {
+        beforeSave() {
+          setIsSaving(true);
+        },
+        onSuccess(configToSave) {
+          toast.success("Configuration saved");
+          trackCollectionRunnerConfigSaved({
+            collection_id: collectionId,
+            request_count: configToSave.runOrder.filter((r: { isSelected: boolean }) => r.isSelected).length,
+            iteration_count: iterations,
+            delay: delay,
+          });
+        },
+        afterSave() {
+          setIsSaving(false);
+        },
+        onError(error) {
+          const { store } = getApiClientFeatureContext(workspaceId);
+          const data = bufferedEntity.getEntityFromState(store.getState());
+          toast.error("Something went wrong while saving!");
+          Sentry.captureException(error, { extra: { collectionId, data } });
+          trackCollectionRunnerConfigSaveFailed({
+            collection_id: collectionId,
+            request_count: data.runOrder.filter((r: { isSelected: boolean }) => r.isSelected).length,
+            iteration_count: iterations,
+            delay: delay,
+          });
+        },
+      }
+    );
+  }, [bufferedEntity, collectionId, dispatch, iterations, delay, saveBuffer, workspaceId]);
 
   return (
     <RQTooltip
@@ -99,8 +130,8 @@ const RunConfigSaveButton: React.FC<{ disabled?: boolean }> = ({ disabled = fals
     >
       <RQButton
         disabled={disabled}
-        enableHotKey={isActiveTab}
-        hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SAVE_COLLECTION.hotKey}
+        enableHotKey={isRunnerTabActive && isActiveTab}
+        hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SAVE_COLLECTION?.hotKey}
         size="small"
         loading={isSaving}
         icon={hasUnsavedChanges ? <div className="unsaved-changes-indicator" /> : <MdOutlineSave />}
@@ -174,29 +205,34 @@ const RunCollectionButton: React.FC<{ disabled?: boolean }> = ({ disabled = fals
   );
 };
 
-export const RunConfigView: React.FC = () => {
-  const ctx = useApiClientFeatureContext();
+interface Props {
+  activeTabKey: string;
+}
 
+export const RunConfigView: React.FC<Props> = ({ activeTabKey }) => {
+  const ctx = useApiClientFeatureContext();
   const { collectionId } = useCollectionView();
-  const [setRunOrder, runOrderCount, setSelectionForAll] = useRunConfigStore((s) => [
-    s.setRunOrder,
-    s.runOrder.length,
-    s.setSelectionForAll,
-  ]);
-  const {
-    runner: { resetRunOrder },
-  } = useCommand();
+
+  const bufferedEntity = useBufferedEntity({
+    id: getRunnerConfigId(collectionId, DEFAULT_RUN_CONFIG_ID),
+    type: ApiClientEntityType.RUN_CONFIG,
+  });
+
+  const isRunnerTabActive = activeTabKey === TAB_KEYS.RUNNER;
+  const runOrderCount = useApiClientSelector((state) => bufferedEntity.getRunOrder(state).length);
 
   const handleSelectAllClick = () => {
-    setSelectionForAll(true);
+    bufferedEntity.toggleAllSelections(true);
   };
 
   const handleDeselectAllClick = () => {
-    setSelectionForAll(false);
+    bufferedEntity.toggleAllSelections(false);
   };
 
   const handleResetClick = () => {
-    resetRunOrder({ collectionId, setRunOrder });
+    const descendantIds = getAllDescendantApiRecordIds(collectionId, ctx.workspaceId);
+    const resetRunOrder = descendantIds.map((id: string) => ({ id, isSelected: true }));
+    bufferedEntity.setRunOrder(resetRunOrder);
   };
 
   const isEmpty = runOrderCount === 0;
@@ -214,9 +250,9 @@ export const RunConfigView: React.FC = () => {
 
         <div className="actions">
           <Conditional condition={!(ctx.repositories instanceof ApiClientLocalRepository)}>
-            <RunConfigSaveButton disabled={isEmpty} />
+            <RunConfigSaveButton disabled={isEmpty} isRunnerTabActive={isRunnerTabActive} />
           </Conditional>
-          <RunCollectionButton disabled={isEmpty} />
+          {/* <RunCollectionButton disabled={isEmpty} /> */}
         </div>
       </div>
 

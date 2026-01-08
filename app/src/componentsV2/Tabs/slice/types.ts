@@ -27,6 +27,7 @@ export interface TabState<T extends TabSource = TabSource> {
   id: TabId;
   source: T;
   activeWorkflows: Set<ActiveWorkflow>;
+  secondaryBufferIds: Set<string>;
   modeConfig: TabModeConfig;
 }
 

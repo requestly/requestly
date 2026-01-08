@@ -65,6 +65,17 @@ export const selectAllDescendantIds = createSelector(
   (parentToChildren, id) => getAllDescendants(id, parentToChildren)
 );
 
+export const selectAllDescendantApiRecordIds = createSelector(
+  [selectRecordsEntities, selectParentToChildren, (_state: ApiClientStoreState, id: EntityId) => id],
+  (entities, parentToChildren, id) => {
+    const descendantIds = getAllDescendants(id, parentToChildren);
+    return descendantIds.filter((descId) => {
+      const record = entities[descId];
+      return record?.type === RQAPI.RecordType.API;
+    });
+  }
+);
+
 export const selectAllDescendantRecords = createSelector(
   [selectRecordsEntities, selectParentToChildren, (_state: ApiClientStoreState, id: EntityId) => id],
   (entities, parentToChildren, id) => {
