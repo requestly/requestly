@@ -3,23 +3,24 @@ import { AutoSyncLocalStoreDaemon } from "features/apiClient/helpers/modules/syn
 import React from "react";
 import EnvironmentDaemon from "./EnvironmentDaemon";
 import CollectionVariablesDaemon from "./CollectionVariablesDaemon";
-import { useApiClientFeatureContextProvider } from "../../apiClientFeatureContext/apiClientFeatureContext.store";
 import { ContextId } from "features/apiClient/contexts/contextId.context";
+import { apiClientContextRegistry } from "features/apiClient/slices";
+import { WorkspaceProvider } from "features/apiClient/common/WorkspaceProvider";
 
 const Daemon: React.FC = React.memo(() => {
-  const contexts = useApiClientFeatureContextProvider((s) => s.contexts);
-  const isMulti = contexts.size > 1;
-  const daemons = Array.from(contexts.values()).map(({ id: contextId }) => (
-    <ContextId id={contextId}>
-      <EnvironmentDaemon />
-      <CollectionVariablesDaemon />
+  const contexts = apiClientContextRegistry.getAllContexts();
+  const isMulti = contexts.length > 1;
+          // <ExampleCollectionsDaemon />
+      // <EnvironmentDaemon />
+      // <CollectionVariablesDaemon />
+  const daemons = contexts.map(({ workspaceId: contextId }) => (
+    <WorkspaceProvider workspaceId={contextId}>
       {!isMulti ? (
         <>
-          <ExampleCollectionsDaemon />
           <AutoSyncLocalStoreDaemon />
         </>
       ) : null}
-    </ContextId>
+    </WorkspaceProvider>
   ));
 
   return daemons;
