@@ -1,25 +1,34 @@
 import type { RQAPI } from "features/apiClient/types";
-import { RunStatus, CollectionRunCompositeId } from "./types";
+import type { CollectionRunCompositeId } from "./types";
+import { RunStatus } from "./types";
 
 export const COLLECTION_RUN_ID_DELIMITER = "::" as const;
 
+/**
+ * Creates a composite ID for a collection run.
+ * Format: ${collectionId}::${configId}
+ */
 export function createCollectionRunCompositeId(
   collectionId: RQAPI.CollectionRecord["id"],
-  runId: string
+  configId: string
 ): CollectionRunCompositeId {
-  return `${collectionId}${COLLECTION_RUN_ID_DELIMITER}${runId}`;
+  return `${collectionId}${COLLECTION_RUN_ID_DELIMITER}${configId}`;
 }
 
+/**
+ * Parses a composite ID into its component parts.
+ * Format: ${collectionId}::${configId}
+ */
 export function parseCollectionRunCompositeId(
   compositeId: CollectionRunCompositeId
-): { collectionId: RQAPI.CollectionRecord["id"]; runId: string } {
-  const [collectionId, runId] = compositeId.split(COLLECTION_RUN_ID_DELIMITER);
+): { collectionId: RQAPI.CollectionRecord["id"]; configId: string } {
+  const [collectionId, configId] = compositeId.split(COLLECTION_RUN_ID_DELIMITER);
 
-  if (!collectionId || !runId) {
+  if (!collectionId || !configId) {
     throw new Error(`Invalid collection run composite id: ${compositeId}`);
   }
 
-  return { collectionId: collectionId as RQAPI.CollectionRecord["id"], runId };
+  return { collectionId: collectionId as RQAPI.CollectionRecord["id"], configId };
 }
 
 export const RunStatusStateMachine = {

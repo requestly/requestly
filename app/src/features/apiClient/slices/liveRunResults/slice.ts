@@ -1,6 +1,5 @@
 import { createSlice, createEntityAdapter, PayloadAction, EntityState } from "@reduxjs/toolkit";
 import { NativeError } from "errors/NativeError";
-import type { RQAPI } from "features/apiClient/types";
 import type { CurrentlyExecutingRequest, LiveIterationMap } from "./types";
 import type {
   CollectionRunCompositeId,
@@ -9,7 +8,7 @@ import type {
   RunStatus,
   Timestamp,
 } from "../common/runResults/types";
-import { createCollectionRunCompositeId, RunStatusStateMachine } from "../common/runResults/utils";
+import { RunStatusStateMachine } from "../common/runResults/utils";
 import { RunStatus as RunStatusEnum } from "../common/runResults/types";
 import { API_CLIENT_LIVE_RUN_RESULT_SLICE_NAME } from "../common/constants";
 
@@ -56,17 +55,15 @@ const slice = createSlice({
     startRun(
       state,
       action: PayloadAction<{
-        collectionId: RQAPI.CollectionRecord["id"];
-        runId: string;
+        id: CollectionRunCompositeId;
         startTime?: Timestamp;
         abortController?: AbortController;
       }>
     ) {
-      const { collectionId, runId, startTime, abortController } = action.payload;
-      const compositeId = createCollectionRunCompositeId(collectionId, runId);
+      const { id, startTime, abortController } = action.payload;
 
       const entry: LiveRunEntryState = {
-        ...createEmptyRunEntry(compositeId),
+        ...createEmptyRunEntry(id),
         startTime: startTime ?? Date.now(),
         runStatus: RunStatusEnum.RUNNING,
         abortController: abortController ?? new AbortController(),
@@ -78,13 +75,13 @@ const slice = createSlice({
     setRunStatus(
       state,
       action: PayloadAction<{
-        compositeId: CollectionRunCompositeId;
+        id: CollectionRunCompositeId;
         status: RunStatus;
         error?: Error | null;
       }>
     ) {
-      const { compositeId, status, error } = action.payload;
-      const entry = state.entities[compositeId];
+      const { id, status, error } = action.payload;
+      const entry = state.entities[id];
       if (!entry) return;
 
       assertTransition(entry.runStatus, status);
@@ -96,12 +93,12 @@ const slice = createSlice({
     setCurrentlyExecutingRequest(
       state,
       action: PayloadAction<{
-        compositeId: CollectionRunCompositeId;
+        id: CollectionRunCompositeId;
         request: CurrentlyExecutingRequest;
       }>
     ) {
-      const { compositeId, request } = action.payload;
-      const entry = state.entities[compositeId];
+      const { id, request } = action.payload;
+      const entry = state.entities[id];
       if (!entry) return;
 
       entry.currentlyExecutingRequest = request;
@@ -110,12 +107,12 @@ const slice = createSlice({
     addIterationResult(
       state,
       action: PayloadAction<{
-        compositeId: CollectionRunCompositeId;
+        id: CollectionRunCompositeId;
         result: RequestExecutionResult;
       }>
     ) {
-      const { compositeId, result } = action.payload;
-      const entry = state.entities[compositeId];
+      const { id, result } = action.payload;
+      const entry = state.entities[id];
       if (!entry) return;
 
       const iterationBucket = entry.iterations.get(result.iteration);
@@ -130,14 +127,14 @@ const slice = createSlice({
     finalizeRun(
       state,
       action: PayloadAction<{
-        compositeId: CollectionRunCompositeId;
+        id: CollectionRunCompositeId;
         status: Extract<RunStatus, RunStatusEnum.COMPLETED | RunStatusEnum.ERRORED | RunStatusEnum.CANCELLED>;
         endTime?: Timestamp;
         error?: Error | null;
       }>
     ) {
-      const { compositeId, status, endTime, error } = action.payload;
-      const entry = state.entities[compositeId];
+      const { id, status, endTime, error } = action.payload;
+      const entry = state.entities[id];
       if (!entry) return;
 
       assertTransition(entry.runStatus, status);
@@ -148,21 +145,21 @@ const slice = createSlice({
       entry.error = status === RunStatusEnum.ERRORED ? error ?? null : null;
     },
 
-    resetRun(state, action: PayloadAction<{ compositeId: CollectionRunCompositeId }>) {
-      const { compositeId } = action.payload;
-      liveRunResultsAdapter.setOne(state, createEmptyRunEntry(compositeId));
+    resetRun(state, action: PayloadAction<{ id: CollectionRunCompositeId }>) {
+      const { id } = action.payload;
+      liveRunResultsAdapter.setOne(state, createEmptyRunEntry(id));
     },
 
     cancelRun(
       state,
       action: PayloadAction<{
-        compositeId: CollectionRunCompositeId;
+        id: CollectionRunCompositeId;
         reason?: Error;
         cancelledAt?: Timestamp;
       }>
     ) {
-      const { compositeId, reason, cancelledAt } = action.payload;
-      const entry = state.entities[compositeId];
+      const { id, reason, cancelledAt } = action.payload;
+      const entry = state.entities[id];
       if (!entry) return;
 
       assertTransition(entry.runStatus, RunStatusEnum.CANCELLED);
