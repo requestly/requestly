@@ -4,12 +4,13 @@ import { RequestIcon } from "features/apiClient/screens/apiClient/components/sid
 import { useRecordById } from "features/apiClient/slices";
 import { useBufferedEntity } from "features/apiClient/slices/entities/hooks";
 import { ApiClientEntityType } from "features/apiClient/slices/entities/types";
-import { DEFAULT_RUN_CONFIG_ID, getRunnerConfigId } from "features/apiClient/slices/runConfig/types";
+import { DEFAULT_RUN_CONFIG_ID } from "features/apiClient/slices/runConfig/types";
 import { RQAPI } from "features/apiClient/types";
 import React, { useRef } from "react";
 import { useDrag, useDrop } from "react-dnd";
 import { useCollectionView } from "../../../../../../collectionView.context";
 import { CollectionChain } from "./CollectionChain";
+import { getRunnerConfigId } from "features/apiClient/slices/runConfig/utils";
 
 enum ReorderableItemType {
   REQUEST = "request",

@@ -12,7 +12,6 @@ import { DataFileModalProvider } from "./components/RunConfigView/ParseFileModal
 import { getDefaultRunConfig } from "features/apiClient/slices/runConfig/thunks";
 import { useWorkspaceId } from "features/apiClient/common/WorkspaceProvider";
 import { runnerConfigActions } from "features/apiClient/slices/runConfig/slice";
-import { fromSavedRunConfig, getRunnerConfigId } from "features/apiClient/slices/runConfig/types";
 import { useTabActions } from "componentsV2/Tabs/slice/hooks";
 import { bufferActions } from "features/apiClient/slices/buffer";
 import { ApiClientEntityType } from "features/apiClient/slices/entities/types";
@@ -21,6 +20,7 @@ import "./collectionRunnerView.scss";
 import { useApiClientStore } from "features/apiClient/slices";
 import { findBufferByReferenceId } from "features/apiClient/slices/buffer/slice";
 import { useHostContext } from "hooks/useHostContext";
+import { fromSavedRunConfig, getRunnerConfigId } from "features/apiClient/slices/runConfig/utils";
 
 interface Props {
   collectionId: RQAPI.CollectionRecord["id"];

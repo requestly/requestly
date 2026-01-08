@@ -7,7 +7,7 @@ import { getFileExtension, truncateString } from "features/apiClient/screens/api
 import { useBufferedEntity } from "features/apiClient/slices/entities/hooks";
 import { ApiClientEntityType } from "features/apiClient/slices/entities/types";
 import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
-import { DEFAULT_RUN_CONFIG_ID, getRunnerConfigId } from "features/apiClient/slices/runConfig/types";
+import { DEFAULT_RUN_CONFIG_ID } from "features/apiClient/slices/runConfig/types";
 import { useApiClientFileStore } from "features/apiClient/store/apiClientFilesStore";
 import { RQButton, RQTooltip } from "lib/design-system-v2/components";
 import {
@@ -19,6 +19,7 @@ import { useCollectionView } from "../../../../../collectionView.context";
 import { useCollectionRunnerFileSelection } from "../hooks/useCollectionRunnerFileSelection.hook";
 import { DataFileModalViewMode, useDataFileModalContext } from "../ParseFileModal/Modals/DataFileModalContext";
 import { DataFileModalWrapper } from "../ParseFileModal/Modals/DataFileModalWrapper";
+import { getRunnerConfigId } from "features/apiClient/slices/runConfig/utils";
 
 export const DataFileSelector: React.FC = () => {
   const {
@@ -44,11 +45,13 @@ export const DataFileSelector: React.FC = () => {
     s.isFilePresentLocally,
     s.files,
   ]);
+
   const file = useMemo(
     () => {
       if (!dataFile) {
         return null;
       }
+
       return getFilesByIds([dataFile?.id])?.[0] ?? null;
     },
 
@@ -56,6 +59,7 @@ export const DataFileSelector: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [dataFile?.id, getFilesByIds, storeFiles]
   );
+
   const { openFileSelector } = useCollectionRunnerFileSelection();
 
   const handleFileSelection = useCallback(() => {

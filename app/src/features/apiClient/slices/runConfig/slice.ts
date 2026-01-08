@@ -1,5 +1,5 @@
 import { createSlice, createEntityAdapter, PayloadAction } from "@reduxjs/toolkit";
-import { RunConfigEntity, RunnerConfigId, RunnerConfigState as RunConfigState, RunDataFile } from "./types";
+import { RunConfigEntity, RunnerConfigId, RunnerConfigState as RunConfigState } from "./types";
 import type { SavedRunConfig } from "features/apiClient/commands/collectionRunner/types";
 import { API_CLIENT_RUNNER_CONFIG_SLICE_NAME } from "../common/constants";
 import { fromSavedRunConfig, isValidDelay, isValidIterations, patchRunOrder } from "./utils";
@@ -57,7 +57,7 @@ export const runnerConfigSlice = createSlice({
         config.iterations = iterations;
       }
     },
-    updateDataFile(state, action: PayloadAction<{ key: RunnerConfigId; dataFile: RunDataFile | null }>) {
+    updateDataFile(state, action: PayloadAction<{ key: RunnerConfigId; dataFile: RunConfigEntity["dataFile"] }>) {
       const config = state.configs.entities[action.payload.key];
       if (config) {
         config.dataFile = action.payload.dataFile;
