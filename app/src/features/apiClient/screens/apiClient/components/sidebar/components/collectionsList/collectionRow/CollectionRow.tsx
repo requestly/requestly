@@ -424,7 +424,10 @@ export const CollectionRow: React.FC<Props> = ({
         const hoverClientY = pointer.y - rect.top;
         const hoverHeight = rect.bottom - rect.top;
 
-        if (hoverClientY < hoverHeight * 0.25) {
+        if (record.collectionId === "") {
+          setDropPosition(null);
+          return;
+        } else if (hoverClientY < hoverHeight * 0.25) {
           setDropPosition("before");
           if (hoverExpandTimeoutRef.current) {
             clearTimeout(hoverExpandTimeoutRef.current);
