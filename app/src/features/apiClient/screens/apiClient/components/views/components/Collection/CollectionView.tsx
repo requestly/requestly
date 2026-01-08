@@ -56,7 +56,7 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
       {
         label: "Runner",
         key: TAB_KEYS.RUNNER,
-        children: <CollectionRunnerView collectionId={collectionId} />,
+        children: <CollectionRunnerView collectionId={collectionId} activeTabKey={activeTabKey} />,
       },
     ];
   }, [collectionId, activeTabKey]);

@@ -1,26 +1,33 @@
 import { ApiClientEntityType, EntityDispatch } from "./types";
 import { HttpRecordEntity } from "./http";
 import { GraphQLRecordEntity } from "./graphql";
-import { ApiClientEntityMeta } from "./base";
+import type { ApiClientEntityMeta } from "./base";
 import { CollectionRecordEntity } from "./collection";
 import { EnvironmentEntity, GlobalEnvironmentEntity } from "./environment";
 import { RuntimeVariablesEntity } from "./runtime-variables";
+import { RunConfigEntity } from "./runConfig";
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace EntityFactory {
-  export type EntityTypeMap<T extends ApiClientEntityType> =
-    T extends ApiClientEntityType.HTTP_RECORD ? HttpRecordEntity :
-    T extends ApiClientEntityType.COLLECTION_RECORD ? CollectionRecordEntity :
-    T extends ApiClientEntityType.ENVIRONMENT ? EnvironmentEntity :
-    T extends ApiClientEntityType.GLOBAL_ENVIRONMENT ? GlobalEnvironmentEntity :
-    T extends ApiClientEntityType.RUNTIME_VARIABLES ? RuntimeVariablesEntity
-    :  GraphQLRecordEntity;
+  export type EntityTypeMap<T extends ApiClientEntityType> = T extends ApiClientEntityType.HTTP_RECORD
+    ? HttpRecordEntity
+    : T extends ApiClientEntityType.COLLECTION_RECORD
+    ? CollectionRecordEntity
+    : T extends ApiClientEntityType.ENVIRONMENT
+    ? EnvironmentEntity
+    : T extends ApiClientEntityType.GLOBAL_ENVIRONMENT
+    ? GlobalEnvironmentEntity
+    : T extends ApiClientEntityType.RUNTIME_VARIABLES
+    ? RuntimeVariablesEntity
+    : T extends ApiClientEntityType.RUN_CONFIG
+    ? RunConfigEntity
+    : GraphQLRecordEntity;
 
   export const GlobalStateOverrideConfig: {
-    [key in ApiClientEntityType]?: boolean
+    [key in ApiClientEntityType]?: boolean;
   } = {
     [ApiClientEntityType.RUNTIME_VARIABLES]: true,
-  }
+  };
 
   export function from<T extends ApiClientEntityType>(
     params: { id: string; type: T },
@@ -42,6 +49,8 @@ export namespace EntityFactory {
           return new GlobalEnvironmentEntity(dispatch);
         case ApiClientEntityType.RUNTIME_VARIABLES:
           return new RuntimeVariablesEntity(dispatch);
+        case ApiClientEntityType.RUN_CONFIG:
+          return new RunConfigEntity(dispatch, meta);
       }
     })() as EntityTypeMap<T>;
 

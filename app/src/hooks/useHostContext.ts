@@ -12,6 +12,8 @@ export interface HostContext {
   getBufferId: () => string | undefined;
 
   registerWorkflow: (workflow: ActiveWorkflow) => void;
+  registerSecondaryBuffer: (bufferId: string) => void;
+  unregisterSecondaryBuffer: (bufferId: string) => void;
 }
 
 export const HostContextImpl = createContext<HostContext | null>(null);

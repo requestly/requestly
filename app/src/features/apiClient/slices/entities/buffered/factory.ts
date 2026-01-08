@@ -5,16 +5,20 @@ import { BufferedGraphQLRecordEntity } from "./graphql";
 import { BufferedEnvironmentEntity, BufferedGlobalEnvironmentEntity } from "./environment";
 import { BufferedRuntimeVariablesEntity } from "./runtime-variables";
 import { BufferedCollectionRecordEntity } from "./collection";
+import { BufferedRunConfigEntity } from "./runConfig";
 import type { ApiClientEntity, ApiClientEntityMeta } from "../base";
 
-export type BufferedApiClientEntityMeta = ApiClientEntityMeta & { referenceId: string } & ({originExists: true} | {originExists: false});
+export type BufferedApiClientEntityMeta = ApiClientEntityMeta & { referenceId: string } & (
+    | { originExists: true }
+    | { originExists: false }
+  );
 export interface BufferedApiClientEntity {
-  meta: BufferedApiClientEntityMeta,
-  origin: ApiClientEntity<any, any, any>
-};
+  meta: BufferedApiClientEntityMeta;
+  origin: ApiClientEntity<any, any, any>;
+}
 
-export type OriginExists<T extends BufferedApiClientEntity> = T & {meta: {originExists: true}};
-export type OriginUndfined<T extends BufferedApiClientEntity> = T & {meta: {originExists: false}};
+export type OriginExists<T extends BufferedApiClientEntity> = T & { meta: { originExists: true } };
+export type OriginUndfined<T extends BufferedApiClientEntity> = T & { meta: { originExists: false } };
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace BufferedEntityFactory {
@@ -30,10 +34,12 @@ export namespace BufferedEntityFactory {
     ? BufferedRuntimeVariablesEntity
     : T extends ApiClientEntityType.COLLECTION_RECORD
     ? BufferedCollectionRecordEntity
+    : T extends ApiClientEntityType.RUN_CONFIG
+    ? BufferedRunConfigEntity
     : never;
 
   export function from<T extends ApiClientEntityType>(
-    params: { id: string; type: T, referenceId: string, },
+    params: { id: string; type: T; referenceId: string },
     dispatch: EntityDispatch
   ): EntityTypeMap<T> {
     const meta: BufferedApiClientEntityMeta = { id: params.id, originExists: true, referenceId: params.referenceId };
@@ -52,6 +58,8 @@ export namespace BufferedEntityFactory {
           return new BufferedRuntimeVariablesEntity(dispatch, meta);
         case ApiClientEntityType.COLLECTION_RECORD:
           return new BufferedCollectionRecordEntity(dispatch, meta);
+        case ApiClientEntityType.RUN_CONFIG:
+          return new BufferedRunConfigEntity(dispatch, meta);
       }
     })() as EntityTypeMap<T>;
 
