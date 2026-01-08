@@ -21,6 +21,7 @@ import { DEFAULT_RUN_CONFIG_ID } from "features/apiClient/slices/runConfig/types
 import {
   getApiClientFeatureContext,
   useApiClientFeatureContext,
+  useApiClientStore,
 } from "features/apiClient/slices/workspaceView/helpers/ApiClientContextRegistry/hooks";
 import { RunStatus } from "features/apiClient/store/collectionRunResult/runResult.store";
 import { useHostContext } from "hooks/useHostContext";
@@ -47,6 +48,7 @@ import "./runConfigView.scss";
 import { getAllDescendantApiRecordIds } from "features/apiClient/slices/apiRecords/utils";
 import { fromSavedRunConfig, getRunnerConfigId, toSavedRunConfig } from "features/apiClient/slices/runConfig/utils";
 import { useGenericState } from "hooks/useGenericState";
+import { useSaveBuffer } from "features/apiClient/slices/buffer/hooks";
 
 const RunConfigSaveButton: React.FC<{ disabled?: boolean; isRunnerTabActive: boolean }> = ({
   disabled = false,
@@ -71,59 +73,55 @@ const RunConfigSaveButton: React.FC<{ disabled?: boolean; isRunnerTabActive: boo
   const delay = useApiClientSelector((state) => bufferedEntity.getDelay(state));
 
   const { getIsActive } = useHostContext();
+  const saveBuffer = useSaveBuffer();
 
   const isActiveTab = getIsActive();
 
   const handleSaveClick = useCallback(async () => {
-    setIsSaving(true);
-    const state = getApiClientFeatureContext(workspaceId).store.getState();
-    const config = bufferedEntity.getEntityFromState(state);
-    const configToSave = toSavedRunConfig(config);
-
-    try {
-      await dispatch(
-        saveRunConfigThunk({
-          workspaceId,
-          collectionId,
-          configToSave,
-        })
-      ).unwrap();
-
-      dispatch(
-        entitySynced({
-          entityId: bufferedEntity.meta.referenceId,
-          entityType: ApiClientEntityType.RUN_CONFIG,
-          data: config,
-        })
-      );
-      dispatch(
-        bufferActions.markSaved({
-          id: bufferedEntity.meta.id,
-          referenceId: bufferedEntity.meta.referenceId,
-          savedData: fromSavedRunConfig(collectionId, configToSave),
-        })
-      );
-
-      toast.success("Configuration saved");
-      trackCollectionRunnerConfigSaved({
-        collection_id: collectionId,
-        request_count: configToSave.runOrder.filter((r: { isSelected: boolean }) => r.isSelected).length,
-        iteration_count: iterations,
-        delay: delay,
-      });
-    } catch (error) {
-      toast.error("Something went wrong while saving!");
-      Sentry.captureException(error, { extra: { collectionId, configToSave } });
-      trackCollectionRunnerConfigSaveFailed({
-        collection_id: collectionId,
-        request_count: configToSave.runOrder.filter((r: { isSelected: boolean }) => r.isSelected).length,
-        iteration_count: iterations,
-        delay: delay,
-      });
-    } finally {
-      setIsSaving(false);
-    }
-  }, [bufferedEntity, dispatch, workspaceId, collectionId, iterations, delay]);
+    saveBuffer(
+      {
+        entity: bufferedEntity,
+        async save(changes, repositories) {
+          await dispatch(
+            saveRunConfigThunk({
+              workspaceId,
+              collectionId,
+              configToSave: toSavedRunConfig(changes),
+            })
+          ).unwrap();
+        },
+      },
+      {
+        beforeSave() {
+          setIsSaving(true);
+        },
+        onSuccess(configToSave) {
+          toast.success("Configuration saved");
+          trackCollectionRunnerConfigSaved({
+            collection_id: collectionId,
+            request_count: configToSave.runOrder.filter((r: { isSelected: boolean }) => r.isSelected).length,
+            iteration_count: iterations,
+            delay: delay,
+          });
+        },
+        afterSave() {
+          setIsSaving(false);
+        },
+        onError(error) {
+          const { store } = getApiClientFeatureContext(workspaceId);
+          const data = bufferedEntity.getEntityFromState(store.getState());
+          toast.error("Something went wrong while saving!");
+          Sentry.captureException(error, { extra: { collectionId, data } });
+          trackCollectionRunnerConfigSaveFailed({
+            collection_id: collectionId,
+            request_count: data.runOrder.filter((r: { isSelected: boolean }) => r.isSelected).length,
+            iteration_count: iterations,
+            delay: delay,
+          });
+        },
+      }
+    );
+  }, [bufferedEntity, collectionId, dispatch, iterations, delay, saveBuffer, workspaceId]);
 
   return (
     <RQTooltip
