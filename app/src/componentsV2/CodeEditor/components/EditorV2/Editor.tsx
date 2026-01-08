@@ -266,13 +266,16 @@ const Editor: React.FC<EditorProps> = ({
     setIsPopoverPinned(false);
   }, []);
 
-  const handleSetVariable = (variable: string | null) => {
-    if (!variable) {
-      handleMouseLeave();
-    } else {
-      setHoveredVariable(variable);
-    }
-  };
+  const handleSetVariable = useCallback(
+    (variable: string | null) => {
+      if (!variable) {
+        handleMouseLeave();
+      } else {
+        setHoveredVariable(variable);
+      }
+    },
+    [handleMouseLeave]
+  );
 
   const editor = (
     <>
@@ -313,7 +316,7 @@ const Editor: React.FC<EditorProps> = ({
         data-gramm="false"
       ></CodeMirror>
       <div className="editor-popup-container" onMouseLeave={handleMouseLeave}>
-        {hoveredVariable && (
+        {hoveredVariable && envVariables && (
           <VariablePopover
             editorRef={{
               current: editorRef.current?.editor ?? null,
