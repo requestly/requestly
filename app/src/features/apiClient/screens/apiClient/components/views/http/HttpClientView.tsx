@@ -76,7 +76,7 @@ import PATHS from "config/constants/sub/paths";
 import { useAPIRecords, useAPIRecordsStore } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 import { Authorization } from "../components/request/components/AuthorizationView/types/AuthConfig";
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
-import { apiRecordsRankingManager } from "features/apiClient/components/sidebar";
+import { apiRecordsRankingManager } from "features/apiClient/helpers/RankingManager";
 import ErrorBoundary from "features/apiClient/components/ErrorBoundary/ErrorBoundary";
 import { useHttpRequestExecutor } from "features/apiClient/hooks/requestExecutors/useHttpRequestExecutor";
 import { PathVariablesProvider } from "features/apiClient/store/pathVariables/PathVariablesContextProvider";
