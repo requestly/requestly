@@ -11,7 +11,7 @@ import { LiveRunResultEntity } from "features/apiClient/slices/entities";
 const CollectionViewContext = createContext<{
   collectionId: RQAPI.CollectionRecord["id"];
   bufferedEntity: OriginExists<BufferedRunConfigEntity>;
-  liveRunResultsEntity: LiveRunResultEntity;
+  liveRunResultEntity: LiveRunResultEntity;
 } | null>(null);
 
 export function useCollectionView() {
@@ -34,14 +34,14 @@ export const CollectionViewContextProvider: React.FC<{
     type: ApiClientEntityType.RUN_CONFIG,
   });
 
-  const liveRunResultsEntity = useEntity({
+  const liveRunResultEntity = useEntity({
     id: getRunnerConfigId(collectionId, configId),
     type: ApiClientEntityType.LIVE_RUN_RESULT,
   });
 
-  const value = useMemo(() => ({ collectionId, bufferedEntity, liveRunResultsEntity }), [
+  const value = useMemo(() => ({ collectionId, bufferedEntity, liveRunResultEntity }), [
     collectionId,
-    liveRunResultsEntity,
+    liveRunResultEntity,
     bufferedEntity,
   ]);
 
