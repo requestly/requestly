@@ -108,6 +108,9 @@ class ApiClientContextService {
       return next(action);
     };
     const store = configureStore({
+      devTools: {
+        name: `workspace-${workspaceId}`
+      },
       reducer: {
         [apiRecordsSlice.name]: createApiClientRecordsPersistedReducer(workspaceId || "null"),
         [environmentsSlice.name]: createEnvironmentsPersistedReducer(workspaceId || "null"),
