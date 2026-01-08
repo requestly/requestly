@@ -35,7 +35,7 @@ export const CollectionViewContextProvider: React.FC<{
   });
 
   const liveRunResultEntity = useEntity({
-    id: getRunnerConfigId(collectionId, configId),
+    id: collectionId,
     type: ApiClientEntityType.LIVE_RUN_RESULT,
   });
 
