@@ -12,15 +12,12 @@ import { getActiveWorkspace } from "store/slices/workspaces/selectors";
 import { Invite } from "types";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import { WorkspacesOverlay } from "./WorkspacesOverlay/WorkspacesOverlay";
-import {
-  ApiClientViewMode,
-  useApiClientMultiWorkspaceView,
-} from "features/apiClient/store/multiWorkspaceView/multiWorkspaceView.store";
 import { MultiWorkspaceAvatarGroup } from "../MultiWorkspaceAvatarGroup";
 import LocalWorkspaceAvatar from "features/workspaces/components/LocalWorkspaceAvatar";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { WorkspaceType } from "features/workspaces/types";
+import { ApiClientViewMode, useViewMode } from "features/apiClient/slices";
 
 const prettifyWorkspaceName = (workspaceName: string) => {
   // if (workspaceName === APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE)
@@ -33,7 +30,7 @@ const WorkSpaceDropDown = ({ teamInvites }: { teamInvites: Invite[] }) => {
   const appMode = useSelector(getAppMode);
   const user = useSelector(getUserAuthDetails);
   const activeWorkspace = useSelector(getActiveWorkspace);
-  const viewMode = useApiClientMultiWorkspaceView((s) => s.viewMode);
+  const viewMode = useViewMode();
 
   // Local State
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);

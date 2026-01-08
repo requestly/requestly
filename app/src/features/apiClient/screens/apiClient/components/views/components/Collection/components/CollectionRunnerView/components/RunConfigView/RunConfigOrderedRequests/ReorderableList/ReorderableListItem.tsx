@@ -1,12 +1,12 @@
-import React, { useRef } from "react";
 import { MdDragIndicator } from "@react-icons/all-files/md/MdDragIndicator";
 import { Checkbox, Typography } from "antd";
-import { RQAPI } from "features/apiClient/types";
-import { useDrag, useDrop } from "react-dnd";
-import { CollectionChain } from "./CollectionChain";
 import { RequestIcon } from "features/apiClient/screens/apiClient/components/sidebar/components/collectionsList/requestRow/RequestRow";
-import { useRunConfigStore } from "../../../../run.context";
-import { useApiRecord } from "features/apiClient/hooks/useApiRecord.hook";
+import { useRecordById } from "features/apiClient/slices";
+import { RQAPI } from "features/apiClient/types";
+import React, { useRef } from "react";
+import { useDrag, useDrop } from "react-dnd";
+import { useCollectionView } from "../../../../../../collectionView.context";
+import { CollectionChain } from "./CollectionChain";
 
 enum ReorderableItemType {
   REQUEST = "request",
@@ -26,7 +26,8 @@ enum DragDirection {
 const RequestInfo: React.FC<{
   recordId: RQAPI.ApiRecord["id"];
 }> = ({ recordId }) => {
-  const request = useApiRecord(recordId) as RQAPI.ApiRecord;
+  const record = useRecordById(recordId);
+  const request = record?.type === RQAPI.RecordType.API ? record : null;
 
   if (!request) {
     return (
@@ -63,7 +64,8 @@ interface ReorderableListItemProps {
 }
 
 export const ReorderableListItem: React.FC<ReorderableListItemProps> = ({ index, orderedRequest, reorder }) => {
-  const [setSelected] = useRunConfigStore((s) => [s.setSelected]);
+  const { bufferedEntity } = useCollectionView();
+
   const ref = useRef<HTMLDivElement>(null);
 
   const [{ isDragging }, drag] = useDrag({
@@ -119,7 +121,7 @@ export const ReorderableListItem: React.FC<ReorderableListItemProps> = ({ index,
       <Checkbox
         checked={orderedRequest.isSelected}
         onChange={(e) => {
-          setSelected(orderedRequest.record.id, e.target.checked);
+          bufferedEntity.toggleRequestSelection(orderedRequest.record.id);
         }}
       />
       <CollectionChain key={orderedRequest.record.collectionId} recordId={orderedRequest.record.id} />

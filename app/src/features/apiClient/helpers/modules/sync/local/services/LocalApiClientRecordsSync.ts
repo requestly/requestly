@@ -281,12 +281,22 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
       data: parsedApiRecord,
     };
   }
-  async updateRecord(patch: Partial<Omit<RQAPI.ApiRecord, "id">>, nativeId: string): RQAPI.ApiClientRecordPromise {
+  async updateRecord(
+    patch: Partial<Omit<RQAPI.ApiClientRecord, "id">>,
+    nativeId: string
+  ): RQAPI.ApiClientRecordPromise {
     const id = parseNativeId(nativeId);
+
+    const isCollection = patch.type === RQAPI.RecordType.COLLECTION;
+    if (isCollection) {
+      return this.updateCollectionRecord(patch as Partial<Omit<RQAPI.CollectionRecord, "id">>, id);
+    }
+
+    // Handle API record updates
     const service = await this.getAdapter();
     const result = await service.updateRecord(
       {
-        ...this.parseApiRecordRequest(patch),
+        ...this.parseApiRecordRequest(patch as Partial<RQAPI.ApiRecord>),
         name: patch.name,
       },
       id
@@ -301,9 +311,97 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
     }
 
     const [parsedApiRecord] = this.parseAPIEntities([result.content]);
+    if (!parsedApiRecord) {
+      return {
+        success: false,
+        data: null,
+        message: "Failed to parse API record",
+      };
+    }
     return {
       success: true,
       data: parsedApiRecord,
+    };
+  }
+
+  private async updateCollectionRecord(
+    patch: Partial<Omit<RQAPI.CollectionRecord, "id">>,
+    id: string
+  ): RQAPI.ApiClientRecordPromise {
+    const service = await this.getAdapter();
+
+    const currentCollectionResult = await service.getCollection(id);
+    if (currentCollectionResult.type === "error") {
+      return {
+        success: false,
+        data: null,
+        message: currentCollectionResult.error.message,
+      };
+    }
+
+    const [currentCollection] = this.parseAPIEntities([currentCollectionResult.content]);
+    const currentCollectionRecord = currentCollection as RQAPI.CollectionRecord;
+
+    // Update name if provided
+    if ("name" in patch && patch.name !== undefined && patch.name !== currentCollectionRecord.name) {
+      const renameResult = await service.renameCollection(id, patch.name);
+      if (renameResult.type === "error") {
+        return {
+          success: false,
+          data: null,
+          message: renameResult.error.message,
+        };
+      }
+
+      const [renamedCollection] = this.parseAPIEntities([renameResult.content]);
+      Object.assign(currentCollectionRecord, renamedCollection);
+    }
+
+    // Update description if provided
+    if (
+      "description" in patch &&
+      patch.description !== undefined &&
+      patch.description !== currentCollectionRecord.description
+    ) {
+      const descriptionResult = await service.updateCollectionDescription(id, patch.description);
+      if (descriptionResult.type === "error") {
+        return {
+          success: false,
+          data: null,
+          message: descriptionResult.error.message,
+        };
+      }
+      currentCollectionRecord.description = descriptionResult.content;
+    }
+
+    // Update variables if provided
+    if (patch.data?.variables !== undefined) {
+      const variablesResult = await service.setCollectionVariables(id, patch.data.variables);
+      if (variablesResult.type === "error") {
+        return {
+          success: false,
+          data: null,
+          message: variablesResult.error.message,
+        };
+      }
+    }
+
+    // Update auth if provided
+    if (patch.data?.auth !== undefined) {
+      const authResult = await service.updateCollectionAuthData(id, patch.data.auth);
+      if (authResult.type === "error") {
+        return {
+          success: false,
+          data: null,
+          message: authResult.error.message,
+        };
+      }
+      currentCollectionRecord.data.auth = authResult.content;
+    }
+
+    return {
+      success: true,
+      data: currentCollectionRecord,
     };
   }
 

@@ -1,6 +1,6 @@
 import { Select } from "antd";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import AuthorizationForm from "./AuthorizationForm";
 import Description from "./Description";
 import { FORM_TEMPLATE_STATIC_DATA, AUTH_SELECTOR_LABELS } from "./AuthorizationForm/formStructure";
@@ -35,9 +35,9 @@ const AuthorizationView: React.FC<Props> = ({
     defaultsRef.current?.currentAuthType || getDefaultAuthType(isRootLevelRecord)
   );
 
-  const [resolvedAuthConfigStore, setResolvedAuthConfigStore] = useState<RQAPI.Auth["authConfigStore"]>(
-    defaultsRef.current?.authConfigStore
-  );
+  const [resolvedAuthConfigStore, setResolvedAuthConfigStore] = useState<RQAPI.Auth["authConfigStore"]>(() => {
+    return defaultsRef.current?.authConfigStore ?? {};
+  });
 
   const onFormConfigChange = useCallback(
     <SelectedAuthType extends AuthConfigMeta.AuthWithConfig>(authConfig: AuthConfig<SelectedAuthType> | null) => {
@@ -47,27 +47,40 @@ const AuthorizationView: React.FC<Props> = ({
           newConfigStore[authConfig.type] = authConfig.config;
         } else {
           // Clear the config for the current auth type when validation fails
-          newConfigStore[selectedAuthType] = null;
+          if (Authorization.requiresConfig(selectedAuthType)) {
+            const authType = selectedAuthType as AuthConfigMeta.AuthWithConfig;
+            newConfigStore[authType] = null;
+          }
         }
+        onAuthUpdate({
+          currentAuthType: selectedAuthType,
+          authConfigStore: newConfigStore,
+        });
         return newConfigStore;
       });
     },
-    [selectedAuthType]
+    [selectedAuthType, onAuthUpdate]
   );
 
-  const handleAuthTypeChange = useCallback((value: Authorization.Type) => {
-    setSelectedAuthType(value);
-  }, []);
-
-  useEffect(() => {
-    // for some reason there is a re render outside this component that sends an empty defaults object
-    if (defaultsRef.current) {
+  const handleAuthTypeChange = useCallback(
+    (value: Authorization.Type) => {
+      setSelectedAuthType(value);
       onAuthUpdate({
-        currentAuthType: selectedAuthType,
+        currentAuthType: value,
         authConfigStore: resolvedAuthConfigStore,
       });
-    }
-  }, [selectedAuthType, resolvedAuthConfigStore, onAuthUpdate]);
+    },
+    [resolvedAuthConfigStore, onAuthUpdate]
+  );
+
+  const handleClearAuthChange = useCallback(() => {
+    setSelectedAuthType(Authorization.Type.NO_AUTH);
+    onAuthUpdate({
+      currentAuthType: Authorization.Type.NO_AUTH,
+      authConfigStore: {},
+    });
+    setResolvedAuthConfigStore({});
+  }, [onAuthUpdate]);
 
   return (
     <div className={`authorization-view ${wrapperClass}`}>
@@ -84,7 +97,7 @@ const AuthorizationView: React.FC<Props> = ({
             <div
               className="clear-icon"
               onClick={() => {
-                setSelectedAuthType(Authorization.Type.NO_AUTH);
+                handleClearAuthChange();
               }}
             >
               <MdClear color="#bbbbbb" size="12px" />

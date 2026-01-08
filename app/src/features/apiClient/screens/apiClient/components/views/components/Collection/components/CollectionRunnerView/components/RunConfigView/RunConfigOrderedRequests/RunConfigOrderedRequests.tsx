@@ -1,14 +1,24 @@
-import React, { useMemo } from "react";
+import React, { useCallback } from "react";
 import { ReorderableList } from "./ReorderableList/ReorderableList";
-import { useRunConfigStore } from "../../../run.context";
-import { getOrderedApiClientRecords } from "features/apiClient/commands/store.utils";
-import { useApiClientFeatureContext } from "features/apiClient/contexts/meta";
+import { useCollectionView } from "../../../../../collectionView.context";
+import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
+import { DEFAULT_RUN_CONFIG_ID } from "features/apiClient/slices/runConfig/types";
+import { selectBufferedRunConfigOrderedRequests } from "features/apiClient/slices/runConfig/selectors";
+import { RQAPI } from "features/apiClient/types";
+import { getRunnerConfigId } from "features/apiClient/slices/runConfig/utils";
 
 export const RunConfigOrderedRequests: React.FC = () => {
-  const [runOrder, setRunOrder] = useRunConfigStore((s) => [s.runOrder, s.setRunOrder]);
-  const ctx = useApiClientFeatureContext();
+  const { collectionId, bufferedEntity } = useCollectionView();
 
-  const orderedRequests = useMemo(() => getOrderedApiClientRecords(ctx, runOrder), [ctx, runOrder]);
+  const referenceId = getRunnerConfigId(collectionId, DEFAULT_RUN_CONFIG_ID);
+  const items = useApiClientSelector((state) => selectBufferedRunConfigOrderedRequests(state, referenceId));
 
-  return <ReorderableList requests={orderedRequests} onOrderUpdate={setRunOrder} />;
+  const handleOrderUpdate = useCallback(
+    (updatedRunOrder: RQAPI.RunConfig["runOrder"]) => {
+      bufferedEntity.setRunOrder(updatedRunOrder);
+    },
+    [bufferedEntity]
+  );
+
+  return <ReorderableList requests={items} onOrderUpdate={handleOrderUpdate} />;
 };

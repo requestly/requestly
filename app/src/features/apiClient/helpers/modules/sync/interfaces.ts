@@ -101,6 +101,7 @@ export interface ApiClientRecordsInterface<Meta extends Record<string, any>> {
 export interface ApiClientRepositoryInterface {
   environmentVariablesRepository: EnvironmentInterface<Record<string, any>>;
   apiClientRecordsRepository: ApiClientRecordsInterface<Record<string, any>>;
+  validateConnection(): Promise<{ isValid: boolean }>;
 }
 
 export type ApiClientCloudMeta = {

@@ -11,12 +11,12 @@ import InfoIcon from "components/misc/InfoIcon";
 
 interface Props {
   handleVariableChange: (record: VariableRow, fieldChanged: keyof VariableRow) => void;
-  handleDeleteVariable: (key: number) => void;
-  handleUpdatePersisted: (id: number, isPersisted: boolean) => void;
-  visibleSecretsRowIds: number[];
-  updateVisibleSecretsRowIds: (id: number) => void;
+  handleDeleteVariable: (id: number | string) => void;
+  handleUpdatePersisted: (id: number | string, isPersisted: boolean) => void;
+  visibleSecretsRowIds: (number | string)[];
+  updateVisibleSecretsRowIds: (id: number | string) => void;
   recordsCount: number;
-  duplicateKeyIndices?: Set<number>;
+  duplicateKeyIndices?: Set<number | string>;
   isReadOnly: boolean;
   container: "environments" | "runtime";
 }
@@ -35,7 +35,7 @@ export const useVariablesListColumns = ({
   container,
 }: Props) => {
   const checkIsSecretHidden = useCallback(
-    (recordId: number) => {
+    (recordId: number | string) => {
       return !visibleSecretsRowIds.includes(recordId);
     },
     [visibleSecretsRowIds]
