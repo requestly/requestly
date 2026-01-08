@@ -408,6 +408,7 @@ class Runner {
 
       await this.afterComplete();
     } catch (e) {
+      console.error({ e });
       if (e instanceof RunCancelled) {
         this.onRunCancelled();
         return;
