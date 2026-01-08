@@ -20,6 +20,7 @@ import { ApiClientBottomSheet } from "../components/response/ApiClientBottomShee
 import { ClientCodeButton } from "../components/ClientCodeButton/ClientCodeButton";
 import "./gqClientView.scss";
 import { GraphQLRecordProvider } from "features/apiClient/store/apiRecord/graphqlRecord/GraphQLRecordContextProvider";
+import { HeadersProvider } from "features/apiClient/store/HeadersContextProvider";
 import { isNull } from "lodash";
 import { useLocation } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
@@ -619,7 +620,9 @@ const WithGraphQLRecordProvider = (Component: React.ComponentType<any>) => {
     return (
       <ErrorBoundary boundaryId="graphql-client-view-error-boundary">
         <GraphQLRecordProvider entry={props.apiEntryDetails.data} recordId={props.apiEntryDetails.id}>
-          <Component {...props} />
+          <HeadersProvider entry={props.apiEntryDetails.data}>
+            <Component {...props} />
+          </HeadersProvider>
         </GraphQLRecordProvider>
       </ErrorBoundary>
     );
