@@ -28,7 +28,7 @@ export function RawBody(props: {
     { leading: true, trailing: true }
   );
 
-  const editorLanguage = contentType === "application/json" ? EditorLanguage.JSON : null;
+  const editorLanguage = contentType === "application/json" ? EditorLanguage.JSON5 : null;
 
   return (
     <div className="api-client-code-editor-container api-request-body-editor-container">
