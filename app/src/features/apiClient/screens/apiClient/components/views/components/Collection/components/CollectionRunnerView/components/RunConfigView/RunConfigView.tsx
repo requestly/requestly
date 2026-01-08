@@ -56,13 +56,9 @@ const RunConfigSaveButton: React.FC<{ disabled?: boolean; isRunnerTabActive: boo
 }) => {
   const [isSaving, setIsSaving] = useState(false);
 
-  const { collectionId } = useCollectionView();
+  const { collectionId, bufferedEntity } = useCollectionView();
   const workspaceId = useWorkspaceId();
   const dispatch = useApiClientDispatch();
-  const bufferedEntity = useBufferedEntity({
-    id: getRunnerConfigId(collectionId, DEFAULT_RUN_CONFIG_ID),
-    type: ApiClientEntityType.RUN_CONFIG,
-  });
 
   const hasUnsavedChanges = useIsBufferDirty({
     referenceId: getRunnerConfigId(collectionId, DEFAULT_RUN_CONFIG_ID),

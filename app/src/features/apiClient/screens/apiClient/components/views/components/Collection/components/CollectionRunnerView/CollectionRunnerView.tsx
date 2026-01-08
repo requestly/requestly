@@ -12,15 +12,16 @@ import { DataFileModalProvider } from "./components/RunConfigView/ParseFileModal
 import { getDefaultRunConfig } from "features/apiClient/slices/runConfig/thunks";
 import { useWorkspaceId } from "features/apiClient/common/WorkspaceProvider";
 import { runnerConfigActions } from "features/apiClient/slices/runConfig/slice";
-import { useTabActions } from "componentsV2/Tabs/slice/hooks";
 import { bufferActions } from "features/apiClient/slices/buffer";
 import { ApiClientEntityType } from "features/apiClient/slices/entities/types";
 import { useApiClientDispatch } from "features/apiClient/slices/hooks/base.hooks";
-import "./collectionRunnerView.scss";
-import { useApiClientStore } from "features/apiClient/slices";
+import { getApiClientFeatureContext } from "features/apiClient/slices";
 import { findBufferByReferenceId } from "features/apiClient/slices/buffer/slice";
 import { useHostContext } from "hooks/useHostContext";
 import { fromSavedRunConfig, getRunnerConfigId } from "features/apiClient/slices/runConfig/utils";
+import { getAllDescendantApiRecordIds } from "features/apiClient/slices/apiRecords/utils";
+import "./collectionRunnerView.scss";
+import { DEFAULT_RUN_CONFIG_ID } from "features/apiClient/slices/runConfig/types";
 
 interface Props {
   collectionId: RQAPI.CollectionRecord["id"];
@@ -30,10 +31,8 @@ interface Props {
 export const CollectionRunnerView: React.FC<Props> = ({ collectionId, activeTabKey }) => {
   const workspaceId = useWorkspaceId();
   const apiClientDispatch = useApiClientDispatch();
-  const tabActions = useTabActions();
   const [isLoading, setIsLoading] = useState(true);
   const [runResults] = useState<RunResult[]>([]);
-  const store = useApiClientStore();
   const { registerSecondaryBuffer, unregisterSecondaryBuffer } = useHostContext();
 
   useEffect(() => {
@@ -43,12 +42,16 @@ export const CollectionRunnerView: React.FC<Props> = ({ collectionId, activeTabK
         const result = await apiClientDispatch(getDefaultRunConfig({ workspaceId, collectionId })).unwrap();
         apiClientDispatch(runnerConfigActions.hydrateRunConfig(collectionId, result));
 
-        // Create buffer for run config
-        const state = store.getState();
         const referenceId = getRunnerConfigId(collectionId, result.id);
+
+        const allRequestIds = getAllDescendantApiRecordIds(collectionId, workspaceId);
+        apiClientDispatch(runnerConfigActions.patchRunOrder({ id: referenceId, requestIds: allRequestIds }));
+
         // Need to fix
+        const state = getApiClientFeatureContext(workspaceId).store.getState();
         const existingBuffer = referenceId ? findBufferByReferenceId(state.buffer.entities, referenceId) : null;
 
+        // Create buffer for run config
         const bufferAction = apiClientDispatch(
           bufferActions.open(
             {
@@ -81,15 +84,7 @@ export const CollectionRunnerView: React.FC<Props> = ({ collectionId, activeTabK
         }
       });
     };
-  }, [
-    collectionId,
-    workspaceId,
-    apiClientDispatch,
-    store,
-    tabActions,
-    registerSecondaryBuffer,
-    unregisterSecondaryBuffer,
-  ]);
+  }, [collectionId, workspaceId, apiClientDispatch, registerSecondaryBuffer, unregisterSecondaryBuffer]);
 
   // useEffect(() => {
   //   (async () => {
@@ -109,7 +104,7 @@ export const CollectionRunnerView: React.FC<Props> = ({ collectionId, activeTabK
   }
 
   return (
-    <CollectionViewContextProvider key={collectionId} collectionId={collectionId}>
+    <CollectionViewContextProvider key={collectionId} collectionId={collectionId} configId={DEFAULT_RUN_CONFIG_ID}>
       <AutogenerateProvider>
         <div className="collection-runner-view">
           <Split
