@@ -15,6 +15,8 @@ import Split from "react-split";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { RootState } from "store/types";
+import { reduxStore } from "store";
+import { closeAllTabs } from "componentsV2/Tabs/slice";
 
 const ApiClientFeatureContainer: React.FC = () => {
   const dispatch = useDispatch();
@@ -36,6 +38,7 @@ const ApiClientFeatureContainer: React.FC = () => {
   };
 
   useEffect(() => {
+    reduxStore.dispatch(closeAllTabs({skipUnsavedPrompt: true}));
     const promise = dispatch(
       setupWorkspaceView({
         userId: user.details?.profile?.uid,
@@ -57,7 +60,7 @@ const ApiClientFeatureContainer: React.FC = () => {
       <TabServiceProvider>
         {/* <LocalSyncRefreshHandler /> */}
         <div className="api-client-container">
-          {/* <Daemon /> */}
+          <Daemon />
           <ApiClientProvider>
             <Split
               className="api-client-container__split"

@@ -44,7 +44,6 @@ import { KEYBOARD_SHORTCUTS } from "../../../../../../../constants/keyboardShort
 import { useDeepLinkState } from "hooks";
 import { RBACButton, RevertViewModeChangesAlert, RoleBasedComponent } from "features/rbac";
 import { Conditional } from "components/common/Conditional";
-import { useScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
 import HttpApiClientUrl from "./components/HttpClientUrl/HttpClientUrl";
 import { ApiClientBreadCrumb, BreadcrumbType } from "../components/ApiClientBreadCrumb/ApiClientBreadCrumb";
 import { ClientCodeButton } from "../components/ClientCodeButton/ClientCodeButton";
@@ -105,7 +104,6 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
   const repositories = useApiClientRepository();
 
   const { endAISession } = useAISessionContext();
-  const scopedVariables = useScopedVariables(entity.meta.referenceId);
 
 
   const [isFailed, setIsFailed] = useState(false);
@@ -126,7 +124,7 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
     type: 'bufferId',
     bufferId: entity.id,
   });
-  const collectionId = useApiClientSelector(s => entity.getCollectionId(s));
+  // const collectionId = useApiClientSelector(s => entity.getCollectionId(s));
   const url = useApiClientSelector(s => entity.getUrl(s));
   const contentType = useApiClientSelector(s => entity.getContentType(s));
   const method = useApiClientSelector(s => entity.getMethod(s));
@@ -136,7 +134,7 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
   const saveBuffer = useSaveBuffer();
 
 
-  const httpRequestExecutor = useHttpRequestExecutor(collectionId);
+  const httpRequestExecutor = useHttpRequestExecutor(entity.meta.referenceId);
 
   const handleGenerateTests = useCallback(async () => {
     const entry = getEntry(entity, store);
@@ -247,7 +245,7 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
     try {
       const apiClientExecutionResult = await httpRequestExecutor.execute(
         {
-          entity,
+          entry: getEntry(entity, store),
           recordId: entity.meta.referenceId,
         },
         {
@@ -441,7 +439,7 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
 
   const handleTestResultRefresh = useCallback(async () => {
     try {
-      const result = await httpRequestExecutor.rerun(entity.meta.referenceId, entity);
+      const result = await httpRequestExecutor.rerun(entity.meta.referenceId, getEntry(entity, store));
       if (result.status === RQAPI.ExecutionStatus.SUCCESS) {
         entity.setTestResults(result.artifacts.testResults);
       } else {
@@ -450,7 +448,7 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
     } catch {
       toast.error("Something went wrong while refreshing test results");
     }
-  }, [httpRequestExecutor, entity]);
+  }, [httpRequestExecutor, entity, store]);
 
   const handleRevertChanges = () => {
     // setEntry(apiEntryDetails?.data);
@@ -494,7 +492,10 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
 
             <ClientCodeButton
               requestPreparer={() =>
-                httpRequestExecutor.requestPreparer.prepareRequest(entity.meta.referenceId, entity).preparedEntry.request
+                {
+                  const entry = entity.getEntityFromState(store.getState()).data;
+                  return httpRequestExecutor.requestPreparer.prepareRequest(entity.meta.referenceId, entry).preparedEntry.request
+                }
               }
             />
           </div>
@@ -512,7 +513,6 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
                 entity={entity}
                 onUrlChange={entity.setUrl.bind(entity)}
                 onEnterPress={onUrlInputEnterPressed}
-                currentEnvironmentVariables={scopedVariables}
               />
             </Space.Compact>
             <RQButton

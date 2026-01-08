@@ -1,4 +1,4 @@
-import { ScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
+import { useScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
 import {
   extractPathVariablesFromUrl,
   extractQueryParams,
@@ -12,14 +12,14 @@ import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks
 
 interface ApiClientUrlProps {
   entity: BufferedHttpRecordEntity
-  currentEnvironmentVariables: ScopedVariables;
   onEnterPress: (e: KeyboardEvent) => void;
   onUrlChange: (value: string, finalParams: KeyValuePair[]) => void;
 }
 
-const HttpApiClientUrl = ({ entity, currentEnvironmentVariables, onEnterPress, onUrlChange }: ApiClientUrlProps) => {
+const HttpApiClientUrl = ({ entity, onEnterPress, onUrlChange }: ApiClientUrlProps) => {
   const url = useApiClientSelector(s => entity.getUrl(s));
   const queryParams = useApiClientSelector(s => entity.getQueryParams(s) );
+  const currentEnvironmentVariables = useScopedVariables(entity.meta.referenceId);
 
   const handleUrlChange = useCallback(
     (value: string) => {
