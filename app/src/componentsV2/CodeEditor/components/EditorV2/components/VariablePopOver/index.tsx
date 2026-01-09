@@ -181,6 +181,10 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
 
   const isFormMode = currentView === PopoverView.CREATE_FORM || currentView === PopoverView.EDIT_FORM;
 
+  // createPortal is being used to bypass the styling override behavior
+  // by antd, and ensure that the desired styling and positioning
+  // applies to the popover
+  // A full refactor will be carried out for the editor in the future
   return createPortal(
     <Popover
       content={<div className="variable-info-body">{popoverContent}</div>}
