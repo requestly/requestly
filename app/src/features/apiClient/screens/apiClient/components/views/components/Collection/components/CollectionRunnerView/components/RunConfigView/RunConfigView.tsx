@@ -181,7 +181,7 @@ const RunCollectionButton: React.FC<{ disabled?: boolean }> = ({ disabled = fals
 
       registerWorkflow({
         cancelWarning: "Collection run is in progress, still want to close?",
-        workflow: { ...promise, abort: () => apiClientDispatch(cancelRunThunk({ runContext })) },
+        workflow: promise,
       });
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Unable to run collection!");
