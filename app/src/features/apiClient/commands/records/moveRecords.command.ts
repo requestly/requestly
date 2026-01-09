@@ -19,12 +19,12 @@ export async function moveRecords(
   const ranks = apiRecordsRankingManager.getRanksForNewApis(context, collectionId, recordsToMove);
 
   const updatedRequests = recordsToMove.map((record, index) => {
-    const baseUpdate = isApiCollection(record)
+    const updatedRecord = isApiCollection(record)
       ? { ...record, collectionId, data: omit(record.data, "children") }
       : { ...record, collectionId };
     // Add rank to the record
-    baseUpdate.rank = ranks[index];
-    return baseUpdate;
+    updatedRecord.rank = ranks[index];
+    return updatedRecord;
   });
 
   const result = await apiClientRecordsRepository.moveAPIEntities(updatedRequests, collectionId);

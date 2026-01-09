@@ -47,7 +47,7 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({ recordTo
       name: recordName,
     };
 
-    // If record doesn't have a rank, generate one using getEffectiveRank
+    // If record does not have a rank generate one using old data to mantain order in UI
     if (!record.rank) {
       const effectiveRank = apiRecordsRankingManager.getEffectiveRank(recordToBeEdited);
       record.rank = effectiveRank;
