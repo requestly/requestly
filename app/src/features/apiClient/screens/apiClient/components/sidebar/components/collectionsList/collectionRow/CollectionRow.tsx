@@ -300,7 +300,7 @@ export const CollectionRow: React.FC<Props> = ({
         setIsCollectionRowLoading(false);
       }
     },
-    [record.id, expandedRecordIds, setExpandedRecordIds]
+    [record.data.children, record.id, expandedRecordIds, setExpandedRecordIds]
   );
 
   const checkCanDropItem = useCallback(
