@@ -33,6 +33,7 @@ import { isGraphQLApiRecord, isHttpApiRecord } from "features/apiClient/screens/
 import { apiRecordsRankingManager } from "features/apiClient/helpers/RankingManager";
 import { saveOrUpdateRecord } from "features/apiClient/commands/store.utils";
 import { RecordData } from "features/apiClient/helpers/RankingManager/APIRecordsListRankingManager";
+import clsx from "clsx";
 
 interface Props {
   record: RQAPI.ApiRecord;
@@ -316,10 +317,10 @@ export const RequestRow: React.FC<Props> = ({
         />
       ) : (
         <div
-          id={`request-row-${record.id}`}
-          className={`request-row ${dropPosition === "before" ? "drop-before" : ""} ${
-            dropPosition === "after" ? "drop-after" : ""
-          }`}
+          className={clsx("request-row", {
+            "drop-before": dropPosition === "before",
+            "drop-after": dropPosition === "after",
+          })}
           ref={(node) => {
             requestRowRef.current = node;
             drag(node);
