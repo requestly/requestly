@@ -1,11 +1,7 @@
 import { RQAPI } from "features/apiClient/types";
 import { BatchRequestExecutor } from "features/apiClient/helpers/batchRequestExecutor";
 import { CurrentlyExecutingRequest, RequestExecutionResult } from "../../common/runResults/types";
-import {
-  getEmptyApiEntry,
-  isHTTPApiEntry,
-  parseCollectionRunnerDataFile,
-} from "features/apiClient/screens/apiClient/utils";
+import { isHTTPApiEntry, parseCollectionRunnerDataFile } from "features/apiClient/screens/apiClient/utils";
 import { NativeError } from "errors/NativeError";
 import { notification } from "antd";
 import {
@@ -166,15 +162,15 @@ class Runner {
       runHistoryActions.setHistoryStatus({ collectionId: this.collectionId, status: RunHistorySaveStatus.IDLE })
     );
 
-    // this.variables = [];
+    this.variables = [];
 
-    // const rootState = reduxStore.getState();
-    // const appMode = getAppMode(rootState);
+    const rootState = reduxStore.getState();
+    const appMode = getAppMode(rootState);
 
-    // if (appMode === "DESKTOP") {
-    //   const variables = await this.parseDataFile();
-    //   this.variables = variables ?? [];
-    // }
+    if (appMode === "DESKTOP") {
+      const variables = await this.parseDataFile();
+      this.variables = variables ?? [];
+    }
 
     trackCollectionRunStarted({
       collection_id: runConfig.collectionId,
@@ -399,19 +395,14 @@ class Runner {
       for await (const { request, iteration, startTime } of this.iterate()) {
         const { currentExecutingRequest } = this.beforeRequestExecutionStart(iteration, request, startTime);
 
-        const result = {
-          status: RQAPI.ExecutionStatus.SUCCESS,
-          executedEntry: getEmptyApiEntry(RQAPI.ApiEntryType.HTTP),
-        } as RQAPI.ExecutionResult;
-
-        // const result = await this.executor.executeSingleRequest(
-        //   { entry: request.data as RQAPI.ApiEntry, recordId: request.id },
-        //   {
-        //     iteration: iteration - 1, // We want 0-based index for usage in scripts
-        //     iterationCount,
-        //   },
-        //   { abortController: this.abortController, executionContext }
-        // );
+        const result = await this.executor.executeSingleRequest(
+          { entry: request.data as RQAPI.ApiEntry, recordId: request.id },
+          {
+            iteration: iteration - 1, // We want 0-based index for usage in scripts
+            iterationCount,
+          },
+          { abortController: this.abortController, executionContext }
+        );
 
         this.afterRequestExecutionComplete(currentExecutingRequest, result);
       }
