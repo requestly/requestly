@@ -86,7 +86,9 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
       if (recordB.isExample && !recordA.isExample) {
         return 1;
       }
-
+      if (recordA.type !== recordB.type) {
+        return recordA.type === RQAPI.RecordType.COLLECTION ? -1 : 1;
+      }
       // use ranking manager to sort by rank
       const aRank = apiRecordsRankingManager.getEffectiveRank(recordA);
       const bRank = apiRecordsRankingManager.getEffectiveRank(recordB);

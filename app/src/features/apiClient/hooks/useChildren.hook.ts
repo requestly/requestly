@@ -21,6 +21,11 @@ export const getAllChildrenRecords = (ctx: ApiClientFeatureContext, nodeId: stri
         return 1;
       }
 
+      // If different type, then keep collection first
+      if (recordA.type !== recordB.type) {
+        return recordA.type === RQAPI.RecordType.COLLECTION ? -1 : 1;
+      }
+
       // use ranking manager to sort by rank
       const aRank = apiRecordsRankingManager.getEffectiveRank(recordA);
       const bRank = apiRecordsRankingManager.getEffectiveRank(recordB);

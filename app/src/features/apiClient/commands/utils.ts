@@ -53,6 +53,10 @@ export function prepareRecordsToRender(records: RQAPI.ApiClientRecord[]) {
     if (recordB.isExample && !recordA.isExample) {
       return 1;
     }
+    // If different type, then keep collection first
+    if (recordA.type !== recordB.type) {
+      return recordA.type === RQAPI.RecordType.COLLECTION ? -1 : 1;
+    }
 
     // Use ranking manager to sort by rank
     const aRank = apiRecordsRankingManager.getEffectiveRank(recordA);
