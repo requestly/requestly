@@ -9,7 +9,7 @@ import { isApiRequest } from "features/apiClient/screens/apiClient/utils";
 import { EntityNotFound } from "../types";
 
 const selectRunConfigSlice = (state: ApiClientStoreState) => {
-  return state.runConfig;
+  return state.runConfigs;
 };
 
 const selectRunConfigEntityState = createSelector(selectRunConfigSlice, (slice) => slice?.configs);

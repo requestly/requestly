@@ -7,13 +7,12 @@ import { RQAPI } from "features/apiClient/types";
 import { GrGraphQl } from "@react-icons/all-files/gr/GrGraphQl";
 import { TabSourceMetadata } from "componentsV2/Tabs/types";
 import { getEmptyDraftApiRecord } from "features/apiClient/screens/apiClient/utils";
-import { apiClientContextRegistry } from "features/apiClient/slices";
+import { apiClientContextRegistry, getApiClientFeatureContext } from "features/apiClient/slices";
 
 interface DraftRequestContainerTabSourceMetadata extends TabSourceMetadata {
   emptyRecord: RQAPI.ApiRecord;
   apiEntryType?: RQAPI.ApiEntryType;
 }
-
 
 export class DraftRequestContainerTabSource extends BaseTabSource {
   metadata: DraftRequestContainerTabSourceMetadata;
@@ -28,7 +27,7 @@ export class DraftRequestContainerTabSource extends BaseTabSource {
       context: {
         id: apiClientContextRegistry.getLastUsedContext()?.workspaceId,
         ...metadata.context,
-      }
+      },
     };
     this.component = (
       <DraftRequestContainer
@@ -45,10 +44,13 @@ export class DraftRequestContainerTabSource extends BaseTabSource {
 
   static create(metadata?: DraftRequestContainerTabSourceMetadata): DraftRequestContainerTabSource {
     const apiEntryType = metadata?.apiEntryType ?? RQAPI.ApiEntryType.HTTP;
+    const ctx = getApiClientFeatureContext();
     return new DraftRequestContainerTabSource({
       apiEntryType,
       emptyRecord: getEmptyDraftApiRecord(apiEntryType),
-      context: {},
+      context: {
+        id: ctx.workspaceId,
+      },
     });
   }
 

@@ -6,6 +6,7 @@ export { ApiClientRecordEntity } from "./api-client-record-entity";
 export { HttpRecordEntity } from "./http";
 export { GraphQLRecordEntity } from "./graphql";
 export { EnvironmentEntity, GlobalEnvironmentEntity } from "./environment";
+export { LiveRunResultEntity } from "./liveRunResult";
 
 export { EntityFactory } from "./factory";
 

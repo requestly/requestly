@@ -35,7 +35,7 @@ export const TabItem: React.FC<React.PropsWithChildren<{ tabId: TabId }>> = Reac
         }, [tab]),
 
         getBufferId: useCallback(() => {
-          if(tab.modeConfig.mode === 'buffer') {
+          if (tab.modeConfig.mode === "buffer") {
             return tab.modeConfig.entityId;
           }
         }, [tab]),

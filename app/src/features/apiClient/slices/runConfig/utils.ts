@@ -1,20 +1,8 @@
 import { SavedRunConfig } from "features/apiClient/commands/collectionRunner/types";
-import {
-  DELAY_MAX_LIMIT,
-  DELAY_MIN,
-  ITERATIONS_MAX_LIMIT,
-  ITERATIONS_MIN,
-  RunConfigEntity,
-  RunnerConfigId,
-} from "./types";
+import { RunConfigEntity } from "./types";
 import type { RQAPI } from "features/apiClient/types";
+import { DELAY_MAX_LIMIT, DELAY_MIN_LIMIT, ITERATIONS_MAX_LIMIT, ITERATIONS_MIN_LIMIT } from "./constants";
 
-/**
- * Patches the runOrder by filtering out stale IDs and adding new ones
- * @param currentRunOrder - The current run order
- * @param requestIds - Array of request IDs to patch with
- * @returns The patched run order
- */
 export const patchRunOrder = (currentRunOrder: RQAPI.RunOrder, requestIds: string[]): RQAPI.RunOrder => {
   const incomingRequestSet = new Set(requestIds);
   // Remove stale ids from existing order
@@ -33,10 +21,11 @@ export const patchRunOrder = (currentRunOrder: RQAPI.RunOrder, requestIds: strin
   return [...filteredRunOrder, ...patch];
 };
 
-export const getRunnerConfigId = (collectionId: string, configId: string): RunnerConfigId =>
-  `${collectionId}::${configId}`;
+export const getRunnerConfigId = (collectionId: string, configId: string): string => {
+  return `${collectionId}::${configId}`;
+};
 
-export const parseRunnerConfigKey = (key: RunnerConfigId): { collectionId: string; configId: string } => {
+export const parseRunnerConfigKey = (key: string): { collectionId: string; configId: string } => {
   const [collectionId, configId] = key.split("::");
   if (!collectionId || !configId) {
     throw new Error(`Invalid RunnerConfigId: ${key}`);
@@ -45,16 +34,16 @@ export const parseRunnerConfigKey = (key: RunnerConfigId): { collectionId: strin
 };
 
 export const isValidDelay = (delay: number): boolean => {
-  return Number.isInteger(delay) && delay >= DELAY_MIN && delay <= DELAY_MAX_LIMIT;
+  return Number.isInteger(delay) && delay >= DELAY_MIN_LIMIT && delay <= DELAY_MAX_LIMIT;
 };
 
 export const isValidIterations = (iterations: number): boolean => {
-  return Number.isInteger(iterations) && iterations >= ITERATIONS_MIN && iterations <= ITERATIONS_MAX_LIMIT;
+  return Number.isInteger(iterations) && iterations >= ITERATIONS_MIN_LIMIT && iterations <= ITERATIONS_MAX_LIMIT;
 };
 
 export const toSavedRunConfig = (entity: RunConfigEntity): SavedRunConfig => {
   return {
-    id: entity.configId, // Use just configId, not composite key
+    id: entity.configId,
     runOrder: entity.runOrder,
     delay: entity.delay,
     iterations: entity.iterations,
@@ -68,6 +57,7 @@ export const fromSavedRunConfig = (
   timestamps?: { createdTs?: number; updatedTs?: number }
 ): RunConfigEntity => {
   return {
+    id: saved.id,
     collectionId,
     configId: saved.id,
     runOrder: saved.runOrder,

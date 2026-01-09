@@ -42,6 +42,8 @@ import { groupBy, mapValues } from "lodash";
 import { RootState } from "store/types";
 import { EntityNotFound } from "features/apiClient/slices/types";
 import { runnerConfigSlice } from "features/apiClient/slices/runConfig/slice";
+import { liveRunResultsSlice } from "features/apiClient/slices/liveRunResults/slice";
+import { runHistorySlice } from "features/apiClient/slices/runHistory";
 
 export type UserDetails = { uid: string; loggedIn: true } | { loggedIn: false };
 
@@ -115,12 +117,12 @@ class ApiClientContextService {
         [erroredRecordsSlice.name]: erroredRecordsSlice.reducer,
         [bufferSlice.name]: bufferSlice.reducer,
         [runnerConfigSlice.name]: runnerConfigSlice.reducer,
+        [liveRunResultsSlice.name]: liveRunResultsSlice.reducer,
+        [runHistorySlice.name]: runHistorySlice.reducer,
       },
       middleware(getDefaultMiddleware) {
         return getDefaultMiddleware({
-          serializableCheck: {
-            ignoredActions: ["records/unsafePatch", "environments/unsafePatch", "buffer/unsafePatch"],
-          },
+          serializableCheck: false,
         })
           .concat(bufferSyncMiddleware)
           .concat(manualRehydrationMiddleware);
