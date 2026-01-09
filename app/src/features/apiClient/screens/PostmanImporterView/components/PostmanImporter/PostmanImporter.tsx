@@ -20,6 +20,8 @@ import { useCommand } from "features/apiClient/commands";
 import { useApiClientRepository } from "features/apiClient/contexts/meta";
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
 import { EnvironmentVariableData } from "features/apiClient/store/variables/types";
+import { captureException } from "backend/apiClient/utils";
+import { ApiClientLocalRepository } from "features/apiClient/helpers/modules/sync/local/ApiClientLocalRepository";
 
 type ProcessedData = {
   environments: { name: string; variables: Record<string, EnvironmentVariableData>; isGlobal: boolean }[];
@@ -48,8 +50,10 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
   const {
     env: { createEnvironment, patchEnvironmentVariables },
   } = useCommand();
-  const { apiClientRecordsRepository, environmentVariablesRepository } = useApiClientRepository();
+  const repository = useApiClientRepository();
+  const { apiClientRecordsRepository, environmentVariablesRepository } = repository;
   const { onSaveRecord } = useNewApiClientContext();
+  const isLocalFileSystem = repository instanceof ApiClientLocalRepository;
 
   const collectionsCount = useRef(0);
 
@@ -155,29 +159,63 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
 
   const handleImportEnvironments = useCallback(async () => {
     try {
-      const importPromises = processedFileData.environments.map(async (env) => {
-        if (env.isGlobal) {
-          await patchEnvironmentVariables({
-            environmentId: environmentVariablesRepository.getGlobalEnvironmentId(),
-            variables: env.variables,
-          });
-          return true;
-        } else {
-          await createEnvironment({
-            newEnvironmentName: env.name,
-            variables: env.variables,
-          });
+      // For local workspace use sequential way
+      if (isLocalFileSystem) {
+        let successCount = 0;
+        for (let index = 0; index < processedFileData.environments.length; index++) {
+          const env = processedFileData.environments[index];
+          try {
+            if (env.isGlobal) {
+              await patchEnvironmentVariables({
+                environmentId: environmentVariablesRepository.getGlobalEnvironmentId(),
+                variables: env.variables,
+              });
+              successCount++;
+            } else {
+              const result = await createEnvironment({
+                newEnvironmentName: env.name,
+                variables: env.variables,
+              });
+              if (result?.id) {
+                successCount++;
+              }
+            }
+          } catch (error) {
+            captureException(error);
+          }
         }
-        return false;
-      });
 
-      const results = await Promise.allSettled(importPromises);
-      return results.filter((result) => result.status === "fulfilled").length;
+        return successCount;
+      } else {
+        const importPromises = processedFileData.environments.map(async (env) => {
+          if (env.isGlobal) {
+            await patchEnvironmentVariables({
+              environmentId: environmentVariablesRepository.getGlobalEnvironmentId(),
+              variables: env.variables,
+            });
+            return true;
+          } else {
+            const result = await createEnvironment({
+              newEnvironmentName: env.name,
+              variables: env.variables,
+            });
+            return !!result?.id;
+          }
+        });
+        const results = await Promise.allSettled(importPromises);
+        return results.filter((result) => result.status === "fulfilled" && result.value).length;
+      }
     } catch (error) {
       Logger.error("Postman data import failed:", error);
       throw error;
     }
-  }, [processedFileData.environments, patchEnvironmentVariables, environmentVariablesRepository, createEnvironment]);
+  }, [
+    processedFileData.environments,
+    patchEnvironmentVariables,
+    environmentVariablesRepository,
+    createEnvironment,
+    isLocalFileSystem,
+  ]);
 
   const handleImportCollectionsAndApis = useCallback(async () => {
     let importedCollectionsCount = 0;
