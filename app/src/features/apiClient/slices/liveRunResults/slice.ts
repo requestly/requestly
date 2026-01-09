@@ -24,14 +24,6 @@ const RunStatusStateMachine = {
   [RunStatus.ERRORED]: [RunStatus.IDLE],
 };
 
-const RunStatusStateMachine = {
-  [RunStatus.IDLE]: [RunStatus.RUNNING],
-  [RunStatus.RUNNING]: [RunStatus.CANCELLED, RunStatus.COMPLETED, RunStatus.ERRORED],
-  [RunStatus.CANCELLED]: [RunStatus.IDLE],
-  [RunStatus.COMPLETED]: [RunStatus.IDLE],
-  [RunStatus.ERRORED]: [RunStatus.IDLE],
-};
-
 export interface LiveRunEntryState extends RunMetadata {
   id: RQAPI.CollectionRecord["id"];
   iterations: Map<Iteration, IterationDetails>;
