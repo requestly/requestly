@@ -18,7 +18,7 @@ const LoadingSkeleton: React.FC = () => <Skeleton.Button className="history-row-
 export const HistoryTable: React.FC<{ onHistoryClick: (result: RunResult) => void }> = ({ onHistoryClick }) => {
   const { collectionId } = useCollectionView();
 
-  const runStatus = useApiClientSelector((s) => selectLiveRunResultRunStatus(s, collectionId)) ?? RunStatus.IDLE;
+  const runStatus = useApiClientSelector((s) => selectLiveRunResultRunStatus(s, collectionId));
   const runStartTime = useApiClientSelector((s) => selectLiveRunResultStartTime(s, collectionId));
 
   const history = useCollectionHistory(collectionId);

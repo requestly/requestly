@@ -4,6 +4,7 @@ import { liveRunResultsAdapter, LiveRunResultsSliceState } from "./slice";
 import { EntityNotFound } from "../types";
 import type { RQAPI } from "features/apiClient/types";
 import { RunStatus } from "./types";
+import { RunHistorySaveStatus } from "../runHistory/types";
 
 const selectLiveRunResultsSlice = (state: ApiClientStoreState): LiveRunResultsSliceState => state.liveRunResults;
 
@@ -132,7 +133,7 @@ export const selectLiveRunResultRunStatus = (
   collectionId: RQAPI.CollectionRecord["id"]
 ) => {
   const entry = selectLiveRunResultEntities(state)[collectionId];
-  return entry?.runStatus ?? null;
+  return entry?.runStatus ?? RunHistorySaveStatus.IDLE;
 };
 
 export const selectLiveRunResultError = (state: ApiClientStoreState, collectionId: RQAPI.CollectionRecord["id"]) => {
