@@ -179,7 +179,10 @@ const RunCollectionButton: React.FC<{ disabled?: boolean }> = ({ disabled = fals
         })
       ).unwrap();
 
-      // registerWorkflow("Collection run is in progress, still want to close?", promise);
+      registerWorkflow({
+        cancelWarning: "Collection run is in progress, still want to close?",
+        workflow: { ...promise, abort: () => apiClientDispatch(cancelRunThunk({ runContext })) },
+      });
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Unable to run collection!");
       Sentry.captureException(error, {
@@ -188,7 +191,7 @@ const RunCollectionButton: React.FC<{ disabled?: boolean }> = ({ disabled = fals
         },
       });
     }
-  }, [dispatch, apiClientDispatch, workspaceId, executor, runContext]);
+  }, [dispatch, apiClientDispatch, workspaceId, executor, runContext, registerWorkflow]);
 
   const handleCancelRunClick = useCallback(() => {
     apiClientDispatch(cancelRunThunk({ runContext }));
