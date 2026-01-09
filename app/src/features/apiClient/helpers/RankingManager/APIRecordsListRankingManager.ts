@@ -15,7 +15,7 @@ type BaseData = {
   rank?: string;
 };
 
-type RecordData = BaseData & { [key: string]: any };
+export type RecordData = BaseData & { [key: string]: any };
 
 export class APIRecordsListRankingManager extends ListRankingManager<RecordData> {
   /**
