@@ -81,17 +81,13 @@ export abstract class ListRankingManager<T> {
     const afterRank = after ? this.getEffectiveRank(after) : null;
 
     const newRanks = [];
-    // try generateNKeysBetween(beforeRank, afterRank, count); if it fails then try generateNKeysBetween(afterRank, beforeRank, count); if it also fails then log the error
 
     try {
-      newRanks.push(...generateNKeysBetween(beforeRank, afterRank, count));
-    } catch (e) {
-      try {
-        newRanks.push(...generateNKeysBetween(afterRank, beforeRank, count));
-      } catch (e2) {
-        console.error("Failed to generate ranks between ", { beforeRank, afterRank, count }, e2);
-        throw e2;
-      }
+      newRanks.push(...generateNKeysBetween(afterRank, beforeRank, count));
+    } catch (e1) {
+      // TODO: log this error in sentry
+      // Fallback to original rank so that undefined ranks are not saved in DB
+      records.forEach((record) => newRanks.push(this.getEffectiveRank(record)));
     }
     // Return the array of new ranks
     return newRanks;
@@ -116,7 +112,7 @@ export abstract class ListRankingManager<T> {
     const lastRecord = sortedRecords.length > 0 ? sortedRecords[sortedRecords.length - 1] : null;
 
     // Generate ranks after the last record (after = null means append at end)
-    const ranks = this.getRanksBetweenRecords(lastRecord, null, newRecords);
+    const ranks = this.getRanksBetweenRecords(null, lastRecord, newRecords);
 
     // Ensure we always return an array
     return ranks;

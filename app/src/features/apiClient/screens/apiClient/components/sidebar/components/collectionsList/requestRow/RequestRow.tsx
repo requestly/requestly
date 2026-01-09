@@ -27,13 +27,14 @@ import { GrGraphQl } from "@react-icons/all-files/gr/GrGraphQl";
 import { useContextId } from "features/apiClient/contexts/contextId.context";
 import { useApiClientRepository, useApiClientFeatureContext } from "features/apiClient/contexts/meta";
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
-import { useChildren } from "features/apiClient/hooks/useChildren.hook";
+import { getImmediateChildrenRecords } from "features/apiClient/hooks/useChildren.hook";
 import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 import { isGraphQLApiRecord, isHttpApiRecord } from "features/apiClient/screens/apiClient/utils";
-import { apiRecordsRankingManager } from "features/apiClient/components/sidebar";
+import { apiRecordsRankingManager } from "features/apiClient/helpers/RankingManager";
 import { saveOrUpdateRecord } from "features/apiClient/commands/store.utils";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
+import { RecordData } from "features/apiClient/helpers/RankingManager/APIRecordsListRankingManager";
 
 interface Props {
   record: RQAPI.ApiRecord;
@@ -87,14 +88,7 @@ export const RequestRow: React.FC<Props> = ({
   const [recordToMove, setRecordToMove] = useState<RQAPI.ApiRecord | null>(null);
   const [dropPosition, setDropPosition] = useState<"before" | "after" | null>(null);
   const requestRowRef = useRef<HTMLDivElement>(null);
-
-  // Get siblings from parent collection
-  const siblings = useChildren(record.collectionId || "");
-  const apiRecordSiblings = useMemo(() => siblings.filter((sibling) => sibling.collectionId === record.collectionId), [
-    siblings,
-    record.collectionId,
-  ]);
-
+  const ctx = useApiClientFeatureContext();
   const { apiClientRecordsRepository } = useApiClientRepository();
   const { onSaveRecord } = useNewApiClientContext();
   const context = useApiClientFeatureContext();
@@ -169,16 +163,17 @@ export const RequestRow: React.FC<Props> = ({
         setDropPosition(null);
 
         try {
-          let before: RQAPI.ApiClientRecord | null = null;
-          let after: RQAPI.ApiClientRecord | null = null;
-          const recordIndex = apiRecordSiblings.findIndex((sibling) => sibling.id === record.id);
+          const siblings = apiRecordsRankingManager.sort(getImmediateChildrenRecords(ctx, record.collectionId ?? ""));
+          let before: RecordData | null = null;
+          let after: RecordData | null = null;
+          const recordIndex = siblings.findIndex((sibling) => sibling.id === record.id);
 
           if (currentDropPosition === "before") {
             before = record;
-            after = apiRecordSiblings[recordIndex - 1] || null;
+            after = siblings[recordIndex - 1] || null;
           } else if (currentDropPosition === "after") {
             after = record;
-            before = apiRecordSiblings[recordIndex + 1] || null;
+            before = siblings[recordIndex + 1] || null;
           }
 
           const rank = apiRecordsRankingManager.getRanksBetweenRecords(before, after, [item.record])[0];
