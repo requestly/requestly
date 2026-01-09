@@ -5,6 +5,7 @@ import Editor, { EditorLanguage } from "componentsV2/CodeEditor";
 import { KeyValuePair, KeyValueDataType } from "features/apiClient/types";
 import { RQButton } from "lib/design-system-v2/components";
 import { MdClose } from "@react-icons/all-files/md/MdClose";
+import { IoEllipse } from "@react-icons/all-files/io5/IoEllipse";
 import "./keyValueBulkEditor.scss";
 
 type StoreHook = (selector: (state: any) => any) => any;
@@ -159,7 +160,12 @@ export const KeyValueBulkEditor: React.FC<KeyValueBulkEditorProps> = ({
   return (
     <div className="key-value-bulk-edit-panel">
       <div className="bulk-edit-panel-header">
-        <div className="bulk-edit-panel-title">BULK EDIT PARAMS</div>
+        <div className="bulk-edit-title-wrapper">
+          <div className="bulk-edit-panel-title">BULK EDIT PARAMS</div>
+          <IoEllipse />
+          <div className="bulk-edit-live-text">Updates Live</div>
+        </div>
+
         <RQButton
           type="transparent"
           size="small"
