@@ -81,9 +81,9 @@ const HttpRequestTabs: React.FC<Props> = ({
         label: <RequestTabLabel label="Params" count={queryParams.length || pathVariables.length} showDot={true} />,
         children: (
           <div className="non-scrollable-tab-content">
-            <div className="params-table-title">Query Params</div>
             <QueryParamsTable
               recordId={requestId}
+              title={<div className="params-table-title">Query Params</div>}
               onQueryParamsChange={(newParams) => {
                 setRequestEntry((prev) => ({
                   ...prev,

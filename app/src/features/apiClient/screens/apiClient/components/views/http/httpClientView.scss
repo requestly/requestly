@@ -81,6 +81,13 @@
     .ant-tabs-content-holder {
       padding: 6px;
     }
+
+    &.active-tab-query_params,
+    &.active-tab-headers {
+      .ant-tabs-content-holder {
+        padding: 0;
+      }
+    }
   }
 
   .non-scrollable-tab-content {

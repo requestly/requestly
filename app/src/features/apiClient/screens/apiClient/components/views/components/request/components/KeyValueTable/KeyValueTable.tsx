@@ -39,6 +39,7 @@ interface KeyValueTableProps {
   };
   children?: React.ReactNode;
   useStore?: any;
+  headerContent?: React.ReactNode;
 }
 
 export const KeyValueTable: React.FC<KeyValueTableProps> = ({
@@ -49,6 +50,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
   config,
   children,
   useStore,
+  headerContent,
 }) => {
   const { checkInvalidCharacter = false } = config || {};
 
@@ -236,6 +238,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
                 title="Bulk edit params as key:value pairs"
                 color="#000000"
                 mouseEnterDelay={0.2}
+                placement="right"
                 overlayClassName="key-value-bulk-edit-tooltip"
               >
                 <RQButton
@@ -319,6 +322,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
         style={isBottomSheetAtBottom ? { minWidth: minSplitPanelSizes[0] } : { minHeight: minSplitPanelSizes[0] }}
       >
         <AutoScrollContainer trigger={scrollFocus.triggerTs} scrollTargetRef={scrollFocus.target}>
+          {headerContent}
           <ContentListTable
             id="api-key-value-table"
             className="api-key-value-table"
