@@ -170,35 +170,33 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
           }
 
           setIsRecordBeingCreated(recordType);
-          return createBlankApiRecord(recordType, collectionId, recordsRepository, entryType, context).then(
-            (result) => {
-              setIsRecordBeingCreated(null);
-              if (!result.success) {
-                toast.error(result.message || "Failed to create record!");
-                return;
-              }
-              saveOrUpdateRecord(context, result.data);
-
-              openTab(
-                new RequestViewTabSource({
-                  id: result.data.id,
-                  apiEntryDetails: result.data as RQAPI.ApiRecord,
-                  title: result.data.name,
-                  isNewTab: true,
-                  context: {
-                    id: context.id,
-                  },
-                })
-              );
+          return createBlankApiRecord(recordType, collectionId, recordsRepository, entryType).then((result) => {
+            setIsRecordBeingCreated(null);
+            if (!result.success) {
+              toast.error(result.message || "Failed to create record!");
               return;
             }
-          );
+            saveOrUpdateRecord(context, result.data);
+
+            openTab(
+              new RequestViewTabSource({
+                id: result.data.id,
+                apiEntryDetails: result.data as RQAPI.ApiRecord,
+                title: result.data.name,
+                isNewTab: true,
+                context: {
+                  id: context.id,
+                },
+              })
+            );
+            return;
+          });
         }
 
         case RQAPI.RecordType.COLLECTION: {
           setIsRecordBeingCreated(recordType);
           trackNewCollectionClicked(analyticEventSource);
-          return createBlankApiRecord(recordType, collectionId, recordsRepository, undefined, context)
+          return createBlankApiRecord(recordType, collectionId, recordsRepository, undefined)
             .then((result) => {
               setIsRecordBeingCreated(null);
               if (result.success) {
