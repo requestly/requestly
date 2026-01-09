@@ -168,9 +168,7 @@ function parseRecords(records: RQAPI.ApiClientRecord[]) {
   const index = new Map<string, RQAPI.ApiClientRecord>();
 
   for (const record of records) {
-    if (record.collectionId) {
-      childParentMap.set(record.id, record.collectionId);
-    }
+    childParentMap.set(record.id, record.collectionId ?? "");
     index.set(record.id, record);
   }
 
