@@ -215,106 +215,37 @@ export const traverseJsonByPath = (jsonObject: any, path: any) => {
     console.log(e);
   }
 };
+const MAX_PREVIEW_SIZE = 5 * 1024 * 1024; // 5 MB
 
-/**
- * Returns true ONLY if the body is safe to render in CodeMirror.
- * Guarantees:
- * - No editor crashes
- * - No UI freezes
- * - No binary garbage rendering
- */
-export function canPreviewAsText(body: any): boolean {
-  // ---------- BASIC SANITY ----------
-  if (typeof body !== "string" || body.length === 0) return false;
+const ALLOWED_MIME_TYPES = new Set([
+  "text/plain",
+  "text/html",
+  "text/css",
+  "text/javascript",
+  "application/javascript",
+  "application/x-javascript",
+  "application/json",
+  "application/xml",
+  "text/xml",
+  "application/xhtml+xml",
+  "application/ecmascript",
+]);
 
-  // ---------- HARD SIZE LIMIT ----------
-  // CodeMirror becomes unstable beyond this, suggested 5mb limit
-  // Browsers aim for 60 FPS (~16ms per frame), and parsing, highlighting, and layout for 5MB can exceed this, causing jank.
-  // Even with incremental parsing, long lines and syntax highlighting increase workload, sometimes leaving visible lines unhighlighted.
-  // Viewport rendering helps, but the browser still tracks scroll offsets, line heights, and decorations for the entire document, increasing memory and computation.
-  if (body.length > 5_000_000) return false; // ~5MB
-
-  let text = body;
-
-  // ---------- BYTE-MAP JSON (fonts/images sent as {0:123}) ----------
-  // Example: {"0":60,"1":115,...}
-  if (body[0] === "{" && body.length < 1_000_000 && /"\d+"\s*:\s*\d+/.test(body)) {
-    try {
-      const obj = JSON.parse(body);
-      const keys = Object.keys(obj);
-
-      // Reject sparse or insane maps
-      if (keys.length === 0 || keys.length > 500_000) return false;
-
-      // Parse keys as numeric indices and validate
-      const numericKeys = [];
-      let maxIndex = -1;
-
-      for (const key of keys) {
-        const index = parseInt(key, 10);
-        // Validate key is a non-negative integer
-        if (!Number.isInteger(index) || index < 0 || index.toString() !== key) {
-          return false;
-        }
-        numericKeys.push(index);
-        if (index > maxIndex) maxIndex = index;
-      }
-
-      // Compute needed length as (maxIndex + 1)
-      const length = maxIndex + 1;
-      if (length > 500_000) return false; // Safety check
-
-      const bytes = new Uint8Array(length);
-
-      // Iterate numeric keys and validate values
-      for (const index of numericKeys) {
-        const value = obj[index.toString()];
-        // Validate value is a number 0-255
-        if (typeof value !== "number" || value < 0 || value > 255 || !Number.isInteger(value)) {
-          return false;
-        }
-        bytes[index] = value;
-      }
-
-      text = new TextDecoder("utf-8", { fatal: false }).decode(bytes);
-      if (text.length === 0) return false;
-    } catch {
-      return false;
-    }
-  }
-
-  // ---------- NULL BYTE DETECTION ----------
-  // Binary ALWAYS contains null bytes
-  if (text.indexOf("\u0000") !== -1) return false;
-
-  // ---------- CONTROL CHARACTER DENSITY ----------
-  // Binary has many non-printable chars
-  let controlCount = 0;
-  const scanLimit = Math.min(text.length, 10_000);
-
-  for (let i = 0; i < scanLimit; i++) {
-    const code = text.charCodeAt(i);
-    if (code < 9 || (code > 13 && code < 32)) {
-      controlCount++;
-      if (controlCount > 100) return false;
-    }
-  }
-
-  // ---------- BASE64 BLOB DETECTION ----------
-  // Prevent rendering encoded binaries
-  if (text.length > 800 && /^[A-Za-z0-9+/=\r\n]+$/.test(text.slice(0, 1000))) {
-    return false;
-  }
-
-  // ---------- PRINTABLE RATIO ----------
-  // Text must contain enough readable characters
-  let printable = 0;
-  for (let i = 0; i < scanLimit; i++) {
-    const c = text.charCodeAt(i);
-    if (c >= 32 && c <= 126) printable++;
-  }
-
-  if (printable / scanLimit < 0.6) return false;
-
-  return true;
+export function canRenderPreview(body?: string, contentType?: string): boolean {
+  if (!body || !contentType) return false;
+  // Size check
+  const sizeInBytes = new TextEncoder().encode(body).length;
+  if (sizeInBytes > MAX_PREVIEW_SIZE) return false;
+  // Binary check
+  if (body.includes("\0")) return false;
+  const mime = contentType.split(";")[0].trim().toLowerCase();
+  // Allow all text/*
+  if (mime.startsWith("text/")) return true;
+  // Explicit allowlist
+  if (ALLOWED_MIME_TYPES.has(mime)) return true;
+  // Vendor JSON (application/vnd.*+json)
+  if (mime.endsWith("+json")) return true;
+  // Vendor XML (application/vnd.*+xml)
+  if (mime.endsWith("+xml")) return true;
+  return false;
 }

@@ -10,7 +10,7 @@ import Editor, { EditorLanguage } from "componentsV2/CodeEditor";
 import "./FixedRequestLogPane.css";
 import { REQUEST_METHOD_COLORS, REQUEST_METHOD_BACKGROUND_COLORS } from "../../../../../../constants";
 import { RequestMethod } from "features/apiClient/types";
-import { canPreviewAsText } from "./utils";
+import { canRenderPreview } from "./utils";
 
 const { Text } = Typography;
 
@@ -174,7 +174,7 @@ const LogPane = ({ log_id, title, requestState, timestamp, data: request_data })
       ),
       body: (
         <div className="navigation-panel-wrapper">
-          {canPreviewAsText(body) ? (
+          {canRenderPreview(body, contentType) ? (
             <Editor
               scriptId={`${title}-${log_id}`}
               value={body || ""}
