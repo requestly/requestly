@@ -196,7 +196,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
         case RQAPI.RecordType.COLLECTION: {
           setIsRecordBeingCreated(recordType);
           trackNewCollectionClicked(analyticEventSource);
-          return createBlankApiRecord(recordType, collectionId, recordsRepository)
+          return createBlankApiRecord(recordType, collectionId, recordsRepository, undefined)
             .then((result) => {
               setIsRecordBeingCreated(null);
               if (result.success) {
@@ -260,7 +260,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
         }
       }
     },
-    [isValidPermission, getRBACValidationFailureErrorMessage, openTab]
+    [isValidPermission, getRBACValidationFailureErrorMessage, openTab, apiClientRecords]
   );
 
   const onNewClick = useCallback(
