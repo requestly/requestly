@@ -12,6 +12,9 @@ import {
 import { API_CLIENT_LIVE_RUN_RESULTS_SLICE_NAME } from "../common/constants";
 import type { RQAPI } from "features/apiClient/types";
 import { EntityNotFound } from "../types";
+import { enableMapSet } from "immer";
+
+enableMapSet();
 
 const RunStatusStateMachine = {
   [RunStatus.IDLE]: [RunStatus.RUNNING],
