@@ -34,6 +34,8 @@ import { apiRecordsRankingManager } from "features/apiClient/helpers/RankingMana
 import { saveOrUpdateRecord } from "features/apiClient/commands/store.utils";
 import { RecordData } from "features/apiClient/helpers/RankingManager/APIRecordsListRankingManager";
 import clsx from "clsx";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import FEATURES from "config/constants/sub/features";
 
 interface Props {
   record: RQAPI.ApiRecord;
@@ -123,10 +125,13 @@ export const RequestRow: React.FC<Props> = ({
       canDrop: (item: { record: RQAPI.ApiClientRecord; contextId: string }) => {
         if (!item || item.contextId !== contextId) return false;
         if (item.record.id === record.id) return false;
+        if (!isFeatureCompatible(FEATURES.API_CLIENT_CUSTOM_SORTING)) {
+          return false;
+        }
         return true;
       },
       hover: (item: { record: RQAPI.ApiClientRecord; contextId: string }, monitor) => {
-        if (!monitor.isOver({ shallow: true })) {
+        if (!monitor.isOver({ shallow: true }) || !isFeatureCompatible(FEATURES.API_CLIENT_CUSTOM_SORTING)) {
           return;
         }
 

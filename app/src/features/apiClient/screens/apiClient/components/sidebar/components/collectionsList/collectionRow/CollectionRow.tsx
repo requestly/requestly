@@ -43,6 +43,8 @@ import { getImmediateChildrenRecords } from "features/apiClient/hooks/useChildre
 import { saveOrUpdateRecord } from "features/apiClient/commands/store.utils";
 import { useApiClientRepository } from "features/apiClient/contexts/meta";
 import clsx from "clsx";
+import FEATURES from "config/constants/sub/features";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
 
 export enum ExportType {
   REQUESTLY = "requestly",
@@ -424,6 +426,7 @@ export const CollectionRow: React.FC<Props> = ({
       // if the record is a request type always drop inside
       if (
         item.record.type === RQAPI.RecordType.API ||
+        !isFeatureCompatible(FEATURES.API_CLIENT_CUSTOM_SORTING) ||
         (hoverClientY > hoverHeight * 0.25 && hoverClientY < hoverHeight * 0.75)
       ) {
         setDropPosition("inside");
@@ -496,6 +499,12 @@ export const CollectionRow: React.FC<Props> = ({
       collapseChangeHandler,
     ]
   );
+
+  useEffect(() => {
+    if (!isOver && dropPosition !== null) {
+      setDropPosition(null);
+    }
+  }, [isOver, dropPosition]);
 
   return (
     <>
