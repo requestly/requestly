@@ -318,8 +318,8 @@ export const RequestRow: React.FC<Props> = ({
       ) : (
         <div
           className={clsx("request-row", {
-            "drop-before": dropPosition === "before",
-            "drop-after": dropPosition === "after",
+            "record-drop-before": dropPosition === "before",
+            "record-drop-after": dropPosition === "after",
           })}
           ref={(node) => {
             requestRowRef.current = node;
