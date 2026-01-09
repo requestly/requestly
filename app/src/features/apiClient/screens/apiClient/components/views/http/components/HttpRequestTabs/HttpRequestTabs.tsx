@@ -4,11 +4,12 @@ import RequestBody from "../../../components/request/RequestBody";
 import { captureException } from "@sentry/react";
 import { HeadersTable } from "../../../components/request/components/HeadersTable/HeadersTable";
 import AuthorizationView from "../../../components/request/components/AuthorizationView";
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useMemo, useEffect } from "react";
 import { ApiClientRequestTabs } from "../../../components/request/components/ApiClientRequestTabs/ApiClientRequestTabs";
 import { sanitizeKeyValuePairs, supportsRequestBody } from "features/apiClient/screens/apiClient/utils";
 import { useFeatureValue } from "@growthbook/growthbook-react";
 import { useQueryParamStore } from "features/apiClient/hooks/useQueryParamStore";
+import { useHeadersStore } from "features/apiClient/hooks/useHeadersStore";
 import { Conditional } from "components/common/Conditional";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
@@ -69,6 +70,7 @@ const HttpRequestTabs: React.FC<Props> = ({
 
   const pathVariables = usePathVariablesStore((state) => state.pathVariables);
   const queryParams = useQueryParamStore((state) => state.queryParams);
+  const headers = useHeadersStore((state) => state.headers);
 
   const hasScriptError = error?.type === RQAPI.ApiClientErrorType.SCRIPT;
 
@@ -78,10 +80,10 @@ const HttpRequestTabs: React.FC<Props> = ({
         key: RequestTab.QUERY_PARAMS,
         label: <RequestTabLabel label="Params" count={queryParams.length || pathVariables.length} showDot={true} />,
         children: (
-          <>
-            <div className="params-table-title">Query Params</div>
+          <div className="non-scrollable-tab-content">
             <QueryParamsTable
               recordId={requestId}
+              title={<div className="params-table-title">Query Params</div>}
               onQueryParamsChange={(newParams) => {
                 setRequestEntry((prev) => ({
                   ...prev,
@@ -91,17 +93,18 @@ const HttpRequestTabs: React.FC<Props> = ({
                   },
                 }));
               }}
-            />
-            <PathVariableTable
-              recordId={requestId}
-              onChange={(newVariables) => {
-                setRequestEntry((prev) => ({
-                  ...prev,
-                  request: { ...prev.request, pathVariables: newVariables },
-                }));
-              }}
-            />
-          </>
+            >
+              <PathVariableTable
+                recordId={requestId}
+                onChange={(newVariables) => {
+                  setRequestEntry((prev) => ({
+                    ...prev,
+                    request: { ...prev.request, pathVariables: newVariables },
+                  }));
+                }}
+              />
+            </QueryParamsTable>
+          </div>
         ),
       },
       {
@@ -125,18 +128,20 @@ const HttpRequestTabs: React.FC<Props> = ({
       },
       {
         key: RequestTab.HEADERS,
-        label: <RequestTabLabel label="Headers" count={sanitizeKeyValuePairs(requestEntry.request.headers).length} />,
+        label: <RequestTabLabel label="Headers" count={sanitizeKeyValuePairs(headers).length} />,
         children: (
-          <HeadersTable
-            recordId={requestId}
-            headers={requestEntry.request.headers}
-            onHeadersChange={(newHeaders) => {
-              setRequestEntry((prev) => ({
-                ...prev,
-                request: { ...prev.request, headers: newHeaders },
-              }));
-            }}
-          />
+          <div className="non-scrollable-tab-content">
+            <HeadersTable
+              recordId={requestId}
+              headers={requestEntry.request.headers}
+              onHeadersChange={(newHeaders) => {
+                setRequestEntry((prev) => ({
+                  ...prev,
+                  request: { ...prev.request, headers: newHeaders },
+                }));
+              }}
+            />
+          </div>
         ),
       },
       {
@@ -181,6 +186,7 @@ const HttpRequestTabs: React.FC<Props> = ({
     isRequestBodySupported,
     queryParams.length,
     pathVariables.length,
+    headers,
     requestEntry,
     setRequestEntry,
     focusPostResponseScriptEditor,

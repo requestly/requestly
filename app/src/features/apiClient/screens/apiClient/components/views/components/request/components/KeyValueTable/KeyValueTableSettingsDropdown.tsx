@@ -1,6 +1,6 @@
 import React from "react";
 import { Dropdown, Checkbox } from "antd";
-import { MdSettings } from "@react-icons/all-files/md/MdSettings";
+import { MdMoreHoriz } from "@react-icons/all-files/md/MdMoreHoriz";
 import { RQButton } from "lib/design-system-v2/components";
 
 interface KeyValueTableSettingsDropdownProps {
@@ -32,8 +32,8 @@ export const KeyValueTableSettingsDropdown: React.FC<KeyValueTableSettingsDropdo
 
   return (
     <div className="key-value-settings-header">
-      <Dropdown menu={{ items }} trigger={["click"]} placement="bottomRight">
-        <RQButton type="transparent" size="small" icon={<MdSettings />} className="key-value-settings-icon" />
+      <Dropdown menu={{ items }} trigger={["click"]} placement="bottomLeft">
+        <RQButton type="transparent" size="small" icon={<MdMoreHoriz />} className="key-value-settings-icon" />
       </Dropdown>
     </div>
   );
