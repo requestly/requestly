@@ -244,3 +244,14 @@
     resize: none;
   }
 }
+
+// Drop position visual feedback
+.record-drop-before {
+  border-top: 2px solid var(--requestly-color-primary-text, #1890ff);
+  margin-top: -2px;
+}
+
+.record-drop-after {
+  border-bottom: 2px solid var(--requestly-color-primary-text, #1890ff);
+  margin-bottom: -2px;
+}

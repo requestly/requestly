@@ -53,17 +53,6 @@
   }
 }
 
-// Drop position visual feedback
-.collection-drop-before {
-  border-top: 2px solid var(--requestly-color-primary-text, #1890ff);
-  margin-top: -2px;
-}
-
-.collection-drop-after {
-  border-bottom: 2px solid var(--requestly-color-primary-text, #1890ff);
-  margin-bottom: -2px;
-}
-
 .collection-drop-inside {
   & > .ant-collapse.collections-list-item {
     background: #004eeb33;

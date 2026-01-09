@@ -119,7 +119,7 @@ export const RequestRow: React.FC<Props> = ({
 
   const [{ isOverCurrent }, drop] = useDrop(
     () => ({
-      accept: [RQAPI.RecordType.API, RQAPI.RecordType.COLLECTION],
+      accept: [RQAPI.RecordType.API],
       canDrop: (item: { record: RQAPI.ApiClientRecord; contextId: string }) => {
         if (!item || item.contextId !== contextId) return false;
         if (item.record.id === record.id) return false;
@@ -318,8 +318,8 @@ export const RequestRow: React.FC<Props> = ({
       ) : (
         <div
           className={clsx("request-row", {
-            "drop-before": dropPosition === "before",
-            "drop-after": dropPosition === "after",
+            "record-drop-before": dropPosition === "before",
+            "record-drop-after": dropPosition === "after",
           })}
           ref={(node) => {
             requestRowRef.current = node;

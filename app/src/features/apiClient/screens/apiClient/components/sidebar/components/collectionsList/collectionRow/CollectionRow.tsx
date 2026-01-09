@@ -20,7 +20,7 @@ import { MdOutlineIosShare } from "@react-icons/all-files/md/MdOutlineIosShare";
 import { Conditional } from "components/common/Conditional";
 import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
 import { CollectionViewTabSource } from "../../../../views/components/Collection/collectionViewTabSource";
-import { useDrag, useDrop } from "react-dnd";
+import { DropTargetMonitor, useDrag, useDrop } from "react-dnd";
 import { MdAdd } from "@react-icons/all-files/md/MdAdd";
 import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 import RequestlyIcon from "assets/img/brand/rq_logo.svg";
@@ -42,6 +42,7 @@ import { RecordData } from "features/apiClient/helpers/RankingManager/APIRecords
 import { getImmediateChildrenRecords } from "features/apiClient/hooks/useChildren.hook";
 import { saveOrUpdateRecord } from "features/apiClient/commands/store.utils";
 import { useApiClientRepository } from "features/apiClient/contexts/meta";
+import clsx from "clsx";
 
 export enum ExportType {
   REQUESTLY = "requestly",
@@ -307,7 +308,8 @@ export const CollectionRow: React.FC<Props> = ({
             setExpandedRecordIds(newExpandedRecordIds);
             sessionStorage.setItem(SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY, newExpandedRecordIds);
           }
-        } else if (currentDropPosition === "before" || currentDropPosition === "after") {
+        }
+        if (currentDropPosition === "before" || currentDropPosition === "after") {
           // Drop before or after the collection (as a sibling)
           const sortedSiblings = apiRecordsRankingManager.sort(
             getImmediateChildrenRecords(context, record.collectionId ?? "")
@@ -383,74 +385,78 @@ export const CollectionRow: React.FC<Props> = ({
     }),
     [record, context.id]
   );
+  const handleHoverExpand = useCallback(
+    (item: DraggableApiRecord, monitor: DropTargetMonitor) => {
+      const isOverAny = monitor.isOver();
+      if (!isOverAny) {
+        if (hoverExpandTimeoutRef.current) {
+          clearTimeout(hoverExpandTimeoutRef.current);
+          hoverExpandTimeoutRef.current = null;
+        }
+        setDropPosition(null);
+        return;
+      }
+
+      const pointer = monitor.getClientOffset();
+      const containerEl = collectionRowRef.current;
+      const headerEl = containerEl?.querySelector(".ant-collapse-header");
+
+      // Only compute dropzones when hovering over the header; ignore children area
+      if (!pointer || !headerEl) {
+        setDropPosition(null);
+        return;
+      }
+
+      const rect = headerEl.getBoundingClientRect();
+
+      // If pointer is outside header bounds, do not show borders/highlights
+      if (pointer.y < rect.top || pointer.y > rect.bottom) {
+        if (hoverExpandTimeoutRef.current) {
+          clearTimeout(hoverExpandTimeoutRef.current);
+          hoverExpandTimeoutRef.current = null;
+        }
+        setDropPosition(null);
+        return;
+      }
+
+      const hoverClientY = pointer.y - rect.top;
+      const hoverHeight = rect.bottom - rect.top;
+      // if the record is a request type always drop inside
+      if (
+        item.record.type === RQAPI.RecordType.API ||
+        (hoverClientY > hoverHeight * 0.25 && hoverClientY < hoverHeight * 0.75)
+      ) {
+        setDropPosition("inside");
+        const IsTargetCollectionCollapsed = !expandedRecordIds.includes(record.id);
+        if (IsTargetCollectionCollapsed && !hoverExpandTimeoutRef.current) {
+          hoverExpandTimeoutRef.current = setTimeout(() => {
+            const newExpandedRecordIds = [...expandedRecordIds, record.id];
+            setExpandedRecordIds(newExpandedRecordIds);
+            sessionStorage.setItem(SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY, newExpandedRecordIds);
+            hoverExpandTimeoutRef.current = null;
+          }, 600);
+        }
+      } else if (hoverClientY < hoverHeight * 0.25) {
+        setDropPosition("before");
+        if (hoverExpandTimeoutRef.current) {
+          clearTimeout(hoverExpandTimeoutRef.current);
+          hoverExpandTimeoutRef.current = null;
+        }
+      } else if (hoverClientY > hoverHeight * 0.75) {
+        setDropPosition("after");
+        if (hoverExpandTimeoutRef.current) {
+          clearTimeout(hoverExpandTimeoutRef.current);
+          hoverExpandTimeoutRef.current = null;
+        }
+      }
+    },
+    [expandedRecordIds, record.id, setExpandedRecordIds]
+  );
 
   const [{ isOver }, drop] = useDrop(
     () => ({
       accept: [RQAPI.RecordType.API, RQAPI.RecordType.COLLECTION],
-      hover: (item: DraggableApiRecord, monitor) => {
-        const isOverAny = monitor.isOver();
-        if (!isOverAny) {
-          if (hoverExpandTimeoutRef.current) {
-            clearTimeout(hoverExpandTimeoutRef.current);
-            hoverExpandTimeoutRef.current = null;
-          }
-          setDropPosition(null);
-          return;
-        }
-
-        const pointer = monitor.getClientOffset();
-        const containerEl = collectionRowRef.current;
-        const headerEl = containerEl?.querySelector(".ant-collapse-header");
-
-        // Only compute dropzones when hovering over the header; ignore children area
-        if (!pointer || !headerEl) {
-          setDropPosition(null);
-          return;
-        }
-
-        const rect = headerEl.getBoundingClientRect();
-
-        // If pointer is outside header bounds, do not show borders/highlights
-        if (pointer.y < rect.top || pointer.y > rect.bottom) {
-          if (hoverExpandTimeoutRef.current) {
-            clearTimeout(hoverExpandTimeoutRef.current);
-            hoverExpandTimeoutRef.current = null;
-          }
-          setDropPosition(null);
-          return;
-        }
-
-        const hoverClientY = pointer.y - rect.top;
-        const hoverHeight = rect.bottom - rect.top;
-
-        if (record.collectionId === "") {
-          setDropPosition(null);
-          return;
-        } else if (hoverClientY < hoverHeight * 0.25) {
-          setDropPosition("before");
-          if (hoverExpandTimeoutRef.current) {
-            clearTimeout(hoverExpandTimeoutRef.current);
-            hoverExpandTimeoutRef.current = null;
-          }
-        } else if (hoverClientY > hoverHeight * 0.75) {
-          setDropPosition("after");
-          if (hoverExpandTimeoutRef.current) {
-            clearTimeout(hoverExpandTimeoutRef.current);
-            hoverExpandTimeoutRef.current = null;
-          }
-        } else {
-          setDropPosition("inside");
-          const IsTargetCollectionCollapsed = !expandedRecordIds.includes(record.id);
-          if (IsTargetCollectionCollapsed && !hoverExpandTimeoutRef.current) {
-            hoverExpandTimeoutRef.current = setTimeout(() => {
-              const newExpandedRecordIds = [...expandedRecordIds, record.id];
-              setExpandedRecordIds(newExpandedRecordIds);
-              sessionStorage.setItem(SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY, newExpandedRecordIds);
-              hoverExpandTimeoutRef.current = null;
-            }, 600);
-          }
-        }
-      },
+      hover: handleHoverExpand,
       drop: (item: DraggableApiRecord, monitor) => {
         // Clear hover timeout on drop
         if (hoverExpandTimeoutRef.current) {
@@ -531,15 +537,12 @@ export const CollectionRow: React.FC<Props> = ({
             collectionRowRef.current = node;
             drop(node);
           }}
-          className={`${
-            dropPosition === "before"
-              ? "collection-drop-before"
-              : dropPosition === "after"
-              ? "collection-drop-after"
-              : dropPosition === "inside"
-              ? "collection-drop-inside"
-              : ""
-          } ${isOver && dropPosition === "inside" ? "collection-drop-target" : ""}`}
+          className={clsx({
+            "record-drop-before": dropPosition === "before",
+            "record-drop-after": dropPosition === "after",
+            "collection-drop-inside": dropPosition === "inside",
+            "collection-drop-target": isOver && dropPosition === "inside",
+          })}
         >
           <Collapse
             activeKey={activeKey}

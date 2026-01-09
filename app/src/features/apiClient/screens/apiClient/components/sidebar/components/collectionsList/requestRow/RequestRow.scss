@@ -20,14 +20,3 @@ svg.graphql-request-icon {
 .collections-list-item.api.selected:hover {
   background-color: rgba(255, 255, 255, 0.12) !important;
 }
-
-// Drop position visual feedback
-.request-row.drop-before {
-  border-top: 2px solid var(--requestly-color-primary-text, #1890ff);
-  margin-top: -2px;
-}
-
-.request-row.drop-after {
-  border-bottom: 2px solid var(--requestly-color-primary-text, #1890ff);
-  margin-bottom: -2px;
-}
