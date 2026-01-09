@@ -9,6 +9,7 @@ import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceSto
 import { useCommand } from "features/apiClient/commands";
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
 import { useApiClientRepository } from "features/apiClient/contexts/meta";
+import { apiRecordsRankingManager } from "features/apiClient/helpers/RankingManager";
 
 export interface NewRecordNameInputProps {
   recordToBeEdited: RQAPI.ApiClientRecord;
@@ -45,6 +46,12 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({ recordTo
       ...recordToBeEdited,
       name: recordName,
     };
+
+    // If record does not have a rank generate one using old data to mantain order in UI
+    if (!record.rank) {
+      const effectiveRank = apiRecordsRankingManager.getEffectiveRank(recordToBeEdited);
+      record.rank = effectiveRank;
+    }
 
     const result =
       record.type === RQAPI.RecordType.API

@@ -5,6 +5,7 @@ import Logger from "lib/logger";
 import lodash from "lodash";
 import { RQAPI } from "features/apiClient/types";
 import { captureException } from "./utils";
+import { apiRecordsRankingManager } from "features/apiClient/helpers/RankingManager";
 
 export function sanitizeRecord(record: Partial<RQAPI.ApiClientRecord>) {
   const sanitizedRecord = lodash.cloneDeep(record);
@@ -65,6 +66,7 @@ const createApiRecord = async (
     createdTs: Timestamp.now().toMillis(),
     updatedTs: Timestamp.now().toMillis(),
   } as RQAPI.ApiClientRecord;
+  newRecord.rank = apiRecordsRankingManager.getEffectiveRank(record);
 
   if (record.type === RQAPI.RecordType.COLLECTION) {
     newRecord.description = record.description || "";
@@ -152,7 +154,7 @@ export const batchUpsertApiRecords = async (
         ownerId,
         createdBy: sanitizedRecord.createdBy ?? uid,
         updatedBy: uid,
-        createdTs: sanitizedRecord.createdTs ?? Timestamp.now().toMillis(),
+        createdTs: Timestamp.now().toMillis(),
         updatedTs: Timestamp.now().toMillis(),
       } as RQAPI.ApiClientRecord;
 
