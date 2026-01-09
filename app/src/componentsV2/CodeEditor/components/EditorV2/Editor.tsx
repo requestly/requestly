@@ -314,7 +314,7 @@ const Editor: React.FC<EditorProps> = ({
         data-enable-grammarly="false"
         data-gramm_editor="false"
         data-gramm="false"
-      ></CodeMirror>
+      />
       <div className="editor-popup-container" onMouseLeave={handleMouseLeave}>
         {hoveredVariable && envVariables && (
           <VariablePopover
