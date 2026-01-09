@@ -2,7 +2,7 @@ import { Decoration, DecorationSet, EditorView, ViewPlugin, ViewUpdate } from "@
 import { ScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
 
 interface VariableSetters {
-  setHoveredVariable: (token: string | null) => void;
+  handleSetVariable: (token: string | null) => void;
   setPopupPosition: (position: { x: number; y: number }) => void;
 }
 
@@ -72,16 +72,16 @@ export const highlightVariablesPlugin = (setters: VariableSetters, variables: Sc
             const coords = this.view.coordsAtPos(hoveredVar.start);
 
             const variable = token.slice(2, -2);
-            setters.setHoveredVariable(variable);
+            setters.handleSetVariable(variable);
             setters.setPopupPosition({
               x: coords.left,
               y: coords.top,
             });
           } else {
-            setters.setHoveredVariable(null); // Hide popup if not hovering over a variable
+            setters.handleSetVariable(null); // Hide popup if not hovering over a variable
           }
         } else {
-          setters.setHoveredVariable(null);
+          setters.handleSetVariable(null);
         }
       }
 
