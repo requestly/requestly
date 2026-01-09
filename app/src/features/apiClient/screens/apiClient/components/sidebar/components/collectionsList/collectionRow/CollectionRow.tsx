@@ -426,7 +426,7 @@ export const CollectionRow: React.FC<Props> = ({
       // if the record is a request type always drop inside
       if (
         item.record.type === RQAPI.RecordType.API ||
-        !isFeatureCompatible(FEATURES.API_CLIENT_CUSTOM_SORTING) ||
+        !isFeatureCompatible(FEATURES.API_CLIENT_RECORDS_REORDERING) ||
         (hoverClientY > hoverHeight * 0.25 && hoverClientY < hoverHeight * 0.75)
       ) {
         setDropPosition("inside");

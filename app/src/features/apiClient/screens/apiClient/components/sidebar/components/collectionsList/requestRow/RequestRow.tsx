@@ -125,13 +125,13 @@ export const RequestRow: React.FC<Props> = ({
       canDrop: (item: { record: RQAPI.ApiClientRecord; contextId: string }) => {
         if (!item || item.contextId !== contextId) return false;
         if (item.record.id === record.id) return false;
-        if (!isFeatureCompatible(FEATURES.API_CLIENT_CUSTOM_SORTING)) {
+        if (!isFeatureCompatible(FEATURES.API_CLIENT_RECORDS_REORDERING)) {
           return false;
         }
         return true;
       },
       hover: (item: { record: RQAPI.ApiClientRecord; contextId: string }, monitor) => {
-        if (!monitor.isOver({ shallow: true }) || !isFeatureCompatible(FEATURES.API_CLIENT_CUSTOM_SORTING)) {
+        if (!monitor.isOver({ shallow: true }) || !isFeatureCompatible(FEATURES.API_CLIENT_RECORDS_REORDERING)) {
           return;
         }
 
