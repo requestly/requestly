@@ -323,6 +323,17 @@ const TestResultTabTitle: React.FC<{ title: string; count: number; loading?: boo
   );
 };
 
+export const EmptyRunResultContainer: React.FC = () => {
+  return (
+    <div className="run-result-view-details">
+      <EmptyState
+        title="No test result found"
+        description="Please add test cases in scripts tab and run them to see results."
+      />
+    </div>
+  );
+};
+
 export const RunResultContainer: React.FC<{
   ranAt: number;
   result: LiveRunResult | RunResult;
@@ -420,36 +431,27 @@ export const RunResultContainer: React.FC<{
 
   return (
     <div className="run-result-view-details">
-      {result.iterations.size === 0 ? (
-        <EmptyState
-          title="No test result found"
-          description="Please add test cases in scripts tab and run them to see results."
+      <div className="result-header">
+        {runMetrics.map((data, index) => {
+          return (
+            <div key={index} className="run-metric">
+              <span className="label">{data.label}:</span>
+              <span className="value">{data.value}</span>
+            </div>
+          );
+        })}
+      </div>
+      <div className="result-tabs-container">
+        <Tabs
+          moreIcon={null}
+          items={tabItems}
+          animated={false}
+          activeKey={activeTab}
+          destroyInactiveTabPane={true}
+          onChange={(activeKey) => setActiveTab(activeKey as RunResultTabKey)}
+          className="test-result-tabs"
         />
-      ) : (
-        <>
-          <div className="result-header">
-            {runMetrics.map((data, index) => {
-              return (
-                <div key={index} className="run-metric">
-                  <span className="label">{data.label}:</span>
-                  <span className="value">{data.value}</span>
-                </div>
-              );
-            })}
-          </div>
-          <div className="result-tabs-container">
-            <Tabs
-              moreIcon={null}
-              items={tabItems}
-              animated={false}
-              activeKey={activeTab}
-              destroyInactiveTabPane={true}
-              onChange={(activeKey) => setActiveTab(activeKey as RunResultTabKey)}
-              className="test-result-tabs"
-            />
-          </div>
-        </>
-      )}
+      </div>
     </div>
   );
 };
