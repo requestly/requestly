@@ -75,6 +75,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
           id: parseFsId(e.id),
           collectionId: e.collectionId ?? null,
           name: e.data.name,
+          rank: e.data.rank,
           ownerId: this.meta.rootPath,
           deleted: false,
           createdBy: "local",
@@ -106,6 +107,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
       case RQAPI.ApiEntryType.HTTP:
         return {
           name: record.name || "Untitled request",
+          rank: record.rank,
           request: {
             type: record.data.type,
             url: record.data.request.url,
@@ -123,6 +125,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
       case RQAPI.ApiEntryType.GRAPHQL:
         return {
           name: record.name || "Untitled request",
+          rank: record.rank,
           request: {
             type: record.data.type,
             url: record.data.request.url,
@@ -138,6 +141,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
         const httpRecord = record as RQAPI.HttpApiRecord;
         return {
           name: record.name || "Untitled Request",
+          rank: record.rank,
           request: {
             type: httpRecord.data.type,
             url: httpRecord.data.request.url,
@@ -284,13 +288,24 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
   async updateRecord(patch: Partial<Omit<RQAPI.ApiRecord, "id">>, nativeId: string): RQAPI.ApiClientRecordPromise {
     const id = parseNativeId(nativeId);
     const service = await this.getAdapter();
-    const result = await service.updateRecord(
-      {
+
+    // If patch includes data field, parse the entire request
+    // Otherwise, only update the provided fields (e.g., rank, collectionId, name)
+    let updatePayload: Partial<RQAPI.ApiRecord>;
+    if (patch.data) {
+      updatePayload = {
         ...this.parseApiRecordRequest(patch),
         name: patch.name,
-      },
-      id
-    );
+      };
+    } else {
+      // For partial updates without data field, only pass the fields that need to be updated
+      updatePayload = {};
+      updatePayload.name = patch?.name;
+      updatePayload.rank = patch?.rank;
+      updatePayload.collectionId = patch?.collectionId;
+    }
+
+    const result = await service.updateRecord(updatePayload, id);
 
     if (result.type === "error") {
       return {
