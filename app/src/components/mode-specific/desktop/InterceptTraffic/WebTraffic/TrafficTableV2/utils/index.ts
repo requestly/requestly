@@ -215,3 +215,37 @@ export const traverseJsonByPath = (jsonObject: any, path: any) => {
     console.log(e);
   }
 };
+const MAX_PREVIEW_SIZE = 5 * 1024 * 1024; // 5 MB
+
+const ALLOWED_MIME_TYPES = new Set([
+  "text/plain",
+  "text/html",
+  "text/css",
+  "text/javascript",
+  "application/javascript",
+  "application/x-javascript",
+  "application/json",
+  "application/xml",
+  "text/xml",
+  "application/xhtml+xml",
+  "application/ecmascript",
+]);
+
+export function canRenderPreview(body?: string, contentType?: string): boolean {
+  if (!body || !contentType) return false;
+  // Size check
+  const sizeInBytes = new TextEncoder().encode(body).length;
+  if (sizeInBytes > MAX_PREVIEW_SIZE) return false;
+  // Binary check
+  if (body.includes("\0")) return false;
+  const mime = contentType.split(";")[0].trim().toLowerCase();
+  // Allow all text/*
+  if (mime.startsWith("text/")) return true;
+  // Explicit allowlist
+  if (ALLOWED_MIME_TYPES.has(mime)) return true;
+  // Vendor JSON (application/vnd.*+json)
+  if (mime.endsWith("+json")) return true;
+  // Vendor XML (application/vnd.*+xml)
+  if (mime.endsWith("+xml")) return true;
+  return false;
+}
