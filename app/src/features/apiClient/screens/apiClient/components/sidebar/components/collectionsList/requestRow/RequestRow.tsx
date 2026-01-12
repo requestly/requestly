@@ -209,9 +209,14 @@ export const RequestRow: React.FC<Props> = ({
   const handleDuplicateRequest = useCallback(
     async (record: RQAPI.ApiRecord) => {
       const { id, ...rest } = record;
+
+      // Generate rank for the duplicated request to place it immediately after the original
+      const rank = apiRecordsRankingManager.getRankForDuplicatedApi(context, record, record.collectionId ?? "");
+
       const newRecord: Omit<RQAPI.ApiRecord, "id"> = {
         ...rest,
         name: `(Copy) ${record.name || record.data.request?.url}`,
+        rank, // Set the calculated rank
       };
 
       try {
@@ -231,7 +236,7 @@ export const RequestRow: React.FC<Props> = ({
         trackDuplicateRequestFailed();
       }
     },
-    [onSaveRecord, apiClientRecordsRepository]
+    [onSaveRecord, apiClientRecordsRepository, context]
   );
 
   const requestOptions = useMemo((): MenuProps["items"] => {
