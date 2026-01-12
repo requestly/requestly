@@ -2,12 +2,10 @@ import React, { useCallback, useState } from "react";
 import { FilePicker } from "components/common/FilePicker";
 import { HiOutlineExternalLink } from "@react-icons/all-files/hi/HiOutlineExternalLink";
 import { Col } from "antd";
-import { RQAPI, ApiClientImporterType } from "@requestly/shared/types/entities/apiClient";
+import { RQAPI, ApiClientImporterType, EnvironmentData } from "@requestly/shared/types/entities/apiClient";
 import { ApiClientImporterMethod, ApiClientImporterOutput } from "@requestly/alternative-importers";
-import { EnvironmentData } from "backend/environment/types";
 import { toast } from "utils/Toast";
-import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
-import { createEnvironment, useApiClientRepository } from "features/apiClient/slices";
+import { apiRecordsActions, createEnvironment, useApiClientRepository } from "features/apiClient/slices";
 import { useApiClientDispatch } from "features/apiClient/slices/hooks/base.hooks";
 import {
   trackImportFailed,
@@ -51,7 +49,6 @@ export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = (
 
   const { environmentVariablesRepository, apiClientRecordsRepository } = useApiClientRepository();
   const dispatch = useApiClientDispatch();
-  const { onSaveRecord: onSaveBulkRecords } = useNewApiClientContext();
 
   const handleResetImport = () => {
     setImportError(null);
@@ -219,12 +216,7 @@ export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = (
   );
 
   const createAllRequests = useCallback(
-    async (
-      collectionToRequestsMap: Map<string, RQAPI.ApiRecord[]>
-    ): Promise<{
-      successfulRequests: RQAPI.ApiRecord[];
-      failedCount: number;
-    }> => {
+    async (collectionToRequestsMap: Map<string, RQAPI.ApiRecord[]>) => {
       const allRequests: RQAPI.ApiRecord[] = [];
       collectionToRequestsMap.forEach((requests) => {
         allRequests.push(...requests);
@@ -236,7 +228,6 @@ export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = (
 
       try {
         const createdRequests = await apiClientRecordsRepository.batchWriteApiRecords(allRequests);
-
         return { successfulRequests: createdRequests, failedCount: 0 };
       } catch (error) {
         return { successfulRequests: [], failedCount: allRequests.length };
@@ -263,12 +254,14 @@ export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = (
         const { successfulCollections, failedCount: failedCollectionsCount } = await createAllCollections(
           flatCollections
         );
-        onSaveBulkRecords(successfulCollections);
+
+        dispatch(apiRecordsActions.upsertRecords(successfulCollections));
 
         const { successfulRequests, failedCount: failedRequestsCount } = await createAllRequests(
           collectionToRequestsMap
         );
-        onSaveBulkRecords(successfulRequests);
+
+        dispatch(apiRecordsActions.upsertRecords(successfulRequests));
 
         const totalImportedCount = successfulCollections.length + successfulRequests.length;
         const totalFailedCount = failedCollectionsCount + failedRequestsCount;
@@ -298,7 +291,7 @@ export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = (
         };
       }
     },
-    [flattenRootCollection, createAllCollections, onSaveBulkRecords, createAllRequests]
+    [flattenRootCollection, createAllCollections, dispatch, createAllRequests]
   );
 
   const handleImportCollections = useCallback(
