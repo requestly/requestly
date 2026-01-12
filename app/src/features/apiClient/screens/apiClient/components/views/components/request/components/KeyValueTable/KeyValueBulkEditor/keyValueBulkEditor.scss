@@ -11,35 +11,14 @@
     align-items: center;
     padding: 6px 12px 0px 12px;
 
-    .bulk-edit-title-wrapper {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-
-      .bulk-edit-panel-title {
-        font-family: var(--requestly-font-family-default);
-        font-size: var(--requestly-font-size-2xs);
-        font-style: normal;
-        font-weight: 500;
-        line-height: 13px;
-        letter-spacing: 1px;
-        text-transform: uppercase;
-      }
-
-      svg {
-        width: 6px;
-        height: 6px;
-        fill: var(--requestly-color-text-placeholder);
-      }
-
-      .bulk-edit-live-text {
-        overflow: hidden;
-        color: var(--requestly-color-text-subtle);
-        font-family: var(--requestly-font-family-default);
-        font-size: var(--requestly-font-size-xs);
-        font-style: normal;
-        font-weight: 400;
-      }
+    .bulk-edit-panel-title {
+      font-family: var(--requestly-font-family-default);
+      font-size: var(--requestly-font-size-2xs);
+      font-style: normal;
+      font-weight: 500;
+      line-height: 13px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
     }
 
     .bulk-edit-panel-close-btn {

@@ -230,10 +230,21 @@
   position: absolute;
   top: 50%;
   right: 0;
-  left: 0;
+  left: auto;
+  min-width: 80px;
   transform: translateY(-50%);
   overflow: visible;
-  padding-right: 8px;
+  padding: 0px 8px;
+
+  &::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 25px;
+    border-left: 1px solid var(--border-dark);
+  }
 }
 
 .key-value-split-horizontal,
