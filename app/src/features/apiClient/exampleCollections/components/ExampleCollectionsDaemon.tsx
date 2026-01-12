@@ -13,9 +13,10 @@ import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getActiveWorkspace } from "store/slices/workspaces/selectors";
+import { AppDispatch } from "store/types";
 
 export const ExampleCollectionsDaemon: React.FC = () => {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const user = useSelector(getUserAuthDetails);
   const activeWorkspace = useSelector(getActiveWorkspace);
   const syncRepository = useApiClientRepository();
@@ -54,7 +55,7 @@ export const ExampleCollectionsDaemon: React.FC = () => {
       apiClientDispatch,
     };
 
-    dispatch(importExampleCollections(dependencies) as any);
+    dispatch(importExampleCollections(dependencies));
   }, [uid, activeWorkspace?.workspaceType, isNudgePermanentlyClosed, syncRepository, dispatch, apiClientDispatch]);
 
   return null;

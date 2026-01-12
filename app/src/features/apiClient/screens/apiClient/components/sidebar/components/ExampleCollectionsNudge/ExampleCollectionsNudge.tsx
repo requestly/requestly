@@ -23,13 +23,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { toast } from "utils/Toast";
 import "./exampleCollectionsNudge.scss";
+import { AppDispatch } from "store/types";
 
 interface ExampleCollectionsNudgeProps {
   readonly fallback?: React.ReactNode;
 }
 
 export const ExampleCollectionsNudge: React.FC<ExampleCollectionsNudgeProps> = ({ fallback = null }) => {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
 
@@ -61,12 +62,7 @@ export const ExampleCollectionsNudge: React.FC<ExampleCollectionsNudgeProps> = (
     };
 
     try {
-      const resultAction = await dispatch(importExampleCollections(dependencies) as any);
-      const result = resultAction.payload as ImportResult;
-
-      if (!result.success) {
-        throw new Error(result.error);
-      }
+      const result = await dispatch(importExampleCollections(dependencies)).unwrap();
 
       toast.success(`Example collections imported successfully! (${result.recordCount} records)`);
       dispatch(exampleCollectionsActions.nudgeClosed());
