@@ -260,7 +260,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
         }
       }
     },
-    [isValidPermission, getRBACValidationFailureErrorMessage, openTab, apiClientRecords]
+    [isValidPermission, getRBACValidationFailureErrorMessage, openTab]
   );
 
   const onNewClick = useCallback(

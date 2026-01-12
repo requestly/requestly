@@ -397,7 +397,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
                   </div>
                 )}
 
-              {updatedRecords.requests.map((record, index) => {
+              {updatedRecords.requests.map((record, _index) => {
                 return (
                   <RequestRow
                     key={record.id}

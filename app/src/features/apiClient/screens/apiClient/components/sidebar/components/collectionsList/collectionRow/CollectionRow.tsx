@@ -550,7 +550,6 @@ export const CollectionRow: React.FC<Props> = ({
             "record-drop-before": dropPosition === "before",
             "record-drop-after": dropPosition === "after",
             "collection-drop-inside": dropPosition === "inside",
-            "collection-drop-target": isOver && dropPosition === "inside",
           })}
         >
           <Collapse

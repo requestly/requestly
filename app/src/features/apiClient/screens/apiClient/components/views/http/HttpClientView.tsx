@@ -527,7 +527,7 @@ const HttpClientView: React.FC<Props> = ({
       record.name = requestName;
     }
 
-    // If record does not have a rank generate one using old data to mantain order in UI
+    // If record does not have a rank generate one using old data to maintain order in UI
     if (!isCreateMode && !apiEntryDetails.rank) {
       const effectiveRank = apiRecordsRankingManager.getEffectiveRank(apiEntryDetails);
       record.rank = effectiveRank;
@@ -614,7 +614,7 @@ const HttpClientView: React.FC<Props> = ({
     if (apiEntryDetails?.id) {
       record.id = apiEntryDetails?.id;
 
-      // If record does not have a rank generate one using old data to mantain order in UI
+      // If record does not have a rank generate one using old data to maintain order in UI
       if (!apiEntryDetails.rank) {
         const effectiveRank = apiRecordsRankingManager.getEffectiveRank(apiEntryDetails);
         record.rank = effectiveRank;

@@ -225,7 +225,7 @@ export const ContextualCollectionsList: React.FC<Props> = ({
                   </div>
                 )}
 
-              {updatedRecords.requests.map((record, index) => {
+              {updatedRecords.requests.map((record, _index) => {
                 return (
                   <RequestRow
                     key={record.id}
