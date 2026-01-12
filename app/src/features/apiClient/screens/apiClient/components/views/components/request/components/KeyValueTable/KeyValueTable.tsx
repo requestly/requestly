@@ -195,7 +195,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
         ? {
             title: "Type",
             dataIndex: "dataType",
-            width: 110,
+            width: isDescriptionVisible ? 110 : 120,
             editable: true,
             onCell: (record: KeyValuePair) => ({
               record,
