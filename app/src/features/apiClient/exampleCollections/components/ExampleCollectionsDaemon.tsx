@@ -1,26 +1,28 @@
+import type { EnvironmentData } from "backend/environment/types";
+import { getOwnerId, LOGGED_OUT_STATE_UID } from "backend/utils";
+import exampleEnvironments from "features/apiClient/exampleCollections/examples/environments.json";
+import { useApiClientRepository } from "features/apiClient/slices";
+import {
+  importExampleCollections,
+  selectIsNudgePermanentlyClosed,
+  ImportDependencies,
+} from "features/apiClient/slices/exampleCollections";
+import { useApiClientDispatch } from "features/apiClient/slices/hooks/base.hooks";
+import { WorkspaceType } from "features/workspaces/types";
 import React, { useEffect } from "react";
-import { useApiClientRepository } from "features/apiClient/contexts/meta";
 import { useDispatch, useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getActiveWorkspace } from "store/slices/workspaces/selectors";
-import { useExampleCollections } from "../store";
-import { WorkspaceType } from "features/workspaces/types";
-import { getOwnerId, LOGGED_OUT_STATE_UID } from "backend/utils";
-import { useCommand } from "features/apiClient/commands";
-import { useAPIRecordsStore } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 
 export const ExampleCollectionsDaemon: React.FC = () => {
-  const store = useAPIRecordsStore();
+  const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const activeWorkspace = useSelector(getActiveWorkspace);
-  const uid = user?.details?.profile?.uid ?? getOwnerId(user?.details?.profile?.uid);
   const syncRepository = useApiClientRepository();
-  const [importExampleCollections] = useExampleCollections((s) => [s.importExampleCollections]);
-  const {
-    env: { createEnvironments },
-  } = useCommand();
+  const apiClientDispatch = useApiClientDispatch();
+  const isNudgePermanentlyClosed = useSelector(selectIsNudgePermanentlyClosed);
 
-  const dispatch = useDispatch();
+  const uid = user?.details?.profile?.uid ?? getOwnerId(user?.details?.profile?.uid);
 
   useEffect(() => {
     if (uid !== LOGGED_OUT_STATE_UID) {
@@ -31,23 +33,29 @@ export const ExampleCollectionsDaemon: React.FC = () => {
       return;
     }
 
-    const envsStore = { createEnvironments };
-    importExampleCollections({
-      ownerId: uid,
-      respository: syncRepository,
-      recordsStore: store,
-      envsStore,
-      dispatch,
-    });
-  }, [
-    uid,
-    activeWorkspace?.workspaceType,
-    syncRepository,
-    importExampleCollections,
-    store,
-    createEnvironments,
-    dispatch,
-  ]);
+    if (!syncRepository) {
+      return;
+    }
 
-  return <></>;
+    if (isNudgePermanentlyClosed) {
+      return;
+    }
+
+    const environmentsToCreate: EnvironmentData[] = exampleEnvironments.environments.map((env) => ({
+      ...env,
+      isExample: true,
+    }));
+
+    // Dispatch import
+    const dependencies: ImportDependencies = {
+      repository: syncRepository,
+      ownerId: uid,
+      environmentsToCreate,
+      apiClientDispatch,
+    };
+
+    dispatch(importExampleCollections(dependencies) as any);
+  }, [uid, activeWorkspace?.workspaceType, isNudgePermanentlyClosed, syncRepository, dispatch, apiClientDispatch]);
+
+  return null;
 };
