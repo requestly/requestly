@@ -6,7 +6,7 @@ import { useAutogenerateStore } from "./useAutogenerateStore";
 import { useGraphQLRecordStore } from "./useGraphQLRecordStore";
 import { useApiClientFeatureContext } from "../slices";
 
-export const useGraphQLIntrospection = (params: { recordId: string; url: string | undefined }) => {
+export const useGraphQLIntrospection = (params: { recordId: string; url: string }) => {
   const [
     setIntrospectionData,
     setIsFetchingIntrospectionData,
@@ -26,7 +26,7 @@ export const useGraphQLIntrospection = (params: { recordId: string; url: string 
   const introspectAndSaveSchema = async () => {
     setIsFetchingIntrospectionData(true);
     try {
-      const { result: renderedUrl } = renderVariables(params.url || "", params.recordId, ctx);
+      const { result: renderedUrl } = renderVariables(params.url, params.recordId, ctx);
       const introspectionData = await fetchGraphQLIntrospectionData(
         renderedUrl,
         appMode,
