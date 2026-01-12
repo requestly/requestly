@@ -9,7 +9,10 @@ import { supportsRequestBody } from "features/apiClient/screens/apiClient/utils"
 import { CONTENT_TYPE_HEADER } from "features/apiClient/constants";
 import { v4 } from "uuid";
 
-export class HttpRecordEntity<M extends ApiClientEntityMeta = ApiClientEntityMeta> extends ApiClientRecordEntity<RQAPI.HttpApiRecord, M> {
+export class HttpRecordEntity<M extends ApiClientEntityMeta = ApiClientEntityMeta> extends ApiClientRecordEntity<
+  RQAPI.HttpApiRecord,
+  M
+> {
   readonly type = ApiClientEntityType.HTTP_RECORD;
   getEntityFromState(state: ApiClientStoreState): RQAPI.HttpApiRecord {
     const record = selectRecordById(state, this.meta.id);
@@ -66,7 +69,6 @@ export class HttpRecordEntity<M extends ApiClientEntityMeta = ApiClientEntityMet
     return this.getRequest(state).pathVariables;
   }
 
-
   reconcilePathKeys(pathKeys: string[]) {
     this.unsafePatch((s) => {
       const existingPathVariables = s.data.request.pathVariables;
@@ -79,17 +81,16 @@ export class HttpRecordEntity<M extends ApiClientEntityMeta = ApiClientEntityMet
       }
 
       for (const sourceKey of pathKeys) {
-        if (!existingPathVariables.find(v => v.key === sourceKey)) {
+        if (!existingPathVariables.find((v) => v.key === sourceKey)) {
           this.addNewPathVariable(s, sourceKey);
         }
       }
 
-      for (const existingKey of existingPathVariables.map(v => v.key)) {
+      for (const existingKey of existingPathVariables.map((v) => v.key)) {
         if (!pathKeys.includes(existingKey)) {
           this.deletePathVariable(s, existingKey);
         }
       }
-
     });
   }
 
@@ -104,9 +105,7 @@ export class HttpRecordEntity<M extends ApiClientEntityMeta = ApiClientEntityMet
       value: "",
       description: "",
       dataType: KeyValueDataType.STRING,
-
-    })
-
+    });
   }
 
   deletePathVariable(state: RQAPI.HttpApiRecord, key: string) {
@@ -114,27 +113,27 @@ export class HttpRecordEntity<M extends ApiClientEntityMeta = ApiClientEntityMet
     if (!existingPathVariables) {
       return;
     }
-    const index = existingPathVariables.findIndex(v => v.key === key);
+    const index = existingPathVariables.findIndex((v) => v.key === key);
     existingPathVariables.splice(index, 1);
   }
 
-  setPathVariable(key: string, patch: Omit<RQAPI.PathVariable, 'id' | 'key'>) {
-    this.unsafePatch(s => {
+  setPathVariable(key: string, patch: Omit<RQAPI.PathVariable, "id" | "key">) {
+    this.unsafePatch((s) => {
       const existingPathVariables = s.data.request.pathVariables;
       if (!existingPathVariables) {
         return;
       }
 
-      const index = existingPathVariables.findIndex(v => v.key === key);
-      if(index < 0) {
+      const index = existingPathVariables.findIndex((v) => v.key === key);
+      if (index < 0) {
         return;
       }
 
       existingPathVariables[index] = {
         ...existingPathVariables[index]!,
         ...patch,
-      }
-    })
+      };
+    });
   }
 
   setUrl(url: string): void {
@@ -142,11 +141,13 @@ export class HttpRecordEntity<M extends ApiClientEntityMeta = ApiClientEntityMet
   }
 
   setIncludeCredentials(includeCredentials: boolean) {
-    this.SET({data: {
-      request: {
-        includeCredentials
-      }
-    }});
+    this.SET({
+      data: {
+        request: {
+          includeCredentials,
+        },
+      },
+    });
   }
 
   setMethod(method: RequestMethod): void {
@@ -190,5 +191,9 @@ export class HttpRecordEntity<M extends ApiClientEntityMeta = ApiClientEntityMet
     this.unsafePatch((state) => {
       state.data.request.headers = state.data.request.headers.filter(predicate);
     });
+  }
+
+  setResponse(response: RQAPI.HttpResponse): void {
+    this.SETCOMMON({ data: { response } });
   }
 }

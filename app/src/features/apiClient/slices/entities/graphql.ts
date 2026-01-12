@@ -36,20 +36,20 @@ export class GraphQLRecordEntity<M extends ApiClientEntityMeta = ApiClientEntity
     return record as RQAPI.GraphQLApiRecord;
   }
 
-  private getRequest(state: ApiClientStoreState): RQAPI.GraphQLRequest | undefined {
-    return this.getEntityFromState(state)?.data?.request;
+  private getRequest(state: ApiClientStoreState): RQAPI.GraphQLRequest {
+    return this.getEntityFromState(state).data.request;
   }
 
   getResponse(state: ApiClientStoreState): RQAPI.GraphQLResponse | undefined {
     return this.getEntityFromState(state)?.data?.response;
   }
 
-  getUrl(state: ApiClientStoreState): string | undefined {
-    return this.getRequest(state)?.url;
+  getUrl(state: ApiClientStoreState): string {
+    return this.getRequest(state).url;
   }
 
-  getHeaders(state: ApiClientStoreState): KeyValuePair[] | undefined {
-    return this.getRequest(state)?.headers;
+  getHeaders(state: ApiClientStoreState): KeyValuePair[] {
+    return this.getRequest(state).headers;
   }
 
   getOperation(state: ApiClientStoreState): string | undefined {
@@ -61,7 +61,7 @@ export class GraphQLRecordEntity<M extends ApiClientEntityMeta = ApiClientEntity
   }
 
   getOperationName(state: ApiClientStoreState): string | undefined {
-    return this.getRequest(state)?.operationName;
+    return this.getRequest(state).operationName;
   }
 
   setUrl(url: string): void {
@@ -92,9 +92,7 @@ export class GraphQLRecordEntity<M extends ApiClientEntityMeta = ApiClientEntity
     this.DELETE({ data: { request: { variables: null } } });
   }
 
-  // Override setResponse to accept GraphQLResponse instead of HttpResponse
-  // @ts-expect-error - GraphQLResponse is not assignable to HttpResponse, but SETCOMMON handles it correctly
-  setResponse(response: RQAPI.GraphQLResponse | null): void {
-    this.SETCOMMON({ data: { response } as any });
+  setResponse(response: RQAPI.GraphQLResponse): void {
+    this.SETCOMMON({ data: { response } });
   }
 }
