@@ -320,9 +320,6 @@ const Editor: React.FC<EditorProps> = ({
       <div className="editor-popup-container" onMouseLeave={handleMouseLeave}>
         {hoveredVariable && envVariables && (
           <VariablePopover
-            editorRef={{
-              current: editorRef.current?.editor ?? null,
-            }}
             hoveredVariable={hoveredVariable}
             popupPosition={popupPosition}
             variables={envVariables}

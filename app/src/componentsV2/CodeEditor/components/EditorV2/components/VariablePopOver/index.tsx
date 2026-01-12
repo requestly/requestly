@@ -29,7 +29,6 @@ const PopoverViewTransitions: Record<PopoverView, PopoverView[]> = {
 interface VariablePopoverProps {
   hoveredVariable: string;
   popupPosition: { x: number; y: number };
-  editorRef: React.RefObject<HTMLDivElement>;
   variables: ScopedVariables;
   onClose?: () => void;
   onPinChange?: (pinned: boolean) => void;
@@ -49,7 +48,6 @@ interface InfoFieldConfig {
 
 export const VariablePopover: React.FC<VariablePopoverProps> = ({
   hoveredVariable,
-  editorRef,
   popupPosition,
   variables,
   onClose,
