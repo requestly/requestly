@@ -120,7 +120,15 @@ export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = (
       const importPromises = [];
       for (const environment of environments) {
         importPromises.push(
-          createEnvironment({ newEnvironmentName: environment.name, variables: environment.variables })
+          createEnvironment({ newEnvironmentName: environment.name, variables: environment.variables }).catch(
+            (error) => {
+              // Check if error is due to duplicate name
+              if (error?.message?.includes("already exists") || error?.message?.includes("duplicate")) {
+                return { id: environment.id, name: environment.name };
+              }
+              throw error;
+            }
+          )
         );
       }
       const importResults = await Promise.allSettled(importPromises);
@@ -198,6 +206,9 @@ export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = (
         try {
           const result = await apiClientRecordsRepository.createCollectionFromImport(collection, collection.id);
           if (result.success) {
+            successfulCollections.push(collection);
+          } else if (result.message === "Id already exists!") {
+            // Treat as success since the collection is already imported
             successfulCollections.push(collection);
           } else {
             failedCount++;
@@ -403,12 +414,11 @@ export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = (
           } and ${environmentsData.length} ${environmentsData.length !== 1 ? "environments" : "environment"}`
         );
         trackImportSuccess(importerType, collectionsData.length, null);
-        onImportSuccess();
       } else {
         toast.warn(`Partially imported: ${totalImported} succeeded, ${totalFailed} failed. Please review your files.`);
         trackImportSuccess(importerType, totalImported, null);
-        onImportSuccess();
       }
+      onImportSuccess();
     } catch (e) {
       setImportError("Failed to import collections and environments");
       trackImportFailed(importerType, e.message);
