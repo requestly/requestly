@@ -6,6 +6,7 @@ import "./runtimevariableHeader.scss";
 import InfoIcon from "components/misc/InfoIcon";
 import { MdOutlineDeleteForever } from "@react-icons/all-files/md/MdOutlineDeleteForever";
 import { KEYBOARD_SHORTCUTS } from "../../../../../../constants/keyboardShortcuts";
+import LINKS from "config/constants/sub/links";
 interface RuntimeVariablesHeaderProps {
   searchValue: string;
   variables: any[];
@@ -29,7 +30,7 @@ export const RuntimeVariablesHeader: React.FC<RuntimeVariablesHeaderProps> = ({
             <>
               Runtime variables allow you to store and reuse values throughout the app. These values reset when the API
               client is closed, unless they’re marked as persistent.
-              <a href="https://www.requestly.com" target="_blank" rel="noreferrer">
+              <a href={LINKS.REQUESTLY_RUNTIME_VARIABLES_DOCS} target="_blank" rel="noreferrer">
                 See how to use them effectively
               </a>
             </>
