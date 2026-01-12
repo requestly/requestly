@@ -1,11 +1,13 @@
 import React, { useCallback } from "react";
 import { useApiClientContext } from "features/apiClient/contexts";
-import { BottomSheetPlacement, BottomSheetProvider } from "componentsV2/BottomSheet";
+import { BottomSheetProvider } from "componentsV2/BottomSheet";
 import { RQAPI } from "features/apiClient/types";
 import { useApiRecord } from "features/apiClient/hooks/useApiRecord.hook";
 import { Result } from "antd";
 import { AutogenerateProvider } from "features/apiClient/store/autogenerateContextProvider";
 import { ClientViewFactory } from "./ClientViewFactory";
+import { BottomSheetFeatureContext } from "componentsV2/BottomSheet/types";
+import { AISessionProvider } from "features/ai/contexts/AISession";
 import "../apiClient.scss";
 
 type BaseProps = {
@@ -38,25 +40,29 @@ export const ApiClientViewManager: React.FC<Props> = React.memo((props) => {
       }
       addToHistory(entry);
     },
-    [addToHistory, isHistoryMode, setCurrentHistoryIndex, history]
+    [addToHistory, isHistoryMode, setCurrentHistoryIndex, history.length]
   );
 
-  if (selectedEntryDetails.type === RQAPI.RecordType.COLLECTION) return null;
+  if (selectedEntryDetails.type === RQAPI.RecordType.COLLECTION) {
+    return null;
+  }
 
   if (!selectedEntryDetails.data) {
     return <Result status="error" title="Request not found" subTitle="Oops! Looks like this request doesn't exist." />;
   }
 
   return (
-    <BottomSheetProvider defaultPlacement={BottomSheetPlacement.BOTTOM} isSheetOpenByDefault={true}>
+    <BottomSheetProvider context={BottomSheetFeatureContext.API_CLIENT}>
       <div className="api-client-container-content">
         <AutogenerateProvider>
-          <ClientViewFactory
-            apiRecord={selectedEntryDetails}
-            handleRequestFinished={handleAppRequestFinished}
-            onSaveCallback={onSaveCallback}
-            isCreateMode={isCreateMode}
-          />
+          <AISessionProvider>
+            <ClientViewFactory
+              apiRecord={selectedEntryDetails}
+              handleRequestFinished={handleAppRequestFinished}
+              onSaveCallback={onSaveCallback}
+              isCreateMode={isCreateMode}
+            />
+          </AISessionProvider>
         </AutogenerateProvider>
       </div>
     </BottomSheetProvider>
