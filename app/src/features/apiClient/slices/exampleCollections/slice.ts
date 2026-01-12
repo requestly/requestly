@@ -45,6 +45,55 @@ const persistConfig = {
   key: "exampleCollections",
   storage,
   whitelist: ["importStatus", "isNudgePermanentlyClosed"],
+  version: 1,
+  migrate: (state: any) => {
+    // Handle migration from old Zustand store
+    if (!state) {
+      try {
+        const zustandState = localStorage.getItem("rqExampleCollectionsStore");
+        if (zustandState) {
+          const parsed = JSON.parse(zustandState);
+          const oldState = parsed.state || parsed;
+
+          let importStatus: ExampleCollectionsState["importStatus"];
+
+          switch (oldState.importStatus) {
+            case "IMPORTING":
+              importStatus = { type: "IMPORTING" };
+              break;
+            case "IMPORTED":
+              importStatus = {
+                type: "IMPORTED",
+                importedAt: Date.now(),
+              };
+              break;
+            case "FAILED":
+              importStatus = {
+                type: "FAILED",
+                error: "Import failed (migrated from old state)",
+                failedAt: Date.now(),
+              };
+              break;
+            case "NOT_IMPORTED":
+            default:
+              importStatus = { type: "NOT_IMPORTED" };
+              break;
+          }
+
+          return {
+            importStatus,
+            isNudgePermanentlyClosed: oldState.isNudgePermanentlyClosed || false,
+          };
+        }
+      } catch (error) {
+        console.warn("Failed to migrate from Zustand state:", error);
+      }
+
+      return initialState;
+    }
+
+    return state;
+  },
 };
 
 export const exampleCollectionsReducerWithPersist = persistReducer(persistConfig, exampleCollectionsSlice.reducer);

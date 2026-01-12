@@ -18,7 +18,7 @@ import { variablesActions } from "store/features/variables/slice";
 import { RootState } from "store/types";
 import { sessionStorage } from "utils/sessionStorage";
 import { exampleCollectionsActions } from "./slice";
-import { ImportDependencies, ImportFailureReason, ImportResult } from "./types";
+import { ImportDependencies, ImportFailureReason } from "./types";
 
 export const EXPANDED_RECORD_IDS_UPDATED = "expandedRecordIdsUpdated" as const;
 
@@ -33,7 +33,7 @@ function markRootCollection<T extends { isExample?: boolean }>(record: T, index:
   return record;
 }
 
-function canImport(state: RootState): ImportResult | null {
+function canImport(state: RootState): { success: false; error: string; reason: ImportFailureReason } | null {
   const { importStatus, isNudgePermanentlyClosed } = state.exampleCollections;
 
   if (importStatus.type === "IMPORTING") {
@@ -52,9 +52,9 @@ function canImport(state: RootState): ImportResult | null {
 }
 
 export const importExampleCollections = createAsyncThunk<
-  ImportResult,
+  { success: true; recordCount: number },
   ImportDependencies,
-  { rejectValue: ImportResult; state: RootState }
+  { rejectValue: { success: false; error: string; reason: ImportFailureReason }; state: RootState }
 >("exampleCollections/import", async (dependencies, { dispatch, getState, rejectWithValue }) => {
   const canImportResult = canImport(getState());
   if (canImportResult !== null) {
