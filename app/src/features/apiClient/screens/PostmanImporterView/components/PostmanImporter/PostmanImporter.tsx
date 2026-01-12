@@ -160,7 +160,7 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
               environmentId: environmentVariablesRepository.getGlobalEnvironmentId(),
               variables: env.variables,
               repository: environmentVariablesRepository,
-            }) as any
+            })
           ).unwrap();
           return true;
         } else {
@@ -169,7 +169,7 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
               name: env.name,
               variables: env.variables,
               repository: environmentVariablesRepository,
-            }) as any
+            })
           ).unwrap();
           return true;
         }
