@@ -255,11 +255,10 @@ const Editor: React.FC<EditorProps> = ({
   );
 
   const handleMouseLeave = useCallback(() => {
-    if (!hoveredVariable) return;
     if (!isPopoverPinned) {
       setHoveredVariable(null);
     }
-  }, [isPopoverPinned, hoveredVariable]);
+  }, [isPopoverPinned]);
 
   const handleClosePopover = useCallback(() => {
     setHoveredVariable(null);
