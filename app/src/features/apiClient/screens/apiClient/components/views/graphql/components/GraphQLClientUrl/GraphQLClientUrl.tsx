@@ -1,5 +1,5 @@
 import { memo, useCallback } from "react";
-import { ScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
+import { useScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
 import { ApiClientUrl } from "features/apiClient/screens/apiClient/components/views/components/request/components/ApiClientUrl/ApiClientUrl";
 import { MdOutlineCheckCircle } from "@react-icons/all-files/md/MdOutlineCheckCircle";
 import { MdOutlineWarningAmber } from "@react-icons/all-files/md/MdOutlineWarningAmber";
@@ -12,28 +12,26 @@ import "./graphqlClientUrl.scss";
 import { DEMO_GRAPHQL_API_URL } from "features/apiClient/constants";
 import { useGraphQLRecordStore } from "features/apiClient/hooks/useGraphQLRecordStore";
 import { useGraphQLIntrospection } from "features/apiClient/hooks/useGraphQLIntrospection";
+import { BufferedGraphQLRecordEntity } from "features/apiClient/slices/entities";
+import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
 
 interface GraphQLClientUrlProps {
-  url: string;
-  recordId: string;
-  currentEnvironmentVariables: ScopedVariables;
+  entity: BufferedGraphQLRecordEntity;
   onEnterPress: (e: KeyboardEvent) => void;
   onUrlChange: (value: string) => void;
 }
 
-const GraphQLClientUrl = ({
-  url,
-  recordId,
-  currentEnvironmentVariables,
-  onEnterPress,
-  onUrlChange,
-}: GraphQLClientUrlProps) => {
+const GraphQLClientUrl = ({ entity, onEnterPress, onUrlChange }: GraphQLClientUrlProps) => {
+  const url = useApiClientSelector((s) => entity.getUrl(s));
+  const currentEnvironmentVariables = useScopedVariables(entity.meta.referenceId);
+
   const [introspectionData, isFetchingIntrospectionData, hasIntrospectionFailed] = useGraphQLRecordStore((state) => [
     state.introspectionData,
     state.isFetchingIntrospectionData,
     state.hasIntrospectionFailed,
   ]);
-  const { introspectAndSaveSchema } = useGraphQLIntrospection({ recordId, url });
+
+  const { introspectAndSaveSchema } = useGraphQLIntrospection({ recordId: entity.meta.referenceId, url });
   const handleUseExampleUrl = useCallback(() => {
     onUrlChange(DEMO_GRAPHQL_API_URL);
   }, [onUrlChange]);
