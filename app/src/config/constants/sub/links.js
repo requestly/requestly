@@ -67,6 +67,8 @@ const LINKS = {
   REQUESTLY_RESPONSE_RULE_DOCS: "https://docs.requestly.com/general/http-rules/rule-types/modify-request-body",
   REQUESTLY_SCRIPT_RULE_DOCS: "https://docs.requestly.com/general/http-rules/rule-types/insert-scripts",
   REQUESTLY_USERAGENT_RULE_DOCS: "https://docs.requestly.com/general/http-rules/rule-types/modify-user-agents",
+  REQUESTLY_RUNTIME_VARIABLES_DOCS:
+    "https://docs.requestly.com/general/api-client/environments-and-variables/runtime-variables",
 
   REQUESTLY_HEADERS_RULE_FAQ_LINK:
     "https://docs.requestly.com/general/http-rules-(modify-traffic)/rule-types/modify-headers#faqs",
