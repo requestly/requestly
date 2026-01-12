@@ -10,7 +10,6 @@ import Editor, { EditorLanguage } from "componentsV2/CodeEditor";
 import "./FixedRequestLogPane.css";
 import { REQUEST_METHOD_COLORS, REQUEST_METHOD_BACKGROUND_COLORS } from "../../../../../../constants";
 import { RequestMethod } from "features/apiClient/types";
-import { canRenderPreview } from "./utils";
 
 const { Text } = Typography;
 
@@ -95,6 +94,41 @@ const BodyTabView = ({ body, requestState, timestamp }) => {
   );
 };
 
+const isPreviewAvailable = (contentType) => {
+  const binaryMIMETypes = [
+    "image/",
+    "video/",
+    "audio/",
+    "application/octet-stream",
+    "application/pdf",
+    "application/zip",
+    "application/x-zip-compressed",
+    "application/x-rar-compressed",
+    "application/x-tar",
+    "application/x-gzip",
+    "application/x-7z-compressed",
+    "application/vnd.ms-excel",
+    "application/vnd.openxmlformats-officedocument",
+    "application/msword",
+    "application/vnd.ms-powerpoint",
+    "font/",
+    "woff2",
+    "application/x-protobuf",
+    "application/protobuf",
+  ];
+
+  //show values if content type is empty
+  if (contentType === "") return true;
+
+  const normalizedContentType = contentType.toLowerCase();
+
+  // Check if it's a binary type
+  if (binaryMIMETypes.some((type) => normalizedContentType.includes(type))) return false;
+
+  // non binary types are true to be shown in code mirror
+  return true;
+};
+
 const LogPane = ({ log_id, title, requestState, timestamp, data: request_data }) => {
   const [currentTabIndex, setCurrentTabIndex] = useState(0);
   const { queryParams, headers, body } = request_data;
@@ -174,7 +208,7 @@ const LogPane = ({ log_id, title, requestState, timestamp, data: request_data })
       ),
       body: (
         <div className="navigation-panel-wrapper">
-          {canRenderPreview(body, contentType) ? (
+          {isPreviewAvailable(contentType) ? (
             <Editor
               scriptId={`${title}-${log_id}`}
               value={body || ""}
