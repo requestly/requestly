@@ -43,6 +43,7 @@ export type API = {
   id: string;
   data: {
     name: string;
+    rank?: string;
     request: ApiRequestDetails;
   };
 };
