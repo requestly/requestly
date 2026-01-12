@@ -10,6 +10,7 @@ import { getIsOptedforAIFeatures, getUserAuthDetails } from "store/slices/global
 import { AIConsentModal } from "features/ai";
 import { isProfessionalPlan } from "utils/PremiumUtils";
 import { trackGenerateTestBtnClicked } from "modules/analytics/events/features/apiClient";
+import { useAISessionContext } from "features/ai/contexts/AISession";
 
 interface GenerateTestsButtonProps {
   hidden: boolean;
@@ -41,6 +42,8 @@ export const GenerateTestsButton: React.FC<GenerateTestsButtonProps> = ({
 
   const [isAIConsentModalOpen, setIsAIConsentModalOpen] = useState(false);
   const [userQuery, setUserQuery] = useState("Generate test cases for this request and check status 200");
+
+  const { createNewAISession } = useAISessionContext();
 
   return (
     <>
@@ -79,7 +82,10 @@ export const GenerateTestsButton: React.FC<GenerateTestsButtonProps> = ({
             icon={<MdOutlineAutoAwesome />}
             disabled={disabled}
             loading={isLoading && !isGenerateTestPopoverOpen}
-            onClick={() => trackGenerateTestBtnClicked()}
+            onClick={() => {
+              const sessionId = createNewAISession();
+              trackGenerateTestBtnClicked(sessionId);
+            }}
           >
             {label}
           </RQButton>
