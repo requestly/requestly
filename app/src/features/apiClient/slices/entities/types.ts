@@ -9,6 +9,7 @@ export enum ApiClientEntityType {
   GLOBAL_ENVIRONMENT = "global",
   RUNTIME_VARIABLES = "runtime_variables",
   RUN_CONFIG = "run_config",
+  LIVE_RUN_RESULT = "live_run_result",
 }
 
 export type { DeepPartial, DeepPartialWithNull };

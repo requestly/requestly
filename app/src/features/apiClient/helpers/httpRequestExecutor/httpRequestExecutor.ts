@@ -22,7 +22,6 @@ import { APIClientWorkloadManager } from "../modules/scriptsV2/workloadManager/A
 import { BaseExecutionMetadata, IterationContext } from "../modules/scriptsV2/worker/script-internals/types";
 import { ApiClientFeatureContext, selectRecordById } from "features/apiClient/slices";
 
-
 enum RQErrorHeaderValue {
   DNS_RESOLUTION_ERROR = "ERR_NAME_NOT_RESOLVED",
 }
@@ -194,7 +193,6 @@ export class HttpRequestExecutor {
     const { abortController, scopes, executionContext } = executionConfig ?? {};
 
     this.abortController = abortController || new AbortController();
-    debugger;
     const preparationResult = (
       await this.prepareRequestWithValidation(recordId, entry, scopes, executionContext)
     ).mapError((error) => new ExecutionError(entry, error));

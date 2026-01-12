@@ -6,6 +6,7 @@ import { MatchedTabSource, TabSourceMetadata } from "componentsV2/Tabs/types";
 import { MdOutlineSyncAlt } from "@react-icons/all-files/md/MdOutlineSyncAlt";
 import { GrGraphQl } from "@react-icons/all-files/gr/GrGraphQl";
 import { ReactNode } from "react";
+import { getApiClientFeatureContext } from "features/apiClient/slices";
 
 interface RequestViewTabSourceMetadata extends TabSourceMetadata {
   apiEntryDetails?: RQAPI.ApiRecord;
@@ -14,10 +15,7 @@ interface RequestViewTabSourceMetadata extends TabSourceMetadata {
 export class RequestViewTabSource extends BaseTabSource {
   constructor(metadata: RequestViewTabSourceMetadata) {
     super();
-    this.component = (
-
-      <RequestView key={metadata.id} requestId={metadata.id} />
-    );
+    this.component = <RequestView key={metadata.id} requestId={metadata.id} />;
     this.metadata = {
       ...metadata,
       name: "request",
@@ -28,12 +26,13 @@ export class RequestViewTabSource extends BaseTabSource {
 
   static create(matchedPath: MatchedTabSource["matchedPath"]): RequestViewTabSource {
     const { requestId } = matchedPath.params;
+    const ctx = getApiClientFeatureContext();
 
     if (!requestId) {
       throw new Error("Request id not found!");
     }
 
-    return new RequestViewTabSource({ id: requestId, title: "Request", context: {} });
+    return new RequestViewTabSource({ id: requestId, title: "Request", context: { id: ctx.workspaceId } });
   }
 
   private getTabIcon(type: RQAPI.ApiEntryType): ReactNode {

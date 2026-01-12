@@ -2,7 +2,7 @@ import React, { useCallback, useState } from "react";
 import { Drawer } from "antd";
 import "./historyDrawer.scss";
 import { HistoryTable } from "./HistoryTable";
-import { RunResult } from "features/apiClient/store/collectionRunResult/runResult.store";
+import { RunResult } from "features/apiClient/slices/common/runResults/types";
 import { RunResultContainer } from "../RunResultContainer/RunResultContainer";
 import { RQButton } from "lib/design-system-v2/components";
 import { MdArrowBack } from "@react-icons/all-files/md/MdArrowBack";
