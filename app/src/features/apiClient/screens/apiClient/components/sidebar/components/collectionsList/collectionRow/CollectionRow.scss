@@ -46,13 +46,6 @@
   }
 }
 
-.collection-drop-target {
-  & > .ant-collapse.collections-list-item {
-    background: #004eeb33;
-    border-color: var(--requestly-color-primary-600);
-  }
-}
-
 .collection-drop-inside {
   & > .ant-collapse.collections-list-item {
     background: #004eeb33;
