@@ -221,7 +221,7 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
             name: env.name,
             variables: env.variables,
             repository: environmentVariablesRepository,
-          }) as any
+          })
         ).unwrap();
         return true;
       });
