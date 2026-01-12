@@ -5,12 +5,9 @@ import { MatchedTabSource, TabSourceMetadata } from "componentsV2/Tabs/types";
 import { MdOutlineFolder } from "@react-icons/all-files/md/MdOutlineFolder";
 import { getApiClientRecordsStore } from "features/apiClient/commands/store.utils";
 import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
+import { getApiClientFeatureContext } from "features/apiClient/slices";
 
 interface CollectionViewTabSourceMetadata extends TabSourceMetadata {}
-
-function Collection(props: { id: string }) {
-  return <>Collection {props.id}</>;
-}
 
 export class CollectionViewTabSource extends BaseTabSource {
   constructor(metadata: CollectionViewTabSourceMetadata) {
@@ -29,12 +26,13 @@ export class CollectionViewTabSource extends BaseTabSource {
 
   static create(matchedPath: MatchedTabSource["matchedPath"]): CollectionViewTabSource {
     const { collectionId } = matchedPath.params;
+    const ctx = getApiClientFeatureContext();
 
     if (!collectionId) {
       throw new Error("Collection id not found!");
     }
 
-    return new CollectionViewTabSource({ id: collectionId, title: "Collection", context: {} });
+    return new CollectionViewTabSource({ id: collectionId, title: "Collection", context: { id: ctx.workspaceId } });
   }
 
   getIsValidTab(context: ApiClientFeatureContext): boolean {

@@ -1,12 +1,16 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { RQAPI } from "features/apiClient/types";
-import { getApiClientFeatureContext } from "features/apiClient/slices/workspaceView/helpers/ApiClientContextRegistry/hooks";
 import { selectAllDescendantIds } from "../apiRecords/selectors";
 import { RunResult } from "features/apiClient/store/collectionRunResult/runResult.store";
 import { SavedRunConfig } from "features/apiClient/commands/collectionRunner/types";
 import { API_CLIENT_RUNNER_CONFIG_SLICE_NAME } from "../common/constants";
-import { ApiClientFeatureContext } from "../workspaceView/helpers/ApiClientContextRegistry";
 import { Workspace } from "features/workspaces/types";
+import { runCollection } from "features/apiClient/slices/runConfig/helpers/runCollection";
+import { BatchRequestExecutor } from "features/apiClient/helpers/batchRequestExecutor";
+import { ApiClientFeatureContext, getApiClientFeatureContext } from "../workspaceView/helpers/ApiClientContextRegistry";
+import { BufferedRunConfigEntity } from "../entities/buffered/runConfig";
+import { LiveRunResultEntity } from "../entities/liveRunResult";
+import { DEFAULT_RUN_CONFIG_ID } from "./constants";
 
 function getDefaultRunOrderByCollectionId(
   ctx: ApiClientFeatureContext,
@@ -40,7 +44,6 @@ export const getDefaultRunConfig = createAsyncThunk<
   async ({ workspaceId, collectionId }, { rejectWithValue }) => {
     try {
       const ctx = getApiClientFeatureContext(workspaceId);
-      const DEFAULT_RUN_CONFIG_ID = "default"; // In future configId will be provided
 
       const result = await ctx.repositories.apiClientRecordsRepository.getRunConfig(
         collectionId,
@@ -146,3 +149,45 @@ export const saveRunResult = createAsyncThunk<
     }
   }
 );
+
+export interface RunContext {
+  runConfigEntity: BufferedRunConfigEntity;
+  liveRunResultEntity: LiveRunResultEntity;
+}
+
+export const runCollectionThunk = createAsyncThunk<
+  void,
+  {
+    workspaceId: Workspace["id"];
+    executor: BatchRequestExecutor;
+    runContext: RunContext;
+  },
+  { rejectValue: string }
+>(
+  `${API_CLIENT_RUNNER_CONFIG_SLICE_NAME}/runCollection`,
+  async ({ workspaceId, executor, runContext }, { rejectWithValue }) => {
+    try {
+      await runCollection({
+        executor,
+        runContext,
+        ctx: getApiClientFeatureContext(workspaceId),
+      });
+    } catch (error) {
+      return rejectWithValue(error instanceof Error ? error.message : "Failed to run collection");
+    }
+  }
+);
+
+export const cancelRunThunk = createAsyncThunk<
+  void,
+  {
+    runContext: RunContext;
+  },
+  { rejectValue: string }
+>(`${API_CLIENT_RUNNER_CONFIG_SLICE_NAME}/cancelRun`, async ({ runContext }, { rejectWithValue }) => {
+  try {
+    runContext.liveRunResultEntity.cancelRun();
+  } catch (error) {
+    return rejectWithValue(error instanceof Error ? error.message : "Failed to cancel run");
+  }
+});

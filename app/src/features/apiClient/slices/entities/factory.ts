@@ -6,6 +6,7 @@ import { CollectionRecordEntity } from "./collection";
 import { EnvironmentEntity, GlobalEnvironmentEntity } from "./environment";
 import { RuntimeVariablesEntity } from "./runtime-variables";
 import { RunConfigEntity } from "./runConfig";
+import { LiveRunResultEntity } from "./liveRunResult";
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace EntityFactory {
@@ -21,6 +22,8 @@ export namespace EntityFactory {
     ? RuntimeVariablesEntity
     : T extends ApiClientEntityType.RUN_CONFIG
     ? RunConfigEntity
+    : T extends ApiClientEntityType.LIVE_RUN_RESULT
+    ? LiveRunResultEntity
     : GraphQLRecordEntity;
 
   export const GlobalStateOverrideConfig: {
@@ -51,6 +54,8 @@ export namespace EntityFactory {
           return new RuntimeVariablesEntity(dispatch);
         case ApiClientEntityType.RUN_CONFIG:
           return new RunConfigEntity(dispatch, meta);
+        case ApiClientEntityType.LIVE_RUN_RESULT:
+          return new LiveRunResultEntity(dispatch, meta);
       }
     })() as EntityTypeMap<T>;
 

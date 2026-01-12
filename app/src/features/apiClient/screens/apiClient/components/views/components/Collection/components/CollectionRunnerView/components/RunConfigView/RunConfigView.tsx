@@ -6,24 +6,23 @@ import { MdOutlineVideoLibrary } from "@react-icons/all-files/md/MdOutlineVideoL
 import * as Sentry from "@sentry/react";
 import { isExtensionInstalled } from "actions/ExtensionActions";
 import { Conditional } from "components/common/Conditional";
-import { useCommand } from "features/apiClient/commands";
 import { useWorkspaceId } from "features/apiClient/common/WorkspaceProvider";
 import { ApiClientLocalRepository } from "features/apiClient/helpers/modules/sync/local";
 import { useBatchRequestExecutor } from "features/apiClient/hooks/requestExecutors/useBatchRequestExecutor";
-import { entitySynced } from "features/apiClient/slices";
-import { bufferActions } from "features/apiClient/slices/buffer";
 import { useIsBufferDirty } from "features/apiClient/slices/entities";
-import { useBufferedEntity } from "features/apiClient/slices/entities/hooks";
-import { ApiClientEntityType } from "features/apiClient/slices/entities/types";
 import { useApiClientDispatch, useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
-import { saveRunConfig as saveRunConfigThunk } from "features/apiClient/slices/runConfig/thunks";
-import { DEFAULT_RUN_CONFIG_ID } from "features/apiClient/slices/runConfig/types";
+import { selectLiveRunResultRunStatus } from "features/apiClient/slices/liveRunResults/selectors";
+import {
+  saveRunConfig as saveRunConfigThunk,
+  runCollectionThunk,
+  cancelRunThunk,
+  RunContext,
+} from "features/apiClient/slices/runConfig/thunks";
 import {
   getApiClientFeatureContext,
   useApiClientFeatureContext,
-  useApiClientStore,
 } from "features/apiClient/slices/workspaceView/helpers/ApiClientContextRegistry/hooks";
-import { RunStatus } from "features/apiClient/store/collectionRunResult/runResult.store";
+import { RunStatus } from "features/apiClient/slices/common/runResults/types";
 import { useHostContext } from "hooks/useHostContext";
 import { RQButton, RQTooltip } from "lib/design-system-v2/components";
 import {
@@ -31,24 +30,22 @@ import {
   trackCollectionRunnerConfigSaveFailed,
   trackInstallExtensionDialogShown,
 } from "modules/analytics/events/features/apiClient";
-import React, { useCallback, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { getAppMode } from "store/selectors";
+import React, { useCallback, useMemo, useState } from "react";
+import { useDispatch } from "react-redux";
 import { globalActions } from "store/slices/global/slice";
 import { isDesktopMode } from "utils/AppUtils";
 import { toast } from "utils/Toast";
 import { KEYBOARD_SHORTCUTS } from "../../../../../../../../../../../../../src/constants/keyboardShortcuts";
 import { TAB_KEYS } from "../../../../CollectionView";
 import { useCollectionView } from "../../../../collectionView.context";
-import { useRunContext, useRunResultStore } from "../../run.context";
 import { EmptyState } from "../EmptyState/EmptyState";
 import { RunConfigOrderedRequests } from "./RunConfigOrderedRequests/RunConfigOrderedRequests";
 import { RunConfigSettings } from "./RunConfigSettings/RunConfigSettings";
-import "./runConfigView.scss";
 import { getAllDescendantApiRecordIds } from "features/apiClient/slices/apiRecords/utils";
-import { fromSavedRunConfig, getRunnerConfigId, toSavedRunConfig } from "features/apiClient/slices/runConfig/utils";
-import { useGenericState } from "hooks/useGenericState";
+import { getRunnerConfigId, toSavedRunConfig } from "features/apiClient/slices/runConfig/utils";
 import { useSaveBuffer } from "features/apiClient/slices/buffer/hooks";
+import { DEFAULT_RUN_CONFIG_ID } from "features/apiClient/slices/runConfig/constants";
+import "./runConfigView.scss";
 
 const RunConfigSaveButton: React.FC<{ disabled?: boolean; isRunnerTabActive: boolean }> = ({
   disabled = false,
@@ -144,18 +141,21 @@ const RunConfigSaveButton: React.FC<{ disabled?: boolean; isRunnerTabActive: boo
 };
 
 const RunCollectionButton: React.FC<{ disabled?: boolean }> = ({ disabled = false }) => {
-  const { collectionId } = useCollectionView();
-  const runContext = useRunContext();
-  const [runStatus] = useRunResultStore((s) => [s.runStatus]);
+  const { collectionId, bufferedEntity, liveRunResultEntity } = useCollectionView();
+  const runStatus = useApiClientSelector((s) => selectLiveRunResultRunStatus(s, collectionId));
+
   const dispatch = useDispatch();
-  const genericState = useGenericState();
-  const appMode = useSelector(getAppMode);
-
-  const {
-    runner: { runCollection, cancelRun },
-  } = useCommand();
-
+  const apiClientDispatch = useApiClientDispatch();
+  const workspaceId = useWorkspaceId();
   const executor = useBatchRequestExecutor(collectionId);
+  const { registerWorkflow } = useHostContext();
+
+  const runContext: RunContext = useMemo(() => {
+    return {
+      liveRunResultEntity,
+      runConfigEntity: bufferedEntity,
+    };
+  }, [bufferedEntity, liveRunResultEntity]);
 
   const handleRunClick = useCallback(async () => {
     if (!isExtensionInstalled() && !isDesktopMode()) {
@@ -170,22 +170,36 @@ const RunCollectionButton: React.FC<{ disabled?: boolean }> = ({ disabled = fals
       return;
     }
 
-    const error = await runCollection({ runContext, executor, genericState, appMode });
-    if (!error) {
-      return;
-    }
+    try {
+      const promise = apiClientDispatch(
+        runCollectionThunk({
+          workspaceId,
+          executor,
+          runContext,
+        })
+      ).unwrap();
 
-    toast.error(error?.message || "Unable to run collection!");
-    Sentry.captureException(error, {
-      extra: {
-        reason: "Unable to run collection!",
-      },
-    });
-  }, [runCollection, runContext, executor, dispatch, genericState, appMode]);
+      registerWorkflow({
+        cancelWarning: "Collection run is in progress, still want to close?",
+        workflow: {
+          then: (cb) => promise.then(cb),
+          catch: (cb) => promise.catch(cb),
+          abort: () => apiClientDispatch(cancelRunThunk({ runContext })),
+        },
+      });
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Unable to run collection!");
+      Sentry.captureException(error, {
+        extra: {
+          reason: "Unable to run collection!",
+        },
+      });
+    }
+  }, [dispatch, apiClientDispatch, workspaceId, executor, runContext, registerWorkflow]);
 
   const handleCancelRunClick = useCallback(() => {
-    cancelRun({ runContext });
-  }, [cancelRun, runContext]);
+    apiClientDispatch(cancelRunThunk({ runContext }));
+  }, [runContext, apiClientDispatch]);
 
   const isRunning = runStatus === RunStatus.RUNNING;
   return isRunning ? (
@@ -211,12 +225,7 @@ interface Props {
 
 export const RunConfigView: React.FC<Props> = ({ activeTabKey }) => {
   const ctx = useApiClientFeatureContext();
-  const { collectionId } = useCollectionView();
-
-  const bufferedEntity = useBufferedEntity({
-    id: getRunnerConfigId(collectionId, DEFAULT_RUN_CONFIG_ID),
-    type: ApiClientEntityType.RUN_CONFIG,
-  });
+  const { collectionId, bufferedEntity } = useCollectionView();
 
   const isRunnerTabActive = activeTabKey === TAB_KEYS.RUNNER;
   const runOrderCount = useApiClientSelector((state) => bufferedEntity.getRunOrder(state).length);
@@ -252,7 +261,7 @@ export const RunConfigView: React.FC<Props> = ({ activeTabKey }) => {
           <Conditional condition={!(ctx.repositories instanceof ApiClientLocalRepository)}>
             <RunConfigSaveButton disabled={isEmpty} isRunnerTabActive={isRunnerTabActive} />
           </Conditional>
-          {/* <RunCollectionButton disabled={isEmpty} /> */}
+          <RunCollectionButton disabled={isEmpty} />
         </div>
       </div>
 

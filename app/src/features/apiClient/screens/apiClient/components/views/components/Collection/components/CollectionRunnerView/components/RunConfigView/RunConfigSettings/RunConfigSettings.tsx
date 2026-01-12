@@ -4,12 +4,12 @@ import { RQTooltip } from "lib/design-system-v2/components";
 import { MdOutlineInfo } from "@react-icons/all-files/md/MdOutlineInfo";
 import { useCollectionView } from "../../../../../collectionView.context";
 import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
-import { DELAY_MAX_LIMIT, ITERATIONS_MAX_LIMIT } from "features/apiClient/slices/runConfig/types";
 import { toast } from "utils/Toast";
 import "./runConfigSettings.scss";
 import { DataFileSelector } from "./DataFileSelector";
 import { getAppMode } from "store/selectors";
 import { useSelector } from "react-redux";
+import { DELAY_MAX_LIMIT, ITERATIONS_MAX_LIMIT } from "features/apiClient/slices/runConfig/constants";
 
 export const RunConfigSettings: React.FC = () => {
   const appMode = useSelector(getAppMode);

@@ -1,27 +1,29 @@
-import React, { useEffect, useState } from "react";
-import { RQAPI } from "features/apiClient/types";
-import { CollectionViewContextProvider } from "../../collectionView.context";
-import Split from "react-split";
-import { AutogenerateProvider } from "features/apiClient/store/autogenerateContextProvider";
-import { toast } from "utils/Toast";
 import * as Sentry from "@sentry/react";
-import { RunnerViewLoader } from "./components/RunnerViewLoader/RunnerViewLoader";
-import { RunConfigView } from "./components/RunConfigView/RunConfigView";
-import { RunResult } from "features/apiClient/store/collectionRunResult/runResult.store";
-import { DataFileModalProvider } from "./components/RunConfigView/ParseFileModal/Modals/DataFileModalContext";
-import { getDefaultRunConfig } from "features/apiClient/slices/runConfig/thunks";
 import { useWorkspaceId } from "features/apiClient/common/WorkspaceProvider";
-import { runnerConfigActions } from "features/apiClient/slices/runConfig/slice";
+import { getApiClientFeatureContext } from "features/apiClient/slices";
+import { getAllDescendantApiRecordIds } from "features/apiClient/slices/apiRecords/utils";
 import { bufferActions } from "features/apiClient/slices/buffer";
+import { findBufferByReferenceId } from "features/apiClient/slices/buffer/slice";
 import { ApiClientEntityType } from "features/apiClient/slices/entities/types";
 import { useApiClientDispatch } from "features/apiClient/slices/hooks/base.hooks";
-import { getApiClientFeatureContext } from "features/apiClient/slices";
-import { findBufferByReferenceId } from "features/apiClient/slices/buffer/slice";
-import { useHostContext } from "hooks/useHostContext";
+import { runnerConfigActions } from "features/apiClient/slices/runConfig/slice";
+import { getDefaultRunConfig, getRunResults } from "features/apiClient/slices/runConfig/thunks";
 import { fromSavedRunConfig, getRunnerConfigId } from "features/apiClient/slices/runConfig/utils";
-import { getAllDescendantApiRecordIds } from "features/apiClient/slices/apiRecords/utils";
+import { AutogenerateProvider } from "features/apiClient/store/autogenerateContextProvider";
+import { RQAPI } from "features/apiClient/types";
+import { useHostContext } from "hooks/useHostContext";
+import React, { useEffect, useState } from "react";
+import Split from "react-split";
+import { toast } from "utils/Toast";
+import { CollectionViewContextProvider } from "../../collectionView.context";
 import "./collectionRunnerView.scss";
-import { DEFAULT_RUN_CONFIG_ID } from "features/apiClient/slices/runConfig/types";
+import { DataFileModalProvider } from "./components/RunConfigView/ParseFileModal/Modals/DataFileModalContext";
+import { RunConfigView } from "./components/RunConfigView/RunConfigView";
+import { RunnerViewLoader } from "./components/RunnerViewLoader/RunnerViewLoader";
+import { RunResultView } from "./components/RunResultView/RunResultView";
+import { runHistoryActions } from "features/apiClient/slices/runHistory";
+import { DEFAULT_RUN_CONFIG_ID } from "features/apiClient/slices/runConfig/constants";
+import { RunHistorySaveStatus } from "features/apiClient/slices/runHistory/types";
 
 interface Props {
   collectionId: RQAPI.CollectionRecord["id"];
@@ -32,7 +34,7 @@ export const CollectionRunnerView: React.FC<Props> = ({ collectionId, activeTabK
   const workspaceId = useWorkspaceId();
   const apiClientDispatch = useApiClientDispatch();
   const [isLoading, setIsLoading] = useState(true);
-  const [runResults] = useState<RunResult[]>([]);
+  const [isResultsLoading, setIsResultsLoading] = useState(true);
   const { registerSecondaryBuffer, unregisterSecondaryBuffer } = useHostContext();
 
   useEffect(() => {
@@ -86,20 +88,29 @@ export const CollectionRunnerView: React.FC<Props> = ({ collectionId, activeTabK
     };
   }, [collectionId, workspaceId, apiClientDispatch, registerSecondaryBuffer, unregisterSecondaryBuffer]);
 
-  // useEffect(() => {
-  //   (async () => {
-  //     try {
-  //       setRunResults(null);
-  //       const results = await getRunResults({ collectionId });
-  //       setRunResults(results);
-  //     } catch (error) {
-  //       toast.error("Something went wrong!");
-  //       Sentry.captureException(error, { extra: { collectionId } });
-  //     }
-  //   })();
-  // }, [collectionId, getRunResults]);
+  useEffect(() => {
+    (async () => {
+      try {
+        setIsResultsLoading(true);
+        const results = await apiClientDispatch(getRunResults({ workspaceId, collectionId })).unwrap();
 
-  if (isLoading) {
+        apiClientDispatch(
+          runHistoryActions.addHistoryEntries({
+            collectionId,
+            history: results,
+            status: RunHistorySaveStatus.IDLE,
+            error: null,
+          })
+        );
+        setIsResultsLoading(false);
+      } catch (error) {
+        toast.error("Something went wrong!");
+        Sentry.captureException(error, { extra: { collectionId } });
+      }
+    })();
+  }, [apiClientDispatch, collectionId, workspaceId]);
+
+  if (isLoading || isResultsLoading) {
     return <RunnerViewLoader />;
   }
 
@@ -116,7 +127,7 @@ export const CollectionRunnerView: React.FC<Props> = ({ collectionId, activeTabK
           >
             <DataFileModalProvider>
               <RunConfigView activeTabKey={activeTabKey} />
-              {/* <RunResultView /> */}
+              <RunResultView />
             </DataFileModalProvider>
           </Split>
         </div>
