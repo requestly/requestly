@@ -8,6 +8,7 @@ import { getAppMode } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { handleLogoutButtonOnClick } from "features/onboarding/components/auth/components/Form/actions";
 import { isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
+import { SessionBookDeprecationBanner } from "features/sessionBook/components/SessionBookDeprecationBanner";
 
 // DUPLICATED
 // TODO: REMOVE OLD FILE
@@ -48,6 +49,7 @@ const PermissionError = ({ isInsideIframe = false }) => {
   return (
     <React.Fragment>
       <ProCard className="primary-card github-like-border" style={{ height: "100%" }}>
+        <SessionBookDeprecationBanner style={{ marginBottom: 24 }} />
         <Row className="hp-text-center">
           <Col span={24}>
             <Row justify="center">
