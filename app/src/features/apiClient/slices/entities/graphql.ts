@@ -7,7 +7,10 @@ import { ApiClientRecordEntity } from "./api-client-record-entity";
 import { ApiClientEntityType } from "./types";
 import { ApiClientEntityMeta } from "./base";
 
-export class GraphQLRecordEntity<M extends ApiClientEntityMeta = ApiClientEntityMeta> extends ApiClientRecordEntity<RQAPI.GraphQLApiRecord, M> {
+export class GraphQLRecordEntity<M extends ApiClientEntityMeta = ApiClientEntityMeta> extends ApiClientRecordEntity<
+  RQAPI.GraphQLApiRecord,
+  M
+> {
   readonly type = ApiClientEntityType.GRAPHQL_RECORD;
 
   dispatchCommand(command: UpdateCommand<RQAPI.GraphQLApiRecord>): void {
@@ -87,5 +90,11 @@ export class GraphQLRecordEntity<M extends ApiClientEntityMeta = ApiClientEntity
 
   deleteVariables(): void {
     this.DELETE({ data: { request: { variables: null } } });
+  }
+
+  // Override setResponse to accept GraphQLResponse instead of HttpResponse
+  // @ts-expect-error - GraphQLResponse is not assignable to HttpResponse, but SETCOMMON handles it correctly
+  setResponse(response: RQAPI.GraphQLResponse | null): void {
+    this.SETCOMMON({ data: { response } as any });
   }
 }

@@ -1,26 +1,15 @@
-import { useGraphQLRecordStore } from "features/apiClient/hooks/useGraphQLRecordStore";
 import { HeadersTable } from "../../../../../components/request/components/HeadersTable/HeadersTable";
-import { KeyValuePair, RQAPI } from "features/apiClient/types";
+import { BufferedGraphQLRecordEntity } from "features/apiClient/slices/entities";
 import React from "react";
 
 interface Props {
-  requestId: RQAPI.ApiRecord["id"];
+  entity: BufferedGraphQLRecordEntity;
 }
 
-export const RequestHeaders: React.FC<Props> = ({ requestId }) => {
-  const [headers, updateEntryRequest] = useGraphQLRecordStore((state) => [
-    state.entry.request.headers,
-    state.updateEntryRequest,
-  ]);
-
-  const handleHeadersChange = (newHeaders: KeyValuePair[]) => {
-    updateEntryRequest({
-      headers: newHeaders,
-    });
-  };
+export const RequestHeaders: React.FC<Props> = ({ entity }) => {
   return (
     <div className="graphql-request-tab-content">
-      <HeadersTable headers={headers} recordId={requestId} onHeadersChange={handleHeadersChange} />
+      <HeadersTable entity={entity as any} />
     </div>
   );
 };

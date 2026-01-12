@@ -5,42 +5,38 @@ import { MdOutlineCheckCircle } from "@react-icons/all-files/md/MdOutlineCheckCi
 import { MdOutlineWarningAmber } from "@react-icons/all-files/md/MdOutlineWarningAmber";
 import { Spin, Tooltip } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
-import { useGraphQLRecordStore } from "features/apiClient/hooks/useGraphQLRecordStore";
 import { IoMdRefresh } from "@react-icons/all-files/io/IoMdRefresh";
 import { MdOutlineAddLink } from "@react-icons/all-files/md/MdOutlineAddLink";
 import { RQButton } from "lib/design-system-v2/components";
 import "./graphqlClientUrl.scss";
 import { DEMO_GRAPHQL_API_URL } from "features/apiClient/constants";
+import { useGraphQLRecordStore } from "features/apiClient/hooks/useGraphQLRecordStore";
 import { useGraphQLIntrospection } from "features/apiClient/hooks/useGraphQLIntrospection";
 
 interface GraphQLClientUrlProps {
   url: string;
+  recordId: string;
   currentEnvironmentVariables: ScopedVariables;
   onEnterPress: (e: KeyboardEvent) => void;
   onUrlChange: (value: string) => void;
-  fetchingIntrospectionData: boolean;
-  isIntrospectionDataFetchingFailed: boolean;
 }
 
 const GraphQLClientUrl = ({
   url,
+  recordId,
   currentEnvironmentVariables,
   onEnterPress,
   onUrlChange,
-  fetchingIntrospectionData,
-  isIntrospectionDataFetchingFailed,
 }: GraphQLClientUrlProps) => {
-  const [introspectionData, updateEntryRequest] = useGraphQLRecordStore((state) => [
+  const [introspectionData, isFetchingIntrospectionData, hasIntrospectionFailed] = useGraphQLRecordStore((state) => [
     state.introspectionData,
-    state.updateEntryRequest,
+    state.isFetchingIntrospectionData,
+    state.hasIntrospectionFailed,
   ]);
-  const { introspectAndSaveSchema } = useGraphQLIntrospection();
-
+  const { introspectAndSaveSchema } = useGraphQLIntrospection({ recordId, url });
   const handleUseExampleUrl = useCallback(() => {
-    updateEntryRequest({
-      url: DEMO_GRAPHQL_API_URL,
-    });
-  }, [updateEntryRequest]);
+    onUrlChange(DEMO_GRAPHQL_API_URL);
+  }, [onUrlChange]);
 
   return (
     <div className="gql-url-container">
@@ -63,7 +59,7 @@ const GraphQLClientUrl = ({
             Use example URL
           </RQButton>
         ) : null}
-        {!fetchingIntrospectionData && url.length ? (
+        {!isFetchingIntrospectionData && url.length ? (
           <RQButton
             className="ant-btn-sm"
             size="small"
@@ -74,14 +70,14 @@ const GraphQLClientUrl = ({
             Refresh
           </RQButton>
         ) : null}
-        {fetchingIntrospectionData ? (
+        {isFetchingIntrospectionData ? (
           <div className="gql-url-container__loading">
             <Spin indicator={<LoadingOutlined spin />} size="small" />
             <span>Fetching schema</span>
           </div>
         ) : (
           <div className="gql-url__fetch-status">
-            {isIntrospectionDataFetchingFailed ? (
+            {hasIntrospectionFailed ? (
               <Tooltip
                 color="#000"
                 title="Error while fetching the schema. The endpoint may not exist or misconfigured."
