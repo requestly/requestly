@@ -1,75 +1,76 @@
-import React, { useEffect } from "react";
+// app/src/features/apiClient/screens/apiClient/components/sidebar/components/ExampleCollectionsNudge/ExampleCollectionsNudge.tsx
+
+import type { EnvironmentData } from "backend/environment/types";
+import exampleEnvironments from "features/apiClient/exampleCollections/examples/environments.json";
+import { useApiClientRepository } from "features/apiClient/slices";
+import {
+  exampleCollectionsActions,
+  importExampleCollections,
+  selectIsImporting,
+  selectShouldShowNudge,
+  ImportDependencies,
+  ImportResult,
+} from "features/apiClient/slices/exampleCollections";
+import { useApiClientDispatch } from "features/apiClient/slices/hooks/base.hooks";
 import { RQButton } from "lib/design-system-v2/components";
-import { ExampleCollectionsImportStatus, useExampleCollections } from "features/apiClient/exampleCollections/store";
-import { useDispatch, useSelector } from "react-redux";
-import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { useApiClientRepository } from "features/apiClient/contexts/meta";
-import { useAPIRecordsStore } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
-import { toast } from "utils/Toast";
-import "./exampleCollectionsNudge.scss";
 import {
   trackExampleCollectionsNudgeCloseClicked,
   trackExampleCollectionsNudgeImportClicked,
   trackExampleCollectionsNudgeShown,
 } from "modules/analytics/events/features/apiClient";
-import { useCommand } from "features/apiClient/commands";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
+import { toast } from "utils/Toast";
+import "./exampleCollectionsNudge.scss";
+import { AppDispatch } from "store/types";
 
 interface ExampleCollectionsNudgeProps {
-  fallback?: React.ReactNode;
+  readonly fallback?: React.ReactNode;
 }
 
 export const ExampleCollectionsNudge: React.FC<ExampleCollectionsNudgeProps> = ({ fallback = null }) => {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
 
   const syncRepository = useApiClientRepository();
-  const {
-    env: { createEnvironments },
-  } = useCommand();
-
-  const recordsStore = useAPIRecordsStore();
-  const [
-    isNudgePermanentlyClosed,
-    importStatus,
-    closeNudge,
-    importExampleCollections,
-  ] = useExampleCollections((state) => [
-    state.isNudgePermanentlyClosed,
-    state.importStatus,
-    state.closeNudge,
-    state.importExampleCollections,
-  ]);
+  const apiClientDispatch = useApiClientDispatch();
+  const showNudge = useSelector((state: any) => selectShouldShowNudge(state, uid));
+  const isImporting = useSelector(selectIsImporting);
 
   const handleNoThanksClick = () => {
     trackExampleCollectionsNudgeCloseClicked();
-    closeNudge();
+    dispatch(exampleCollectionsActions.nudgeClosed());
   };
 
   const handleImportClick = async () => {
     trackExampleCollectionsNudgeImportClicked();
+
+    // Prepare environments
+    const environmentsToCreate: EnvironmentData[] = exampleEnvironments.environments.map((env) => ({
+      ...env,
+      isExample: true,
+    }));
+
+    // Prepare dependencies
+    const dependencies: ImportDependencies = {
+      repository: syncRepository,
+      ownerId: uid ?? null,
+      environmentsToCreate,
+      apiClientDispatch,
+    };
+
     try {
-      const result = await importExampleCollections({
-        ownerId: uid ?? null,
-        respository: syncRepository,
-        recordsStore: recordsStore,
-        envsStore: { createEnvironments },
-        dispatch,
-      });
+      const result = await dispatch(importExampleCollections(dependencies)).unwrap();
 
-      if (result.success === false) {
-        throw new Error(result.message);
-      }
-
-      toast.success("Example collections imported successfully!");
-      closeNudge();
+      toast.success(`Example collections imported successfully! (${result.recordCount} records)`);
+      dispatch(exampleCollectionsActions.nudgeClosed());
     } catch (error) {
-      toast.error("Failed to import example collections, please try again.");
+      const message = error instanceof Error ? error.message : "Failed to import example collections";
+      toast.error(message);
     }
   };
-
-  const isImporting = importStatus === ExampleCollectionsImportStatus.IMPORTING;
-  const showNudge = uid && !isNudgePermanentlyClosed && importStatus !== ExampleCollectionsImportStatus.IMPORTED;
 
   useEffect(() => {
     if (showNudge) {
@@ -77,10 +78,14 @@ export const ExampleCollectionsNudge: React.FC<ExampleCollectionsNudgeProps> = (
     }
   }, [showNudge]);
 
-  return showNudge ? (
+  if (!showNudge) {
+    return <>{fallback}</>;
+  }
+
+  return (
     <div className="example-collections-nudge-container">
       <div className="content">
-        <img width={14} height={14} src={"/assets/media/common/sparkles.svg"} alt="sparkles" />
+        <img width={14} height={14} src="/assets/media/common/sparkles.svg" alt="sparkles" />
         <div className="description">Explore all API client features in action with example collections.</div>
       </div>
       <div className="actions">
@@ -92,7 +97,5 @@ export const ExampleCollectionsNudge: React.FC<ExampleCollectionsNudgeProps> = (
         </RQButton>
       </div>
     </div>
-  ) : (
-    fallback
   );
 };
