@@ -256,7 +256,7 @@ const GraphQLClientView: React.FC<GraphQLClientViewProps> = ({
         },
         async save(record, repositories) {
           if (override?.onSaveClick) {
-            return override.onSaveClick.save(record, repositories);
+            return override.onSaveClick.save(record, repositories) as Promise<RQAPI.GraphQLApiRecord>;
           }
           const result = await repositories.apiClientRecordsRepository.updateRecord(record, record.id);
           if (!result.success) {
