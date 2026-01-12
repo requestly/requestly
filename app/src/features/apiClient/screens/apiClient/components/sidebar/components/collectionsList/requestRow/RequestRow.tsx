@@ -123,6 +123,7 @@ export const RequestRow: React.FC<Props> = ({
     () => ({
       accept: [RQAPI.RecordType.API],
       canDrop: (item: { record: RQAPI.ApiClientRecord; contextId: string }) => {
+        if (isReadOnly) return false;
         if (!item || item.contextId !== contextId) return false;
         if (item.record.id === record.id) return false;
         if (!isFeatureCompatible(FEATURES.API_CLIENT_RECORDS_REORDERING)) {
