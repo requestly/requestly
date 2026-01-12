@@ -8,10 +8,11 @@ import { BottomSheetFeatureContext } from "componentsV2/BottomSheet/types";
 import { AISessionProvider } from "features/ai/contexts/AISession";
 import { BufferedGraphQLRecordEntity, BufferedHttpRecordEntity } from "features/apiClient/slices/entities";
 import { HttpClientViewProps } from "../components/views/http/HttpClientView";
+import { GraphQLClientViewProps } from "../components/views/graphql/GraphQLClientView";
 
 type Props = {
-  entity: BufferedHttpRecordEntity | BufferedGraphQLRecordEntity,
-  override?: HttpClientViewProps['override'],
+  entity: BufferedHttpRecordEntity | BufferedGraphQLRecordEntity;
+  override?: HttpClientViewProps["override"] | GraphQLClientViewProps["override"];
   handleAppRequestFinished: (entry: RQAPI.ApiEntry) => void;
   isOpenInModal?: boolean;
 };
