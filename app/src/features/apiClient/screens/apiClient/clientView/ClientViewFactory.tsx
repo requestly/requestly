@@ -1,47 +1,40 @@
 import { RQAPI } from "features/apiClient/types";
 import HttpClientView, { HttpClientViewProps } from "../components/views/http/HttpClientView";
+import GraphQLClientView, { GraphQLClientViewProps } from "../components/views/graphql/GraphQLClientView";
 import { BufferedGraphQLRecordEntity, BufferedHttpRecordEntity } from "features/apiClient/slices/entities";
 import { ApiClientEntityType } from "features/apiClient/slices/entities/types";
 
 interface Props {
-  entity: BufferedHttpRecordEntity | BufferedGraphQLRecordEntity,
+  entity: BufferedHttpRecordEntity | BufferedGraphQLRecordEntity;
   handleRequestFinished: (entry: RQAPI.ApiEntry) => void;
   isOpenInModal?: boolean;
-  override?: HttpClientViewProps['override'],
+  override?: HttpClientViewProps["override"] | GraphQLClientViewProps["override"];
 }
 
-export const ClientViewFactory = ({
-  entity,
-  handleRequestFinished,
-  isOpenInModal,
-  override,
-}: Props) => {
+export const ClientViewFactory = ({ entity, handleRequestFinished, isOpenInModal, override }: Props) => {
   if (entity.type === ApiClientEntityType.HTTP_RECORD) {
     return (
       <HttpClientView
         entity={entity}
         notifyApiRequestFinished={handleRequestFinished}
         openInModal={isOpenInModal}
-        override={override}
+        override={override as HttpClientViewProps["override"]}
       />
     );
   }
 
-  return 'wtf!';
+  if (entity.type === ApiClientEntityType.GRAPHQL_RECORD) {
+    return (
+      <GraphQLClientView
+        entity={entity}
+        notifyApiRequestFinished={handleRequestFinished}
+        openInModal={isOpenInModal}
+        override={override as GraphQLClientViewProps["override"]}
+      />
+    );
+  }
 
-  // if (isGraphQLApiRecord(apiRecord)) {
-  //   return (
-  //     <GraphQLClientView
-  //       recordId={apiRecord.id}
-  //       apiEntryDetails={apiRecord}
-  //       notifyApiRequestFinished={handleRequestFinished}
-  //       onSaveCallback={onSaveCallback}
-  //       isCreateMode={isCreateMode}
-  //       openInModal={isOpenInModal}
-  //     />
-  //   );
-  // }
-
+  return "Not found";
   // return (
   //   <HttpClientView
   //     apiEntryDetails={apiRecord as RQAPI.HttpApiRecord}
