@@ -3,12 +3,13 @@ import HttpClientView, { HttpClientViewProps } from "../components/views/http/Ht
 import GraphQLClientView, { GraphQLClientViewProps } from "../components/views/graphql/GraphQLClientView";
 import { BufferedGraphQLRecordEntity, BufferedHttpRecordEntity } from "features/apiClient/slices/entities";
 import { ApiClientEntityType } from "features/apiClient/slices/entities/types";
+import { GenericApiClientOverride } from "./GenericApiClient";
 
 interface Props {
   entity: BufferedHttpRecordEntity | BufferedGraphQLRecordEntity;
   handleRequestFinished: (entry: RQAPI.ApiEntry) => void;
   isOpenInModal?: boolean;
-  override?: HttpClientViewProps["override"] | GraphQLClientViewProps["override"];
+  override?: GenericApiClientOverride;
 }
 
 export const ClientViewFactory = ({ entity, handleRequestFinished, isOpenInModal, override }: Props) => {
