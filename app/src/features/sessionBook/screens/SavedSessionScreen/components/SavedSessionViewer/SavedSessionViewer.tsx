@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { Tooltip } from "antd";
-import { BottomSheetLayout, BottomSheetPlacement, BottomSheetProvider } from "componentsV2/BottomSheet";
+import { BottomSheetLayout, BottomSheetProvider } from "componentsV2/BottomSheet";
 import { SaveSessionButton } from "features/sessionBook/components/SaveSessionButton/SaveSessionButton";
 import { SessionPlayer } from "features/sessionBook/components/SessionPlayer/SessionPlayer";
 import { SessionTitle } from "features/sessionBook/screens/SavedSessionScreen/components/SessionsTitle/SessionTitle";
@@ -29,7 +29,7 @@ import { secToMinutesAndSeconds } from "utils/DateTimeUtils";
 import { useRBAC } from "features/rbac";
 import { Conditional } from "components/common/Conditional";
 import { copyToClipBoard } from "utils/Misc";
-import { SheetLayout } from "componentsV2/BottomSheet/types";
+import { BottomSheetFeatureContext, SheetLayout } from "componentsV2/BottomSheet/types";
 
 interface NavigationState {
   fromApp?: boolean;
@@ -107,9 +107,10 @@ export const SavedSessionViewer = () => {
     }
   }, [isMobileView]);
 
+  // Added Rules as context for BottomSheetProvider as this feature is getting deprecated
   return (
     <div className="saved-session-viewer-container">
-      <BottomSheetProvider defaultPlacement={BottomSheetPlacement.RIGHT}>
+      <BottomSheetProvider context={BottomSheetFeatureContext.RULES}>
         <div className="saved-session-header">
           <SessionTitle />
 

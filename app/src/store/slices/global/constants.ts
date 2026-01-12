@@ -4,6 +4,7 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { GlobalSliceState } from "./types";
 import appListJson from "../../initial-state/sub/appsList.json";
 import { ONBOARDING_STEPS } from "features/onboarding/types";
+import { BottomSheetPlacement } from "componentsV2/BottomSheet";
 
 const INITIAL_GLOBAL_SLICE_STATE: GlobalSliceState = {
   /* User */
@@ -183,6 +184,24 @@ const INITIAL_GLOBAL_SLICE_STATE: GlobalSliceState = {
     isNewUser: false,
     userPersona: null,
     isAcquisitionAnnouncementModalVisible: true,
+  },
+
+  bottomSheetOrientation: {
+    api_client: {
+      open: true,
+      placement: BottomSheetPlacement.RIGHT,
+      size: [55, 45],
+    },
+    rules: {
+      open: false,
+      placement: BottomSheetPlacement.BOTTOM,
+      size: [70, 30],
+    },
+    mocks: {
+      open: false,
+      placement: BottomSheetPlacement.BOTTOM,
+      size: [70, 30],
+    },
   },
 
   editorToast: {},
