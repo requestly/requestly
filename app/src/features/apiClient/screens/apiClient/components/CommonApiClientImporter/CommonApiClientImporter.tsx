@@ -120,7 +120,7 @@ export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = (
               name: environment.name,
               variables: environment.variables,
               repository: environmentVariablesRepository,
-            }) as any
+            })
           ).unwrap();
           return true;
         });

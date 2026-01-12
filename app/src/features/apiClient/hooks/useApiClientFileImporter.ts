@@ -150,7 +150,7 @@ const useApiClientFileImporter = (importer: ImporterType) => {
                 environmentId: globalEnvId,
                 variables: env.variables,
                 repository: environmentVariablesRepository,
-              }) as any
+              })
             ).unwrap();
             return true;
           } else {
@@ -159,7 +159,7 @@ const useApiClientFileImporter = (importer: ImporterType) => {
                 name: env.name,
                 variables: env.variables,
                 repository: environmentVariablesRepository,
-              }) as any
+              })
             ).unwrap();
             return true;
           }
