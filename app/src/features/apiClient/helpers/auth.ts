@@ -44,7 +44,7 @@ export const getHeadersAndQueryParams = (auth: RQAPI.Auth) => {
 export function inheritAuthFromParent(
   childDetails: {
     id: RQAPI.ApiClientRecord["id"];
-    parentId: RQAPI.ApiClientRecord["collectionId"];
+    parentId: RQAPI.ApiClientRecord["collectionId"] | undefined;
   },
   allRecords: RQAPI.ApiClientRecord[]
 ) {

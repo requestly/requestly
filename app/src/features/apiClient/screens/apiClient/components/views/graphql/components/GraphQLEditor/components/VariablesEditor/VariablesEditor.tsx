@@ -1,21 +1,21 @@
-import { useGraphQLRecordStore } from "features/apiClient/hooks/useGraphQLRecordStore";
 import { GraphQLEditor } from "../../GraphQLEditor";
+import { BufferedGraphQLRecordEntity } from "features/apiClient/slices/entities";
+import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
+import React, { useCallback } from "react";
 
-export const VariablesEditor = () => {
-  const [variables, updateEntryRequest] = useGraphQLRecordStore((state) => [
-    state.entry.request.variables,
-    state.updateEntryRequest,
-  ]);
-  return (
-    <GraphQLEditor
-      type="variables"
-      className="variables-editor"
-      initialDoc={variables}
-      onChange={(value) => {
-        updateEntryRequest({
-          variables: value,
-        });
-      }}
-    />
+interface Props {
+  entity: BufferedGraphQLRecordEntity;
+}
+
+export const VariablesEditor: React.FC<Props> = ({ entity }) => {
+  const variables = useApiClientSelector((s) => entity.getVariables(s) || "");
+
+  const handleChange = useCallback(
+    (value: string) => {
+      entity.setVariables(value);
+    },
+    [entity]
   );
+
+  return <GraphQLEditor type="variables" className="variables-editor" initialDoc={variables} onChange={handleChange} />;
 };
