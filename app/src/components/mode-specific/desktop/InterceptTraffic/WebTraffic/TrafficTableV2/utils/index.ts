@@ -215,3 +215,33 @@ export const traverseJsonByPath = (jsonObject: any, path: any) => {
     console.log(e);
   }
 };
+
+// Added 5MB cap to maintain the stability and responsiveness of the app
+const MAX_PREVIEW_SIZE = 5 * 1024 * 1024; // 5 MB
+
+// Regex to match previewable MIME types
+const PREVIEWABLE_MIME_TYPES_REGEX = new RegExp(
+  [
+    "^text/.*", // All text/* types (HTML, plain, CSS, etc.)
+    "^application/javascript", // JavaScript (standard)
+    "^application/x-javascript", // JavaScript (legacy)
+    "^application/json", // JSON data
+    "^application/xml", // XML data
+    "^application/.*\\+json$", // Vendor-specific JSON (e.g., application/vnd.api+json)
+    "^application/.*\\+xml$", // Vendor-specific XML (e.g., application/vnd.api+xml)
+  ].join("|"),
+  "i"
+);
+
+export function shouldRenderPreview(body?: string, contentType?: string): boolean {
+  if (!body || !contentType) return false;
+  // Size check
+  const sizeInBytes = new TextEncoder().encode(body).length;
+  if (sizeInBytes > MAX_PREVIEW_SIZE) return false;
+  // Binary check
+  if (body.includes("\0")) return false;
+  // Extract and normalize MIME type
+  const mime = contentType.split(";")[0].trim().toLowerCase();
+  // Use regex to match previewable MIME types
+  return PREVIEWABLE_MIME_TYPES_REGEX.test(mime);
+}
