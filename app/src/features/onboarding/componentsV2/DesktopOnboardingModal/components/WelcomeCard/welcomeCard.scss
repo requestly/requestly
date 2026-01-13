@@ -1,0 +1,19 @@
+.welcome-card-option {
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+  cursor: pointer;
+  padding: var(--requestly-space-6) var(--requestly-space-8);
+  transition: border 0.2s ease-in-out;
+  border: 1px solid transparent;
+
+  &:hover {
+    border: 1px solid var(--requestly-color-primary);
+  }
+}
+
+.fade-out {
+  opacity: 0.2;
+  transition: opacity 0.2s ease-in-out;
+  pointer-events: none;
+}

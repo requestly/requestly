@@ -4,6 +4,7 @@ export enum ErrorCode {
   NotPermitted = "not_permitted",
   MigrationFailed = "migration_failed",
   EntityAlreadyExists = "entity_already_exists",
+  PathIsAlreadyAWorkspace = "path_is_already_a_workspace",
   NotFound = "not_found",
   UNKNOWN = "unknown",
 }

@@ -11,6 +11,7 @@
     overflow: hidden;
     color: var(--requestly-color-text-subtle);
     font-size: var(--requestly-font-size-sm, 12px);
+    flex: 1;
   }
   .ant-btn.ant-btn-default {
     border-top-right-radius: 0;

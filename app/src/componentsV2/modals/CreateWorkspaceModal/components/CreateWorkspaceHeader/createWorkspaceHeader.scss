@@ -24,4 +24,13 @@
     border: 1px solid var(--requestly-color-white-t-20, rgba(255, 255, 255, 0.12));
     margin-top: 8px;
   }
+
+  &__input-error-message {
+    margin-top: var(--requestly-space-2, 4px);
+    color: var(--requestly-color-error-text);
+    font-size: var(--requestly-font-size-xs);
+    display: flex;
+    align-items: center;
+    gap: var(--requestly-space-2, 4px);
+  }
 }
