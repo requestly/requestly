@@ -31,7 +31,7 @@ export const RQEditorTitle: React.FC<TitleProps> = ({
   disabled = false,
   isSampleRule = false,
   showDocs = false,
-  description,
+  description = "",
   nameChangeCallback,
   namePlaceholder,
   descriptionPlaceholder,
