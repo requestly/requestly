@@ -1,10 +1,16 @@
 import { EnvironmentVariables, VariableScope } from "backend/environment/types";
 import { RQAPI } from "features/apiClient/types";
-import lodash from 'lodash';
+import lodash from "lodash";
 import { useMemo } from "react";
 import { VariableData, VariableKey } from "features/apiClient/store/variables/types";
 import { runtimeVariablesStore as _runtimeVariablesStore } from "features/apiClient/store/runtimeVariables/runtimeVariables.store";
-import { ApiClientStoreState, selectActiveEnvironment, selectAncestorIds, selectGlobalEnvironment, selectRecordById } from "features/apiClient/slices";
+import {
+  ApiClientStoreState,
+  selectActiveEnvironment,
+  selectAncestorIds,
+  selectGlobalEnvironment,
+  selectRecordById,
+} from "features/apiClient/slices";
 import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
 import { useSelector } from "react-redux";
 import { selectRuntimeVariables } from "features/apiClient/slices/runtimeVariables";
@@ -31,7 +37,7 @@ export type StoreOverrideConfig = {
   activeEnvironmentVariables?: EnvironmentVariables;
   globalEnvironmentVariables?: EnvironmentVariables;
   collectionVariables?: Partial<{
-    [key: string]: EnvironmentVariables
+    [key: string]: EnvironmentVariables;
   }>;
 };
 
@@ -53,7 +59,7 @@ export class VariableHolder {
     const result: ScopedVariables = {};
     for (const key in variables) {
       const variable = variables[key];
-      if(!variable) {
+      if (!variable) {
         continue;
       }
       result[key] = [variable, variableSource];
@@ -69,7 +75,7 @@ export class VariableHolder {
     const { variables, variableSource } = params;
     this.data.set(variableSource.level, this.parseVariableState(variables, variableSource));
     const newVariables = this.getAll();
-    if(!lodash.isEqual(this.variables, newVariables)) {
+    if (!lodash.isEqual(this.variables, newVariables)) {
       this.variables = this.getAll();
     }
     return true;
@@ -104,8 +110,8 @@ function getScopes(
   runtimeVariables: EnvironmentVariables,
   id: string,
   config?: {
-    initialScopes?: Scope[],
-    storeOverrideConfig?: StoreOverrideConfig
+    initialScopes?: Scope[];
+    storeOverrideConfig?: StoreOverrideConfig;
   }
 ): Scope[] {
   const parents = selectAncestorIds(state, id);
@@ -115,7 +121,6 @@ function getScopes(
   const scopes: Scope[] = [...initialScopes];
   const activeEnvironment = selectActiveEnvironment(state);
   const globalEnvironment = selectGlobalEnvironment(state);
-
 
   // 0. Runtime Variables
   if (runtimeVariables) {
@@ -193,9 +198,9 @@ export function getScopedVariables(
   runtimeVariables: EnvironmentVariables,
   id: string,
   config?: {
-    variableHolder?: VariableHolder,
-    scopes?: Scope[],
-    storeOverrideConfig?: StoreOverrideConfig
+    variableHolder?: VariableHolder;
+    scopes?: Scope[];
+    storeOverrideConfig?: StoreOverrideConfig;
   }
 ): ScopedVariables {
   const variableHolder = config?.variableHolder || new VariableHolder();
@@ -215,8 +220,8 @@ export function resolveVariable(
   id: string,
   key: string,
   config: {
-    scopes?: Scope[],
-    storeOverrideConfig?: StoreOverrideConfig
+    scopes?: Scope[];
+    storeOverrideConfig?: StoreOverrideConfig;
   }
 ) {
   return getScopedVariables(state, runtimeVariables, id, config)[key];
@@ -225,5 +230,7 @@ export function resolveVariable(
 export function useScopedVariables(id: string) {
   const variableHolder = useMemo(() => new VariableHolder(), [id]);
   const runtimeVariables = useSelector(selectRuntimeVariables);
-  return useApiClientSelector((state: ApiClientStoreState) => getScopedVariables(state, runtimeVariables, id, { variableHolder }));
+  return useApiClientSelector((state: ApiClientStoreState) =>
+    getScopedVariables(state, runtimeVariables, id, { variableHolder })
+  );
 }

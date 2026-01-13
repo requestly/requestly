@@ -6,6 +6,7 @@ import { getScopedVariables, Scope } from "features/apiClient/helpers/variableRe
 import { EnvironmentVariableData, VariableData } from "features/apiClient/store/variables/types";
 import { ApiClientFeatureContext } from "features/apiClient/slices";
 import { reduxStore } from "store";
+import { DepGraph } from "dependency-graph";
 
 type Variables = Record<string, string | number | boolean>;
 interface RenderResult<T> {
@@ -61,7 +62,10 @@ export const renderTemplate = <T extends string | Record<string, T>>(
     return envVars;
   }, {} as Variables);
 
-  const { renderedTemplate, usedVariables } = recursiveRender(template, parsedVariables);
+  // Resolve composite variables (variables that reference other variables)
+  const resolvedVariables = resolveCompositeVariables(parsedVariables);
+
+  const { renderedTemplate, usedVariables } = recursiveRender(template, resolvedVariables);
   return {
     renderedTemplate,
     renderedVariables: usedVariables,
@@ -160,6 +164,76 @@ const collectAndEscapeVariablesFromTemplate = (
   });
 
   return { wrappedTemplate, usedVariables };
+};
+
+/**
+ * Resolves composite variables (variables that reference other variables) using dependency-graph
+ * Example: composite = "composite_value", var_1 = "{{composite}}-name" => var_1 = "composite_value-name"
+ * @param variables - The variables to resolve
+ * @returns Resolved variables with all composite references expanded
+ */
+const resolveCompositeVariables = (variables: Variables): Variables => {
+  const resolved: Variables = { ...variables };
+  const graph = new DepGraph({
+    circular: true, // to not throw errors in case of circular dependencies and return the unresolved variables as is
+  });
+
+  Object.keys(variables).forEach((key) => {
+    graph.addNode(key);
+  });
+
+  // Add dependencies
+  Object.entries(variables).forEach(([key, value]) => {
+    if (typeof value === "string") {
+      const variableReferences = extractVariableNameFromStringIfExists(value);
+      if (variableReferences) {
+        variableReferences.forEach((refName) => {
+          const trimmedRef = refName.trim();
+          // Only add dependency if the referenced variable exists and is not a self-reference
+          if (trimmedRef in variables && trimmedRef !== key) {
+            graph.addDependency(key, trimmedRef);
+          }
+        });
+      }
+    }
+  });
+
+  // Get resolution order (topologically sorted)
+  const resolutionOrder = graph.overallOrder();
+
+  // Resolve variables in dependency order
+  for (const varName of resolutionOrder) {
+    const value = resolved[varName];
+
+    // Only process string values that might contain variable references
+    if (typeof value !== "string") {
+      continue;
+    }
+
+    // Check if this value contains any variable references
+    const variableReferences = extractVariableNameFromStringIfExists(value);
+    if (!variableReferences || variableReferences.length === 0) {
+      continue;
+    }
+
+    // Render this variable value using the current resolved variables
+    try {
+      // Create a resolution context without the current variable
+      // This prevents self-reference resolution (e.g., a = "{{a}}-{{b}}")
+      const resolutionContext = { ...resolved };
+      delete resolutionContext[varName];
+
+      const { wrappedTemplate } = collectAndEscapeVariablesFromTemplate(value, resolutionContext);
+      const hbsTemplate = compile(wrappedTemplate, { noEscape: true });
+      const renderedValue = hbsTemplate(resolutionContext);
+      resolved[varName] = renderedValue;
+    } catch (e) {
+      // Keep the original value if rendering fails
+      Logger.error("Error resolving composite variable:", varName, e);
+    }
+  }
+
+  return resolved;
 };
 
 export const mergeLocalAndSyncVariables = (
