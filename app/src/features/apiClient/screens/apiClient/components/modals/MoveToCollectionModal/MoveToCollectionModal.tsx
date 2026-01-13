@@ -7,17 +7,22 @@ import { RQButton } from "lib/design-system/components";
 import { trackMoveRequestToCollectionFailed, trackRequestMoved } from "modules/analytics/events/features/apiClient";
 import "./moveToCollectionModal.scss";
 import * as Sentry from "@sentry/react";
-import { useContextId } from "features/apiClient/contexts/contextId.context";
 import { getCollectionOptionsToMoveIn } from "features/apiClient/commands/utils";
+import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
+import { createNewCollection } from "./utils";
+import { RQTooltip } from "lib/design-system-v2/components";
 import {
   ApiClientViewMode,
-  useApiClientMultiWorkspaceView,
-} from "features/apiClient/store/multiWorkspaceView/multiWorkspaceView.store";
-import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
-
-import { createNewCollection, moveRecordsToCollection } from "./utils";
-import { RQTooltip } from "lib/design-system-v2/components";
-import { getApiClientFeatureContext } from "features/apiClient/commands/store.utils";
+  getApiClientFeatureContext,
+  moveRecords,
+  useGetAllSelectedWorkspaces,
+  useViewMode,
+} from "features/apiClient/slices";
+import { useWorkspaceId } from "features/apiClient/common/WorkspaceProvider";
+import { reduxStore } from "store";
+import { getWorkspaceById, dummyPersonalWorkspace } from "store/slices/workspaces/selectors";
+import { RootState } from "store/types";
+import { Workspace } from "features/workspaces/types";
 
 interface Props {
   recordsToMove: RQAPI.ApiClientRecord[];
@@ -33,26 +38,32 @@ interface CollectionOption {
 }
 
 const MoveRecordAcrossWorkspaceModal: React.FC<Props> = ({ isOpen, onClose, recordsToMove }) => {
-  const currentContextId = useContextId();
-  const [selectedWorkspaces] = useApiClientMultiWorkspaceView((s) => [s.selectedWorkspaces]);
+  const workspaceId = useWorkspaceId();
+  const selectedWorkspaces = useGetAllSelectedWorkspaces();
 
   const [isLoading, setIsLoading] = useState(false);
   const [selectedCollection, setSelectedCollection] = useState<CollectionOption | null>(null);
 
   const workspacesOptions = useMemo(() => {
-    return selectedWorkspaces.map((w) => ({
-      label: w.getState().name,
-      value: w.getState().id,
-    }));
+    const rootState = reduxStore.getState() as RootState;
+    return selectedWorkspaces.map((w) => {
+      const rawWorkspace = w.id === null ? dummyPersonalWorkspace : getWorkspaceById(w.id)(rootState);
+      const workspaceName = rawWorkspace?.name ?? "Unknown Workspace";
+
+      return {
+        label: workspaceName,
+        value: w.id,
+      };
+    });
   }, [selectedWorkspaces]);
 
   const [selectedWorkspace, setSelectedWorkspace] = useState<{
     label: string;
-    value: string;
+    value: Workspace["id"];
   } | null>(
     () =>
       workspacesOptions.find((w) => {
-        return w.value === getApiClientFeatureContext(currentContextId).workspaceId;
+        return w.value === getApiClientFeatureContext(workspaceId).workspaceId;
       }) ?? null
   );
 
@@ -65,7 +76,7 @@ const MoveRecordAcrossWorkspaceModal: React.FC<Props> = ({ isOpen, onClose, reco
       return [];
     }
 
-    return getCollectionOptionsToMoveIn(context.id, recordsToMove);
+    return getCollectionOptionsToMoveIn(context.workspaceId, recordsToMove);
   }, [context, recordsToMove]);
 
   const handleRecordMove = useCallback(async () => {
@@ -80,12 +91,18 @@ const MoveRecordAcrossWorkspaceModal: React.FC<Props> = ({ isOpen, onClose, reco
         : selectedCollection?.value;
 
       if (collectionId) {
-        await moveRecordsToCollection({
-          contextId: currentContextId,
-          recordsToMove,
-          collectionId,
-          destinationContextId: context?.id,
-        });
+        const currentContext = getApiClientFeatureContext(workspaceId);
+        await currentContext.store
+          .dispatch(
+            moveRecords({
+              recordsToMove,
+              collectionId,
+              repository: context.repositories.apiClientRecordsRepository,
+              sourceWorkspaceId: workspaceId,
+              destinationWorkspaceId: context.workspaceId,
+            }) as any
+          )
+          .unwrap();
       }
 
       trackRequestMoved(selectedCollection?.__isNew__ ? "new_collection" : "existing_collection");
@@ -112,7 +129,7 @@ const MoveRecordAcrossWorkspaceModal: React.FC<Props> = ({ isOpen, onClose, reco
     selectedCollection?.__isNew__,
     selectedCollection?.label,
     selectedCollection?.value,
-    currentContextId,
+    workspaceId,
     recordsToMove,
     onClose,
   ]);
@@ -191,32 +208,37 @@ const MoveRecordInSameWorkspaceModal: React.FC<Props> = ({
   recordsToMove,
   isBulkActionMode = false,
 }) => {
-  const contextId = useContextId();
-  const [viewMode] = useApiClientMultiWorkspaceView((s) => [s.viewMode]);
+  const workspaceId = useWorkspaceId();
+  const viewMode = useViewMode();
 
   const [selectedCollection, setSelectedCollection] = useState<CollectionOption | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const collectionOptions = useMemo(() => {
-    return getCollectionOptionsToMoveIn(contextId, recordsToMove);
-  }, [contextId, recordsToMove]);
+    return getCollectionOptionsToMoveIn(workspaceId, recordsToMove);
+  }, [workspaceId, recordsToMove]);
 
   const handleRecordMove = useCallback(async () => {
     try {
       setIsLoading(true);
 
-      const context = getApiClientFeatureContext(contextId);
+      const context = getApiClientFeatureContext(workspaceId);
       const collectionId = selectedCollection?.__isNew__
         ? await createNewCollection(context, selectedCollection?.label)
         : selectedCollection?.value;
 
       if (collectionId) {
-        await moveRecordsToCollection({
-          contextId,
-          recordsToMove,
-          collectionId,
-          destinationContextId: contextId,
-        });
+        await context.store
+          .dispatch(
+            moveRecords({
+              recordsToMove,
+              collectionId,
+              repository: context.repositories.apiClientRecordsRepository,
+              sourceWorkspaceId: workspaceId,
+              destinationWorkspaceId: workspaceId,
+            }) as any
+          )
+          .unwrap();
       }
 
       trackRequestMoved(selectedCollection?.__isNew__ ? "new_collection" : "existing_collection");
@@ -239,7 +261,7 @@ const MoveRecordInSameWorkspaceModal: React.FC<Props> = ({
       onClose();
     }
   }, [
-    contextId,
+    workspaceId,
     selectedCollection?.__isNew__,
     selectedCollection?.label,
     selectedCollection?.value,
@@ -295,7 +317,7 @@ const MoveRecordInSameWorkspaceModal: React.FC<Props> = ({
 };
 
 export const MoveToCollectionModal: React.FC<Props> = ({ ...props }) => {
-  const [viewMode] = useApiClientMultiWorkspaceView((s) => [s.viewMode]);
+  const viewMode = useViewMode();
 
   if (viewMode === ApiClientViewMode.MULTI && !props.isBulkActionMode) {
     return <MoveRecordAcrossWorkspaceModal {...props} />;

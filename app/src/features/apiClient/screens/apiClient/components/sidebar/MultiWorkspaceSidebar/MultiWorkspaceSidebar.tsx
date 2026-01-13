@@ -13,11 +13,11 @@ import { ContextualCollectionsSidebar } from "./ContextualCollectionsSidebar/Con
 import { ContextualEnvironmentsSidebar } from "./ContextualEnvironmentsSidebar/ContextualEnvironmentsSidebar";
 import { getEmptyApiEntry } from "../../../utils";
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
-import { useApiClientRepository } from "features/apiClient/contexts/meta";
 import "./multiWorkspaceSidebar.scss";
 import { MdOutlineSpaceDashboard } from "@react-icons/all-files/md/MdOutlineSpaceDashboard";
 import { RuntimeVariables } from "features/apiClient/screens/environment/components/RuntimeVariables/runtimevariables";
 import { MultiWorkspaceErrorFilesList } from "./MultiWorkspaceErrorFilesList/MultiWorkspaceErrorFilesList";
+import { getApiClientFeatureContext } from "features/apiClient/slices";
 
 export enum ApiClientSidebarTabKey {
   HISTORY = "history",
@@ -46,7 +46,6 @@ export const MultiWorkspaceSidebar: React.FC = () => {
   } = useApiClientContext();
 
   const { onSaveRecord } = useNewApiClientContext();
-  const { apiClientRecordsRepository } = useApiClientRepository();
 
   const handleNewRecordClick = useCallback(
     (recordType: RQAPI.RecordType, analyticEventSource: RQAPI.AnalyticsEventSource, entryType?: RQAPI.ApiEntryType) => {
@@ -170,7 +169,8 @@ export const MultiWorkspaceSidebar: React.FC = () => {
           data: apiEntry,
         };
 
-        const result = await apiClientRecordsRepository.createRecord(record);
+        const context = getApiClientFeatureContext();
+        const result = await context.repositories.apiClientRecordsRepository.createRecord(record);
 
         if (result.success) {
           onSaveRecord(result.data, "open");
@@ -191,7 +191,7 @@ export const MultiWorkspaceSidebar: React.FC = () => {
         setIsLoading(false);
       }
     },
-    [onSaveRecord, setIsImportModalOpen, apiClientRecordsRepository]
+    [onSaveRecord, setIsImportModalOpen]
   );
 
   useEffect(() => {

@@ -10,4 +10,8 @@ export enum ReducerKeys {
   BILLING = "billing",
   VARIABLES = "variables",
   WORKSPACE = "workspace",
+  WORKSPACE_VIEW = "workspaceView",
+  TABS = "tabs",
+  RUNTIME_VARIABLES = "runtimeVariables",
+  EXAMPLE_COLLECTIONS = "exampleCollections",
 }

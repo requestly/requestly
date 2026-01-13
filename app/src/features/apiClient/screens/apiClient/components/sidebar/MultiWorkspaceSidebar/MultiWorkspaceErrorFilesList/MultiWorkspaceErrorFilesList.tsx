@@ -1,22 +1,20 @@
 import React, { useCallback, useState } from "react";
 import { ErrorFilesList } from "../../components/ErrorFilesList/ErrorFileslist";
-import {
-  useApiClientMultiWorkspaceView,
-  useWorkspace,
-} from "features/apiClient/store/multiWorkspaceView/multiWorkspaceView.store";
+import { useGetAllSelectedWorkspaces, useWorkspace } from "features/apiClient/slices/workspaceView/hooks";
 import { WorkspaceProvider } from "../WorkspaceProvider/WorkspaceProvider";
 import { Collapse } from "antd";
 import { MdOutlineArrowForwardIos } from "@react-icons/all-files/md/MdOutlineArrowForwardIos";
-import "./multiWorkspaceErrorFilesList.scss";
 import { MdWarningAmber } from "@react-icons/all-files/md/MdWarningAmber";
+import { Workspace } from "features/workspaces/types";
+import "./multiWorkspaceErrorFilesList.scss";
 
-const WorkspaceErrorFilesList: React.FC<{ workspaceId: string; handleErrorRecordsCount: (v: number) => void }> = ({
-  workspaceId,
-  handleErrorRecordsCount,
-}) => {
-  const workspace = useWorkspace(workspaceId, (s) => s);
+const WorkspaceErrorFilesList: React.FC<{
+  workspaceId: Workspace["id"];
+  handleErrorRecordsCount: (v: number) => void;
+}> = ({ workspaceId, handleErrorRecordsCount }) => {
+  const workspace = useWorkspace(workspaceId);
 
-  if (workspace.state.loading || workspace.state.errored) {
+  if (workspace.status.loading || workspace.status.state.success === false) {
     return null;
   }
 
@@ -28,7 +26,7 @@ const WorkspaceErrorFilesList: React.FC<{ workspaceId: string; handleErrorRecord
 };
 
 export const MultiWorkspaceErrorFilesList: React.FC = () => {
-  const selectedWorkspaces = useApiClientMultiWorkspaceView((s) => s.selectedWorkspaces);
+  const selectedWorkspaces = useGetAllSelectedWorkspaces();
   const [errorRecordsCount, setErrorRecordsCount] = useState<number>(0);
 
   const handleErrorRecordsCount = useCallback((value: number) => {
@@ -62,8 +60,8 @@ export const MultiWorkspaceErrorFilesList: React.FC = () => {
           {selectedWorkspaces.map((workspace) => {
             return (
               <WorkspaceErrorFilesList
-                key={workspace.getState().id}
-                workspaceId={workspace.getState().id}
+                key={workspace.id}
+                workspaceId={workspace.id}
                 handleErrorRecordsCount={handleErrorRecordsCount}
               />
             );

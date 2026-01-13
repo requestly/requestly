@@ -33,7 +33,6 @@ const AuthorizationForm = <AuthType extends AuthConfigMeta.AuthWithConfig>({
   const { formState, handleFormChange } = useAuthFormState(formType, onChangeHandler, defaultAuthValues);
 
   const scopedVariables = useScopedVariables(recordId);
-
   return (
     <div className="form">
       {formData.map((formField, index) => (

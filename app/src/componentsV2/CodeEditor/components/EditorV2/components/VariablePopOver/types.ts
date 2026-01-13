@@ -26,6 +26,7 @@ export interface CreateVariableFormData {
 export interface ScopeOption {
   value: VariableScope;
   label: string;
+  id?: string;
   icon?: React.ReactNode;
   disabled?: boolean;
 }

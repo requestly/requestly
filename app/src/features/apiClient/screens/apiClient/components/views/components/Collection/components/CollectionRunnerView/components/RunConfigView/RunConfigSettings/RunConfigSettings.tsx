@@ -2,36 +2,37 @@ import React from "react";
 import { InputNumber } from "antd";
 import { RQTooltip } from "lib/design-system-v2/components";
 import { MdOutlineInfo } from "@react-icons/all-files/md/MdOutlineInfo";
-import { useRunConfigStore } from "../../../run.context";
+import { useCollectionView } from "../../../../../collectionView.context";
+import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
 import { toast } from "utils/Toast";
-import { DELAY_MAX_LIMIT, ITERATIONS_MAX_LIMIT } from "features/apiClient/store/collectionRunConfig/runConfig.store";
 import "./runConfigSettings.scss";
 import { DataFileSelector } from "./DataFileSelector";
 import { getAppMode } from "store/selectors";
 import { useSelector } from "react-redux";
+import { DELAY_MAX_LIMIT, ITERATIONS_MAX_LIMIT } from "features/apiClient/slices/runConfig/constants";
 
 export const RunConfigSettings: React.FC = () => {
   const appMode = useSelector(getAppMode);
-  const [iterations, setIterations, delay, setDelay] = useRunConfigStore((s) => [
-    s.iterations,
-    s.setIterations,
-    s.delay,
-    s.setDelay,
-  ]);
+  const { bufferedEntity } = useCollectionView();
 
-  const handleIterationsChange = (value: number) => {
+  const iterations = useApiClientSelector((state) => bufferedEntity.getIterations(state));
+  const delay = useApiClientSelector((state) => bufferedEntity.getDelay(state));
+
+  const handleIterationsChange = (value: number | null) => {
+    if (value === null) return;
     try {
-      setIterations(value);
+      bufferedEntity.setIterations(value);
     } catch (error) {
-      toast.error(error);
+      toast.error(error instanceof Error ? error.message : String(error));
     }
   };
 
-  const handleDelayChange = (value: number) => {
+  const handleDelayChange = (value: number | null) => {
+    if (value === null) return;
     try {
-      setDelay(value);
+      bufferedEntity.setDelay(value);
     } catch (error) {
-      toast.error(error);
+      toast.error(error instanceof Error ? error.message : String(error));
     }
   };
 

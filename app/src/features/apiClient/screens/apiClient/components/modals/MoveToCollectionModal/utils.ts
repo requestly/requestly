@@ -1,8 +1,6 @@
-import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 import { RQAPI } from "features/apiClient/types";
 import { Authorization } from "../../views/components/request/components/AuthorizationView/types/AuthConfig";
-import { getApiClientFeatureContext } from "features/apiClient/commands/store.utils";
-import { moveRecordsAcrossWorkspace } from "features/apiClient/commands/records";
+import { ApiClientFeatureContext } from "features/apiClient/slices";
 
 export async function createNewCollection(context: ApiClientFeatureContext, collectionName: string) {
   const collectionToBeCreated: Partial<RQAPI.CollectionRecord> = {
@@ -27,23 +25,4 @@ export async function createNewCollection(context: ApiClientFeatureContext, coll
   }
 
   return newCollection.data.id;
-}
-
-export async function moveRecordsToCollection(params: {
-  contextId: string;
-  recordsToMove: RQAPI.ApiClientRecord[];
-  collectionId: string;
-  destinationContextId: string;
-}) {
-  const { contextId, recordsToMove, collectionId, destinationContextId } = params;
-
-  try {
-    const currentContext = getApiClientFeatureContext(contextId);
-    await moveRecordsAcrossWorkspace(currentContext, {
-      recordsToMove,
-      destination: { collectionId, contextId: destinationContextId },
-    });
-  } catch (error) {
-    throw new Error("Failed to move some requests to collection");
-  }
 }
