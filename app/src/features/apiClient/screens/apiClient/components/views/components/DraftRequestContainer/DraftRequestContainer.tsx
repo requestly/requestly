@@ -56,8 +56,8 @@ export const DraftRequestContainer: React.FC<{ draftId: string; apiEntryType: RQ
   );
 
   if (requestViewState.isCreateMode === true) {
-    return <DraftRequestView onSaveCallback={onSaveCallback}/>;
+    return <DraftRequestView onSaveCallback={onSaveCallback} apiEntryType={apiEntryType} />;
   } else {
-    return <RequestView requestId={requestViewState.entryDetails.id}  />;
+    return <RequestView requestId={requestViewState.entryDetails.id} />;
   }
 };

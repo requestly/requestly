@@ -1,28 +1,33 @@
 import React, { useEffect, useRef } from "react";
 import Explorer from "graphiql-explorer";
-import { useGraphQLRecordStore } from "features/apiClient/hooks/useGraphQLRecordStore";
 import { buildClientSchema, parse } from "graphql";
 import "@graphiql/plugin-explorer/style.css";
 import { Checkbox } from "antd";
 import { RQButton } from "lib/design-system-v2/components";
 import { IoMdRefresh } from "@react-icons/all-files/io/IoMdRefresh";
 import { useGraphQLIntrospection } from "features/apiClient/hooks/useGraphQLIntrospection";
+import { useGraphQLRecordStore } from "features/apiClient/hooks/useGraphQLRecordStore";
 import { MdClose } from "@react-icons/all-files/md/MdClose";
+import { BufferedGraphQLRecordEntity } from "features/apiClient/slices/entities";
+import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
 import "./schemaBuilder.scss";
 
 interface Props {
+  entity: BufferedGraphQLRecordEntity;
   setIsSchemaBuilderOpen: (isOpen: boolean) => void;
 }
 
-export const SchemaBuilder: React.FC<Props> = ({ setIsSchemaBuilderOpen }) => {
-  const [introspectionData, query, updateEntryRequest, hasIntrospectionFailed] = useGraphQLRecordStore((state) => [
+export const SchemaBuilder: React.FC<Props> = ({ entity, setIsSchemaBuilderOpen }) => {
+  const operation = useApiClientSelector((s) => entity.getOperation(s) || "");
+  const url = useApiClientSelector((s) => entity.getUrl(s) || "");
+  const [introspectionData, hasIntrospectionFailed] = useGraphQLRecordStore((state) => [
     state.introspectionData,
-    state.entry.request.operation,
-    state.updateEntryRequest,
     state.hasIntrospectionFailed,
   ]);
-
-  const { introspectAndSaveSchema } = useGraphQLIntrospection();
+  const { introspectAndSaveSchema } = useGraphQLIntrospection({
+    recordId: entity.meta.referenceId,
+    url,
+  });
 
   const hasParsedSuccessfully = useRef(false);
 
@@ -44,16 +49,16 @@ export const SchemaBuilder: React.FC<Props> = ({ setIsSchemaBuilderOpen }) => {
   useEffect(() => {
     if (!hasParsedSuccessfully.current) {
       try {
-        parse(query);
+        parse(operation);
         hasParsedSuccessfully.current = true;
       } catch (e) {
         // NO OP
       }
     }
-  }, [query]);
+  }, [operation]);
 
   const handleEdit = (query: string) => {
-    updateEntryRequest({ operation: query });
+    entity.setOperation(query);
   };
 
   return (
@@ -75,7 +80,7 @@ export const SchemaBuilder: React.FC<Props> = ({ setIsSchemaBuilderOpen }) => {
           <div className="schema-builder__content">
             <Explorer
               schema={introspectionData ? buildClientSchema(introspectionData) : {}}
-              query={hasParsedSuccessfully.current ? query : ""}
+              query={hasParsedSuccessfully.current ? operation : ""}
               explorerIsOpen={true}
               arrowClosed={<Checkbox checked={false} className="schema-builder__checkbox" />}
               arrowOpen={<Checkbox checked={true} className="schema-builder__checkbox" />}
