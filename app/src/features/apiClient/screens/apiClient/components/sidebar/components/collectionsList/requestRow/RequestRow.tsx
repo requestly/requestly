@@ -88,6 +88,7 @@ export const RequestRow: React.FC<Props> = ({
   const [isEditMode, setIsEditMode] = useState(false);
   const [recordToMove, setRecordToMove] = useState<RQAPI.ApiRecord | null>(null);
   const [dropPosition, setDropPosition] = useState<"before" | "after" | null>(null);
+  const dropPositionRef = useRef<"before" | "after" | null>(null);
   const requestRowRef = useRef<HTMLDivElement>(null);
   const { apiClientRecordsRepository } = useApiClientRepository();
   const { onSaveRecord } = useNewApiClientContext();
@@ -142,18 +143,21 @@ export const RequestRow: React.FC<Props> = ({
           const targetRect = targetElement.getBoundingClientRect();
           const hoverMiddleY = (targetRect.bottom - targetRect.top) / 2;
           const hoverClientY = hoverBoundingRect.y - targetRect.top;
-
-          setDropPosition(hoverClientY < hoverMiddleY ? "before" : "after");
+          const dropPosition = hoverClientY < hoverMiddleY ? "before" : "after";
+          setDropPosition(dropPosition);
+          dropPositionRef.current = dropPosition;
         }
       },
       drop: async (item: { record: RQAPI.ApiClientRecord; contextId: string }, monitor) => {
         if (!monitor.isOver({ shallow: true })) {
           setDropPosition(null);
+          dropPositionRef.current = null;
           return;
         }
 
-        const currentDropPosition = dropPosition;
+        const currentDropPosition = dropPositionRef.current;
         setDropPosition(null);
+        dropPositionRef.current = null;
 
         try {
           const siblings = apiRecordsRankingManager.sort(
@@ -198,8 +202,9 @@ export const RequestRow: React.FC<Props> = ({
 
   // Clear drop position when no longer hovering
   React.useEffect(() => {
-    if (!isOverCurrent && dropPosition !== null) {
+    if (!isOverCurrent && (dropPosition !== null || dropPositionRef.current !== null)) {
       setDropPosition(null);
+      dropPositionRef.current = null;
     }
   }, [isOverCurrent, dropPosition]);
 
