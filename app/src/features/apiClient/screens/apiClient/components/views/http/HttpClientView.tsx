@@ -476,7 +476,7 @@ const HttpClientView: React.FC<Props> = ({
   };
 
   const handleRecordNameUpdate = async () => {
-    if (!requestName || requestName === apiEntryDetails?.name) {
+    if ((!requestName || requestName === apiEntryDetails?.name) && !isCreateMode) {
       return;
     }
 
