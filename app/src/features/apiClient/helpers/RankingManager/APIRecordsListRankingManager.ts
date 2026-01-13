@@ -69,9 +69,7 @@ export class APIRecordsListRankingManager extends ListRankingManager<RecordData>
     const sortedRecords = this.sort(siblings);
 
     // Find the index of the original record
-    const originalIndex = sortedRecords.findIndex(
-      (rec) => this.getEffectiveRank(rec) === this.getEffectiveRank(originalRecord)
-    );
+    const originalIndex = sortedRecords.findIndex((rec) => rec.id === originalRecord.id);
 
     if (originalIndex === -1) {
       // Original record not found, append at the end
