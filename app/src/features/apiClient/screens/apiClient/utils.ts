@@ -776,7 +776,8 @@ export const filterOutChildrenRecords = (
 
 export const processRecordsForDuplication = (
   recordsToProcess: RQAPI.ApiClientRecord[],
-  apiClientRecordsRepository: ApiClientRecordsInterface<Record<string, any>>
+  apiClientRecordsRepository: ApiClientRecordsInterface<Record<string, any>>,
+  context: ApiClientFeatureContext
 ) => {
   const recordsToDuplicate: RQAPI.ApiClientRecord[] = [];
   const queue: RQAPI.ApiClientRecord[] = [...recordsToProcess];
@@ -796,6 +797,12 @@ export const processRecordsForDuplication = (
         data: omit(record.data, "children"),
       });
 
+      // Set rank for the duplicated collection
+      collectionToDuplicate.rank = apiRecordsRankingManager.getRankForDuplicatedApi(
+        context,
+        record,
+        record.collectionId ?? ""
+      );
       recordsToDuplicate.push(collectionToDuplicate);
 
       if (record.data.children?.length) {
@@ -809,6 +816,12 @@ export const processRecordsForDuplication = (
         id: apiClientRecordsRepository.generateApiRecordId(record.collectionId ?? undefined),
         name: `(Copy) ${record.name}`,
       });
+      // Set rank for the duplicated request
+      requestToDuplicate.rank = apiRecordsRankingManager.getRankForDuplicatedApi(
+        context,
+        record,
+        record.collectionId ?? ""
+      );
 
       recordsToDuplicate.push(requestToDuplicate);
     }

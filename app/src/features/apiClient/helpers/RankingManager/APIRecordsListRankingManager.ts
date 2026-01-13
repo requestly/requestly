@@ -52,6 +52,38 @@ export class APIRecordsListRankingManager extends ListRankingManager<RecordData>
     const siblings = getImmediateChildrenRecords(context, collectionID);
     return this.getNextRanks(siblings, newRecords);
   }
+
+  /**
+   * Generates a rank for a duplicated request
+   * Places the duplicated request immediately after the original request
+   *
+   * @param context - The API client feature context
+   * @param originalRecord - The record being duplicated
+   * @param collectionId - The collection ID where the record belongs
+   * @returns Rank string for the duplicated record
+   */
+  getRankForDuplicatedApi(context: ApiClientFeatureContext, originalRecord: RecordData, collectionId: string): string {
+    const siblings = getImmediateChildrenRecords(context, collectionId);
+
+    // Sort all records to find the correct order
+    const sortedRecords = this.sort(siblings);
+
+    // Find the index of the original record
+    const originalIndex = sortedRecords.findIndex((rec) => rec.id === originalRecord.id);
+
+    if (originalIndex === -1) {
+      // Original record not found, append at the end
+      return this.getNextRanks(siblings, [originalRecord])[0];
+    }
+
+    // Get the record after the original (or null if it's the last one)
+    const nextRecord = sortedRecords[originalIndex + 1] ?? null;
+
+    // Generate a rank between the original record and the next record
+    const ranks = this.getRanksBetweenRecords(nextRecord, originalRecord, [originalRecord]);
+
+    return ranks[0];
+  }
 }
 
 // Export singleton instance for convenience
