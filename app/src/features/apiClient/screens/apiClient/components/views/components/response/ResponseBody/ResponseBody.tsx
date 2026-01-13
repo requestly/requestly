@@ -7,6 +7,7 @@ import { RQButton } from "lib/design-system-v2/components";
 import { IoMdCopy } from "@react-icons/all-files/io/IoMdCopy";
 import Editor from "componentsV2/CodeEditor";
 import { copyToClipBoard } from "utils/Misc";
+import { shouldRenderPreview } from "components/mode-specific/desktop/InterceptTraffic/WebTraffic/TrafficTableV2/utils";
 
 interface Props {
   responseText: string;
@@ -82,7 +83,7 @@ const ResponseBody: React.FC<Props> = ({ responseText, contentTypeHeader }) => {
       <div className="api-response-body-editor-container">
         <Editor
           prettifyOnInit
-          value={responseText}
+          value={shouldRenderPreview(responseText, contentTypeHeader) ? responseText : "Preview not available"}
           language={editorLanguage}
           isReadOnly
           toolbarOptions={{
