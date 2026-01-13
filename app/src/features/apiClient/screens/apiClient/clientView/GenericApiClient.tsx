@@ -7,11 +7,19 @@ import "../apiClient.scss";
 import { BottomSheetFeatureContext } from "componentsV2/BottomSheet/types";
 import { AISessionProvider } from "features/ai/contexts/AISession";
 import { BufferedGraphQLRecordEntity, BufferedHttpRecordEntity } from "features/apiClient/slices/entities";
-import { HttpClientViewProps } from "../components/views/http/HttpClientView";
+import { ApiClientRepositoryInterface } from "features/apiClient/helpers/modules/sync/interfaces";
+
+export type GenericApiClientOverride = {
+  handleNameChange?: (name: string) => Promise<void>;
+  onSaveClick?: {
+    save: (record: RQAPI.ApiRecord, repositories: ApiClientRepositoryInterface) => Promise<RQAPI.ApiRecord>;
+    onSuccess: (record: RQAPI.ApiRecord) => void;
+  };
+};
 
 type Props = {
-  entity: BufferedHttpRecordEntity | BufferedGraphQLRecordEntity,
-  override?: HttpClientViewProps['override'],
+  entity: BufferedHttpRecordEntity | BufferedGraphQLRecordEntity;
+  override?: GenericApiClientOverride;
   handleAppRequestFinished: (entry: RQAPI.ApiEntry) => void;
   isOpenInModal?: boolean;
 };
