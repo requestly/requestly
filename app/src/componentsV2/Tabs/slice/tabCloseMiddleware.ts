@@ -4,8 +4,13 @@ import { closeAllTabs } from "./thunks";
 import { RootState } from "store/types";
 import { ReducerKeys } from "store/constants";
 import { isEqual } from "lodash";
-import { AnyListenerPredicate, ListenerEffect } from "@reduxjs/toolkit/dist/listenerMiddleware/types";
+import {
+  AnyListenerPredicate,
+  ListenerEffect,
+  ListenerErrorHandler,
+} from "@reduxjs/toolkit/dist/listenerMiddleware/types";
 import { ThunkDispatch } from "redux-thunk";
+import * as Sentry from "@sentry/react";
 
 function hasWorkspaceIdsChanged(currentState: unknown, previousState: unknown): boolean {
   const current = currentState as RootState;
@@ -57,7 +62,16 @@ const tabCloseListeners: TabCloseListener[] = [
   },
 ];
 
-const tabCloseListenerMiddleware = createListenerMiddleware();
+const onError: ListenerErrorHandler = (error, errorInfo) => {
+  Sentry.captureException(error, {
+    tags: {
+      middleware: "tabCloseMiddleware",
+      raisedBy: errorInfo.raisedBy,
+    },
+  });
+};
+
+const tabCloseListenerMiddleware = createListenerMiddleware({ onError });
 
 tabCloseListeners.forEach(({ predicate, effect }) => {
   tabCloseListenerMiddleware.startListening({ predicate, effect });
