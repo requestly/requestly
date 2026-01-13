@@ -37,13 +37,13 @@ export class ApiClientVariables<T, State = ApiClientStoreState> {
     };
     this.unsafePatch((s) => {
       const variables = this.getVariableObject(s);
-      if(!variables[key]) {
+      if (!variables[key]) {
         variables[key] = variable;
       } else {
         variables[key] = {
           ...variables[key],
           ...variable,
-        }
+        };
       }
     });
 
@@ -59,12 +59,30 @@ export class ApiClientVariables<T, State = ApiClientStoreState> {
         return;
       }
       const [oldKey, variable] = entry;
-      lodash.extend(variable, variableData);
-      if (params.key) {
-        if (oldKey !== params.key) {
-          variables[params.key] = variable;
-          delete variables[oldKey];
+
+      if (params.key && oldKey !== params.key) {
+        if (variables[params.key] && variables[params.key]?.id !== params.id) {
+          lodash.extend(variable, variableData);
+          return;
         }
+
+        const newVariables: EnvironmentVariables = {};
+        for (const [key, val] of Object.entries(variables)) {
+          if (key === oldKey) {
+            newVariables[params.key!] = { ...val, ...variableData };
+          } else {
+            newVariables[key] = val;
+          }
+        }
+
+        const parentObject = s as any;
+        if (parentObject.variables === variables) {
+          parentObject.variables = newVariables;
+        } else if (parentObject.data?.variables === variables) {
+          parentObject.data.variables = newVariables;
+        }
+      } else {
+        lodash.extend(variable, variableData);
       }
     });
   }
