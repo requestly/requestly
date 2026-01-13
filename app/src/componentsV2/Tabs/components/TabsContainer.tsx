@@ -1,16 +1,16 @@
+import { IoIosArrowDown } from "@react-icons/all-files/io/IoIosArrowDown";
+import { MdClose } from "@react-icons/all-files/md/MdClose";
+import { Dropdown, MenuProps, Popover, Tabs, TabsProps, Typography } from "antd";
+import PATHS from "config/constants/sub/paths";
+import { DraftRequestContainerTabSource } from "features/apiClient/screens/apiClient/components/views/components/DraftRequestContainer/draftRequestContainerTabSource";
+import { useCloseActiveTabShortcut } from "hooks/useCloseActiveTabShortcut";
+import { RQButton } from "lib/design-system-v2/components";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Tabs, TabsProps, Typography, Popover } from "antd";
+import { Outlet, unstable_useBlocker } from "react-router-dom";
+import { useMatchedTabSource } from "../hooks/useMatchedTabSource";
+import { useSetUrl } from "../hooks/useSetUrl";
 import { useTabServiceWithSelector } from "../store/tabServiceStore";
 import { TabItem } from "./TabItem";
-import { useMatchedTabSource } from "../hooks/useMatchedTabSource";
-import { Outlet, unstable_useBlocker } from "react-router-dom";
-import { DraftRequestContainerTabSource } from "features/apiClient/screens/apiClient/components/views/components/DraftRequestContainer/draftRequestContainerTabSource";
-import { RQButton } from "lib/design-system-v2/components";
-import { MdClose } from "@react-icons/all-files/md/MdClose";
-import { IoIosArrowDown } from "@react-icons/all-files/io/IoIosArrowDown";
-import { useSetUrl } from "../hooks/useSetUrl";
-import PATHS from "config/constants/sub/paths";
-import { useCloseActiveTabShortcut } from "hooks/useCloseActiveTabShortcut";
 import "./tabsContainer.scss";
 import { TabsMorePopover } from "./TabsMorePopover";
 
@@ -152,53 +152,100 @@ export const TabsContainer: React.FC = () => {
   }, [activeTabSource, setUrl]);
 
   const tabItems: TabsProps["items"] = useMemo(() => {
-    return Array.from(tabs.values()).map((tabStore) => {
+    return Array.from(tabs.values()).map((tabStore, index) => {
       const tabState = tabStore.getState();
+      const tabsArray = Array.from(tabs.values());
+
+      const closeTabsToLeft = () => {
+        for (let i = 0; i < index; i++) {
+          const tab = tabsArray[i];
+          closeTabById(tab.getState().id);
+        }
+      };
+
+      const closeTabsToRight = () => {
+        for (let i = index + 1; i < tabsArray.length; i++) {
+          const tab = tabsArray[i];
+          closeTabById(tab.getState().id);
+        }
+      };
+
+      const closeAllTabs = () => {
+        Array.from(tabs.values()).forEach((tab) => {
+          closeTabById(tab.getState().id);
+        });
+      };
+
+      const contextMenuItems: MenuProps["items"] = [
+        {
+          key: "close-left",
+          label: "Close Tabs to the Left",
+          onClick: closeTabsToLeft,
+          disabled: index === 0,
+        },
+        {
+          key: "close-right",
+          label: "Close Tabs to the Right",
+          onClick: closeTabsToRight,
+          disabled: index === tabsArray.length - 1,
+        },
+        {
+          type: "divider",
+        },
+        {
+          key: "close-all",
+          label: "Close All Tabs",
+          onClick: closeAllTabs,
+        },
+      ];
+
       return {
         key: tabState.id.toString(),
         closable: false,
         label: (
-          <div
-            className="tab-title-container"
-            onDoubleClick={() => {
-              if (tabState.preview) {
-                tabState.setPreview(false);
-                incrementVersion();
-                resetPreviewTab();
-              }
-            }}
-          >
-            <div className="tab-title">
-              {<div className="icon">{tabState.icon}</div>}
-              <Typography.Text
-                ellipsis={{
-                  tooltip: {
-                    title: tabState.title,
-                    placement: "bottom",
-                    color: "#000",
-                    mouseEnterDelay: 0.5,
-                  },
-                }}
-                className="title"
-              >
-                {tabState.preview ? <i>{tabState.title}</i> : tabState.title}
-              </Typography.Text>
-            </div>
+          <Dropdown menu={{ items: contextMenuItems }} trigger={["contextMenu"]}>
+            <div
+              className="tab-title-container"
+              onDoubleClick={() => {
+                if (tabState.preview) {
+                  tabState.setPreview(false);
+                  incrementVersion();
+                  resetPreviewTab();
+                }
+              }}
+            >
+              <div className="tab-title">
+                {<div className="icon">{tabState.icon}</div>}
+                <Typography.Text
+                  ellipsis={{
+                    tooltip: {
+                      title: tabState.title,
+                      placement: "bottom",
+                      color: "#000",
+                      mouseEnterDelay: 0.5,
+                    },
+                  }}
+                  className="title"
+                >
+                  {tabState.preview ? <i>{tabState.title}</i> : tabState.title}
+                </Typography.Text>
+              </div>
 
-            <div className="tab-actions">
-              <RQButton
-                size="small"
-                type="transparent"
-                className="tab-close-button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  closeTabById(tabState.id);
-                }}
-                icon={<MdClose />}
-              />
-              {tabState.unsaved ? <div className="unsaved-changes-indicator" /> : null}
+              <div className="tab-actions">
+                <RQButton
+                  size="small"
+                  type="transparent"
+                  className="tab-close-button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    closeTabById(tabState.id);
+                  }}
+                  icon={<MdClose />}
+                />
+                {tabState.unsaved ? <div className="unsaved-changes-indicator" /> : null}
+              </div>
             </div>
-          </div>
+          </Dropdown>
         ),
         children: <TabItem store={tabStore}>{tabState.source.render()}</TabItem>,
       };
