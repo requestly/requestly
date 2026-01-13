@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useLayoutEffect, useState, useMemo } fro
 import { notification, Select, Space } from "antd";
 import { useDispatch } from "react-redux";
 import * as Sentry from "@sentry/react";
+import { SPAN_STATUS_ERROR, SPAN_STATUS_OK } from "@sentry/core";
 import { KeyValuePair, RQAPI, RequestContentType, RequestMethod } from "../../../../../types";
 import {
   hasTests,
@@ -70,6 +71,7 @@ import { ClientCodeButton } from "../components/ClientCodeButton/ClientCodeButto
 import HttpRequestTabs, { RequestTab } from "./components/HttpRequestTabs/HttpRequestTabs";
 import "./httpClientView.scss";
 import { QueryParamsProvider } from "features/apiClient/store/QueryParamsContextProvider";
+import { HeadersProvider } from "features/apiClient/store/HeadersContextProvider";
 import { MdOutlineSyncAlt } from "@react-icons/all-files/md/MdOutlineSyncAlt";
 import { useAPIRecords, useAPIRecordsStore } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 import { Authorization } from "../components/request/components/AuthorizationView/types/AuthConfig";
@@ -79,6 +81,7 @@ import { useHttpRequestExecutor } from "features/apiClient/hooks/requestExecutor
 import { PathVariablesProvider } from "features/apiClient/store/pathVariables/PathVariablesContextProvider";
 import { usePathVariablesStore } from "features/apiClient/hooks/usePathVariables.store";
 import { useAISessionContext } from "features/ai/contexts/AISession";
+import { wrapWithCustomSpan } from "utils/sentry";
 
 const requestMethodOptions = Object.values(RequestMethod).map((method) => ({
   value: method,
@@ -476,7 +479,7 @@ const HttpClientView: React.FC<Props> = ({
   };
 
   const handleRecordNameUpdate = async () => {
-    if (!requestName || requestName === apiEntryDetails?.name) {
+    if ((!requestName || requestName === apiEntryDetails?.name) && !isCreateMode) {
       return;
     }
 
@@ -539,84 +542,109 @@ const HttpClientView: React.FC<Props> = ({
   };
 
   const onSaveButtonClick = useCallback(async () => {
-    setIsRequestSaving(true);
-
-    const entryToSave = {
-      ...entry,
-      request: {
-        ...entry.request,
-        url: entry.request.url.split("?")[0],
-        queryParams: queryParams,
-        pathVariables: getPathVariables(),
+    return wrapWithCustomSpan(
+      {
+        name: "[Transaction] api_client.save",
+        op: "api_client.save",
+        forceTransaction: true,
+        attributes: {
+          "_attribute.is_create_mode": isCreateMode,
+        },
       },
-    };
-    const isValidHeader = entry.request?.headers?.every((header) => {
-      return !header.isEnabled || !INVALID_KEY_CHARACTERS.test(header.key);
-    });
+      async () => {
+        setIsRequestSaving(true);
 
-    const isValidAuthKey =
-      entry.auth?.currentAuthType !== Authorization.Type.API_KEY ||
-      !entry.auth?.authConfigStore?.API_KEY?.key ||
-      !INVALID_KEY_CHARACTERS.test(entry.auth?.authConfigStore?.API_KEY?.key) ||
-      entry.auth?.authConfigStore?.API_KEY.addTo === "QUERY";
+        const entryToSave = {
+          ...entry,
+          request: {
+            ...entry.request,
+            url: entry.request.url.split("?")[0],
+            queryParams: queryParams,
+            pathVariables: getPathVariables(),
+          },
+        };
+        const isValidHeader = entry.request?.headers?.every((header) => {
+          return !header.isEnabled || !INVALID_KEY_CHARACTERS.test(header.key);
+        });
 
-    if (!isValidHeader || !isValidAuthKey) {
-      notification.error({
-        message: `Could not save request.`,
-        description: "key contains invalid characters.",
-        placement: "bottomRight",
-      });
-      setIsRequestSaving(false);
-      return;
-    }
+        const isValidAuthKey =
+          entry.auth?.currentAuthType !== Authorization.Type.API_KEY ||
+          !entry.auth?.authConfigStore?.API_KEY?.key ||
+          !INVALID_KEY_CHARACTERS.test(entry.auth?.authConfigStore?.API_KEY?.key) ||
+          entry.auth?.authConfigStore?.API_KEY.addTo === "QUERY";
 
-    const record: Partial<RQAPI.ApiRecord> = {
-      type: RQAPI.RecordType.API,
-      data: { ...sanitizeEntry(entryToSave, false) },
-    };
+        if (!isValidHeader || !isValidAuthKey) {
+          notification.error({
+            message: `Could not save request.`,
+            description: "key contains invalid characters.",
+            placement: "bottomRight",
+          });
+          setIsRequestSaving(false);
+          Sentry.captureException(new Error("Invalid Header or Auth Key"));
+          Sentry.getActiveSpan()?.setStatus({
+            code: SPAN_STATUS_ERROR,
+            // message: "invalid_auth_header", // This somehow is breaking the status of the span on sentry. Comes as unknown if set
+          });
+          return;
+        }
 
-    if (isCreateMode) {
-      const requestId = apiClientRecordsRepository.generateApiRecordId();
-      record.id = requestId;
-    }
+        const record: Partial<RQAPI.ApiRecord> = {
+          type: RQAPI.RecordType.API,
+          data: { ...sanitizeEntry(entryToSave, false) },
+        };
 
-    //  Is this check necessary?
-    if (apiEntryDetails?.id) {
-      record.id = apiEntryDetails?.id;
-    }
+        if (isCreateMode) {
+          const requestId = apiClientRecordsRepository.generateApiRecordId();
+          record.id = requestId;
+        }
 
-    const result = isCreateMode
-      ? await apiClientRecordsRepository.createRecordWithId(record, record.id!) // not the ideal way but had to assert because record is typed as Partial here
-      : await apiClientRecordsRepository.updateRecord(record, record.id!);
+        //  Is this check necessary?
+        if (apiEntryDetails?.id) {
+          record.id = apiEntryDetails?.id;
+        }
 
-    if (result.success && result.data.type === RQAPI.RecordType.API) {
-      const httpApiEntry = result.data as RQAPI.HttpApiRecord;
+        const result = isCreateMode
+          ? await apiClientRecordsRepository.createRecordWithId(record, record.id!) // not the ideal way but had to assert because record is typed as Partial here
+          : await apiClientRecordsRepository.updateRecord(record, record.id!);
 
-      onSaveRecord({ ...(apiEntryDetails ?? {}), ...result.data, data: { ...result.data.data, ...record.data } });
+        if (result.success && result.data.type === RQAPI.RecordType.API) {
+          const httpApiEntry = result.data as RQAPI.HttpApiRecord;
 
-      setEntry({ ...httpApiEntry.data, response: entry.response, testResults: entry.testResults });
-      const { response, testResults, ...resultWithoutResponse } = result.data.data;
-      resetChanges({ ...(resultWithoutResponse as RQAPI.HttpApiEntry), response: null });
-      trackRequestSaved({
-        src: "api_client_view",
-        has_scripts: Boolean(entry.scripts?.preRequest),
-        auth_type: entry?.auth?.currentAuthType,
-        type: RQAPI.ApiEntryType.HTTP,
-      });
-      if (isCreateMode) {
-        onSaveCallback(httpApiEntry);
+          onSaveRecord({ ...(apiEntryDetails ?? {}), ...result.data, data: { ...result.data.data, ...record.data } });
+
+          setEntry({ ...httpApiEntry.data, response: entry.response, testResults: entry.testResults });
+          const { response, testResults, ...resultWithoutResponse } = result.data.data;
+          resetChanges({ ...(resultWithoutResponse as RQAPI.HttpApiEntry), response: null });
+          trackRequestSaved({
+            src: "api_client_view",
+            has_scripts: Boolean(entry.scripts?.preRequest),
+            auth_type: entry?.auth?.currentAuthType,
+            type: RQAPI.ApiEntryType.HTTP,
+          });
+          if (isCreateMode) {
+            onSaveCallback(httpApiEntry);
+          }
+          toast.success("Request saved!");
+          Sentry.getActiveSpan()?.setStatus({
+            code: SPAN_STATUS_OK,
+          });
+        } else {
+          notification.error({
+            message: `Could not save request.`,
+            description: result?.message,
+            placement: "bottomRight",
+          });
+          Sentry.captureException(new Error(`Could not save request: ${result?.message}`));
+          Sentry.getActiveSpan()?.setStatus({
+            code: SPAN_STATUS_ERROR,
+          });
+        }
+
+        setIsRequestSaving(false);
+        endAISession();
       }
-      toast.success("Request saved!");
-    } else {
-      notification.error({
-        message: `Could not save request.`,
-        description: result?.message,
-        placement: "bottomRight",
-      });
-    }
-
-    setIsRequestSaving(false);
-    endAISession();
+    )();
+    // Little bit weird syntax but we need to call function to actually execute the wrapped function
   }, [
     apiClientRecordsRepository,
     apiEntryDetails,
@@ -837,13 +865,18 @@ const HttpClientView: React.FC<Props> = ({
 const WithQueryParamsProvider = (Component: React.ComponentType<any>): React.FC<Props> => {
   const WrappedComponent: React.FC = (props: any) => {
     const record = useAPIRecordsStore().getState().getData(props.apiEntryDetails.id) as RQAPI.ApiClientRecord;
-    const entry = (record?.data as RQAPI.HttpApiEntry) || props.apiEntryDetails.data;
+    const entry = useMemo(() => (record?.data as RQAPI.HttpApiEntry) || props.apiEntryDetails.data, [
+      record?.data,
+      props.apiEntryDetails.data,
+    ]);
 
     return (
       <ErrorBoundary boundaryId="http-client-view-error-boundary">
         <PathVariablesProvider pathVariables={entry.request?.pathVariables ?? []}>
           <QueryParamsProvider entry={entry}>
-            <Component {...props} />
+            <HeadersProvider entry={entry}>
+              <Component {...props} entry={entry} />
+            </HeadersProvider>
           </QueryParamsProvider>
         </PathVariablesProvider>
       </ErrorBoundary>

@@ -76,6 +76,7 @@
     "@requestly/mock-server": "0.1.6",
     "@requestly/requestly-core": "file:..",
     "@requestly/shared": "file:../shared",
+    "@sentry/core": "^10.32.1",
     "@sentry/react": "^10.32.1",
     "@stripe/react-stripe-js": "^2.3.0",
     "@stripe/stripe-js": "^1.24.0",
