@@ -1,0 +1,69 @@
+.key-value-bulk-edit-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  min-width: 340px;
+
+  .bulk-edit-panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 12px 0px 12px;
+
+    .bulk-edit-panel-title {
+      font-family: var(--requestly-font-family-default);
+      font-size: var(--requestly-font-size-2xs);
+      font-style: normal;
+      font-weight: 500;
+      line-height: 13px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .bulk-edit-panel-close-btn {
+      flex-shrink: 0;
+    }
+  }
+
+  .bulk-edit-panel-content {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow: hidden;
+
+    .react-resizable {
+      height: 100% !important;
+    }
+
+    .cm-editor {
+      .cm-content {
+        color: #ffffff;
+      }
+
+      .cm-placeholder {
+        color: var(--requestly-color-text-placeholder, #8f8f8f);
+      }
+
+      .cm-search {
+        font-size: 12px;
+
+        input,
+        button,
+        label {
+          font-size: 12px;
+        }
+      }
+    }
+  }
+
+  .bulk-edit-panel-hint {
+    font-size: 12px;
+    padding: 8px;
+    color: var(--requestly-color-text-tertiary, #8f8f8f);
+  }
+
+  &:has(.cm-search) .bulk-edit-panel-hint {
+    display: none;
+  }
+}

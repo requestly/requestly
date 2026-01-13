@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import CodeMirror, { EditorView, ReactCodeMirrorRef } from "@uiw/react-codemirror";
+import CodeMirror, { EditorView, Extension, ReactCodeMirrorRef } from "@uiw/react-codemirror";
 import { javascript } from "@codemirror/lang-javascript";
 import { html } from "@codemirror/lang-html";
 import { json5 } from "codemirror-json5";
@@ -31,6 +31,8 @@ import {
   highlightVariablesPlugin,
   generateCompletionsForVariables,
 } from "componentsV2/CodeEditor/components/EditorV2/plugins";
+import { placeholder as placeholderExtension } from "@codemirror/view";
+
 interface EditorProps {
   value: string;
   language: EditorLanguage | null;
@@ -57,6 +59,9 @@ interface EditorProps {
     source: "ai" | "user";
     onPartialMerge: (mergedValue: string, newIncomingValue: string, type: "accept" | "reject") => void;
   };
+  disableDefaultAutoCompletions?: boolean;
+  customTheme?: Extension;
+  placeholder?: string;
 }
 const Editor: React.FC<EditorProps> = ({
   value,
@@ -78,6 +83,9 @@ const Editor: React.FC<EditorProps> = ({
   onFocus,
   onEditorReady,
   mergeView,
+  disableDefaultAutoCompletions = false,
+  customTheme,
+  placeholder,
 }) => {
   const location = useLocation();
   const dispatch = useDispatch();
@@ -270,6 +278,8 @@ const Editor: React.FC<EditorProps> = ({
       theme={vscodeDark}
       extensions={[
         editorLanguage,
+        customTheme,
+        placeholder ? placeholderExtension(placeholder) : null,
         customKeyBinding,
         EditorView.lineWrapping,
         envVariables
@@ -288,6 +298,7 @@ const Editor: React.FC<EditorProps> = ({
         bracketMatching: true,
         closeBrackets: true,
         allowMultipleSelections: true,
+        autocompletion: !disableDefaultAutoCompletions,
       }}
       data-enable-grammarly="false"
       data-gramm_editor="false"
