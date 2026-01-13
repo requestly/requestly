@@ -341,6 +341,8 @@ export const CollectionRow: React.FC<Props> = ({
 
           if (result.success) {
             saveOrUpdateRecord(context, result.data);
+          } else {
+            throw new Error(result.message || "Failed to move item. Please try again.");
           }
         }
       } catch (error) {

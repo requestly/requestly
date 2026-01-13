@@ -89,7 +89,6 @@ export const RequestRow: React.FC<Props> = ({
   const [recordToMove, setRecordToMove] = useState<RQAPI.ApiRecord | null>(null);
   const [dropPosition, setDropPosition] = useState<"before" | "after" | null>(null);
   const requestRowRef = useRef<HTMLDivElement>(null);
-  const ctx = useApiClientFeatureContext();
   const { apiClientRecordsRepository } = useApiClientRepository();
   const { onSaveRecord } = useNewApiClientContext();
   const context = useApiClientFeatureContext();
@@ -157,7 +156,9 @@ export const RequestRow: React.FC<Props> = ({
         setDropPosition(null);
 
         try {
-          const siblings = apiRecordsRankingManager.sort(getImmediateChildrenRecords(ctx, record.collectionId ?? ""));
+          const siblings = apiRecordsRankingManager.sort(
+            getImmediateChildrenRecords(context, record.collectionId ?? "")
+          );
           let before: RecordData | null = null;
           let after: RecordData | null = null;
           const recordIndex = siblings.findIndex((sibling) => sibling.id === record.id);
