@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import { CreateTeamParams, LocalWorkspaceConfig, SharedOrPrivateWorkspaceConfig } from "types";
 import { SharedWorkspaceCreationView } from "./SharedWorkspaceCreationView/SharedWorkspaceCreationView";
 import { LocalWorkspaceCreationView } from "./LocalWorkspaceCreationView/LocalWorkspaceCreationView";
@@ -24,6 +24,8 @@ import { workspaceActions } from "store/slices/workspaces/slice";
 import { getDomainFromEmail } from "utils/mailCheckerUtils";
 import { getAvailableBillingTeams } from "store/features/billing/selectors";
 import * as Sentry from "@sentry/react";
+import { ErrorCode } from "errors/types";
+import { ExistingWorkspaceConflictView } from "./LocalWorkspaceCreationView/components/ExistingWorkspaceConflictView/ExistingWorkspaceConflictView";
 
 interface Props {
   workspaceType: WorkspaceType;
@@ -52,7 +54,10 @@ export const WorkspaceCreationView: React.FC<Props> = ({ workspaceType, analytic
   const user = useSelector(getUserAuthDetails);
   const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<ErrorCode | null>(null);
   const billingTeams = useSelector(getAvailableBillingTeams);
+
+  const currentSelectedFolderPathRef = useRef<string | null>(null);
 
   const handlePostTeamCreationStep = useCallback(
     async (teamId: string, newTeamName: string, hasMembersInSameDomain: boolean) => {
@@ -148,7 +153,7 @@ export const WorkspaceCreationView: React.FC<Props> = ({ workspaceType, analytic
           if (config.type === WorkspaceType.LOCAL) {
             const workspaceCreationResult = await createWorkspaceFolder(workspaceName, config.rootPath);
             if (workspaceCreationResult.type === "error") {
-              throw new Error(workspaceCreationResult.error.message);
+              throw new Error(workspaceCreationResult.error.message, { cause: workspaceCreationResult.error });
             }
             const partialWorkspace = workspaceCreationResult.content;
             const localWorkspace: Workspace = {
@@ -204,7 +209,13 @@ export const WorkspaceCreationView: React.FC<Props> = ({ workspaceType, analytic
 
         callback?.();
       } catch (err) {
-        toast.error(err?.message || "Unable to Create Team");
+        if (err.cause && err.cause.code === ErrorCode.PathIsAlreadyAWorkspace) {
+          currentSelectedFolderPathRef.current = err.cause.path;
+          setError(ErrorCode.PathIsAlreadyAWorkspace);
+          return;
+        } else {
+          toast.error(err?.message || "Unable to Create Team");
+        }
         Sentry.captureException(err || "Create Team Failure", {
           extra: {
             message: err?.message,
@@ -226,6 +237,21 @@ export const WorkspaceCreationView: React.FC<Props> = ({ workspaceType, analytic
       analyticEventSource,
     ]
   );
+
+  if (error) {
+    switch (error) {
+      case ErrorCode.PathIsAlreadyAWorkspace:
+        return (
+          <ExistingWorkspaceConflictView
+            path={currentSelectedFolderPathRef.current as string}
+            onChooseAnotherFolder={() => {
+              currentSelectedFolderPathRef.current = null;
+              setError(null);
+            }}
+          />
+        );
+    }
+  }
 
   return (
     <>

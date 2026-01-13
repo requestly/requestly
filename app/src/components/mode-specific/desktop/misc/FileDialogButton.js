@@ -69,12 +69,17 @@ export const displayFolderSelector = (callback, onCancelCallback) => {
   }
 };
 
+export const openPathInFileExplorer = (path) => {
+  window.RQ.DESKTOP.SERVICES.IPC.invokeEventInMain("open-path-in-file-explorer", {
+    resourcePath: path,
+  });
+};
+
 export const handleOpenLocalFileInBrowser = (link) => {
   window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG("open-external-link", {
     link,
   });
 };
-
 const FileDialogButton = ({ text, callback }) => {
   return (
     <Button onClick={() => displayFileSelector(callback)} style={{ marginRight: 8 }}>
