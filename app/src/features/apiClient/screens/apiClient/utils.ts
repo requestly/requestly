@@ -35,6 +35,8 @@ import { getFileContents } from "components/mode-specific/desktop/DesktopFilePic
 import { NativeError } from "errors/NativeError";
 import { trackCollectionRunnerRecordLimitExceeded } from "modules/analytics/events/features/apiClient";
 import { getBoundary, parse as multipartParser } from "parse-multipart-data";
+import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
+import { apiRecordsRankingManager } from "features/apiClient/helpers/RankingManager";
 
 const createAbortError = (signal: AbortSignal) => {
   if (signal && signal.reason === AbortReason.USER_CANCELLED) {
@@ -479,12 +481,14 @@ export const isApiCollection = (record: RQAPI.ApiClientRecord) => {
 
 const sortRecords = (records: RQAPI.ApiClientRecord[]) => {
   return records.sort((a, b) => {
-    // Sort by type first
-    const typeComparison = a.type.localeCompare(b.type);
-    if (typeComparison !== 0) return typeComparison;
-
-    // If types are the same, sort alphabetically by name
-    return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
+    // If different type, then keep collection first
+    if (a.type !== b.type) {
+      return a.type === RQAPI.RecordType.COLLECTION ? -1 : 1;
+    }
+    // use ranking manager to sort by rank
+    const aRank = apiRecordsRankingManager.getEffectiveRank(a);
+    const bRank = apiRecordsRankingManager.getEffectiveRank(b);
+    return apiRecordsRankingManager.compareFn(aRank, bRank);
   });
 };
 
@@ -772,7 +776,8 @@ export const filterOutChildrenRecords = (
 
 export const processRecordsForDuplication = (
   recordsToProcess: RQAPI.ApiClientRecord[],
-  apiClientRecordsRepository: ApiClientRecordsInterface<Record<string, any>>
+  apiClientRecordsRepository: ApiClientRecordsInterface<Record<string, any>>,
+  context: ApiClientFeatureContext
 ) => {
   const recordsToDuplicate: RQAPI.ApiClientRecord[] = [];
   const queue: RQAPI.ApiClientRecord[] = [...recordsToProcess];
@@ -792,6 +797,12 @@ export const processRecordsForDuplication = (
         data: omit(record.data, "children"),
       });
 
+      // Set rank for the duplicated collection
+      collectionToDuplicate.rank = apiRecordsRankingManager.getRankForDuplicatedApi(
+        context,
+        record,
+        record.collectionId ?? ""
+      );
       recordsToDuplicate.push(collectionToDuplicate);
 
       if (record.data.children?.length) {
@@ -805,6 +816,12 @@ export const processRecordsForDuplication = (
         id: apiClientRecordsRepository.generateApiRecordId(record.collectionId ?? undefined),
         name: `(Copy) ${record.name}`,
       });
+      // Set rank for the duplicated request
+      requestToDuplicate.rank = apiRecordsRankingManager.getRankForDuplicatedApi(
+        context,
+        record,
+        record.collectionId ?? ""
+      );
 
       recordsToDuplicate.push(requestToDuplicate);
     }

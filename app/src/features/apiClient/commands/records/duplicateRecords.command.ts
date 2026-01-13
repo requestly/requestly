@@ -11,7 +11,7 @@ export async function duplicateRecords(context: ApiClientFeatureContext, params:
   const recordsToRender = getRecordsToRender({ apiClientRecords });
   const childParentMap = getChildParentMap(context);
   const processedRecords = filterOutChildrenRecords(params.recordIds, childParentMap, recordsToRender.recordsMap);
-  const recordsToDuplicate = processRecordsForDuplication(processedRecords, apiClientRecordsRepository);
+  const recordsToDuplicate = processRecordsForDuplication(processedRecords, apiClientRecordsRepository, context);
 
   const result = await apiClientRecordsRepository.duplicateApiEntities(recordsToDuplicate);
 
