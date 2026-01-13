@@ -70,6 +70,7 @@ import { ClientCodeButton } from "../components/ClientCodeButton/ClientCodeButto
 import HttpRequestTabs, { RequestTab } from "./components/HttpRequestTabs/HttpRequestTabs";
 import "./httpClientView.scss";
 import { QueryParamsProvider } from "features/apiClient/store/QueryParamsContextProvider";
+import { HeadersProvider } from "features/apiClient/store/HeadersContextProvider";
 import { MdOutlineSyncAlt } from "@react-icons/all-files/md/MdOutlineSyncAlt";
 import { useAPIRecords, useAPIRecordsStore } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 import { Authorization } from "../components/request/components/AuthorizationView/types/AuthConfig";
@@ -837,13 +838,18 @@ const HttpClientView: React.FC<Props> = ({
 const WithQueryParamsProvider = (Component: React.ComponentType<any>): React.FC<Props> => {
   const WrappedComponent: React.FC = (props: any) => {
     const record = useAPIRecordsStore().getState().getData(props.apiEntryDetails.id) as RQAPI.ApiClientRecord;
-    const entry = (record?.data as RQAPI.HttpApiEntry) || props.apiEntryDetails.data;
+    const entry = useMemo(() => (record?.data as RQAPI.HttpApiEntry) || props.apiEntryDetails.data, [
+      record?.data,
+      props.apiEntryDetails.data,
+    ]);
 
     return (
       <ErrorBoundary boundaryId="http-client-view-error-boundary">
         <PathVariablesProvider pathVariables={entry.request?.pathVariables ?? []}>
           <QueryParamsProvider entry={entry}>
-            <Component {...props} />
+            <HeadersProvider entry={entry}>
+              <Component {...props} entry={entry} />
+            </HeadersProvider>
           </QueryParamsProvider>
         </PathVariablesProvider>
       </ErrorBoundary>

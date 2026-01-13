@@ -39,6 +39,7 @@
 }
 
 .http-client-view {
+  height: 100%;
   // HEADER URL AND METHOD SELECTOR
   .api-client-header__url {
     .api-client-url-container {
@@ -80,5 +81,19 @@
     .ant-tabs-content-holder {
       padding: 6px;
     }
+
+    &.active-tab-query_params,
+    &.active-tab-headers {
+      .ant-tabs-content-holder {
+        padding: 0;
+      }
+    }
+  }
+
+  .non-scrollable-tab-content {
+    height: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
   }
 }
