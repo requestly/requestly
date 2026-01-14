@@ -14,6 +14,7 @@ interface KeyValueBulkEditorProps {
   onChange: (updatedPairs: KeyValuePair[]) => void;
   onClose: () => void;
   useStore?: StoreHook;
+  tableType: string;
 }
 
 const whiteTextTheme = EditorView.theme({
@@ -87,6 +88,7 @@ export const KeyValueBulkEditor: React.FC<KeyValueBulkEditorProps> = ({
   onChange: propsOnChange,
   onClose,
   useStore,
+  tableType,
 }) => {
   const useStoreHook = useStore ?? (() => undefined);
   const storeData = useStoreHook((state: any) => state?.queryParams ?? state?.headers);
@@ -154,12 +156,12 @@ export const KeyValueBulkEditor: React.FC<KeyValueBulkEditorProps> = ({
 
   const showHintPanel = editorValue.trim().length > 0;
   const placeholderText =
-    "Add or edit params in key:value format\n- Separate each row by a new line\n- Add parameters separated by a colon (:)\n- Prepend // to any row to disable it";
+    "- Add or edit in key:value format\n- Separate each row by a newline\n- Prepend // to any row to disable it";
 
   return (
     <div className="key-value-bulk-edit-panel">
       <div className="bulk-edit-panel-header">
-        <div className="bulk-edit-panel-title">BULK EDIT PARAMS</div>
+        <div className="bulk-edit-panel-title">{`BULK EDIT ${tableType}`} </div>
 
         <RQButton
           type="transparent"

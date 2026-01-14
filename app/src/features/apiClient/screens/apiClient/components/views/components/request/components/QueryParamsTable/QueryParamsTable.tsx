@@ -38,6 +38,7 @@ function Data(props: {
         dataType: { visible: true },
       }}
       useStore={useQueryParamStore}
+      tableType="params"
     >
       {props.children}
     </KeyValueTable>
