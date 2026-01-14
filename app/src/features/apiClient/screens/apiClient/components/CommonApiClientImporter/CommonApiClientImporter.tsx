@@ -88,7 +88,7 @@ export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = (
                 const fileContent = reader.result as string;
                 importer({ content: fileContent, name: file.name, type: file.type })
                   .then((output) => resolve(output))
-                  .catch(() => reject(new Error("Failed to parse specification file")));
+                  .catch((error) => reject(error));
               };
               reader.readAsText(file);
             });
