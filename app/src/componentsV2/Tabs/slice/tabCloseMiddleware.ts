@@ -1,15 +1,10 @@
-import { createListenerMiddleware, AnyAction } from "@reduxjs/toolkit";
+import { createListenerMiddleware } from "@reduxjs/toolkit";
 import { workspaceActions } from "store/slices/workspaces/slice";
 import { closeAllTabs } from "./thunks";
 import { RootState } from "store/types";
 import { ReducerKeys } from "store/constants";
 import { isEqual } from "lodash";
-import {
-  AnyListenerPredicate,
-  ListenerEffect,
-  ListenerErrorHandler,
-} from "@reduxjs/toolkit/dist/listenerMiddleware/types";
-import { ThunkDispatch } from "redux-thunk";
+import { ListenerErrorHandler } from "@reduxjs/toolkit/dist/listenerMiddleware/types";
 import * as Sentry from "@sentry/react";
 
 function hasWorkspaceIdsChanged(currentState: unknown, previousState: unknown): boolean {
@@ -32,36 +27,6 @@ function hasAuthStateChanged(currentState: unknown, previousState: unknown): boo
   return currentLoggedIn !== previousLoggedIn;
 }
 
-type TabCloseListener = {
-  predicate: AnyListenerPredicate<RootState>;
-  effect: ListenerEffect<AnyAction, RootState, ThunkDispatch<RootState, unknown, AnyAction>>;
-};
-
-const tabCloseListeners: TabCloseListener[] = [
-  {
-    predicate: (action, currentState, previousState) => {
-      if (action.type !== workspaceActions.setActiveWorkspaceIds.type) {
-        return false;
-      }
-      return hasWorkspaceIdsChanged(currentState, previousState);
-    },
-    effect: async (action, listenerApi) => {
-      await listenerApi.dispatch(closeAllTabs({ skipUnsavedPrompt: true })).unwrap();
-    },
-  },
-  {
-    predicate: (action, currentState, previousState) => {
-      if (action.type !== `${ReducerKeys.GLOBAL}/updateUserInfo`) {
-        return false;
-      }
-      return hasAuthStateChanged(currentState, previousState);
-    },
-    effect: async (action, listenerApi) => {
-      await listenerApi.dispatch(closeAllTabs({ skipUnsavedPrompt: true })).unwrap();
-    },
-  },
-];
-
 const onError: ListenerErrorHandler = (error, errorInfo) => {
   Sentry.captureException(error, {
     tags: {
@@ -73,8 +38,28 @@ const onError: ListenerErrorHandler = (error, errorInfo) => {
 
 const tabCloseListenerMiddleware = createListenerMiddleware({ onError });
 
-tabCloseListeners.forEach(({ predicate, effect }) => {
-  tabCloseListenerMiddleware.startListening({ predicate, effect });
+tabCloseListenerMiddleware.startListening({
+  predicate: (action, currentState, previousState) => {
+    if (action.type !== workspaceActions.setActiveWorkspaceIds.type) {
+      return false;
+    }
+    return hasWorkspaceIdsChanged(currentState, previousState);
+  },
+  effect: async (action, listenerApi) => {
+    await listenerApi.dispatch(closeAllTabs({ skipUnsavedPrompt: true })).unwrap();
+  },
+});
+
+tabCloseListenerMiddleware.startListening({
+  predicate: (action, currentState, previousState) => {
+    if (action.type !== `${ReducerKeys.GLOBAL}/updateUserInfo`) {
+      return false;
+    }
+    return hasAuthStateChanged(currentState, previousState);
+  },
+  effect: async (action, listenerApi) => {
+    await listenerApi.dispatch(closeAllTabs({ skipUnsavedPrompt: true })).unwrap();
+  },
 });
 
 export const tabCloseMiddleware = tabCloseListenerMiddleware.middleware;
