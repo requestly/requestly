@@ -8,7 +8,7 @@ import { displayFolderSelector } from "components/mode-specific/desktop/misc/Fil
 import { PiFolderOpen } from "@react-icons/all-files/pi/PiFolderOpen";
 import Logger from "lib/logger";
 import { RQButton } from "lib/design-system-v2/components";
-import { CreateWorkspaceArgs } from "../WorkspaceCreationView";
+import { CreateWorkspaceArgs } from "features/workspaces/hooks/useCreateWorkspace";
 import { MdOutlineInfo } from "@react-icons/all-files/md/MdOutlineInfo";
 import "./localWorkspaceCreationView.scss";
 import { WorkspaceType } from "features/workspaces/types";
