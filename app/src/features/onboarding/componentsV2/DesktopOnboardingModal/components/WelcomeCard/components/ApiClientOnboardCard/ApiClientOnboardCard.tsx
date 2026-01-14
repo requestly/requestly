@@ -1,13 +1,13 @@
 import React from "react";
+import { useDispatch } from "react-redux";
 import { AnimatePresence, m } from "framer-motion";
 import { WelcomeCardHeader } from "../WelcomeCardHeader/WelcomeCardHeader";
 import { collapseExpandTransition } from "utils/animations";
 import { MdOutlineKeyboardArrowUp } from "@react-icons/all-files/md/MdOutlineKeyboardArrowUp";
 import { MdOutlineKeyboardArrowDown } from "@react-icons/all-files/md/MdOutlineKeyboardArrowDown";
-import "./apiClientOnboardCard.scss";
-import { useDispatch } from "react-redux";
+import { LocalWorkspaceCreateOptions } from "componentsV2/modals/CreateWorkspaceModal";
 import { globalActions } from "store/slices/global/slice";
-import { LocalWorkspaceCreateOptions } from "componentsV2/modals/CreateWorkspaceModal/components/LocalWorkspaceCreationView/components/LocalWorkspaceCreateOptions/LocalWorkspaceCreateOptions";
+import "./apiClientOnboardCard.scss";
 
 interface CardProps {
   isExpanded: boolean;

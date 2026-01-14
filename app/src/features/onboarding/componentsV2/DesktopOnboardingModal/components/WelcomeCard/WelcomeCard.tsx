@@ -9,6 +9,7 @@ import { WelcomeCardHeader } from "./components/WelcomeCardHeader/WelcomeCardHea
 import { ApiClientOnboardCard } from "./components/ApiClientOnboardCard/ApiClientOnboardCard";
 import clsx from "clsx";
 import "./welcomeCard.scss";
+import { useCreateDefaultLocalWorkspace } from "features/workspaces/hooks/useCreateDefaultLocalWorkspace";
 
 interface Props {
   onFeatureClick: (step: OnboardingStep) => void;
@@ -17,6 +18,14 @@ interface Props {
 export const WelcomeCard: React.FC<Props> = ({ onFeatureClick }) => {
   const dispatch = useDispatch();
   const [isApiClientCardExpanded, setIsApiClientCardExpanded] = useState(false);
+
+  const { createWorkspace, isLoading } = useCreateDefaultLocalWorkspace({
+    analyticEventSource: "desktop_onboarding",
+    onCreateWorkspaceCallback: () => {
+      trackDesktopOnboardingStepSkipped(OnboardingStep.FEATURE_SELECTION);
+      dispatch(globalActions.updateIsOnboardingCompleted(true));
+    },
+  });
 
   const handleApiClientCardExpandToggle = () => {
     setIsApiClientCardExpanded((prev) => !prev);
@@ -57,14 +66,7 @@ export const WelcomeCard: React.FC<Props> = ({ onFeatureClick }) => {
         </div>
       </div>
       <div className="skip-footer">
-        <Button
-          type="link"
-          size="small"
-          onClick={() => {
-            trackDesktopOnboardingStepSkipped(OnboardingStep.FEATURE_SELECTION);
-            dispatch(globalActions.updateIsOnboardingCompleted(true));
-          }}
-        >
+        <Button type="link" size="small" loading={isLoading} onClick={createWorkspace}>
           Skip
         </Button>{" "}
         this screen and quick start

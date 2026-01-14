@@ -253,6 +253,15 @@ export function createWorkspaceFolder(name: string, path: string) {
     path
   ) as Promise<FileSystemResult<{ id: string; name: string; path: string }>>;
 }
+
+export function createDefaultWorkspace() {
+  return rpc({
+    namespace: LOCAL_SYNC_BUILDER_NAMESPACE,
+    method: "createDefaultWorkspace",
+    timeout: 80000,
+  }) as Promise<FileSystemResult<{ id: string; name: string; path: string }>>;
+}
+
 export function getAllWorkspaces() {
   return rpcWithRetry({
     namespace: LOCAL_SYNC_BUILDER_NAMESPACE,
