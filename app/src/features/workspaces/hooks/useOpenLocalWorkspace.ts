@@ -8,11 +8,12 @@ import { getAppMode } from "store/selectors";
 import { ErrorCode } from "errors/types";
 import { workspaceActions } from "store/slices/workspaces/slice";
 import * as Sentry from "@sentry/react";
+import { FileSystemError } from "features/apiClient/helpers/modules/sync/local/services/types";
 
 interface UseOpenLocalWorkspaceParams {
   analyticEventSource: string;
   onOpenWorkspaceCallback?: () => void;
-  onError?: (error: any) => void;
+  onError?: (error: FileSystemError) => void;
 }
 
 export const useOpenLocalWorkspace = ({
@@ -62,7 +63,7 @@ export const useOpenLocalWorkspace = ({
             }
             throw new Error("Something went wrong while opening the workspace");
           }
-          throw new Error(openWorkspaceResult.error.message, { cause: openWorkspaceResult.error });
+          throw new Error(openWorkspaceResult.error.message, { cause: openWorkspaceResult });
         }
 
         const workspace = openWorkspaceResult.content;
@@ -70,10 +71,10 @@ export const useOpenLocalWorkspace = ({
         await handleWorkspaceSwitch(workspace.id, workspace.name);
         onOpenWorkspaceCallback?.();
       } catch (error) {
-        onError?.(error);
+        onError?.(error.cause);
         Sentry.captureException(error, {
           extra: {
-            message: error.message,
+            message: error.cause?.message,
           },
         });
       } finally {

@@ -7,9 +7,8 @@ import { Tooltip } from "antd";
 import clsx from "clsx";
 import { useCreateDefaultLocalWorkspace } from "features/workspaces/hooks/useCreateDefaultLocalWorkspace";
 import { RQButton } from "lib/design-system-v2/components";
-import "./localWorkspaceCreateOptions.scss";
-import { useOpenLocalWorkspace } from "features/workspaces/hooks/useOpenLocalWorkspace";
 import { displayFolderSelector } from "components/mode-specific/desktop/misc/FileDialogButton";
+import "./localWorkspaceCreateOptions.scss";
 
 enum WorkspaceCreationMode {
   QUICK_START = "quick_start",
@@ -19,6 +18,8 @@ enum WorkspaceCreationMode {
 
 interface OptionsProps {
   analyticEventSource: string;
+  openWorkspace: (workspacePath: string) => void;
+  isOpeningWorkspaceLoading: boolean;
   isOpenedInModal?: boolean;
   onCreateWorkspaceClick: () => void;
   onCreationCallback: () => void;
@@ -27,21 +28,14 @@ interface OptionsProps {
 export const LocalWorkspaceCreateOptions: React.FC<OptionsProps> = ({
   onCreateWorkspaceClick,
   onCreationCallback,
+  openWorkspace,
+  isOpeningWorkspaceLoading,
   analyticEventSource,
   isOpenedInModal = false,
 }) => {
   const { createWorkspace, isLoading } = useCreateDefaultLocalWorkspace({
     analyticEventSource,
     onCreateWorkspaceCallback: onCreationCallback,
-  });
-
-  const { openWorkspace, isLoading: isOpeningWorkspaceLoading } = useOpenLocalWorkspace({
-    analyticEventSource,
-    onOpenWorkspaceCallback: onCreationCallback,
-    onError: (error) => {
-      // TODO: Handle error
-      console.log("DBG OPEN ERROR", error);
-    },
   });
 
   const options = useMemo(
