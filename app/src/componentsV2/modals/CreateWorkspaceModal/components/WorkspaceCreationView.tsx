@@ -25,7 +25,7 @@ import { getDomainFromEmail } from "utils/mailCheckerUtils";
 import { getAvailableBillingTeams } from "store/features/billing/selectors";
 import * as Sentry from "@sentry/react";
 import { ErrorCode } from "errors/types";
-import { ExistingWorkspaceConflictView } from "./LocalWorkspaceCreationView/components/ExistingWorkspaceConflictView/ExistingWorkspaceConflictView";
+import { ExistingWorkspaceConflictView } from "./LocalWorkspaceCreationView/components/ExistingWorkspaceConflictView";
 
 interface Props {
   workspaceType: WorkspaceType;
