@@ -7,6 +7,7 @@ import { Tooltip } from "antd";
 import clsx from "clsx";
 import { useCreateDefaultLocalWorkspace } from "features/workspaces/hooks/useCreateDefaultLocalWorkspace";
 import { RQButton } from "lib/design-system-v2/components";
+import { displayFolderSelector } from "components/mode-specific/desktop/misc/FileDialogButton";
 import "./localWorkspaceCreateOptions.scss";
 
 enum WorkspaceCreationMode {
@@ -17,6 +18,8 @@ enum WorkspaceCreationMode {
 
 interface OptionsProps {
   analyticEventSource: string;
+  openWorkspace: (workspacePath: string) => void;
+  isOpeningWorkspaceLoading: boolean;
   isOpenedInModal?: boolean;
   onCreateWorkspaceClick: () => void;
   onCreationCallback: () => void;
@@ -25,6 +28,8 @@ interface OptionsProps {
 export const LocalWorkspaceCreateOptions: React.FC<OptionsProps> = ({
   onCreateWorkspaceClick,
   onCreationCallback,
+  openWorkspace,
+  isOpeningWorkspaceLoading,
   analyticEventSource,
   isOpenedInModal = false,
 }) => {
@@ -32,6 +37,7 @@ export const LocalWorkspaceCreateOptions: React.FC<OptionsProps> = ({
     analyticEventSource,
     onCreateWorkspaceCallback: onCreationCallback,
   });
+
   const options = useMemo(
     () => [
       {
@@ -54,11 +60,12 @@ export const LocalWorkspaceCreateOptions: React.FC<OptionsProps> = ({
         id: WorkspaceCreationMode.OPEN,
         title: "Open existing workspace",
         icon: <PiFolderOpen />,
+        isLoading: isOpeningWorkspaceLoading,
         info: "Already have a workspace? Select the folder to continue working.",
-        onClick: () => {},
+        onClick: () => displayFolderSelector((folderPath: string) => openWorkspace(folderPath)),
       },
     ],
-    [isOpenedInModal, onCreateWorkspaceClick, isLoading, createWorkspace]
+    [isOpenedInModal, onCreateWorkspaceClick, isLoading, createWorkspace, openWorkspace, isOpeningWorkspaceLoading]
   );
 
   return options

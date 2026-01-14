@@ -271,6 +271,17 @@ export function getAllWorkspaces() {
   }) as Promise<FileSystemResult<{ id: string; name: string; path: string }[]>>;
 }
 
+export function openExistingLocalWorkspace(workspacePath: string) {
+  return rpc(
+    {
+      namespace: LOCAL_SYNC_BUILDER_NAMESPACE,
+      method: "openExistingLocalWorkspace",
+      timeout: 10000,
+    },
+    workspacePath
+  ) as Promise<FileSystemResult<{ id: string; name: string; path: string }>>;
+}
+
 export function removeWorkspace(
   workspaceId: string,
   opts: { deleteDirectory?: boolean } = {}
