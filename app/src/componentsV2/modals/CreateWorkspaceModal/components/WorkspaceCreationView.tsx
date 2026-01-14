@@ -3,7 +3,7 @@ import { SharedWorkspaceCreationView } from "./SharedWorkspaceCreationView/Share
 import { LocalWorkspaceCreationView } from "./LocalWorkspaceCreationView/LocalWorkspaceCreationView";
 import { WorkspaceType } from "features/workspaces/types";
 import { ErrorCode } from "errors/types";
-import { ExistingWorkspaceConflictView } from "./LocalWorkspaceCreationView/components/ExistingWorkspaceConflictView/ExistingWorkspaceConflictView";
+import { ExistingWorkspaceConflictView } from "./LocalWorkspaceCreationView/components/ExistingWorkspaceConflictView";
 import { useCreateWorkspace } from "features/workspaces/hooks/useCreateWorkspace";
 import { toast } from "utils/Toast";
 
