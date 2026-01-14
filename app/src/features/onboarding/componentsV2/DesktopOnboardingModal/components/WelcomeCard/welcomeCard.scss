@@ -17,3 +17,23 @@
   transition: opacity 0.2s ease-in-out;
   pointer-events: none;
 }
+
+.api-client-onboard-card {
+  position: relative;
+
+  &__options-container {
+    padding-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--requestly-space-4, 8px);
+  }
+
+  &__arrow {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    position: absolute;
+    right: 16px;
+    top: 32px;
+  }
+}
