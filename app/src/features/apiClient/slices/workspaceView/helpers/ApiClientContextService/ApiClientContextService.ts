@@ -44,7 +44,6 @@ import { EntityNotFound } from "features/apiClient/slices/types";
 import { runnerConfigSlice } from "features/apiClient/slices/runConfig/slice";
 import { liveRunResultsSlice } from "features/apiClient/slices/liveRunResults/slice";
 import { runHistorySlice } from "features/apiClient/slices/runHistory";
-import { apiClientStoreCloseTabsMiddleware } from "features/apiClient/slices/apiRecords/middleware";
 
 export type UserDetails = { uid: string; loggedIn: true } | { loggedIn: false };
 
@@ -125,7 +124,6 @@ class ApiClientContextService {
         return getDefaultMiddleware({
           serializableCheck: false,
         })
-          .concat(apiClientStoreCloseTabsMiddleware)
           .concat(bufferSyncMiddleware)
           .concat(manualRehydrationMiddleware);
       },
