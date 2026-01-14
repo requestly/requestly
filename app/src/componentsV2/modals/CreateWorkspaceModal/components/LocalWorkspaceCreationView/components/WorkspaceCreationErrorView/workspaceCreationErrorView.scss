@@ -1,4 +1,4 @@
-.existing-workspace-conflict-view__header {
+.workspace-creation-error-view__header {
   display: flex;
   align-items: center;
   gap: 4px;
@@ -12,13 +12,13 @@
   }
 }
 
-.existing-workspace-conflict-view__description {
+.workspace-creation-error-view__description {
   color: var(--requestly-color-text-default);
   font-size: var(--requestly-font-size-sm);
   margin-top: var(--requestly-space-6);
 }
 
-.existing-workspace-conflict-view__path {
+.workspace-creation-error-view__path {
   display: flex;
   align-items: center;
   gap: 4px;
@@ -38,7 +38,7 @@
   }
 }
 
-.existing-workspace-conflict-view__actions {
+.workspace-creation-error-view__actions {
   display: flex;
   gap: var(--requestly-space-4);
   margin-top: var(--requestly-space-8);
