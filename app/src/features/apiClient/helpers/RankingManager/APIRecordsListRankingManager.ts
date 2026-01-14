@@ -7,6 +7,7 @@
 
 import { getImmediateChildrenRecords } from "features/apiClient/hooks/useChildren.hook";
 import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
+import { WorkspaceType } from "features/workspaces/types";
 import { ListRankingManager } from "modules/ranking";
 
 type BaseData = {
@@ -34,17 +35,17 @@ export class APIRecordsListRankingManager extends ListRankingManager<RecordData>
   getGeneratedRank(record: RecordData): string {
     // Extract alphanumeric characters from name, lowercase, max 5 chars
     const name = record.name ?? "Untitled request";
-
-    const namePrefix = name
-      .replace(/[^a-zA-Z0-9]/g, "")
-      .toLowerCase()
-      .slice(0, 5)
-      .padEnd(5, "0"); // Pad with zeros if less than 5 chars
-
-    const ts = record.createdTs ?? Date.now();
-    // Combine prefix + name + timestamp for deterministic ordering
-    // (fractional indexing does not allow first character to be a digit and last character to be a zero)
-    return `a${namePrefix}${ts}1`;
+    const isLocalWorkspace = window.currentlyActiveWorkspaceType === WorkspaceType.LOCAL;
+    const namePrefix = name.replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
+    if (isLocalWorkspace) {
+      return `a${namePrefix}1`;
+    } else {
+      const ts = record.createdTs ?? Date.now();
+      const namePrefixFinal = namePrefix.slice(0, 5).padEnd(5, "0"); // Pad with zeros if less than 5 chars;
+      // Combine prefix + name + timestamp for deterministic ordering
+      // (fractional indexing does not allow first character to be a digit and last character to be a zero)
+      return `a${namePrefixFinal}${ts}1`;
+    }
   }
 
   // add a function to generate new ranks for new requests being added to a list
