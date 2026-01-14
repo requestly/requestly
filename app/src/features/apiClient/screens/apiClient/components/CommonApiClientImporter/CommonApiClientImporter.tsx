@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/react";
 import React, { useCallback, useState } from "react";
 import { FilePicker } from "components/common/FilePicker";
 import { HiOutlineExternalLink } from "@react-icons/all-files/hi/HiOutlineExternalLink";
@@ -18,6 +19,8 @@ import {
 import "./commonApiClientImporter.scss";
 import { ImportErrorView } from "./components/ImporterErrorView";
 import { SuccessfulParseView } from "./components/SuccessfulParseView";
+import { wrapWithCustomSpan } from "utils/sentry";
+import { SPAN_STATUS_ERROR, SPAN_STATUS_OK } from "@sentry/core";
 
 export interface ImportFile {
   content: string;
@@ -64,56 +67,76 @@ export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = (
     setEnvironmentsData([]);
   };
 
-  const onFilesDrop = async (files: File[]) => {
-    setIsDataProcessing(true);
-    const processFiles = files.map((file) => {
-      return new Promise<ApiClientImporterOutput>((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onerror = () => {
-          reject(new Error("Could not process the selected files! Try again."));
-        };
-        reader.onload = () => {
-          const fileContent = reader.result as string;
-          importer({ content: fileContent, name: file.name, type: file.type })
-            .then((output) => resolve(output))
-            .catch(() => reject(new Error("Failed to parse specification file")));
-        };
-        reader.readAsText(file);
-      });
-    });
+  const handleFileDrop = useCallback(
+    async (files: File[]) => {
+      return wrapWithCustomSpan(
+        {
+          name: `[Transaction] api_client.${importerType.toLowerCase()}_import.process_files`,
+          op: `api_client.${importerType.toLowerCase()}_import.process_files`,
+          forceTransaction: true,
+          attributes: {},
+        },
+        async (files: File[]) => {
+          setIsDataProcessing(true);
+          const processFiles = files.map((file) => {
+            return new Promise<ApiClientImporterOutput>((resolve, reject) => {
+              const reader = new FileReader();
+              reader.onerror = () => {
+                reject(new Error("Could not process the selected files! Try again."));
+              };
+              reader.onload = () => {
+                const fileContent = reader.result as string;
+                importer({ content: fileContent, name: file.name, type: file.type })
+                  .then((output) => resolve(output))
+                  .catch((error) => reject(error));
+              };
+              reader.readAsText(file);
+            });
+          });
 
-    await Promise.allSettled(processFiles)
-      .then((results: PromiseSettledResult<ApiClientImporterOutput>[]) => {
-        const hasAllFilesFailed = !results.some((result) => result.status === "fulfilled");
-        if (hasAllFilesFailed) {
-          throw new Error("Could not process the files! Please check if files are valid");
+          await Promise.allSettled(processFiles)
+            .then((results: PromiseSettledResult<ApiClientImporterOutput>[]) => {
+              const hasAllFilesFailed = !results.some((result) => result.status === "fulfilled");
+              if (hasAllFilesFailed) {
+                throw new Error("Could not process the files! Please check if files are valid");
+              }
+              const processedResults: { collections: RQAPI.CollectionRecord[]; environments: EnvironmentData[] } = {
+                collections: [],
+                environments: [],
+              };
+              results.forEach((result) => {
+                if (result.status === "fulfilled") {
+                  processedResults.collections.push(result.value.data.collection);
+                  processedResults.environments.push(...result.value.data.environments);
+                }
+              });
+              if (processedResults.collections.length === 0 && processedResults.environments.length === 0) {
+                throw new Error("Selected Files don't contain any collections or environments");
+              }
+              setCollectionsData(processedResults.collections);
+              setEnvironmentsData(processedResults.environments);
+              setIsParseComplete(true);
+              trackImportParsed(importerType, processedResults.collections.length, null);
+              Sentry.getActiveSpan()?.setStatus({
+                code: SPAN_STATUS_OK,
+              });
+            })
+            .catch((error) => {
+              setImportError(error.message || "Could not process the selected files! Try again.");
+              trackImportParseFailed(importerType, error.message);
+              Sentry.captureException(error);
+              Sentry.getActiveSpan()?.setStatus({
+                code: SPAN_STATUS_ERROR,
+              });
+            })
+            .finally(() => {
+              setIsDataProcessing(false);
+            });
         }
-        const processedResults: { collections: RQAPI.CollectionRecord[]; environments: EnvironmentData[] } = {
-          collections: [],
-          environments: [],
-        };
-        results.forEach((result) => {
-          if (result.status === "fulfilled") {
-            processedResults.collections.push(result.value.data.collection);
-            processedResults.environments.push(...result.value.data.environments);
-          }
-        });
-        if (processedResults.collections.length === 0 && processedResults.environments.length === 0) {
-          throw new Error("Selected Files don't contain any collections or environments");
-        }
-        setCollectionsData(processedResults.collections);
-        setEnvironmentsData(processedResults.environments);
-        setIsParseComplete(true);
-        trackImportParsed(importerType, processedResults.collections.length, null);
-      })
-      .catch((error) => {
-        setImportError(error.message || "Could not process the selected files! Try again.");
-        trackImportParseFailed(importerType, error.message);
-      })
-      .finally(() => {
-        setIsDataProcessing(false);
-      });
-  };
+      )(files);
+    },
+    [importer, importerType]
+  );
 
   const handleImportEnvironments = useCallback(
     async (environments: EnvironmentData[]) => {
@@ -357,64 +380,91 @@ export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = (
   );
 
   const handleImportData = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const importPromises = [];
-      importPromises.push(handleImportEnvironments(environmentsData));
-      importPromises.push(handleImportCollections(collectionsData));
-      const importResults = await Promise.allSettled(importPromises);
+    return wrapWithCustomSpan(
+      {
+        name: `[Transaction] api_client.${importerType.toLowerCase()}_import.import_data`,
+        op: `api_client.${importerType.toLowerCase()}_import.import_data`,
+        forceTransaction: true,
+        attributes: {},
+      },
+      async () => {
+        setIsLoading(true);
+        try {
+          const importPromises = [];
+          importPromises.push(handleImportEnvironments(environmentsData));
+          importPromises.push(handleImportCollections(collectionsData));
+          const importResults = await Promise.allSettled(importPromises);
 
-      const environmentResults = importResults[0];
-      const collectionResults = importResults[1];
+          const environmentResults = importResults[0];
+          const collectionResults = importResults[1];
 
-      let totalImported = 0;
-      let totalFailed = 0;
+          let totalImported = 0;
+          let totalFailed = 0;
 
-      if (environmentResults.status === "fulfilled") {
-        const envResults = environmentResults.value as PromiseSettledResult<{ id: string; name: string }>[];
-        const successfulEnvironments = envResults.filter((result) => result.status === "fulfilled").length;
-        totalImported += successfulEnvironments;
-        totalFailed += envResults.length - successfulEnvironments;
-      } else {
-        totalFailed += environmentsData.length;
+          if (environmentResults.status === "fulfilled") {
+            const envResults = environmentResults.value as PromiseSettledResult<{ id: string; name: string }>[];
+            const successfulEnvironments = envResults.filter((result) => result.status === "fulfilled").length;
+            totalImported += successfulEnvironments;
+            totalFailed += envResults.length - successfulEnvironments;
+          } else {
+            totalFailed += environmentsData.length;
+          }
+
+          if (collectionResults.status === "fulfilled") {
+            const collectionResult = collectionResults.value as {
+              success: boolean;
+              importedCount: number;
+              failedCount: number;
+            };
+            totalImported += collectionResult.importedCount;
+            totalFailed += collectionResult.failedCount;
+          } else {
+            totalFailed += collectionsData.length;
+          }
+
+          if (totalImported === 0) {
+            setImportError("Failed to import collections and environments");
+            Sentry.captureException(new Error("Failed to import collections and environments"));
+            Sentry.getActiveSpan()?.setStatus({
+              code: SPAN_STATUS_ERROR,
+            });
+            return;
+          }
+
+          if (totalFailed === 0) {
+            toast.success(
+              `Successfully imported ${collectionsData.length} ${
+                collectionsData.length !== 1 ? "collections" : "collection"
+              } and ${environmentsData.length} ${environmentsData.length !== 1 ? "environments" : "environment"}`
+            );
+            trackImportSuccess(importerType, collectionsData.length, null);
+            onImportSuccess();
+            Sentry.getActiveSpan()?.setStatus({
+              code: SPAN_STATUS_OK,
+            });
+          } else {
+            toast.warn(
+              `Partially imported: ${totalImported} succeeded, ${totalFailed} failed. Please review your files.`
+            );
+            trackImportSuccess(importerType, totalImported, null);
+            onImportSuccess();
+            Sentry.captureException(new Error("Partially imported collections and environments"));
+            Sentry.getActiveSpan()?.setStatus({
+              code: SPAN_STATUS_ERROR,
+            });
+          }
+        } catch (e) {
+          setImportError("Failed to import collections and environments");
+          trackImportFailed(importerType, e.message);
+          Sentry.captureException(e);
+          Sentry.getActiveSpan()?.setStatus({
+            code: SPAN_STATUS_ERROR,
+          });
+        } finally {
+          setIsLoading(false);
+        }
       }
-
-      if (collectionResults.status === "fulfilled") {
-        const collectionResult = collectionResults.value as {
-          success: boolean;
-          importedCount: number;
-          failedCount: number;
-        };
-        totalImported += collectionResult.importedCount;
-        totalFailed += collectionResult.failedCount;
-      } else {
-        totalFailed += collectionsData.length;
-      }
-
-      if (totalImported === 0) {
-        setImportError("Failed to import collections and environments");
-        return;
-      }
-
-      if (totalFailed === 0) {
-        toast.success(
-          `Successfully imported ${collectionsData.length} ${
-            collectionsData.length !== 1 ? "collections" : "collection"
-          } and ${environmentsData.length} ${environmentsData.length !== 1 ? "environments" : "environment"}`
-        );
-        trackImportSuccess(importerType, collectionsData.length, null);
-        onImportSuccess();
-      } else {
-        toast.warn(`Partially imported: ${totalImported} succeeded, ${totalFailed} failed. Please review your files.`);
-        trackImportSuccess(importerType, totalImported, null);
-        onImportSuccess();
-      }
-    } catch (e) {
-      setImportError("Failed to import collections and environments");
-      trackImportFailed(importerType, e.message);
-    } finally {
-      setIsLoading(false);
-    }
+    )();
   }, [
     collectionsData,
     environmentsData,
@@ -468,7 +518,7 @@ export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = (
               maxFiles={5}
               onFilesDrop={(files) => {
                 handleResetImport();
-                onFilesDrop(files);
+                handleFileDrop(files);
               }}
               isProcessing={isDataProcessing}
               title={`Drag and drop your ${productName} export file to upload`}
