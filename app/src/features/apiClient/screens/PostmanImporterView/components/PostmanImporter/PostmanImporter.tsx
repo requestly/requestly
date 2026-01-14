@@ -18,10 +18,12 @@ import "./postmanImporter.scss";
 import * as Sentry from "@sentry/react";
 import { useCommand } from "features/apiClient/commands";
 import { useApiClientRepository } from "features/apiClient/contexts/meta";
-import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
 import { EnvironmentVariableData } from "features/apiClient/store/variables/types";
 import { captureException } from "backend/apiClient/utils";
-import { ApiClientLocalRepository } from "features/apiClient/helpers/modules/sync/local/ApiClientLocalRepository";
+import { useSelector } from "react-redux";
+import { getActiveWorkspace } from "store/slices/workspaces/selectors";
+import { isLocalFSWorkspace } from "features/workspaces/utils";
+import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
 
 type ProcessedData = {
   environments: { name: string; variables: Record<string, EnvironmentVariableData>; isGlobal: boolean }[];
@@ -50,10 +52,12 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
   const {
     env: { createEnvironment, patchEnvironmentVariables },
   } = useCommand();
-  const repository = useApiClientRepository();
-  const { apiClientRecordsRepository, environmentVariablesRepository } = repository;
+
+  const { apiClientRecordsRepository, environmentVariablesRepository } = useApiClientRepository();
   const { onSaveRecord } = useNewApiClientContext();
-  const isLocalFileSystem = repository instanceof ApiClientLocalRepository;
+
+  const activeWorkspace = useSelector(getActiveWorkspace);
+  const isLocalFileSystem = isLocalFSWorkspace(activeWorkspace);
 
   const collectionsCount = useRef(0);
 
