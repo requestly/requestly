@@ -221,7 +221,7 @@ const AppModeInitializer = () => {
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [appMode]);
 
   const closeConnectedAppsModal = useCallback(
     (props = {}) => {
