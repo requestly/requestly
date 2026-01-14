@@ -40,6 +40,7 @@ function Data(props: {
         dataType: { visible: true },
       }}
       useStore={useHeadersStore}
+      tableType="headers"
     />
   );
 }

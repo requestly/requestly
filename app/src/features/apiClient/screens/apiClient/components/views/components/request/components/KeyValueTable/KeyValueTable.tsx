@@ -40,6 +40,7 @@ interface KeyValueTableProps {
   children?: React.ReactNode;
   useStore?: any;
   headerContent?: React.ReactNode;
+  tableType?: string;
 }
 
 export const KeyValueTable: React.FC<KeyValueTableProps> = ({
@@ -51,6 +52,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
   children,
   useStore,
   headerContent,
+  tableType,
 }) => {
   const { checkInvalidCharacter = false } = config || {};
 
@@ -235,7 +237,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
                 onToggleDescription={extraColumns.description.onToggle}
               />
               <Tooltip
-                title="Bulk edit params as key:value pairs"
+                title={`Bulk edit ${tableType} as key:value pairs`}
                 color="#000000"
                 mouseEnterDelay={0.2}
                 placement="right"
@@ -280,6 +282,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
     data.length,
     handleDeletePair,
     showBulkEditPanel,
+    tableType,
   ]);
 
   const lastEntryRef = useRef<HTMLDivElement>(null);
@@ -362,6 +365,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
             onChange={onChange}
             onClose={() => setShowBulkEditPanel(false)}
             useStore={useStore}
+            tableType={tableType ?? "params"}
           />
         )}
       </div>
