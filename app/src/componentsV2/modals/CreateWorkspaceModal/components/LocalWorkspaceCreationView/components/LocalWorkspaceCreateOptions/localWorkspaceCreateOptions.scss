@@ -1,0 +1,46 @@
+.ant-btn.ant-btn-default.local-workspace-create-options__option {
+  padding: var(--requestly-space-5, 12px) var(--requestly-space-6, 16px) !important;
+  border-radius: 8px;
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.06);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background 0.2s ease-in-out;
+  height: 56px;
+
+  &:hover {
+    background: var(--requestly-color-white-t-20);
+  }
+
+  .local-workspace-create-options__option-title {
+    display: flex;
+    align-items: center;
+    gap: var(--requestly-space-5, 12px);
+  }
+
+  &--primary {
+    background: var(--requestly-color-primary-dark);
+
+    &:hover {
+      background: var(--requestly-color-primary);
+    }
+  }
+
+  .local-workspace-create-options__option-arrow {
+    display: flex;
+    width: 32px;
+    height: 32px;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    border-radius: 48px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.04);
+
+    svg {
+      width: 20px;
+      height: 20px;
+    }
+  }
+}
