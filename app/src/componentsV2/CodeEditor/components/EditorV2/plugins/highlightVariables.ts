@@ -47,9 +47,14 @@ export const highlightVariablesPlugin = (setters: VariableSetters, variables: Sc
             variable,
           });
 
+          const isDefined = variables.has(variable);
+          const cls = `highlight-${isDefined ? "defined" : "undefined"}-variable`;
+          const colorVar = isDefined ? "var(--requestly-color-primary-text)" : "var(--requestly-color-error-text)";
+
           decorations.push(
             Decoration.mark({
-              class: `highlight-${variables.has(variable) ? "defined" : "undefined"}-variable`,
+              class: cls,
+              attributes: { style: `color: ${colorVar} !important;` },
             }).range(match.index, match.index + match[0].length)
           );
         }
