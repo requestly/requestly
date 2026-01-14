@@ -31,11 +31,11 @@ import { getImmediateChildrenRecords } from "features/apiClient/hooks/useChildre
 import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 import { isGraphQLApiRecord, isHttpApiRecord } from "features/apiClient/screens/apiClient/utils";
 import { apiRecordsRankingManager } from "features/apiClient/helpers/RankingManager";
-import { saveOrUpdateRecord } from "features/apiClient/commands/store.utils";
 import { RecordData } from "features/apiClient/helpers/RankingManager/APIRecordsListRankingManager";
 import clsx from "clsx";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
+import { moveRecordsAcrossWorkspace } from "features/apiClient/commands/records";
 
 interface Props {
   record: RQAPI.ApiRecord;
@@ -178,17 +178,16 @@ export const RequestRow: React.FC<Props> = ({
           const rank = apiRecordsRankingManager.getRanksBetweenRecords(before, after, [item.record])[0];
           const targetCollectionId = record.collectionId;
 
-          const patch: Partial<RQAPI.ApiRecord> = {
-            id: item.record.id,
-            rank,
-            collectionId: targetCollectionId,
-          };
+          const recordWithRank = { ...item.record, rank, collectionId: targetCollectionId };
 
-          const result = await apiClientRecordsRepository.updateRecord(patch, item.record.id);
-
-          if (result.success) {
-            saveOrUpdateRecord(context, result.data);
-          }
+          await moveRecordsAcrossWorkspace(context, {
+            recordsToMove: [recordWithRank],
+            ranks: [rank],
+            destination: {
+              contextId,
+              collectionId: targetCollectionId || "",
+            },
+          });
         } catch (error) {
           toast.error("Error moving record");
         }
@@ -233,7 +232,6 @@ export const RequestRow: React.FC<Props> = ({
         toast.success("Request duplicated successfully");
         trackRequestDuplicated();
       } catch (error: any) {
-        console.error("Error duplicating request:", error);
         notification.error({
           message: "Error duplicating request",
           description: error?.message || "Unexpected error. Please contact support.",

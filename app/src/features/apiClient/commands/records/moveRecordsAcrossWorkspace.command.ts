@@ -8,19 +8,20 @@ export async function moveRecordsAcrossWorkspace(
   ctx: ApiClientFeatureContext,
   params: {
     recordsToMove: RQAPI.ApiClientRecord[];
+    ranks?: string[];
     destination: {
       contextId: string;
       collectionId: RQAPI.ApiClientRecord["id"];
     };
   }
 ) {
-  const { recordsToMove, destination } = params;
+  const { recordsToMove, ranks, destination } = params;
 
   const result = await moveRecords(ctx, {
     recordsToMove: recordsToMove,
+    ranks,
     collectionId: destination.collectionId,
   });
-
 
   if (destination.contextId !== ctx.id) {
     const destinationContext = getApiClientFeatureContext(destination.contextId);

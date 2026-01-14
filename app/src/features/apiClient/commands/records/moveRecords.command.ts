@@ -10,13 +10,17 @@ export async function moveRecords(
   params: {
     collectionId: string;
     recordsToMove: RQAPI.ApiClientRecord[];
+    ranks?: string[];
   }
 ) {
   const { collectionId, recordsToMove } = params;
   const { apiClientRecordsRepository } = context.repositories;
 
   // Generate ranks for records being moved
-  const ranks = apiRecordsRankingManager.getRanksForNewApis(context, collectionId, recordsToMove);
+  const ranks =
+    params.ranks?.length === recordsToMove.length
+      ? params.ranks
+      : apiRecordsRankingManager.getRanksForNewApis(context, collectionId, recordsToMove);
 
   const updatedRequests = recordsToMove.map((record, index) => {
     const updatedRecord = isApiCollection(record)

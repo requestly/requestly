@@ -565,8 +565,16 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
       })();
 
       if (moveResult.type === "success") {
-        const parsedCollection = this.parseAPIEntities([moveResult.content as APIEntity]);
-        result.push(parsedCollection[0]);
+        // After moving, update the file with the new rank if provided
+        if (entity.rank) {
+          const updateResult = await this.updateRecord({ rank: entity.rank }, parseFsId(moveResult.content.id));
+          if (updateResult.success) {
+            result.push(updateResult.data);
+          }
+        } else {
+          const parsedCollection = this.parseAPIEntities([moveResult.content as APIEntity]);
+          result.push(parsedCollection[0]);
+        }
       }
     }
 
