@@ -152,9 +152,10 @@ export const TabsContainer: React.FC = () => {
   }, [activeTabSource, setUrl]);
 
   const tabItems: TabsProps["items"] = useMemo(() => {
-    return Array.from(tabs.values()).map((tabStore, index) => {
+    const tabsArray = Array.from(tabs.values());
+
+    return tabsArray.map((tabStore, index) => {
       const tabState = tabStore.getState();
-      const tabsArray = Array.from(tabs.values());
 
       const closeTabsToLeft = () => {
         for (let i = 0; i < index; i++) {
@@ -171,7 +172,7 @@ export const TabsContainer: React.FC = () => {
       };
 
       const closeAllTabs = () => {
-        Array.from(tabs.values()).forEach((tab) => {
+        tabsArray.forEach((tab) => {
           closeTabById(tab.getState().id);
         });
       };
