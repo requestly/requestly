@@ -23,6 +23,8 @@ import { useCommand } from "features/apiClient/commands";
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
 import { useApiClientRepository } from "features/apiClient/contexts/meta";
 import { EnvironmentVariableData } from "features/apiClient/store/variables/types";
+import { wrapWithCustomSpan } from "utils/sentry";
+import { SPAN_STATUS_ERROR, SPAN_STATUS_OK } from "@sentry/core";
 
 interface BrunoImporterProps {
   onSuccess?: () => void;
@@ -54,84 +56,100 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
 
   const handleFileDrop = useCallback(
     (files: File[]) => {
-      setProcessingStatus("processing");
-      setImportError(null);
+      return wrapWithCustomSpan(
+        {
+          name: "[Transaction] api_client.bruno_import.process_files",
+          op: "api_client.bruno_import.process_files",
+          forceTransaction: true,
+          attributes: {},
+        },
+        async (files: File[]) => {
+          setProcessingStatus("processing");
+          setImportError(null);
 
-      const processFiles = files.map((file) => {
-        return new Promise((resolve, reject) => {
-          const reader = new FileReader();
+          const processFiles = files.map((file) => {
+            return new Promise((resolve, reject) => {
+              const reader = new FileReader();
 
-          reader.onerror = () => reject(new Error("Could not process the selected file!"));
+              reader.onerror = () => reject(new Error("Could not process the selected file!"));
 
-          reader.onload = () => {
-            try {
-              if (!file.type.includes("json")) {
-                throw new Error("Invalid file. Please upload valid Bruno export files.");
-              }
+              reader.onload = () => {
+                try {
+                  if (!file.type.includes("json")) {
+                    throw new Error("Invalid file. Please upload valid Bruno export files.");
+                  }
 
-              const fileContent = JSON.parse(reader.result as string);
-              // Basic validation for Bruno files
-              if (!fileContent.name || !fileContent.items) {
-                throw new Error("Invalid Bruno collection format");
-              }
+                  const fileContent = JSON.parse(reader.result as string);
+                  // Basic validation for Bruno files
+                  if (!fileContent.name || !fileContent.items) {
+                    throw new Error("Invalid Bruno collection format");
+                  }
 
-              const processedData = processBrunoCollectionData(fileContent, apiClientRecordsRepository);
-              resolve({ data: processedData });
-            } catch (error) {
-              console.error("Error processing Bruno file:", error);
-              reject(error);
-            }
-          };
-          reader.readAsText(file);
-        });
-      });
-
-      Promise.allSettled(processFiles)
-        .then((results) => {
-          const hasProcessingAllFilesFailed = !results.some((result) => result.status === "fulfilled");
-          if (hasProcessingAllFilesFailed) {
-            throw new Error(
-              "Could not process the selected files! Please check if the files are valid Bruno export files."
-            );
-          }
-
-          const processedRecords = {
-            collections: [] as Partial<RQAPI.CollectionRecord>[],
-            apis: [] as Partial<RQAPI.ApiRecord>[],
-            environments: [] as Array<{
-              name: string;
-              variables: Record<string, EnvironmentVariableData>;
-            }>,
-          };
-
-          results.forEach((result: any) => {
-            if (result.status === "fulfilled") {
-              const { collections, apis, environments } = result.value.data;
-              processedRecords.collections.push(...collections);
-              processedRecords.apis.push(...apis);
-              processedRecords.environments.push(...environments);
-              collectionsCount.current += collections.length;
-              trackImportParsed(
-                ApiClientImporterType.BRUNO,
-                processedRecords.collections.length,
-                processedRecords.apis.length
-              );
-            }
+                  const processedData = processBrunoCollectionData(fileContent, apiClientRecordsRepository);
+                  resolve({ data: processedData });
+                } catch (error) {
+                  console.error("Error processing Bruno file:", error);
+                  reject(error);
+                }
+              };
+              reader.readAsText(file);
+            });
           });
 
-          setProcessedFileData(processedRecords);
-          setProcessingStatus("processed");
-        })
-        .catch((error) => {
-          trackImportParseFailed(ApiClientImporterType.BRUNO, error.message);
-          setImportError(error.message);
-          setProcessingStatus("idle");
+          await Promise.allSettled(processFiles)
+            .then((results) => {
+              const hasProcessingAllFilesFailed = !results.some((result) => result.status === "fulfilled");
+              if (hasProcessingAllFilesFailed) {
+                throw new Error(
+                  "Could not process the selected files! Please check if the files are valid Bruno export files."
+                );
+              }
 
-          Sentry.withScope((scope) => {
-            scope.setTag("error_type", "api_client_bruno_processing");
-            Sentry.captureException(error);
-          });
-        });
+              const processedRecords = {
+                collections: [] as Partial<RQAPI.CollectionRecord>[],
+                apis: [] as Partial<RQAPI.ApiRecord>[],
+                environments: [] as Array<{
+                  name: string;
+                  variables: Record<string, EnvironmentVariableData>;
+                }>,
+              };
+
+              results.forEach((result: any) => {
+                if (result.status === "fulfilled") {
+                  const { collections, apis, environments } = result.value.data;
+                  processedRecords.collections.push(...collections);
+                  processedRecords.apis.push(...apis);
+                  processedRecords.environments.push(...environments);
+                  collectionsCount.current += collections.length;
+                  trackImportParsed(
+                    ApiClientImporterType.BRUNO,
+                    processedRecords.collections.length,
+                    processedRecords.apis.length
+                  );
+                }
+              });
+
+              setProcessedFileData(processedRecords);
+              setProcessingStatus("processed");
+              Sentry.getActiveSpan()?.setStatus({
+                code: SPAN_STATUS_OK,
+              });
+            })
+            .catch((error) => {
+              trackImportParseFailed(ApiClientImporterType.BRUNO, error.message);
+              setImportError(error.message);
+              setProcessingStatus("idle");
+
+              Sentry.withScope((scope) => {
+                scope.setTag("error_type", "api_client_bruno_processing");
+                Sentry.captureException(error);
+              });
+              Sentry.getActiveSpan()?.setStatus({
+                code: SPAN_STATUS_ERROR,
+              });
+            });
+        }
+      )(files);
     },
     [apiClientRecordsRepository]
   );
