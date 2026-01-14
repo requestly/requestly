@@ -1,11 +1,14 @@
-import React from "react";
+import React, { useState } from "react";
 import { Button } from "antd";
 import RQOnlyLogo from "/assets/media/common/RQ-only-logo.svg";
-import { WelcomeCardOption } from "../WelcomeCardOption/WelcomeCardOption";
 import { useDispatch } from "react-redux";
 import { globalActions } from "store/slices/global/slice";
 import { trackDesktopOnboardingFeatureSelected, trackDesktopOnboardingStepSkipped } from "../../analytics";
 import { OnboardingStep } from "../../types";
+import { WelcomeCardHeader } from "./components/WelcomeCardHeader/WelcomeCardHeader";
+import { ApiClientOnboardCard } from "./components/ApiClientOnboardCard/ApiClientOnboardCard";
+import clsx from "clsx";
+import "./welcomeCard.scss";
 
 interface Props {
   onFeatureClick: (step: OnboardingStep) => void;
@@ -13,34 +16,45 @@ interface Props {
 
 export const WelcomeCard: React.FC<Props> = ({ onFeatureClick }) => {
   const dispatch = useDispatch();
+  const [isApiClientCardExpanded, setIsApiClientCardExpanded] = useState(false);
+
+  const handleApiClientCardExpandToggle = () => {
+    setIsApiClientCardExpanded((prev) => !prev);
+  };
+
   return (
     <>
-      <img src={RQOnlyLogo} alt="RQ Only Logo" />
-      <div className="rq-desktop-onboarding-modal-content__card-header" style={{ marginTop: "24px" }}>
+      <img src={RQOnlyLogo} alt="RQ Only Logo" className={clsx(isApiClientCardExpanded && "fade-out")} />
+      <div
+        className={clsx("rq-desktop-onboarding-modal-content__card-header", isApiClientCardExpanded && "fade-out")}
+        style={{ marginTop: "24px" }}
+      >
         Welcome to the Requestly
       </div>
-      <div className="rq-desktop-onboarding-modal-content__card-description">
+      <div
+        className={clsx("rq-desktop-onboarding-modal-content__card-description", isApiClientCardExpanded && "fade-out")}
+      >
         Intercept, Mock, Build & Test APIs faster
       </div>
       <div className="welcome-options">
-        <WelcomeCardOption
-          title="Start using API Client"
-          description="Create, manage, and test APIs with collections and reusable variables."
-          iconSrc={"/assets/media/apiClient/api-client-icon.svg"}
-          onClick={() => {
-            trackDesktopOnboardingFeatureSelected("api_client");
-            onFeatureClick(OnboardingStep.FOLDER_SELECTION);
-          }}
+        <ApiClientOnboardCard
+          isExpanded={isApiClientCardExpanded}
+          onExpandToggle={handleApiClientCardExpandToggle}
+          onCreateWorkspaceClick={() => onFeatureClick(OnboardingStep.FOLDER_SELECTION)}
         />
-        <WelcomeCardOption
-          title="Intercept and Modify Web Traffic"
-          description="Capture and modify requests, responses, headers, and scripts in real time."
-          iconSrc={"/assets/media/rules/rules-icon.svg"}
+        <div
+          className={clsx("welcome-card-option", isApiClientCardExpanded && "fade-out")}
           onClick={() => {
             trackDesktopOnboardingFeatureSelected("rules");
             onFeatureClick(OnboardingStep.AUTH);
           }}
-        />
+        >
+          <WelcomeCardHeader
+            title="Intercept and Modify Web Traffic"
+            description="Capture and modify requests, responses, headers, and scripts in real time."
+            iconSrc={"/assets/media/rules/rules-icon.svg"}
+          />
+        </div>
       </div>
       <div className="skip-footer">
         <Button

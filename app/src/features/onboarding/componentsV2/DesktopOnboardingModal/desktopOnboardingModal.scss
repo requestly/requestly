@@ -50,7 +50,7 @@
           }
 
           &.welcome-card {
-            padding: var(--space-12, 56px) var(--space-9, 32px);
+            padding: var(--requestly-space-12) var(--requestly-space-9);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -78,14 +78,10 @@
             }
           }
           &.local-workspace-card {
-            padding: var(--space-9, 32px);
-
-            .create-workspace-header__title {
-              display: none;
-            }
+            padding: var(--requestly-space-8);
           }
           &.auth-card {
-            padding: var(--space-9, 32px);
+            padding: var(--requestly-space-8);
           }
         }
 

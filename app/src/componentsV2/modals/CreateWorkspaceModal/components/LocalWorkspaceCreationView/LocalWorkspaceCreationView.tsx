@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Tooltip, Typography } from "antd";
+import { useCallback, useEffect, useState } from "react";
+import { Tooltip } from "antd";
 import { MdOutlineFolder } from "@react-icons/all-files/md/MdOutlineFolder";
 import { MdOutlineInsertDriveFile } from "@react-icons/all-files/md/MdOutlineInsertDriveFile";
 import { CreateWorkspaceHeader } from "../CreateWorkspaceHeader/CreateWorkspaceHeader";
@@ -12,6 +12,8 @@ import { CreateWorkspaceArgs } from "../WorkspaceCreationView";
 import { MdOutlineInfo } from "@react-icons/all-files/md/MdOutlineInfo";
 import "./localWorkspaceCreationView.scss";
 import { WorkspaceType } from "features/workspaces/types";
+import { useDebounce } from "hooks/useDebounce";
+import { WorkspacePathEllipsis } from "features/workspaces/components/WorkspacePathEllipsis";
 
 type FolderItem = {
   name: string;
@@ -59,6 +61,7 @@ export const LocalWorkspaceCreationView = ({
   const [workspaceName, setWorkspaceName] = useState("");
   const [folderPath, setFolderPath] = useState("");
   const [folderPreview, setFolderPreview] = useState<FolderPreview | null>(null);
+  const [hasDuplicateWorkspaceName, setHasDuplicateWorkspaceName] = useState(false);
 
   const folderSelectCallback = async (folderPath: string) => {
     setFolderPath(folderPath);
@@ -99,6 +102,20 @@ export const LocalWorkspaceCreationView = ({
     ));
   };
 
+  const debouncedCheckForDuplicateWorkspaceName = useDebounce((value: string) => {
+    const workspaceName = value.replace(INVALID_FS_NAME_CHARACTERS, "-");
+    const isDuplicate = folderPreview?.existingContents.find((item) => item.name === workspaceName);
+    setHasDuplicateWorkspaceName(!!isDuplicate);
+  });
+
+  const handleWorkspaceNameChange = useCallback(
+    (value: string) => {
+      setWorkspaceName(value.replace(INVALID_FS_NAME_CHARACTERS, "-"));
+      debouncedCheckForDuplicateWorkspaceName(value);
+    },
+    [debouncedCheckForDuplicateWorkspaceName]
+  );
+
   useEffect(() => {
     window.RQ.DESKTOP.SERVICES.IPC.invokeEventInMain("get-workspace-folder-preview", {
       folderPath: "",
@@ -120,27 +137,14 @@ export const LocalWorkspaceCreationView = ({
       <CreateWorkspaceHeader
         title="Create a new local workspace"
         description=""
-        onWorkspaceNameChange={(value) => {
-          setWorkspaceName(value.replace(INVALID_FS_NAME_CHARACTERS, "-"));
-        }}
+        onWorkspaceNameChange={handleWorkspaceNameChange}
+        hasDuplicateWorkspaceName={hasDuplicateWorkspaceName}
       />
       <div className="workspace-folder-selector">
         <RQButton icon={<MdOutlineFolder />} onClick={() => displayFolderSelector(folderSelectCallback)}>
           Select a folder
         </RQButton>
-        {folderPath.length ? (
-          <Typography.Text
-            ellipsis={{
-              tooltip: {
-                title: folderPath,
-                color: "#000",
-              },
-            }}
-            className="selected-folder-path"
-          >
-            {folderPath}
-          </Typography.Text>
-        ) : null}
+        {folderPath.length ? <WorkspacePathEllipsis path={folderPath} className="selected-folder-path" /> : null}
       </div>
 
       {folderPreview ? (
@@ -191,7 +195,7 @@ export const LocalWorkspaceCreationView = ({
         onCancel={onCancel}
         onCreateWorkspaceClick={handleOnCreateWorkspaceClick}
         isLoading={isLoading}
-        disabled={!workspaceName.length || !folderPath.length}
+        disabled={!workspaceName.length || !folderPath.length || hasDuplicateWorkspaceName}
       />
     </>
   );
