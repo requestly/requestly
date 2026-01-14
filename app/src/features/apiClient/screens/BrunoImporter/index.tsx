@@ -55,7 +55,7 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
   const collectionsCount = useRef(0);
 
   const handleFileDrop = useCallback(
-    (files: File[]) => {
+    async (files: File[]) => {
       return wrapWithCustomSpan(
         {
           name: "[Transaction] api_client.bruno_import.process_files",
@@ -250,52 +250,64 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
     }
   }, [createEnvironment, processedFileData.environments]);
 
-  const handleImportBrunoData = useCallback(() => {
-    setIsImporting(true);
-    Promise.all([handleImportEnvironments(), handleImportCollectionsAndApis()])
-      .then(([importedEnvs, recordsResult]) => {
-        if (
-          recordsResult.importedApisCount === 0 &&
-          importedEnvs === 0 &&
-          recordsResult.importedCollectionsCount === 0
-        ) {
-          notification.error({
-            message: "Failed to import Bruno data",
-            placement: "bottomRight",
+  const handleImportBrunoData = useCallback(async () => {
+    return wrapWithCustomSpan(
+      {
+        name: "[Transaction] api_client.bruno_import.import_data",
+        op: "api_client.bruno_import.import_data",
+        forceTransaction: true,
+        attributes: {},
+      },
+      async () => {
+        setIsImporting(true);
+        await Promise.all([handleImportEnvironments(), handleImportCollectionsAndApis()])
+          .then(([importedEnvs, recordsResult]) => {
+            if (
+              recordsResult.importedApisCount === 0 &&
+              importedEnvs === 0 &&
+              recordsResult.importedCollectionsCount === 0
+            ) {
+              throw new Error("Failed to import Bruno data.");
+            }
+
+            const successMessage = [
+              recordsResult.importedApisCount + recordsResult.importedCollectionsCount > 0
+                ? `${recordsResult.importedApisCount + recordsResult.importedCollectionsCount} collection(s) and api(s)`
+                : null,
+              importedEnvs > 0 ? `${importedEnvs} environment(s)` : null,
+            ]
+              .filter(Boolean)
+              .join(" and ");
+
+            toast.success(`Successfully imported ${successMessage}`);
+
+            trackImportSuccess(
+              ApiClientImporterType.BRUNO,
+              recordsResult.importedCollectionsCount,
+              recordsResult.importedApisCount
+            );
+            onSuccess?.();
+            Sentry.getActiveSpan()?.setStatus({
+              code: SPAN_STATUS_OK,
+            });
+          })
+          .catch((error) => {
+            Logger.error("Bruno data import failed:", error);
+            setImportError("Something went wrong! Couldn't import Bruno data");
+            trackImportFailed(ApiClientImporterType.BRUNO, JSON.stringify(error));
+            Sentry.withScope((scope) => {
+              scope.setTag("error_type", "api_client_bruno_import");
+              Sentry.captureException(error);
+            });
+            Sentry.getActiveSpan()?.setStatus({
+              code: SPAN_STATUS_ERROR,
+            });
+          })
+          .finally(() => {
+            setIsImporting(false);
           });
-          return;
-        }
-
-        const successMessage = [
-          recordsResult.importedApisCount + recordsResult.importedCollectionsCount > 0
-            ? `${recordsResult.importedApisCount + recordsResult.importedCollectionsCount} collection(s) and api(s)`
-            : null,
-          importedEnvs > 0 ? `${importedEnvs} environment(s)` : null,
-        ]
-          .filter(Boolean)
-          .join(" and ");
-
-        toast.success(`Successfully imported ${successMessage}`);
-
-        trackImportSuccess(
-          ApiClientImporterType.BRUNO,
-          recordsResult.importedCollectionsCount,
-          recordsResult.importedApisCount
-        );
-        onSuccess?.();
-      })
-      .catch((error) => {
-        Logger.error("Bruno data import failed:", error);
-        setImportError("Something went wrong! Couldn't import Bruno data");
-        trackImportFailed(ApiClientImporterType.BRUNO, JSON.stringify(error));
-        Sentry.withScope((scope) => {
-          scope.setTag("error_type", "api_client_bruno_import");
-          Sentry.captureException(error);
-        });
-      })
-      .finally(() => {
-        setIsImporting(false);
-      });
+      }
+    )();
   }, [handleImportEnvironments, handleImportCollectionsAndApis, onSuccess]);
 
   const handleResetImport = () => {
