@@ -17,6 +17,7 @@ import { ApiClientViewMode } from "../workspaceView";
 import { getApiClientFeatureContext } from "../workspaceView/helpers/ApiClientContextRegistry/hooks";
 import { Workspace } from "features/workspaces/types";
 import { erroredRecordsActions } from "../erroredRecords";
+import { closeTabByEntityId } from "componentsV2/Tabs/slice";
 
 type Repository = ApiClientRecordsInterface<Record<string, unknown>>;
 
@@ -78,31 +79,43 @@ export const deleteRecords = createAsyncThunk<
     repository: Repository;
   },
   { rejectValue: string }
->("apiRecords/delete", async ({ records, repository }, { dispatch, rejectWithValue }) => {
-  const recordsToBeDeleted = getAllRecords(records);
+>(
+  "apiRecords/delete",
+  async ({ records, repository }, { dispatch, rejectWithValue, getState, signal }) => {
+    const recordsToBeDeleted = getAllRecords(records);
 
-  const [apiRecords, collectionRecords] = partition(recordsToBeDeleted, isApiRequest);
-  const apiRecordIds = apiRecords.map((record) => record.id);
-  const collectionRecordIds = collectionRecords.map((record) => record.id);
+    const [apiRecords, collectionRecords] = partition(recordsToBeDeleted, isApiRequest);
+    const apiRecordIds = apiRecords.map((record) => record.id);
+    const collectionRecordIds = collectionRecords.map((record) => record.id);
 
-  const recordsDeletionResult = await repository.deleteRecords(apiRecordIds);
-  const collectionsDeletionResult = await repository.deleteCollections(collectionRecordIds);
+    const recordsDeletionResult = await repository.deleteRecords(apiRecordIds);
+    const collectionsDeletionResult = await repository.deleteCollections(collectionRecordIds);
 
-  if (!recordsDeletionResult.success || !collectionsDeletionResult.success) {
-    return rejectWithValue(
-      recordsDeletionResult.message ?? collectionsDeletionResult.message ?? "Failed to delete records"
-    );
+    if (!recordsDeletionResult.success || !collectionsDeletionResult.success) {
+      return rejectWithValue(
+        recordsDeletionResult.message ?? collectionsDeletionResult.message ?? "Failed to delete records"
+      );
+    }
+
+    dispatch(apiRecordsActions.recordsDeleted([...apiRecordIds, ...collectionRecordIds]));
+
+    return {
+      recordsDeletionResult,
+      collectionsDeletionResult,
+      deletedApiRecords: apiRecords as RQAPI.ApiRecord[],
+      deletedCollectionRecords: collectionRecords as RQAPI.CollectionRecord[],
+    };
+  },
+  {
+    condition: ({ records }) => {
+      getAllRecords(records).forEach(async (r) => {
+        await reduxStore.dispatch(closeTabByEntityId({ entityId: r.id, skipUnsavedPrompt: true }));
+      });
+
+      return true;
+    },
   }
-
-  dispatch(apiRecordsActions.recordsDeleted([...apiRecordIds, ...collectionRecordIds]));
-
-  return {
-    recordsDeletionResult,
-    collectionsDeletionResult,
-    deletedApiRecords: apiRecords as RQAPI.ApiRecord[],
-    deletedCollectionRecords: collectionRecords as RQAPI.CollectionRecord[],
-  };
-});
+);
 
 export const forceRefreshRecords = createAsyncThunk<boolean, { repository: Repository }, { rejectValue: string }>(
   "apiRecords/forceRefresh",
