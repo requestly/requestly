@@ -1,5 +1,6 @@
 import type React from "react";
 import { useState, useCallback, useMemo, useRef } from "react";
+import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
 import { EnvironmentVariableType } from "backend/environment/types";
 import type { EnvironmentVariables } from "backend/environment/types";
 import { useVariablesListColumns } from "./hooks/useVariablesListColumns";
@@ -41,8 +42,10 @@ export const VariablesList: React.FC<VariablesListProps> = ({
   const [visibleSecretsRowIds, setVisibleSecrets] = useState<(number | string)[]>([]);
   const emptyRowIdRef = useRef<string>(uuidv4());
 
+  const variablesOrder = useApiClientSelector((state) => variables.getOrder(state));
+
   const dataSource = useMemo(() => {
-    const arr = mapToEnvironmentArray(variablesData);
+    const arr = mapToEnvironmentArray(variablesData, variablesOrder);
     if (arr.length === 0) {
       return [
         {
@@ -57,7 +60,7 @@ export const VariablesList: React.FC<VariablesListProps> = ({
     }
     emptyRowIdRef.current = uuidv4();
     return arr;
-  }, [variablesData]);
+  }, [variablesData, variablesOrder]);
 
   const filteredDataSource = useMemo(
     () => dataSource.filter((item) => item.key.toLowerCase().includes(searchValue.toLowerCase())),
