@@ -57,7 +57,10 @@ export const useOpenLocalWorkspace = ({
         if (openWorkspaceResult.type === "error") {
           if (openWorkspaceResult.error.code === ErrorCode.EntityAlreadyExists) {
             if (openWorkspaceResult.error.metadata) {
-              await handleWorkspaceSwitch(openWorkspaceResult.error.metadata.workspaceId, "Default Workspace");
+              await handleWorkspaceSwitch(
+                openWorkspaceResult.error.metadata.workspaceId,
+                openWorkspaceResult.error.metadata.name
+              );
               onOpenWorkspaceCallback?.();
               return;
             }
