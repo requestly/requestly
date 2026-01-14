@@ -8,6 +8,8 @@ import clsx from "clsx";
 import { useCreateDefaultLocalWorkspace } from "features/workspaces/hooks/useCreateDefaultLocalWorkspace";
 import { RQButton } from "lib/design-system-v2/components";
 import "./localWorkspaceCreateOptions.scss";
+import { useOpenLocalWorkspace } from "features/workspaces/hooks/useOpenLocalWorkspace";
+import { displayFolderSelector } from "components/mode-specific/desktop/misc/FileDialogButton";
 
 enum WorkspaceCreationMode {
   QUICK_START = "quick_start",
@@ -32,6 +34,16 @@ export const LocalWorkspaceCreateOptions: React.FC<OptionsProps> = ({
     analyticEventSource,
     onCreateWorkspaceCallback: onCreationCallback,
   });
+
+  const { openWorkspace, isLoading: isOpeningWorkspaceLoading } = useOpenLocalWorkspace({
+    analyticEventSource,
+    onOpenWorkspaceCallback: onCreationCallback,
+    onError: (error) => {
+      // TODO: Handle error
+      console.log("DBG OPEN ERROR", error);
+    },
+  });
+
   const options = useMemo(
     () => [
       {
@@ -54,11 +66,12 @@ export const LocalWorkspaceCreateOptions: React.FC<OptionsProps> = ({
         id: WorkspaceCreationMode.OPEN,
         title: "Open existing workspace",
         icon: <PiFolderOpen />,
+        isLoading: isOpeningWorkspaceLoading,
         info: "Already have a workspace? Select the folder to continue working.",
-        onClick: () => {},
+        onClick: () => displayFolderSelector((folderPath: string) => openWorkspace(folderPath)),
       },
     ],
-    [isOpenedInModal, onCreateWorkspaceClick, isLoading, createWorkspace]
+    [isOpenedInModal, onCreateWorkspaceClick, isLoading, createWorkspace, openWorkspace, isOpeningWorkspaceLoading]
   );
 
   return options
