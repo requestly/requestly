@@ -7,7 +7,7 @@ import { RQButton } from "lib/design-system-v2/components";
 import { IoMdCopy } from "@react-icons/all-files/io/IoMdCopy";
 import Editor from "componentsV2/CodeEditor";
 import { copyToClipBoard } from "utils/Misc";
-import { shouldRenderPreview } from "components/mode-specific/desktop/InterceptTraffic/WebTraffic/TrafficTableV2/utils";
+import { shouldRenderPreview } from "utils/CodeEditorUtils";
 
 interface Props {
   responseText: string;
