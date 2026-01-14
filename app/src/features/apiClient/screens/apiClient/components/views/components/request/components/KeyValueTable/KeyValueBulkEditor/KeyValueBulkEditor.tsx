@@ -161,7 +161,7 @@ export const KeyValueBulkEditor: React.FC<KeyValueBulkEditorProps> = ({
   return (
     <div className="key-value-bulk-edit-panel">
       <div className="bulk-edit-panel-header">
-        <div className="bulk-edit-panel-title">{`BULK EDIT ${tableType}`} </div>
+        <div className="bulk-edit-panel-title">{`BULK EDIT ${tableType.toUpperCase()}`} </div>
 
         <RQButton
           type="transparent"
