@@ -2,7 +2,7 @@
   padding: var(--requestly-space-5, 12px) var(--requestly-space-6, 16px) !important;
   border-radius: 8px;
   backdrop-filter: blur(10px);
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--requestly-color-white-t-10);
   display: flex;
   justify-content: space-between;
   align-items: center;

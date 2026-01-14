@@ -5,7 +5,6 @@ import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
 import { PiFolderOpen } from "@react-icons/all-files/pi/PiFolderOpen";
 import { Tooltip } from "antd";
 import clsx from "clsx";
-// import { useCreateDefaultLocalWorkspace } from "features/workspaces/hooks/useCreateDefaultLocalWorkspace";
 import { RQButton } from "lib/design-system-v2/components";
 import "./localWorkspaceCreateOptions.scss";
 
@@ -28,10 +27,6 @@ export const LocalWorkspaceCreateOptions: React.FC<OptionsProps> = ({
   analyticEventSource,
   isOpenedInModal = false,
 }) => {
-  //   const { createWorkspace, isLoading } = useCreateDefaultLocalWorkspace({
-  //     analyticEventSource,
-  //     onCreateWorkspaceCallback: onCreationCallback,
-  //   });
   const options = useMemo(
     () => [
       {
