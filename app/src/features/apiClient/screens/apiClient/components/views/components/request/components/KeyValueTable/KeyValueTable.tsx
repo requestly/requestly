@@ -237,7 +237,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
                 onToggleDescription={extraColumns.description.onToggle}
               />
               <Tooltip
-                title={`Bulk edit ${tableType} as key:value pairs`}
+                title={`Bulk edit ${tableType ?? "params"} as key:value pairs`}
                 color="#000000"
                 mouseEnterDelay={0.2}
                 placement="right"
