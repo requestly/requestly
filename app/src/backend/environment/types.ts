@@ -9,6 +9,7 @@ export interface EnvironmentData {
   id: string;
   name: string;
   variables: IVariableValues<EnvironmentVariableData>;
+  variablesOrder?: string[]; // Array of variable keys in display order
 }
 
 export type EnvironmentMap = Record<string, EnvironmentData>;

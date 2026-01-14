@@ -31,15 +31,30 @@ export const environmentsSlice = createSlice({
   initialState,
   reducers: {
     environmentCreated(state, action: PayloadAction<EnvironmentEntity>) {
-      environmentsAdapter.addOne(state.environments, action.payload);
+      const entity = action.payload;
+      // Initialize variablesOrder if not present
+      if (!entity.variablesOrder && entity.variables) {
+        entity.variablesOrder = Object.keys(entity.variables);
+      }
+      environmentsAdapter.addOne(state.environments, entity);
 
       if (state.environments.ids.length === 1) {
-        state.activeEnvironmentId = action.payload.id;
+        state.activeEnvironmentId = entity.id;
       }
     },
 
     environmentsCreated(state, action: PayloadAction<EnvironmentEntity[]>) {
-      environmentsAdapter.addMany(state.environments, action.payload);
+      // Initialize variablesOrder for entities that don't have it
+      const migratedEntities = action.payload.map((env) => {
+        if (!env.variablesOrder && env.variables) {
+          return {
+            ...env,
+            variablesOrder: Object.keys(env.variables),
+          };
+        }
+        return env;
+      });
+      environmentsAdapter.addMany(state.environments, migratedEntities);
     },
 
     environmentUpdated(
@@ -61,11 +76,21 @@ export const environmentsSlice = createSlice({
     },
 
     upsertEnvironment(state, action: PayloadAction<EnvironmentEntity>) {
-      environmentsAdapter.upsertOne(state.environments, action.payload);
+      const entity = action.payload;
+      // Initialize variablesOrder if not present
+      if (!entity.variablesOrder && entity.variables) {
+        entity.variablesOrder = Object.keys(entity.variables);
+      }
+      environmentsAdapter.upsertOne(state.environments, entity);
     },
 
     updateGlobalEnvironment(state, action: PayloadAction<EnvironmentEntity>) {
-      state.globalEnvironment = action.payload;
+      const entity = action.payload;
+      // Initialize variablesOrder if not present
+      if (!entity.variablesOrder && entity.variables) {
+        entity.variablesOrder = Object.keys(entity.variables);
+      }
+      state.globalEnvironment = entity;
     },
 
     setActiveEnvironment(state, action: PayloadAction<EntityId | null>) {
@@ -105,8 +130,30 @@ export const environmentsSlice = createSlice({
       }>
     ) {
       const { environments, globalEnvironment, activeEnvironmentId } = action.payload;
-      environmentsAdapter.setAll(state.environments, environments);
-      state.globalEnvironment = globalEnvironment;
+
+      // Initialize variablesOrder for entities that don't have it (migration)
+      const migratedEnvironments = environments.map((env) => {
+        if (!env.variablesOrder && env.variables) {
+          return {
+            ...env,
+            variablesOrder: Object.keys(env.variables),
+          };
+        }
+        return env;
+      });
+
+      environmentsAdapter.setAll(state.environments, migratedEnvironments);
+
+      // Initialize variablesOrder for global environment if missing
+      if (!globalEnvironment.variablesOrder && globalEnvironment.variables) {
+        state.globalEnvironment = {
+          ...globalEnvironment,
+          variablesOrder: Object.keys(globalEnvironment.variables),
+        };
+      } else {
+        state.globalEnvironment = globalEnvironment;
+      }
+
       if (activeEnvironmentId !== undefined) {
         state.activeEnvironmentId = activeEnvironmentId;
       }
@@ -146,11 +193,17 @@ const hydrationTransformer = createTransform<
   (inboundState) => {
     const inboundEntities = pickBy(inboundState.entities, (e) => !!e);
     const entities = mapValues(inboundEntities, (env) => {
+      const persistedData = ApiClientVariables.perist(
+        env.variables,
+        {
+          isPersisted: true, // always persist environment variables
+        },
+        env.variablesOrder
+      );
       return {
         id: env.id,
-        variables: ApiClientVariables.perist(env.variables, {
-          isPersisted: true, // always persist environment variables
-        }),
+        variables: persistedData.variables,
+        variablesOrder: persistedData.order,
       };
     });
 
@@ -181,13 +234,20 @@ const globalEnvHydrationTransformer = createTransform<
         id: GLOBAL_ENVIRONMENT_ID,
         name: "Global Environment",
         variables: {},
+        variablesOrder: [],
       };
     }
+    const persistedData = ApiClientVariables.perist(
+      inboundState.variables,
+      {
+        isPersisted: true,
+      },
+      inboundState.variablesOrder
+    );
     return {
       id: inboundState.id,
-      variables: ApiClientVariables.perist(inboundState.variables, {
-        isPersisted: true,
-      }),
+      variables: persistedData.variables,
+      variablesOrder: persistedData.order,
     };
   },
   (outboundState) => {
