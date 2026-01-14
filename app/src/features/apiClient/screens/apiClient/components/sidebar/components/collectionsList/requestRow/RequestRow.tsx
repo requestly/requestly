@@ -88,8 +88,8 @@ export const RequestRow: React.FC<Props> = ({
   const [isEditMode, setIsEditMode] = useState(false);
   const [recordToMove, setRecordToMove] = useState<RQAPI.ApiRecord | null>(null);
   const [dropPosition, setDropPosition] = useState<"before" | "after" | null>(null);
+  const dropPositionRef = useRef<"before" | "after" | null>(null);
   const requestRowRef = useRef<HTMLDivElement>(null);
-  const ctx = useApiClientFeatureContext();
   const { apiClientRecordsRepository } = useApiClientRepository();
   const { onSaveRecord } = useNewApiClientContext();
   const context = useApiClientFeatureContext();
@@ -143,21 +143,26 @@ export const RequestRow: React.FC<Props> = ({
           const targetRect = targetElement.getBoundingClientRect();
           const hoverMiddleY = (targetRect.bottom - targetRect.top) / 2;
           const hoverClientY = hoverBoundingRect.y - targetRect.top;
-
-          setDropPosition(hoverClientY < hoverMiddleY ? "before" : "after");
+          const dropPosition = hoverClientY < hoverMiddleY ? "before" : "after";
+          setDropPosition(dropPosition);
+          dropPositionRef.current = dropPosition;
         }
       },
       drop: async (item: { record: RQAPI.ApiClientRecord; contextId: string }, monitor) => {
         if (!monitor.isOver({ shallow: true })) {
           setDropPosition(null);
+          dropPositionRef.current = null;
           return;
         }
 
-        const currentDropPosition = dropPosition;
+        const currentDropPosition = dropPositionRef.current;
         setDropPosition(null);
+        dropPositionRef.current = null;
 
         try {
-          const siblings = apiRecordsRankingManager.sort(getImmediateChildrenRecords(ctx, record.collectionId ?? ""));
+          const siblings = apiRecordsRankingManager.sort(
+            getImmediateChildrenRecords(context, record.collectionId ?? "")
+          );
           let before: RecordData | null = null;
           let after: RecordData | null = null;
           const recordIndex = siblings.findIndex((sibling) => sibling.id === record.id);
@@ -197,8 +202,9 @@ export const RequestRow: React.FC<Props> = ({
 
   // Clear drop position when no longer hovering
   React.useEffect(() => {
-    if (!isOverCurrent && dropPosition !== null) {
+    if (!isOverCurrent && (dropPosition !== null || dropPositionRef.current !== null)) {
       setDropPosition(null);
+      dropPositionRef.current = null;
     }
   }, [isOverCurrent, dropPosition]);
 
@@ -209,9 +215,14 @@ export const RequestRow: React.FC<Props> = ({
   const handleDuplicateRequest = useCallback(
     async (record: RQAPI.ApiRecord) => {
       const { id, ...rest } = record;
+
+      // Generate rank for the duplicated request to place it immediately after the original
+      const rank = apiRecordsRankingManager.getRankForDuplicatedApi(context, record, record.collectionId ?? "");
+
       const newRecord: Omit<RQAPI.ApiRecord, "id"> = {
         ...rest,
         name: `(Copy) ${record.name || record.data.request?.url}`,
+        rank, // Set the calculated rank
       };
 
       try {
@@ -231,7 +242,7 @@ export const RequestRow: React.FC<Props> = ({
         trackDuplicateRequestFailed();
       }
     },
-    [onSaveRecord, apiClientRecordsRepository]
+    [onSaveRecord, apiClientRecordsRepository, context]
   );
 
   const requestOptions = useMemo((): MenuProps["items"] => {

@@ -280,7 +280,7 @@ export const createApiRecordsStore = (
 
     getParent(id) {
       const { childParentMap } = get();
-      return childParentMap.get(id);
+      return childParentMap.get(id) || undefined;
     },
 
     getParentChain(id) {
