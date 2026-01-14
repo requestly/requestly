@@ -380,64 +380,91 @@ export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = (
   );
 
   const handleImportData = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const importPromises = [];
-      importPromises.push(handleImportEnvironments(environmentsData));
-      importPromises.push(handleImportCollections(collectionsData));
-      const importResults = await Promise.allSettled(importPromises);
+    return wrapWithCustomSpan(
+      {
+        name: `[Transaction] api_client.${importerType.toLowerCase()}_import.import_data`,
+        op: `api_client.${importerType.toLowerCase()}_import.import_data`,
+        forceTransaction: true,
+        attributes: {},
+      },
+      async () => {
+        setIsLoading(true);
+        try {
+          const importPromises = [];
+          importPromises.push(handleImportEnvironments(environmentsData));
+          importPromises.push(handleImportCollections(collectionsData));
+          const importResults = await Promise.allSettled(importPromises);
 
-      const environmentResults = importResults[0];
-      const collectionResults = importResults[1];
+          const environmentResults = importResults[0];
+          const collectionResults = importResults[1];
 
-      let totalImported = 0;
-      let totalFailed = 0;
+          let totalImported = 0;
+          let totalFailed = 0;
 
-      if (environmentResults.status === "fulfilled") {
-        const envResults = environmentResults.value as PromiseSettledResult<{ id: string; name: string }>[];
-        const successfulEnvironments = envResults.filter((result) => result.status === "fulfilled").length;
-        totalImported += successfulEnvironments;
-        totalFailed += envResults.length - successfulEnvironments;
-      } else {
-        totalFailed += environmentsData.length;
+          if (environmentResults.status === "fulfilled") {
+            const envResults = environmentResults.value as PromiseSettledResult<{ id: string; name: string }>[];
+            const successfulEnvironments = envResults.filter((result) => result.status === "fulfilled").length;
+            totalImported += successfulEnvironments;
+            totalFailed += envResults.length - successfulEnvironments;
+          } else {
+            totalFailed += environmentsData.length;
+          }
+
+          if (collectionResults.status === "fulfilled") {
+            const collectionResult = collectionResults.value as {
+              success: boolean;
+              importedCount: number;
+              failedCount: number;
+            };
+            totalImported += collectionResult.importedCount;
+            totalFailed += collectionResult.failedCount;
+          } else {
+            totalFailed += collectionsData.length;
+          }
+
+          if (totalImported === 0) {
+            setImportError("Failed to import collections and environments");
+            Sentry.captureException(new Error("Failed to import collections and environments"));
+            Sentry.getActiveSpan()?.setStatus({
+              code: SPAN_STATUS_ERROR,
+            });
+            return;
+          }
+
+          if (totalFailed === 0) {
+            toast.success(
+              `Successfully imported ${collectionsData.length} ${
+                collectionsData.length !== 1 ? "collections" : "collection"
+              } and ${environmentsData.length} ${environmentsData.length !== 1 ? "environments" : "environment"}`
+            );
+            trackImportSuccess(importerType, collectionsData.length, null);
+            onImportSuccess();
+            Sentry.getActiveSpan()?.setStatus({
+              code: SPAN_STATUS_OK,
+            });
+          } else {
+            toast.warn(
+              `Partially imported: ${totalImported} succeeded, ${totalFailed} failed. Please review your files.`
+            );
+            trackImportSuccess(importerType, totalImported, null);
+            onImportSuccess();
+            Sentry.captureException(new Error("Partially imported collections and environments"));
+            Sentry.getActiveSpan()?.setStatus({
+              code: SPAN_STATUS_ERROR,
+            });
+          }
+        } catch (e) {
+          setImportError("Failed to import collections and environments");
+          trackImportFailed(importerType, e.message);
+          Sentry.captureException(e);
+          Sentry.getActiveSpan()?.setStatus({
+            code: SPAN_STATUS_ERROR,
+          });
+        } finally {
+          setIsLoading(false);
+        }
       }
-
-      if (collectionResults.status === "fulfilled") {
-        const collectionResult = collectionResults.value as {
-          success: boolean;
-          importedCount: number;
-          failedCount: number;
-        };
-        totalImported += collectionResult.importedCount;
-        totalFailed += collectionResult.failedCount;
-      } else {
-        totalFailed += collectionsData.length;
-      }
-
-      if (totalImported === 0) {
-        setImportError("Failed to import collections and environments");
-        return;
-      }
-
-      if (totalFailed === 0) {
-        toast.success(
-          `Successfully imported ${collectionsData.length} ${
-            collectionsData.length !== 1 ? "collections" : "collection"
-          } and ${environmentsData.length} ${environmentsData.length !== 1 ? "environments" : "environment"}`
-        );
-        trackImportSuccess(importerType, collectionsData.length, null);
-        onImportSuccess();
-      } else {
-        toast.warn(`Partially imported: ${totalImported} succeeded, ${totalFailed} failed. Please review your files.`);
-        trackImportSuccess(importerType, totalImported, null);
-        onImportSuccess();
-      }
-    } catch (e) {
-      setImportError("Failed to import collections and environments");
-      trackImportFailed(importerType, e.message);
-    } finally {
-      setIsLoading(false);
-    }
+    )();
   }, [
     collectionsData,
     environmentsData,
