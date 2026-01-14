@@ -33,7 +33,7 @@ import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsCon
 import { EXPANDED_RECORD_IDS_UPDATED } from "features/apiClient/exampleCollections/store";
 import { ExampleCollectionsNudge } from "../ExampleCollectionsNudge/ExampleCollectionsNudge";
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
-import { useApiClientRepository } from "features/apiClient/contexts/meta";
+import { useApiClientRepository, useApiClientFeatureContext } from "features/apiClient/contexts/meta";
 
 interface Props {
   onNewClick: (src: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType) => Promise<void>;
@@ -50,6 +50,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
   const { onSaveRecord, onSaveBulkRecords } = useNewApiClientContext();
 
   const { apiClientRecordsRepository } = useApiClientRepository();
+  const context = useApiClientFeatureContext();
 
   const [collectionsToExport, setCollectionsToExport] = useState<RQAPI.ApiClientRecord[]>([]);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
@@ -179,7 +180,11 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
       const processedRecords = filterOutChildrenRecords(selectedRecords, childParentMap, updatedRecords.recordsMap);
       switch (action) {
         case BulkActions.DUPLICATE: {
-          const recordsToDuplicate = processRecordsForDuplication(processedRecords, apiClientRecordsRepository);
+          const recordsToDuplicate = processRecordsForDuplication(
+            processedRecords,
+            apiClientRecordsRepository,
+            context
+          );
 
           try {
             const result = await apiClientRecordsRepository.duplicateApiEntities(recordsToDuplicate);
@@ -253,6 +258,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
       handleRecordsToBeDeleted,
       isAllRecordsSelected,
       apiClientRecordsRepository,
+      context,
       onSaveRecord,
       onSaveBulkRecords,
       addNestedCollection,

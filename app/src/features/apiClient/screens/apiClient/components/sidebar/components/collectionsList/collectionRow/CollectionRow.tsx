@@ -98,6 +98,7 @@ export const CollectionRow: React.FC<Props> = ({
   const [hoveredId, setHoveredId] = useState("");
   const [isCollectionRowLoading, setIsCollectionRowLoading] = useState(false);
   const hoverExpandTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
+  const dropPositionRef = React.useRef<"before" | "after" | "inside" | null>(null);
   const [dropPosition, setDropPosition] = useState<"before" | "after" | "inside" | null>(null);
   const collectionRowRef = React.useRef<HTMLDivElement>(null);
 
@@ -341,6 +342,8 @@ export const CollectionRow: React.FC<Props> = ({
 
           if (result.success) {
             saveOrUpdateRecord(context, result.data);
+          } else {
+            throw new Error(result.message || "Failed to move item. Please try again.");
           }
         }
       } catch (error) {
@@ -396,6 +399,7 @@ export const CollectionRow: React.FC<Props> = ({
           hoverExpandTimeoutRef.current = null;
         }
         setDropPosition(null);
+        dropPositionRef.current = null;
         return;
       }
 
@@ -406,6 +410,7 @@ export const CollectionRow: React.FC<Props> = ({
       // Only compute dropzones when hovering over the header; ignore children area
       if (!pointer || !headerEl) {
         setDropPosition(null);
+        dropPositionRef.current = null;
         return;
       }
 
@@ -418,6 +423,7 @@ export const CollectionRow: React.FC<Props> = ({
           hoverExpandTimeoutRef.current = null;
         }
         setDropPosition(null);
+        dropPositionRef.current = null;
         return;
       }
 
@@ -430,6 +436,7 @@ export const CollectionRow: React.FC<Props> = ({
         (hoverClientY > hoverHeight * 0.25 && hoverClientY < hoverHeight * 0.75)
       ) {
         setDropPosition("inside");
+        dropPositionRef.current = "inside";
         const IsTargetCollectionCollapsed = !expandedRecordIds.includes(record.id);
         if (IsTargetCollectionCollapsed && !hoverExpandTimeoutRef.current) {
           hoverExpandTimeoutRef.current = setTimeout(() => {
@@ -441,12 +448,14 @@ export const CollectionRow: React.FC<Props> = ({
         }
       } else if (hoverClientY < hoverHeight * 0.25) {
         setDropPosition("before");
+        dropPositionRef.current = "before";
         if (hoverExpandTimeoutRef.current) {
           clearTimeout(hoverExpandTimeoutRef.current);
           hoverExpandTimeoutRef.current = null;
         }
       } else if (hoverClientY > hoverHeight * 0.75) {
         setDropPosition("after");
+        dropPositionRef.current = "after";
         if (hoverExpandTimeoutRef.current) {
           clearTimeout(hoverExpandTimeoutRef.current);
           hoverExpandTimeoutRef.current = null;
@@ -470,16 +479,19 @@ export const CollectionRow: React.FC<Props> = ({
         const isOverCurrent = monitor.isOver({ shallow: true });
         if (!isOverCurrent) {
           setDropPosition(null);
+          dropPositionRef.current = null;
           return;
         }
 
         if (item.record.id === record.id) {
           setDropPosition(null);
+          dropPositionRef.current = null;
           return;
         }
 
-        const currentDropPosition = dropPosition;
+        const currentDropPosition = dropPositionRef.current;
         setDropPosition(null);
+        dropPositionRef.current = null;
         setIsCollectionRowLoading(true);
         handleRecordDrop(item, context.id, currentDropPosition);
       },
@@ -501,8 +513,9 @@ export const CollectionRow: React.FC<Props> = ({
   );
 
   useEffect(() => {
-    if (!isOver && dropPosition !== null) {
+    if (!isOver && (dropPosition !== null || dropPositionRef.current !== null)) {
       setDropPosition(null);
+      dropPositionRef.current = null;
     }
   }, [isOver, dropPosition]);
 
