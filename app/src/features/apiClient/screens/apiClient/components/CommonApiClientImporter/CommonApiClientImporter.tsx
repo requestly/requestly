@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/react";
 import React, { useCallback, useState } from "react";
 import { FilePicker } from "components/common/FilePicker";
 import { HiOutlineExternalLink } from "@react-icons/all-files/hi/HiOutlineExternalLink";
@@ -18,6 +19,8 @@ import {
 import "./commonApiClientImporter.scss";
 import { ImportErrorView } from "./components/ImporterErrorView";
 import { SuccessfulParseView } from "./components/SuccessfulParseView";
+import { wrapWithCustomSpan } from "utils/sentry";
+import { SPAN_STATUS_ERROR, SPAN_STATUS_OK } from "@sentry/core";
 
 export interface ImportFile {
   content: string;
@@ -64,56 +67,76 @@ export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = (
     setEnvironmentsData([]);
   };
 
-  const onFilesDrop = async (files: File[]) => {
-    setIsDataProcessing(true);
-    const processFiles = files.map((file) => {
-      return new Promise<ApiClientImporterOutput>((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onerror = () => {
-          reject(new Error("Could not process the selected files! Try again."));
-        };
-        reader.onload = () => {
-          const fileContent = reader.result as string;
-          importer({ content: fileContent, name: file.name, type: file.type })
-            .then((output) => resolve(output))
-            .catch(() => reject(new Error("Failed to parse specification file")));
-        };
-        reader.readAsText(file);
-      });
-    });
+  const handleFileDrop = useCallback(
+    async (files: File[]) => {
+      return wrapWithCustomSpan(
+        {
+          name: `[Transaction] api_client.${importerType.toLowerCase()}_import.process_files`,
+          op: `api_client.${importerType.toLowerCase()}_import.process_files`,
+          forceTransaction: true,
+          attributes: {},
+        },
+        async (files: File[]) => {
+          setIsDataProcessing(true);
+          const processFiles = files.map((file) => {
+            return new Promise<ApiClientImporterOutput>((resolve, reject) => {
+              const reader = new FileReader();
+              reader.onerror = () => {
+                reject(new Error("Could not process the selected files! Try again."));
+              };
+              reader.onload = () => {
+                const fileContent = reader.result as string;
+                importer({ content: fileContent, name: file.name, type: file.type })
+                  .then((output) => resolve(output))
+                  .catch(() => reject(new Error("Failed to parse specification file")));
+              };
+              reader.readAsText(file);
+            });
+          });
 
-    await Promise.allSettled(processFiles)
-      .then((results: PromiseSettledResult<ApiClientImporterOutput>[]) => {
-        const hasAllFilesFailed = !results.some((result) => result.status === "fulfilled");
-        if (hasAllFilesFailed) {
-          throw new Error("Could not process the files! Please check if files are valid");
+          await Promise.allSettled(processFiles)
+            .then((results: PromiseSettledResult<ApiClientImporterOutput>[]) => {
+              const hasAllFilesFailed = !results.some((result) => result.status === "fulfilled");
+              if (hasAllFilesFailed) {
+                throw new Error("Could not process the files! Please check if files are valid");
+              }
+              const processedResults: { collections: RQAPI.CollectionRecord[]; environments: EnvironmentData[] } = {
+                collections: [],
+                environments: [],
+              };
+              results.forEach((result) => {
+                if (result.status === "fulfilled") {
+                  processedResults.collections.push(result.value.data.collection);
+                  processedResults.environments.push(...result.value.data.environments);
+                }
+              });
+              if (processedResults.collections.length === 0 && processedResults.environments.length === 0) {
+                throw new Error("Selected Files don't contain any collections or environments");
+              }
+              setCollectionsData(processedResults.collections);
+              setEnvironmentsData(processedResults.environments);
+              setIsParseComplete(true);
+              trackImportParsed(importerType, processedResults.collections.length, null);
+              Sentry.getActiveSpan()?.setStatus({
+                code: SPAN_STATUS_OK,
+              });
+            })
+            .catch((error) => {
+              setImportError(error.message || "Could not process the selected files! Try again.");
+              trackImportParseFailed(importerType, error.message);
+              Sentry.captureException(error);
+              Sentry.getActiveSpan()?.setStatus({
+                code: SPAN_STATUS_ERROR,
+              });
+            })
+            .finally(() => {
+              setIsDataProcessing(false);
+            });
         }
-        const processedResults: { collections: RQAPI.CollectionRecord[]; environments: EnvironmentData[] } = {
-          collections: [],
-          environments: [],
-        };
-        results.forEach((result) => {
-          if (result.status === "fulfilled") {
-            processedResults.collections.push(result.value.data.collection);
-            processedResults.environments.push(...result.value.data.environments);
-          }
-        });
-        if (processedResults.collections.length === 0 && processedResults.environments.length === 0) {
-          throw new Error("Selected Files don't contain any collections or environments");
-        }
-        setCollectionsData(processedResults.collections);
-        setEnvironmentsData(processedResults.environments);
-        setIsParseComplete(true);
-        trackImportParsed(importerType, processedResults.collections.length, null);
-      })
-      .catch((error) => {
-        setImportError(error.message || "Could not process the selected files! Try again.");
-        trackImportParseFailed(importerType, error.message);
-      })
-      .finally(() => {
-        setIsDataProcessing(false);
-      });
-  };
+      )(files);
+    },
+    [importer, importerType]
+  );
 
   const handleImportEnvironments = useCallback(
     async (environments: EnvironmentData[]) => {
@@ -468,7 +491,7 @@ export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = (
               maxFiles={5}
               onFilesDrop={(files) => {
                 handleResetImport();
-                onFilesDrop(files);
+                handleFileDrop(files);
               }}
               isProcessing={isDataProcessing}
               title={`Drag and drop your ${productName} export file to upload`}
