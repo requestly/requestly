@@ -15,6 +15,7 @@ import { globalReducers } from "./slices/global/slice";
 import { workspaceViewReducerWithLocal } from "features/apiClient/slices";
 import { runtimeVariablesReducerWithPersist } from "features/apiClient/slices/runtimeVariables";
 import { tabsReducerWithPersist, tabBufferMiddleware } from "componentsV2/Tabs/slice";
+import { tabCloseMiddleware } from "componentsV2/Tabs/slice/tabCloseMiddleware";
 import { exampleCollectionsReducerWithPersist } from "features/apiClient/slices/exampleCollections";
 
 export const reduxStore = configureStore({
@@ -38,7 +39,7 @@ export const reduxStore = configureStore({
     // in our case we have functions in payload,
     // so avoiding this check.
     const middlewares = getDefaultMiddleware({ serializableCheck: false });
-    return middlewares.concat(tabBufferMiddleware);
+    return middlewares.concat(tabBufferMiddleware).concat(tabCloseMiddleware);
   },
   enhancers: (existingEnhancers) => {
     // Add the autobatch enhancer to the store setup

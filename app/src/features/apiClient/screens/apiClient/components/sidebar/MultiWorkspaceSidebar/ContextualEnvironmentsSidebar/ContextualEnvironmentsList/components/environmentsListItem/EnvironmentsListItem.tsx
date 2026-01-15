@@ -61,7 +61,7 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
   const dispatch = useApiClientDispatch();
   const workspaceId = useWorkspaceId();
   const { environmentVariablesRepository } = useApiClientRepository();
-  const { openBufferedTab, closeTabByEntityId } = useTabActions();
+  const { openBufferedTab } = useTabActions();
   const activeTabSourceId = useActiveTabId();
 
   const environment = useEnvironmentById(environmentId);
@@ -147,13 +147,12 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
         })
       ).unwrap();
 
-      closeTabByEntityId({ entityId: environment.id });
       trackEnvironmentDeleted();
       toast.success("Environment deleted successfully");
     } catch (error) {
       toast.error("Failed to delete environment");
     }
-  }, [environment, dispatch, environmentVariablesRepository, closeTabByEntityId]);
+  }, [environment, dispatch, environmentVariablesRepository]);
 
   const menuItems = useMemo(() => {
     if (!environment) return [];
