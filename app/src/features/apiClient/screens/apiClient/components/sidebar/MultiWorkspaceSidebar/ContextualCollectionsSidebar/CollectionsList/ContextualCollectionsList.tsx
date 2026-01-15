@@ -8,7 +8,6 @@ import { union } from "lodash";
 import { SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY } from "features/apiClient/constants";
 import { useRBAC } from "features/rbac";
 import { useAllRecords, useChildToParent } from "features/apiClient/slices/apiRecords/apiRecords.hooks";
-import { EXPANDED_RECORD_IDS_UPDATED } from "features/apiClient/exampleCollections/store";
 import { getRecordIdsToBeExpanded, isApiCollection } from "features/apiClient/screens/apiClient/utils";
 import { CollectionRow } from "../../../components/collectionsList/collectionRow/CollectionRow";
 import { SidebarPlaceholderItem } from "../../../components/SidebarPlaceholderItem/SidebarPlaceholderItem";
@@ -22,6 +21,7 @@ import {
 } from "features/apiClient/commands/utils";
 import { updateRecordSelection } from "./utils";
 import { ApiClientFeatureContext, useApiClientFeatureContext, WorkspaceInfo } from "features/apiClient/slices";
+import { EXPANDED_RECORD_IDS_UPDATED } from "features/apiClient/slices/exampleCollections";
 
 interface Props {
   searchValue: string;

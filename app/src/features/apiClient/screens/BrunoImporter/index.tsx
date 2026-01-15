@@ -20,9 +20,9 @@ import {
 } from "modules/analytics/events/features/apiClient";
 import * as Sentry from "@sentry/react";
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
-import { EnvironmentVariableData } from "features/apiClient/store/variables/types";
 import { createEnvironment, useApiClientRepository } from "features/apiClient/slices";
 import { useApiClientDispatch } from "features/apiClient/slices/hooks/base.hooks";
+import { EnvironmentVariableData } from "@requestly/shared/types/entities/apiClient";
 
 interface BrunoImporterProps {
   onSuccess?: () => void;

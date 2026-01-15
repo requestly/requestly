@@ -1,4 +1,5 @@
 import { EnvironmentVariables, EnvironmentVariableType } from "backend/environment/types";
+import { EnvironmentVariableData } from "@requestly/shared/types/entities/apiClient";
 import { RQAPI } from "../types";
 import {
   isApiRequest,
@@ -7,22 +8,23 @@ import {
   convertFlatRecordsToNestedRecords,
   filterOutChildrenRecords,
 } from "../screens/apiClient/utils";
-import { getChildParentMap } from "./store.utils";
 import { isEmpty } from "lodash";
 import { selectAllRecords as selectAllRecordsFromSlice, selectChildToParent } from "../slices/apiRecords/selectors";
 import { Workspace } from "features/workspaces/types";
 import { getApiClientFeatureContext, WorkspaceInfo } from "../slices";
 
+export const NoopContextId = "__stub_context_id";
+
 export function sanitizePatch(patch: EnvironmentVariables) {
   return Object.fromEntries(
-    Object.entries(patch).map(([key, value], index) => {
+    Object.entries(patch).map(([key, value]: [string, EnvironmentVariableData], index) => {
       const typeToSaveInDB =
         value.type === EnvironmentVariableType.Secret
           ? EnvironmentVariableType.Secret
           : (typeof value.syncValue as EnvironmentVariableType);
       return [
         key.trim(),
-        { localValue: value.localValue, syncValue: value.syncValue, type: typeToSaveInDB, id: index },
+        { localValue: value.localValue ?? "", syncValue: value.syncValue ?? "", type: typeToSaveInDB, id: index },
       ];
     })
   );
@@ -90,17 +92,18 @@ export function getRecordsToExpandBySearchValue(params: {
   }
 
   const context = getApiClientFeatureContext(contextId);
-  const childParentMap = getChildParentMap(context);
+  const state = context?.store.getState();
+  const childParentMap = state ? selectChildToParent(state) : {};
   const filteredRecords = filterRecordsBySearch(apiClientRecords, searchValue);
 
   const recordsToExpand: string[] = [];
   filteredRecords.forEach((record) => {
     if (record.collectionId) {
       recordsToExpand.push(record.collectionId);
-      let parentId = childParentMap.get(record.collectionId);
+      let parentId = childParentMap[record.collectionId];
       while (parentId) {
         recordsToExpand.push(parentId);
-        parentId = childParentMap.get(parentId);
+        parentId = childParentMap[parentId];
       }
     }
   });

@@ -1,11 +1,9 @@
-import { BaseTabSource } from "componentsV2/Tabs/helpers/baseTabSource";
-import PATHS from "config/constants/sub/paths";
-import { MatchedTabSource, TabSourceMetadata } from "componentsV2/Tabs/types";
 import { MdHorizontalSplit } from "@react-icons/all-files/md/MdHorizontalSplit";
-import { getApiClientEnvironmentsStore } from "features/apiClient/commands/store.utils";
-import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
-import { EnvironmentViewManager } from "./EnvironmentViewManager";
+import { BaseTabSource } from "componentsV2/Tabs/helpers/baseTabSource";
+import { MatchedTabSource, TabSourceMetadata } from "componentsV2/Tabs/types";
+import PATHS from "config/constants/sub/paths";
 import { getApiClientFeatureContext } from "features/apiClient/slices";
+import { EnvironmentViewManager } from "./EnvironmentViewManager";
 
 interface EnvironmentViewTabSourceMetadata extends TabSourceMetadata {
   isGlobal: boolean;
@@ -38,11 +36,5 @@ export class EnvironmentViewTabSource extends BaseTabSource {
       context: { id: ctx.workspaceId },
       isGlobal: false,
     });
-  }
-
-  getIsValidTab(context: ApiClientFeatureContext): boolean {
-    const store = getApiClientEnvironmentsStore(context);
-    const isExist = store.getState().getEnvironment(this.metadata.id);
-    return !!isExist;
   }
 }

@@ -1,7 +1,6 @@
 import React from "react";
 import { AbstractTabSource } from "./tabSource";
 import { TabSourceMetadata } from "../types";
-import { NativeError } from "errors/NativeError";
 import { WorkspaceProvider } from "features/apiClient/common/WorkspaceProvider";
 
 export class BaseTabSource implements AbstractTabSource {
@@ -43,13 +42,5 @@ export class BaseTabSource implements AbstractTabSource {
 
   getIsNewTab(): boolean {
     return this.metadata.isNewTab ?? false;
-  }
-
-  getIsValidTab(ctx: unknown): boolean {
-    throw new NativeError("getIsValidTab is not implemented!").addContext({
-      ctx,
-      metadata: this.metadata,
-      sourceType: this.type,
-    });
   }
 }
