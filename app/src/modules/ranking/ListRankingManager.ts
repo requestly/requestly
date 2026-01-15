@@ -6,6 +6,7 @@
  */
 
 import { generateNKeysBetween } from "fractional-indexing";
+import * as Sentry from "@sentry/react";
 
 export abstract class ListRankingManager<T> {
   /**
@@ -85,7 +86,14 @@ export abstract class ListRankingManager<T> {
     try {
       newRanks.push(...generateNKeysBetween(beforeRank, afterRank, count));
     } catch (e1) {
-      // TODO: log this error in sentry
+      Sentry.captureException(e1, {
+        extra: {
+          beforeRank,
+          afterRank,
+          count,
+        },
+      });
+
       // Fallback to original rank so that undefined ranks are not saved in DB
       records.forEach((record) => newRanks.push(this.getEffectiveRank(record)));
     }
