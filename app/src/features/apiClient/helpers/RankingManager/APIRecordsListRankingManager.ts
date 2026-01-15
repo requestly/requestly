@@ -80,7 +80,7 @@ export class APIRecordsListRankingManager extends ListRankingManager<RecordData>
     const nextRecord = sortedRecords[originalIndex + 1] ?? null;
 
     // Generate a rank between the original record and the next record
-    const ranks = this.getRanksBetweenRecords(nextRecord, originalRecord, [originalRecord]);
+    const ranks = this.getRanksBetweenRecords(originalRecord, nextRecord, [originalRecord]);
 
     return ranks[0];
   }

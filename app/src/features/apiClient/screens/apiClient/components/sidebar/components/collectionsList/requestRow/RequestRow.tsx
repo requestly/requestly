@@ -163,19 +163,19 @@ export const RequestRow: React.FC<Props> = ({
           const siblings = apiRecordsRankingManager.sort(
             getImmediateChildrenRecords(context, record.collectionId ?? "")
           );
-          let before: RecordData | null = null;
-          let after: RecordData | null = null;
+          let beforeRecord: RecordData | null = null;
+          let afterRecord: RecordData | null = null;
           const recordIndex = siblings.findIndex((sibling) => sibling.id === record.id);
 
           if (currentDropPosition === "before") {
-            before = record;
-            after = siblings[recordIndex - 1] || null;
+            beforeRecord = siblings[recordIndex - 1] || null;
+            afterRecord = record;
           } else if (currentDropPosition === "after") {
-            after = record;
-            before = siblings[recordIndex + 1] || null;
+            afterRecord = siblings[recordIndex + 1] || null;
+            beforeRecord = record;
           }
 
-          const rank = apiRecordsRankingManager.getRanksBetweenRecords(before, after, [item.record])[0];
+          const rank = apiRecordsRankingManager.getRanksBetweenRecords(beforeRecord, afterRecord, [item.record])[0];
           const targetCollectionId = record.collectionId;
 
           const patch: Partial<RQAPI.ApiRecord> = {
