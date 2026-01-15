@@ -1,6 +1,5 @@
 import { createSlice, createEntityAdapter, PayloadAction } from "@reduxjs/toolkit";
-import { RunConfigEntity, RunnerConfigId, RunnerConfigState as RunConfigState } from "./types";
-import type { SavedRunConfig } from "features/apiClient/commands/collectionRunner/types";
+import { RunConfigEntity, RunnerConfigId, RunnerConfigState as RunConfigState, SavedRunConfig } from "./types";
 import { API_CLIENT_RUNNER_CONFIG_SLICE_NAME } from "../common/constants";
 import { fromSavedRunConfig, isValidDelay, isValidIterations, patchRunOrder } from "./utils";
 import { entitySynced } from "../common";
