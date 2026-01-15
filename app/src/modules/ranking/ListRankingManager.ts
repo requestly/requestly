@@ -58,12 +58,12 @@ export abstract class ListRankingManager<T> {
   /**
    * Generates rank(s) between two records
    *
-   * @param before - The record before the target position (null for start)
-   * @param after - The record after the target position (null for end)
+   * @param beforeRecord - The record before the target position (if before is null, means -infinity)
+   * @param afterRecord - The record after the target position (if after is null, means infinity)
    * @param records - Array of records to generate ranks for
    * @returns Single rank string or array of rank strings
    */
-  getRanksBetweenRecords(before: T | null, after: T | null, records: T[]): string[] {
+  getRanksBetweenRecords(beforeRecord: T | null, afterRecord: T | null, records: T[]): string[] {
     const count = records.length;
 
     if (count === 0) {
@@ -71,19 +71,19 @@ export abstract class ListRankingManager<T> {
     }
 
     // If both before and after are null (empty list), use generated ranks
-    if (before === null && after === null) {
+    if (beforeRecord === null && afterRecord === null) {
       // For multiple records, return their generated ranks
       return records.map((record) => this.getEffectiveRank(record));
     }
 
     // Get the rank values for before and after
-    const beforeRank = before ? this.getEffectiveRank(before) : null;
-    const afterRank = after ? this.getEffectiveRank(after) : null;
+    const beforeRank = beforeRecord ? this.getEffectiveRank(beforeRecord) : null;
+    const afterRank = afterRecord ? this.getEffectiveRank(afterRecord) : null;
 
     const newRanks = [];
 
     try {
-      newRanks.push(...generateNKeysBetween(afterRank, beforeRank, count));
+      newRanks.push(...generateNKeysBetween(beforeRank, afterRank, count));
     } catch (e1) {
       // TODO: log this error in sentry
       // Fallback to original rank so that undefined ranks are not saved in DB
@@ -112,7 +112,7 @@ export abstract class ListRankingManager<T> {
     const lastRecord = sortedRecords.length > 0 ? sortedRecords[sortedRecords.length - 1] : null;
 
     // Generate ranks after the last record (after = null means append at end)
-    const ranks = this.getRanksBetweenRecords(null, lastRecord, newRecords);
+    const ranks = this.getRanksBetweenRecords(lastRecord, null, newRecords);
 
     // Ensure we always return an array
     return ranks;
