@@ -418,7 +418,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
     );
   }, [isLibraryPickerOpen, handlePackageSelect, importCount, scriptLineCount]);
 
-  const trackChangeMade = debounce((type) => trackScriptWritten(type), 10_000, { leading: true });
+  const trackChangeMade = useMemo(() => debounce((type) => trackScriptWritten(type), 10_000, { leading: true }), []);
 
   return (
     <div className="api-client-script-editor-container">
