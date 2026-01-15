@@ -26,7 +26,14 @@ export const getAllChildrenRecords = (ctx: ApiClientFeatureContext, nodeId: stri
         return recordA.type === RQAPI.RecordType.COLLECTION ? -1 : 1;
       }
 
-      // use ranking manager to sort by rank
+      // Sort collections alphabetically by name (case-insensitive)
+      if (recordA.type === RQAPI.RecordType.COLLECTION) {
+        const nameA = (recordA.name || "").toLowerCase();
+        const nameB = (recordB.name || "").toLowerCase();
+        return nameA.localeCompare(nameB);
+      }
+
+      // Sort requests using ranking manager
       const aRank = apiRecordsRankingManager.getEffectiveRank(recordA);
       const bRank = apiRecordsRankingManager.getEffectiveRank(recordB);
       return apiRecordsRankingManager.compareFn(aRank, bRank);
