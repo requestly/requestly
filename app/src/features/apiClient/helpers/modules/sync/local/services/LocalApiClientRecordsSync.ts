@@ -7,8 +7,8 @@ import { v4 as uuidv4 } from "uuid";
 import { EnvironmentVariables } from "backend/environment/types";
 import { Authorization } from "features/apiClient/screens/apiClient/components/views/components/request/components/AuthorizationView/types/AuthConfig";
 import { ResponsePromise } from "backend/types";
-import { SavedRunConfig } from "features/apiClient/commands/collectionRunner/types";
-import { RunResult, SavedRunResult } from "features/apiClient/store/collectionRunResult/runResult.store";
+import { SavedRunConfig } from "features/apiClient/slices/runConfig/types";
+import { RunResult, SavedRunResult } from "features/apiClient/slices/common/runResults";
 
 export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiClientLocalMeta> {
   meta: ApiClientLocalMeta;

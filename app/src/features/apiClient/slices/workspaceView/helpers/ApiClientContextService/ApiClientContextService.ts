@@ -10,8 +10,6 @@ import { WorkspaceType } from "features/workspaces/types";
 import { toast } from "utils/Toast";
 import { ApiClientFeatureContext, ApiClientStore } from "../ApiClientContextRegistry/types";
 import { reduxStore } from "store";
-import { forceRefreshRecords } from "features/apiClient/commands/records";
-import { forceRefreshEnvironments } from "features/apiClient/commands/environments";
 import { reloadFsManager } from "services/fsManagerServiceAdapter";
 import { workspaceViewActions } from "../../slice";
 import {
@@ -20,6 +18,8 @@ import {
 } from "../ApiClientContextRegistry/ApiClientContextRegistry";
 import { configureStore, EntityState } from "@reduxjs/toolkit";
 import { apiRecordsSlice } from "features/apiClient/slices/apiRecords";
+import { forceRefreshRecords } from "features/apiClient/slices/apiRecords/thunks";
+import { forceRefreshEnvironments } from "features/apiClient/slices/environments/thunks";
 import { WorkspaceInfo } from "../../types";
 import persistStore from "redux-persist/es/persistStore";
 import { REHYDRATE } from "redux-persist";
@@ -109,7 +109,7 @@ class ApiClientContextService {
     };
     const store = configureStore({
       devTools: {
-        name: `workspace-${workspaceId}`
+        name: `workspace-${workspaceId}`,
       },
       reducer: {
         [apiRecordsSlice.name]: createApiClientRecordsPersistedReducer(workspaceId || "null"),
@@ -415,7 +415,14 @@ class ApiClientContextService {
 
       // TODO: Update to use new Redux store refresh logic
       // For now, using the old commands - these will need to be migrated
-      await Promise.all([forceRefreshRecords(context as any), forceRefreshEnvironments(context as any)]);
+      await Promise.all([
+        context.store.dispatch(
+          forceRefreshRecords({ repository: context.repositories.apiClientRecordsRepository }) as any
+        ),
+        context.store.dispatch(
+          forceRefreshEnvironments({ repository: context.repositories.environmentVariablesRepository }) as any
+        ),
+      ]);
     } catch (e) {
       reduxStore.dispatch(
         workspaceViewActions.setWorkspaceStatus({

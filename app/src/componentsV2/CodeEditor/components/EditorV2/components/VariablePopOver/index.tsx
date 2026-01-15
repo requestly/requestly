@@ -15,7 +15,7 @@ import { RevealableSecretField } from "../../../../../RevealableSecretField/Reve
 import { captureMessage } from "@sentry/react";
 import { useRBAC } from "features/rbac";
 import { useWorkspaceId } from "features/apiClient/common/WorkspaceProvider";
-import { NoopContextId } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
+import { NoopContextId } from "features/apiClient/commands/utils";
 
 type VariableData = ScopedVariable[0];
 

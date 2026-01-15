@@ -12,7 +12,6 @@ import { EnvironmentsList } from "features/apiClient/screens/environment/compone
 import { useApiClientContext } from "features/apiClient/contexts";
 import { DeleteApiRecordModal, ImportFromCurlModal } from "../../modals";
 import { getEmptyApiEntry } from "../../../utils";
-import { ErrorFilesList } from "../components/ErrorFilesList/ErrorFileslist";
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
 import "./singleWorkspaceSidebar.scss";
 import { MdOutlineSpaceDashboard } from "@react-icons/all-files/md/MdOutlineSpaceDashboard";

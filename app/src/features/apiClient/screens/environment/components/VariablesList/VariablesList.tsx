@@ -10,10 +10,10 @@ import { EditableCell, EditableRow } from "./components/customTableRow/CustomTab
 import { EnvironmentAnalyticsContext, EnvironmentAnalyticsSource } from "../../types";
 import { trackAddVariableClicked } from "../../analytics";
 import "./variablesList.scss";
-import type { VariableData } from "features/apiClient/store/variables/types";
 import EmptySearchResultsView from "./components/emptySearchResultsView/EmptySearchResultsView";
 import type { ApiClientVariables } from "features/apiClient/slices/entities/api-client-variables";
 import { mapToEnvironmentArray } from "../../utils";
+import { VariableData } from "@requestly/shared/types/entities/apiClient";
 
 interface VariablesListProps {
   variablesData: EnvironmentVariables;

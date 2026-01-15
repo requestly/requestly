@@ -2,8 +2,6 @@ import { EnvironmentVariables, VariableScope } from "backend/environment/types";
 import { RQAPI } from "features/apiClient/types";
 import lodash from "lodash";
 import { useMemo } from "react";
-import { VariableData, VariableKey } from "features/apiClient/store/variables/types";
-import { runtimeVariablesStore as _runtimeVariablesStore } from "features/apiClient/store/runtimeVariables/runtimeVariables.store";
 import {
   ApiClientStoreState,
   selectActiveEnvironment,
@@ -14,6 +12,7 @@ import {
 import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
 import { useSelector } from "react-redux";
 import { selectRuntimeVariables } from "features/apiClient/slices/runtimeVariables";
+import { VariableData, VariableKey } from "@requestly/shared/types/entities/apiClient";
 
 export type VariableSource = {
   scope: VariableScope;
@@ -228,7 +227,7 @@ export function resolveVariable(
 }
 
 export function useScopedVariables(id: string) {
-  const variableHolder = useMemo(() => new VariableHolder(), [id]);
+  const variableHolder = useMemo(() => new VariableHolder(), []);
   const runtimeVariables = useSelector(selectRuntimeVariables);
   return useApiClientSelector((state: ApiClientStoreState) =>
     getScopedVariables(state, runtimeVariables, id, { variableHolder })

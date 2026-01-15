@@ -2,9 +2,12 @@ import { useCallback } from "react";
 import { RQAPI } from "../types";
 import { RequestViewTabSource } from "../screens/apiClient/components/views/components/RequestView/requestViewTabSource";
 import { CollectionViewTabSource } from "../screens/apiClient/components/views/components/Collection/collectionViewTabSource";
-import { getApiClientFeatureContext } from "../slices";
-import { saveOrUpdateRecord } from "../commands/store.utils";
+import { ApiClientFeatureContext, apiRecordsActions, getApiClientFeatureContext } from "../slices";
 import { useTabActions } from "componentsV2/Tabs/slice";
+
+export function saveOrUpdateRecord(context: ApiClientFeatureContext, apiClientRecord: RQAPI.ApiClientRecord) {
+  context.store.dispatch(apiRecordsActions.upsertRecord(apiClientRecord));
+}
 
 export function useNewApiClientContext() {
   const { openBufferedTab } = useTabActions();

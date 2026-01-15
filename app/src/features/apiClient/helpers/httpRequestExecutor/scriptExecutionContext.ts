@@ -4,7 +4,7 @@ import { RQAPI } from "features/apiClient/types";
 import { isEmpty } from "lodash";
 import { ApiClientFeatureContext } from "features/apiClient/slices";
 import { reduxStore } from "store";
-import { VariableData } from "features/apiClient/store/variables/types";
+import { VariableData } from "@requestly/shared/types/entities/apiClient";
 
 export type BaseExecutionContext = {
   global: EnvironmentVariables;

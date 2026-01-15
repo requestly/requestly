@@ -9,7 +9,6 @@ import {
   selectIsImporting,
   selectShouldShowNudge,
   ImportDependencies,
-  ImportResult,
 } from "features/apiClient/slices/exampleCollections";
 import { useApiClientDispatch } from "features/apiClient/slices/hooks/base.hooks";
 import { RQButton } from "lib/design-system-v2/components";

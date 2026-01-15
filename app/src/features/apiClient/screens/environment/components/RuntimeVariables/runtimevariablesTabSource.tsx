@@ -28,8 +28,4 @@ export class RuntimeVariablesViewTabSource extends BaseTabSource {
       context: { id: context.workspaceId },
     });
   }
-
-  getIsValidTab(): boolean {
-    return true;
-  }
 }
