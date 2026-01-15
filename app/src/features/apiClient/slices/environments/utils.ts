@@ -6,5 +6,6 @@ export function parseEnvironmentEntityToData(env: EnvironmentEntity): Environmen
     id: env.id,
     name: env.name,
     variables: env.variables,
+    variablesOrder: env.variablesOrder,
   };
 }

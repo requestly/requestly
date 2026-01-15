@@ -29,6 +29,7 @@ const emptyTreeIndices: TreeIndices = {
 const initialState: ApiRecordsState = {
   records: apiRecordsAdapter.getInitialState(),
   tree: emptyTreeIndices,
+  erroredRecords: [],
 };
 
 function rebuildTreeIndices(state: ApiRecordsState): void {
@@ -48,34 +49,12 @@ export const apiRecordsSlice = createSlice({
     },
 
     upsertRecord(state, action: PayloadAction<RQAPI.ApiClientRecord>) {
-      const record = action.payload;
-      // Initialize variablesOrder for collections if not present
-      if (record.type === RQAPI.RecordType.COLLECTION) {
-        if (!record.data.variablesOrder && record.data.variables) {
-          record.data.variablesOrder = Object.keys(record.data.variables);
-        }
-      }
-      apiRecordsAdapter.upsertOne(state.records, record);
+      apiRecordsAdapter.upsertOne(state.records, action.payload);
       rebuildTreeIndices(state);
     },
 
     upsertRecords(state, action: PayloadAction<RQAPI.ApiClientRecord[]>) {
-      // Initialize variablesOrder for collections that don't have it
-      const migratedRecords = action.payload.map((record) => {
-        if (record.type === RQAPI.RecordType.COLLECTION) {
-          if (!record.data.variablesOrder && record.data.variables) {
-            return {
-              ...record,
-              data: {
-                ...record.data,
-                variablesOrder: Object.keys(record.data.variables),
-              },
-            };
-          }
-        }
-        return record;
-      });
-      apiRecordsAdapter.upsertMany(state.records, migratedRecords);
+      apiRecordsAdapter.upsertMany(state.records, action.payload);
       rebuildTreeIndices(state);
     },
 
@@ -161,22 +140,8 @@ export const apiRecordsSlice = createSlice({
         erroredRecords: ErroredRecord[]; // TODO: cleanup
       }>
     ) {
-      // Initialize variablesOrder for collections that don't have it (migration)
-      const migratedRecords = action.payload.records.map((record) => {
-        if (record.type === RQAPI.RecordType.COLLECTION) {
-          if (!record.data.variablesOrder && record.data.variables) {
-            return {
-              ...record,
-              data: {
-                ...record.data,
-                variablesOrder: Object.keys(record.data.variables),
-              },
-            };
-          }
-        }
-        return record;
-      });
-      apiRecordsAdapter.setAll(state.records, migratedRecords);
+      // Data from repository is already migrated in ApiClientContextService
+      apiRecordsAdapter.setAll(state.records, action.payload.records);
       rebuildTreeIndices(state);
     },
   },
@@ -236,8 +201,22 @@ const hydrationTransformer = createTransform<
     };
   },
   (o) => {
-    // We have to case here since redux-persist doesn't know that we are handling hydration ourselves
-    return { ids: [], entities: o.entities as ApiRecordsState["records"]["entities"] };
+    const entities = mapValues(o.entities, (record) => {
+      if (record && record.type === RQAPI.RecordType.COLLECTION) {
+        const collectionData = record.data as RQAPI.Collection;
+        if (!collectionData.variablesOrder && collectionData.variables) {
+          return {
+            ...record,
+            data: {
+              ...collectionData,
+              variablesOrder: Object.keys(collectionData.variables),
+            },
+          };
+        }
+      }
+      return record;
+    });
+    return { ids: [], entities: entities as ApiRecordsState["records"]["entities"] };
   },
   {
     whitelist: ["records", "entities"],

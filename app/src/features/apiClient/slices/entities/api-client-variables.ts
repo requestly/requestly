@@ -11,6 +11,7 @@ type Variable = EnvironmentVariables[0];
 export class ApiClientVariables<T, State = ApiClientStoreState> {
   constructor(
     private readonly getVariableObject: (entity: T) => EnvironmentVariables,
+    private readonly getOrderArray: (entity: T) => string[] | undefined,
     private readonly unsafePatch: (patcher: (state: T) => void) => void,
     private readonly getEntityFromState: (state: State) => T
   ) {}
@@ -129,19 +130,16 @@ export class ApiClientVariables<T, State = ApiClientStoreState> {
 
   getOrder(state: State): string[] | undefined {
     const entity = this.getEntityFromState(state);
-    // Try different paths where order might be stored
-    const entityAny = entity as any;
-    return entityAny.variablesOrder || entityAny.data?.variablesOrder;
+    return this.getOrderArray(entity);
   }
 
   // Helper methods for order management
-  private getOrderArray(entity: T): string[] | undefined {
-    const entityAny = entity as any;
-    return entityAny.variablesOrder || entityAny.data?.variablesOrder;
+  private getOrderArrayFromEntity(entity: T): string[] | undefined {
+    return this.getOrderArray(entity);
   }
 
   private initializeOrder(entity: T, keys: string[]): void {
-    const order = this.getOrderArray(entity);
+    const order = this.getOrderArrayFromEntity(entity);
     if (order !== undefined) {
       order.length = 0;
       order.push(...keys);
@@ -149,14 +147,14 @@ export class ApiClientVariables<T, State = ApiClientStoreState> {
   }
 
   private addToOrder(entity: T, key: string): void {
-    const order = this.getOrderArray(entity);
+    const order = this.getOrderArrayFromEntity(entity);
     if (order && !order.includes(key)) {
       order.push(key);
     }
   }
 
   private removeFromOrder(entity: T, key: string): void {
-    const order = this.getOrderArray(entity);
+    const order = this.getOrderArrayFromEntity(entity);
     if (order) {
       const index = order.indexOf(key);
       if (index !== -1) {
@@ -166,7 +164,7 @@ export class ApiClientVariables<T, State = ApiClientStoreState> {
   }
 
   private replaceInOrder(entity: T, oldKey: string, newKey: string): void {
-    const order = this.getOrderArray(entity);
+    const order = this.getOrderArrayFromEntity(entity);
     if (order) {
       const oldIndex = order.indexOf(oldKey);
       if (oldIndex !== -1) {
@@ -179,7 +177,7 @@ export class ApiClientVariables<T, State = ApiClientStoreState> {
   }
 
   private clearOrder(entity: T): void {
-    const order = this.getOrderArray(entity);
+    const order = this.getOrderArrayFromEntity(entity);
     if (order) {
       order.length = 0;
     }
