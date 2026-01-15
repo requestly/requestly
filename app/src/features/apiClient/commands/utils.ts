@@ -57,6 +57,12 @@ export function prepareRecordsToRender(records: RQAPI.ApiClientRecord[]) {
     if (recordA.type !== recordB.type) {
       return recordA.type === RQAPI.RecordType.COLLECTION ? -1 : 1;
     }
+    // Sort collections alphabetically by name (case-insensitive)
+    if (recordA.type === RQAPI.RecordType.COLLECTION) {
+      const nameA = (recordA.name || "").toLowerCase();
+      const nameB = (recordB.name || "").toLowerCase();
+      return nameA.localeCompare(nameB);
+    }
 
     // Use ranking manager to sort by rank
     const aRank = apiRecordsRankingManager.getEffectiveRank(recordA);

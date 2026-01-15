@@ -485,6 +485,12 @@ const sortRecords = (records: RQAPI.ApiClientRecord[]) => {
     if (a.type !== b.type) {
       return a.type === RQAPI.RecordType.COLLECTION ? -1 : 1;
     }
+    // sort collections alphabetically by name (case-insensitive)
+    if (a.type === RQAPI.RecordType.COLLECTION) {
+      const nameA = (a.name || "").toLowerCase();
+      const nameB = (b.name || "").toLowerCase();
+      return nameA.localeCompare(nameB);
+    }
     // use ranking manager to sort by rank
     const aRank = apiRecordsRankingManager.getEffectiveRank(a);
     const bRank = apiRecordsRankingManager.getEffectiveRank(b);
