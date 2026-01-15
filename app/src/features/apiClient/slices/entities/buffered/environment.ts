@@ -8,15 +8,18 @@ import { EntityDispatch } from "../types";
 
 import { BufferedApiClientEntity, BufferedApiClientEntityMeta } from "./factory";
 
-export class BufferedEnvironmentEntity extends EnvironmentEntity<BufferedApiClientEntityMeta> implements BufferedApiClientEntity {
-  origin = new EnvironmentEntity(this.dispatch, {id: this.meta.referenceId});
-  override readonly variables = new ApiClientVariables<EnvironmentRecord, ApiClientRootState>(
+export class BufferedEnvironmentEntity
+  extends EnvironmentEntity<BufferedApiClientEntityMeta>
+  implements BufferedApiClientEntity {
+  origin = new EnvironmentEntity(this.dispatch, { id: this.meta.referenceId });
+  readonly variables = new ApiClientVariables<EnvironmentRecord, ApiClientRootState>(
     (e) => e.variables,
+    (e) => e.variablesOrder,
     this.unsafePatch.bind(this),
     this.getEntityFromState.bind(this)
   );
 
-  override getEntityFromState(state: ApiClientRootState): EnvironmentRecord {
+  getEntityFromState(state: ApiClientRootState): EnvironmentRecord {
     const entry = bufferAdapterSelectors.selectById(state.buffer, this.meta.id);
     if (!entry) {
       throw new EntityNotFound(this.id, this.type);
@@ -24,7 +27,7 @@ export class BufferedEnvironmentEntity extends EnvironmentEntity<BufferedApiClie
     return entry.current as EnvironmentRecord;
   }
 
-  override dispatchUnsafePatch(patcher: (env: EnvironmentRecord) => void): void {
+  dispatchUnsafePatch(patcher: (env: EnvironmentRecord) => void): void {
     this.dispatch(
       bufferActions.unsafePatch({
         id: this.meta.id,
@@ -36,20 +39,23 @@ export class BufferedEnvironmentEntity extends EnvironmentEntity<BufferedApiClie
   }
 }
 
-export class BufferedGlobalEnvironmentEntity extends GlobalEnvironmentEntity<BufferedApiClientEntityMeta> implements BufferedApiClientEntity {
+export class BufferedGlobalEnvironmentEntity
+  extends GlobalEnvironmentEntity<BufferedApiClientEntityMeta>
+  implements BufferedApiClientEntity {
   origin: GlobalEnvironmentEntity;
   constructor(public readonly dispatch: EntityDispatch, public readonly meta: BufferedApiClientEntityMeta) {
     super(dispatch);
     this.origin = new GlobalEnvironmentEntity(this.dispatch);
   }
 
-  override readonly variables = new ApiClientVariables<EnvironmentRecord, ApiClientRootState>(
+  readonly variables = new ApiClientVariables<EnvironmentRecord, ApiClientRootState>(
     (e) => e.variables,
+    (e) => e.variablesOrder,
     this.unsafePatch.bind(this),
     this.getEntityFromState.bind(this)
   );
 
-  override getEntityFromState(state: ApiClientRootState): EnvironmentRecord {
+  getEntityFromState(state: ApiClientRootState): EnvironmentRecord {
     const entry = bufferAdapterSelectors.selectById(state.buffer, this.meta.id);
     if (!entry) {
       throw new EntityNotFound(this.id, this.type);
@@ -57,7 +63,7 @@ export class BufferedGlobalEnvironmentEntity extends GlobalEnvironmentEntity<Buf
     return entry.current as EnvironmentRecord;
   }
 
-  override dispatchUnsafePatch(patcher: (env: EnvironmentRecord) => void): void {
+  dispatchUnsafePatch(patcher: (env: EnvironmentRecord) => void): void {
     this.dispatch(
       bufferActions.unsafePatch({
         id: this.meta.id,

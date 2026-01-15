@@ -10,6 +10,7 @@ import { ApiClientVariables } from "../entities/api-client-variables";
 import { DeepPartial, EntityId } from "../types";
 import { entitySynced } from "../common/actions";
 import { ApiClientEntityType } from "../entities/types";
+import { EnvironmentVariables } from "backend/environment/types";
 
 export const environmentsAdapter = createEntityAdapter<EnvironmentEntity>({
   selectId: (env) => env.id,
@@ -31,30 +32,15 @@ export const environmentsSlice = createSlice({
   initialState,
   reducers: {
     environmentCreated(state, action: PayloadAction<EnvironmentEntity>) {
-      const entity = action.payload;
-      // Initialize variablesOrder if not present
-      if (!entity.variablesOrder && entity.variables) {
-        entity.variablesOrder = Object.keys(entity.variables);
-      }
-      environmentsAdapter.addOne(state.environments, entity);
+      environmentsAdapter.addOne(state.environments, action.payload);
 
       if (state.environments.ids.length === 1) {
-        state.activeEnvironmentId = entity.id;
+        state.activeEnvironmentId = action.payload.id;
       }
     },
 
     environmentsCreated(state, action: PayloadAction<EnvironmentEntity[]>) {
-      // Initialize variablesOrder for entities that don't have it
-      const migratedEntities = action.payload.map((env) => {
-        if (!env.variablesOrder && env.variables) {
-          return {
-            ...env,
-            variablesOrder: Object.keys(env.variables),
-          };
-        }
-        return env;
-      });
-      environmentsAdapter.addMany(state.environments, migratedEntities);
+      environmentsAdapter.addMany(state.environments, action.payload);
     },
 
     environmentUpdated(
@@ -76,21 +62,11 @@ export const environmentsSlice = createSlice({
     },
 
     upsertEnvironment(state, action: PayloadAction<EnvironmentEntity>) {
-      const entity = action.payload;
-      // Initialize variablesOrder if not present
-      if (!entity.variablesOrder && entity.variables) {
-        entity.variablesOrder = Object.keys(entity.variables);
-      }
-      environmentsAdapter.upsertOne(state.environments, entity);
+      environmentsAdapter.upsertOne(state.environments, action.payload);
     },
 
     updateGlobalEnvironment(state, action: PayloadAction<EnvironmentEntity>) {
-      const entity = action.payload;
-      // Initialize variablesOrder if not present
-      if (!entity.variablesOrder && entity.variables) {
-        entity.variablesOrder = Object.keys(entity.variables);
-      }
-      state.globalEnvironment = entity;
+      state.globalEnvironment = action.payload;
     },
 
     setActiveEnvironment(state, action: PayloadAction<EntityId | null>) {
@@ -131,28 +107,8 @@ export const environmentsSlice = createSlice({
     ) {
       const { environments, globalEnvironment, activeEnvironmentId } = action.payload;
 
-      // Initialize variablesOrder for entities that don't have it (migration)
-      const migratedEnvironments = environments.map((env) => {
-        if (!env.variablesOrder && env.variables) {
-          return {
-            ...env,
-            variablesOrder: Object.keys(env.variables),
-          };
-        }
-        return env;
-      });
-
-      environmentsAdapter.setAll(state.environments, migratedEnvironments);
-
-      // Initialize variablesOrder for global environment if missing
-      if (!globalEnvironment.variablesOrder && globalEnvironment.variables) {
-        state.globalEnvironment = {
-          ...globalEnvironment,
-          variablesOrder: Object.keys(globalEnvironment.variables),
-        };
-      } else {
-        state.globalEnvironment = globalEnvironment;
-      }
+      environmentsAdapter.setAll(state.environments, environments);
+      state.globalEnvironment = globalEnvironment;
 
       if (activeEnvironmentId !== undefined) {
         state.activeEnvironmentId = activeEnvironmentId;
@@ -212,9 +168,15 @@ const hydrationTransformer = createTransform<
     };
   },
   (outboundState) => {
+    const entities = mapValues(outboundState.entities, (env) => {
+      if (env && !env.variablesOrder && env.variables) {
+        return { ...env, variablesOrder: Object.keys(env.variables) };
+      }
+      return env;
+    });
     return {
       ids: [],
-      entities: outboundState.entities as EnvironmentsState["environments"]["entities"],
+      entities: entities as EnvironmentsState["environments"]["entities"],
     };
   },
   {
@@ -251,7 +213,29 @@ const globalEnvHydrationTransformer = createTransform<
     };
   },
   (outboundState) => {
-    return outboundState as EnvironmentsState["globalEnvironment"];
+    if (!outboundState) {
+      return {
+        id: GLOBAL_ENVIRONMENT_ID,
+        name: "Global Environment",
+        variables: {},
+        variablesOrder: [],
+      } as EnvironmentsState["globalEnvironment"];
+    }
+
+    // Ensure all required fields exist with proper types
+    const id = outboundState.id || GLOBAL_ENVIRONMENT_ID;
+    const name = outboundState.name || "Global Environment";
+    const variables = (outboundState.variables || {}) as EnvironmentVariables;
+    const variablesOrder =
+      outboundState.variablesOrder ||
+      (outboundState.variables ? Object.keys(outboundState.variables).filter((k): k is string => !!k) : []);
+
+    return {
+      id,
+      name,
+      variables,
+      variablesOrder,
+    } as EnvironmentsState["globalEnvironment"];
   },
   {
     whitelist: ["globalEnvironment"],

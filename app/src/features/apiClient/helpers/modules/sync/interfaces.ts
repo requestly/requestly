@@ -23,7 +23,7 @@ export interface EnvironmentInterface<Meta extends Record<string, any>> {
   deleteEnvironment(envId: string): Promise<{ success: boolean; message?: string }>;
   updateEnvironment(
     environmentId: string,
-    updates: Partial<Pick<EnvironmentData, "name" | "variables">>
+    updates: Partial<Pick<EnvironmentData, "name" | "variables" | "variablesOrder">>
   ): Promise<void>;
   duplicateEnvironment(environmentId: string, allEnvironments: EnvironmentMap): Promise<EnvironmentData>;
   getGlobalEnvironmentId(): string;

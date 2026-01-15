@@ -66,6 +66,31 @@ function arrayToEntityState<T extends { id: string }>(items: T[]): EntityState<T
   };
 }
 
+function ensureVariablesOrder(env: EnvironmentData): EnvironmentData {
+  if (!env.variablesOrder && env.variables) {
+    return {
+      ...env,
+      variablesOrder: Object.keys(env.variables),
+    };
+  }
+  return env;
+}
+
+function ensureCollectionVariablesOrder(record: RQAPI.ApiClientRecord): RQAPI.ApiClientRecord {
+  if (record.type === RQAPI.RecordType.COLLECTION) {
+    if (!record.data.variablesOrder && record.data.variables) {
+      return {
+        ...record,
+        data: {
+          ...record.data,
+          variablesOrder: Object.keys(record.data.variables),
+        },
+      };
+    }
+  }
+  return record;
+}
+
 class ApiClientContextService {
   contextRegistry: ApiClientContextRegistry;
 
@@ -109,7 +134,7 @@ class ApiClientContextService {
     };
     const store = configureStore({
       devTools: {
-        name: `workspace-${workspaceId}`
+        name: `workspace-${workspaceId}`,
       },
       reducer: {
         [apiRecordsSlice.name]: createApiClientRecordsPersistedReducer(workspaceId || "null"),
@@ -344,16 +369,17 @@ class ApiClientContextService {
 
     const result = await this.extractSetupDataFromRepository(repo);
 
-    // Convert environment data to EnvironmentEntity format
-    const environments: EnvironmentEntity[] = Object.values(result.environments.nonGlobalEnvironments).map((env) => ({
-      id: env.id,
-      name: env.name,
-      variables: env.variables,
-    }));
+    // Migrate and convert environment data to EnvironmentEntity format
+    const environments: EnvironmentEntity[] = Object.values(result.environments.nonGlobalEnvironments)
+      .map(ensureVariablesOrder)
+      .map((env) => ({
+        id: env.id,
+        name: env.name,
+        variables: env.variables,
+        variablesOrder: env.variablesOrder,
+      }));
     const globalEnvironment: EnvironmentEntity = {
-      id: result.environments.globalEnvironment.id,
-      name: result.environments.globalEnvironment.name,
-      variables: result.environments.globalEnvironment.variables,
+      ...ensureVariablesOrder(result.environments.globalEnvironment),
     };
 
     await this.hydrateInPlace({
@@ -462,7 +488,7 @@ class ApiClientContextService {
       });
     } else {
       records = {
-        records: fetchedRecordsResult.data.records,
+        records: fetchedRecordsResult.data.records.map(ensureCollectionVariablesOrder),
         erroredRecords: fetchedRecordsResult.data.erroredRecords,
       };
     }
@@ -483,8 +509,10 @@ class ApiClientContextService {
       }
 
       environments = {
-        globalEnvironment: globalEnv,
-        nonGlobalEnvironments: otherEnvs,
+        globalEnvironment: ensureVariablesOrder(globalEnv),
+        nonGlobalEnvironments: Object.fromEntries(
+          Object.entries(otherEnvs).map(([id, env]) => [id, ensureVariablesOrder(env)])
+        ),
         erroredRecords: fetchedEnvResult.data.erroredRecords,
       };
     }
