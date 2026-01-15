@@ -17,6 +17,7 @@ import { MockPickerModal } from "features/mocks/modals";
 import { EditorLanguage } from "componentsV2/CodeEditor";
 import { RuleType } from "@requestly/shared/types/entities/rules";
 import Editor from "componentsV2/CodeEditor";
+import { useEditorHeight } from "hooks/useEditorHeight";
 
 const { Text } = Typography;
 
@@ -38,6 +39,7 @@ const CustomScriptRow = ({
   const [sourceTypeSelection, setSourceTypeSelection] = useState(GLOBAL_CONSTANTS.SCRIPT_TYPES.CODE);
   const [isScriptDeletePopupVisible, setIsScriptDeletePopupVisible] = useState(false);
   const [initialCodeEditorValue, setInitialCodeEditorValue] = useState(null);
+  const { editorHeight, editorContainerRef, setEditorHeight } = useEditorHeight(300, 300);
 
   const isCompatibleWithAttributes = isFeatureCompatible(FEATURES.SCRIPT_RULE.ATTRIBUTES_SUPPORT);
 
@@ -237,11 +239,12 @@ const CustomScriptRow = ({
             justifyContent: "center",
           }}
         >
-          <Col xl="12" span={24}>
+          <Col xl="12" span={24} ref={editorContainerRef}>
             <Editor
               isResizable
               scriptId={script.id}
-              height={script.type === GLOBAL_CONSTANTS.SCRIPT_TYPES.URL ? 125 : 300}
+              height={editorHeight}
+              onHeightChange={setEditorHeight}
               language={codeEditorLanguage}
               value={initialCodeEditorValue ?? scriptEditorBoilerCode}
               handleChange={handleEditorUpdate}
