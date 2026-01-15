@@ -18,9 +18,7 @@ export function createCollectionRunCompositeId(
  * Parses a composite ID into its component parts.
  * Format: ${collectionId}::${configId}
  */
-export function parseCollectionRunCompositeId(
-  compositeId: CollectionRunCompositeId
-): {
+export function parseCollectionRunCompositeId(compositeId: CollectionRunCompositeId): {
   collectionId: RQAPI.CollectionRecord["id"];
   configId: string;
 } {

@@ -24,13 +24,10 @@ export const selectCollectionHistory = createSelector(
   }
 );
 
-export const selectCollectionHistoryStatus = createSelector(
-  [selectCollectionEntry],
-  (entry): RunHistorySaveStatus => {
-    if (!entry) {
-      throw new NativeError("Run history entry not found!");
-    }
-
-    return entry.status;
+export const selectCollectionHistoryStatus = createSelector([selectCollectionEntry], (entry): RunHistorySaveStatus => {
+  if (!entry) {
+    throw new NativeError("Run history entry not found!");
   }
-);
+
+  return entry.status;
+});
