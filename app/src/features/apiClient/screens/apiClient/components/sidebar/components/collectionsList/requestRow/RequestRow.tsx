@@ -88,6 +88,7 @@ export const RequestRow: React.FC<Props> = ({
   const [isEditMode, setIsEditMode] = useState(false);
   const [recordToMove, setRecordToMove] = useState<RQAPI.ApiRecord | null>(null);
   const [dropPosition, setDropPosition] = useState<"before" | "after" | null>(null);
+  const [isDropProcessing, setIsDropProcessing] = useState(false);
   const dropPositionRef = useRef<"before" | "after" | null>(null);
   const requestRowRef = useRef<HTMLDivElement>(null);
   const { apiClientRecordsRepository } = useApiClientRepository();
@@ -111,10 +112,16 @@ export const RequestRow: React.FC<Props> = ({
       item: {
         record,
         contextId,
+        onDropComplete: () => setIsDropProcessing(false),
       },
       collect: (monitor) => ({
         isDragging: monitor.isDragging(),
       }),
+      end: (item, monitor) => {
+        if (monitor.didDrop()) {
+          setIsDropProcessing(true);
+        }
+      },
     }),
     [record, contextId]
   );
@@ -122,7 +129,7 @@ export const RequestRow: React.FC<Props> = ({
   const [{ isOverCurrent }, drop] = useDrop(
     () => ({
       accept: [RQAPI.RecordType.API],
-      canDrop: (item: { record: RQAPI.ApiClientRecord; contextId: string }) => {
+      canDrop: (item: { record: RQAPI.ApiClientRecord; contextId: string; onDropComplete?: () => void }) => {
         if (isReadOnly) return false;
         if (!item || item.contextId !== contextId) return false;
         if (item.record.id === record.id) return false;
@@ -131,7 +138,7 @@ export const RequestRow: React.FC<Props> = ({
         }
         return true;
       },
-      hover: (item: { record: RQAPI.ApiClientRecord; contextId: string }, monitor) => {
+      hover: (item: { record: RQAPI.ApiClientRecord; contextId: string; onDropComplete?: () => void }, monitor) => {
         if (!monitor.isOver({ shallow: true }) || !isFeatureCompatible(FEATURES.API_CLIENT_RECORDS_REORDERING)) {
           return;
         }
@@ -148,7 +155,10 @@ export const RequestRow: React.FC<Props> = ({
           dropPositionRef.current = dropPosition;
         }
       },
-      drop: async (item: { record: RQAPI.ApiClientRecord; contextId: string }, monitor) => {
+      drop: async (
+        item: { record: RQAPI.ApiClientRecord; contextId: string; onDropComplete?: () => void },
+        monitor
+      ) => {
         if (!monitor.isOver({ shallow: true })) {
           setDropPosition(null);
           dropPositionRef.current = null;
@@ -191,6 +201,8 @@ export const RequestRow: React.FC<Props> = ({
           }
         } catch (error) {
           toast.error("Error moving record");
+        } finally {
+          item.onDropComplete?.();
         }
       },
       collect: (monitor) => ({
@@ -343,7 +355,7 @@ export const RequestRow: React.FC<Props> = ({
             drag(node);
             drop(node);
           }}
-          style={{ opacity: isDragging ? 0.5 : 1 }}
+          style={{ opacity: isDragging || isDropProcessing ? 0.5 : 1 }}
         >
           <div
             className={`collections-list-item api ${record.id === activeTabSourceId ? "active" : ""} ${
