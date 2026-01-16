@@ -10,22 +10,19 @@ import { emitBufferUpdated } from "componentsV2/Tabs/slice";
 import { DeepPartialWithNull, EntityNotFound } from "../types";
 
 const FIELDS_FILTER: {
-  [key in ApiClientEntityType]?: DeepPartialWithNull<Record<string, any>>
+  [key in ApiClientEntityType]?: DeepPartialWithNull<Record<string, any>>;
 } = {
-  [ApiClientEntityType.HTTP_RECORD]:
-    {
-      data: {
-        response: null,
-        testResults: null,
-      }
-    }
-}
-
-
+  [ApiClientEntityType.HTTP_RECORD]: {
+    data: {
+      response: null,
+      testResults: null,
+    },
+  },
+};
 
 export function getPathsToFilter(entityType: ApiClientEntityType) {
   const filter = FIELDS_FILTER[entityType];
-  if(!filter) {
+  if (!filter) {
     return [];
   }
 
@@ -116,7 +113,7 @@ export const bufferSlice = createSlice({
         const operations = objectToSetOperations(command.value);
         for (const { path, value } of operations) {
           set(entry.current as object, path, value);
-          if(isPathPresent(pathFilters, path)) {
+          if (isPathPresent(pathFilters, path)) {
             continue;
           }
           set(entry.diff as object, path, value);
@@ -128,7 +125,7 @@ export const bufferSlice = createSlice({
         const paths = objectToDeletePaths(command.value);
         for (const path of paths) {
           unset(entry.current, path);
-          if(isPathPresent(pathFilters, path)) {
+          if (isPathPresent(pathFilters, path)) {
             continue;
           }
           unset(entry.diff, path);
@@ -136,7 +133,7 @@ export const bufferSlice = createSlice({
         }
       }
 
-      if(!isMutated) {
+      if (!isMutated) {
         return;
       }
 
@@ -162,7 +159,6 @@ export const bufferSlice = createSlice({
       const pathFilters = getPathsToFilter(entry.entityType);
       let isMutated = false;
 
-
       const plain = current(entry.current);
 
       const [_, patches] = produceWithPatches(plain, (draft) => {
@@ -175,7 +171,7 @@ export const bufferSlice = createSlice({
           case "add":
           case "replace":
             set(entry.current as object, path, patch.value);
-            if(isPathPresent(pathFilters, path)) {
+            if (isPathPresent(pathFilters, path)) {
               continue;
             }
             set(entry.diff, path, patch.value);
@@ -183,7 +179,7 @@ export const bufferSlice = createSlice({
             break;
           case "remove":
             unset(entry.current as object, path);
-            if(isPathPresent(pathFilters, path)) {
+            if (isPathPresent(pathFilters, path)) {
               continue;
             }
             unset(entry.diff, path);
@@ -192,7 +188,7 @@ export const bufferSlice = createSlice({
         }
       }
 
-      if(!isMutated) {
+      if (!isMutated) {
         return;
       }
 
@@ -213,16 +209,19 @@ export const bufferSlice = createSlice({
       }>
     ) {
       const entry = findBufferByReferenceId(state.entities, action.payload.referenceId);
-      if (!entry) throw new EntityNotFound(action.payload.referenceId,"buffer");
+      if (!entry) throw new EntityNotFound(action.payload.referenceId, "buffer");
 
+      const userEdits = cloneDeep(entry.diff);
       entry.current = cloneDeep(action.payload.sourceData);
 
-      const operations = objectToSetOperations(entry.diff);
-      for (const { path } of operations) {
-        const value = get(entry.current, path);
-        if (value === undefined ) {
+      const operations = objectToSetOperations(userEdits);
+      for (const { path, value } of operations) {
+        // const value = get(entry.current, path);
+        if (value === undefined) {
+          unset(entry.current, path);
           unset(entry.diff as object, path);
         } else {
+          set(entry.current as object, path, value);
           set(entry.diff as object, path, value);
         }
       }
@@ -232,17 +231,17 @@ export const bufferSlice = createSlice({
       state,
       action: PayloadAction<{
         id: string;
-        savedData?: unknown,
+        savedData?: unknown;
         referenceId?: string;
       }>
     ) {
       const entry = state.entities[action.payload.id];
       if (!entry) return;
 
-      if(action.payload.referenceId) {
+      if (action.payload.referenceId) {
         entry.referenceId = action.payload.referenceId;
       }
-      if(action.payload.savedData) {
+      if (action.payload.savedData) {
         entry.current = action.payload.savedData;
       }
       entry.diff = {};
