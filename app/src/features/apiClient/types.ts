@@ -280,6 +280,7 @@ export namespace RQAPI {
       postResponse: string;
     };
     variables: Omit<EnvironmentVariables, "localValue">;
+    variablesOrder?: string[]; // Array of variable keys in display order
     auth: Auth;
   }
 

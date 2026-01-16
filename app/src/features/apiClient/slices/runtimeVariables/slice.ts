@@ -34,6 +34,7 @@ export const runtimeVariablesSlice = createSlice({
       state.entity = {
         id: RUNTIME_VARIABLES_ENTITY_ID,
         variables: {},
+        variablesOrder: [],
       };
     },
   },
@@ -52,15 +53,26 @@ const persistTransform = createTransform<
       return {
         id: RUNTIME_VARIABLES_ENTITY_ID,
         variables: {},
+        variablesOrder: [],
       };
     }
+    const persistedData = ApiClientVariables.persistFull(inboundState.variables, inboundState.variablesOrder);
     return {
       id: inboundState.id,
-      variables: ApiClientVariables.persistFull(inboundState.variables),
+      variables: persistedData.variables,
+      variablesOrder: persistedData.order,
     };
   },
-  // Outbound: storage -> state (rehydrate) - just read as-is
-  (outboundState) => outboundState,
+  // Outbound: storage -> state (rehydrate) - initialize variablesOrder if missing
+  (outboundState) => {
+    if (!outboundState.variablesOrder && outboundState.variables) {
+      return {
+        ...outboundState,
+        variablesOrder: Object.keys(outboundState.variables),
+      };
+    }
+    return outboundState;
+  },
   {
     whitelist: ["entity"],
   }
@@ -80,4 +92,3 @@ export const runtimeVariablesReducerWithPersist = persistReducer(
 
 export const runtimeVariablesActions = runtimeVariablesSlice.actions;
 export const runtimeVariablesReducer = runtimeVariablesSlice.reducer;
-

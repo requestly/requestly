@@ -10,11 +10,28 @@ export const isGlobalEnvironment = (environmentId: string) => {
   return environmentId === GLOBAL_ENVIRONMENT_ID || environmentId.endsWith("/environments/global.json");
 };
 
-export const mapToEnvironmentArray = (variables: EnvironmentVariables): VariableRow[] => {
-  return Object.keys(variables).map((key) => ({
-    key,
-    ...variables[key],
-  }));
+export const mapToEnvironmentArray = (variables: EnvironmentVariables, order?: string[]): VariableRow[] => {
+  // If order is provided, use it
+  if (order && order.length > 0) {
+    return order
+      .filter((key) => variables[key]) // Filter out keys that don't exist
+      .map(
+        (key) =>
+          ({
+            key,
+            ...variables[key],
+          } as VariableRow)
+      );
+  }
+
+  // Fallback to Object.keys order (backward compatibility)
+  return Object.keys(variables).map(
+    (key) =>
+      ({
+        key,
+        ...variables[key],
+      } as VariableRow)
+  );
 };
 
 export const convertEnvironmentToMap = (variables: VariableRow[]) => {

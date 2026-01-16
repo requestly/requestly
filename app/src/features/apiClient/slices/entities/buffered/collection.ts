@@ -12,6 +12,7 @@ export class BufferedCollectionRecordEntity
   origin = new CollectionRecordEntity(this.dispatch, { id: this.meta.referenceId });
   readonly variables = new ApiClientVariables<RQAPI.CollectionRecord, ApiClientRootState>(
     (e) => e.data.variables,
+    (e) => e.data.variablesOrder,
     this.unsafePatch.bind(this),
     this.getEntityFromState.bind(this)
   );
