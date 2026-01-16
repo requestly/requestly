@@ -36,6 +36,7 @@ import clsx from "clsx";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
 import { moveRecordsAcrossWorkspace } from "features/apiClient/commands/records";
+import { getApiClientFeatureContext } from "features/apiClient/commands/store.utils";
 
 interface Props {
   record: RQAPI.ApiRecord;
@@ -148,7 +149,6 @@ export const RequestRow: React.FC<Props> = ({
         }
       },
       drop: async (item: { record: RQAPI.ApiClientRecord; contextId: string }, monitor) => {
-        console.log("DBG:: drop called with item:", context, item.contextId);
         if (!monitor.isOver({ shallow: true })) {
           setDropPosition(null);
           dropPositionRef.current = null;
@@ -160,6 +160,12 @@ export const RequestRow: React.FC<Props> = ({
         dropPositionRef.current = null;
 
         try {
+          // Get the source context where the item is being dragged from
+          const sourceContext = getApiClientFeatureContext(item.contextId);
+          if (!sourceContext) {
+            throw new Error(`Source context not found for id: ${item.contextId}`);
+          }
+
           const siblings = apiRecordsRankingManager.sort(
             getImmediateChildrenRecords(context, record.collectionId ?? "")
           );
@@ -180,7 +186,8 @@ export const RequestRow: React.FC<Props> = ({
 
           const recordWithRank = { ...item.record, rank, collectionId: targetCollectionId };
 
-          await moveRecordsAcrossWorkspace(context, {
+          // Use sourceContext as the first parameter to refresh the source workspace
+          await moveRecordsAcrossWorkspace(sourceContext, {
             recordsToMove: [recordWithRank],
             ranks: [rank],
             destination: {

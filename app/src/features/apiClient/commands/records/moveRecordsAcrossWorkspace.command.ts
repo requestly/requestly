@@ -23,9 +23,14 @@ export async function moveRecordsAcrossWorkspace(
     collectionId: destination.collectionId,
   });
 
+  // Always refresh both contexts to ensure UI stays in sync
   if (destination.contextId !== ctx.id) {
     const destinationContext = getApiClientFeatureContext(destination.contextId);
-    await forceRefreshRecords(destinationContext);
+
+    // Refresh both workspaces to reflect the changes
+    await Promise.all([forceRefreshRecords(destinationContext), forceRefreshRecords(ctx)]);
+  } else {
+    // Even when moving within the same workspace, refresh to ensure UI updates
     await forceRefreshRecords(ctx);
   }
 
