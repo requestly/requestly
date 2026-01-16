@@ -72,6 +72,7 @@ export const CreateWorkspaceModal: React.FC<Props> = ({
           callback?.();
         }}
         analyticEventSource="create_workspace_modal"
+        isOpenedInModal
       />
     </Modal>
   );
