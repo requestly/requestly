@@ -13,13 +13,13 @@ export async function moveRecords(
     ranks?: string[];
   }
 ) {
-  const { collectionId, recordsToMove } = params;
+  const { collectionId, recordsToMove, ranks } = params;
   const { apiClientRecordsRepository } = context.repositories;
 
   // Generate ranks for records being moved
-  const ranks =
-    params.ranks?.length === recordsToMove.length
-      ? params.ranks
+  const FinalRanks =
+    ranks?.length === recordsToMove.length
+      ? ranks
       : apiRecordsRankingManager.getRanksForNewApis(context, collectionId, recordsToMove);
 
   const updatedRequests = recordsToMove.map((record, index) => {
@@ -27,7 +27,7 @@ export async function moveRecords(
       ? { ...record, collectionId, data: omit(record.data, "children") }
       : { ...record, collectionId };
     // Add rank to the record
-    updatedRecord.rank = ranks[index];
+    updatedRecord.rank = FinalRanks[index];
     return updatedRecord;
   });
 
