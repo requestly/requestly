@@ -23,6 +23,7 @@ import { useCommand } from "features/apiClient/commands";
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
 import { useApiClientRepository } from "features/apiClient/contexts/meta";
 import { EnvironmentVariableData } from "features/apiClient/store/variables/types";
+import { apiRecordsRankingManager } from "features/apiClient/helpers/RankingManager";
 
 interface BrunoImporterProps {
   onSuccess?: () => void;
@@ -107,8 +108,15 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
           results.forEach((result: any) => {
             if (result.status === "fulfilled") {
               const { collections, apis, environments } = result.value.data;
+
+              const ranks = apiRecordsRankingManager.getNextRanks(apis, apis);
+
               processedRecords.collections.push(...collections);
-              processedRecords.apis.push(...apis);
+              Array.from(apis).forEach((apiRecord, index) => {
+                // Assign ranks to APIs based on their order in the Bruno export
+                apiRecord.rank = ranks[index];
+                processedRecords.apis.push(apiRecord);
+              });
               processedRecords.environments.push(...environments);
               collectionsCount.current += collections.length;
               trackImportParsed(
