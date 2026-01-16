@@ -14,6 +14,8 @@ import "./localWorkspaceCreationView.scss";
 import { WorkspaceType } from "features/workspaces/types";
 import { useDebounce } from "hooks/useDebounce";
 import { WorkspacePathEllipsis } from "features/workspaces/components/WorkspacePathEllipsis";
+import { LocalWorkspaceCreateOptions } from "./components/LocalWorkspaceCreateOptions/LocalWorkspaceCreateOptions";
+import { useOpenLocalWorkspace } from "features/workspaces/hooks/useOpenLocalWorkspace";
 
 type FolderItem = {
   name: string;
@@ -51,17 +53,27 @@ const INVALID_FS_NAME_CHARACTERS = /[<>:"/\\|?*\x00-\x1f]/g;
 
 export const LocalWorkspaceCreationView = ({
   onCreateWorkspaceClick,
-  isLoading,
   onCancel,
+  isLoading,
+  isOpenedInModal,
 }: {
   onCreateWorkspaceClick: (args: CreateWorkspaceArgs) => void;
   isLoading: boolean;
   onCancel: () => void;
+  isOpenedInModal?: boolean;
 }) => {
   const [workspaceName, setWorkspaceName] = useState("");
   const [folderPath, setFolderPath] = useState("");
   const [folderPreview, setFolderPreview] = useState<FolderPreview | null>(null);
   const [hasDuplicateWorkspaceName, setHasDuplicateWorkspaceName] = useState(false);
+  const [isCreationOptionsVisible, setIsCreationOptionsVisible] = useState(isOpenedInModal ?? false);
+
+  const { openWorkspace, isLoading: isOpenWorkspaceLoading } = useOpenLocalWorkspace({
+    analyticEventSource: "create_workspace_modal",
+    onOpenWorkspaceCallback: () => {
+      onCancel();
+    },
+  });
 
   const folderSelectCallback = async (folderPath: string) => {
     setFolderPath(folderPath);
@@ -131,6 +143,25 @@ export const LocalWorkspaceCreationView = ({
         // No OP
       });
   }, []);
+
+  if (isCreationOptionsVisible) {
+    return (
+      <>
+        <div className="create-workspace-header">
+          <div className="create-workspace-header__title">Add a local workspace</div>
+        </div>
+        <div style={{ padding: "12px 0" }}>
+          <LocalWorkspaceCreateOptions
+            analyticEventSource="create_workspace_modal"
+            onCreateWorkspaceClick={() => setIsCreationOptionsVisible(false)}
+            openWorkspace={openWorkspace}
+            isOpeningWorkspaceLoading={isOpenWorkspaceLoading}
+            isOpenedInModal
+          />
+        </div>
+      </>
+    );
+  }
 
   return (
     <>
