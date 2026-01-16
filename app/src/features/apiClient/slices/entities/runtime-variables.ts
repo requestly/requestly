@@ -14,11 +14,16 @@ const RUNTIME_VARIABLES_ENTITY_ID = "runtime_variables";
  * Simple entity with just a variables property.
  * Uses the global Redux store instead of per-workspace API client store.
  */
-export class RuntimeVariablesEntity<M extends ApiClientEntityMeta = ApiClientEntityMeta> extends ApiClientEntity<RuntimeVariablesRecord, M, RootState> {
+export class RuntimeVariablesEntity<M extends ApiClientEntityMeta = ApiClientEntityMeta> extends ApiClientEntity<
+  RuntimeVariablesRecord,
+  M,
+  RootState
+> {
   readonly type = ApiClientEntityType.RUNTIME_VARIABLES;
 
   public readonly variables = new ApiClientVariables<RuntimeVariablesRecord, RootState>(
     (e) => e.variables,
+    (e) => e.variablesOrder,
     this.unsafePatch.bind(this),
     this.getEntityFromState.bind(this)
   );
@@ -55,7 +60,7 @@ export class RuntimeVariablesEntity<M extends ApiClientEntityMeta = ApiClientEnt
   }
 
   upsert(entity: RuntimeVariablesRecord): void {
-    this.variables.refresh(entity.variables)
+    this.variables.refresh(entity.variables);
   }
 
   /**
@@ -65,4 +70,3 @@ export class RuntimeVariablesEntity<M extends ApiClientEntityMeta = ApiClientEnt
     this.dispatch(runtimeVariablesActions.clear());
   }
 }
-

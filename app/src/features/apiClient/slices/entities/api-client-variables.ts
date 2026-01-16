@@ -11,6 +11,7 @@ type Variable = EnvironmentVariables[0];
 export class ApiClientVariables<T, State = ApiClientStoreState> {
   constructor(
     private readonly getVariableObject: (entity: T) => EnvironmentVariables,
+    private readonly getOrderArray: (entity: T) => string[] | undefined,
     private readonly unsafePatch: (patcher: (state: T) => void) => void,
     private readonly getEntityFromState: (state: State) => T
   ) {}
@@ -25,6 +26,9 @@ export class ApiClientVariables<T, State = ApiClientStoreState> {
         }
         variables[key] = params[key];
       }
+
+      // Initialize order array from params
+      this.initializeOrder(s, Object.keys(params));
     });
   }
 
@@ -37,13 +41,16 @@ export class ApiClientVariables<T, State = ApiClientStoreState> {
     };
     this.unsafePatch((s) => {
       const variables = this.getVariableObject(s);
-      if(!variables[key]) {
+
+      if (!variables[key]) {
         variables[key] = variable;
+        // Add to order array
+        this.addToOrder(s, key);
       } else {
         variables[key] = {
           ...variables[key],
           ...variable,
-        }
+        };
       }
     });
 
@@ -59,12 +66,23 @@ export class ApiClientVariables<T, State = ApiClientStoreState> {
         return;
       }
       const [oldKey, variable] = entry;
-      lodash.extend(variable, variableData);
-      if (params.key) {
-        if (oldKey !== params.key) {
-          variables[params.key] = variable;
-          delete variables[oldKey];
+
+      if (params.key && oldKey !== params.key) {
+        // Check if new key already exists with different id
+        if (variables[params.key] && variables[params.key]?.id !== params.id) {
+          lodash.extend(variable, variableData);
+          return;
         }
+
+        // Delete old key and add new key
+        delete variables[oldKey];
+        variables[params.key] = { ...variable, ...variableData };
+
+        // Update order array
+        this.replaceInOrder(s, oldKey, params.key);
+      } else {
+        // Just update the variable (no key change)
+        lodash.extend(variable, variableData);
       }
     });
   }
@@ -90,6 +108,9 @@ export class ApiClientVariables<T, State = ApiClientStoreState> {
       const variables = this.getVariableObject(state);
       const keys = Object.keys(variables);
       keys.forEach((key) => lodash.unset(variables, key));
+
+      // Clear order array
+      this.clearOrder(state);
     });
   }
 
@@ -98,9 +119,68 @@ export class ApiClientVariables<T, State = ApiClientStoreState> {
       const variables = this.getVariableObject(s);
       const entry = Object.entries(variables).find(([_, v]) => v.id === id);
       if (entry) {
-        delete variables[entry[0]];
+        const [key] = entry;
+        delete variables[key];
+
+        // Remove from order array
+        this.removeFromOrder(s, key);
       }
     });
+  }
+
+  getOrder(state: State): string[] | undefined {
+    const entity = this.getEntityFromState(state);
+    return this.getOrderArray(entity);
+  }
+
+  // Helper methods for order management
+  private getOrderArrayFromEntity(entity: T): string[] | undefined {
+    return this.getOrderArray(entity);
+  }
+
+  private initializeOrder(entity: T, keys: string[]): void {
+    const order = this.getOrderArrayFromEntity(entity);
+    if (order !== undefined) {
+      order.length = 0;
+      order.push(...keys);
+    }
+  }
+
+  private addToOrder(entity: T, key: string): void {
+    const order = this.getOrderArrayFromEntity(entity);
+    if (order && !order.includes(key)) {
+      order.push(key);
+    }
+  }
+
+  private removeFromOrder(entity: T, key: string): void {
+    const order = this.getOrderArrayFromEntity(entity);
+    if (order) {
+      const index = order.indexOf(key);
+      if (index !== -1) {
+        order.splice(index, 1);
+      }
+    }
+  }
+
+  private replaceInOrder(entity: T, oldKey: string, newKey: string): void {
+    const order = this.getOrderArrayFromEntity(entity);
+    if (order) {
+      const oldIndex = order.indexOf(oldKey);
+      if (oldIndex !== -1) {
+        order[oldIndex] = newKey;
+      } else {
+        // Key wasn't in order, add it
+        order.push(newKey);
+      }
+    }
+  }
+
+  private clearOrder(entity: T): void {
+    const order = this.getOrderArrayFromEntity(entity);
+    if (order) {
+      order.length = 0;
+    }
   }
 
   static merge(object: EnvironmentVariables, source: DeepPartial<EnvironmentVariables>) {
@@ -135,11 +215,15 @@ export class ApiClientVariables<T, State = ApiClientStoreState> {
     variables: EnvironmentVariables,
     config: {
       isPersisted?: boolean;
-    }
+    },
+    order?: string[]
   ) {
-    return lodash.mapValues(variables, (v) => ({
-      localValue: (config ? config.isPersisted : v.isPersisted) ? v.localValue : undefined,
-    }));
+    return {
+      variables: lodash.mapValues(variables, (v) => ({
+        localValue: (config ? config.isPersisted : v.isPersisted) ? v.localValue : undefined,
+      })),
+      order: order,
+    };
   }
 
   /**
@@ -147,10 +231,13 @@ export class ApiClientVariables<T, State = ApiClientStoreState> {
    * Unlike `perist` which only keeps localValue for overlay merging, this preserves the complete variable structure.
    * Suitable for slices where variables are self-contained and don't need hydrate-in-place merging.
    */
-  static persistFull(variables: EnvironmentVariables) {
-    return lodash.mapValues(variables, (v) => ({
-      ...v,
-      localValue: v.isPersisted ? v.localValue : undefined,
-    }));
+  static persistFull(variables: EnvironmentVariables, order?: string[]) {
+    return {
+      variables: lodash.mapValues(variables, (v) => ({
+        ...v,
+        localValue: v.isPersisted ? v.localValue : undefined,
+      })),
+      order: order,
+    };
   }
 }

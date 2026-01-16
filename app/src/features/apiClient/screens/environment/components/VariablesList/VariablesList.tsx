@@ -1,5 +1,6 @@
 import type React from "react";
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useRef } from "react";
+import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
 import { EnvironmentVariableType } from "backend/environment/types";
 import type { EnvironmentVariables } from "backend/environment/types";
 import { useVariablesListColumns } from "./hooks/useVariablesListColumns";
@@ -13,7 +14,12 @@ import "./variablesList.scss";
 import EmptySearchResultsView from "./components/emptySearchResultsView/EmptySearchResultsView";
 import type { ApiClientVariables } from "features/apiClient/slices/entities/api-client-variables";
 import { mapToEnvironmentArray } from "../../utils";
+import { v4 as uuidv4 } from "uuid";
 import { VariableData } from "@requestly/shared/types/entities/apiClient";
+
+const existsInBackend = (variablesData: EnvironmentVariables, id: string | number) =>
+  Object.values(variablesData).some((v) => v.id === id);
+
 
 interface VariablesListProps {
   variablesData: EnvironmentVariables;
@@ -35,13 +41,16 @@ export const VariablesList: React.FC<VariablesListProps> = ({
   container = "environments",
 }) => {
   const [visibleSecretsRowIds, setVisibleSecrets] = useState<(number | string)[]>([]);
+  const emptyRowIdRef = useRef<string>(uuidv4());
+
+  const variablesOrder = useApiClientSelector((state) => variables.getOrder(state));
 
   const dataSource = useMemo(() => {
-    const arr = mapToEnvironmentArray(variablesData);
+    const arr = mapToEnvironmentArray(variablesData, variablesOrder);
     if (arr.length === 0) {
       return [
         {
-          id: "__empty__",
+          id: emptyRowIdRef.current,
           key: "",
           type: EnvironmentVariableType.String,
           syncValue: "",
@@ -50,8 +59,9 @@ export const VariablesList: React.FC<VariablesListProps> = ({
         } as VariableRow,
       ];
     }
+    emptyRowIdRef.current = uuidv4();
     return arr;
-  }, [variablesData]);
+  }, [variablesData, variablesOrder]);
 
   const filteredDataSource = useMemo(
     () => dataSource.filter((item) => item.key.toLowerCase().includes(searchValue.toLowerCase())),
@@ -90,9 +100,10 @@ export const VariablesList: React.FC<VariablesListProps> = ({
 
   const handleVariableChange = useCallback(
     (row: VariableRow, fieldChanged: keyof VariableRow) => {
-      if (row.id === "__empty__") {
+      if (!existsInBackend(variablesData, row.id)) {
         if (row.key) {
           variables.add({
+            id: row.id,
             key: row.key,
             type: row.type,
             syncValue: row.syncValue,
@@ -102,10 +113,9 @@ export const VariablesList: React.FC<VariablesListProps> = ({
         }
         return;
       }
-
       variables.set({ id: row.id, [fieldChanged]: row[fieldChanged] });
     },
-    [variables]
+    [variables, variablesData]
   );
 
   const handleAddNewRow = useCallback(() => {
@@ -121,12 +131,10 @@ export const VariablesList: React.FC<VariablesListProps> = ({
 
   const handleDeleteVariable = useCallback(
     (id: number | string) => {
-      if (id === "__empty__") {
-        return;
-      }
+      if (!existsInBackend(variablesData, id)) return;
       variables.delete(id);
     },
-    [variables]
+    [variables, variablesData]
   );
 
   const handleUpdateVisibleSecretsRowIds = useCallback(
@@ -142,12 +150,10 @@ export const VariablesList: React.FC<VariablesListProps> = ({
 
   const handleUpdatePersisted = useCallback(
     (id: number | string, isPersisted: boolean) => {
-      if (id === "__empty__") {
-        return;
-      }
+      if (!existsInBackend(variablesData, id)) return;
       variables.set({ id, isPersisted: isPersisted as true });
     },
-    [variables]
+    [variables, variablesData]
   );
 
   const columns = useVariablesListColumns({

@@ -29,6 +29,7 @@ const emptyTreeIndices: TreeIndices = {
 const initialState: ApiRecordsState = {
   records: apiRecordsAdapter.getInitialState(),
   tree: emptyTreeIndices,
+  erroredRecords: [],
 };
 
 function rebuildTreeIndices(state: ApiRecordsState): void {
@@ -139,6 +140,7 @@ export const apiRecordsSlice = createSlice({
         erroredRecords: ErroredRecord[]; // TODO: cleanup
       }>
     ) {
+      // Data from repository is already migrated in ApiClientContextService
       apiRecordsAdapter.setAll(state.records, action.payload.records);
       rebuildTreeIndices(state);
     },
@@ -176,12 +178,18 @@ const hydrationTransformer = createTransform<
   (i) => {
     const collections = pickBy(i.entities, (e) => e?.type === RQAPI.RecordType.COLLECTION);
     const entities = mapValues(collections, (c) => {
+      const persistedData = ApiClientVariables.perist(
+        c.data.variables,
+        {
+          isPersisted: true, // always persist collection variables
+        },
+        c.data.variablesOrder
+      );
       const data: DeepPartial<RQAPI.CollectionRecord> = {
         id: c.id,
         data: {
-          variables: ApiClientVariables.perist(c.data.variables, {
-            isPersisted: true, // always persist collection variables
-          }),
+          variables: persistedData.variables,
+          variablesOrder: persistedData.order,
         },
       };
 
@@ -193,8 +201,22 @@ const hydrationTransformer = createTransform<
     };
   },
   (o) => {
-    // We have to case here since redux-persist doesn't know that we are handling hydration ourselves
-    return { ids: [], entities: o.entities as ApiRecordsState["records"]["entities"] };
+    const entities = mapValues(o.entities, (record) => {
+      if (record && record.type === RQAPI.RecordType.COLLECTION) {
+        const collectionData = record.data as RQAPI.Collection;
+        if (!collectionData.variablesOrder && collectionData.variables) {
+          return {
+            ...record,
+            data: {
+              ...collectionData,
+              variablesOrder: Object.keys(collectionData.variables),
+            },
+          };
+        }
+      }
+      return record;
+    });
+    return { ids: [], entities: entities as ApiRecordsState["records"]["entities"] };
   },
   {
     whitelist: ["records", "entities"],

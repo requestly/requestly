@@ -13,6 +13,7 @@ export class CollectionRecordEntity<M extends ApiClientEntityMeta = ApiClientEnt
 > {
   public readonly variables = new ApiClientVariables<RQAPI.CollectionRecord>(
     (e) => e.data.variables,
+    (e) => e.data.variablesOrder,
     this.unsafePatch.bind(this),
     this.getEntityFromState.bind(this)
   );
