@@ -45,12 +45,13 @@ export function getEntityDataFromTabSource(
   const isRuntimeVariables = source instanceof RuntimeVariablesViewTabSource;
 
   if (isDraftRequest) {
+    const draftSource = source as DraftRequestContainerTabSource;
     return {
       entityType:
-        source.metadata.apiEntryType === RQAPI.ApiEntryType.HTTP
+        draftSource.metadata.apiEntryType === RQAPI.ApiEntryType.HTTP
           ? ApiClientEntityType.HTTP_RECORD
           : ApiClientEntityType.GRAPHQL_RECORD,
-      data: source.metadata.emptyRecord,
+      data: draftSource.metadata.emptyRecord,
     };
   }
 

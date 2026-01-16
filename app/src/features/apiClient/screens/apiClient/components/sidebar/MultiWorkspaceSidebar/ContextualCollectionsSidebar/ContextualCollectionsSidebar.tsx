@@ -13,7 +13,6 @@ import {
   getApiClientFeatureContext,
   WorkspaceInfo,
 } from "features/apiClient/slices";
-import { getRecord } from "features/apiClient/slices/apiRecords/utils";
 import { ApiClientExportModal } from "../../../modals/exportModal/ApiClientExportModal";
 import { captureException } from "backend/apiClient/utils";
 import { DeleteApiRecordModal } from "../../../modals";

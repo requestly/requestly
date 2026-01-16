@@ -9,7 +9,6 @@ import { deleteRecords } from "features/apiClient/slices/apiRecords/thunks";
 import { toast } from "utils/Toast";
 import { isApiCollection } from "../../../utils";
 import * as Sentry from "@sentry/react";
-import { useTabActions } from "componentsV2/Tabs/slice";
 import { ApiClientFeatureContext } from "features/apiClient/slices";
 
 interface DeleteApiRecordModalProps {
@@ -28,8 +27,6 @@ export const DeleteApiRecordModal: React.FC<DeleteApiRecordModalProps> = ({
   onClose,
   onSuccess,
 }) => {
-  const { closeTabByEntityId } = useTabActions();
-
   const recordsWithContext = useMemo(() => {
     return getRecordsToDelete();
   }, [getRecordsToDelete]);
@@ -45,7 +42,7 @@ export const DeleteApiRecordModal: React.FC<DeleteApiRecordModalProps> = ({
   }
 
   let apiRequestCount =
-    records.length === 1 ? (isApiCollection(records[0]) ? records[0]?.data?.children?.length : 1) : "";
+    records.length === 1 ? (isApiCollection(records[0]!) ? records[0]?.data?.children?.length : 1) : "";
 
   const handleDeleteApiRecord = async () => {
     try {
@@ -61,21 +58,11 @@ export const DeleteApiRecordModal: React.FC<DeleteApiRecordModalProps> = ({
           }) as any
         ).unwrap();
 
-        const { deletedApiRecords, deletedCollectionRecords } = result;
+        const { deletedCollectionRecords } = result;
 
         const isExampleCollection = deletedCollectionRecords.some((record) => !!record.isExample);
         trackCollectionDeleted(isExampleCollection ? "example" : "");
-
-        deletedApiRecords.forEach((r) => {
-          closeTabByEntityId({ entityId: r.id });
-        });
-
-        deletedCollectionRecords.forEach((r) => {
-          closeTabByEntityId({ entityId: r.id });
-        });
       });
-
-      // First delete records
 
       toast.success(
         records.length === 1
@@ -87,12 +74,7 @@ export const DeleteApiRecordModal: React.FC<DeleteApiRecordModalProps> = ({
       onClose();
       onSuccess?.();
     } catch (error) {
-      // const erroredResult = !recordDeletionResult.success ? recordDeletionResult : collectionsDeletionResult;
-      // notification.error({
-      //   message: `Error deleting ${records.length === 1 ? "record" : "records"}`,
-      //   description: erroredResult?.message,
-      //   placement: "bottomRight",
-      // });
+      toast.error("Error while deleting!");
 
       Sentry.withScope((scope) => {
         scope.setTag("error_type", "api_client_record_deletion");

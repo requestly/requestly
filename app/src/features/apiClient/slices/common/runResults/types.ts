@@ -3,7 +3,7 @@ import type { RQAPI } from "features/apiClient/types";
 export type Iteration = number;
 export type Timestamp = number;
 
-type BaseRequestExecutionResult = {
+export type BaseRequestExecutionResult = {
   iteration: Iteration;
   recordId: RQAPI.ApiRecord["id"];
   recordName: RQAPI.ApiRecord["name"];

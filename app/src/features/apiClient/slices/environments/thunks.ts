@@ -8,6 +8,8 @@ import { environmentsActions } from "./slice";
 import { EnvironmentEntity } from "./types";
 import { parseEnvironmentEntityToData } from "./utils";
 import { erroredRecordsActions } from "../erroredRecords";
+import { reduxStore } from "store";
+import { closeTabByEntityId } from "componentsV2/Tabs/slice";
 
 type Repository = EnvironmentInterface<Record<string, unknown>>;
 
@@ -100,14 +102,30 @@ export const deleteEnvironment = createAsyncThunk<
     repository: Repository;
   },
   { rejectValue: string }
->("environments/delete", async ({ environmentId, repository }, { dispatch, rejectWithValue }) => {
-  try {
-    await repository.deleteEnvironment(environmentId);
-    dispatch(environmentsActions.environmentDeleted(environmentId));
-  } catch (error) {
-    return rejectWithValue(error instanceof Error ? error.message : "Failed to delete environment");
+>(
+  "environments/delete",
+  async ({ environmentId, repository }, { dispatch, rejectWithValue }) => {
+    try {
+      await repository.deleteEnvironment(environmentId);
+      dispatch(environmentsActions.environmentDeleted(environmentId));
+    } catch (error) {
+      return rejectWithValue(error instanceof Error ? error.message : "Failed to delete environment");
+    }
+  },
+  {
+    condition: async ({ environmentId }) => {
+      const result = await reduxStore.dispatch(
+        closeTabByEntityId({ entityId: environmentId, skipUnsavedPrompt: true })
+      );
+
+      if (closeTabByEntityId.rejected.match(result)) {
+        return false;
+      }
+
+      return true;
+    },
   }
-});
+);
 
 export const duplicateEnvironment = createAsyncThunk<
   void,

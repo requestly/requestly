@@ -17,8 +17,6 @@ import "./apiClient.scss";
 import { WindowsAndLinuxGatedHoc } from "componentsV2/WindowsAndLinuxGatedHoc";
 import { AutogenerateProvider } from "features/apiClient/store/autogenerateContextProvider";
 import { ClientViewFactory } from "features/apiClient/screens/apiClient/clientView/ClientViewFactory";
-import { ContextId } from "features/apiClient/contexts/contextId.context";
-import { NoopContextId } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 import { BottomSheetFeatureContext } from "componentsV2/BottomSheet/types";
 import { AISessionProvider } from "features/ai/contexts/AISession";
 
@@ -138,19 +136,17 @@ export const APIClientModal: React.FC<Props> = ({ request, isModalOpen, onModalC
     >
       <WindowsAndLinuxGatedHoc featureName="API client">
         <BottomSheetProvider context={BottomSheetFeatureContext.API_CLIENT}>
-          <ContextId id={NoopContextId}>
-            <AutogenerateProvider>
-              <AISessionProvider>
-                <ClientViewFactory
-                  isOpenInModal
-                  apiRecord={apiRecord}
-                  handleRequestFinished={() => {}}
-                  onSaveCallback={() => {}}
-                  isCreateMode={true}
-                />
-              </AISessionProvider>
-            </AutogenerateProvider>
-          </ContextId>
+          <AutogenerateProvider>
+            <AISessionProvider>
+              <ClientViewFactory
+                isOpenInModal
+                apiRecord={apiRecord}
+                handleRequestFinished={() => {}}
+                onSaveCallback={() => {}}
+                isCreateMode={true}
+              />
+            </AISessionProvider>
+          </AutogenerateProvider>
         </BottomSheetProvider>
       </WindowsAndLinuxGatedHoc>
     </Modal>

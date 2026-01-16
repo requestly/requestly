@@ -394,7 +394,6 @@ class Runner {
 
       for await (const { request, iteration, startTime } of this.iterate()) {
         const { currentExecutingRequest } = this.beforeRequestExecutionStart(iteration, request, startTime);
-
         const result = await this.executor.executeSingleRequest(
           { entry: request.data as RQAPI.ApiEntry, recordId: request.id },
           {
@@ -409,6 +408,7 @@ class Runner {
 
       await this.afterComplete();
     } catch (e) {
+      console.error({ e });
       if (e instanceof RunCancelled) {
         this.onRunCancelled();
         return;
