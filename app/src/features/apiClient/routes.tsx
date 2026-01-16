@@ -14,12 +14,12 @@ export const apiClientRoutes: RouteObject[] = [
         label: "API Client",
       },
     },
-    // children: [
-    //   {
-    //     index: true,
-    //     element: <ApiClientEmptyView />,
-    //   },
-    // ],
+    children: [
+      {
+        index: true,
+        element: <ApiClientEmptyView />,
+      },
+    ],
   },
   {
     path: PATHS.API_CLIENT.IMPORT_FROM_POSTMAN.ABSOLUTE,

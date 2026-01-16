@@ -1,10 +1,10 @@
 import React from "react";
 import { SingleWorkspaceSidebar } from "./SingleWorkspaceSidebar/SingleWorkspaceSidebar";
-import { ApiClientViewMode } from "features/apiClient/store/multiWorkspaceView/multiWorkspaceView.store";
 import { useViewMode, useGetSingleModeWorkspace } from "features/apiClient/slices/workspaceView/hooks";
 import { MultiWorkspaceSidebar } from "./MultiWorkspaceSidebar/MultiWorkspaceSidebar";
 import { WorkspaceProvider } from "features/apiClient/common/WorkspaceProvider";
 import { ApiClientLoadingView } from "../views/components/ApiClientLoadingView/ApiClientLoadingView";
+import { ApiClientViewMode } from "features/apiClient/slices";
 
 const SingleViewSidebarWrapper = () => {
   const workspace = useGetSingleModeWorkspace();

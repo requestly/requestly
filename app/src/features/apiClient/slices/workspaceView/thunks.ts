@@ -116,7 +116,6 @@ function removeWorkspaceFromView(params: { workspaceId: WorkspaceState["id"] }):
   const { workspaceId } = params;
 
   try {
-    // getTabServiceActions().closeTabsByContext(workspaceId);
     apiClientContextRegistry.removeContext(workspaceId);
     reduxStore.dispatch(workspaceViewActions.removeWorkspace(workspaceId));
 
@@ -215,7 +214,7 @@ export const setupWorkspaceView = createAsyncThunk(
     if (getViewMode(rootState) === ApiClientViewMode.SINGLE) {
       const selectedWorkspace = (() => {
         const resurrected = selectedWorkspaces[0];
-        if(resurrected?.id === FAKE_LOGGED_OUT_WORKSPACE_ID) {
+        if (resurrected?.id === FAKE_LOGGED_OUT_WORKSPACE_ID) {
           return;
         }
         return resurrected;
@@ -295,7 +294,7 @@ export const setupWorkspaceView = createAsyncThunk(
 export const resetWorkspaceView = () => {
   return (dispatch: Dispatch, getState: () => RootState) => {
     apiClientContextRegistry.clearAll();
-    reduxStore.dispatch(closeAllTabs({skipUnsavedPrompt: true}));
+    reduxStore.dispatch(closeAllTabs({ skipUnsavedPrompt: true }));
     dispatch(workspaceViewActions.reset());
   };
 };

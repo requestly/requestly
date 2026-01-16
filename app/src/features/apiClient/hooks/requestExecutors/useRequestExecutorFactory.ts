@@ -7,7 +7,14 @@ import { HttpRequestValidationService } from "../../helpers/httpRequestExecutor/
 import { toast } from "utils/Toast";
 import { APIClientWorkloadManager } from "features/apiClient/helpers/modules/scriptsV2/workloadManager/APIClientWorkloadManager";
 import { BaseExecutionContext } from "features/apiClient/helpers/httpRequestExecutor/scriptExecutionContext";
-import { ApiClientFeatureContext, selectGlobalEnvironment, selectRecordById, useApiClientFeatureContext, useApiClientRepository, useApiClientStore } from "features/apiClient/slices";
+import {
+  ApiClientFeatureContext,
+  selectGlobalEnvironment,
+  selectRecordById,
+  useApiClientFeatureContext,
+  useApiClientRepository,
+  useApiClientStore,
+} from "features/apiClient/slices";
 import { useApiClientDispatch } from "features/apiClient/slices/hooks/base.hooks";
 import { EnvironmentEntity, GlobalEnvironmentEntity } from "features/apiClient/slices/entities";
 import { CollectionRecordEntity } from "features/apiClient/slices/entities/collection";
@@ -24,10 +31,7 @@ type ExecutorConstructor<T> = new (
   appMode: "EXTENSION" | "DESKTOP"
 ) => T;
 
-export const useRequestExecutorFactory = <T>(
-  ExecutorClass: ExecutorConstructor<T>,
-  recordId: string,
-): T => {
+export const useRequestExecutorFactory = <T>(ExecutorClass: ExecutorConstructor<T>, recordId: string): T => {
   const ctx = useApiClientFeatureContext();
   const appMode = useSelector(getAppMode);
   const store = useApiClientStore();
@@ -39,68 +43,67 @@ export const useRequestExecutorFactory = <T>(
   const handleUpdatesFromExecutionWorker = useCallback(
     async (state: BaseExecutionContext) => {
       try {
-        debugger;
         for (const key in state) {
           const entity = (() => {
             if (key === "environment") {
               const activeEnvironmentId = store.getState().environments.activeEnvironmentId;
-              if(activeEnvironmentId) {
-                return new EnvironmentEntity(apiClientDispatch, {id:activeEnvironmentId});
+              if (activeEnvironmentId) {
+                return new EnvironmentEntity(apiClientDispatch, { id: activeEnvironmentId });
               }
               return;
-         }
-          if (key === "global") {
-            return new GlobalEnvironmentEntity(apiClientDispatch);
-
-          }
-          if (key === "collectionVariables") {
-            const record = selectRecordById(store.getState(), recordId);
-            if (!record || !record.collectionId) {
-              return;
             }
-            return new CollectionRecordEntity(apiClientDispatch, {id: record.collectionId});
-
-
-          }
-          if (key === "variables") {
-            return new RuntimeVariablesEntity(rootDispatch);
-          }
+            if (key === "global") {
+              return new GlobalEnvironmentEntity(apiClientDispatch);
+            }
+            if (key === "collectionVariables") {
+              const record = selectRecordById(store.getState(), recordId);
+              if (!record || !record.collectionId) {
+                return;
+              }
+              return new CollectionRecordEntity(apiClientDispatch, { id: record.collectionId });
+            }
+            if (key === "variables") {
+              return new RuntimeVariablesEntity(rootDispatch);
+            }
           })();
 
-          if(!entity) {
+          if (!entity) {
             continue;
           }
 
           const variables = (state as any)[key] as EnvironmentVariables;
-          for(const key in variables) {
+          for (const key in variables) {
             const variable = variables[key]!;
             entity.variables.add({
               key,
               ...variable,
             });
           }
-          if(entity.type === ApiClientEntityType.RUNTIME_VARIABLES) {
+          if (entity.type === ApiClientEntityType.RUNTIME_VARIABLES) {
             continue;
           }
           const variablesToSave = entity.variables.getAll(store.getState());
-          if(entity.type === ApiClientEntityType.COLLECTION_RECORD) {
+          if (entity.type === ApiClientEntityType.COLLECTION_RECORD) {
             await repositories.apiClientRecordsRepository.setCollectionVariables(entity.id, variablesToSave);
             continue;
           }
-          if(entity.type === ApiClientEntityType.ENVIRONMENT) {
-            await repositories.environmentVariablesRepository.updateEnvironment(entity.id, {variables: variablesToSave});
+          if (entity.type === ApiClientEntityType.ENVIRONMENT) {
+            await repositories.environmentVariablesRepository.updateEnvironment(entity.id, {
+              variables: variablesToSave,
+            });
             continue;
           }
           const globalEnvironmentId = selectGlobalEnvironment(store.getState()).id;
-          await repositories.environmentVariablesRepository.updateEnvironment(globalEnvironmentId, {variables: variablesToSave});
+          await repositories.environmentVariablesRepository.updateEnvironment(globalEnvironmentId, {
+            variables: variablesToSave,
+          });
         }
       } catch (error) {
         console.log("Failed to update variables from script execution", error);
         toast.error("Failed to update variables from script execution");
       }
     },
-    [  store,
-    ]
+    [store, apiClientDispatch, recordId, repositories, rootDispatch]
   );
 
   return useMemo(() => {

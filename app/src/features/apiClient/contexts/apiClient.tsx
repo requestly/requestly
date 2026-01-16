@@ -14,12 +14,12 @@ import { toast } from "utils/Toast";
 import { RBAC, useRBAC } from "features/rbac";
 import { DraftRequestContainerTabSource } from "../screens/apiClient/components/views/components/DraftRequestContainer/draftRequestContainerTabSource";
 import { EnvironmentViewTabSource } from "../screens/environment/components/environmentView/EnvironmentViewTabSource";
-import { saveOrUpdateRecord } from "../commands/store.utils";
 import { RequestViewTabSource } from "../screens/apiClient/components/views/components/RequestView/requestViewTabSource";
 import { CollectionViewTabSource } from "../screens/apiClient/components/views/components/Collection/collectionViewTabSource";
 import { createEnvironment, getApiClientFeatureContext } from "../slices";
 import { Workspace } from "features/workspaces/types";
 import { useTabActions } from "componentsV2/Tabs/slice";
+import { saveOrUpdateRecord } from "../hooks/useNewApiClientContext";
 
 interface ApiClientContextInterface {
   history: RQAPI.ApiEntry[];

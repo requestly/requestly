@@ -8,8 +8,8 @@ import { BsGlobeCentralSouthAsia } from "@react-icons/all-files/bs/BsGlobeCentra
 import { MdHorizontalSplit } from "@react-icons/all-files/md/MdHorizontalSplit";
 import { useActiveEnvironment } from "features/apiClient/slices";
 import { useWorkspaceId } from "features/apiClient/common/WorkspaceProvider";
-import { NoopContextId } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 import { GLOBAL_ENVIRONMENT_ID, RUNTIME_VARIABLES_ENTITY_ID } from "features/apiClient/slices/common/constants";
+import { NoopContextId } from "features/apiClient/commands/utils";
 
 interface UseScopeOptionsResult {
   scopeOptions: ScopeOption[];

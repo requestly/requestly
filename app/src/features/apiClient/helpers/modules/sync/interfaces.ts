@@ -2,8 +2,8 @@ import { EnvironmentData, EnvironmentMap, EnvironmentVariables, VariableScope } 
 import { CollectionVariableMap, RQAPI } from "features/apiClient/types";
 import { ErroredRecord, FileType } from "./local/services/types";
 import { ResponsePromise } from "backend/types";
-import { SavedRunConfig } from "features/apiClient/commands/collectionRunner/types";
-import { RunResult, SavedRunResult } from "features/apiClient/store/collectionRunResult/runResult.store";
+import { SavedRunConfig } from "features/apiClient/slices/runConfig/types";
+import { RunResult, SavedRunResult } from "features/apiClient/slices/common/runResults";
 
 export interface EnvironmentInterface<Meta extends Record<string, any>> {
   meta: Meta;

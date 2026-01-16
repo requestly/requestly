@@ -1,20 +1,19 @@
+import { notification } from "antd";
+import { VariablesListHeader } from "features/apiClient/screens/environment/components/VariablesListHeader/VariablesListHeader";
+import { useSaveBuffer } from "features/apiClient/slices/buffer/hooks";
+import {
+    useBufferedCollectionEntity,
+    useIsBufferDirty,
+} from "features/apiClient/slices/entities/hooks";
+import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
+import type { ApiClientRootState } from "features/apiClient/slices/hooks/types";
+import { trackVariablesSaved } from "modules/analytics/events/features/apiClient";
 import type React from "react";
 import { useCallback, useState } from "react";
-import { VariablesListHeader } from "features/apiClient/screens/environment/components/VariablesListHeader/VariablesListHeader";
 import { toast } from "utils/Toast";
-import { trackVariablesSaved } from "modules/analytics/events/features/apiClient";
-import "./collectionsVariablesView.scss";
-import { useApiClientDispatch, useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
-import {
-  useBufferedCollectionEntity,
-  useIsBufferDirty,
-} from "features/apiClient/slices/entities/hooks";
-import { useApiClientRepository } from "features/apiClient/slices/workspaceView/helpers/ApiClientContextRegistry";
-import { CollectionsVariablesList } from "../CollectionsVariablesList";
-import type { ApiClientRootState } from "features/apiClient/slices/hooks/types";
-import { useSaveBuffer } from "features/apiClient/slices/buffer/hooks";
-import { notification } from "antd";
 import { TAB_KEYS } from "../../CollectionView";
+import { CollectionsVariablesList } from "../CollectionsVariablesList";
+import "./collectionsVariablesView.scss";
 
 interface CollectionsVariablesViewProps {
   collectionId: string;

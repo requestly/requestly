@@ -3,7 +3,6 @@ import { Alert } from "antd";
 import { RQButton } from "lib/design-system-v2/components";
 import { NativeError } from "errors/NativeError";
 import { isDesktopMode } from "utils/AppUtils";
-import { getTabServiceActions } from "componentsV2/Tabs/tabUtils";
 import { ErrorDetails } from "./ErrorDetails";
 import "./ErrorScreen.scss";
 
@@ -24,7 +23,6 @@ export const ErrorScreen: React.FC<ErrorScreenProps> = ({ error, resetError }) =
         <div className="error-boundary__actions">
           <RQButton
             onClick={() => {
-              getTabServiceActions().resetTabs(true);
               window.location.reload();
             }}
           >
@@ -38,4 +36,3 @@ export const ErrorScreen: React.FC<ErrorScreenProps> = ({ error, resetError }) =
     </div>
   );
 };
-

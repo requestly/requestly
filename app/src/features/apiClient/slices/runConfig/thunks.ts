@@ -1,8 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { RQAPI } from "features/apiClient/types";
 import { selectAllDescendantIds } from "../apiRecords/selectors";
-import { RunResult } from "features/apiClient/store/collectionRunResult/runResult.store";
-import { SavedRunConfig } from "features/apiClient/commands/collectionRunner/types";
 import { API_CLIENT_RUNNER_CONFIG_SLICE_NAME } from "../common/constants";
 import { Workspace } from "features/workspaces/types";
 import { runCollection } from "features/apiClient/slices/runConfig/helpers/runCollection";
@@ -11,6 +9,8 @@ import { ApiClientFeatureContext, getApiClientFeatureContext } from "../workspac
 import { BufferedRunConfigEntity } from "../entities/buffered/runConfig";
 import { LiveRunResultEntity } from "../entities/liveRunResult";
 import { DEFAULT_RUN_CONFIG_ID } from "./constants";
+import { SavedRunConfig } from "./types";
+import { RunResult } from "../common/runResults";
 
 function getDefaultRunOrderByCollectionId(
   ctx: ApiClientFeatureContext,
