@@ -175,6 +175,11 @@ export class FsManagerServiceAdapter extends BackgroundServiceAdapter {
       FileSystemResult<RQAPI.ApiClientRecord>
     >;
   }
+
+  @FsErrorHandler
+  async excludeFile(filePath: string) {
+    return this.invokeProcedureInBG("excludeFile", filePath) as Promise<FileSystemResult<void>>;
+  }
 }
 
 class FsManagerServiceAdapterProvider {
