@@ -22,6 +22,7 @@ import { ResponsePromise } from "backend/types";
 import { SavedRunConfig } from "features/apiClient/commands/collectionRunner/types";
 import { RunResult, SavedRunResult } from "features/apiClient/store/collectionRunResult/runResult.store";
 import { batchCreateCollectionRunDetailsInFirebase } from "backend/apiClient/batchCreateCollectionRunDetailsInFirebase";
+import { apiRecordsRankingManager } from "features/apiClient/helpers/RankingManager";
 
 export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<ApiClientCloudMeta> {
   meta: ApiClientCloudMeta;
@@ -82,6 +83,10 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
   }
 
   async updateRecord(record: Partial<RQAPI.ApiClientRecord>, id: string, type?: RQAPI.ApiClientRecord["type"]) {
+    if (!record.rank) {
+      const existingRecord = await this.getRecord(id);
+      record.rank = apiRecordsRankingManager.getEffectiveRank(existingRecord.data || {});
+    }
     const sanitizedRecord = sanitizeRecord(record as RQAPI.ApiClientRecord);
     sanitizedRecord.id = id;
     if (type) {
