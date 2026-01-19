@@ -802,13 +802,6 @@ export const processRecordsForDuplication = (
         name: `(Copy) ${record.name}`,
         data: omit(record.data, "children"),
       });
-
-      // Set rank for the duplicated collection
-      collectionToDuplicate.rank = apiRecordsRankingManager.getRankForDuplicatedApi(
-        context,
-        record,
-        record.collectionId ?? ""
-      );
       recordsToDuplicate.push(collectionToDuplicate);
 
       if (record.data.children?.length) {
