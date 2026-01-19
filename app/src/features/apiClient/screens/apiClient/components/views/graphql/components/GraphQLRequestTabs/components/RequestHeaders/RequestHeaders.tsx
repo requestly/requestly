@@ -7,9 +7,5 @@ interface Props {
 }
 
 export const RequestHeaders: React.FC<Props> = ({ entity }) => {
-  return (
-    <div className="graphql-request-tab-content">
-      <HeadersTable entity={entity} />
-    </div>
-  );
+  return <HeadersTable entity={entity} />;
 };
