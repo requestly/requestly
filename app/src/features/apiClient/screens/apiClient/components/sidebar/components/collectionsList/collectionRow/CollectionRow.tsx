@@ -224,6 +224,16 @@ export const CollectionRow: React.FC<Props> = ({
     [handleCollectionExport, openTab, context.id, handleRecordsToBeDeleted]
   );
 
+  const updateExpandedRecordIds = useCallback(
+    (newExpandedIds: RQAPI.ApiClientRecord["id"][]) => {
+      setExpandedRecordIds(newExpandedIds);
+      isEmpty(newExpandedIds)
+        ? sessionStorage.removeItem(SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY)
+        : sessionStorage.setItem(SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY, newExpandedIds);
+    },
+    [setExpandedRecordIds]
+  );
+
   const collapseChangeHandler = useCallback(
     (keys: RQAPI.ApiClientRecord["id"][]) => {
       let activeKeysCopy = [...expandedRecordIds];
@@ -232,12 +242,9 @@ export const CollectionRow: React.FC<Props> = ({
       } else if (!activeKeysCopy.includes(record.id)) {
         activeKeysCopy.push(record.id);
       }
-      setExpandedRecordIds(activeKeysCopy);
-      isEmpty(activeKeysCopy)
-        ? sessionStorage.removeItem(SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY)
-        : sessionStorage.setItem(SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY, activeKeysCopy);
+      updateExpandedRecordIds(activeKeysCopy);
     },
-    [record, expandedRecordIds, setExpandedRecordIds]
+    [record, expandedRecordIds, updateExpandedRecordIds]
   );
 
   useEffect(() => {
@@ -270,8 +277,7 @@ export const CollectionRow: React.FC<Props> = ({
 
         if (!expandedRecordIds.includes(record.id)) {
           const newExpandedRecordIds = [...expandedRecordIds, destination.collectionId];
-          setExpandedRecordIds(newExpandedRecordIds);
-          sessionStorage.setItem(SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY, newExpandedRecordIds);
+          updateExpandedRecordIds(newExpandedRecordIds);
         }
       } catch (error) {
         notification.error({
@@ -283,7 +289,7 @@ export const CollectionRow: React.FC<Props> = ({
         setIsCollectionRowLoading(false);
       }
     },
-    [record.id, expandedRecordIds, setExpandedRecordIds]
+    [record.id, expandedRecordIds, updateExpandedRecordIds]
   );
 
   const checkCanDropItem = useCallback(
@@ -335,13 +341,12 @@ export const CollectionRow: React.FC<Props> = ({
       if (IsTargetCollectionCollapsed && !hoverExpandTimeoutRef.current) {
         hoverExpandTimeoutRef.current = setTimeout(() => {
           const newExpandedRecordIds = [...expandedRecordIds, record.id];
-          setExpandedRecordIds(newExpandedRecordIds);
-          sessionStorage.setItem(SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY, newExpandedRecordIds);
+          updateExpandedRecordIds(newExpandedRecordIds);
           hoverExpandTimeoutRef.current = null;
         }, 600);
       }
     },
-    [expandedRecordIds, record.id, setExpandedRecordIds]
+    [expandedRecordIds, record.id, updateExpandedRecordIds]
   );
   const [{ isOver }, drop] = useDrop(
     () => ({
