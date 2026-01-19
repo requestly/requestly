@@ -47,12 +47,6 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({ recordTo
       name: recordName,
     };
 
-    // If record does not have a rank generate one using old data to maintain order in UI
-    if (!record.rank) {
-      const effectiveRank = apiRecordsRankingManager.getEffectiveRank(recordToBeEdited);
-      record.rank = effectiveRank;
-    }
-
     const result =
       record.type === RQAPI.RecordType.API
         ? await apiClientRecordsRepository.updateRecord(record, record.id)
