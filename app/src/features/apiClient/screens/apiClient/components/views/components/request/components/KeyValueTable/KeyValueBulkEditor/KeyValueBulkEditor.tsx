@@ -1,20 +1,17 @@
-import React, { useCallback, useState, useEffect, useRef } from "react";
-import { EditorView } from "codemirror";
 import { EditorSelection, Transaction } from "@codemirror/state";
-import Editor, { EditorLanguage } from "componentsV2/CodeEditor";
-import { KeyValuePair, KeyValueDataType } from "features/apiClient/types";
-import { RQButton } from "lib/design-system-v2/components";
 import { MdClose } from "@react-icons/all-files/md/MdClose";
+import { EditorView } from "codemirror";
+import Editor, { EditorLanguage } from "componentsV2/CodeEditor";
+import { KeyValueDataType, KeyValuePair } from "features/apiClient/types";
+import { RQButton } from "lib/design-system-v2/components";
+import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import "./keyValueBulkEditor.scss";
-
-type StoreHook = (selector: (state: any) => any) => any;
 
 interface KeyValueBulkEditorProps {
   data: KeyValuePair[];
-  onChange: (updatedPairs: KeyValuePair[]) => void;
+  onChange: (a: KeyValuePair[]) => void;
   onClose: () => void;
-  useStore?: StoreHook;
-  tableType: string;
+  tableTitle?: string;
 }
 
 const whiteTextTheme = EditorView.theme({
@@ -26,14 +23,14 @@ const whiteTextTheme = EditorView.theme({
   },
 });
 
-const parseKeyValueText = (text: string, originalData: KeyValuePair[]): KeyValuePair[] => {
+const parseKeyValueText = (text: string): KeyValuePair[] => {
   const existingDataMap = new Map<string, KeyValuePair[]>();
-  originalData.forEach((item) => {
-    if (!existingDataMap.has(item.key)) {
-      existingDataMap.set(item.key, []);
-    }
-    existingDataMap.get(item.key)!.push(item);
-  });
+  // originalData.forEach((item) => {
+  //   if (!existingDataMap.has(item.key)) {
+  //     existingDataMap.set(item.key, []);
+  //   }
+  //   existingDataMap.get(item.key)!.push(item);
+  // });
 
   let idCounter = 0;
   const generateId = () => Date.now() * 1000 + idCounter++;
@@ -83,21 +80,11 @@ const formatKeyValueText = (pairs: KeyValuePair[]): string => {
     .join("\n");
 };
 
-export const KeyValueBulkEditor: React.FC<KeyValueBulkEditorProps> = ({
-  data: propsData,
-  onChange: propsOnChange,
-  onClose,
-  useStore,
-  tableType,
-}) => {
-  const useStoreHook = useStore ?? (() => undefined);
-  const storeData = useStoreHook((state: any) => state?.queryParams ?? state?.headers);
-  const activeData = storeData ?? propsData;
-
-  const [editorValue, setEditorValue] = useState(() => formatKeyValueText(activeData));
+export const KeyValueBulkEditor: React.FC<KeyValueBulkEditorProps> = ({ data, onClose, onChange, tableTitle }) => {
+  // const [editorValue, setEditorValue] = useState(() => formatKeyValueText(activeData));
 
   const editorViewRef = useRef<EditorView | null>(null);
-  const dataRef = useRef(activeData);
+  // const dataRef = useRef(activeData);
   const isInternalChange = useRef(false);
   const lastSyncedText = useRef<string | null>(null);
 
@@ -105,20 +92,20 @@ export const KeyValueBulkEditor: React.FC<KeyValueBulkEditorProps> = ({
     editorViewRef.current = view;
   }, []);
 
-  useEffect(() => {
-    dataRef.current = activeData;
-  }, [activeData]);
+  // useEffect(() => {
+  //   dataRef.current = activeData;
+  // }, [activeData]);
 
   // Sync from Table -> Editor
   useEffect(() => {
     // Changing this flag allows the value inside the Editor to be changed by our formatter and changes passed down from Table
     if (isInternalChange.current) {
       isInternalChange.current = false;
-      lastSyncedText.current = formatKeyValueText(activeData);
+      lastSyncedText.current = formatKeyValueText(data);
       return;
     }
 
-    const newText = formatKeyValueText(activeData);
+    const newText = formatKeyValueText(data);
     lastSyncedText.current = newText;
 
     const view = editorViewRef.current;
@@ -136,8 +123,8 @@ export const KeyValueBulkEditor: React.FC<KeyValueBulkEditorProps> = ({
         });
       }
     }
-    setEditorValue(newText);
-  }, [activeData]);
+    // setEditorValue(newText);
+  }, [data]);
 
   const handleEditorChange = useCallback(
     (value: string) => {
@@ -146,14 +133,15 @@ export const KeyValueBulkEditor: React.FC<KeyValueBulkEditorProps> = ({
       }
 
       isInternalChange.current = true;
-      setEditorValue(value);
+      // setEditorValue(value);
 
-      const parsed = parseKeyValueText(value, dataRef.current);
-      propsOnChange(parsed);
+      const parsed = parseKeyValueText(value);
+      onChange(parsed);
     },
-    [propsOnChange]
+    [onChange]
   );
 
+  const editorValue = useMemo(() => formatKeyValueText(data), [data]);
   const showHintPanel = editorValue.trim().length > 0;
   const placeholderText =
     "- Add or edit in key:value format\n- Separate each row by a newline\n- Prepend // to any row to disable it";
@@ -161,7 +149,7 @@ export const KeyValueBulkEditor: React.FC<KeyValueBulkEditorProps> = ({
   return (
     <div className="key-value-bulk-edit-panel">
       <div className="bulk-edit-panel-header">
-        <div className="bulk-edit-panel-title">{`BULK EDIT ${tableType.toUpperCase()}`} </div>
+        <div className="bulk-edit-panel-title">{`BULK EDIT ${tableTitle?.toUpperCase()}`} </div>
 
         <RQButton
           type="transparent"

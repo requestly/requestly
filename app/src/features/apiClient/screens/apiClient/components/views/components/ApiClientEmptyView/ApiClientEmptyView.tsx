@@ -6,19 +6,19 @@ import { trackNewCollectionClicked, trackNewRequestClicked } from "modules/analy
 import { variablesActions } from "store/features/variables/slice";
 import { RBACButton, useRBAC } from "features/rbac";
 import { notification } from "antd";
-import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
+import { useTotalRecords, useApiClientRepository } from "features/apiClient/slices";
 import {
   NewApiRecordDropdown,
   NewRecordDropdownItemType,
 } from "../../../sidebar/components/NewApiRecordDropdown/NewApiRecordDropdown";
 import "./apiClientEmptyView.scss";
-import { useApiClientRepository } from "features/apiClient/contexts/meta";
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
+import { WorkspaceProvider } from "features/apiClient/common/WorkspaceProvider";
 
-export const ApiClientEmptyView = () => {
+const ApiClientEmptyViewContent = () => {
   const dispatch = useDispatch();
 
-  const apiClientRecords = useAPIRecords((state) => state.apiClientRecords);
+  const totalRecords = useTotalRecords();
   const { onSaveRecord } = useNewApiClientContext();
   const { apiClientRecordsRepository } = useApiClientRepository();
   const { validatePermission } = useRBAC();
@@ -26,7 +26,7 @@ export const ApiClientEmptyView = () => {
 
   const [isRecordCreating, setIsRecordCreating] = useState<RQAPI.RecordType | null>(null);
 
-  const isEmpty = apiClientRecords.length === 0;
+  const isEmpty = totalRecords === 0;
 
   const collectionButton = (
     <RBACButton
@@ -116,5 +116,13 @@ export const ApiClientEmptyView = () => {
         </div>
       </div>
     </div>
+  );
+};
+
+export const ApiClientEmptyView = () => {
+  return (
+    <WorkspaceProvider>
+      <ApiClientEmptyViewContent />
+    </WorkspaceProvider>
   );
 };

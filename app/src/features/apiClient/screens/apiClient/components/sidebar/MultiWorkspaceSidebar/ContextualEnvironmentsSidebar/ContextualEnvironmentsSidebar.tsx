@@ -1,15 +1,15 @@
 import React, { useState } from "react";
 import { SidebarListHeader } from "../../components/sidebarListHeader/SidebarListHeader";
-import { useApiClientMultiWorkspaceView } from "features/apiClient/store/multiWorkspaceView/multiWorkspaceView.store";
 import { WorkspaceProvider } from "../WorkspaceProvider/WorkspaceProvider";
 import { ContextualEnvironmentsList } from "./ContextualEnvironmentsList/ContextualEnvironmentsList";
 import { ApiClientSidebarTabKey } from "../MultiWorkspaceSidebar";
+import { useGetAllSelectedWorkspaces } from "features/apiClient/slices";
 import { useApiClientContext } from "features/apiClient/contexts";
 
 export const ContextualEnvironmentsSidebar: React.FC = () => {
   const [searchValue, setSearchValue] = useState("");
-  const selectedWorkspaces = useApiClientMultiWorkspaceView((s) => s.selectedWorkspaces);
   const { onNewClick } = useApiClientContext();
+  const selectedWorkspaces = useGetAllSelectedWorkspaces();
 
   return (
     <div className="multiview-environments-sidebar-container">
@@ -24,12 +24,10 @@ export const ContextualEnvironmentsSidebar: React.FC = () => {
 
       <div className="multiview-environments-sidebar-list-section">
         {selectedWorkspaces.map((workspace) => {
-          const workspaceId = workspace.getState().id;
-
           return (
             <WorkspaceProvider
-              key={workspaceId}
-              workspaceId={workspaceId}
+              key={workspace.id}
+              workspaceId={workspace.id}
               showEnvSwitcher={false}
               type={ApiClientSidebarTabKey.ENVIRONMENTS}
             >

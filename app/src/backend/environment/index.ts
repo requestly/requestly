@@ -63,7 +63,7 @@ export const getEnvironment = async (id: string, ownerId: string): Promise<Envir
 export const updateEnvironmentInDB = async (
   ownerId: string,
   environmentId: string,
-  updates: Partial<Pick<EnvironmentData, "name" | "variables">>
+  updates: Partial<Pick<EnvironmentData, "name" | "variables" | "variablesOrder">>
 ) => {
   if (updates.variables) {
     // Transform variables to the required format if present
@@ -195,8 +195,15 @@ export const duplicateEnvironmentInDB = async (
   }
 
   const newEnvironment = await createNonGlobalEnvironmentInDB(ownerId, `${environmentToDuplicate.name} Copy`);
-  return updateEnvironmentInDB(ownerId, newEnvironment.id, { variables: environmentToDuplicate.variables }).then(() => {
-    return { ...newEnvironment, variables: environmentToDuplicate.variables };
+  return updateEnvironmentInDB(ownerId, newEnvironment.id, {
+    variables: environmentToDuplicate.variables,
+    variablesOrder: environmentToDuplicate.variablesOrder,
+  }).then(() => {
+    return {
+      ...newEnvironment,
+      variables: environmentToDuplicate.variables,
+      variablesOrder: environmentToDuplicate.variablesOrder,
+    };
   });
 };
 

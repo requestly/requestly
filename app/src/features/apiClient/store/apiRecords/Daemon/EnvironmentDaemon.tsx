@@ -1,46 +1,52 @@
-import React, { useEffect } from "react";
-import { useApiClientRepository } from "features/apiClient/contexts/meta";
 import { VariableScope } from "backend/environment/types";
-import { useAPIEnvironment } from "../ApiRecordsContextProvider";
-import { parseEnvVariables } from "../../variables/variables.store";
-
+import { useApiClientRepository } from "features/apiClient/slices";
+import { GLOBAL_ENVIRONMENT_ID } from "features/apiClient/slices/common/constants";
+import { environmentsActions, useActiveEnvironmentId } from "features/apiClient/slices/environments";
+import { useApiClientDispatch } from "features/apiClient/slices/hooks/base.hooks";
+import { mergeSyncedVariablesPreservingLocalValue } from "features/apiClient/slices/utils/syncVariables";
+import React, { useEffect } from "react";
 const EnvironmentDaemon: React.FC = () => {
-  const { globalEnvironement, activeEnvrionment } = useAPIEnvironment((state) => {
-    return {
-      activeEnvrionment: state.activeEnvironment,
-      globalEnvironement: state.globalEnvironment,
-    };
-  });
   const { environmentVariablesRepository } = useApiClientRepository();
+  const dispatch = useApiClientDispatch();
+
+  const activeEnvironmentId = useActiveEnvironmentId();
 
   useEffect(() => {
-    if (!activeEnvrionment) return;
-    const unsusbscribe = environmentVariablesRepository.attachListener({
+    if (!activeEnvironmentId) return;
+
+    const unsubscribe = environmentVariablesRepository.attachListener({
       scope: VariableScope.ENVIRONMENT,
-      id: activeEnvrionment.getState().id,
+      id: activeEnvironmentId,
       callback: (updatedEnvironmentData) => {
-        activeEnvrionment
-          .getState()
-          .data.variables?.getState()
-          .resetSyncValues(parseEnvVariables(updatedEnvironmentData.variables));
+        dispatch(
+          environmentsActions.unsafePatch({
+            id: activeEnvironmentId,
+            patcher: (env) => {
+              env.variables = mergeSyncedVariablesPreservingLocalValue(env.variables, updatedEnvironmentData.variables);
+            },
+          })
+        );
       },
     });
-    return unsusbscribe;
-  }, [environmentVariablesRepository, activeEnvrionment]);
+    return unsubscribe;
+  }, [environmentVariablesRepository, activeEnvironmentId, dispatch]);
 
   useEffect(() => {
     const unsubscribe = environmentVariablesRepository.attachListener({
       scope: VariableScope.GLOBAL,
-      id: globalEnvironement.getState().id,
+      id: GLOBAL_ENVIRONMENT_ID,
       callback: (updatedEnvironmentData) => {
-        globalEnvironement
-          .getState()
-          .data.variables.getState()
-          .resetSyncValues(parseEnvVariables(updatedEnvironmentData.variables));
+        dispatch(
+          environmentsActions.unsafePatchGlobal({
+            patcher: (env) => {
+              env.variables = mergeSyncedVariablesPreservingLocalValue(env.variables, updatedEnvironmentData.variables);
+            },
+          })
+        );
       },
     });
     return unsubscribe;
-  }, [environmentVariablesRepository, globalEnvironement]);
+  }, [environmentVariablesRepository, dispatch]);
   return null;
 };
 

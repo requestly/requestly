@@ -108,7 +108,7 @@ export namespace RQAPI {
   }
 
   export type PathVariable = {
-    id: number;
+    id: number | string;
     key: string;
     value: string;
     description?: string;
@@ -280,6 +280,7 @@ export namespace RQAPI {
       postResponse: string;
     };
     variables: Omit<EnvironmentVariables, "localValue">;
+    variablesOrder?: string[]; // Array of variable keys in display order
     auth: Auth;
   }
 

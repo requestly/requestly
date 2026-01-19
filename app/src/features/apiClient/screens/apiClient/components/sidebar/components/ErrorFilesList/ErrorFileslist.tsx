@@ -10,13 +10,14 @@ import { CgStack } from "@react-icons/all-files/cg/CgStack";
 import { MdOutlineSyncAlt } from "@react-icons/all-files/md/MdOutlineSyncAlt";
 import "./errorFilesList.scss";
 import { RiDeleteBinLine } from "@react-icons/all-files/ri/RiDeleteBinLine";
-import { useErroredRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
-import {
-  ApiClientViewMode,
-  useApiClientMultiWorkspaceView,
-} from "features/apiClient/store/multiWorkspaceView/multiWorkspaceView.store";
-import { useApiClientFeatureContext, useApiClientRepository } from "features/apiClient/contexts/meta";
-import { useCommand } from "features/apiClient/commands";
+import { ApiClientViewMode, useViewMode } from "features/apiClient/slices/workspaceView";
+import { useApiClientFeatureContext } from "features/apiClient/slices/workspaceView/helpers/ApiClientContextRegistry/hooks";
+import { useApiErroredRecords, useEnvironmentErroredRecords } from "features/apiClient/slices/erroredRecords";
+import { forceRefreshRecords } from "features/apiClient/slices/apiRecords/thunks";
+import { forceRefreshEnvironments } from "features/apiClient/slices/environments/thunks";
+import { useSelector } from "react-redux";
+import { getWorkspaceById, dummyPersonalWorkspace } from "store/slices/workspaces/selectors";
+import { RootState } from "store/types";
 
 const DeleteErrorFileButton = ({ onDelete }: { onDelete: () => void }) => {
   const [isConfirmationPopupOpen, setIsConfirmationPopupOpen] = useState(false);
@@ -65,9 +66,9 @@ const getFileIcon = (fileType: FileType) => {
 };
 
 const ErrorListHeader: React.FC = () => {
-  const [getViewMode] = useApiClientMultiWorkspaceView((s) => [s.getViewMode, s.getSelectedWorkspace]);
+  const viewMode = useViewMode();
 
-  return getViewMode() === ApiClientViewMode.SINGLE ? (
+  return viewMode === ApiClientViewMode.SINGLE ? (
     <div className="error-files-list-header">
       <MdWarningAmber />
       ERROR FILES
@@ -76,16 +77,15 @@ const ErrorListHeader: React.FC = () => {
 };
 
 const ErrorFileItemTitle: React.FC<{ file: ErroredRecord }> = ({ file }) => {
-  const [getViewMode, getSelectedWorkspace] = useApiClientMultiWorkspaceView((s) => [
-    s.getViewMode,
-    s.getSelectedWorkspace,
-  ]);
-
+  const viewMode = useViewMode();
   const ctx = useApiClientFeatureContext();
-  // Workspace cannot be null in this component context - using non-null assertion
-  const workspace = useMemo(() => getSelectedWorkspace(ctx.workspaceId)!, [getSelectedWorkspace, ctx.workspaceId]);
 
-  return getViewMode() === ApiClientViewMode.SINGLE ? (
+  const rawWorkspace = useSelector((state: RootState) =>
+    ctx.workspaceId === null ? dummyPersonalWorkspace : getWorkspaceById(ctx.workspaceId)(state)
+  );
+  const workspaceName = rawWorkspace?.name ?? "Unknown Workspace";
+
+  return viewMode === ApiClientViewMode.SINGLE ? (
     <>
       {getFileIcon(file.type)}
       <span>{file.name}</span>
@@ -95,7 +95,7 @@ const ErrorFileItemTitle: React.FC<{ file: ErroredRecord }> = ({ file }) => {
       {getFileIcon(file.type)}
 
       <div className="file-item-title">
-        <div className="workspace-name">{workspace.getState().name}</div>
+        <div className="workspace-name">{workspaceName}</div>
         <div className="file-name">{file.name}</div>
       </div>
     </div>
@@ -131,17 +131,11 @@ export const ErrorFilesList: React.FC<{ updateErrorRecordsCount?: (value: number
   const [errorFileToView, setErrorFileToView] = useState<ErroredRecord | null>(null);
   const [isErrorFileViewerModalOpen, setIsErrorFileViewerModalOpen] = useState(false);
 
-  const {
-    env: { forceRefreshEnvironments },
-    api: { forceRefreshRecords },
-  } = useCommand();
+  const context = useApiClientFeatureContext();
+  const { apiClientRecordsRepository, environmentVariablesRepository } = context.repositories;
 
-  const { apiClientRecordsRepository } = useApiClientRepository();
-
-  const [apiErroredRecords, environmentErroredRecords] = useErroredRecords((s) => [
-    s.apiErroredRecords,
-    s.environmentErroredRecords,
-  ]);
+  const apiErroredRecords = useApiErroredRecords();
+  const environmentErroredRecords = useEnvironmentErroredRecords();
 
   const files = useMemo(() => [...apiErroredRecords, ...environmentErroredRecords], [
     apiErroredRecords,
@@ -162,9 +156,21 @@ export const ErrorFilesList: React.FC<{ updateErrorRecordsCount?: (value: number
 
       if (result.success) {
         if (errorFile.type === FileType.ENVIRONMENT) {
-          forceRefreshEnvironments();
+          await context.store
+            .dispatch(
+              forceRefreshEnvironments({
+                repository: environmentVariablesRepository,
+              }) as any
+            )
+            .unwrap();
         } else {
-          forceRefreshRecords();
+          await context.store
+            .dispatch(
+              forceRefreshRecords({
+                repository: apiClientRecordsRepository,
+              }) as any
+            )
+            .unwrap();
         }
 
         toast.success("Error file deleted successfully");
@@ -175,7 +181,7 @@ export const ErrorFilesList: React.FC<{ updateErrorRecordsCount?: (value: number
         });
       }
     },
-    [apiClientRecordsRepository, forceRefreshEnvironments, forceRefreshRecords]
+    [apiClientRecordsRepository, environmentVariablesRepository, context]
   );
 
   const handleOpenErrorFile = (file: ErroredRecord) => {

@@ -18,9 +18,9 @@ import { Ok, Result, Try } from "utils/try";
 import { NativeError } from "errors/NativeError";
 import { WorkResult, WorkResultType } from "../modules/scriptsV2/workloadManager/workLoadTypes";
 import { BaseExecutionContext, ExecutionContext, ScriptExecutionContext } from "./scriptExecutionContext";
-import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 import { APIClientWorkloadManager } from "../modules/scriptsV2/workloadManager/APIClientWorkloadManager";
 import { BaseExecutionMetadata, IterationContext } from "../modules/scriptsV2/worker/script-internals/types";
+import { ApiClientFeatureContext, selectRecordById } from "features/apiClient/slices";
 
 enum RQErrorHeaderValue {
   DNS_RESOLUTION_ERROR = "ERR_NAME_NOT_RESOLVED",
@@ -193,7 +193,6 @@ export class HttpRequestExecutor {
     const { abortController, scopes, executionContext } = executionConfig ?? {};
 
     this.abortController = abortController || new AbortController();
-
     const preparationResult = (
       await this.prepareRequestWithValidation(recordId, entry, scopes, executionContext)
     ).mapError((error) => new ExecutionError(entry, error));
@@ -204,7 +203,7 @@ export class HttpRequestExecutor {
 
     let { preparedEntry, renderedVariables } = preparationResult.unwrap();
 
-    const recordName = this.ctx.stores.records.getState().getData(recordId)?.name ?? "";
+    const recordName = selectRecordById(this.ctx.store.getState(), recordId)?.name ?? "";
     const scriptExecutionContext = new ScriptExecutionContext(
       this.ctx,
       recordId,
@@ -363,11 +362,11 @@ export class HttpRequestExecutor {
 
   async rerun(recordId: string, entry: RQAPI.HttpApiEntry): Promise<RQAPI.RerunResult> {
     this.abortController = new AbortController();
-
     const executionContext = new ScriptExecutionContext(this.ctx, recordId, entry);
+    const recordName = selectRecordById(this.ctx.store.getState(), recordId)?.name ?? "";
     const executionMetadata: BaseExecutionMetadata = {
       requestId: recordId,
-      requestName: this.ctx.stores.records.getState().getData(recordId)?.name ?? "",
+      requestName: recordName,
       iterationContext: { iteration: 0, iterationCount: 1 },
     };
     const scriptExecutor = new HttpRequestScriptExecutionService(

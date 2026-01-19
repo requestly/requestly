@@ -1,19 +1,16 @@
 import React, { useCallback, useMemo } from "react";
 import { RequestViewTabSource } from "../../RequestView/requestViewTabSource";
-import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
 import { RQAPI } from "features/apiClient/types";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { GenericApiClient } from "features/apiClient/screens/apiClient/clientView/GenericApiClient";
-import {
-  ApiClientViewMode,
-  useApiClientMultiWorkspaceView,
-} from "features/apiClient/store/multiWorkspaceView/multiWorkspaceView.store";
 import "./historyView.scss";
+import { ApiClientViewMode, useViewMode } from "features/apiClient/slices";
+import { useTabActions } from "componentsV2/Tabs/slice";
 
 export const HistoryView: React.FC = () => {
-  const [openTab] = useTabServiceWithSelector((state) => [state.openTab]);
+  const [viewMode] = useViewMode();
+  const { openBufferedTab } = useTabActions();
   const { history, addToHistory, setCurrentHistoryIndex, selectedHistoryIndex } = useApiClientContext();
-  const [viewMode] = useApiClientMultiWorkspaceView((s) => [s.viewMode]);
 
   const entry = useMemo(() => {
     if (selectedHistoryIndex != null && history?.[selectedHistoryIndex]) {
@@ -34,17 +31,16 @@ export const HistoryView: React.FC = () => {
         return;
       }
 
-      openTab(
-        new RequestViewTabSource({
+      openBufferedTab({
+        source: new RequestViewTabSource({
           id: entryDetails.id,
           apiEntryDetails: entryDetails,
           title: entryDetails.name || entryDetails.data.request?.url,
           context: {},
         }),
-        { preview: false }
-      );
+      });
     },
-    [openTab, hideSaveBtn]
+    [openBufferedTab, hideSaveBtn]
   );
 
   const handleAppRequestFinished = useCallback(
@@ -67,7 +63,6 @@ export const HistoryView: React.FC = () => {
 
   return (
     <GenericApiClient
-      isCreateMode
       isOpenInModal={hideSaveBtn} // TODO: rename isOpenInModal prop with some meaningful name
       onSaveCallback={handleSaveCallback}
       apiEntryDetails={entry}

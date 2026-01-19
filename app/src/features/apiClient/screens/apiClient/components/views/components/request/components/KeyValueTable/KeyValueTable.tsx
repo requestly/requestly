@@ -37,22 +37,19 @@ interface KeyValueTableProps {
   config?: {
     checkInvalidCharacter?: boolean;
   };
-  children?: React.ReactNode;
-  useStore?: any;
-  headerContent?: React.ReactNode;
   tableType?: string;
+  headerContent?: React.ReactNode;
 }
 
-export const KeyValueTable: React.FC<KeyValueTableProps> = ({
+export const KeyValueTable: React.FC<React.PropsWithChildren<KeyValueTableProps>> = ({
   data,
   variables,
   onChange,
   extraColumns,
   config,
+  tableType,
   children,
-  useStore,
   headerContent,
-  tableType = "params",
 }) => {
   const { checkInvalidCharacter = false } = config || {};
 
@@ -364,8 +361,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
             data={memoizedData}
             onChange={onChange}
             onClose={() => setShowBulkEditPanel(false)}
-            useStore={useStore}
-            tableType={tableType}
+            tableTitle={tableType}
           />
         )}
       </div>

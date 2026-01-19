@@ -3,7 +3,6 @@ import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getActiveWorkspace } from "store/slices/workspaces/selectors";
 import { WorkspaceType } from "features/workspaces/types";
-import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 import { useSyncService } from "../store/hooks";
 import { toast } from "utils/Toast";
 import {
@@ -13,14 +12,16 @@ import {
 import * as Sentry from "@sentry/react";
 import { syncServiceStore } from "../store/syncServiceStore";
 import { APIClientSyncService } from "../store/types";
-import { useApiClientRepository } from "features/apiClient/contexts/meta";
 import { ApiClientLocalStoreRepository } from "../ApiClientLocalStorageRepository";
+import { apiRecordsActions, useApiClientRepository, useApiClientStore } from "features/apiClient/slices";
+import { useApiClientDispatch } from "features/apiClient/slices/hooks/base.hooks";
 
 const LoggedInDaemon: React.FC<{}> = () => {
   const activeWorkspace = useSelector(getActiveWorkspace);
   const syncRepository = useApiClientRepository();
   const [syncAll, setSyncTask] = useSyncService((state) => [state.syncAll, state.setSyncTask]);
-  const [addNewRecords, getAllRecords] = useAPIRecords((state) => [state.addNewRecords, state.getAllRecords]);
+  const store = useApiClientStore();
+  const dispatch = useApiClientDispatch();
 
   useEffect(() => {
     if (syncRepository instanceof ApiClientLocalStoreRepository) {
@@ -47,7 +48,7 @@ const LoggedInDaemon: React.FC<{}> = () => {
           syncedEnvironmentIds.push(...envIds);
         }
 
-        const syncedRecordIds: string[] = getAllRecords().map((r) => r.id);
+        const syncedRecordIds: string[] = store.getState().records.records.ids as string[];
         const recordsToSkip = new Set(syncedRecordIds);
         const environmentsToSkip = new Set(syncedEnvironmentIds);
 
@@ -57,7 +58,7 @@ const LoggedInDaemon: React.FC<{}> = () => {
         });
 
         if (syncedRecords.records.length) {
-          addNewRecords(syncedRecords.records);
+          dispatch(apiRecordsActions.upsertRecords(syncedRecords.records));
         }
 
         if (syncedRecords.records.length || syncedRecords.environments.length) {
@@ -81,14 +82,15 @@ const LoggedInDaemon: React.FC<{}> = () => {
     })();
 
     setSyncTask(task);
-  }, [activeWorkspace?.workspaceType, syncRepository, syncAll, getAllRecords, addNewRecords, setSyncTask]);
+  }, [activeWorkspace?.workspaceType, syncRepository, syncAll, store, dispatch, setSyncTask]);
 
   return <></>;
 };
 
 const LoggedOutDaemon: React.FC<{}> = () => {
   const [syncTask, setSyncTask] = useSyncService((state) => [state.syncTask, state.setSyncTask]);
-  const [getAllRecords, refresh] = useAPIRecords((state) => [state.getAllRecords, state.refresh]);
+  const store = useApiClientStore();
+  const dispatch = useApiClientDispatch();
 
   useEffect(() => {
     if (!syncTask) {
@@ -105,18 +107,15 @@ const LoggedOutDaemon: React.FC<{}> = () => {
         }
 
         const syncedRecords = result.data.records;
-        const syncedRecordIds = new Set(syncedRecords.map((r) => r.id));
+        const syncedRecordIds = syncedRecords.map((r) => r.id);
 
-        const records = getAllRecords();
-        const recordsToBeShown = records.filter((r) => !syncedRecordIds.has(r.id));
-
-        refresh(recordsToBeShown);
+        dispatch(apiRecordsActions.clearRecords(syncedRecordIds))
       } catch (e) {
         // This is a noop, since syncing failing in logged out state
         // doesn't warrant any action.
       }
     })();
-  }, [syncTask, setSyncTask, getAllRecords, refresh]);
+  }, [syncTask, setSyncTask, store, dispatch]);
 
   return <></>;
 };

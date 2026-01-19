@@ -121,7 +121,7 @@ export class LocalStoreEnvSync implements EnvironmentInterface<ApiClientLocalSto
 
   async updateEnvironment(
     environmentId: string,
-    updates: Partial<Pick<EnvironmentData, "name" | "variables">>
+    updates: Partial<Pick<EnvironmentData, "name" | "variables" | "variablesOrder">>
   ): Promise<void> {
     const environment = await this.queryService.getRecord(environmentId);
 
@@ -131,7 +131,11 @@ export class LocalStoreEnvSync implements EnvironmentInterface<ApiClientLocalSto
       }
 
       if (updates.variables) {
-        environment.variables = { ...environment.variables, ...updates.variables };
+        environment.variables = { ...updates.variables };
+      }
+
+      if (updates.variablesOrder) {
+        environment.variablesOrder = [...updates.variablesOrder];
       }
 
       await this.queryService.updateRecord(environmentId, environment);

@@ -1,33 +1,37 @@
-import React from "react";
-import { useGraphQLRecordStore } from "features/apiClient/hooks/useGraphQLRecordStore";
+import React, { useCallback } from "react";
 import { ScriptEditor } from "../../../../../components/Scripts/components/ScriptEditor/ScriptEditor";
+import { BufferedGraphQLRecordEntity } from "features/apiClient/slices/entities";
 import { RQAPI } from "features/apiClient/types";
+import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
 
 interface GraphQLScriptsProps {
+  entity: BufferedGraphQLRecordEntity;
   focusPostResponse?: boolean;
 }
 
-export const GraphQLScripts: React.FC<GraphQLScriptsProps> = ({ focusPostResponse }) => {
-  const [entry, recordId, updateScripts, updateEntry] = useGraphQLRecordStore((state) => [
-    state.entry,
-    state.recordId,
-    state.updateEntryScripts,
-    state.updateEntry,
-  ]);
+export const GraphQLScripts: React.FC<GraphQLScriptsProps> = ({ entity, focusPostResponse }) => {
+  const entry = useApiClientSelector((s) => entity.getEntityFromState(s).data);
 
-  const handleUpdateTests = (testResults: RQAPI.ApiEntryMetaData["testResults"]) => {
-    updateEntry({
-      ...entry,
-      testResults,
-    });
-  };
+  const handleScriptsChange = useCallback(
+    (scripts: { preRequest: string; postResponse: string }) => {
+      entity.setScripts(scripts);
+    },
+    [entity]
+  );
+
+  const handleUpdateTests = useCallback(
+    (testResults: RQAPI.ApiEntryMetaData["testResults"]) => {
+      entity.setTestResults(testResults);
+    },
+    [entity]
+  );
 
   return (
     <div className="graphql-request-tab-content" style={{ height: "inherit" }}>
       <ScriptEditor
-        requestId={recordId}
+        requestId={entity.meta.referenceId}
         entry={entry}
-        onScriptsChange={updateScripts}
+        onScriptsChange={handleScriptsChange}
         aiTestsExcutionCallback={handleUpdateTests}
         focusPostResponse={focusPostResponse}
       />
