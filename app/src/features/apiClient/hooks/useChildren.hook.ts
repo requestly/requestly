@@ -5,39 +5,17 @@ import { ApiClientEventTopic } from "../helpers/apiClientTreeBus/types";
 import { RQAPI } from "../types";
 import { ApiClientFeatureContext } from "../store/apiClientFeatureContext/apiClientFeatureContext.store";
 import { apiRecordsRankingManager } from "../helpers/RankingManager";
+import { sortRecords } from "../screens/apiClient/utils";
 
 export const getAllChildrenRecords = (ctx: ApiClientFeatureContext, nodeId: string) => {
   const children = ctx.stores.records.getState().getAllChildren(nodeId);
   const getRecord = ctx.stores.records.getState().getData;
-  return children
+
+  const records = children
     .map((child) => getRecord(child))
-    .filter((record): record is RQAPI.ApiClientRecord => Boolean(record))
-    .sort((recordA, recordB) => {
-      // Keep example collections first
-      if (recordA.isExample && !recordB.isExample) {
-        return -1;
-      }
-      if (recordB.isExample && !recordA.isExample) {
-        return 1;
-      }
+    .filter((record): record is RQAPI.ApiClientRecord => Boolean(record));
 
-      // If different type, then keep collection first
-      if (recordA.type !== recordB.type) {
-        return recordA.type === RQAPI.RecordType.COLLECTION ? -1 : 1;
-      }
-
-      // Sort collections alphabetically by name (case-insensitive)
-      if (recordA.type === RQAPI.RecordType.COLLECTION) {
-        const nameA = (recordA.name || "").toLowerCase();
-        const nameB = (recordB.name || "").toLowerCase();
-        return nameA.localeCompare(nameB);
-      }
-
-      // Sort requests using ranking manager
-      const aRank = apiRecordsRankingManager.getEffectiveRank(recordA);
-      const bRank = apiRecordsRankingManager.getEffectiveRank(recordB);
-      return apiRecordsRankingManager.compareFn(aRank, bRank);
-    });
+  return sortRecords(records);
 };
 
 export const getImmediateChildrenRecords = (ctx: ApiClientFeatureContext, nodeId: string) => {

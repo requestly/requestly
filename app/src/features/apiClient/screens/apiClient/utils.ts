@@ -479,8 +479,16 @@ export const isApiCollection = (record: RQAPI.ApiClientRecord) => {
   return record?.type === RQAPI.RecordType.COLLECTION;
 };
 
-const sortRecords = (records: RQAPI.ApiClientRecord[]) => {
-  return records.sort((a, b) => {
+export const sortRecords = (records: RQAPI.ApiClientRecord[]) => {
+  return [...records].sort((a, b) => {
+    // Keep example collections first
+    if (a.isExample && !b.isExample) {
+      return -1;
+    }
+    if (b.isExample && !a.isExample) {
+      return 1;
+    }
+
     // If different type, then keep collection first
     if (a.type !== b.type) {
       return a.type === RQAPI.RecordType.COLLECTION ? -1 : 1;
