@@ -3,7 +3,6 @@ import { useParams } from "react-router-dom";
 import { BulkActions, RQAPI } from "features/apiClient/types";
 import { notification } from "antd";
 import { useApiClientContext } from "features/apiClient/contexts";
-import { apiRecordsRankingManager } from "features/apiClient/helpers/RankingManager";
 import { CollectionRow, ExportType } from "./collectionRow/CollectionRow";
 import { RequestRow } from "./requestRow/RequestRow";
 import {
@@ -14,6 +13,7 @@ import {
   getRecordIdsToBeExpanded,
   filterOutChildrenRecords,
   processRecordsForDuplication,
+  sortRecords,
 } from "../../../../utils";
 import { ApiRecordEmptyState } from "./apiRecordEmptyState/ApiRecordEmptyState";
 import { SidebarPlaceholderItem } from "../SidebarPlaceholderItem/SidebarPlaceholderItem";
@@ -78,36 +78,12 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
   const prepareRecordsToRender = useCallback((records: RQAPI.ApiClientRecord[]) => {
     const { updatedRecords, recordsMap } = convertFlatRecordsToNestedRecords(records);
     setShowSelection(false);
-
-    updatedRecords.sort((recordA, recordB) => {
-      // Keep example collections first
-      if (recordA.isExample && !recordB.isExample) {
-        return -1;
-      }
-      if (recordB.isExample && !recordA.isExample) {
-        return 1;
-      }
-      if (recordA.type !== recordB.type) {
-        return recordA.type === RQAPI.RecordType.COLLECTION ? -1 : 1;
-      }
-
-      // Sort collections alphabetically by name (case-insensitive)
-      if (recordA.type === RQAPI.RecordType.COLLECTION) {
-        const nameA = (recordA.name || "").toLowerCase();
-        const nameB = (recordB.name || "").toLowerCase();
-        return nameA.localeCompare(nameB);
-      }
-
-      // Sort requests using ranking manager
-      const aRank = apiRecordsRankingManager.getEffectiveRank(recordA);
-      const bRank = apiRecordsRankingManager.getEffectiveRank(recordB);
-      return apiRecordsRankingManager.compareFn(aRank, bRank);
-    });
+    const sortedRecords = sortRecords(updatedRecords);
 
     return {
-      count: updatedRecords.length,
-      collections: updatedRecords.filter((record) => isApiCollection(record)) as RQAPI.CollectionRecord[],
-      requests: updatedRecords.filter((record) => isApiRequest(record)) as RQAPI.ApiRecord[],
+      count: sortedRecords.length,
+      collections: sortedRecords.filter((record) => isApiCollection(record)) as RQAPI.CollectionRecord[],
+      requests: sortedRecords.filter((record) => isApiRequest(record)) as RQAPI.ApiRecord[],
       recordsMap: recordsMap,
     };
   }, []);
