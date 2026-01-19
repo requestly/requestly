@@ -159,7 +159,7 @@ export const TabsContainer: React.FC = () => {
 
       const closeTabsToLeft = () => {
         const tabsToClose = tabsArray.slice(0, index);
-        const unsavedTabs = tabsToClose.filter((tab) => tab.getState().unsaved || tab.getState().getActiveBlocker());
+        const unsavedTabs = tabsToClose.filter((tab) => tab.getState().unsaved || !tab.getState().canCloseTab());
 
         if (unsavedTabs.length > 0) {
           const shouldClose = window.confirm(
@@ -177,7 +177,7 @@ export const TabsContainer: React.FC = () => {
 
       const closeTabsToRight = () => {
         const tabsToClose = tabsArray.slice(index + 1);
-        const unsavedTabs = tabsToClose.filter((tab) => tab.getState().unsaved || tab.getState().getActiveBlocker());
+        const unsavedTabs = tabsToClose.filter((tab) => tab.getState().unsaved || !tab.getState().canCloseTab());
 
         if (unsavedTabs.length > 0) {
           const shouldClose = window.confirm(
@@ -194,7 +194,7 @@ export const TabsContainer: React.FC = () => {
       };
 
       const closeAllTabs = () => {
-        const unsavedTabs = tabsArray.filter((tab) => tab.getState().unsaved || tab.getState().getActiveBlocker());
+        const unsavedTabs = tabsArray.filter((tab) => tab.getState().unsaved || !tab.getState().canCloseTab());
 
         if (unsavedTabs.length > 0) {
           const shouldClose = window.confirm(
