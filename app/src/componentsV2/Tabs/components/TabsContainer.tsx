@@ -158,22 +158,55 @@ export const TabsContainer: React.FC = () => {
       const tabState = tabStore.getState();
 
       const closeTabsToLeft = () => {
-        for (let i = 0; i < index; i++) {
-          const tab = tabsArray[i];
-          closeTabById(tab.getState().id);
+        const tabsToClose = tabsArray.slice(0, index);
+        const unsavedTabs = tabsToClose.filter((tab) => tab.getState().unsaved || tab.getState().getActiveBlocker());
+
+        if (unsavedTabs.length > 0) {
+          const shouldClose = window.confirm(
+            `${unsavedTabs.length} tab(s) have unsaved changes. Discard changes? Changes you made will not be saved.`
+          );
+          if (!shouldClose) {
+            return;
+          }
         }
+
+        tabsToClose.forEach((tab) => {
+          closeTabById(tab.getState().id, true);
+        });
       };
 
       const closeTabsToRight = () => {
-        for (let i = index + 1; i < tabsArray.length; i++) {
-          const tab = tabsArray[i];
-          closeTabById(tab.getState().id);
+        const tabsToClose = tabsArray.slice(index + 1);
+        const unsavedTabs = tabsToClose.filter((tab) => tab.getState().unsaved || tab.getState().getActiveBlocker());
+
+        if (unsavedTabs.length > 0) {
+          const shouldClose = window.confirm(
+            `${unsavedTabs.length} tab(s) have unsaved changes. Discard changes? Changes you made will not be saved.`
+          );
+          if (!shouldClose) {
+            return;
+          }
         }
+
+        tabsToClose.forEach((tab) => {
+          closeTabById(tab.getState().id, true);
+        });
       };
 
       const closeAllTabs = () => {
+        const unsavedTabs = tabsArray.filter((tab) => tab.getState().unsaved || tab.getState().getActiveBlocker());
+
+        if (unsavedTabs.length > 0) {
+          const shouldClose = window.confirm(
+            `${unsavedTabs.length} tab(s) have unsaved changes. Discard changes? Changes you made will not be saved.`
+          );
+          if (!shouldClose) {
+            return;
+          }
+        }
+
         tabsArray.forEach((tab) => {
-          closeTabById(tab.getState().id);
+          closeTabById(tab.getState().id, true);
         });
       };
 
