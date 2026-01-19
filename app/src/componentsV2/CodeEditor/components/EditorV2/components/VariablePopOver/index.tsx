@@ -16,6 +16,7 @@ import { useContextId } from "features/apiClient/contexts/contextId.context";
 import { NoopContextId } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 import { captureMessage } from "@sentry/react";
 import { useRBAC } from "features/rbac";
+import { createPortal } from "react-dom";
 
 const PopoverViewTransitions: Record<PopoverView, PopoverView[]> = {
   [PopoverView.IDLE]: [PopoverView.VARIABLE_INFO, PopoverView.NOT_FOUND],
@@ -28,7 +29,6 @@ const PopoverViewTransitions: Record<PopoverView, PopoverView[]> = {
 interface VariablePopoverProps {
   hoveredVariable: string;
   popupPosition: { x: number; y: number };
-  editorRef: React.RefObject<HTMLDivElement>;
   variables: ScopedVariables;
   onClose?: () => void;
   onPinChange?: (pinned: boolean) => void;
@@ -48,7 +48,6 @@ interface InfoFieldConfig {
 
 export const VariablePopover: React.FC<VariablePopoverProps> = ({
   hoveredVariable,
-  editorRef,
   popupPosition,
   variables,
   onClose,
@@ -173,14 +172,18 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
 
   const popupStyle: React.CSSProperties = {
     position: "absolute",
-    top: (popupPosition?.y ?? 0) - (editorRef.current?.getBoundingClientRect().top ?? 0) + 10,
-    left: (popupPosition?.x ?? 0) - (editorRef.current?.getBoundingClientRect().left ?? 0) + 100,
+    top: (popupPosition?.y ?? 0) + 10,
+    left: (popupPosition?.x ?? 0) + 100,
     zIndex: 1000,
   };
 
   const isFormMode = currentView === PopoverView.CREATE_FORM || currentView === PopoverView.EDIT_FORM;
 
-  return (
+  // createPortal is being used to bypass the styling override behavior
+  // by antd, and ensure that the desired styling and positioning
+  // applies to the popover
+  // A full refactor will be carried out for the editor in the future
+  return createPortal(
     <Popover
       content={<div className="variable-info-body">{popoverContent}</div>}
       open
@@ -199,7 +202,8 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
       }`}
     >
       <div style={popupStyle} className="variable-info-div"></div>
-    </Popover>
+    </Popover>,
+    document.body
   );
 };
 
