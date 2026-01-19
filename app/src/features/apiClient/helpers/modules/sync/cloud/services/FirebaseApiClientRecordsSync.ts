@@ -85,7 +85,9 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
   async updateRecord(record: Partial<RQAPI.ApiClientRecord>, id: string, type?: RQAPI.ApiClientRecord["type"]) {
     if (!record.rank) {
       const existingRecord = await this.getRecord(id);
-      record.rank = apiRecordsRankingManager.getEffectiveRank(existingRecord.data || {});
+      if (existingRecord?.success && existingRecord.data) {
+        record.rank = apiRecordsRankingManager.getEffectiveRank(existingRecord.data);
+      }
     }
     const sanitizedRecord = sanitizeRecord(record as RQAPI.ApiClientRecord);
     sanitizedRecord.id = id;
