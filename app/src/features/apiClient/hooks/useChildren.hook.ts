@@ -4,7 +4,6 @@ import { Subscription } from "../helpers/apiClientTreeBus/subscription";
 import { ApiClientEventTopic } from "../helpers/apiClientTreeBus/types";
 import { RQAPI } from "../types";
 import { ApiClientFeatureContext } from "../store/apiClientFeatureContext/apiClientFeatureContext.store";
-import { apiRecordsRankingManager } from "../helpers/RankingManager";
 import { sortRecords } from "../screens/apiClient/utils";
 
 export const getAllChildrenRecords = (ctx: ApiClientFeatureContext, nodeId: string) => {
