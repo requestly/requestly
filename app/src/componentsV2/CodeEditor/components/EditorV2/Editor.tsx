@@ -289,50 +289,54 @@ const Editor: React.FC<EditorProps> = ({
     [handleMouseLeave]
   );
 
-  const extensions: Extension[] = [];
+  const extensions: Extension[] = useMemo(() => {
+    const result: Extension[] = [];
 
-  if (editorLanguage) {
-    extensions.push(editorLanguage);
-  }
+    if (editorLanguage) {
+      result.push(editorLanguage);
+    }
 
-  if (language === EditorLanguage.JAVASCRIPT) {
-    extensions.push(lintGutter(), javascriptLinter());
-  }
+    if (language === EditorLanguage.JAVASCRIPT) {
+      result.push(lintGutter(), javascriptLinter());
+    }
 
-  if (language === EditorLanguage.JSON) {
-    extensions.push(lintGutter(), jsonLinter());
-  }
+    if (language === EditorLanguage.JSON) {
+      result.push(lintGutter(), jsonLinter());
+    }
 
-  if (language === EditorLanguage.JSON5) {
-    extensions.push(lintGutter(), json5Linter());
-  }
+    if (language === EditorLanguage.JSON5) {
+      result.push(lintGutter(), json5Linter());
+    }
 
-  if (customTheme) {
-    extensions.push(customTheme);
-  }
+    if (customTheme) {
+      result.push(customTheme);
+    }
 
-  if (placeholder) {
-    extensions.push(placeholderExtension(placeholder));
-  }
+    if (placeholder) {
+      result.push(placeholderExtension(placeholder));
+    }
 
-  extensions.push(customKeyBinding, EditorView.lineWrapping);
+    result.push(customKeyBinding, EditorView.lineWrapping);
 
-  if (envVariables) {
-    extensions.push(
-      highlightVariablesPlugin(
-        {
-          handleSetVariable,
-          setPopupPosition,
-        },
-        envVariables
-      )
-    );
-  }
+    if (envVariables) {
+      result.push(
+        highlightVariablesPlugin(
+          {
+            handleSetVariable,
+            setPopupPosition,
+          },
+          envVariables
+        )
+      );
+    }
 
-  const completionExtension = generateCompletionsForVariables(envVariables);
-  if (completionExtension) {
-    extensions.push(completionExtension);
-  }
+    const completionExtension = generateCompletionsForVariables(envVariables);
+    if (completionExtension) {
+      result.push(completionExtension);
+    }
+
+    return result;
+  }, [editorLanguage, language, customTheme, placeholder, envVariables, handleSetVariable, setPopupPosition]);
 
   const editor = (
     <>
