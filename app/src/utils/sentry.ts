@@ -28,6 +28,28 @@ export const wrapWithCustomSpan = <T, Args extends any[] = []>(
   };
 };
 
+/** Usage with useCallback */
+/**
+const onSaveButtonClick = useCallback(async (a: string) => {
+  return wrapWithCustomSpan(
+    {
+      name: "[Transaction] xyz",
+      op: "xyz",
+      forceTransaction: true,
+      attributes: {
+        "_attribute.test": "test",
+      },
+    },
+    async (a: string) => {}
+  )(a); // <---- This is Weird syntax
+    // Little bit weird syntax since we need to call function to actually execute the wrapped function
+    // We can directly expose the wrapWithCustomSpan() to useCallback but lint rules dont allow it.
+    // React Hook useCallback received a function whose dependencies are unknown. Pass an inline function instead.eslintreact-hooks/exhaustive-deps
+    // TODO: Check if we can disable this linter rule? - https://linear.app/requestly/issue/ENGG-5178/improve-usage-with-usecallback
+}, []);
+**/
+
+
 // WIP - Needs detailed testing
 /**
  * Decorator that wraps a method with Sentry span tracking
