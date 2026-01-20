@@ -21,6 +21,7 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
   placeholder,
   onPressEnter,
   onBlur,
+  onPaste,
   variables,
 }) => {
   const editorRef = useRef<HTMLDivElement>(null);
@@ -33,6 +34,7 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
   */
   const onBlurRef = useRef(onBlur);
   const onChangeRef = useRef(onChange);
+  const onPasteRef = useRef(onPaste);
   const previousDefaultValueRef = useRef(defaultValue);
 
   const emptyVariables = useMemo(() => new Map(), []);
@@ -40,7 +42,8 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
   useEffect(() => {
     onBlurRef.current = onBlur;
     onChangeRef.current = onChange;
-  }, [onBlur, onChange]);
+    onPasteRef.current = onPaste;
+  }, [onBlur, onChange, onPaste]);
 
   const [hoveredVariable, setHoveredVariable] = useState<string | null>(null); // Track hovered variable
   const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
@@ -93,19 +96,28 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
             },
             paste: (event, view) => {
               const pastedText = event.clipboardData?.getData("text/plain");
-              if (pastedText?.includes("\n")) {
-                event.preventDefault();
-                const singleLineText = pastedText.replace(/\\\s*\n\s*/g, " ").replace(/\n/g, " ");
-                view.dispatch(
-                  view.state.update({
-                    changes: {
-                      from: view.state.selection.main.from,
-                      to: view.state.selection.main.to,
-                      insert: singleLineText,
-                    },
-                  })
-                );
-                return true;
+              if (pastedText) {
+                // Notify parent component about paste - if it returns true, it handled the paste
+                const handled = onPasteRef.current?.(pastedText);
+                if (handled) {
+                  event.preventDefault();
+                  return true;
+                }
+                // Handle multiline paste conversion
+                if (pastedText.includes("\n")) {
+                  event.preventDefault();
+                  const singleLineText = pastedText.replace(/\\\s*\n\s*/g, " ").replace(/\n/g, " ");
+                  view.dispatch(
+                    view.state.update({
+                      changes: {
+                        from: view.state.selection.main.from,
+                        to: view.state.selection.main.to,
+                        insert: singleLineText,
+                      },
+                    })
+                  );
+                  return true;
+                }
               }
             },
           }),

@@ -24,20 +24,27 @@ const HttpApiClientUrl = ({ entity, onEnterPress, onUrlChange, onCurlImport }: A
   const queryParams = useApiClientSelector((s) => entity.getQueryParams(s));
   const currentEnvironmentVariables = useScopedVariables(entity.meta.referenceId);
 
-  const handleUrlChange = useCallback(
-    (value: string) => {
-      // Detect if the input is a curl command
-      if (isCurlCommand(value)) {
+  const handlePaste = useCallback(
+    (pastedText: string): boolean => {
+      // Detect if the pasted content is a curl command
+      if (isCurlCommand(pastedText)) {
         try {
-          const requestFromCurl = parseCurlRequest(value);
+          const requestFromCurl = parseCurlRequest(pastedText);
           if (requestFromCurl?.url) {
             onCurlImport?.(requestFromCurl);
-            return;
+            return true; // Indicate that we handled the paste
           }
         } catch (error) {
           console.warn("Curl parsing error:", error);
         }
       }
+      return false; // Let normal paste handling continue
+    },
+    [onCurlImport]
+  );
+
+  const handleUrlChange = useCallback(
+    (value: string) => {
       // Regular URL handling
       const pathVariables = extractPathVariablesFromUrl(value);
       entity.reconcilePathKeys(pathVariables);
@@ -68,7 +75,7 @@ const HttpApiClientUrl = ({ entity, onEnterPress, onUrlChange, onCurlImport }: A
       entity.setQueryParams(finalParams);
       onUrlChange(value, finalParams);
     },
-    [entity, onUrlChange, onCurlImport, queryParams]
+    [entity, onUrlChange, queryParams]
   );
 
   return (
@@ -78,6 +85,7 @@ const HttpApiClientUrl = ({ entity, onEnterPress, onUrlChange, onCurlImport }: A
       currentEnvironmentVariables={currentEnvironmentVariables}
       onEnterPress={onEnterPress}
       onUrlChange={handleUrlChange}
+      onPaste={handlePaste}
     />
   );
 };
