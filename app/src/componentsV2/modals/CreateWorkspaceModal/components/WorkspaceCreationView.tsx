@@ -22,9 +22,9 @@ export const WorkspaceCreationView: React.FC<Props> = ({ workspaceType, analytic
     analyticEventSource,
     onCreateWorkspaceCallback: callback,
     onError: (err) => {
-      if (err.cause && err.cause.code === ErrorCode.PathIsAlreadyAWorkspace) {
+      if (err.cause && err.cause.code === ErrorCode.WorkspacePathAlreadyInUse) {
         currentSelectedFolderPathRef.current = err.cause.path;
-        setError(ErrorCode.PathIsAlreadyAWorkspace);
+        setError(ErrorCode.WorkspacePathAlreadyInUse);
         return;
       } else {
         toast.error(err?.message || "Unable to Create Team");
@@ -34,7 +34,7 @@ export const WorkspaceCreationView: React.FC<Props> = ({ workspaceType, analytic
 
   if (error) {
     switch (error) {
-      case ErrorCode.PathIsAlreadyAWorkspace:
+      case ErrorCode.WorkspacePathAlreadyInUse:
         return (
           <ExistingWorkspaceConflictView
             path={currentSelectedFolderPathRef.current as string}
