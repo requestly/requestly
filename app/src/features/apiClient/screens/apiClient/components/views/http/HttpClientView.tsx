@@ -431,6 +431,37 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
     // setEntry(apiEntryDetails?.data);
   };
 
+  const handleCurlImport = useCallback(
+    (request: RQAPI.Request) => {
+      try {
+        // Type assertion: parseCurlRequest always returns an HTTP request
+        const httpRequest = request as RQAPI.HttpRequest;
+        // Update the entity with the parsed curl request data
+        entity.setUrl(httpRequest.url);
+        entity.setMethod(httpRequest.method);
+        if (httpRequest.headers) {
+          entity.setHeaders(httpRequest.headers);
+        }
+        if (httpRequest.queryParams) {
+          entity.setQueryParams(httpRequest.queryParams);
+        }
+        if (httpRequest.body) {
+          entity.setBody(httpRequest.body);
+        }
+        if (httpRequest.contentType) {
+          entity.setContentType(httpRequest.contentType);
+        }
+        toast.success("cURL command imported successfully");
+        trackRQLastActivity(API_CLIENT.CURL_IMPORTED);
+        trackRQDesktopLastActivity(API_CLIENT.CURL_IMPORTED);
+      } catch (error) {
+        console.error("Error importing curl:", error);
+        toast.error("Failed to import cURL command");
+      }
+    },
+    [entity]
+  );
+
   const enableHotkey = getIsActive();
 
   return isExtensionEnabled ? (
@@ -488,6 +519,7 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
                 entity={entity}
                 onUrlChange={entity.setUrl.bind(entity)}
                 onEnterPress={onUrlInputEnterPressed}
+                onCurlImport={handleCurlImport}
               />
             </Space.Compact>
             <RQButton

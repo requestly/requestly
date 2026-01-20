@@ -91,6 +91,23 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
                 onPressEnter?.(event, view.state.doc.toString());
               }
             },
+            paste: (event, view) => {
+              const pastedText = event.clipboardData?.getData("text/plain");
+              if (pastedText?.includes("\n")) {
+                event.preventDefault();
+                const singleLineText = pastedText.replace(/\\\s*\n\s*/g, " ").replace(/\n/g, " ");
+                view.dispatch(
+                  view.state.update({
+                    changes: {
+                      from: view.state.selection.main.from,
+                      to: view.state.selection.main.to,
+                      insert: singleLineText,
+                    },
+                  })
+                );
+                return true;
+              }
+            },
           }),
           highlightVariablesPlugin(
             {

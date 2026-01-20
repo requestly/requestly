@@ -378,6 +378,67 @@ export const parseMultipartFormDataString = (
   return result;
 };
 
+/**
+ * Detects if the input string is a cURL command or a regular URL
+ * @param input - The input string to check
+ * @returns true if input appears to be a cURL command, false otherwise
+ */
+export const isCurlCommand = (input: string): boolean => {
+  if (!input || typeof input !== "string") {
+    return false;
+  }
+  const trimmedInput = input.trim();
+  // Empty input is not a curl command
+  if (!trimmedInput) {
+    return false;
+  }
+  // Check for common cURL command patterns
+  // 1. Starts with 'curl ' (with space)
+  // 2. Has curl with flags like -X, --request, -H, --header, -d, --data, etc.
+  // 3. Handles multiline curl commands (with backslashes)
+  const curlPatterns = [
+    /^curl\s+/i, // Starts with 'curl '
+    /^curl$/i, // Just 'curl'
+    /\bcurl\s+-/i, // curl with flags
+    /\bcurl\s+--/i, // curl with long flags
+  ];
+  // Check if it matches any curl pattern
+  const matchesCurlPattern = curlPatterns.some((pattern) => pattern.test(trimmedInput));
+  if (matchesCurlPattern) {
+    return true;
+  }
+  // Check for common curl flags even if curl keyword is not at the start
+  // This handles cases where input might have been pasted without the initial curl
+  const curlFlagPatterns = [
+    /-X\s+(GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS)/i,
+    /--request\s+(GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS)/i,
+    /-H\s+['"].*['"]/,
+    /--header\s+['"].*['"]/,
+    /-d\s+/,
+    /--data\s+/,
+    /--data-raw\s+/,
+    /--data-binary\s+/,
+    /--data-urlencode\s+/,
+    /-u\s+/,
+    /--user\s+/,
+    /--compressed/i,
+  ];
+  const hasCurlFlags = curlFlagPatterns.some((pattern) => pattern.test(trimmedInput));
+  if (hasCurlFlags) {
+    return true;
+  }
+  // If it looks like a simple URL (starts with http:// or https://) and has no curl flags
+  // Also check it doesn't look like multiline curl (backslash continuation)
+  if (/^https?:\/\//i.test(trimmedInput) && !hasCurlFlags && !/\\\s*$/m.test(trimmedInput)) {
+    return false;
+  }
+  // Check for backslash line continuation pattern (common in multiline curl commands)
+  if (/\\\s*$/m.test(trimmedInput)) {
+    return true;
+  }
+  return false;
+};
+
 export const parseCurlRequest = (curl: string): RQAPI.Request => {
   const requestJson = curlconverter.toJsonObject(curl);
   const queryParamsFromJson = generateKeyValuePairs(requestJson.queries);
