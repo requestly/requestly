@@ -966,7 +966,8 @@ export const extractPathVariablesFromUrl = (url: string) => {
 
   // Allow all characters except URL reserved characters: : / ? # [ ] @ ! $ & ' ( ) * + , ; =
   // Also exclude whitespace and control characters for practical reasons
-  const variablePattern = /(?<!:):([^:/?#[\]@!$&'()*+,;=\s]+)/g;
+  // and checks if : is preceded by any alphanumeric value to ignore it form path variables
+  const variablePattern = /(?<![a-zA-Z0-9]):([^:/?#[\]@!$&'()*+,;=\s]+)/g;
   const variables: string[] = [];
   let match;
 

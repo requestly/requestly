@@ -29,23 +29,59 @@ export class HttpRequestPreparationService {
 
   private renderPathVariables(url: string, pathVariables: RQAPI.PathVariable[]): string {
     const variableValues: Record<RQAPI.PathVariable["key"], RQAPI.PathVariable["value"]> = {};
+    const varMapping = new Map<string, string>();
 
     if (!pathVariables || pathVariables.length === 0) {
       return url;
     }
 
+    const validVarNameRegex = /^[a-zA-Z_$][a-zA-Z0-9_$]*$/;
+    let safeIndex = 0;
+
     pathVariables.forEach((variable) => {
-      variableValues[variable.key] = variable.value;
+      if (!variable.key) return;
+
+      // Rename Invalid variables like :123 which fail in path-to-regexp to safe variables like var_i
+      // and populate path variables in varMapping
+      if (validVarNameRegex.test(variable.key)) {
+        varMapping.set(variable.key, variable.key);
+        variableValues[variable.key] = variable.value;
+      } else {
+        const safeKey = `var_${safeIndex++}`;
+        varMapping.set(variable.key, safeKey);
+        variableValues[safeKey] = variable.value;
+      }
     });
 
     const normalizedUrl = addUrlSchemeIfMissing(url);
 
     const urlObject = new URL(normalizedUrl);
+    let pathname = urlObject.pathname;
+    const varRegex = /:([^:/?#[\]@!$&'()*+,;=\s]+)/g;
 
-    const toPath = compile(urlObject.pathname);
-    const renderedPath = toPath(variableValues);
+    pathname = pathname.replace(varRegex, (match, varName, offset, string) => {
+      // Ignore colons preceded by alphanumerics (e.g. "f:uuid")
+      // We escape it so it passes as the literal text "f:uuid"
+      if (offset > 0 && /[a-zA-Z0-9]/.test(string[offset - 1])) {
+        return `\\:${varName}`;
+      }
 
-    urlObject.pathname = renderedPath;
+      // Use safe variables from varMapping
+      if (varMapping.has(varName)) {
+        return `:${varMapping.get(varName)}`;
+      }
+
+      return `:${varName}`;
+    });
+
+    try {
+      const toPath = compile(pathname);
+      const renderedPath = toPath(variableValues);
+      urlObject.pathname = renderedPath;
+    } catch (error) {
+      // Alerts??
+      console.warn("Failed to compile path with variables:", error);
+    }
 
     return urlObject.toString();
   }
