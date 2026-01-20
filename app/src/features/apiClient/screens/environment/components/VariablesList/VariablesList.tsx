@@ -56,7 +56,7 @@ export const VariablesList: React.FC<VariablesListProps> = ({
           syncValue: "",
           localValue: "",
           isPersisted: true,
-        } as VariableRow,
+        },
       ];
     }
     emptyRowIdRef.current = uuidv4();

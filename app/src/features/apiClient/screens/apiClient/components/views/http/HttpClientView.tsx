@@ -19,6 +19,7 @@ import { useHttpRequestExecutor } from "features/apiClient/hooks/requestExecutor
 import {
   ApiClientStore,
   bufferAdapterSelectors,
+  bufferActions,
   useApiClientRepository,
   useApiClientStore,
 } from "features/apiClient/slices";
@@ -286,7 +287,7 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
             Sentry.captureException(new Error(`API Request Failed: ${error.message || "Unknown error"}`));
           });
         }
-        trackRequestFailed(error.message, error.type, request.url, request.method, response?.status);
+        trackRequestFailed(error.message, error.type, request.url, request.method, executedEntry.response?.status);
         trackRQLastActivity(API_CLIENT.REQUEST_FAILED);
         trackRQDesktopLastActivity(API_CLIENT.REQUEST_FAILED);
       }
@@ -454,9 +455,28 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
     }
   }, [httpRequestExecutor, entity, store]);
 
-  const handleRevertChanges = () => {
-    // setEntry(apiEntryDetails?.data);
-  };
+  const handleRevertChanges = useCallback(() => {
+    if (!entity.meta.originExists) {
+      return; // Can't revert if there's no origin
+    }
+    const originState = entity.origin.getEntityFromState(store.getState());
+    store.dispatch(
+      bufferActions.syncFromSource({
+        referenceId: entity.meta.referenceId!,
+        sourceData: originState,
+      })
+    );
+    // Clear diff to fully revert
+    store.dispatch(
+      bufferActions.unsafePatch({
+        id: entity.id,
+        patcher: (entry) => {
+          entry.diff = {};
+          entry.isDirty = false;
+        },
+      })
+    );
+  }, [entity, store]);
 
   const enableHotkey = getIsActive();
 

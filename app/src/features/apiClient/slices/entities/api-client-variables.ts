@@ -204,7 +204,7 @@ export class ApiClientVariables<T, State = ApiClientStoreState> {
     for (const r of params.records) {
       const persistedVariables = params.getVariablesFromPersistedData(r, storedState);
       if (!persistedVariables) {
-        return;
+        continue;
       }
       ApiClientVariables.merge(params.getVariablesFromRecord(r), persistedVariables);
     }

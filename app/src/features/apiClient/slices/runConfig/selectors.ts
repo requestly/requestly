@@ -9,7 +9,7 @@ import { isApiRequest } from "features/apiClient/screens/apiClient/utils";
 import { EntityNotFound } from "../types";
 
 const selectRunConfigSlice = (state: ApiClientStoreState) => {
-  return state.runConfigs;
+  return state.runnerConfig;
 };
 
 const selectRunConfigEntityState = createSelector(selectRunConfigSlice, (slice) => slice?.configs);
@@ -52,7 +52,7 @@ export const selectBufferedRunConfigOrderedRequests = createSelector(
     const bufferEntry = findBufferByReferenceId(bufferState.entities, referenceId);
 
     if (!bufferEntry) {
-      throw new EntityNotFound(referenceId, "Buffer not found!");
+      throw new EntityNotFound(referenceId, "BUFFER");
     }
 
     const runConfig = bufferEntry.current as RunConfigEntity;
