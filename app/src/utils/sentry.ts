@@ -54,7 +54,6 @@ const onSaveButtonClick = useCallback(async (a: string) => {
 }, []);
 **/
 
-// WIP - Needs detailed testing
 /**
  * Decorator that wraps a method with Sentry span tracking
  **/
