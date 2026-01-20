@@ -27,15 +27,14 @@ import { GrGraphQl } from "@react-icons/all-files/gr/GrGraphQl";
 import { useContextId } from "features/apiClient/contexts/contextId.context";
 import { useApiClientRepository, useApiClientFeatureContext } from "features/apiClient/contexts/meta";
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
-import { getImmediateChildrenRecords } from "features/apiClient/hooks/useChildren.hook";
 import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 import { isGraphQLApiRecord, isHttpApiRecord } from "features/apiClient/screens/apiClient/utils";
 import { apiRecordsRankingManager } from "features/apiClient/helpers/RankingManager";
 import { saveOrUpdateRecord } from "features/apiClient/commands/store.utils";
-import { RecordData } from "features/apiClient/helpers/RankingManager/APIRecordsListRankingManager";
 import clsx from "clsx";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
+import { getRankForDroppedRecord } from "../dropHelper/getRankForDroppedRecord";
 
 interface Props {
   record: RQAPI.ApiRecord;
@@ -170,22 +169,13 @@ export const RequestRow: React.FC<Props> = ({
         dropPositionRef.current = null;
 
         try {
-          const siblings = apiRecordsRankingManager.sort(
-            getImmediateChildrenRecords(context, record.collectionId ?? "")
-          );
-          let beforeRecord: RecordData | null = null;
-          let afterRecord: RecordData | null = null;
-          const recordIndex = siblings.findIndex((sibling) => sibling.id === record.id);
+          const rank = getRankForDroppedRecord({
+            context,
+            targetRecord: record,
+            droppedRecord: item.record,
+            dropPosition: currentDropPosition,
+          });
 
-          if (currentDropPosition === "before") {
-            beforeRecord = siblings[recordIndex - 1] || null;
-            afterRecord = record;
-          } else if (currentDropPosition === "after") {
-            afterRecord = siblings[recordIndex + 1] || null;
-            beforeRecord = record;
-          }
-
-          const rank = apiRecordsRankingManager.getRanksBetweenRecords(beforeRecord, afterRecord, [item.record])[0];
           const targetCollectionId = record.collectionId;
 
           const patch: Partial<RQAPI.ApiRecord> = {
