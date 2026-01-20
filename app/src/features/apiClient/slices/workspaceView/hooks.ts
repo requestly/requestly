@@ -70,7 +70,7 @@ export function useWorkspaceViewActions() {
   const actions = useMemo(() => {
     return {
       async switchContext(params: Parameters<typeof switchContext>[0]) {
-        return dispatch(switchContext(params) as any).unwrap();
+        return dispatch(switchContext(params) as any);
       },
 
       async workspaceViewManager(params: Parameters<typeof workspaceViewManager>[0]) {
