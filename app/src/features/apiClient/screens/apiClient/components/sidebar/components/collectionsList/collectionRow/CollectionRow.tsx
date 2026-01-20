@@ -255,6 +255,14 @@ export const CollectionRow: React.FC<Props> = ({
     /* Temporary Change-> To remove previous key from session storage
        which was added due to the previous logic can be removed after some time */
     sessionStorage.removeItem("collapsed_collection_keys");
+
+    // clean up hover timeout on unmount
+    return () => {
+      if (hoverExpandTimeoutRef.current) {
+        clearTimeout(hoverExpandTimeoutRef.current);
+        hoverExpandTimeoutRef.current = null;
+      }
+    };
   }, []);
 
   const handleRecordDrop = useCallback(
