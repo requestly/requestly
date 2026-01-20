@@ -267,6 +267,28 @@ const Editor: React.FC<EditorProps> = ({
     ]
   );
 
+  const handleMouseLeave = useCallback(() => {
+    if (!isPopoverPinned) {
+      setHoveredVariable(null);
+    }
+  }, [isPopoverPinned]);
+
+  const handleClosePopover = useCallback(() => {
+    setHoveredVariable(null);
+    setIsPopoverPinned(false);
+  }, []);
+
+  const handleSetVariable = useCallback(
+    (variable: string | null) => {
+      if (!variable) {
+        handleMouseLeave();
+      } else {
+        setHoveredVariable(variable);
+      }
+    },
+    [handleMouseLeave]
+  );
+
   const extensions: Extension[] = [];
 
   if (editorLanguage) {
@@ -299,7 +321,7 @@ const Editor: React.FC<EditorProps> = ({
     extensions.push(
       highlightVariablesPlugin(
         {
-          setHoveredVariable,
+          handleSetVariable,
           setPopupPosition,
         },
         envVariables
@@ -311,28 +333,6 @@ const Editor: React.FC<EditorProps> = ({
   if (completionExtension) {
     extensions.push(completionExtension);
   }
-
-  const handleMouseLeave = useCallback(() => {
-    if (!isPopoverPinned) {
-      setHoveredVariable(null);
-    }
-  }, [isPopoverPinned]);
-
-  const handleClosePopover = useCallback(() => {
-    setHoveredVariable(null);
-    setIsPopoverPinned(false);
-  }, []);
-
-  const handleSetVariable = useCallback(
-    (variable: string | null) => {
-      if (!variable) {
-        handleMouseLeave();
-      } else {
-        setHoveredVariable(variable);
-      }
-    },
-    [handleMouseLeave]
-  );
 
   const editor = (
     <>
@@ -347,23 +347,7 @@ const Editor: React.FC<EditorProps> = ({
         onKeyDown={() => (isUnsaveChange.current = true)}
         onChange={debouncedhandleEditorBodyChange}
         theme={vscodeDark}
-        extensions={[
-          editorLanguage,
-          customTheme,
-          placeholder ? placeholderExtension(placeholder) : null,
-          customKeyBinding,
-          EditorView.lineWrapping,
-          envVariables
-            ? highlightVariablesPlugin(
-                {
-                  handleSetVariable,
-                  setPopupPosition,
-                },
-                envVariables
-              )
-            : null,
-          generateCompletionsForVariables(envVariables),
-        ].filter(Boolean)}
+        extensions={extensions}
         basicSetup={{
           highlightActiveLine: false,
           bracketMatching: true,
