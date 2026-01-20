@@ -53,6 +53,11 @@ export const ExampleCollectionsNudge: React.FC<ExampleCollectionsNudgeProps> = (
     }));
 
     // Prepare dependencies
+    if (!syncRepository) {
+      toast.error("Repository not available. Please try again.");
+      return;
+    }
+
     const dependencies: ImportDependencies = {
       repository: syncRepository,
       ownerId: uid ?? null,

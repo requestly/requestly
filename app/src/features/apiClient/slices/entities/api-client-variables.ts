@@ -32,11 +32,16 @@ export class ApiClientVariables<T, State = ApiClientStoreState> {
     });
   }
 
+  /**
+   * Adds or updates (upserts) a variable.
+   * If a variable with the same key exists, it merges the new data with the existing variable.
+   * Note: Despite the name "add", this method performs an upsert operation.
+   */
   add(params: Omit<Variable, "id"> & { key: string; id?: string | number }) {
     const id = params.id ?? uuidv4();
     const { key, id: _id, ...variableData } = params;
     const variable: Variable = {
-      id,
+      id: typeof id === "number" ? id : parseInt(id, 10) || 0,
       ...variableData,
     };
     this.unsafePatch((s) => {
@@ -47,6 +52,7 @@ export class ApiClientVariables<T, State = ApiClientStoreState> {
         // Add to order array
         this.addToOrder(s, key);
       } else {
+        // Upsert: merge with existing variable
         variables[key] = {
           ...variables[key],
           ...variable,
@@ -211,7 +217,7 @@ export class ApiClientVariables<T, State = ApiClientStoreState> {
     return params.records;
   }
 
-  static perist(
+  static persist(
     variables: EnvironmentVariables,
     config: {
       isPersisted?: boolean;
@@ -228,7 +234,7 @@ export class ApiClientVariables<T, State = ApiClientStoreState> {
 
   /**
    * Persists full variable data, conditionally including localValue based on each variable's isPersisted flag.
-   * Unlike `perist` which only keeps localValue for overlay merging, this preserves the complete variable structure.
+   * Unlike `persist` which only keeps localValue for overlay merging, this preserves the complete variable structure.
    * Suitable for slices where variables are self-contained and don't need hydrate-in-place merging.
    */
   static persistFull(variables: EnvironmentVariables, order?: string[]) {
