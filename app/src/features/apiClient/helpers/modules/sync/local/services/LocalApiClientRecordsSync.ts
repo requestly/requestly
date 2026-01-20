@@ -384,6 +384,9 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
           message: variablesResult.error.message,
         };
       }
+      if (variablesResult.type === "success") {
+        currentCollectionRecord.data.variables = variablesResult.data;
+      }
     }
 
     // Update auth if provided

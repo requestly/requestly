@@ -227,7 +227,7 @@ export function resolveVariable(
 }
 
 export function useScopedVariables(id: string) {
-  const variableHolder = useMemo(() => new VariableHolder(), []);
+  const variableHolder = useMemo(() => new VariableHolder(), [id]);
   const runtimeVariables = useSelector(selectRuntimeVariables);
   return useApiClientSelector((state: ApiClientStoreState) =>
     getScopedVariables(state, runtimeVariables, id, { variableHolder })
