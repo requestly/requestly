@@ -41,7 +41,7 @@ export class ApiClientVariables<T, State = ApiClientStoreState> {
     const id = params.id ?? uuidv4();
     const { key, id: _id, ...variableData } = params;
     const variable: Variable = {
-      id: typeof id === "number" ? id : parseInt(id, 10) || 0,
+      id,
       ...variableData,
     };
     this.unsafePatch((s) => {

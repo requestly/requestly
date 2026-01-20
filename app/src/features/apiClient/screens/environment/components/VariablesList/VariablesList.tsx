@@ -136,7 +136,8 @@ export const VariablesList: React.FC<VariablesListProps> = ({
   const handleDeleteVariable = useCallback(
     (id: number | string) => {
       if (!existsInBackend(variablesData, id)) return;
-      variables.delete(id);
+      // Safe cast: existsInBackend ensures the id is numeric (from backend)
+      variables.delete(id as number);
     },
     [variables, variablesData]
   );
@@ -155,9 +156,10 @@ export const VariablesList: React.FC<VariablesListProps> = ({
   const handleUpdatePersisted = useCallback(
     (id: number | string, isPersisted: boolean) => {
       if (!existsInBackend(variablesData, id)) return;
+      // Safe cast: existsInBackend ensures the id is numeric (from backend)
       // Note: Type assertion needed because Variable type expects isPersisted: true for persisted variables
       // This is a design limitation - the type system doesn't allow boolean here
-      variables.set({ id, isPersisted: (isPersisted ? true : undefined) as any });
+      variables.set({ id: id as number, isPersisted: (isPersisted ? true : undefined) as any });
     },
     [variables, variablesData]
   );
