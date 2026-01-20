@@ -32,6 +32,8 @@ import {
   generateCompletionsForVariables,
 } from "componentsV2/CodeEditor/components/EditorV2/plugins";
 import { placeholder as placeholderExtension } from "@codemirror/view";
+import { lintGutter } from "@codemirror/lint";
+import { javascriptLinter, jsonLinter, json5Linter } from "./lints/linters";
 
 interface EditorProps {
   value: string;
@@ -168,7 +170,7 @@ const Editor: React.FC<EditorProps> = ({
     const doc = view?.state?.doc;
 
     if (!view || !doc) {
-      return null;
+      return;
     }
     // Not mark prettify as unsaved change, that is just a effect
     isUnsaveChange.current = false;
@@ -264,6 +266,51 @@ const Editor: React.FC<EditorProps> = ({
     ]
   );
 
+  const extensions: Extension[] = [];
+
+  if (editorLanguage) {
+    extensions.push(editorLanguage);
+  }
+
+  if (language === EditorLanguage.JAVASCRIPT) {
+    extensions.push(lintGutter(), javascriptLinter());
+  }
+
+  if (language === EditorLanguage.JSON) {
+    extensions.push(lintGutter(), jsonLinter());
+  }
+
+  if (language === EditorLanguage.JSON5) {
+    extensions.push(lintGutter(), json5Linter());
+  }
+
+  if (customTheme) {
+    extensions.push(customTheme);
+  }
+
+  if (placeholder) {
+    extensions.push(placeholderExtension(placeholder));
+  }
+
+  extensions.push(customKeyBinding, EditorView.lineWrapping);
+
+  if (envVariables) {
+    extensions.push(
+      highlightVariablesPlugin(
+        {
+          setHoveredVariable,
+          setPopupPosition,
+        },
+        envVariables
+      )
+    );
+  }
+
+  const completionExtension = generateCompletionsForVariables(envVariables);
+  if (completionExtension) {
+    extensions.push(completionExtension);
+  }
+
   const editor = (
     <CodeMirror
       ref={editorRefCallback}
@@ -276,23 +323,7 @@ const Editor: React.FC<EditorProps> = ({
       onKeyDown={() => (isUnsaveChange.current = true)}
       onChange={debouncedhandleEditorBodyChange}
       theme={vscodeDark}
-      extensions={[
-        editorLanguage,
-        customTheme,
-        placeholder ? placeholderExtension(placeholder) : null,
-        customKeyBinding,
-        EditorView.lineWrapping,
-        envVariables
-          ? highlightVariablesPlugin(
-              {
-                setHoveredVariable,
-                setPopupPosition,
-              },
-              envVariables
-            )
-          : null,
-        generateCompletionsForVariables(envVariables),
-      ].filter(Boolean)}
+      extensions={extensions}
       basicSetup={{
         highlightActiveLine: false,
         bracketMatching: true,
