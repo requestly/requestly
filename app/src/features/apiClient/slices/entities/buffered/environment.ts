@@ -5,13 +5,24 @@ import type { ApiClientRootState } from "../../hooks/types";
 import { EnvironmentEntity, GlobalEnvironmentEntity } from "../environment";
 import { ApiClientVariables } from "../api-client-variables";
 import { EntityDispatch } from "../types";
+import type { ApiClientEntityMeta } from "../base";
 
 import { BufferedApiClientEntity, BufferedApiClientEntityMeta } from "./factory";
 
 export class BufferedEnvironmentEntity
   extends EnvironmentEntity<BufferedApiClientEntityMeta>
   implements BufferedApiClientEntity {
-  origin = new EnvironmentEntity(this.dispatch, { id: this.meta.referenceId });
+  origin: EnvironmentEntity<ApiClientEntityMeta>;
+
+  constructor(public readonly dispatch: EntityDispatch, public readonly meta: BufferedApiClientEntityMeta) {
+    super(dispatch, meta);
+    if (!this.meta.originExists || !this.meta.referenceId) {
+      throw new Error(
+        `BufferedEnvironmentEntity requires originExists=true and referenceId. Got: ${JSON.stringify(this.meta)}`
+      );
+    }
+    this.origin = new EnvironmentEntity(this.dispatch, { id: this.meta.referenceId });
+  }
   readonly variables = new ApiClientVariables<EnvironmentRecord, ApiClientRootState>(
     (e) => e.variables,
     (e) => e.variablesOrder,

@@ -20,7 +20,6 @@ import { VariableData } from "@requestly/shared/types/entities/apiClient";
 const existsInBackend = (variablesData: EnvironmentVariables, id: string | number) =>
   Object.values(variablesData).some((v) => v.id === id);
 
-
 interface VariablesListProps {
   variablesData: EnvironmentVariables;
   variables: ApiClientVariables<any, any>;
@@ -100,20 +99,25 @@ export const VariablesList: React.FC<VariablesListProps> = ({
 
   const handleVariableChange = useCallback(
     (row: VariableRow, fieldChanged: keyof VariableRow) => {
-      if (!existsInBackend(variablesData, row.id)) {
-        if (row.key) {
-          variables.add({
-            id: row.id,
-            key: row.key,
-            type: row.type,
-            syncValue: row.syncValue,
-            localValue: row.localValue,
-            isPersisted: true,
-          });
+      try {
+        if (!existsInBackend(variablesData, row.id)) {
+          if (row.key) {
+            variables.add({
+              id: row.id,
+              key: row.key,
+              type: row.type,
+              syncValue: row.syncValue,
+              localValue: row.localValue,
+              isPersisted: true,
+            });
+          }
+          return;
         }
-        return;
+        variables.set({ id: row.id, [fieldChanged]: row[fieldChanged] });
+      } catch (error) {
+        console.error("Failed to update variable", error);
+        // Error is handled silently as it's a local state update
       }
-      variables.set({ id: row.id, [fieldChanged]: row[fieldChanged] });
     },
     [variables, variablesData]
   );
@@ -151,7 +155,9 @@ export const VariablesList: React.FC<VariablesListProps> = ({
   const handleUpdatePersisted = useCallback(
     (id: number | string, isPersisted: boolean) => {
       if (!existsInBackend(variablesData, id)) return;
-      variables.set({ id, isPersisted: isPersisted as true });
+      // Note: Type assertion needed because Variable type expects isPersisted: true for persisted variables
+      // This is a design limitation - the type system doesn't allow boolean here
+      variables.set({ id, isPersisted: (isPersisted ? true : undefined) as any });
     },
     [variables, variablesData]
   );

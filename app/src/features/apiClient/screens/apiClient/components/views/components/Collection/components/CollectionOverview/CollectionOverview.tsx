@@ -41,37 +41,55 @@ export const CollectionOverview: React.FC<CollectionOverviewProps> = ({ collecti
 
   const handleCollectionNameChange = useCallback(
     async (value: string) => {
-      const updatedCollectionName = value || "Untitled Collection";
-      const result = await repositories.apiClientRecordsRepository.renameCollection(
-        collectionId,
-        updatedCollectionName
-      );
-      if (!result.success) {
+      try {
+        const updatedCollectionName = value || "Untitled Collection";
+        const result = await repositories.apiClientRecordsRepository.renameCollection(
+          collectionId,
+          updatedCollectionName
+        );
+        if (!result.success) {
+          notification.error({
+            message: `Could not update collection Name.`,
+            description: result?.message,
+            placement: "bottomRight",
+          });
+          return;
+        }
+
+        entity.setName(updatedCollectionName);
+      } catch (error) {
         notification.error({
-          message: `Could not update collection Name.`,
-          description: result?.message,
+          message: `Failed to update collection name.`,
+          description: error instanceof Error ? error.message : "Unknown error",
           placement: "bottomRight",
         });
       }
-
-      entity.setName(updatedCollectionName);
     },
     [entity, collectionId, repositories.apiClientRecordsRepository]
   );
 
   const handleDescriptionChange = useCallback(
     async (value: string) => {
-      const result = await repositories.apiClientRecordsRepository.updateCollectionDescription(collectionId, value);
+      try {
+        const result = await repositories.apiClientRecordsRepository.updateCollectionDescription(collectionId, value);
 
-      if (!result.success) {
+        if (!result.success) {
+          notification.error({
+            message: `Could not update collection description.`,
+            description: result?.message,
+            placement: "bottomRight",
+          });
+          return;
+        }
+
+        entity.setDescription(value);
+      } catch (error) {
         notification.error({
-          message: `Could not update collection description.`,
-          description: result?.message,
+          message: `Failed to update collection description.`,
+          description: error instanceof Error ? error.message : "Unknown error",
           placement: "bottomRight",
         });
       }
-
-      entity.setDescription(value);
     },
     [entity, collectionId, repositories.apiClientRecordsRepository]
   );

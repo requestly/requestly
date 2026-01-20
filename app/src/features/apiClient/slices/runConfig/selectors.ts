@@ -7,6 +7,7 @@ import type { ApiClientStoreState } from "../workspaceView/helpers/ApiClientCont
 import { findBufferByReferenceId } from "../buffer/slice";
 import { isApiRequest } from "features/apiClient/screens/apiClient/utils";
 import { EntityNotFound } from "../types";
+import { getRunnerConfigId } from "./utils";
 
 const selectRunConfigSlice = (state: ApiClientStoreState) => {
   return state.runnerConfig;
@@ -37,7 +38,7 @@ export const selectRunConfig = createSelector(
     (_state: ApiClientStoreState, _collectionId: string, configId: string) => configId,
   ],
   (entities, collectionId, configId) => {
-    const key = `${collectionId}::${configId}`;
+    const key = getRunnerConfigId(collectionId, configId);
     return entities[key] ?? null;
   }
 );

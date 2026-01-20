@@ -60,6 +60,9 @@ export const HttpMethodIcon = ({ method }: { method: RequestMethod }) => {
 export const GraphQlIcon = () => <GrGraphQl className="graphql-request-icon" />;
 
 export const RequestIcon = ({ record }: { record: RQAPI.ApiRecord }) => {
+  if (!record?.data) {
+    return null;
+  }
   if (isHttpApiRecord(record)) {
     return <HttpMethodIcon method={record.data.request?.method} />;
   } else if (isGraphQLApiRecord(record)) {
