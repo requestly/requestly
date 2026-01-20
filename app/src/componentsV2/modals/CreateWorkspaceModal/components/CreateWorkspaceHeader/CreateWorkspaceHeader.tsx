@@ -6,7 +6,7 @@ import "./createWorkspaceHeader.scss";
 interface CreateWorkspaceHeaderProps {
   title: string;
   description: string;
-  hasDuplicateWorkspaceName?: boolean;
+  hasDuplicateWorkspaceName: boolean;
   onWorkspaceNameChange: (name: string) => void;
 }
 

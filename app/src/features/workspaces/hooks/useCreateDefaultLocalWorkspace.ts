@@ -71,7 +71,7 @@ export const useCreateDefaultLocalWorkspace = ({
       await handleWorkspaceSwitch(partialWorkspace.id, partialWorkspace.name);
       onCreateWorkspaceCallback?.();
     } catch (error) {
-      if (error.cause && error.cause.code === ErrorCode.EntityAlreadyExists) {
+      if (error.cause?.code === ErrorCode.EntityAlreadyExists && error.cause.metadata?.workspaceId) {
         await handleWorkspaceSwitch(error.cause.metadata.workspaceId, "Default Workspace");
         onCreateWorkspaceCallback?.();
       } else {
@@ -82,6 +82,8 @@ export const useCreateDefaultLocalWorkspace = ({
           },
         });
       }
+    } finally {
+      setIsLoading(false);
     }
   }, [dispatch, handleWorkspaceSwitch, onCreateWorkspaceCallback, onError]);
 
