@@ -93,7 +93,7 @@ const Editor: React.FC<EditorProps> = ({
   const dispatch = useDispatch();
   const editorRef = useRef<ReactCodeMirrorRef | null>(null);
   const [editorHeight, setEditorHeight] = useState(height);
-  const [hoveredVariable, setHoveredVariable] = useState(null);
+  const [hoveredVariable, setHoveredVariable] = useState<string | null>(null);
   const isFullScreenModeOnboardingCompleted = useSelector(getIsCodeEditorFullScreenModeOnboardingCompleted);
   const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
   const [isEditorInitialized, setIsEditorInitialized] = useState(false);
@@ -103,6 +103,7 @@ const Editor: React.FC<EditorProps> = ({
   const isDefaultPrettificationDone = useRef(false);
   const isUnsaveChange = useRef(false);
   const [isFullScreen, setFullScreen] = useState(false);
+  const [isPopoverPinned, setIsPopoverPinned] = useState(false);
 
   const handleFullScreenChange = () => {
     setFullScreen((prev) => !prev);
@@ -311,45 +312,81 @@ const Editor: React.FC<EditorProps> = ({
     extensions.push(completionExtension);
   }
 
+  const handleMouseLeave = useCallback(() => {
+    if (!isPopoverPinned) {
+      setHoveredVariable(null);
+    }
+  }, [isPopoverPinned]);
+
+  const handleClosePopover = useCallback(() => {
+    setHoveredVariable(null);
+    setIsPopoverPinned(false);
+  }, []);
+
+  const handleSetVariable = useCallback(
+    (variable: string | null) => {
+      if (!variable) {
+        handleMouseLeave();
+      } else {
+        setHoveredVariable(variable);
+      }
+    },
+    [handleMouseLeave]
+  );
+
   const editor = (
-    <CodeMirror
-      ref={editorRefCallback}
-      className={`code-editor ${envVariables ? "code-editor-with-env-variables" : ""} ${
-        !isEditorInitialized ? "not-visible" : ""
-      }`}
-      width="100%"
-      readOnly={isReadOnly}
-      value={value ?? ""}
-      onKeyDown={() => (isUnsaveChange.current = true)}
-      onChange={debouncedhandleEditorBodyChange}
-      theme={vscodeDark}
-      extensions={extensions}
-      basicSetup={{
-        highlightActiveLine: false,
-        bracketMatching: true,
-        closeBrackets: true,
-        allowMultipleSelections: true,
-        autocompletion: !disableDefaultAutoCompletions,
-      }}
-      data-enable-grammarly="false"
-      data-gramm_editor="false"
-      data-gramm="false"
-    >
-      {envVariables && (
-        <div className="editor-popup-container ant-input" onMouseLeave={() => setHoveredVariable(null)}>
-          {hoveredVariable && (
-            <VariablePopover
-              editorRef={{
-                current: editorRef.current?.editor ?? null,
-              }}
-              hoveredVariable={hoveredVariable}
-              popupPosition={popupPosition}
-              variables={envVariables}
-            />
-          )}
-        </div>
-      )}
-    </CodeMirror>
+    <>
+      <CodeMirror
+        ref={editorRefCallback}
+        className={`code-editor ${envVariables ? "code-editor-with-env-variables" : ""} ${
+          !isEditorInitialized ? "not-visible" : ""
+        }`}
+        width="100%"
+        readOnly={isReadOnly}
+        value={value ?? ""}
+        onKeyDown={() => (isUnsaveChange.current = true)}
+        onChange={debouncedhandleEditorBodyChange}
+        theme={vscodeDark}
+        extensions={[
+          editorLanguage,
+          customTheme,
+          placeholder ? placeholderExtension(placeholder) : null,
+          customKeyBinding,
+          EditorView.lineWrapping,
+          envVariables
+            ? highlightVariablesPlugin(
+                {
+                  handleSetVariable,
+                  setPopupPosition,
+                },
+                envVariables
+              )
+            : null,
+          generateCompletionsForVariables(envVariables),
+        ].filter(Boolean)}
+        basicSetup={{
+          highlightActiveLine: false,
+          bracketMatching: true,
+          closeBrackets: true,
+          allowMultipleSelections: true,
+          autocompletion: !disableDefaultAutoCompletions,
+        }}
+        data-enable-grammarly="false"
+        data-gramm_editor="false"
+        data-gramm="false"
+      />
+      <div className="editor-popup-container" onMouseLeave={handleMouseLeave}>
+        {hoveredVariable && envVariables && (
+          <VariablePopover
+            hoveredVariable={hoveredVariable}
+            popupPosition={popupPosition}
+            variables={envVariables}
+            onPinChange={setIsPopoverPinned}
+            onClose={handleClosePopover}
+          />
+        )}
+      </div>
+    </>
   );
 
   const toastContainer = toastOverlay && (
