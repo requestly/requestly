@@ -10,9 +10,14 @@ export const wrapWithCustomSpan = <T, Args extends any[] = []>(
   callback: (...args: Args) => T
 ) => {
   return (...args: Args) => {
+    const activeSpan = Sentry.getActiveSpan();
+
     return Sentry.startSpan(
       {
         ...options,
+        //  When wrapped functions are called from within decorated methods,
+        // the child spans weren't properly linking to parent spans, resulting in a flat span structure.
+        ...(activeSpan && { parentSpan: activeSpan }),
       },
       (span) => {
         // Important to tag error with the current transaction for dashboarding
@@ -48,7 +53,6 @@ const onSaveButtonClick = useCallback(async (a: string) => {
     // TODO: Check if we can disable this linter rule? - https://linear.app/requestly/issue/ENGG-5178/improve-usage-with-usecallback
 }, []);
 **/
-
 
 // WIP - Needs detailed testing
 /**
