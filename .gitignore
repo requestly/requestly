@@ -20,3 +20,20 @@ app/.env.local
 /requestly-1.0.0.tgz
 package
 *.code-workspace
+
+# turbo
+.turbo
+
+#vscode change
+.vscode
+
+.npmrc
+
+# testing
+coverage
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
