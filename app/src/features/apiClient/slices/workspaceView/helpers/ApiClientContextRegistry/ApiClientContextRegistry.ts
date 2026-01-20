@@ -1,17 +1,42 @@
 import { NativeError } from "errors/NativeError";
 import { ApiClientFeatureContext } from "./types";
 
+type ContextVersion = number & { readonly __tag: unique symbol };
+
+export class InvalidContextVersionError extends NativeError {
+  constructor() {
+    super("Invalid context version");
+  }
+}
+
 export class ApiClientContextRegistry {
   private contexts: Map<ApiClientFeatureContext["workspaceId"], ApiClientFeatureContext>;
   private lastUsedContext?: ApiClientFeatureContext;
+  /**
+   * Context version for tracking stale context updates
+   */
+  private version: ContextVersion = 0 as ContextVersion;
 
   constructor() {
     this.contexts = new Map();
   }
 
-  addContext(context: ApiClientFeatureContext) {
+  getVersion() {
+    return this.version;
+  }
+
+  private incrementVersion() {
+    this.version++;
+  }
+
+  addContext(context: ApiClientFeatureContext, newVersion: ContextVersion) {
+    if (this.version > newVersion) {
+      throw new InvalidContextVersionError().addContext({ oldVersion: this.version, newVersion });
+    }
+
     this.contexts.set(context.workspaceId, context);
     this.lastUsedContext = context;
+    this.incrementVersion();
   }
 
   removeContext(id: ApiClientFeatureContext["workspaceId"]) {
@@ -19,6 +44,7 @@ export class ApiClientContextRegistry {
     if (!context) return;
 
     this.contexts.delete(id);
+    this.incrementVersion();
 
     if (this.lastUsedContext?.workspaceId === id) {
       this.lastUsedContext = undefined;
@@ -62,6 +88,7 @@ export class ApiClientContextRegistry {
   clearAll() {
     this.contexts.clear();
     this.lastUsedContext = undefined;
+    this.incrementVersion();
   }
 
   hasContext(id: ApiClientFeatureContext["workspaceId"]) {
