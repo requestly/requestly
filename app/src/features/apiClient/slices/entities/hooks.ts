@@ -21,7 +21,7 @@ export function useEntity<T extends ApiClientEntityType>(params: { id: string; t
   const dispatch = EntityFactory.GlobalStateOverrideConfig[params.type] ? useDispatch() : useApiClientDispatch();
   return useMemo(
     () => EntityFactory.from(params, dispatch),
-    [params.id, params.type, dispatch]
+    [params, dispatch]
   );
 }
 

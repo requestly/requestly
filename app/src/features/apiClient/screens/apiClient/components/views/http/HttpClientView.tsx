@@ -196,7 +196,7 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
   }, [isGeneratingTests, setDeepLinkState, entity, store]);
 
   const onSendButtonClick = useCallback(async () => {
-    const { request, scripts, auth, response } = getEntry(entity, store);
+    const { request, scripts, auth } = getEntry(entity, store);
     const { url } = request;
     if (!url) {
       return;
