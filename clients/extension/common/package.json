@@ -1,0 +1,76 @@
+{
+  "name": "@requestly/extension-common",
+  "version": "1.0.0",
+  "description": "Common code between MV2 (now deprecated) and MV3 browser extensions",
+  "homepage": "https://requestly.com",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/requestly/requestly.git",
+    "directory": "clients/extension/common"
+  },
+  "author": {
+    "name": "Requestlers",
+    "email": "contact@requestly.com",
+    "url": "https://requestly.com/"
+  },
+  "engines": {
+    "node": ">=18.18.0",
+    "pnpm": ">=8.0.0"
+  },
+  "license": "SEE LICENSE IN LICENSE",
+  "bugs": {
+    "url": "https://github.com/requestly/requestly/issues"
+  },
+  "scripts": {
+    "preinstall": "sh ./scripts/build-analytics-vendor.sh",
+    "build": "rm -rf dist && rollup -c",
+    "prebuild": "npm ls",
+    "watch": "rm -rf dist && rollup -cw"
+  },
+  "devDependencies": {
+    "@requestly-ui/resource-table": "^0.1.8",
+    "@rollup/plugin-commonjs": "^23.0.2",
+    "@rollup/plugin-json": "^5.0.0",
+    "@rollup/plugin-node-resolve": "^15.0.1",
+    "@rollup/plugin-replace": "^5.0.1",
+    "@rollup/plugin-terser": "^0.4.4",
+    "@rollup/plugin-typescript": "^9.0.1",
+    "@svgr/rollup": "^6.5.1",
+    "@types/chrome": "^0.0.200",
+    "@types/lodash": "^4.17.7",
+    "@types/react": "^18.0.25",
+    "@types/react-dom": "^18.0.9",
+    "@types/uuid": "^9.0.1",
+    "archiver": "^5.3.1",
+    "postcss": "^8.4.30",
+    "rollup": "^2.79.1",
+    "rollup-plugin-copy": "^3.4.0",
+    "rollup-plugin-postcss": "^4.0.2",
+    "rollup-plugin-svg": "^2.0.0",
+    "sass": "^1.72.0",
+    "tslib": "^2.4.0",
+    "typescript": "^4.8.4"
+  },
+  "dependencies": {
+    "@ant-design/icons": "^4.8.0",
+    "@codemirror/lang-css": "^6.2.1",
+    "@codemirror/lang-html": "^6.4.9",
+    "@codemirror/lang-javascript": "^6.2.2",
+    "@codemirror/lang-json": "^6.0.1",
+    "@codemirror/lang-markdown": "^6.2.5",
+    "@devtools-ds/navigation": "^1.2.1",
+    "@devtools-ds/object-inspector": "^1.2.1",
+    "@devtools-ds/table": "^1.2.1",
+    "@devtools-ds/themes": "^1.2.1",
+    "@requestly/analytics-vendors": "workspace:*",
+    "@uiw/codemirror-theme-vscode": "^4.23.0",
+    "@uiw/react-codemirror": "^4.23.0",
+    "antd": "^5.0.4",
+    "lodash": "^4.17.21",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-split": "^2.0.14",
+    "uuid": "^9.0.0"
+  }
+}

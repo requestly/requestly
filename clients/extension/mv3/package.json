@@ -1,0 +1,55 @@
+{
+  "name": "@requestly/extension-mv3",
+  "version": "25.9.24",
+  "description": "Browser extension acting as Web Debugging Proxy to Intercept & Modify HTTP(s) Requests",
+  "homepage": "https://requestly.com",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/requestly/requestly.git",
+    "directory": "clients/extension/mv3"
+  },
+  "bugs": {
+    "url": "https://github.com/requestly/requestly/issues"
+  },
+  "author": {
+    "name": "Requestly",
+    "email": "contact@requestly.io",
+    "url": "https://requestly.com/"
+  },
+  "engines": {
+    "node": ">=18.18.0",
+    "pnpm": ">=8.0.0"
+  },
+  "license": "SEE LICENSE IN LICENSE",
+  "scripts": {
+    "config": "cd ../config && npm run build && cd ../mv3",
+    "build": "npm run build:common && npm run build:current",
+    "build:safari": "npm run build:common && rm -rf dist && rollup -c rollup.config.safari.js",
+    "build:current": "rm -rf dist && rollup -c",
+    "build:common": "cd ../common && npm run build && cd ../mv3",
+    "prebuild": "npm ls",
+    "watch": "rm -rf dist && rollup -cw",
+    "start:firefox": "web-ext run -s dist",
+    "test": "playwright test",
+    "pretest": "npm run build",
+    "release": "sh scripts/release-extension.sh",
+    "prerelease": "sh ../install.sh",
+    "release:firefox": "sh scripts/release-firefox-extension.sh"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.44.1",
+    "@requestly/web-sdk": "0.15.1",
+    "@rollup/plugin-json": "^5.0.0",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-terser": "^0.4.4",
+    "@rollup/plugin-typescript": "^11.0.0",
+    "@types/chrome": "^0.0.266",
+    "archiver": "^5.3.1",
+    "rollup": "^2.79.1",
+    "rollup-plugin-copy": "^3.4.0",
+    "tslib": "^2.4.0",
+    "typescript": "^4.9.5",
+    "web-ext": "^8.3.0"
+  }
+}

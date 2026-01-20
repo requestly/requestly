@@ -1,0 +1,36 @@
+{
+  "name": "@requestly/utils",
+  "version": "1.0.0",
+  "description": "Shared utilities for Requestly",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.esm.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "require": "./dist/index.cjs.js",
+      "import": "./dist/index.esm.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./logger": {
+      "require": "./dist/logger.cjs.js",
+      "import": "./dist/logger.esm.js"
+    },
+    "./analytics-vendors": {
+      "require": "./dist/analytics-vendors/index.cjs.js",
+      "import": "./dist/analytics-vendors/index.esm.js"
+    }
+  },
+  "scripts": {
+    "build": "rollup -c",
+    "watch": "rollup -c --watch"
+  },
+  "engines": {
+    "node": ">=18.18.0"
+  },
+  "dependencies": {
+    "@requestly/constants": "workspace:*"
+  },
+  "files": [
+    "dist"
+  ]
+}

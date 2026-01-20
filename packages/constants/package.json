@@ -1,0 +1,25 @@
+{
+  "name": "@requestly/constants",
+  "version": "1.0.0",
+  "description": "Shared constants for Requestly",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.esm.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "require": "./dist/index.cjs.js",
+      "import": "./dist/index.esm.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "rollup -c",
+    "watch": "rollup -c --watch"
+  },
+  "engines": {
+    "node": ">=18.18.0"
+  },
+  "files": [
+    "dist"
+  ]
+}
