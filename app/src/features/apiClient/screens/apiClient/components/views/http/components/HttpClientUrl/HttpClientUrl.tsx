@@ -3,26 +3,42 @@ import {
   extractPathVariablesFromUrl,
   extractQueryParams,
   queryParamsToURLString,
+  isCurlCommand,
+  parseCurlRequest,
 } from "features/apiClient/screens/apiClient/utils";
-import { KeyValuePair } from "features/apiClient/types";
+import { KeyValuePair, RQAPI } from "features/apiClient/types";
 import { useCallback, memo } from "react";
 import { ApiClientUrl } from "../../../components/request/components/ApiClientUrl/ApiClientUrl";
 import { BufferedHttpRecordEntity } from "features/apiClient/slices/entities";
 import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
 
 interface ApiClientUrlProps {
-  entity: BufferedHttpRecordEntity
+  entity: BufferedHttpRecordEntity;
   onEnterPress: (e: KeyboardEvent) => void;
   onUrlChange: (value: string, finalParams: KeyValuePair[]) => void;
+  onCurlImport?: (request: RQAPI.Request) => void;
 }
 
-const HttpApiClientUrl = ({ entity, onEnterPress, onUrlChange }: ApiClientUrlProps) => {
-  const url = useApiClientSelector(s => entity.getUrl(s));
-  const queryParams = useApiClientSelector(s => entity.getQueryParams(s) );
+const HttpApiClientUrl = ({ entity, onEnterPress, onUrlChange, onCurlImport }: ApiClientUrlProps) => {
+  const url = useApiClientSelector((s) => entity.getUrl(s));
+  const queryParams = useApiClientSelector((s) => entity.getQueryParams(s));
   const currentEnvironmentVariables = useScopedVariables(entity.meta.referenceId);
 
   const handleUrlChange = useCallback(
     (value: string) => {
+      // Detect if the input is a curl command
+      if (isCurlCommand(value)) {
+        try {
+          const requestFromCurl = parseCurlRequest(value);
+          if (requestFromCurl?.url) {
+            onCurlImport?.(requestFromCurl);
+            return;
+          }
+        } catch (error) {
+          console.warn("Curl parsing error:", error);
+        }
+      }
+      // Regular URL handling
       const pathVariables = extractPathVariablesFromUrl(value);
       entity.reconcilePathKeys(pathVariables);
 
@@ -52,13 +68,13 @@ const HttpApiClientUrl = ({ entity, onEnterPress, onUrlChange }: ApiClientUrlPro
       entity.setQueryParams(finalParams);
       onUrlChange(value, finalParams);
     },
-    [onUrlChange, queryParams, ]
+    [entity, onUrlChange, onCurlImport, queryParams]
   );
 
   return (
     <ApiClientUrl
       url={queryParamsToURLString(queryParams, url)}
-      placeholder="Enter or paste HTTP URL"
+      placeholder="Enter or paste HTTP URL or cURL command"
       currentEnvironmentVariables={currentEnvironmentVariables}
       onEnterPress={onEnterPress}
       onUrlChange={handleUrlChange}
