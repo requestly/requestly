@@ -2,6 +2,45 @@
 
 Join Requestly community on Discord: [Link](https://rqst.ly/join-community)
 
+## 📁 Monorepo Structure
+
+This repository is organized as a monorepo using **pnpm workspaces** and **Turbo** for efficient builds and development.
+
+```
+requestly/
+├── clients/               # Client applications
+│   ├── web/              # Web application (React/Vite)
+│   └── extension/        # Browser extension (Chrome/Firefox/Safari)
+├── packages/             # Shared packages
+│   ├── analytics-vendors/ # Analytics integration
+│   ├── constants/        # Shared constants
+│   ├── core/             # Core rule processing logic
+│   ├── eslint-config/    # Shared ESLint configuration
+│   ├── shared/           # Shared types, helpers, utilities
+│   └── utils/            # Common utilities
+└── scripts/              # Build, deploy, and monitoring scripts
+```
+
+### Development Commands
+```bash
+# Install dependencies
+pnpm install
+
+# Start development servers
+pnpm dev                    # Start all clients
+pnpm dev:web                # Start web app only
+pnpm dev:extension          # Start extension build in watch mode
+
+# Build
+pnpm build                  # Build all packages and clients
+pnpm build:web              # Build web app only
+pnpm build:extension        # Build extension only
+
+# Testing & Linting
+pnpm test                   # Run all tests
+pnpm lint                   # Lint all code
+```
+
 
 ## Requestly - API Client with HTTP Interceptor, Modfications, Testing & Mocking.
 

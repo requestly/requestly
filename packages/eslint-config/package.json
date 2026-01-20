@@ -1,0 +1,12 @@
+{
+  "name": "@requestly/eslint-config",
+  "version": "1.0.0",
+  "description": "Shared ESLint configuration for Requestly",
+  "main": "index.js",
+  "files": [
+    "index.js"
+  ],
+  "peerDependencies": {
+    "eslint": "^8.0.0"
+  }
+}
