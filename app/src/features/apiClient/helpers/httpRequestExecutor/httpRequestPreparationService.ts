@@ -19,6 +19,7 @@ import { getApiClientRecordsStore } from "../../commands/store.utils";
 import { createDummyVariablesStoreFromData } from "features/apiClient/store/variables/variables.store";
 import JSON5 from "json5";
 import { RequestContentType } from "../../types";
+import { captureException } from "@sentry/react";
 
 export class HttpRequestPreparationService {
   constructor(
@@ -79,8 +80,8 @@ export class HttpRequestPreparationService {
       const renderedPath = toPath(variableValues);
       urlObject.pathname = renderedPath;
     } catch (error) {
-      // Alerts??
       console.warn("Failed to compile path with variables:", error);
+      captureException(error);
     }
 
     return urlObject.toString();
