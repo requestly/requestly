@@ -17,6 +17,7 @@ import { ExclamationCircleFilled } from "@ant-design/icons";
 import { Modal } from "antd";
 import { ApiClientViewMode, useViewMode, useWorkspaceViewActions } from "features/apiClient/slices";
 import { getWorkspaceInfo } from "features/apiClient/slices/workspaceView/utils";
+import { InvalidContextVersionError } from "features/apiClient/slices/workspaceView/helpers/ApiClientContextRegistry/ApiClientContextRegistry";
 
 //TODO: move it into top level hooks
 export const useWorkspaceSwitcher = () => {
@@ -71,10 +72,18 @@ export const useWorkspaceSwitcher = () => {
 
       setIsWorkspaceLoading(true);
 
-      await switchContext({
+      const result = await switchContext({
         userId,
         workspace: getWorkspaceInfo(workspace),
       });
+
+      if (result.payload?.error) {
+        if (result.payload.error.name === InvalidContextVersionError.name) {
+          return;
+        } else {
+          throw new Error(result.payload?.error);
+        }
+      }
 
       // TBD: should we move switchWorkspace inside the switchContext
       // Issues:
@@ -162,10 +171,20 @@ export const useWorkspaceSwitcher = () => {
       }
     }
     setIsWorkspaceLoading(true);
-    await switchContext({
+
+    const result = await switchContext({
       userId,
       workspace: { id: dummyPersonalWorkspace.id, meta: { type: WorkspaceType.PERSONAL } },
     });
+
+    if (result.payload?.error) {
+      if (result.payload.error.name === InvalidContextVersionError.name) {
+        setIsWorkspaceLoading(false);
+        return;
+      } else {
+        throw new Error(result.payload?.error);
+      }
+    }
 
     return clearCurrentlyActiveWorkspace(dispatch, appMode)
       .then(() => {
