@@ -38,9 +38,11 @@ export class HttpRequestPreparationService {
 
     const validVarNameRegex = /^[a-zA-Z_$][a-zA-Z0-9_$]*$/;
     let safeIndex = 0;
+    const usedKeys = new Set<string>();
 
     pathVariables.forEach((variable) => {
       if (!variable.key) return;
+      usedKeys.add(variable.key);
 
       // Rename Invalid variables like :123 which fail in path-to-regexp to safe variables like var_i
       // and populate path variables in varMapping
@@ -48,7 +50,11 @@ export class HttpRequestPreparationService {
         varMapping.set(variable.key, variable.key);
         variableValues[variable.key] = variable.value;
       } else {
-        const safeKey = `var_${safeIndex++}`;
+        let safeKey = "";
+        do {
+          safeKey = `__rq_var_${safeIndex++}`;
+        } while (usedKeys.has(safeKey));
+        usedKeys.add(safeKey);
         varMapping.set(variable.key, safeKey);
         variableValues[safeKey] = variable.value;
       }
