@@ -300,7 +300,7 @@ const Editor: React.FC<EditorProps> = ({
       result.push(lintGutter(), javascriptLinter());
     }
 
-    if (language === EditorLanguage.JSON || EditorLanguage.JSON5) {
+    if (language === EditorLanguage.JSON || language === EditorLanguage.JSON5) {
       result.push(lintGutter(), jsonLinter());
     }
 
