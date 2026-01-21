@@ -183,7 +183,6 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
   }
 
   // TODO: remove this
-  // added sentry capture here for rejected
   async batchWriteApiEntities(
     batchSize: number,
     entities: RQAPI.ApiClientRecord[],
@@ -191,6 +190,7 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
   ) {
     try {
       const result = await batchWrite(batchSize, entities, writeFunction);
+
       result.forEach((r) => {
         if (r.status === "rejected") {
           const err = r.reason;

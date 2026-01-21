@@ -237,7 +237,6 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
       handleCollectionWrites
     );
 
-    // should we cleanup such errors, this will also help in cleanup of sentry?
     if (!collectionWriteResult.success) {
       throw new Error(`Failed to import collections: ${collectionWriteResult.message}`);
     }
@@ -300,14 +299,6 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
           .then((results) => {
             const [environmentsResult, collectionsResult] = results;
 
-            // Capture rejected promises to Sentry
-            if (environmentsResult.status === "rejected") {
-              Sentry.withScope((scope) => {
-                scope.setTag("error_type", "api_client_postman_import_environments_failed");
-                Sentry.captureException(environmentsResult.reason);
-              });
-            }
-
             if (collectionsResult.status === "rejected") {
               Sentry.withScope((scope) => {
                 scope.setTag("error_type", "api_client_postman_import_collections_failed");
@@ -315,7 +306,6 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
               });
             }
 
-            // handle full imports
             const importedEnvironments = environmentsResult.status === "fulfilled" ? environmentsResult.value : 0;
             const importedCollectionsCount =
               collectionsResult.status === "fulfilled" ? collectionsResult.value.importedCollectionsCount : 0;
@@ -339,7 +329,6 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
               return;
             }
 
-            // handle partial imports
             const hasFailures = failedEnvironments > 0 || failedCollections > 0;
             const hasSuccesses = importedEnvironments > 0 || importedCollectionsCount > 0;
 

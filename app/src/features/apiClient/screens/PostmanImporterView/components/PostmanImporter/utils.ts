@@ -108,28 +108,25 @@ const processScripts = (item: any) => {
   return scripts;
 };
 
-// CHK-1: why we have allowed undefined here?
 const processAuthorizationOptions = (item: PostmanAuth.Item | undefined, parentCollectionId?: string): RQAPI.Auth => {
-  // it's true for undefined value
   if (isEmpty(item)) return getDefaultAuth(parentCollectionId === null);
 
   const currentAuthType = POSTMAN_AUTH_TYPES_MAPPING[item.type] ?? getDefaultAuthType(parentCollectionId === null);
 
   const auth: RQAPI.Auth = { currentAuthType, authConfigStore: {} };
 
-  // added optional chaining, as item[item.type] might have came undefined
-  if (item.type === PostmanAuth.AuthType.BEARER_TOKEN) {
+  if (item.type === PostmanAuth.AuthType.BEARER_TOKEN && item[item.type]) {
     const authOptions = item[item.type];
     const token = authOptions?.[0];
     auth.authConfigStore[Authorization.Type.BEARER_TOKEN] = {
       bearer: token?.value ?? "",
     };
-  } else if (item.type === PostmanAuth.AuthType.BASIC_AUTH) {
+  } else if (item.type === PostmanAuth.AuthType.BASIC_AUTH && item[item.type]) {
     const basicAuthOptions = item[item.type];
     //if somehow username or password comes undefined return empty string in that case as fallback to avoid runtime error
     let username: PostmanAuth.KV<"username"> | undefined, password: PostmanAuth.KV<"password"> | undefined;
 
-    basicAuthOptions?.forEach((option) => {
+    basicAuthOptions.forEach((option) => {
       if (option.key === "username") {
         username = option;
       } else if (option.key === "password") {
@@ -141,13 +138,13 @@ const processAuthorizationOptions = (item: PostmanAuth.Item | undefined, parentC
       username: username?.value ?? "",
       password: password?.value ?? "",
     };
-  } else if (item.type === PostmanAuth.AuthType.API_KEY) {
+  } else if (item.type === PostmanAuth.AuthType.API_KEY && item[item.type]) {
     const apiKeyOptions = item[item.type];
     let keyLabel: PostmanAuth.KV<"key"> | undefined;
     let apiKey: PostmanAuth.KV<"value"> | undefined;
     let addTo: Authorization.API_KEY_CONFIG["addTo"] = "HEADER";
 
-    apiKeyOptions?.forEach((option) => {
+    apiKeyOptions.forEach((option) => {
       if (option.key === "key") {
         keyLabel = option;
       } else if (option.key === "value") {
