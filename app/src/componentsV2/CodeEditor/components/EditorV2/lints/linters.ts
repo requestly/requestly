@@ -46,31 +46,6 @@ function extractErrorPosition(text: string, err: any): { from: number; to: numbe
   return { from, to: Math.min(from + 1, text.length) };
 }
 
-function makeSimpleLinter(parser: (text: string) => any, defaultMessage: string) {
-  return linter((view) => {
-    const text = view.state.doc.toString();
-    if (!text.trim()) return [];
-
-    try {
-      parser(text);
-      return [];
-    } catch (err: any) {
-      const pos = extractErrorPosition(text, err);
-      const diag: Diagnostic = {
-        from: pos?.from ?? 0,
-        to: pos?.to ?? Math.min(1, text.length),
-        severity: "error",
-        message: err?.message || defaultMessage,
-      };
-      return [diag];
-    }
-  });
-}
-
-export function json5Linter() {
-  return makeSimpleLinter(JSON5.parse, "Invalid JSON5");
-}
-
 export function jsonLinter() {
   const uri = "inmemory://request-body.json";
 
@@ -78,7 +53,10 @@ export function jsonLinter() {
     const text = view.state.doc.toString();
     if (!text.trim()) return [];
 
-    const document = TextDocument.create(uri, "json", 0, text);
+    // Using jsonc to support comments
+    // Trailing commas and single quotes for string literals will
+    // be flagged as errors by the linter
+    const document = TextDocument.create(uri, "jsonc", 0, text);
     const jsonDoc = jsonLanguageService.parseJSONDocument(document);
     const diagnostics: JsonDiagnostic[] = await jsonLanguageService.doValidation(document, jsonDoc);
 

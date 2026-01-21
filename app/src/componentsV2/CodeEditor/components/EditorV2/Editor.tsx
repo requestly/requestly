@@ -33,7 +33,7 @@ import {
 } from "componentsV2/CodeEditor/components/EditorV2/plugins";
 import { placeholder as placeholderExtension } from "@codemirror/view";
 import { lintGutter } from "@codemirror/lint";
-import { javascriptLinter, jsonLinter, json5Linter } from "./lints/linters";
+import { javascriptLinter, jsonLinter } from "./lints/linters";
 
 interface EditorProps {
   value: string;
@@ -300,12 +300,8 @@ const Editor: React.FC<EditorProps> = ({
       result.push(lintGutter(), javascriptLinter());
     }
 
-    if (language === EditorLanguage.JSON) {
+    if (language === EditorLanguage.JSON || EditorLanguage.JSON5) {
       result.push(lintGutter(), jsonLinter());
-    }
-
-    if (language === EditorLanguage.JSON5) {
-      result.push(lintGutter(), json5Linter());
     }
 
     if (customTheme) {
