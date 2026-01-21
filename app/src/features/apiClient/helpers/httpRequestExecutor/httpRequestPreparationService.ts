@@ -30,27 +30,21 @@ export class HttpRequestPreparationService {
 
   private renderPathVariables(url: string, pathVariables: RQAPI.PathVariable[]): string {
     const variableValues: Record<RQAPI.PathVariable["key"], RQAPI.PathVariable["value"]> = {};
-    const varMapping = new Map<string, string>();
 
     if (!pathVariables || pathVariables.length === 0) {
       return url;
     }
 
-    // Map all variables to safe internal names to __rq_var_{index}
-    let safeIndex = 0;
     pathVariables.forEach((variable) => {
       if (!variable.key) return;
-
-      // Generate a unique, safe key for internal use by path-to-regexp
-      const safeKey = `__rq_var_${safeIndex++}`;
-      varMapping.set(variable.key, safeKey);
-      variableValues[safeKey] = variable.value;
+      variableValues[variable.key] = variable.value;
     });
 
     const normalizedUrl = addUrlSchemeIfMissing(url);
 
     const urlObject = new URL(normalizedUrl);
     let pathname = urlObject.pathname;
+    // Regex to identify path variables
     const varRegex = /:([^:/?#[\]@!$&'()*+,;=\s]+)/g;
 
     pathname = pathname.replace(varRegex, (match, varName, offset, string) => {
@@ -60,12 +54,7 @@ export class HttpRequestPreparationService {
         return `\\:${varName}`;
       }
 
-      // Use safe variables from varMapping
-      if (varMapping.has(varName)) {
-        return `:${varMapping.get(varName)}`;
-      }
-
-      return `:${varName}`;
+      return `:"${varName}"`;
     });
 
     try {
