@@ -13,6 +13,7 @@ import { ResponsePromise } from "backend/types";
 import { SavedRunConfig, SavedRunConfigRecord } from "features/apiClient/commands/collectionRunner/types";
 import { RunResult, SavedRunResult } from "features/apiClient/store/collectionRunResult/runResult.store";
 import { LocalStore } from "./types";
+import { captureException } from "backend/apiClient/utils";
 
 export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClientLocalStoreMeta> {
   meta: ApiClientLocalStoreMeta;
@@ -229,6 +230,7 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
         await writeFunction(entity);
       }
     } catch (error) {
+      captureException(error);
       return {
         success: false,
         message: error.message,

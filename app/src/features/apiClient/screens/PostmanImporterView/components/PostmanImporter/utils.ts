@@ -108,6 +108,7 @@ const processScripts = (item: any) => {
   return scripts;
 };
 
+// CHK-1: why we have allowed undefined here?
 const processAuthorizationOptions = (item: PostmanAuth.Item | undefined, parentCollectionId?: string): RQAPI.Auth => {
   if (isEmpty(item)) return getDefaultAuth(parentCollectionId === null);
 
