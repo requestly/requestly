@@ -86,7 +86,6 @@ const _createApiRecord = async (
       Logger.log(`Api document created with ID ${docId}`);
       return { success: true, data: { ...newRecord, id: docId } };
     } catch (e) {
-      // if setDoc fails it gets captured here
       captureException(e);
       Logger.error(`Error creating Api document with ID ${docId}`);
       return { success: false, data: null };
@@ -102,7 +101,6 @@ const _createApiRecord = async (
 
       return { success: true, data: { ...newRecord, id: resultDocRef.id } };
     } catch (err) {
-      // if resultDocRef fails it gets captured here
       captureException(err);
       Logger.error("Error while creating api record", err);
       return { success: false, data: null };
@@ -140,7 +138,6 @@ const _updateApiRecord = async (
     Logger.log(`Api document updated`);
     return { success: true, data: updatedRecord };
   } catch (err) {
-    // we already have sentry check here
     captureException(err);
     Logger.error("Error while updating api record", err);
     return { success: false, data: null };
