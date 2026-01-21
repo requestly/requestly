@@ -110,24 +110,26 @@ const processScripts = (item: any) => {
 
 // CHK-1: why we have allowed undefined here?
 const processAuthorizationOptions = (item: PostmanAuth.Item | undefined, parentCollectionId?: string): RQAPI.Auth => {
+  // it's true for undefined value
   if (isEmpty(item)) return getDefaultAuth(parentCollectionId === null);
 
   const currentAuthType = POSTMAN_AUTH_TYPES_MAPPING[item.type] ?? getDefaultAuthType(parentCollectionId === null);
 
   const auth: RQAPI.Auth = { currentAuthType, authConfigStore: {} };
 
+  // added optional chaining, as item[item.type] might have came undefined
   if (item.type === PostmanAuth.AuthType.BEARER_TOKEN) {
     const authOptions = item[item.type];
-    const token = authOptions[0];
+    const token = authOptions?.[0];
     auth.authConfigStore[Authorization.Type.BEARER_TOKEN] = {
-      bearer: token.value,
+      bearer: token?.value ?? "",
     };
   } else if (item.type === PostmanAuth.AuthType.BASIC_AUTH) {
     const basicAuthOptions = item[item.type];
     //if somehow username or password comes undefined return empty string in that case as fallback to avoid runtime error
     let username: PostmanAuth.KV<"username"> | undefined, password: PostmanAuth.KV<"password"> | undefined;
 
-    basicAuthOptions.forEach((option) => {
+    basicAuthOptions?.forEach((option) => {
       if (option.key === "username") {
         username = option;
       } else if (option.key === "password") {
@@ -145,7 +147,7 @@ const processAuthorizationOptions = (item: PostmanAuth.Item | undefined, parentC
     let apiKey: PostmanAuth.KV<"value"> | undefined;
     let addTo: Authorization.API_KEY_CONFIG["addTo"] = "HEADER";
 
-    apiKeyOptions.forEach((option) => {
+    apiKeyOptions?.forEach((option) => {
       if (option.key === "key") {
         keyLabel = option;
       } else if (option.key === "value") {
