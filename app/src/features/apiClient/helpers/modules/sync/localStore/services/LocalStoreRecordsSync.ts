@@ -106,8 +106,13 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
       updatedTs: Timestamp.now().toMillis(),
     } as RQAPI.ApiClientRecord;
 
-    await this.queryService.createRecord(newRecord);
-    return { success: true, data: newRecord };
+    try {
+      await this.queryService.createRecord(newRecord);
+      return { success: true, data: newRecord };
+    } catch (error) {
+      captureException(error);
+      return { success: false, data: null };
+    }
   }
 
   async updateRecord(record: Partial<RQAPI.ApiClientRecord>, id: string): RQAPI.ApiClientRecordPromise {
@@ -121,8 +126,13 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
       updatedTs: Timestamp.now().toMillis(),
     } as RQAPI.ApiClientRecord;
 
-    await this.queryService.updateRecord(id, updatedRecord);
-    return { success: true, data: updatedRecord };
+    try {
+      await this.queryService.updateRecord(id, updatedRecord);
+      return { success: true, data: updatedRecord };
+    } catch (err) {
+      captureException(err);
+      return { success: false, data: null };
+    }
   }
 
   async deleteRecords(recordIds: string[]): Promise<{ success: boolean; data: unknown; message?: string }> {
