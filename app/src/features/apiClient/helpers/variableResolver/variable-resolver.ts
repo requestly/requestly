@@ -122,7 +122,8 @@ function getScopes(
   const globalEnvironment = selectGlobalEnvironment(state);
 
   // 0. Runtime Variables
-  if (runtimeVariables) {
+  const effectiveRuntimeVariables = override?.runtimeVariables ?? runtimeVariables;
+  if (effectiveRuntimeVariables) {
     scopes.push([
       {
         scope: VariableScope.RUNTIME,
@@ -130,7 +131,7 @@ function getScopes(
         name: "Runtime Variables",
         level: currentScopeLevel++,
       },
-      runtimeVariables,
+      effectiveRuntimeVariables,
     ]);
   }
 
