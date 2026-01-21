@@ -9,6 +9,7 @@ import { Authorization } from "features/apiClient/screens/apiClient/components/v
 import { ResponsePromise } from "backend/types";
 import { SavedRunConfig } from "features/apiClient/commands/collectionRunner/types";
 import { RunResult, SavedRunResult } from "features/apiClient/store/collectionRunResult/runResult.store";
+import { captureException } from "backend/apiClient/utils";
 
 export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiClientLocalMeta> {
   meta: ApiClientLocalMeta;
@@ -500,6 +501,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
         await writeFunction(entity);
       }
     } catch (error) {
+      captureException(error);
       return {
         success: false,
         message: error.message,
