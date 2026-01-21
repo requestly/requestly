@@ -6,13 +6,14 @@ import { CollectionsVariablesView } from "./components/CollectionsVariablesView/
 import CollectionAuthorizationView from "./components/CollectionAuthorizationView/CollectionAuthorizationView";
 import "./collectionView.scss";
 import { useBufferByReferenceId, useEntity } from "features/apiClient/slices/entities/hooks";
-import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
+import { useApiClientDispatch, useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
 import { useApiClientRepository } from "features/apiClient/slices/workspaceView/helpers/ApiClientContextRegistry";
 import { ApiClientBreadCrumb, BreadcrumbType } from "../ApiClientBreadCrumb/ApiClientBreadCrumb";
 import { trackCollectionRunnerViewed } from "modules/analytics/events/features/apiClient";
 import { CollectionRowOptionsCustomEvent } from "../../../sidebar/components/collectionsList/collectionRow/utils";
 import { ApiClientEntityType } from "features/apiClient/slices/entities/types";
 import { CollectionRunnerView } from "./components/CollectionRunnerView/CollectionRunnerView";
+import { bufferActions } from "features/apiClient/slices";
 
 export const TAB_KEYS = {
   OVERVIEW: "overview",
@@ -28,6 +29,7 @@ interface CollectionViewProps {
 export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) => {
   const { apiClientRecordsRepository } = useApiClientRepository();
   const [activeTabKey, setActiveTabKey] = useState(TAB_KEYS.OVERVIEW);
+  const dispatch = useApiClientDispatch();
   const entity = useEntity({
     id: collectionId,
     type: ApiClientEntityType.COLLECTION_RECORD,
@@ -86,8 +88,13 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
       }
 
       entity.setName(name);
+      dispatch(
+        bufferActions.markSaved({
+          id: collectionBuffer.id,
+        })
+      );
     },
-    [apiClientRecordsRepository, collectionId, entity]
+    [apiClientRecordsRepository, collectionBuffer.id, collectionId, dispatch, entity]
   );
 
   return (
