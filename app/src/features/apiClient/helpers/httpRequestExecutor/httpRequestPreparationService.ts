@@ -36,28 +36,15 @@ export class HttpRequestPreparationService {
       return url;
     }
 
-    const validVarNameRegex = /^[a-zA-Z_$][a-zA-Z0-9_$]*$/;
+    // Map all variables to safe internal names to __rq_var_{index}
     let safeIndex = 0;
-    const usedKeys = new Set<string>();
-
     pathVariables.forEach((variable) => {
       if (!variable.key) return;
-      usedKeys.add(variable.key);
 
-      // Rename Invalid variables like :123 which fail in path-to-regexp to safe variables like var_i
-      // and populate path variables in varMapping
-      if (validVarNameRegex.test(variable.key)) {
-        varMapping.set(variable.key, variable.key);
-        variableValues[variable.key] = variable.value;
-      } else {
-        let safeKey = "";
-        do {
-          safeKey = `__rq_var_${safeIndex++}`;
-        } while (usedKeys.has(safeKey));
-        usedKeys.add(safeKey);
-        varMapping.set(variable.key, safeKey);
-        variableValues[safeKey] = variable.value;
-      }
+      // Generate a unique, safe key for internal use by path-to-regexp
+      const safeKey = `__rq_var_${safeIndex++}`;
+      varMapping.set(variable.key, safeKey);
+      variableValues[safeKey] = variable.value;
     });
 
     const normalizedUrl = addUrlSchemeIfMissing(url);
