@@ -14,7 +14,7 @@ export const ApiClientRequestTabs: React.FC<Props> = ({ requestId, ...props }) =
   return (
     <Tabs
       {...props}
-      className="api-request-tabs"
+      className={`api-request-tabs active-tab-${selectedTab.tab ?? props.defaultActiveKey} ${props.className || ""}`}
       activeKey={selectedTab.tab}
       onChange={(tab) => {
         setSelectedTab({ tab: tab });

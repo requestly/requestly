@@ -58,4 +58,16 @@
     font-size: var(--requestly-font-size-xs);
     color: var(--requestly-color-text-subtle);
   }
+
+  .table-container {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+  }
+
+  .table-content {
+    flex: 1;
+    min-height: 0;
+  }
 }
