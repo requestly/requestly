@@ -268,6 +268,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
       record.collectionId ?? null
     );
 
+    // we have already had a handling here for error state
     if (result.type === "error") {
       return {
         success: false,
