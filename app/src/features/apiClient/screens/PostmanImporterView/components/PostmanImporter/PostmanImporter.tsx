@@ -222,6 +222,12 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
           }
         });
         const results = await Promise.allSettled(importPromises);
+        results.forEach((result) => {
+          if (result.status === "rejected") {
+            const err = result.reason;
+            Sentry.captureException(err);
+          }
+        });
         return results.filter((result) => result.status === "fulfilled" && result.value).length;
       }
     } catch (error) {
@@ -322,6 +328,14 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
     Promise.allSettled([handleImportEnvironments(), handleImportCollectionsAndApis()])
       .then((results) => {
         const [environmentsResult, collectionsResult] = results;
+
+        if (collectionsResult.status === "rejected") {
+          Sentry.withScope((scope) => {
+            scope.setTag("error_type", "api_client_postman_import_collections_failed");
+            Sentry.captureException(collectionsResult.reason);
+          });
+        }
+
         const importedEnvironments = environmentsResult.status === "fulfilled" ? environmentsResult.value : 0;
         const importedCollectionsCount =
           collectionsResult.status === "fulfilled" ? collectionsResult.value.importedCollectionsCount : 0;
