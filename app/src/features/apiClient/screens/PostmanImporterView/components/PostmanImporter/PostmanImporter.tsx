@@ -222,12 +222,11 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
           return newCollection.data.id;
         } else {
           failedCollectionsCount++;
-          return null;
         }
       } catch (error) {
         failedCollectionsCount++;
         Logger.error("Error importing collection:", error);
-        return null;
+        throw error;
       }
     };
 
@@ -263,7 +262,7 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
       } catch (error) {
         failedCollectionsCount++;
         Logger.error("Error importing API:", error);
-        return null;
+        throw error;
       }
     };
 
@@ -298,6 +297,9 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
         await Promise.allSettled([handleImportEnvironments(), handleImportCollectionsAndApis()])
           .then((results) => {
             const [environmentsResult, collectionsResult] = results;
+
+            console.log("collectionsResult", collectionsResult);
+            console.log("environmentsResult", environmentsResult);
 
             if (collectionsResult.status === "rejected") {
               Sentry.withScope((scope) => {
