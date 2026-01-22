@@ -7,7 +7,7 @@ import { WelcomeCard } from "./components/WelcomeCard/WelcomeCard";
 import { useDispatch, useSelector } from "react-redux";
 import { globalActions } from "store/slices/global/slice";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { IoMdArrowBack } from "@react-icons/all-files/io/IoMdArrowBack";
+// import { IoMdArrowBack } from "@react-icons/all-files/io/IoMdArrowBack";
 import { redirectToApiClient } from "utils/RedirectionUtils";
 import "./desktopOnboardingModal.scss";
 import { trackDesktopOnboardingStepSkipped, trackDesktopOnboardingViewed } from "./analytics";
@@ -48,10 +48,6 @@ export const DesktopOnboardingModal = () => {
           </DesktopOnboardingCard>
         ) : onboardingStep === OnboardingStep.FOLDER_SELECTION ? (
           <DesktopOnboardingCard className="local-workspace-card">
-            <div className="rq-desktop-onboarding-modal-content__local-workspace-card-header">
-              <IoMdArrowBack onClick={() => setOnboardingStep(OnboardingStep.FEATURE_SELECTION)} /> Create a new local
-              workspace
-            </div>
             <WorkspaceCreationView
               workspaceType={WorkspaceType.LOCAL}
               onCancel={() => setOnboardingStep(OnboardingStep.FEATURE_SELECTION)}

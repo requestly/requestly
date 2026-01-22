@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Tooltip, Typography } from "antd";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Tooltip } from "antd";
 import { MdOutlineFolder } from "@react-icons/all-files/md/MdOutlineFolder";
 import { MdOutlineInsertDriveFile } from "@react-icons/all-files/md/MdOutlineInsertDriveFile";
 import { CreateWorkspaceHeader } from "../CreateWorkspaceHeader/CreateWorkspaceHeader";
@@ -8,10 +8,14 @@ import { displayFolderSelector } from "components/mode-specific/desktop/misc/Fil
 import { PiFolderOpen } from "@react-icons/all-files/pi/PiFolderOpen";
 import Logger from "lib/logger";
 import { RQButton } from "lib/design-system-v2/components";
-import { CreateWorkspaceArgs } from "../WorkspaceCreationView";
+import { CreateWorkspaceArgs } from "features/workspaces/hooks/useCreateWorkspace";
 import { MdOutlineInfo } from "@react-icons/all-files/md/MdOutlineInfo";
 import "./localWorkspaceCreationView.scss";
 import { WorkspaceType } from "features/workspaces/types";
+import { useDebounce } from "hooks/useDebounce";
+import { WorkspacePathEllipsis } from "features/workspaces/components/WorkspacePathEllipsis";
+import { LocalWorkspaceCreateOptions } from "./components/LocalWorkspaceCreateOptions/LocalWorkspaceCreateOptions";
+import { useOpenLocalWorkspace } from "features/workspaces/hooks/useOpenLocalWorkspace";
 
 type FolderItem = {
   name: string;
@@ -49,16 +53,29 @@ const INVALID_FS_NAME_CHARACTERS = /[<>:"/\\|?*\x00-\x1f]/g;
 
 export const LocalWorkspaceCreationView = ({
   onCreateWorkspaceClick,
-  isLoading,
   onCancel,
+  isLoading,
+  isOpenedInModal,
 }: {
   onCreateWorkspaceClick: (args: CreateWorkspaceArgs) => void;
   isLoading: boolean;
   onCancel: () => void;
+  isOpenedInModal?: boolean;
 }) => {
   const [workspaceName, setWorkspaceName] = useState("");
   const [folderPath, setFolderPath] = useState("");
   const [folderPreview, setFolderPreview] = useState<FolderPreview | null>(null);
+  const [hasDuplicateWorkspaceName, setHasDuplicateWorkspaceName] = useState(false);
+  const [isCreationOptionsVisible, setIsCreationOptionsVisible] = useState(isOpenedInModal ?? false);
+
+  const { openWorkspace, isLoading: isOpenWorkspaceLoading } = useOpenLocalWorkspace({
+    analyticEventSource: "create_workspace_modal",
+    onOpenWorkspaceCallback: () => {
+      onCancel();
+    },
+  });
+
+  const workspaceNameRef = useRef<string>(workspaceName);
 
   const folderSelectCallback = async (folderPath: string) => {
     setFolderPath(folderPath);
@@ -99,6 +116,27 @@ export const LocalWorkspaceCreationView = ({
     ));
   };
 
+  const checkForDuplicateWorkspaceName = useCallback(
+    (value: string) => {
+      const workspaceName = value.replace(INVALID_FS_NAME_CHARACTERS, "-");
+      const isDuplicate = folderPreview?.existingContents.find((item) => item.name === workspaceName);
+      setHasDuplicateWorkspaceName(!!isDuplicate);
+    },
+    [folderPreview]
+  );
+
+  const debouncedCheckForDuplicateWorkspaceName = useDebounce(checkForDuplicateWorkspaceName);
+
+  const handleWorkspaceNameChange = useCallback(
+    (value: string) => {
+      const newName = value.replace(INVALID_FS_NAME_CHARACTERS, "-");
+      setWorkspaceName(newName);
+      workspaceNameRef.current = newName;
+      debouncedCheckForDuplicateWorkspaceName(newName);
+    },
+    [debouncedCheckForDuplicateWorkspaceName]
+  );
+
   useEffect(() => {
     window.RQ.DESKTOP.SERVICES.IPC.invokeEventInMain("get-workspace-folder-preview", {
       folderPath: "",
@@ -115,32 +153,44 @@ export const LocalWorkspaceCreationView = ({
       });
   }, []);
 
+  useEffect(() => {
+    if (folderPreview) {
+      checkForDuplicateWorkspaceName(workspaceNameRef.current);
+    }
+  }, [folderPreview, checkForDuplicateWorkspaceName]);
+
+  if (isCreationOptionsVisible) {
+    return (
+      <>
+        <div className="create-workspace-header">
+          <div className="create-workspace-header__title">Add a local workspace</div>
+        </div>
+        <div style={{ padding: "12px 0" }}>
+          <LocalWorkspaceCreateOptions
+            analyticEventSource="create_workspace_modal"
+            onCreateWorkspaceClick={() => setIsCreationOptionsVisible(false)}
+            openWorkspace={openWorkspace}
+            isOpeningWorkspaceLoading={isOpenWorkspaceLoading}
+            isOpenedInModal
+          />
+        </div>
+      </>
+    );
+  }
+
   return (
     <>
       <CreateWorkspaceHeader
         title="Create a new local workspace"
         description=""
-        onWorkspaceNameChange={(value) => {
-          setWorkspaceName(value.replace(INVALID_FS_NAME_CHARACTERS, "-"));
-        }}
+        onWorkspaceNameChange={handleWorkspaceNameChange}
+        hasDuplicateWorkspaceName={hasDuplicateWorkspaceName}
       />
       <div className="workspace-folder-selector">
         <RQButton icon={<MdOutlineFolder />} onClick={() => displayFolderSelector(folderSelectCallback)}>
           Select a folder
         </RQButton>
-        {folderPath.length ? (
-          <Typography.Text
-            ellipsis={{
-              tooltip: {
-                title: folderPath,
-                color: "#000",
-              },
-            }}
-            className="selected-folder-path"
-          >
-            {folderPath}
-          </Typography.Text>
-        ) : null}
+        {folderPath.length ? <WorkspacePathEllipsis path={folderPath} className="selected-folder-path" /> : null}
       </div>
 
       {folderPreview ? (
@@ -191,7 +241,7 @@ export const LocalWorkspaceCreationView = ({
         onCancel={onCancel}
         onCreateWorkspaceClick={handleOnCreateWorkspaceClick}
         isLoading={isLoading}
-        disabled={!workspaceName.length || !folderPath.length}
+        disabled={!workspaceName.length || !folderPath.length || hasDuplicateWorkspaceName}
       />
     </>
   );

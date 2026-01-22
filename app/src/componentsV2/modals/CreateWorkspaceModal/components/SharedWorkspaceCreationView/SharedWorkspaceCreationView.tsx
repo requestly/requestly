@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import { Checkbox } from "antd";
 import { CreateWorkspaceHeader } from "../CreateWorkspaceHeader/CreateWorkspaceHeader";
 import { CreateWorkspaceFooter } from "../CreateWorkspaceFooter/CreateWorkspaceFooter";
-import { CreateWorkspaceArgs } from "../WorkspaceCreationView";
+import { CreateWorkspaceArgs } from "features/workspaces/hooks/useCreateWorkspace";
 import "./sharedWorkspaceCreationView.scss";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getDomainFromEmail } from "utils/FormattingHelper";
@@ -37,6 +37,7 @@ export const SharedWorkspaceCreationView = ({
         title="Create a new team workspace"
         description="Workspaces are where your team collaborate on rules, variables, and mocks."
         onWorkspaceNameChange={setWorkspaceName}
+        hasDuplicateWorkspaceName={false}
       />
       <div className="invite-all-domain-users-container">
         <Checkbox checked={isNotifyAllSelected} onChange={() => setIsNotifyAllSelected(!isNotifyAllSelected)} />{" "}
