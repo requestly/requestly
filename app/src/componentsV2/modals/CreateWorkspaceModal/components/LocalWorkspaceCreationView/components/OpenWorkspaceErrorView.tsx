@@ -1,13 +1,15 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { RQButton } from "lib/design-system-v2/components";
 import { WorkspaceCreationErrorView } from "./WorkspaceCreationErrorView/WorkspaceCreationErrorView";
 import { displayFolderSelector } from "components/mode-specific/desktop/misc/FileDialogButton";
+import { trackLocalWorkspaceCreationConflictShown } from "modules/analytics/events/common/teams";
 
 interface Props {
   path: string;
   onNewWorkspaceClick: () => void;
   openWorkspace: (workspacePath: string) => void;
   isOpeningWorkspaceLoading: boolean;
+  analyticEventSource: string;
 }
 
 export const OpenWorkspaceErrorView: React.FC<Props> = ({
@@ -15,7 +17,12 @@ export const OpenWorkspaceErrorView: React.FC<Props> = ({
   onNewWorkspaceClick,
   openWorkspace,
   isOpeningWorkspaceLoading,
+  analyticEventSource,
 }) => {
+  useEffect(() => {
+    trackLocalWorkspaceCreationConflictShown("config_missing_open_existing_attempted", analyticEventSource);
+  }, [analyticEventSource]);
+
   return (
     <>
       <WorkspaceCreationErrorView

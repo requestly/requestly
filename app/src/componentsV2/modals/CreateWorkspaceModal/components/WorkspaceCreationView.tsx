@@ -10,7 +10,7 @@ import { toast } from "utils/Toast";
 interface Props {
   workspaceType: WorkspaceType;
   analyticEventSource: string;
-  isOpenedInModal: boolean;
+  isOpenedInModal?: boolean;
   callback?: () => void;
   onCancel: () => void;
 }
@@ -49,6 +49,7 @@ export const WorkspaceCreationView: React.FC<Props> = ({
               currentSelectedFolderPathRef.current = null;
               setError(null);
             }}
+            analyticEventSource={analyticEventSource}
           />
         );
     }
