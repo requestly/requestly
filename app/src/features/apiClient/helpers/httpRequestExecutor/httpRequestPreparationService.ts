@@ -46,9 +46,9 @@ export class HttpRequestPreparationService {
     const urlObject = new URL(normalizedUrl);
     let pathname = urlObject.pathname;
 
-    const varRegex = getPathVariableRegex(false);
+    const variableRegex = getPathVariableRegex(false);
 
-    pathname = pathname.replace(varRegex, (match, varName, offset, string) => {
+    pathname = pathname.replace(variableRegex, (match, varName, offset, string) => {
       // Ignore colons preceded by alphanumerics (e.g. "f:uuid")
       // We escape it so it passes as the literal text "f:uuid"
       if (offset > 0 && /\w/.test(string[offset - 1])) {
