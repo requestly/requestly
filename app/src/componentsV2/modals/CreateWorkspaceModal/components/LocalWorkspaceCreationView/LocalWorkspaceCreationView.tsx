@@ -23,12 +23,12 @@ type FolderItem = {
   name: string;
   path: string;
 } & (
-  | {
+    | {
       type: "directory";
       contents: FolderItem[];
     }
-  | { type: "file" }
-);
+    | { type: "file" }
+  );
 
 interface FolderPreview {
   success: boolean;
