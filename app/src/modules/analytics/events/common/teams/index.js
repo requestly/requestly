@@ -114,3 +114,15 @@ export const trackMultiWorkspaceDeselected = (source) => {
 export const trackManageWorkspaceClicked = (source) => {
   trackEvent(TEAMS.MANAGE_WORKSPACE_CLICKED, { source });
 };
+
+export const trackNewTeamCreationWorkflowStarted = (type, source) => {
+  trackEvent(TEAMS.NEW_TEAM_CREATION_WORKFLOW_STARTED, { type, source });
+};
+
+export const trackLocalWorkspaceCreationConflictShown = (conflict_type, source) => {
+  trackEvent(TEAMS.LOCAL_WORKSPACE_CREATION_CONFLICT_SHOWN, { conflict_type, source });
+};
+
+export const trackLocalWorkspaceCreationModeSelected = (mode, source) => {
+  trackEvent(TEAMS.LOCAL_WORKSPACE_CREATION_MODE_SELECTED, { mode, source });
+};

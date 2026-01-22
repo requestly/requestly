@@ -9,6 +9,7 @@ import { ErrorCode } from "errors/types";
 import { workspaceActions } from "store/slices/workspaces/slice";
 import * as Sentry from "@sentry/react";
 import { FileSystemError } from "features/apiClient/helpers/modules/sync/local/services/types";
+import { trackNewTeamCreateFailure, trackNewTeamCreateSuccess } from "modules/analytics/events/features/teams";
 
 interface UseOpenLocalWorkspaceParams {
   analyticEventSource: string;
@@ -73,7 +74,9 @@ export const useOpenLocalWorkspace = ({
         dispatch(workspaceActions.upsertWorkspace(workspace));
         await handleWorkspaceSwitch(workspace.id, workspace.name);
         onOpenWorkspaceCallback?.();
+        trackNewTeamCreateSuccess(workspace.id, workspace.name, analyticEventSource, WorkspaceType.LOCAL);
       } catch (error) {
+        trackNewTeamCreateFailure("Untitled", WorkspaceType.LOCAL);
         onError?.(error.cause);
         Sentry.captureException(error, {
           extra: {
@@ -84,7 +87,7 @@ export const useOpenLocalWorkspace = ({
         setIsLoading(false);
       }
     },
-    [dispatch, handleWorkspaceSwitch, onOpenWorkspaceCallback, onError]
+    [dispatch, handleWorkspaceSwitch, onOpenWorkspaceCallback, onError, analyticEventSource]
   );
 
   return {
