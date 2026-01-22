@@ -219,9 +219,14 @@ const AppModeInitializer = () => {
       window.RQ.DESKTOP.SERVICES.IPC.registerEvent("initiate-app-close", () => {
         navigate(PATHS.DESKTOP.QUIT.ABSOLUTE);
       });
+
+      return () => {
+        window.RQ.DESKTOP.SERVICES.IPC.unregisterEvent("deeplink-handler");
+        window.RQ.DESKTOP.SERVICES.IPC.unregisterEvent("initiate-app-close");
+      };
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [appMode]);
 
   const closeConnectedAppsModal = useCallback(
     (props = {}) => {

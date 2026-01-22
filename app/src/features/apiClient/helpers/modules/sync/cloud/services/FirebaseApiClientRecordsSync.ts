@@ -23,6 +23,7 @@ import { SavedRunConfig } from "features/apiClient/commands/collectionRunner/typ
 import { RunResult, SavedRunResult } from "features/apiClient/store/collectionRunResult/runResult.store";
 import { batchCreateCollectionRunDetailsInFirebase } from "backend/apiClient/batchCreateCollectionRunDetailsInFirebase";
 import { apiRecordsRankingManager } from "features/apiClient/helpers/RankingManager";
+import { SentryCustomSpan } from "utils/sentry";
 
 export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<ApiClientCloudMeta> {
   meta: ApiClientCloudMeta;
@@ -70,6 +71,13 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
     return this.updateRecord({ id, name: newName }, id, RQAPI.RecordType.COLLECTION);
   }
 
+  @SentryCustomSpan({
+    name: "api_client.cloud.repository.createRecord",
+    op: "repository.create",
+    attributes: {
+      "_attribute.repo_type": "cloud",
+    },
+  })
   async createRecord(record: Partial<RQAPI.ApiClientRecord>) {
     return upsertApiRecord(this.meta.uid, record, this.meta.teamId);
   }
@@ -82,6 +90,13 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
     return upsertApiRecord(this.meta.uid, record, this.meta.teamId, id);
   }
 
+  @SentryCustomSpan({
+    name: "api_client.cloud.repository.updateRecord",
+    op: "repository.update",
+    attributes: {
+      "_attribute.repo_type": "cloud",
+    },
+  })
   async updateRecord(record: Partial<RQAPI.ApiClientRecord>, id: string, type?: RQAPI.ApiClientRecord["type"]) {
     if (!record.rank) {
       const existingRecord = await this.getRecord(id);
