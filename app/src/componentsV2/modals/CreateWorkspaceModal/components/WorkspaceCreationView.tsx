@@ -9,12 +9,19 @@ import { toast } from "utils/Toast";
 
 interface Props {
   workspaceType: WorkspaceType;
+  analyticEventSource: string;
+  isOpenedInModal: boolean;
   callback?: () => void;
   onCancel: () => void;
-  analyticEventSource: string;
 }
 
-export const WorkspaceCreationView: React.FC<Props> = ({ workspaceType, analyticEventSource, callback, onCancel }) => {
+export const WorkspaceCreationView: React.FC<Props> = ({
+  workspaceType,
+  analyticEventSource,
+  callback,
+  onCancel,
+  isOpenedInModal,
+}) => {
   const [error, setError] = useState<ErrorCode | null>(null);
   const currentSelectedFolderPathRef = useRef<string | null>(null);
 
@@ -60,6 +67,7 @@ export const WorkspaceCreationView: React.FC<Props> = ({ workspaceType, analytic
           onCreateWorkspaceClick={createWorkspace}
           isLoading={isLoading}
           onCancel={onCancel}
+          isOpenedInModal={isOpenedInModal}
         />
       )}
     </>

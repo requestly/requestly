@@ -22,7 +22,7 @@ interface OptionsProps {
   isOpeningWorkspaceLoading: boolean;
   isOpenedInModal?: boolean;
   onCreateWorkspaceClick: () => void;
-  onCreationCallback: () => void;
+  onCreationCallback?: () => void;
 }
 
 export const LocalWorkspaceCreateOptions: React.FC<OptionsProps> = ({
@@ -68,35 +68,39 @@ export const LocalWorkspaceCreateOptions: React.FC<OptionsProps> = ({
     [isOpenedInModal, onCreateWorkspaceClick, isLoading, createWorkspace, openWorkspace, isOpeningWorkspaceLoading]
   );
 
-  return options
-    .filter((option) => !option.hidden)
-    .map((option) => (
-      <RQButton
-        size="large"
-        block
-        key={option.id}
-        className={clsx(
-          "local-workspace-create-options__option",
-          option.isPrimary && "local-workspace-create-options__option--primary"
-        )}
-        loading={option.isLoading}
-        onClick={(e) => {
-          e.stopPropagation();
-          option.onClick();
-        }}
-      >
-        <div className="local-workspace-create-options__option-title">
-          {option.icon}
-          {option.title}
-          <Tooltip title={option.info} color="#000" placement="right">
-            <MdInfoOutline />
-          </Tooltip>
-        </div>
-        {option.id === WorkspaceCreationMode.QUICK_START && (
-          <span className="local-workspace-create-options__option-arrow">
-            <IoMdArrowForward />
-          </span>
-        )}
-      </RQButton>
-    ));
+  return (
+    <div className="local-workspace-create-options__options-container">
+      {options
+        .filter((option) => !option.hidden)
+        .map((option) => (
+          <RQButton
+            size="large"
+            block
+            key={option.id}
+            className={clsx(
+              "local-workspace-create-options__option",
+              option.isPrimary && "local-workspace-create-options__option--primary"
+            )}
+            loading={option.isLoading}
+            onClick={(e) => {
+              e.stopPropagation();
+              option.onClick();
+            }}
+          >
+            <div className="local-workspace-create-options__option-title">
+              {option.icon}
+              {option.title}
+              <Tooltip title={option.info} color="#000" placement="right">
+                <MdInfoOutline />
+              </Tooltip>
+            </div>
+            {option.id === WorkspaceCreationMode.QUICK_START && !option.isLoading && (
+              <span className="local-workspace-create-options__option-arrow">
+                <IoMdArrowForward />
+              </span>
+            )}
+          </RQButton>
+        ))}
+    </div>
+  );
 };
