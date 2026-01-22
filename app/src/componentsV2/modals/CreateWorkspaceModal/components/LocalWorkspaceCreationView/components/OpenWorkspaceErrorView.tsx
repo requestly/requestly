@@ -19,8 +19,9 @@ export const OpenWorkspaceErrorView: React.FC<Props> = ({
   return (
     <>
       <WorkspaceCreationErrorView
-        title="Workspace already exists in this folder"
-        description="This folder already contains Requestly workspace files. You can continue using the existing workspace or choose a different folder."
+        title="Workspace couldn’t be opened"
+        description="We couldn’t find the workspace config file (requestly.json) in this folder. 
+This error usually occurs when the wrong folder is selected, or if you've selected a subfolder instead of the workspace root."
         path={path}
         actions={
           <>
