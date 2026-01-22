@@ -169,33 +169,27 @@ export const switchContext = createAsyncThunk(
 );
 
 async function switchToPrivateWorkspace() {
-  try {
-    const rootState = reduxStore.getState();
-    const appMode = getAppMode(rootState);
-    const user = getUserAuthDetails(rootState);
-    const isSharedWorkspaceMode = isActiveWorkspaceShared(rootState);
+  const rootState = reduxStore.getState();
+  const appMode = getAppMode(rootState);
+  const user = getUserAuthDetails(rootState);
+  const isSharedWorkspaceMode = isActiveWorkspaceShared(rootState);
 
-    await switchWorkspace(
-      {
-        teamId: null,
-        teamName: dummyPersonalWorkspace.name,
-        teamMembersCount: 0,
-        workspaceType: WorkspaceType.PERSONAL,
-      },
-      reduxStore.dispatch,
-      {
-        isSyncEnabled: user?.details?.isSyncEnabled || false,
-        isWorkspaceMode: isSharedWorkspaceMode,
-      },
-      appMode,
-      undefined, // setLoader
-      "switch_context_thunk" // source
-    );
-  } catch (error) {
-    throw new NativeError("Failed to switch to private workspace").addContext({
-      error: error instanceof Error ? error.message : String(error),
-    });
-  }
+  await switchWorkspace(
+    {
+      teamId: null,
+      teamName: dummyPersonalWorkspace.name,
+      teamMembersCount: 0,
+      workspaceType: WorkspaceType.PERSONAL,
+    },
+    reduxStore.dispatch,
+    {
+      isSyncEnabled: user?.details?.isSyncEnabled || false,
+      isWorkspaceMode: isSharedWorkspaceMode,
+    },
+    appMode,
+    undefined, // setLoader
+    "switch_context_thunk" // source
+  );
 }
 
 function isWorkspaceDeletedError(error: Error) {

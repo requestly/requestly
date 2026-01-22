@@ -1,5 +1,6 @@
 import type React from "react";
 import { useCallback, useMemo, useState } from "react";
+import * as Sentry from "@sentry/react";
 import { InlineInput } from "componentsV2/InlineInput/InlineInput";
 import { Input, notification, Tabs } from "antd";
 import ReactMarkdown from "react-markdown";
@@ -58,6 +59,10 @@ export const CollectionOverview: React.FC<CollectionOverviewProps> = ({ collecti
 
         entity.setName(updatedCollectionName);
       } catch (error) {
+        Sentry.captureException(error instanceof Error ? error : new Error(String(error)), {
+          tags: { feature: "api_client", component: "collection_overview", action: "update_name" },
+          extra: { collectionId },
+        });
         notification.error({
           message: `Failed to update collection name.`,
           description: error instanceof Error ? error.message : "Unknown error",
@@ -84,6 +89,10 @@ export const CollectionOverview: React.FC<CollectionOverviewProps> = ({ collecti
 
         entity.setDescription(value);
       } catch (error) {
+        Sentry.captureException(error instanceof Error ? error : new Error(String(error)), {
+          tags: { feature: "api_client", component: "collection_overview", action: "update_description" },
+          extra: { collectionId },
+        });
         notification.error({
           message: `Failed to update collection description.`,
           description: error instanceof Error ? error.message : "Unknown error",

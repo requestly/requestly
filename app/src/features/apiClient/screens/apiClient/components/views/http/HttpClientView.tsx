@@ -461,19 +461,9 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
     }
     const originState = entity.origin.getEntityFromState(store.getState());
     store.dispatch(
-      bufferActions.syncFromSource({
+      bufferActions.revertChanges({
         referenceId: entity.meta.referenceId!,
         sourceData: originState,
-      })
-    );
-    // Clear diff to fully revert
-    store.dispatch(
-      bufferActions.unsafePatch({
-        id: entity.id,
-        patcher: (entry) => {
-          entry.diff = {};
-          entry.isDirty = false;
-        },
       })
     );
   }, [entity, store]);

@@ -1,5 +1,6 @@
 import type React from "react";
 import { useState, useCallback, useMemo, useRef } from "react";
+import * as Sentry from "@sentry/react";
 import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
 import { EnvironmentVariableType } from "backend/environment/types";
 import type { EnvironmentVariables } from "backend/environment/types";
@@ -116,6 +117,10 @@ export const VariablesList: React.FC<VariablesListProps> = ({
         variables.set({ id: row.id, [fieldChanged]: row[fieldChanged] });
       } catch (error) {
         console.error("Failed to update variable", error);
+        Sentry.captureException(error instanceof Error ? error : new Error(String(error)), {
+          tags: { feature: "api_client", component: "variables_list" },
+          extra: { variableId: row.id, fieldChanged },
+        });
         // Error is handled silently as it's a local state update
       }
     },

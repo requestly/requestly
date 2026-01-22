@@ -6,7 +6,7 @@ import { MatchedTabSource, TabSourceMetadata } from "componentsV2/Tabs/types";
 import { MdOutlineSyncAlt } from "@react-icons/all-files/md/MdOutlineSyncAlt";
 import { GrGraphQl } from "@react-icons/all-files/gr/GrGraphQl";
 import { ReactNode } from "react";
-import { getApiClientFeatureContext, selectRecordById } from "features/apiClient/slices";
+import { getApiClientFeatureContext, selectRecordById, EntityNotFound } from "features/apiClient/slices";
 
 interface RequestViewTabSourceMetadata extends TabSourceMetadata {
   apiEntryDetails?: RQAPI.ApiRecord;
@@ -36,7 +36,7 @@ export class RequestViewTabSource extends BaseTabSource {
     const state = ctx.store.getState();
     const record = selectRecordById(state, requestId);
     if (!record) {
-      throw new Error(`Request with id ${requestId} not found in store`);
+      throw new EntityNotFound(requestId, "request");
     }
 
     return new RequestViewTabSource({ id: requestId, title: "Request", context: { id: ctx.workspaceId } });

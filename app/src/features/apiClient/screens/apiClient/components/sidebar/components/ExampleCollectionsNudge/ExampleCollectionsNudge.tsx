@@ -1,5 +1,6 @@
 // app/src/features/apiClient/screens/apiClient/components/sidebar/components/ExampleCollectionsNudge/ExampleCollectionsNudge.tsx
 
+import * as Sentry from "@sentry/react";
 import type { EnvironmentData } from "backend/environment/types";
 import exampleEnvironments from "features/apiClient/exampleCollections/examples/environments.json";
 import { useApiClientRepository } from "features/apiClient/slices";
@@ -54,6 +55,9 @@ export const ExampleCollectionsNudge: React.FC<ExampleCollectionsNudgeProps> = (
 
     // Prepare dependencies
     if (!syncRepository) {
+      Sentry.captureException(new Error("Repository not available in ExampleCollectionsNudge"), {
+        tags: { feature: "api_client", component: "example_collections_nudge" },
+      });
       toast.error("Repository not available. Please try again.");
       return;
     }
