@@ -128,7 +128,7 @@ const createExampleCollectionsStore = () => {
             });
             proccessedData.environments = proccessedData.environments.map((r) => markAsExample(r)) as EnvironmentData[];
 
-            const recordsToImport = [...proccessedData.apis, ...proccessedData.collections];
+            const recordsToImport = [...proccessedData.collections, ...proccessedData.apis];
 
             // TODO: extract into a command
             const recordsResult = await respository.apiClientRecordsRepository.batchCreateRecordsWithExistingId(
