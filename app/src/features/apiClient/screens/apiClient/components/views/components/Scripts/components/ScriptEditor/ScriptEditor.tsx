@@ -10,7 +10,7 @@ import { EditorView } from "@codemirror/view";
 import "./scriptEditor.scss";
 import { LibraryPickerPopover, insertImportStatement, getImportedPackageCount } from "../LibraryPicker";
 import { ExternalPackage } from "features/apiClient/helpers/modules/scriptsV2/worker/script-internals/scriptExecutionWorker/globals/packageTypes";
-import { trackPackageAdded } from "features/apiClient/helpers/modules/scriptsV2/analytics";
+import { trackPackageAdded, trackScriptWritten } from "features/apiClient/helpers/modules/scriptsV2/analytics";
 import { DEFAULT_SCRIPT_VALUES } from "features/apiClient/constants";
 import Editor from "componentsV2/CodeEditor";
 import { experimental_useObject as useObject } from "@ai-sdk/react";
@@ -35,6 +35,7 @@ import {
 } from "modules/analytics/events/features/apiClient";
 import { useAISessionContext } from "features/ai/contexts/AISession";
 import { getChunks } from "@codemirror/merge";
+import { debounce } from "lodash";
 
 const TestGenerationOutputSchema = z.object({
   text: z
@@ -89,6 +90,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
     lastUsedQuery,
     lastGeneratedCode,
     generationMetrics,
+    generationId,
     setLastUsedQuery,
     setLastGeneratedCode,
     getCurrentGenerationId,
@@ -175,6 +177,10 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
           language: "javascript",
         },
         query: lastUsedQuery,
+      },
+      meta: {
+        sessionId,
+        generationId,
       },
     });
     setLastUsedQuery(query);
@@ -412,14 +418,17 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
     );
   }, [isLibraryPickerOpen, handlePackageSelect, importCount, scriptLineCount]);
 
+  const trackChangeMade = useMemo(() => debounce((type) => trackScriptWritten(type), 10_000, { leading: true }), []);
+
   return (
     <div className="api-client-script-editor-container">
       <Editor
         key={`${scriptType}`}
         value={entry?.scripts?.[scriptType] || DEFAULT_SCRIPT_VALUES[scriptType]}
-        handleChange={(value: string) =>
-          onScriptsChange({ ...(entry?.scripts || defaultScripts), [scriptType]: value })
-        }
+        handleChange={(value: string) => {
+          trackChangeMade(scriptType);
+          onScriptsChange({ ...(entry?.scripts || defaultScripts), [scriptType]: value });
+        }}
         language={EditorLanguage.JAVASCRIPT}
         toolbarOptions={{
           title: "",

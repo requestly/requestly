@@ -5,6 +5,7 @@ import { ReactNode } from "react";
 export enum EditorLanguage {
   JAVASCRIPT = "javascript",
   JSON = "json",
+  JSON5 = "json5",
   HTML = "html",
   CSS = "css",
 }
