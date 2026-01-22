@@ -48,7 +48,7 @@ export abstract class ListRankingManager<T> {
    * Sorts records based on their effective ranks
    * Returns a new sorted array without mutating the original
    */
-  sort(records: T[]): T[] {
+  sort<U extends T>(records: U[]): U[] {
     return [...records].sort((a, b) => {
       const aRank = this.getEffectiveRank(a);
       const bRank = this.getEffectiveRank(b);

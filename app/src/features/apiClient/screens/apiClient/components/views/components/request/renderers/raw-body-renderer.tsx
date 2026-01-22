@@ -28,7 +28,7 @@ export function RawBody(props: {
     { leading: true, trailing: true }
   );
 
-  const editorLanguage = contentType === "application/json" ? EditorLanguage.JSON : null;
+  const editorLanguage = contentType === RequestContentType.JSON ? EditorLanguage.JSON5 : null;
 
   return (
     <div className="api-client-code-editor-container api-request-body-editor-container">
@@ -43,7 +43,7 @@ export function RawBody(props: {
         toolbarOptions={{ title: "", options: [editorOptions] }}
         analyticEventProperties={{ source: "api_client" }}
         showOptions={{
-          enablePrettify: contentType === "application/json",
+          enablePrettify: contentType === RequestContentType.JSON,
         }}
       />
     </div>
