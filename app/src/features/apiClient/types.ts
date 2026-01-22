@@ -94,7 +94,8 @@ export namespace RQAPI {
     | "collection_row"
     | "collection_list_empty_state"
     | "api_client_sidebar_header"
-    | "api_client_sidebar";
+    | "api_client_sidebar"
+    | "api_client_home";
 
   export enum RecordType {
     API = "api",
