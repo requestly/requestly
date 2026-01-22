@@ -1,6 +1,6 @@
 import React, { useCallback, useRef, useState } from "react";
 import { FilePicker } from "components/common/FilePicker";
-import { processBrunoCollectionData } from "./utils";
+import { processBrunoCollectionData, ProcessedBrunoData } from "./utils";
 import { toast } from "utils/Toast";
 import { RQButton } from "lib/design-system-v2/components";
 import { ApiClientImporterType, RQAPI } from "features/apiClient/types";
@@ -23,6 +23,9 @@ import { useCommand } from "features/apiClient/commands";
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
 import { useApiClientRepository } from "features/apiClient/contexts/meta";
 import { EnvironmentVariableData } from "features/apiClient/store/variables/types";
+import { apiRecordsRankingManager } from "features/apiClient/helpers/RankingManager";
+import { wrapWithCustomSpan } from "utils/sentry";
+import { SPAN_STATUS_ERROR, SPAN_STATUS_OK } from "@sentry/core";
 
 interface BrunoImporterProps {
   onSuccess?: () => void;
@@ -35,14 +38,11 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
   const [processingStatus, setProcessingStatus] = useState<ProcessingStatus>("idle");
   const [isImporting, setIsImporting] = useState(false);
   const [importError, setImportError] = useState<string | null>(null);
-  const [processedFileData, setProcessedFileData] = useState<{
-    collections: Partial<RQAPI.CollectionRecord>[];
-    apis: Partial<RQAPI.ApiRecord>[];
-    environments: Array<{
-      name: string;
-      variables: Record<string, EnvironmentVariableData>;
-    }>;
-  }>({ collections: [], apis: [], environments: [] });
+  const [processedFileData, setProcessedFileData] = useState<ProcessedBrunoData>({
+    collections: [],
+    apis: [],
+    environments: [],
+  });
 
   const { onSaveRecord } = useNewApiClientContext();
   const { apiClientRecordsRepository } = useApiClientRepository();
@@ -53,85 +53,116 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
   const collectionsCount = useRef(0);
 
   const handleFileDrop = useCallback(
-    (files: File[]) => {
-      setProcessingStatus("processing");
-      setImportError(null);
+    async (files: File[]) => {
+      return wrapWithCustomSpan(
+        {
+          name: "[Transaction] api_client.bruno_import.process_files",
+          op: "api_client.bruno_import.process_files",
+          forceTransaction: true,
+          attributes: {},
+        },
+        async (files: File[]) => {
+          setProcessingStatus("processing");
+          setImportError(null);
 
-      const processFiles = files.map((file) => {
-        return new Promise((resolve, reject) => {
-          const reader = new FileReader();
+          const processFiles = files.map(
+            (
+              file
+            ): Promise<{
+              data: ProcessedBrunoData;
+            }> => {
+              return new Promise((resolve, reject) => {
+                const reader = new FileReader();
 
-          reader.onerror = () => reject(new Error("Could not process the selected file!"));
+                reader.onerror = () => reject(new Error("Could not process the selected file!"));
 
-          reader.onload = () => {
-            try {
-              if (!file.type.includes("json")) {
-                throw new Error("Invalid file. Please upload valid Bruno export files.");
+                reader.onload = () => {
+                  try {
+                    if (!file.type.includes("json")) {
+                      throw new Error("Invalid file. Please upload valid Bruno export files.");
+                    }
+
+                    const fileContent = JSON.parse(reader.result as string);
+                    // Basic validation for Bruno files
+                    if (!fileContent.name || !fileContent.items) {
+                      throw new Error("Invalid Bruno collection format");
+                    }
+
+                    const processedData = processBrunoCollectionData(fileContent, apiClientRecordsRepository);
+                    resolve({ data: processedData });
+                  } catch (error) {
+                    console.error("Error processing Bruno file:", error);
+                    reject(error);
+                  }
+                };
+                reader.readAsText(file);
+              });
+            }
+          );
+
+          await Promise.allSettled(processFiles)
+            .then((results) => {
+              const hasProcessingAllFilesFailed = !results.some((result) => result.status === "fulfilled");
+              if (hasProcessingAllFilesFailed) {
+                throw new Error(
+                  "Could not process the selected files! Please check if the files are valid Bruno export files."
+                );
               }
 
-              const fileContent = JSON.parse(reader.result as string);
-              // Basic validation for Bruno files
-              if (!fileContent.name || !fileContent.items) {
-                throw new Error("Invalid Bruno collection format");
-              }
+              const processedRecords = {
+                collections: [] as Partial<RQAPI.CollectionRecord>[],
+                apis: [] as Partial<RQAPI.ApiRecord>[],
+                environments: [] as Array<{
+                  name: string;
+                  variables: Record<string, EnvironmentVariableData>;
+                }>,
+              };
 
-              const processedData = processBrunoCollectionData(fileContent, apiClientRecordsRepository);
-              resolve({ data: processedData });
-            } catch (error) {
-              console.error("Error processing Bruno file:", error);
-              reject(error);
-            }
-          };
-          reader.readAsText(file);
-        });
-      });
+              results.forEach((result) => {
+                if (result.status === "fulfilled") {
+                  const { collections, apis, environments } = result.value.data;
 
-      Promise.allSettled(processFiles)
-        .then((results) => {
-          const hasProcessingAllFilesFailed = !results.some((result) => result.status === "fulfilled");
-          if (hasProcessingAllFilesFailed) {
-            throw new Error(
-              "Could not process the selected files! Please check if the files are valid Bruno export files."
-            );
-          }
+                  const ranks = apiRecordsRankingManager.getNextRanks(apis, apis);
 
-          const processedRecords = {
-            collections: [] as Partial<RQAPI.CollectionRecord>[],
-            apis: [] as Partial<RQAPI.ApiRecord>[],
-            environments: [] as Array<{
-              name: string;
-              variables: Record<string, EnvironmentVariableData>;
-            }>,
-          };
+                  processedRecords.collections.push(...collections);
+                  processedRecords.apis.push(
+                    ...apis.map((apiRecord, index) => {
+                      // Assign ranks to APIs based on their order in the Bruno export
+                      apiRecord.rank = ranks[index];
+                      return apiRecord;
+                    })
+                  );
+                  processedRecords.environments.push(...environments);
+                  collectionsCount.current += collections.length;
+                  trackImportParsed(
+                    ApiClientImporterType.BRUNO,
+                    processedRecords.collections.length,
+                    processedRecords.apis.length
+                  );
+                }
+              });
 
-          results.forEach((result: any) => {
-            if (result.status === "fulfilled") {
-              const { collections, apis, environments } = result.value.data;
-              processedRecords.collections.push(...collections);
-              processedRecords.apis.push(...apis);
-              processedRecords.environments.push(...environments);
-              collectionsCount.current += collections.length;
-              trackImportParsed(
-                ApiClientImporterType.BRUNO,
-                processedRecords.collections.length,
-                processedRecords.apis.length
-              );
-            }
-          });
+              setProcessedFileData(processedRecords);
+              setProcessingStatus("processed");
+              Sentry.getActiveSpan()?.setStatus({
+                code: SPAN_STATUS_OK,
+              });
+            })
+            .catch((error) => {
+              trackImportParseFailed(ApiClientImporterType.BRUNO, error.message);
+              setImportError(error.message);
+              setProcessingStatus("idle");
 
-          setProcessedFileData(processedRecords);
-          setProcessingStatus("processed");
-        })
-        .catch((error) => {
-          trackImportParseFailed(ApiClientImporterType.BRUNO, error.message);
-          setImportError(error.message);
-          setProcessingStatus("idle");
-
-          Sentry.withScope((scope) => {
-            scope.setTag("error_type", "api_client_bruno_processing");
-            Sentry.captureException(error);
-          });
-        });
+              Sentry.withScope((scope) => {
+                scope.setTag("error_type", "api_client_bruno_processing");
+                Sentry.captureException(error);
+              });
+              Sentry.getActiveSpan()?.setStatus({
+                code: SPAN_STATUS_ERROR,
+              });
+            });
+        }
+      )(files);
     },
     [apiClientRecordsRepository]
   );
@@ -232,52 +263,64 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
     }
   }, [createEnvironment, processedFileData.environments]);
 
-  const handleImportBrunoData = useCallback(() => {
-    setIsImporting(true);
-    Promise.all([handleImportEnvironments(), handleImportCollectionsAndApis()])
-      .then(([importedEnvs, recordsResult]) => {
-        if (
-          recordsResult.importedApisCount === 0 &&
-          importedEnvs === 0 &&
-          recordsResult.importedCollectionsCount === 0
-        ) {
-          notification.error({
-            message: "Failed to import Bruno data",
-            placement: "bottomRight",
+  const handleImportBrunoData = useCallback(async () => {
+    return wrapWithCustomSpan(
+      {
+        name: "[Transaction] api_client.bruno_import.import_data",
+        op: "api_client.bruno_import.import_data",
+        forceTransaction: true,
+        attributes: {},
+      },
+      async () => {
+        setIsImporting(true);
+        await Promise.all([handleImportEnvironments(), handleImportCollectionsAndApis()])
+          .then(([importedEnvs, recordsResult]) => {
+            if (
+              recordsResult.importedApisCount === 0 &&
+              importedEnvs === 0 &&
+              recordsResult.importedCollectionsCount === 0
+            ) {
+              throw new Error("Failed to import Bruno data.");
+            }
+
+            const successMessage = [
+              recordsResult.importedApisCount + recordsResult.importedCollectionsCount > 0
+                ? `${recordsResult.importedApisCount + recordsResult.importedCollectionsCount} collection(s) and api(s)`
+                : null,
+              importedEnvs > 0 ? `${importedEnvs} environment(s)` : null,
+            ]
+              .filter(Boolean)
+              .join(" and ");
+
+            toast.success(`Successfully imported ${successMessage}`);
+
+            trackImportSuccess(
+              ApiClientImporterType.BRUNO,
+              recordsResult.importedCollectionsCount,
+              recordsResult.importedApisCount
+            );
+            onSuccess?.();
+            Sentry.getActiveSpan()?.setStatus({
+              code: SPAN_STATUS_OK,
+            });
+          })
+          .catch((error) => {
+            Logger.error("Bruno data import failed:", error);
+            setImportError("Something went wrong! Couldn't import Bruno data");
+            trackImportFailed(ApiClientImporterType.BRUNO, JSON.stringify(error));
+            Sentry.withScope((scope) => {
+              scope.setTag("error_type", "api_client_bruno_import");
+              Sentry.captureException(error);
+            });
+            Sentry.getActiveSpan()?.setStatus({
+              code: SPAN_STATUS_ERROR,
+            });
+          })
+          .finally(() => {
+            setIsImporting(false);
           });
-          return;
-        }
-
-        const successMessage = [
-          recordsResult.importedApisCount + recordsResult.importedCollectionsCount > 0
-            ? `${recordsResult.importedApisCount + recordsResult.importedCollectionsCount} collection(s) and api(s)`
-            : null,
-          importedEnvs > 0 ? `${importedEnvs} environment(s)` : null,
-        ]
-          .filter(Boolean)
-          .join(" and ");
-
-        toast.success(`Successfully imported ${successMessage}`);
-
-        trackImportSuccess(
-          ApiClientImporterType.BRUNO,
-          recordsResult.importedCollectionsCount,
-          recordsResult.importedApisCount
-        );
-        onSuccess?.();
-      })
-      .catch((error) => {
-        Logger.error("Bruno data import failed:", error);
-        setImportError("Something went wrong! Couldn't import Bruno data");
-        trackImportFailed(ApiClientImporterType.BRUNO, JSON.stringify(error));
-        Sentry.withScope((scope) => {
-          scope.setTag("error_type", "api_client_bruno_import");
-          Sentry.captureException(error);
-        });
-      })
-      .finally(() => {
-        setIsImporting(false);
-      });
+      }
+    )();
   }, [handleImportEnvironments, handleImportCollectionsAndApis, onSuccess]);
 
   const handleResetImport = () => {

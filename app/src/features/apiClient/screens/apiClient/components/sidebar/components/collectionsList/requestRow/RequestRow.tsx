@@ -188,9 +188,15 @@ export const RequestRow: React.FC<Props> = ({
 
           if (result.success) {
             saveOrUpdateRecord(context, result.data);
+          } else {
+            throw new Error("Failed to move record");
           }
         } catch (error) {
-          toast.error("Error moving record");
+          notification.error({
+            message: "Error moving record",
+            description: error?.message || "Unexpected error. Please contact support.",
+            placement: "bottomRight",
+          });
         } finally {
           item.onDropComplete?.();
         }
