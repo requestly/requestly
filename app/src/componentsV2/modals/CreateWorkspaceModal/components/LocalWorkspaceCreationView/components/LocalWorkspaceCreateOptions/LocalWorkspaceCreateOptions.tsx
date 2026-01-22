@@ -94,7 +94,7 @@ export const LocalWorkspaceCreateOptions: React.FC<OptionsProps> = ({
                 <MdInfoOutline />
               </Tooltip>
             </div>
-            {option.id === WorkspaceCreationMode.QUICK_START && (
+            {option.id === WorkspaceCreationMode.QUICK_START && !option.isLoading && (
               <span className="local-workspace-create-options__option-arrow">
                 <IoMdArrowForward />
               </span>
