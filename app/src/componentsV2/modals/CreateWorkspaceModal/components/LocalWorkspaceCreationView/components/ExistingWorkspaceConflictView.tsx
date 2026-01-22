@@ -1,6 +1,9 @@
 import React from "react";
 import { WorkspaceCreationErrorView } from "./WorkspaceCreationErrorView/WorkspaceCreationErrorView";
 import { RQButton } from "lib/design-system-v2/components";
+import { useDispatch } from "react-redux";
+import { globalActions } from "store/slices/global/slice";
+import { useOpenLocalWorkspace } from "features/workspaces/hooks/useOpenLocalWorkspace";
 
 interface Props {
   path: string;
@@ -8,6 +11,14 @@ interface Props {
 }
 
 export const ExistingWorkspaceConflictView: React.FC<Props> = ({ path, onChooseAnotherFolder }) => {
+  const dispatch = useDispatch();
+  const { openWorkspace, isLoading: isOpeningWorkspaceLoading } = useOpenLocalWorkspace({
+    analyticEventSource: "desktop_onboarding",
+    onOpenWorkspaceCallback: () => {
+      dispatch(globalActions.updateIsOnboardingCompleted(true));
+    },
+  });
+
   return (
     <>
       <WorkspaceCreationErrorView
@@ -17,7 +28,9 @@ export const ExistingWorkspaceConflictView: React.FC<Props> = ({ path, onChooseA
         actions={
           <>
             <RQButton onClick={onChooseAnotherFolder}>Choose another folder</RQButton>
-            <RQButton type="primary">Use existing workspace</RQButton>
+            <RQButton type="primary" onClick={() => openWorkspace(path)} loading={isOpeningWorkspaceLoading}>
+              Use existing workspace
+            </RQButton>
           </>
         }
       />
