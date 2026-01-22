@@ -14,7 +14,6 @@ import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { isExtensionInstalled, isSafariBrowser } from "actions/ExtensionActions";
 import ExtensionDeactivationMessage from "components/misc/ExtensionDeactivationMessage";
 import InstallExtensionCTA from "components/misc/InstallExtensionCTA";
-import MonitorMountedTime from "components/common/SentryMonitoring/MonitorMountedTime";
 import { getFilteredRecords } from "./utils";
 import RulesListContentHeader from "./components/RulesListContentHeader/RulesListContentHeader";
 import { useSearchParams } from "react-router-dom";
@@ -68,7 +67,6 @@ const RulesList: React.FC<Props> = () => {
       <>
         {isLoading || isRuleListLoading ? (
           <>
-            <MonitorMountedTime transactionName="new-rules-list-loading" />
             <br /> <SpinnerColumn message="Getting your rules ready" skeletonType="list" />
           </>
         ) : allRecords?.length > 0 ? (

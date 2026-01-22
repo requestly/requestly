@@ -206,7 +206,7 @@ export const MultiEditableCell: React.FC<React.PropsWithChildren<EditableCellPro
 
             {dataIndex === "value" &&
               record?.type === FormDropDownOptions.FILE &&
-              (!Array.isArray(record.value) || record.value.length === 0) && (
+              (!Array.isArray(record?.value) || record?.value?.length === 0) && (
                 <RQButton
                   size="small"
                   type="secondary"
@@ -217,7 +217,7 @@ export const MultiEditableCell: React.FC<React.PropsWithChildren<EditableCellPro
                 </RQButton>
               )}
 
-            {dataIndex === "value" && record?.type === FormDropDownOptions.FILE && record.value.length > 0 && (
+            {dataIndex === "value" && record?.type === FormDropDownOptions.FILE && record?.value?.length > 0 && (
               <FileDropdown
                 MultipartFormEntry={record}
                 onAddMoreFiles={handleAddMoreFiles}
