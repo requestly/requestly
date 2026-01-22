@@ -114,6 +114,11 @@ export const addUrlSchemeIfMissing = (url: string): string => {
   return url;
 };
 
+/**
+ * Creates an empty HTTP API entry with default values.
+ * Note: Default values are hard-coded here. If the schema changes,
+ * these defaults should be updated accordingly.
+ */
 export const getEmptyHttpEntry = (request?: RQAPI.Request): RQAPI.HttpApiEntry => {
   const httpRequest = (request || {}) as RQAPI.HttpRequest;
 

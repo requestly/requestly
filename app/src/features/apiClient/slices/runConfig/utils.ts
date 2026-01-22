@@ -64,7 +64,7 @@ export const fromSavedRunConfig = (
     delay: saved.delay,
     iterations: saved.iterations,
     dataFile: saved.dataFile,
-    ...(timestamps?.createdTs && { createdTs: timestamps.createdTs }),
-    ...(timestamps?.updatedTs && { updatedTs: timestamps.updatedTs }),
+    ...(timestamps?.createdTs !== undefined && { createdTs: timestamps.createdTs }),
+    ...(timestamps?.updatedTs !== undefined && { updatedTs: timestamps.updatedTs }),
   };
 };

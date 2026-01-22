@@ -130,7 +130,7 @@ export const CollectionRow: React.FC<Props> = ({
       default:
         console.warn(`Unknown export type: ${exportType}`);
     }
-  }, []);
+  }, [record.id, workspaceId]);
 
   const getCollectionOptions = useCallback(
     (record: RQAPI.CollectionRecord) => {

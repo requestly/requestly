@@ -178,7 +178,7 @@ const hydrationTransformer = createTransform<
   (i) => {
     const collections = pickBy(i.entities, (e) => e?.type === RQAPI.RecordType.COLLECTION);
     const entities = mapValues(collections, (c) => {
-      const persistedData = ApiClientVariables.perist(
+      const persistedData = ApiClientVariables.persist(
         c.data.variables,
         {
           isPersisted: true, // always persist collection variables

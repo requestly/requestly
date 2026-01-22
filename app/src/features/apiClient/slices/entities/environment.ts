@@ -83,6 +83,8 @@ export class EnvironmentEntity<M extends ApiClientEntityMeta = ApiClientEntityMe
 
   /**
    * Set this environment as the active environment.
+   * Note: This method dispatches directly to the Redux store, which is the standard
+   * pattern for entity classes. The dispatch is handled by the entity's dispatch function.
    */
   setAsActive(): void {
     this.dispatch(environmentsActions.setActiveEnvironment(this.id));

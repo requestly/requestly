@@ -11,7 +11,13 @@ import { BufferedApiClientEntity, BufferedApiClientEntityMeta } from "./factory"
 export class BufferedEnvironmentEntity
   extends EnvironmentEntity<BufferedApiClientEntityMeta>
   implements BufferedApiClientEntity {
-  origin = new EnvironmentEntity(this.dispatch, { id: this.meta.referenceId });
+  origin: EnvironmentEntity;
+
+  constructor(public readonly dispatch: EntityDispatch, public readonly meta: BufferedApiClientEntityMeta) {
+    super(dispatch, meta);
+
+    this.origin = new EnvironmentEntity(this.dispatch, { id: this.meta.referenceId });
+  }
   readonly variables = new ApiClientVariables<EnvironmentRecord, ApiClientRootState>(
     (e) => e.variables,
     (e) => e.variablesOrder,

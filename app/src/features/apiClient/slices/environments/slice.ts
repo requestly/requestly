@@ -149,7 +149,7 @@ const hydrationTransformer = createTransform<
   (inboundState) => {
     const inboundEntities = pickBy(inboundState.entities, (e) => !!e);
     const entities = mapValues(inboundEntities, (env) => {
-      const persistedData = ApiClientVariables.perist(
+      const persistedData = ApiClientVariables.persist(
         env.variables,
         {
           isPersisted: true, // always persist environment variables
@@ -199,7 +199,7 @@ const globalEnvHydrationTransformer = createTransform<
         variablesOrder: [],
       };
     }
-    const persistedData = ApiClientVariables.perist(
+    const persistedData = ApiClientVariables.persist(
       inboundState.variables,
       {
         isPersisted: true,
