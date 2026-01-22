@@ -298,9 +298,6 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
           .then((results) => {
             const [environmentsResult, collectionsResult] = results;
 
-            console.log("collectionsResult", collectionsResult);
-            console.log("environmentsResult", environmentsResult);
-
             if (collectionsResult.status === "rejected") {
               Sentry.withScope((scope) => {
                 scope.setTag("error_type", "api_client_postman_import_collections_failed");
