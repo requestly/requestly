@@ -111,8 +111,10 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
       .then(() => {
         return { success: true as true, data: newRecord };
       })
-      .catch((e) => {
-        return { success: false, data: null, message: e.message };
+      .catch((err) => {
+        // removed success false response, as it was marked as fullfilled instead of rejection hence thrown error
+        captureException(err);
+        throw err;
       });
   }
 
