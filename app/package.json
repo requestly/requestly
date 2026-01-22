@@ -118,7 +118,7 @@
     "jsoneditor": "^9.7.3",
     "jsoneditor-react": "^3.1.2",
     "jwt-decode": "^4.0.0",
-    "lodash": "^4.17.21",
+    "lodash": "^4.17.23",
     "lottie-web": "^5.10.0",
     "md5": "^2.3.0",
     "moment": "^2.29.1",
