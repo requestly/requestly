@@ -13,7 +13,6 @@ import { trackCollectionRunnerViewed } from "modules/analytics/events/features/a
 import { CollectionRowOptionsCustomEvent } from "../../../sidebar/components/collectionsList/collectionRow/utils";
 import { ApiClientEntityType } from "features/apiClient/slices/entities/types";
 import { CollectionRunnerView } from "./components/CollectionRunnerView/CollectionRunnerView";
-import { bufferActions } from "features/apiClient/slices";
 
 export const TAB_KEYS = {
   OVERVIEW: "overview",
@@ -88,13 +87,8 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
       }
 
       entity.setName(name);
-      dispatch(
-        bufferActions.markSaved({
-          id: collectionBuffer.id,
-        })
-      );
     },
-    [apiClientRecordsRepository, collectionBuffer.id, collectionId, dispatch, entity]
+    [apiClientRecordsRepository, collectionId, entity]
   );
 
   return (
