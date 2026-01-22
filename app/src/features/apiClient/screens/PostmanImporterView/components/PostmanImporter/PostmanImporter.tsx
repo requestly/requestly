@@ -261,11 +261,12 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
           return newCollection.data.id;
         } else {
           failedCollectionsCount++;
+          return null;
         }
       } catch (error) {
         failedCollectionsCount++;
         Logger.error("Error importing collection:", error);
-        throw error;
+        return null;
       }
     };
 
@@ -301,7 +302,7 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
       } catch (error) {
         failedCollectionsCount++;
         Logger.error("Error importing API:", error);
-        throw error;
+        return null;
       }
     };
 
