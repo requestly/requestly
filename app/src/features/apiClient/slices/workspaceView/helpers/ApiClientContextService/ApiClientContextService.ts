@@ -354,12 +354,13 @@ class ApiClientContextService {
     });
   }
 
-  async createContext(workspace: WorkspaceInfo, userDetails: UserDetails): Promise<ApiClientFeatureContext> {
+  async createContext(workspace: WorkspaceInfo, userDetails: UserDetails): Promise<void> {
     const workspaceId = workspace.id;
 
+    const currentCtxVersion = this.contextRegistry.getVersion();
     const existing = this.contextRegistry.getContext(workspaceId);
     if (existing) {
-      return existing;
+      return;
     }
 
     const repo = this.createRepository({ workspaceId, workspaceMeta: workspace.meta, user: userDetails });
@@ -422,9 +423,7 @@ class ApiClientContextService {
     });
 
     const ctx: ApiClientFeatureContext = { workspaceId, store, repositories: repo };
-    this.contextRegistry.addContext(ctx);
-
-    return ctx;
+    this.contextRegistry.addContext(ctx, currentCtxVersion);
   }
 
   async refreshContext(workspaceId: ApiClientFeatureContext["workspaceId"]): Promise<void> {

@@ -94,7 +94,7 @@ export const addWorkspaceIntoView = createAsyncThunk(
   `${SLICE_NAME}/addWorkspaceIntoView`,
   async (params: { workspace: WorkspaceInfo; userDetails: UserDetails }) => {
     const { workspace, userDetails } = params;
-    await apiClientContextService.createContext(workspace, userDetails);
+    return apiClientContextService.createContext(workspace, userDetails);
   }
 );
 
@@ -158,13 +158,13 @@ const singleToMultiView = createAsyncThunk(
 
 export const switchContext = createAsyncThunk(
   `${SLICE_NAME}/switchContext`,
-  async (params: { workspace: WorkspaceInfo; userId?: string }, { dispatch }) => {
+  async (params: { workspace: WorkspaceInfo; userId?: string }, { dispatch, rejectWithValue }) => {
     const { workspace, userId } = params;
     apiClientContextRegistry.clearAll();
     dispatch(workspaceViewActions.resetToSingleView());
 
     const userDetails = getUserDetails(userId);
-    return dispatch(addWorkspaceIntoView({ workspace, userDetails })).unwrap();
+    return dispatch(addWorkspaceIntoView({ workspace, userDetails }));
   }
 );
 
