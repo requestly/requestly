@@ -8,6 +8,7 @@ import { isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 import { getAppMode } from "store/selectors";
 import * as Sentry from "@sentry/react";
 import { ErrorCode } from "errors/types";
+import { trackNewTeamCreateFailure, trackNewTeamCreateSuccess } from "modules/analytics/events/features/teams";
 
 interface UseCreateDefaultWorkspaceParams {
   analyticEventSource: string;
@@ -70,11 +71,13 @@ export const useCreateDefaultLocalWorkspace = ({
       dispatch(workspaceActions.upsertWorkspace(localWorkspace));
       await handleWorkspaceSwitch(partialWorkspace.id, partialWorkspace.name);
       onCreateWorkspaceCallback?.();
+      trackNewTeamCreateSuccess(partialWorkspace.id, partialWorkspace.name, analyticEventSource, WorkspaceType.LOCAL);
     } catch (error) {
       if (error.cause?.code === ErrorCode.EntityAlreadyExists && error.cause.metadata?.workspaceId) {
         await handleWorkspaceSwitch(error.cause.metadata.workspaceId, "Default Workspace");
         onCreateWorkspaceCallback?.();
       } else {
+        trackNewTeamCreateFailure("Default Workspace", WorkspaceType.LOCAL);
         onError?.(error);
         Sentry.captureException(error, {
           extra: {
@@ -85,7 +88,7 @@ export const useCreateDefaultLocalWorkspace = ({
     } finally {
       setIsLoading(false);
     }
-  }, [dispatch, handleWorkspaceSwitch, onCreateWorkspaceCallback, onError]);
+  }, [dispatch, handleWorkspaceSwitch, onCreateWorkspaceCallback, onError, analyticEventSource]);
 
   return {
     isLoading,

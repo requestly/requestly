@@ -28,7 +28,7 @@ export const WelcomeCard: React.FC<Props> = ({ onFeatureClick }) => {
   const [openWorkspaceError, setOpenWorkspaceError] = useState<FileSystemError | null>(null);
 
   const { createWorkspace, isLoading } = useCreateDefaultLocalWorkspace({
-    analyticEventSource: "desktop_onboarding",
+    analyticEventSource: "desktop_onboarding_modal",
     onCreateWorkspaceCallback: () => {
       trackDesktopOnboardingStepSkipped(OnboardingStep.FEATURE_SELECTION);
       dispatch(globalActions.updateIsOnboardingCompleted(true));
@@ -36,7 +36,7 @@ export const WelcomeCard: React.FC<Props> = ({ onFeatureClick }) => {
   });
 
   const { openWorkspace, isLoading: isOpeningWorkspaceLoading } = useOpenLocalWorkspace({
-    analyticEventSource: "desktop_onboarding",
+    analyticEventSource: "desktop_onboarding_modal",
     onOpenWorkspaceCallback: () => {
       dispatch(globalActions.updateIsOnboardingCompleted(true));
     },
@@ -46,6 +46,9 @@ export const WelcomeCard: React.FC<Props> = ({ onFeatureClick }) => {
   });
 
   const handleApiClientCardExpandToggle = () => {
+    if (!isApiClientCardExpanded) {
+      trackDesktopOnboardingFeatureSelected("api_client");
+    }
     setIsApiClientCardExpanded((prev) => !prev);
   };
 
@@ -57,6 +60,7 @@ export const WelcomeCard: React.FC<Props> = ({ onFeatureClick }) => {
           onNewWorkspaceClick={() => onFeatureClick(OnboardingStep.FOLDER_SELECTION)}
           openWorkspace={openWorkspace}
           isOpeningWorkspaceLoading={isOpeningWorkspaceLoading}
+          analyticEventSource="desktop_onboarding_modal"
         />
       </div>
     );
@@ -108,7 +112,7 @@ export const WelcomeCard: React.FC<Props> = ({ onFeatureClick }) => {
                 <m.div {...collapseExpandTransition}>
                   <div className="api-client-onboard-card__options-container">
                     <LocalWorkspaceCreateOptions
-                      analyticEventSource="desktop_onboarding"
+                      analyticEventSource="desktop_onboarding_modal"
                       onCreateWorkspaceClick={() => onFeatureClick(OnboardingStep.FOLDER_SELECTION)}
                       onCreationCallback={() => {
                         dispatch(globalActions.updateIsOnboardingCompleted(true));

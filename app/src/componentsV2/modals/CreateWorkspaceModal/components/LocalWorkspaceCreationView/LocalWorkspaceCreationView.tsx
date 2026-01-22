@@ -16,17 +16,19 @@ import { useDebounce } from "hooks/useDebounce";
 import { WorkspacePathEllipsis } from "features/workspaces/components/WorkspacePathEllipsis";
 import { LocalWorkspaceCreateOptions } from "./components/LocalWorkspaceCreateOptions/LocalWorkspaceCreateOptions";
 import { useOpenLocalWorkspace } from "features/workspaces/hooks/useOpenLocalWorkspace";
+import { FileSystemError } from "features/apiClient/helpers/modules/sync/local/services/types";
+import { OpenWorkspaceErrorView } from "./components/OpenWorkspaceErrorView";
 
 type FolderItem = {
   name: string;
   path: string;
 } & (
-  | {
+    | {
       type: "directory";
       contents: FolderItem[];
     }
-  | { type: "file" }
-);
+    | { type: "file" }
+  );
 
 interface FolderPreview {
   success: boolean;
@@ -67,11 +69,15 @@ export const LocalWorkspaceCreationView = ({
   const [folderPreview, setFolderPreview] = useState<FolderPreview | null>(null);
   const [hasDuplicateWorkspaceName, setHasDuplicateWorkspaceName] = useState(false);
   const [isCreationOptionsVisible, setIsCreationOptionsVisible] = useState(isOpenedInModal ?? false);
+  const [openWorkspaceError, setOpenWorkspaceError] = useState<FileSystemError | null>(null);
 
   const { openWorkspace, isLoading: isOpenWorkspaceLoading } = useOpenLocalWorkspace({
     analyticEventSource: "create_workspace_modal",
     onOpenWorkspaceCallback: () => {
       onCancel();
+    },
+    onError: (error) => {
+      setOpenWorkspaceError(error);
     },
   });
 
@@ -159,6 +165,21 @@ export const LocalWorkspaceCreationView = ({
     }
   }, [folderPreview, checkForDuplicateWorkspaceName]);
 
+  if (openWorkspaceError) {
+    return (
+      <OpenWorkspaceErrorView
+        path={openWorkspaceError.error.path}
+        onNewWorkspaceClick={() => {
+          setOpenWorkspaceError(null);
+          setIsCreationOptionsVisible(false);
+        }}
+        openWorkspace={openWorkspace}
+        isOpeningWorkspaceLoading={isOpenWorkspaceLoading}
+        analyticEventSource="create_workspace_modal"
+      />
+    );
+  }
+
   if (isCreationOptionsVisible) {
     return (
       <>
@@ -168,7 +189,10 @@ export const LocalWorkspaceCreationView = ({
         <div style={{ padding: "12px 0" }}>
           <LocalWorkspaceCreateOptions
             analyticEventSource="create_workspace_modal"
-            onCreateWorkspaceClick={() => setIsCreationOptionsVisible(false)}
+            onCreateWorkspaceClick={() => {
+              setOpenWorkspaceError(null);
+              setIsCreationOptionsVisible(false);
+            }}
             openWorkspace={openWorkspace}
             isOpeningWorkspaceLoading={isOpenWorkspaceLoading}
             isOpenedInModal

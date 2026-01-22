@@ -1,16 +1,22 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { WorkspaceCreationErrorView } from "./WorkspaceCreationErrorView/WorkspaceCreationErrorView";
 import { RQButton } from "lib/design-system-v2/components";
 import { useDispatch } from "react-redux";
 import { globalActions } from "store/slices/global/slice";
 import { useOpenLocalWorkspace } from "features/workspaces/hooks/useOpenLocalWorkspace";
+import { trackLocalWorkspaceCreationConflictShown } from "modules/analytics/events/common/teams";
 
 interface Props {
   path: string;
+  analyticEventSource: string;
   onChooseAnotherFolder: () => void;
 }
 
-export const ExistingWorkspaceConflictView: React.FC<Props> = ({ path, onChooseAnotherFolder }) => {
+export const ExistingWorkspaceConflictView: React.FC<Props> = ({
+  path,
+  analyticEventSource,
+  onChooseAnotherFolder,
+}) => {
   const dispatch = useDispatch();
   const { openWorkspace, isLoading: isOpeningWorkspaceLoading } = useOpenLocalWorkspace({
     analyticEventSource: "desktop_onboarding",
@@ -18,6 +24,10 @@ export const ExistingWorkspaceConflictView: React.FC<Props> = ({ path, onChooseA
       dispatch(globalActions.updateIsOnboardingCompleted(true));
     },
   });
+
+  useEffect(() => {
+    trackLocalWorkspaceCreationConflictShown("config_exists_create_new_attempted", analyticEventSource);
+  }, [analyticEventSource]);
 
   return (
     <>
