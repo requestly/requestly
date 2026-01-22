@@ -34,7 +34,7 @@ import { saveOrUpdateRecord } from "features/apiClient/commands/store.utils";
 import clsx from "clsx";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
-import { getRankForDroppedRecord } from "features/apiClient/helpers/RankingManager/getRankForDroppedRecord";
+import { getRankForDroppedRecord } from "features/apiClient/helpers/RankingManager/utils";
 
 interface Props {
   record: RQAPI.ApiRecord;
