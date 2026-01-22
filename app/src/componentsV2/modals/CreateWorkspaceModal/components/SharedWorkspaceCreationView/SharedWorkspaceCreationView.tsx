@@ -37,6 +37,7 @@ export const SharedWorkspaceCreationView = ({
         title="Create a new team workspace"
         description="Workspaces are where your team collaborate on rules, variables, and mocks."
         onWorkspaceNameChange={setWorkspaceName}
+        hasDuplicateWorkspaceName={false}
       />
       <div className="invite-all-domain-users-container">
         <Checkbox checked={isNotifyAllSelected} onChange={() => setIsNotifyAllSelected(!isNotifyAllSelected)} />{" "}
