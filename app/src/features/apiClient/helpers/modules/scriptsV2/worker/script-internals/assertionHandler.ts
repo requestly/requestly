@@ -2,6 +2,7 @@ import { get as lodashGet } from "lodash";
 import { LocalScopeResponse } from "./types";
 import { verify } from "./utils";
 import Ajv, { Options as AjvOptions } from "ajv";
+import addFormats from "ajv-formats";
 
 export class AssertionHandler {
   constructor(private response: LocalScopeResponse) {}
@@ -116,6 +117,8 @@ export class AssertionHandler {
   haveJsonSchema(expectedSchema: any, isEqualityCheck: boolean, config: AjvOptions): void;
   haveJsonSchema(expectedSchema: any, isEqualityCheck: boolean, config?: AjvOptions): void {
     const ajv = new Ajv(config || { allErrors: true });
+    addFormats(ajv);
+
     const validate = ajv.compile(expectedSchema);
 
     const isValid = validate(this.response?.json());
