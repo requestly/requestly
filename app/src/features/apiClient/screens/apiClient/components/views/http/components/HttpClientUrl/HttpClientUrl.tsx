@@ -52,7 +52,7 @@ const HttpApiClientUrl = ({ entity, onEnterPress, onUrlChange }: ApiClientUrlPro
       entity.setQueryParams(finalParams);
       onUrlChange(value, finalParams);
     },
-    [onUrlChange, queryParams, ]
+    [onUrlChange, queryParams, entity]
   );
 
   return (

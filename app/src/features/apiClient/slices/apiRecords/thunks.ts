@@ -107,11 +107,11 @@ export const deleteRecords = createAsyncThunk<
     };
   },
   {
-    condition: ({ records }) => {
-      getAllRecords(records).forEach(async (r) => {
+    condition: async ({ records }) => {
+      const allRecords = getAllRecords(records);
+      for (const r of allRecords) {
         await reduxStore.dispatch(closeTabByEntityId({ entityId: r.id, skipUnsavedPrompt: true }));
-      });
-
+      }
       return true;
     },
   }

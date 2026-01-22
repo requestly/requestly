@@ -13,8 +13,11 @@ export const isGlobalEnvironment = (environmentId: string) => {
 export const mapToEnvironmentArray = (variables: EnvironmentVariables, order?: string[]): VariableRow[] => {
   // If order is provided, use it
   if (order && order.length > 0) {
-    return order
-      .filter((key) => variables[key]) // Filter out keys that don't exist
+    const orderedKeys = new Set(order);
+
+    // Build ordered list first
+    const orderedVariables = order
+      .filter((key) => key in variables) // Use "in" to detect existing keys even if falsy
       .map(
         (key) =>
           ({
@@ -22,6 +25,19 @@ export const mapToEnvironmentArray = (variables: EnvironmentVariables, order?: s
             ...variables[key],
           } as VariableRow)
       );
+
+    // Append any remaining keys not in order
+    const remainingVariables = Object.keys(variables)
+      .filter((key) => !orderedKeys.has(key))
+      .map(
+        (key) =>
+          ({
+            key,
+            ...variables[key],
+          } as VariableRow)
+      );
+
+    return [...orderedVariables, ...remainingVariables];
   }
 
   // Fallback to Object.keys order (backward compatibility)

@@ -4,7 +4,7 @@ import { RQAPI } from "features/apiClient/types";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { GenericApiClient } from "features/apiClient/screens/apiClient/clientView/GenericApiClient";
 import "./historyView.scss";
-import { ApiClientViewMode, useViewMode } from "features/apiClient/slices";
+import { ApiClientViewMode, getApiClientFeatureContext, useViewMode } from "features/apiClient/slices";
 import { useTabActions } from "componentsV2/Tabs/slice";
 
 export const HistoryView: React.FC = () => {
@@ -31,12 +31,16 @@ export const HistoryView: React.FC = () => {
         return;
       }
 
+      const ctx = getApiClientFeatureContext()
+      
       openBufferedTab({
         source: new RequestViewTabSource({
           id: entryDetails.id,
           apiEntryDetails: entryDetails,
           title: entryDetails.name || entryDetails.data.request?.url,
-          context: {},
+          context: {
+            id: ctx.workspaceId
+          },
         }),
       });
     },

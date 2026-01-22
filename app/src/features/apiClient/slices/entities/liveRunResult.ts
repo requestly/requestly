@@ -43,7 +43,7 @@ export class LiveRunResultEntity<M extends ApiClientEntityMeta = ApiClientEntity
     const result = liveRunResultsAdapter.getSelectors().selectById(liveRunResultsState, this.id);
 
     if (!result) {
-      return createEmptyRunEntry(this.id, "default");
+      return createEmptyRunEntry(this.id);
       // throw new EntityNotFound(this.id, "Live run result not found");
     }
 
@@ -106,7 +106,7 @@ export class LiveRunResultEntity<M extends ApiClientEntityMeta = ApiClientEntity
     );
   }
 
-  resetRun(configId: string): void {
+  resetRun(): void {
     this.dispatch(
       liveRunResultsActions.resetRun({
         collectionId: this.id,
@@ -124,8 +124,8 @@ export class LiveRunResultEntity<M extends ApiClientEntityMeta = ApiClientEntity
     );
   }
 
-  delete(configId: string): void {
-    this.resetRun(configId);
+  delete(): void {
+    this.resetRun();
   }
 
   getRunStatus(state: ApiClientStoreState): RunStatus {

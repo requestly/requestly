@@ -104,11 +104,18 @@ const addWorkspacesIntoMultiView = createAsyncThunk(
     const { workspaces, userId } = params;
     const userDetails = getUserDetails(userId);
 
-    await Promise.allSettled(
+    const results = await Promise.allSettled(
       workspaces.map(async (workspace) => {
         return dispatch(addWorkspaceIntoView({ workspace, userDetails })).unwrap();
       })
     );
+
+    const failures = results.filter((r) => r.status === "rejected");
+    if (failures.length > 0) {
+      console.error(`Failed to add ${failures.length} workspace(s):`, failures);
+      // Optionally show user notification
+      // toast.error(`Some workspaces failed to load`);
+    }
   }
 );
 
@@ -121,7 +128,7 @@ function removeWorkspaceFromView(params: { workspaceId: WorkspaceState["id"] }):
 
     return new Ok(null);
   } catch (error) {
-    return new Err(error);
+    return new Err(error instanceof Error ? error : new Error(String(error)));
   }
 }
 

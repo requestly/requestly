@@ -13,7 +13,7 @@ import { ApiClientImporterType, CreateType } from "features/apiClient/types";
 import { RoleBasedComponent, useRBAC } from "features/rbac";
 import { RQButton, RQTooltip } from "lib/design-system-v2/components";
 import { isEmpty } from "lodash";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
@@ -34,7 +34,10 @@ const ApiClientCard = () => {
   const user = useSelector(getUserAuthDetails);
   const isLoggedIn = user?.details?.isLoggedIn;
   const tabs = useTabs();
-  const [cardOptions] = useState<CardOptions | null>(!isEmpty(tabs) ? getOptions(tabs) : null);
+  const cardOptions = useMemo<CardOptions | null>(
+    () => (!isEmpty(tabs) ? getOptions(tabs) : null),
+    [tabs]
+  );
   const { validatePermission } = useRBAC();
   const { isValidPermission } = validatePermission("api_client_request", "create");
   const isOpenApiSupportEnabled = useFeatureIsOn("openapi-import-support");

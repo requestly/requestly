@@ -195,14 +195,18 @@ export const duplicateEnvironmentInDB = async (
   }
 
   const newEnvironment = await createNonGlobalEnvironmentInDB(ownerId, `${environmentToDuplicate.name} Copy`);
-  return updateEnvironmentInDB(ownerId, newEnvironment.id, {
+
+  const updates = {
     variables: environmentToDuplicate.variables,
-    variablesOrder: environmentToDuplicate.variablesOrder,
-  }).then(() => {
+    ...(environmentToDuplicate.variablesOrder !== undefined && {
+      variablesOrder: environmentToDuplicate.variablesOrder,
+    }),
+  };
+
+  return updateEnvironmentInDB(ownerId, newEnvironment.id, updates).then(() => {
     return {
       ...newEnvironment,
-      variables: environmentToDuplicate.variables,
-      variablesOrder: environmentToDuplicate.variablesOrder,
+      ...updates,
     };
   });
 };

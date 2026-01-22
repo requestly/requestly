@@ -3,6 +3,7 @@ import { BaseTabSource } from "componentsV2/Tabs/helpers/baseTabSource";
 import { MatchedTabSource, TabSourceMetadata } from "componentsV2/Tabs/types";
 import PATHS from "config/constants/sub/paths";
 import { getApiClientFeatureContext } from "features/apiClient/slices";
+import { GLOBAL_ENVIRONMENT_ID } from "features/apiClient/slices/common/constants";
 import { EnvironmentViewManager } from "./EnvironmentViewManager";
 
 interface EnvironmentViewTabSourceMetadata extends TabSourceMetadata {
@@ -34,7 +35,7 @@ export class EnvironmentViewTabSource extends BaseTabSource {
       id: envId,
       title: "Environment",
       context: { id: ctx.workspaceId },
-      isGlobal: false,
+      isGlobal: envId === GLOBAL_ENVIRONMENT_ID,
     });
   }
 }
