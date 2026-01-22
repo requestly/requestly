@@ -22,6 +22,7 @@ export class RuntimeVariablesViewTabSource extends BaseTabSource {
 
   static create(matchedPath: MatchedTabSource["matchedPath"]): RuntimeVariablesViewTabSource {
     const context = getApiClientFeatureContext();
+
     return new RuntimeVariablesViewTabSource({
       id: RUNTIME_VARIABLES_ENTITY_ID,
       title: "Runtime Variables",
