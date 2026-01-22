@@ -225,6 +225,7 @@ export const bufferSlice = createSlice({
           set(entry.diff as object, path, value);
         }
       }
+      entry.isNew = false;
     },
 
     markSaved(
