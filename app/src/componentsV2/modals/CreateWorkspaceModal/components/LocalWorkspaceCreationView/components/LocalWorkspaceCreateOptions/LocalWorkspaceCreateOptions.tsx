@@ -7,6 +7,7 @@ import { Tooltip } from "antd";
 import clsx from "clsx";
 import { useCreateDefaultLocalWorkspace } from "features/workspaces/hooks/useCreateDefaultLocalWorkspace";
 import { RQButton } from "lib/design-system-v2/components";
+import { displayFolderSelector } from "components/mode-specific/desktop/misc/FileDialogButton";
 import "./localWorkspaceCreateOptions.scss";
 
 enum WorkspaceCreationMode {
@@ -17,14 +18,18 @@ enum WorkspaceCreationMode {
 
 interface OptionsProps {
   analyticEventSource: string;
+  openWorkspace: (workspacePath: string) => void;
+  isOpeningWorkspaceLoading: boolean;
   isOpenedInModal?: boolean;
   onCreateWorkspaceClick: () => void;
-  onCreationCallback: () => void;
+  onCreationCallback?: () => void;
 }
 
 export const LocalWorkspaceCreateOptions: React.FC<OptionsProps> = ({
   onCreateWorkspaceClick,
   onCreationCallback,
+  openWorkspace,
+  isOpeningWorkspaceLoading,
   analyticEventSource,
   isOpenedInModal = false,
 }) => {
@@ -32,6 +37,7 @@ export const LocalWorkspaceCreateOptions: React.FC<OptionsProps> = ({
     analyticEventSource,
     onCreateWorkspaceCallback: onCreationCallback,
   });
+
   const options = useMemo(
     () => [
       {
@@ -54,42 +60,47 @@ export const LocalWorkspaceCreateOptions: React.FC<OptionsProps> = ({
         id: WorkspaceCreationMode.OPEN,
         title: "Open existing workspace",
         icon: <PiFolderOpen />,
+        isLoading: isOpeningWorkspaceLoading,
         info: "Already have a workspace? Select the folder to continue working.",
-        onClick: () => {},
+        onClick: () => displayFolderSelector((folderPath: string) => openWorkspace(folderPath)),
       },
     ],
-    [isOpenedInModal, onCreateWorkspaceClick, isLoading, createWorkspace]
+    [isOpenedInModal, onCreateWorkspaceClick, isLoading, createWorkspace, openWorkspace, isOpeningWorkspaceLoading]
   );
 
-  return options
-    .filter((option) => !option.hidden)
-    .map((option) => (
-      <RQButton
-        size="large"
-        block
-        key={option.id}
-        className={clsx(
-          "local-workspace-create-options__option",
-          option.isPrimary && "local-workspace-create-options__option--primary"
-        )}
-        loading={option.isLoading}
-        onClick={(e) => {
-          e.stopPropagation();
-          option.onClick();
-        }}
-      >
-        <div className="local-workspace-create-options__option-title">
-          {option.icon}
-          {option.title}
-          <Tooltip title={option.info} color="#000" placement="right">
-            <MdInfoOutline />
-          </Tooltip>
-        </div>
-        {option.id === WorkspaceCreationMode.QUICK_START && (
-          <span className="local-workspace-create-options__option-arrow">
-            <IoMdArrowForward />
-          </span>
-        )}
-      </RQButton>
-    ));
+  return (
+    <div className="local-workspace-create-options__options-container">
+      {options
+        .filter((option) => !option.hidden)
+        .map((option) => (
+          <RQButton
+            size="large"
+            block
+            key={option.id}
+            className={clsx(
+              "local-workspace-create-options__option",
+              option.isPrimary && "local-workspace-create-options__option--primary"
+            )}
+            loading={option.isLoading}
+            onClick={(e) => {
+              e.stopPropagation();
+              option.onClick();
+            }}
+          >
+            <div className="local-workspace-create-options__option-title">
+              {option.icon}
+              {option.title}
+              <Tooltip title={option.info} color="#000" placement="right">
+                <MdInfoOutline />
+              </Tooltip>
+            </div>
+            {option.id === WorkspaceCreationMode.QUICK_START && !option.isLoading && (
+              <span className="local-workspace-create-options__option-arrow">
+                <IoMdArrowForward />
+              </span>
+            )}
+          </RQButton>
+        ))}
+    </div>
+  );
 };
