@@ -6,6 +6,15 @@ import { ApiClientRecordsInterface } from "features/apiClient/helpers/modules/sy
 import { EnvironmentVariableData } from "features/apiClient/store/variables/types";
 import { createBodyContainer } from "../apiClient/utils";
 
+export type ProcessedBrunoData = {
+  collections: Partial<RQAPI.CollectionRecord>[];
+  apis: Partial<RQAPI.ApiRecord>[];
+  environments: Array<{
+    name: string;
+    variables: Record<string, EnvironmentVariableData>;
+  }>;
+};
+
 export const processBrunoScripts = (request: Bruno.Request) => {
   const scripts = {
     preRequest: request?.script?.req?.replace(/bru\./g, "rq.") || "",
@@ -165,14 +174,7 @@ const createCollectionRecord = (
 export const processBrunoCollectionData = (
   fileContent: Bruno.RootCollection,
   apiClientRecordsRepository: ApiClientRecordsInterface<Record<string, any>>
-): {
-  collections: Partial<RQAPI.CollectionRecord>[];
-  apis: Partial<RQAPI.ApiRecord>[];
-  environments: {
-    name: string;
-    variables: Record<string, EnvironmentVariableData>;
-  }[];
-} => {
+): ProcessedBrunoData => {
   const environments = (fileContent.environments || []).map((env) => ({
     name: env.name,
     variables: env.variables.reduce((acc, variable, index) => {
