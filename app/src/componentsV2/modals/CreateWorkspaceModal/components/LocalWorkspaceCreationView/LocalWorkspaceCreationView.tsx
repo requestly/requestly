@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Tooltip } from "antd";
 import { MdOutlineFolder } from "@react-icons/all-files/md/MdOutlineFolder";
 import { MdOutlineInsertDriveFile } from "@react-icons/all-files/md/MdOutlineInsertDriveFile";
@@ -75,6 +75,8 @@ export const LocalWorkspaceCreationView = ({
     },
   });
 
+  const workspaceNameRef = useRef<string>(workspaceName);
+
   const folderSelectCallback = async (folderPath: string) => {
     setFolderPath(folderPath);
     try {
@@ -114,16 +116,23 @@ export const LocalWorkspaceCreationView = ({
     ));
   };
 
-  const debouncedCheckForDuplicateWorkspaceName = useDebounce((value: string) => {
-    const workspaceName = value.replace(INVALID_FS_NAME_CHARACTERS, "-");
-    const isDuplicate = folderPreview?.existingContents.find((item) => item.name === workspaceName);
-    setHasDuplicateWorkspaceName(!!isDuplicate);
-  });
+  const checkForDuplicateWorkspaceName = useCallback(
+    (value: string) => {
+      const workspaceName = value.replace(INVALID_FS_NAME_CHARACTERS, "-");
+      const isDuplicate = folderPreview?.existingContents.find((item) => item.name === workspaceName);
+      setHasDuplicateWorkspaceName(!!isDuplicate);
+    },
+    [folderPreview]
+  );
+
+  const debouncedCheckForDuplicateWorkspaceName = useDebounce(checkForDuplicateWorkspaceName);
 
   const handleWorkspaceNameChange = useCallback(
     (value: string) => {
-      setWorkspaceName(value.replace(INVALID_FS_NAME_CHARACTERS, "-"));
-      debouncedCheckForDuplicateWorkspaceName(value);
+      const newName = value.replace(INVALID_FS_NAME_CHARACTERS, "-");
+      setWorkspaceName(newName);
+      workspaceNameRef.current = newName;
+      debouncedCheckForDuplicateWorkspaceName(newName);
     },
     [debouncedCheckForDuplicateWorkspaceName]
   );
@@ -143,6 +152,12 @@ export const LocalWorkspaceCreationView = ({
         // No OP
       });
   }, []);
+
+  useEffect(() => {
+    if (folderPreview) {
+      checkForDuplicateWorkspaceName(workspaceNameRef.current);
+    }
+  }, [folderPreview, checkForDuplicateWorkspaceName]);
 
   if (isCreationOptionsVisible) {
     return (

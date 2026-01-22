@@ -12,9 +12,10 @@ export const WorkspacePathEllipsis: React.FC<WorkspacePathEllipsisProps> = ({ pa
   }
 
   const lastSeparatorIndex = Math.max(path.lastIndexOf("/"), path.lastIndexOf("\\"));
+  const hasSplit = lastSeparatorIndex > 0;
 
-  const suffix = lastSeparatorIndex >= 0 ? path.slice(lastSeparatorIndex) : path;
-  const prefix = lastSeparatorIndex >= 0 ? path.slice(0, lastSeparatorIndex) : "";
+  const suffix = hasSplit ? path.slice(lastSeparatorIndex) : "";
+  const prefix = hasSplit ? path.slice(0, lastSeparatorIndex) : path;
 
   return (
     <Typography.Text
