@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useCallback, useMemo } from "react";
 import { IoMdAdd } from "@react-icons/all-files/io/IoMdAdd";
 import { IoMdArrowForward } from "@react-icons/all-files/io/IoMdArrowForward";
 import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
@@ -9,11 +9,16 @@ import { useCreateDefaultLocalWorkspace } from "features/workspaces/hooks/useCre
 import { RQButton } from "lib/design-system-v2/components";
 import { displayFolderSelector } from "components/mode-specific/desktop/misc/FileDialogButton";
 import "./localWorkspaceCreateOptions.scss";
+import { trackDesktopOnboardingFeatureSelected } from "features/onboarding/componentsV2/DesktopOnboardingModal/analytics";
+import {
+  trackLocalWorkspaceCreationModeSelected,
+  trackNewTeamCreationWorkflowStarted,
+} from "modules/analytics/events/common/teams";
 
-enum WorkspaceCreationMode {
+enum LocalWorkspaceCreationMode {
   QUICK_START = "quick_start",
-  CREATE = "create",
-  OPEN = "open",
+  CREATE_WORKSPACE = "create_workspace",
+  OPEN_EXISTING_WORKSPACE = "open_existing_workspace",
 }
 
 interface OptionsProps {
@@ -38,34 +43,63 @@ export const LocalWorkspaceCreateOptions: React.FC<OptionsProps> = ({
     onCreateWorkspaceCallback: onCreationCallback,
   });
 
+  const handleOptionClick = useCallback(
+    (mode: LocalWorkspaceCreationMode) => {
+      if (analyticEventSource === "desktop_onboarding_modal") {
+        trackDesktopOnboardingFeatureSelected(mode);
+      }
+
+      trackNewTeamCreationWorkflowStarted("local", analyticEventSource);
+      trackLocalWorkspaceCreationModeSelected(mode, analyticEventSource);
+    },
+    [analyticEventSource]
+  );
+
   const options = useMemo(
     () => [
       {
-        id: WorkspaceCreationMode.QUICK_START,
+        id: LocalWorkspaceCreationMode.QUICK_START,
         title: "Quick Start",
         info: "Skip the setup. Your APIs will be managed in the Documents folder.",
         isPrimary: true,
         hidden: isOpenedInModal,
         isLoading,
-        onClick: createWorkspace,
+        onClick: () => {
+          handleOptionClick(LocalWorkspaceCreationMode.QUICK_START);
+          createWorkspace();
+        },
       },
       {
-        id: WorkspaceCreationMode.CREATE,
+        id: LocalWorkspaceCreationMode.CREATE_WORKSPACE,
         title: "Create a new workspace",
         icon: <IoMdAdd />,
         info: "Choose where you want to store your project files and data.",
-        onClick: onCreateWorkspaceClick,
+        onClick: () => {
+          handleOptionClick(LocalWorkspaceCreationMode.CREATE_WORKSPACE);
+          onCreateWorkspaceClick();
+        },
       },
       {
-        id: WorkspaceCreationMode.OPEN,
+        id: LocalWorkspaceCreationMode.OPEN_EXISTING_WORKSPACE,
         title: "Open existing workspace",
         icon: <PiFolderOpen />,
         isLoading: isOpeningWorkspaceLoading,
         info: "Already have a workspace? Select the folder to continue working.",
-        onClick: () => displayFolderSelector((folderPath: string) => openWorkspace(folderPath)),
+        onClick: () => {
+          handleOptionClick(LocalWorkspaceCreationMode.OPEN_EXISTING_WORKSPACE);
+          displayFolderSelector((folderPath: string) => openWorkspace(folderPath));
+        },
       },
     ],
-    [isOpenedInModal, onCreateWorkspaceClick, isLoading, createWorkspace, openWorkspace, isOpeningWorkspaceLoading]
+    [
+      isOpenedInModal,
+      onCreateWorkspaceClick,
+      isLoading,
+      createWorkspace,
+      openWorkspace,
+      isOpeningWorkspaceLoading,
+      handleOptionClick,
+    ]
   );
 
   return (
@@ -94,7 +128,7 @@ export const LocalWorkspaceCreateOptions: React.FC<OptionsProps> = ({
                 <MdInfoOutline />
               </Tooltip>
             </div>
-            {option.id === WorkspaceCreationMode.QUICK_START && !option.isLoading && (
+            {option.id === LocalWorkspaceCreationMode.QUICK_START && !option.isLoading && (
               <span className="local-workspace-create-options__option-arrow">
                 <IoMdArrowForward />
               </span>
