@@ -950,6 +950,17 @@ export const checkForLargeFiles = (body: RQAPI.RequestBody): boolean => {
   return false;
 };
 
+export function getPathVariableRegex(includeLookbehind: boolean) {
+  // Allow all characters except URL reserved characters: : / ? # [ ] @ ! $ & ' ( ) * + , ; =
+  // Also exclude whitespace and control characters
+  const variablePattern = /([^:/?#[\]@!$&'()*+,;=\s]+)/;
+  if (includeLookbehind) {
+    // Checks if : is preceded by any word char to ignore it from path variables
+    return new RegExp(`(?<!\\w):${variablePattern.source}`, "g");
+  }
+  return new RegExp(`:${variablePattern.source}`, "g");
+}
+
 export const extractPathVariablesFromUrl = (url: string) => {
   if (!url) {
     return [];
@@ -964,10 +975,7 @@ export const extractPathVariablesFromUrl = (url: string) => {
     return [];
   }
 
-  // Allow all characters except URL reserved characters: : / ? # [ ] @ ! $ & ' ( ) * + , ; =
-  // Also exclude whitespace and control characters for practical reasons
-  // and checks if : is preceded by any alphanumeric value to ignore it form path variables
-  const variablePattern = /(?<![a-zA-Z0-9]):([^:/?#[\]@!$&'()*+,;=\s]+)/g;
+  const variablePattern = getPathVariableRegex(true);
   const variables: string[] = [];
   let match;
 
