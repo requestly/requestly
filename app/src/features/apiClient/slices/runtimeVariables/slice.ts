@@ -5,6 +5,7 @@ import persistReducer from "redux-persist/es/persistReducer";
 import createTransform from "redux-persist/es/createTransform";
 import storage from "redux-persist/lib/storage";
 import { ApiClientVariables } from "../entities/api-client-variables";
+import { pickBy } from "lodash";
 
 const RUNTIME_VARIABLES_ENTITY_ID = "runtime_variables";
 
@@ -63,15 +64,28 @@ const persistTransform = createTransform<
       variablesOrder: persistedData.order,
     };
   },
-  // Outbound: storage -> state (rehydrate) - initialize variablesOrder if missing
+  // Outbound: storage -> state (rehydrate) - filter out non-persisted variables and initialize variablesOrder if missing
   (outboundState) => {
-    if (!outboundState.variablesOrder && outboundState.variables) {
+    if (!outboundState) {
       return {
-        ...outboundState,
-        variablesOrder: Object.keys(outboundState.variables),
+        id: RUNTIME_VARIABLES_ENTITY_ID,
+        variables: {},
+        variablesOrder: [],
       };
     }
-    return outboundState;
+
+    const filteredVariables = pickBy(outboundState.variables || {}, (v) => v.isPersisted === true);
+
+    const variablesOrder =
+      outboundState.variablesOrder || (outboundState.variables ? Object.keys(outboundState.variables) : []);
+
+    const filteredOrder = variablesOrder.filter((key) => key in filteredVariables);
+
+    return {
+      ...outboundState,
+      variables: filteredVariables,
+      variablesOrder: filteredOrder,
+    };
   },
   {
     whitelist: ["entity"],
