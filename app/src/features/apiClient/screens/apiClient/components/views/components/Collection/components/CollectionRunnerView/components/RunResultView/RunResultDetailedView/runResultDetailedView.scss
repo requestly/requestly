@@ -1,0 +1,183 @@
+.request-details-panel {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--requestly-color-surface-0);
+  border-left: 1px solid var(--requestly-color-border-primary);
+
+  .request-details-panel-header {
+    padding: 16px;
+    border-bottom: 1px solid var(--requestly-color-border-primary);
+    background: var(--requestly-color-surface-1);
+
+    .panel-title-section {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+
+      .panel-title {
+        font-size: 16px;
+        font-weight: 500;
+        color: var(--requestly-color-text-default);
+      }
+    }
+
+    .request-details-meta {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      flex-wrap: wrap;
+
+      .collection-name {
+        color: var(--requestly-color-text-subtle);
+        font-size: 12px;
+      }
+
+      .status-code,
+      .response-time {
+        color: var(--requestly-color-text-default);
+        font-size: 12px;
+        font-weight: 500;
+      }
+    }
+  }
+}
+
+.request-details-content {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+
+  .request-details-tab,
+  .response-details-tab {
+    height: 100%;
+    .ant-collapse {
+      border: none;
+
+      .ant-collapse-item {
+        border: 1px solid var(--requestly-color-border-primary);
+        border-radius: 4px;
+        border-bottom: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
+        padding: var(--space-4, 8px) var(--space-5, 12px);
+        &:last-child {
+          margin-bottom: 0;
+        }
+
+        .ant-collapse-header {
+          color: var(--requestly-color-text-default);
+          font-weight: 500;
+          display: flex;
+          gap: 2px;
+
+          .ant-collapse-expand-icon {
+            color: var(--alias-tokens-color-text-subtle, #bbb);
+            text-align: center;
+            font-family: "Material Symbols Outlined";
+            font-size: 14px;
+            font-style: normal;
+            font-weight: 400;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+
+            .ant-collapse-arrow svg {
+              width: 10px !important;
+              height: 10px;
+            }
+          }
+
+          .ant-collapse-header-text {
+            overflow: hidden;
+            color: var(--alias-tokens-color-text-subtle, #bbb);
+            text-overflow: ellipsis;
+            font-family: var(--font-family-default, Inter);
+            font-size: var(--font-size-2xs, 9px);
+            font-style: normal;
+            font-weight: 500;
+            line-height: 13px; /* 144.444% */
+            letter-spacing: 1px;
+            text-transform: uppercase;
+          }
+        }
+
+        .ant-collapse-content {
+          border-top: 1px solid var(--requestly-color-border-primary);
+
+          .ant-collcontent {
+            flex: 1;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+
+            .ant-tabs {
+              flex: 1;
+              display: flex;
+              flex-direction: column;
+
+              .ant-tabs-nav {
+                padding: 0 16px;
+                margin: 0;
+                background: var(--requestly-color-surface-0);
+                border-bottom: 1px solid var(--requestly-color-border-primary);
+
+                .ant-tabs-tab {
+                  padding: 12px 16px;
+                  color: var(--requestly-color-text-subtle);
+
+                  &.ant-tabs-tab-active {
+                    color: var(--requestly-color-primary-text);
+
+                    .ant-tabs-tab-btn {
+                      color: var(--requestly-color-primary-text);
+                    }
+                  }
+                }
+              }
+
+              .ant-tabs-content-holder {
+                flex: 1;
+                overflow: auto;
+
+                .ant-tabs-content {
+                  height: 100%;
+                }
+              }
+            }
+          }
+
+          .request-details-tab,
+          .response-details-tab {
+            height: 100%;
+            padding: 16;
+          }
+        }
+      }
+
+      .request-details-editor {
+        height: 100%;
+        max-height: 400px;
+        overflow: hidden;
+
+        .code-editor {
+          height: 100%;
+          border: none;
+        }
+      }
+
+      .request-details-properties {
+        max-height: 400px;
+        overflow: auto;
+      }
+
+      .empty-state {
+        padding: 32px;
+        text-align: center;
+        color: var(--requestly-color-text-subtle);
+        font-size: 14px;
+        font-style: italic;
+      }
+    }
+  }
+}
