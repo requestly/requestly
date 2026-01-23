@@ -18,17 +18,18 @@ import { LocalWorkspaceCreateOptions } from "./components/LocalWorkspaceCreateOp
 import { useOpenLocalWorkspace } from "features/workspaces/hooks/useOpenLocalWorkspace";
 import { FileSystemError } from "features/apiClient/helpers/modules/sync/local/services/types";
 import { OpenWorkspaceErrorView } from "./components/OpenWorkspaceErrorView";
+import { useWorkspaceCreationContext } from "../../context";
 
 type FolderItem = {
   name: string;
   path: string;
 } & (
-    | {
+  | {
       type: "directory";
       contents: FolderItem[];
     }
-    | { type: "file" }
-  );
+  | { type: "file" }
+);
 
 interface FolderPreview {
   success: boolean;
@@ -64,13 +65,14 @@ export const LocalWorkspaceCreationView = ({
   onCancel: () => void;
   isOpenedInModal?: boolean;
 }) => {
-  const [workspaceName, setWorkspaceName] = useState("");
-  const [folderPath, setFolderPath] = useState("");
+  const { workspaceName, folderPath, setWorkspaceName, setFolderPath } = useWorkspaceCreationContext();
+
   const [folderPreview, setFolderPreview] = useState<FolderPreview | null>(null);
   const [hasDuplicateWorkspaceName, setHasDuplicateWorkspaceName] = useState(false);
   const [isCreationOptionsVisible, setIsCreationOptionsVisible] = useState(isOpenedInModal ?? false);
   const [openWorkspaceError, setOpenWorkspaceError] = useState<FileSystemError | null>(null);
 
+  console.log("folderPath", folderPath);
   const { openWorkspace, isLoading: isOpenWorkspaceLoading } = useOpenLocalWorkspace({
     analyticEventSource: "create_workspace_modal",
     onOpenWorkspaceCallback: () => {
@@ -85,20 +87,6 @@ export const LocalWorkspaceCreationView = ({
 
   const folderSelectCallback = async (folderPath: string) => {
     setFolderPath(folderPath);
-    try {
-      const result: FolderPreview = await window.RQ.DESKTOP.SERVICES.IPC.invokeEventInMain(
-        "get-workspace-folder-preview",
-        {
-          folderPath,
-        }
-      );
-      if (result.success) {
-        setFolderPreview(result);
-      }
-    } catch (err) {
-      Logger.log("Could not get workspace folder preview data", err);
-      // No OP
-    }
   };
 
   const handleOnCreateWorkspaceClick = () => {
@@ -140,12 +128,12 @@ export const LocalWorkspaceCreationView = ({
       workspaceNameRef.current = newName;
       debouncedCheckForDuplicateWorkspaceName(newName);
     },
-    [debouncedCheckForDuplicateWorkspaceName]
+    [debouncedCheckForDuplicateWorkspaceName, setWorkspaceName]
   );
 
   useEffect(() => {
     window.RQ.DESKTOP.SERVICES.IPC.invokeEventInMain("get-workspace-folder-preview", {
-      folderPath: "",
+      folderPath,
     })
       .then((result: FolderPreview) => {
         if (result.success) {
@@ -157,7 +145,7 @@ export const LocalWorkspaceCreationView = ({
         Logger.log("Could not get workspace folder preview data", err);
         // No OP
       });
-  }, []);
+  }, [folderPath, setFolderPreview, setFolderPath]);
 
   useEffect(() => {
     if (folderPreview) {
@@ -207,6 +195,7 @@ export const LocalWorkspaceCreationView = ({
       <CreateWorkspaceHeader
         title="Create a new local workspace"
         description=""
+        name={workspaceName}
         onWorkspaceNameChange={handleWorkspaceNameChange}
         hasDuplicateWorkspaceName={hasDuplicateWorkspaceName}
       />
