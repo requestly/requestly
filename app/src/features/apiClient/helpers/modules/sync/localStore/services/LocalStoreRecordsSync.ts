@@ -106,7 +106,7 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
     } as RQAPI.ApiClientRecord;
 
     await this.queryService.createRecord(newRecord);
-    return { success: true, data: newRecord };
+    return { success: true as true, data: newRecord };
   }
 
   async updateRecord(record: Partial<RQAPI.ApiClientRecord>, id: string): RQAPI.ApiClientRecordPromise {
@@ -121,7 +121,7 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
     } as RQAPI.ApiClientRecord;
 
     await this.queryService.updateRecord(id, updatedRecord);
-    return { success: true, data: updatedRecord };
+    return { success: true as true, data: updatedRecord };
   }
 
   async deleteRecords(recordIds: string[]): Promise<{ success: boolean; data: unknown; message?: string }> {

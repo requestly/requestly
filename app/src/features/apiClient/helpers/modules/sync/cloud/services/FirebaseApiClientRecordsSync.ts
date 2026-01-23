@@ -86,7 +86,11 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
   }
 
   async createRecordWithId(record: Partial<RQAPI.ApiClientRecord>, id: string) {
-    return upsertApiRecord(this.meta.uid, record, this.meta.teamId, id);
+    const result = await upsertApiRecord(this.meta.uid, record, this.meta.teamId, id);
+    if (!result.success) {
+      throw new Error(result.message);
+    }
+    return result;
   }
 
   @SentryCustomSpan({
@@ -102,7 +106,11 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
     if (type) {
       sanitizedRecord.type = type;
     }
-    return updateApiRecord(this.meta.uid, sanitizedRecord, this.meta.teamId);
+    const result = await updateApiRecord(this.meta.uid, sanitizedRecord, this.meta.teamId);
+    if (!result.success) {
+      throw new Error(result.message);
+    }
+    return result;
   }
 
   async deleteRecords(recordIds: string[]) {

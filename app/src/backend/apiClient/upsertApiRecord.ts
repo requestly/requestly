@@ -88,7 +88,7 @@ const _createApiRecord = async (
     } catch (e) {
       captureException(e);
       Logger.error(`Error creating Api document with ID ${docId}`);
-      return { success: false, data: null };
+      return { success: false, data: null, message: e?.message };
     }
   } else {
     try {
@@ -103,7 +103,7 @@ const _createApiRecord = async (
     } catch (err) {
       captureException(err);
       Logger.error("Error while creating api record", err);
-      return { success: false, data: null };
+      return { success: false, data: null, message: err?.message };
     }
   }
 };
@@ -140,7 +140,7 @@ const _updateApiRecord = async (
   } catch (err) {
     captureException(err);
     Logger.error("Error while updating api record", err);
-    return { success: false, data: null };
+    return { success: false, data: null, message: err?.message };
   }
 };
 export const updateApiRecord = wrapWithCustomSpan(
