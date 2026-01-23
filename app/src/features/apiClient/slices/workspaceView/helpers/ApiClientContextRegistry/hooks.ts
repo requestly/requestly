@@ -57,9 +57,5 @@ export function useApiClientRepository() {
 }
 
 export function useApiClientStore(): ApiClientStore {
-  // Try to get store from React context first (for fake stores)
-  // This allows FakeWorkspaceStoreProvider to override the store
-
-  // Fall back to registry store
   return useApiClientFeatureContext().store;
 }
