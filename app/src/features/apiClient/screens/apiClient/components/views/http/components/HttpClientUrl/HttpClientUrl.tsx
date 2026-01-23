@@ -11,6 +11,7 @@ import { useCallback, memo } from "react";
 import { ApiClientUrl } from "../../../components/request/components/ApiClientUrl/ApiClientUrl";
 import { BufferedHttpRecordEntity } from "features/apiClient/slices/entities";
 import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
+import { toast } from "utils/Toast";
 
 interface ApiClientUrlProps {
   entity: BufferedHttpRecordEntity;
@@ -26,7 +27,7 @@ const HttpApiClientUrl = ({ entity, onEnterPress, onUrlChange, onCurlImport }: A
 
   const handlePaste = useCallback(
     (pastedText: string): boolean => {
-      // Detect if the pasted content is a curl command
+      // Only try to parse if it looks like a curl command
       if (isCurlCommand(pastedText)) {
         try {
           const requestFromCurl = parseCurlRequest(pastedText);
@@ -35,10 +36,11 @@ const HttpApiClientUrl = ({ entity, onEnterPress, onUrlChange, onCurlImport }: A
             return true; // Indicate that we handled the paste
           }
         } catch (error) {
-          console.warn("Curl parsing error:", error);
+          console.error("Curl parsing error:", error);
+          toast.error("Failed to parse cURL command");
         }
       }
-      return false; // Let normal paste handling continue
+      return false; // Let normal paste handling continue for regular URLs
     },
     [onCurlImport]
   );
