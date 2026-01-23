@@ -77,7 +77,7 @@ export class ScriptExecutionWorker implements ScriptExecutionWorkerInterface {
     try {
       await scriptFunction(globalObject);
     } catch (error) {
-      throw new ScriptExecutionError(error);
+      throw new ScriptExecutionError(typeof error === "string" ? new Error(error) : error);
     }
     try {
       this.syncLocalDump(callback);
