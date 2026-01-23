@@ -28,6 +28,8 @@ import { useTabActions } from "componentsV2/Tabs/slice";
 import { useCollectionView } from "../../../../../collectionView.context";
 import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
 import { selectLiveRunResultCurrentlyExecutingRequest } from "features/apiClient/slices/liveRunResults/selectors";
+import { RunResultDetailedView } from "../RunResultDetailedView/RunResultDetailedView";
+import Split from "react-split";
 
 enum RunResultTabKey {
   ALL = "all",
@@ -87,7 +89,8 @@ const RunningRequestPlaceholder: React.FC<{
 
 const TestDetails: React.FC<{
   requestExecutionResult: RequestExecutionResult;
-}> = React.memo(({ requestExecutionResult }) => {
+  onDetailsClick: (result: RequestExecutionResult) => void;
+}> = React.memo(({ requestExecutionResult, onDetailsClick }) => {
   const workspaceId = useWorkspaceId();
   const { openBufferedTab } = useTabActions();
 
@@ -149,7 +152,7 @@ const TestDetails: React.FC<{
   ]);
 
   return (
-    <div className="test-details-container">
+    <div className="test-details-container" onClick={() => onDetailsClick(requestExecutionResult)}>
       <div className="request-details">
         <span className="icon">
           {requestExecutionResult.entry.type === RQAPI.ApiEntryType.GRAPHQL ? (
@@ -188,7 +191,8 @@ const TestResultList: React.FC<{
   tabKey: RunResultTabKey;
   results: TestSummary;
   totalIterationCount?: number;
-}> = ({ tabKey, results, totalIterationCount }) => {
+  onDetailsClick: (result: RequestExecutionResult) => void;
+}> = ({ tabKey, results, totalIterationCount, onDetailsClick }) => {
   const { collectionId } = useCollectionView();
   const currentlyExecutingRequest = useApiClientSelector((state) =>
     selectLiveRunResultCurrentlyExecutingRequest(state, collectionId)
@@ -244,7 +248,13 @@ const TestResultList: React.FC<{
     return (
       <div className="tests-results-view-container">
         {resultsToShow[0][1].map(({ requestExecutionResult }) => {
-          return <TestDetails key={requestExecutionResult.recordId} requestExecutionResult={requestExecutionResult} />;
+          return (
+            <TestDetails
+              key={requestExecutionResult.recordId}
+              requestExecutionResult={requestExecutionResult}
+              onDetailsClick={onDetailsClick}
+            />
+          );
         })}
         {currentRunningRequest}
       </div>
@@ -298,6 +308,7 @@ const TestResultList: React.FC<{
                     <TestDetails
                       key={requestExecutionResult.recordId}
                       requestExecutionResult={requestExecutionResult}
+                      onDetailsClick={onDetailsClick}
                     />
                   ))}
                   {isCurrentIteration ? currentRunningRequest : null}
@@ -341,6 +352,18 @@ export const RunResultContainer: React.FC<{
   totalIterationCount?: number;
 }> = ({ ranAt, result, running = false, totalIterationCount }) => {
   const [activeTab, setActiveTab] = useState<RunResultTabKey>(RunResultTabKey.ALL);
+  const [selectedRequest, setSelectedRequest] = useState<RequestExecutionResult | null>(null);
+  const [splitSizes, setSplitSizes] = useState<number[]>([100, 0]);
+
+  const handleDetailsClick = (requestResult: RequestExecutionResult) => {
+    setSelectedRequest(requestResult);
+    setSplitSizes([60, 40]);
+  };
+
+  const handlePanelClose = () => {
+    setSelectedRequest(null);
+    setSplitSizes([100, 0]);
+  };
 
   const metrics = useMemo(() => {
     return getRunMetrics(result.iterations);
@@ -379,6 +402,7 @@ export const RunResultContainer: React.FC<{
             tabKey={RunResultTabKey.ALL}
             results={summary.totalTests}
             totalIterationCount={totalIterationCount}
+            onDetailsClick={handleDetailsClick}
           />
         ),
       },
@@ -390,6 +414,7 @@ export const RunResultContainer: React.FC<{
             tabKey={RunResultTabKey.PASSED}
             results={summary.successTests}
             totalIterationCount={totalIterationCount}
+            onDetailsClick={handleDetailsClick}
           />
         ),
       },
@@ -401,6 +426,7 @@ export const RunResultContainer: React.FC<{
             tabKey={RunResultTabKey.FAILED}
             results={summary.failedTests}
             totalIterationCount={totalIterationCount}
+            onDetailsClick={handleDetailsClick}
           />
         ),
       },
@@ -412,6 +438,7 @@ export const RunResultContainer: React.FC<{
             tabKey={RunResultTabKey.SKIPPED}
             results={summary.skippedTests}
             totalIterationCount={totalIterationCount}
+            onDetailsClick={handleDetailsClick}
           />
         ),
       },
@@ -427,31 +454,53 @@ export const RunResultContainer: React.FC<{
     summary.skippedTestsCounts,
     summary.skippedTests,
     totalIterationCount,
+    handleDetailsClick,
   ]);
 
   return (
-    <div className="run-result-view-details">
-      <div className="result-header">
-        {runMetrics.map((data, index) => {
-          return (
-            <div key={index} className="run-metric">
-              <span className="label">{data.label}:</span>
-              <span className="value">{data.value}</span>
-            </div>
-          );
-        })}
-      </div>
-      <div className="result-tabs-container">
-        <Tabs
-          moreIcon={null}
-          items={tabItems}
-          animated={false}
-          activeKey={activeTab}
-          destroyInactiveTabPane={true}
-          onChange={(activeKey) => setActiveTab(activeKey as RunResultTabKey)}
-          className="test-result-tabs"
-        />
-      </div>
+    <div className="run-result-view-details-wrapper">
+      <Split
+        sizes={splitSizes}
+        minSize={[300, 0]}
+        snapOffset={50}
+        gutterSize={selectedRequest ? 8 : 0}
+        className="run-result-split-container"
+        onDragEnd={(newSizes) => {
+          setSplitSizes(newSizes);
+          if (newSizes[1] < 5) {
+            handlePanelClose();
+          }
+        }}
+      >
+        <div className="run-result-view-details">
+          <div className="result-header">
+            {runMetrics.map((data, index) => {
+              return (
+                <div key={index} className="run-metric">
+                  <span className="label">{data.label}:</span>
+                  <span className="value">{data.value}</span>
+                </div>
+              );
+            })}
+          </div>
+          <div className="result-tabs-container">
+            <Tabs
+              moreIcon={null}
+              items={tabItems}
+              animated={false}
+              activeKey={activeTab}
+              destroyInactiveTabPane={true}
+              onChange={(activeKey) => setActiveTab(activeKey as RunResultTabKey)}
+              className="test-result-tabs"
+            />
+          </div>
+        </div>
+        <div className="run-result-detail-panel-container">
+          {selectedRequest && (
+            <RunResultDetailedView onClose={handlePanelClose} requestExecutionResult={selectedRequest} />
+          )}
+        </div>
+      </Split>
     </div>
   );
 };

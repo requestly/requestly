@@ -5,6 +5,26 @@
   display: flex;
   flex-direction: column;
 
+  .run-result-split-container {
+    flex: 1;
+    min-height: 0;
+
+    .split {
+      height: 100%;
+      display: flex;
+
+      .gutter {
+        background-color: var(--requestly-color-border-primary);
+        cursor: col-resize;
+        position: relative;
+
+        &:hover {
+          background-color: var(--requestly-color-primary);
+        }
+      }
+    }
+  }
+
   .result-header {
     display: flex;
     align-items: center;
@@ -208,6 +228,12 @@
         gap: var(--space-4, 8px);
         align-self: stretch;
         border-bottom: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+
+        &:hover {
+          background-color: var(--requestly-color-white-t-5, rgba(255, 255, 255, 0.03));
+        }
 
         .execution-error-message {
           display: flex;
