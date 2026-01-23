@@ -327,6 +327,7 @@ export namespace RQAPI {
         success: false;
         data: null;
         message?: string;
+        error?: Error;
       }
   >;
 
