@@ -407,35 +407,6 @@ export const isCurlCommand = (input: string): boolean => {
   if (matchesCurlPattern) {
     return true;
   }
-  // Check for common curl flags even if curl keyword is not at the start
-  // This handles cases where input might have been pasted without the initial curl
-  const curlFlagPatterns = [
-    /-X\s+(GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS)/i,
-    /--request\s+(GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS)/i,
-    /-H\s+['"].*['"]/,
-    /--header\s+['"].*['"]/,
-    /-d\s+/,
-    /--data\s+/,
-    /--data-raw\s+/,
-    /--data-binary\s+/,
-    /--data-urlencode\s+/,
-    /-u\s+/,
-    /--user\s+/,
-    /--compressed/i,
-  ];
-  const hasCurlFlags = curlFlagPatterns.some((pattern) => pattern.test(trimmedInput));
-  if (hasCurlFlags) {
-    return true;
-  }
-  // If it looks like a simple URL (starts with http:// or https://) and has no curl flags
-  // Also check it doesn't look like multiline curl (backslash continuation)
-  if (/^https?:\/\//i.test(trimmedInput) && !hasCurlFlags && !/\\\s*$/m.test(trimmedInput)) {
-    return false;
-  }
-  // Check for backslash line continuation pattern (common in multiline curl commands)
-  if (/\\\s*$/m.test(trimmedInput)) {
-    return true;
-  }
   return false;
 };
 

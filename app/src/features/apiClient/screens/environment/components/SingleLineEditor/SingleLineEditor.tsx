@@ -96,28 +96,11 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
             },
             paste: (event, view) => {
               const pastedText = event.clipboardData?.getData("text/plain");
-              if (pastedText) {
-                // Notify parent component about paste - if it returns true, it handled the paste
-                const handled = onPasteRef.current?.(pastedText);
-                if (handled) {
-                  event.preventDefault();
-                  return true;
-                }
-                // Handle multiline paste conversion
-                if (pastedText.includes("\n")) {
-                  event.preventDefault();
-                  const singleLineText = pastedText.replace(/\\\s*\n\s*/g, " ").replace(/\n/g, " ");
-                  view.dispatch(
-                    view.state.update({
-                      changes: {
-                        from: view.state.selection.main.from,
-                        to: view.state.selection.main.to,
-                        insert: singleLineText,
-                      },
-                    })
-                  );
-                  return true;
-                }
+              if (!pastedText) return;
+              // Notify parent - if it returns true, it handled the paste
+              if (onPasteRef.current?.(pastedText)) {
+                event.preventDefault();
+                return true;
               }
             },
           }),

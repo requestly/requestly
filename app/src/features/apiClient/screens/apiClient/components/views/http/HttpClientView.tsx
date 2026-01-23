@@ -437,20 +437,7 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
         // Type assertion: parseCurlRequest always returns an HTTP request
         const httpRequest = request as RQAPI.HttpRequest;
         // Update the entity with the parsed curl request data
-        entity.setUrl(httpRequest.url);
-        entity.setMethod(httpRequest.method);
-        if (httpRequest.headers) {
-          entity.setHeaders(httpRequest.headers);
-        }
-        if (httpRequest.queryParams) {
-          entity.setQueryParams(httpRequest.queryParams);
-        }
-        if (httpRequest.body) {
-          entity.setBody(httpRequest.body);
-        }
-        if (httpRequest.contentType) {
-          entity.setContentType(httpRequest.contentType);
-        }
+        entity.setRequest(httpRequest);
         toast.success("cURL command imported successfully");
         trackRQLastActivity(API_CLIENT.CURL_IMPORTED);
         trackRQDesktopLastActivity(API_CLIENT.CURL_IMPORTED);
