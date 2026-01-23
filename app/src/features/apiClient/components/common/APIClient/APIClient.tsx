@@ -1,4 +1,3 @@
-import type { RQAPI as SharedRQAPI } from "@requestly/shared/types/entities/apiClient";
 import { Modal } from "antd";
 import { BottomSheetProvider } from "componentsV2/BottomSheet";
 import { BottomSheetFeatureContext } from "componentsV2/BottomSheet/types";
@@ -23,7 +22,7 @@ import { BufferedHttpRecordEntity } from "features/apiClient/slices/entities";
 import { useOriginUndefinedBufferedEntity } from "features/apiClient/slices/entities/hooks";
 import { ApiClientEntityType } from "features/apiClient/slices/entities/types";
 import { RequestContentType, RequestMethod, RQAPI } from "features/apiClient/types";
-import React, { useEffect, useMemo } from "react";
+import React, { useMemo } from "react";
 import { v4 as uuidv4 } from "uuid";
 import "./apiClient.scss";
 import { APIClientRequest } from "./types";
@@ -39,7 +38,7 @@ export const createDummyApiRecord = (apiEntry: RQAPI.ApiEntry): RQAPI.ApiRecord 
   // This record is created only for cases when client view is opened without any option to save the request.
   // if saving is enabled in such cases, please take the necessary fields into account (eg. id, ownerId...).
   return {
-    id: "",
+    id: uuidv4(), // Generated ID to ensure ID is always present
     name: "Untitled request",
     type: RQAPI.RecordType.API,
     data: apiEntry,
@@ -131,41 +130,57 @@ const ClientViewContent: React.FC<{ bufferId: string; onRequestFinished: () => v
 }) => {
   const entity = useOriginUndefinedBufferedEntity<ApiClientEntityType.HTTP_RECORD>({
     bufferId,
-  }) as BufferedHttpRecordEntity;
+  });
 
-  return <ClientViewFactory entity={entity} handleRequestFinished={onRequestFinished} isOpenInModal />;
+  return <ClientViewFactory entity={entity as BufferedHttpRecordEntity} handleRequestFinished={onRequestFinished} isOpenInModal />;
+};
+
+const ApiClientSession: React.FC<{
+  apiRecord: RQAPI.ApiRecord;
+  onModalClose?: () => void;
+}> = ({ apiRecord, onModalClose }) => {
+  const bufferId = useMemo(() => uuidv4(), []);
+  
+    const fakeStore = useMemo(() => {
+      const store = createFakeStore();
+  
+      store.dispatch(
+        bufferActions.open(
+          {
+            entityType: ApiClientEntityType.HTTP_RECORD,
+            isNew: false,
+            referenceId: apiRecord.id,
+            data: apiRecord,
+          },
+          {
+            id: bufferId,
+          }
+        )
+      );
+  
+      return store;
+    }, [apiRecord, bufferId]);
+
+  return (
+    <FakeModalHostContextProvider onClose={onModalClose}>
+      <WindowsAndLinuxGatedHoc featureName="API client">
+        <BottomSheetProvider context={BottomSheetFeatureContext.API_CLIENT}>
+          <AISessionProvider>
+            <FakeWorkspaceStoreProvider store={fakeStore}>
+              <ClientViewContent bufferId={bufferId} onRequestFinished={() => {}} />
+            </FakeWorkspaceStoreProvider>
+          </AISessionProvider>
+        </BottomSheetProvider>
+      </WindowsAndLinuxGatedHoc>
+    </FakeModalHostContextProvider>
+  );
 };
 
 export const APIClientModal: React.FC<Props> = ({ request, isModalOpen, onModalClose, modalTitle }) => {
   const apiRecord = useMemo(() => buildApiRecordFromRequest(request), [request]);
-  const bufferId = useMemo(() => uuidv4(), []);
-
   const hasApiData = Boolean(apiRecord.data);
 
-  const fakeStore = useMemo(() => {
-    if (!hasApiData) return null;
-    return createFakeStore();
-  }, [hasApiData]);
-
-  useEffect(() => {
-    if (!fakeStore || !hasApiData) return;
-
-    fakeStore.dispatch(
-      bufferActions.open(
-        {
-          entityType: ApiClientEntityType.HTTP_RECORD,
-          isNew: false,
-          referenceId: apiRecord.id || "",
-          data: apiRecord as unknown as SharedRQAPI.HttpApiRecord,
-        },
-        {
-          id: bufferId,
-        }
-      )
-    );
-  }, [fakeStore, hasApiData, apiRecord, bufferId]);
-
-  if (!hasApiData || !fakeStore) {
+  if (!hasApiData) {
     return null;
   }
 
@@ -180,17 +195,7 @@ export const APIClientModal: React.FC<Props> = ({ request, isModalOpen, onModalC
       width="70%"
       destroyOnClose
     >
-      <FakeModalHostContextProvider onClose={onModalClose}>
-        <WindowsAndLinuxGatedHoc featureName="API client">
-          <BottomSheetProvider context={BottomSheetFeatureContext.API_CLIENT}>
-            <AISessionProvider>
-              <FakeWorkspaceStoreProvider store={fakeStore}>
-                <ClientViewContent bufferId={bufferId} onRequestFinished={() => {}} />
-              </FakeWorkspaceStoreProvider>
-            </AISessionProvider>
-          </BottomSheetProvider>
-        </WindowsAndLinuxGatedHoc>
-      </FakeModalHostContextProvider>
+      <ApiClientSession apiRecord={apiRecord} onModalClose={onModalClose} />
     </Modal>
   );
 };
