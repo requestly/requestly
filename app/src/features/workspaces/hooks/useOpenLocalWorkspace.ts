@@ -77,7 +77,9 @@ export const useOpenLocalWorkspace = ({
         trackNewTeamCreateSuccess(workspace.id, workspace.name, analyticEventSource, WorkspaceType.LOCAL);
       } catch (error) {
         trackNewTeamCreateFailure("Untitled", WorkspaceType.LOCAL);
-        onError?.(error.cause);
+        if (error.cause) {
+          onError?.(error.cause);
+        }
         Sentry.captureException(error, {
           extra: {
             message: error.cause?.message,

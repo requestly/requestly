@@ -19,7 +19,7 @@ export const ExistingWorkspaceConflictView: React.FC<Props> = ({
 }) => {
   const dispatch = useDispatch();
   const { openWorkspace, isLoading: isOpeningWorkspaceLoading } = useOpenLocalWorkspace({
-    analyticEventSource: "desktop_onboarding",
+    analyticEventSource,
     onOpenWorkspaceCallback: () => {
       dispatch(globalActions.updateIsOnboardingCompleted(true));
     },
