@@ -48,7 +48,6 @@ export const trackEvent = (name, params, config) => {
   newParams.workspaceMembersCount = window.workspaceMembersCount ?? null;
 
   Logger.log(`[analytics.trackEvent] name=${name}`, { params, config });
-  console.log("Temp event log", name, newParams);
   posthogIntegration.trackEvent(name, newParams);
 };
 

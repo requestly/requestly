@@ -5,6 +5,7 @@ import "./createWorkspaceHeader.scss";
 
 interface CreateWorkspaceHeaderProps {
   title: string;
+  name: string;
   description: string;
   hasDuplicateWorkspaceName: boolean;
   onWorkspaceNameChange: (name: string) => void;
@@ -12,6 +13,7 @@ interface CreateWorkspaceHeaderProps {
 
 export const CreateWorkspaceHeader: React.FC<CreateWorkspaceHeaderProps> = ({
   title,
+  name,
   description,
   hasDuplicateWorkspaceName,
   onWorkspaceNameChange,
@@ -34,6 +36,7 @@ export const CreateWorkspaceHeader: React.FC<CreateWorkspaceHeaderProps> = ({
       <Input
         ref={inputRef}
         autoFocus
+        value={name}
         id="workspace-name"
         className="create-workspace-header__input"
         onChange={(e) => onWorkspaceNameChange(e.target.value)}
