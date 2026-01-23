@@ -7,10 +7,11 @@ import {
   ReactReduxContextValue,
   TypedUseSelectorHook,
 } from "react-redux";
-import { ApiClientStoreState, useApiClientStore } from "../slices";
+import { ApiClientStore, ApiClientStoreState, useApiClientStore } from "../slices";
 import { Workspace } from "features/workspaces/types";
+import { NoopContextId } from "../commands/utils";
 
-const WorkspaceStoreContext = createContext<ReactReduxContextValue<ApiClientStoreState> | null>(null);
+export const WorkspaceStoreContext = createContext<ReactReduxContextValue<ApiClientStoreState> | null>(null);
 
 export const useWorkspaceViewStore = createStoreHook(WorkspaceStoreContext);
 export const useWorkspaceViewDispatch = createDispatchHook(WorkspaceStoreContext);
@@ -38,6 +39,16 @@ const WorkspaceStoreProvider: React.FC<React.PropsWithChildren> = (props) => {
     <Provider context={WorkspaceStoreContext} store={store}>
       {props.children}
     </Provider>
+  );
+};
+
+export const FakeWorkspaceStoreProvider: React.FC<React.PropsWithChildren & { store: ApiClientStore }> = (props) => {
+  return (
+    <WorkspaceIdContextProvider id={NoopContextId}>
+    <Provider context={WorkspaceStoreContext} store={props.store}>
+      {props.children}
+      </Provider>
+    </WorkspaceIdContextProvider>
   );
 };
 
