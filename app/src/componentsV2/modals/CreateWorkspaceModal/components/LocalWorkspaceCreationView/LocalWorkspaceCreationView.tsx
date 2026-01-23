@@ -72,7 +72,6 @@ export const LocalWorkspaceCreationView = ({
   const [isCreationOptionsVisible, setIsCreationOptionsVisible] = useState(isOpenedInModal ?? false);
   const [openWorkspaceError, setOpenWorkspaceError] = useState<FileSystemError | null>(null);
 
-  console.log("folderPath", folderPath);
   const { openWorkspace, isLoading: isOpenWorkspaceLoading } = useOpenLocalWorkspace({
     analyticEventSource: "create_workspace_modal",
     onOpenWorkspaceCallback: () => {
