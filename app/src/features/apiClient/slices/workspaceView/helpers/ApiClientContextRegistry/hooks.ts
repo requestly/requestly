@@ -42,6 +42,12 @@ function createInfiniteChainable<T>() {
   return new Proxy({}, handler) as T;
 }
 
+// TODO: This is a workaround for when workspaceId is NoopContextId but we have a contextValue.
+// The infinite chainable proxy will silently fail on any method calls, which can lead to
+// silent errors. We should either:
+// 1. Prevent this case from happening upstream
+// 2. Throw an error here to fail fast
+// 3. Add proper error handling/logging when methods are called on the infinite chainable
 export function useApiClientFeatureContext(): ApiClientFeatureContext {
   const workspaceId = useWorkspaceId();
   const contextValue = useContext(WorkspaceStoreContext);
