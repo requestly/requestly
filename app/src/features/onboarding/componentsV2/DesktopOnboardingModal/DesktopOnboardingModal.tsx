@@ -13,6 +13,7 @@ import "./desktopOnboardingModal.scss";
 import { trackDesktopOnboardingStepSkipped, trackDesktopOnboardingViewed } from "./analytics";
 import { OnboardingStep } from "./types";
 import { WorkspaceType } from "features/workspaces/types";
+import { WorkspaceCreationProvider } from "componentsV2/modals/CreateWorkspaceModal/context";
 
 export const DesktopOnboardingCard = ({ children, className }: { children: React.ReactNode; className?: string }) => {
   return <div className={`rq-desktop-onboarding-modal-content__card ${className}`}>{children}</div>;
@@ -41,41 +42,43 @@ export const DesktopOnboardingModal = () => {
       wrapClassName="rq-desktop-onboarding-modal-wrapper"
       className="rq-desktop-onboarding-modal"
     >
-      <div className="rq-desktop-onboarding-modal-content">
-        {onboardingStep === OnboardingStep.FEATURE_SELECTION ? (
-          <DesktopOnboardingCard className="welcome-card">
-            <WelcomeCard onFeatureClick={(step: OnboardingStep) => setOnboardingStep(step)} />
-          </DesktopOnboardingCard>
-        ) : onboardingStep === OnboardingStep.FOLDER_SELECTION ? (
-          <DesktopOnboardingCard className="local-workspace-card">
-            <WorkspaceCreationView
-              workspaceType={WorkspaceType.LOCAL}
-              onCancel={() => setOnboardingStep(OnboardingStep.FEATURE_SELECTION)}
-              callback={() => {
-                dispatch(globalActions.updateIsOnboardingCompleted(true));
-                redirectToApiClient(navigate);
-              }}
-              analyticEventSource="desktop_onboarding_modal"
-            />
-          </DesktopOnboardingCard>
-        ) : onboardingStep === OnboardingStep.AUTH ? (
-          <>
-            <DesktopOnboardingCard className="auth-card">
-              <AuthCard onBackClick={() => setOnboardingStep(OnboardingStep.FEATURE_SELECTION)} />
+      <WorkspaceCreationProvider>
+        <div className="rq-desktop-onboarding-modal-content">
+          {onboardingStep === OnboardingStep.FEATURE_SELECTION ? (
+            <DesktopOnboardingCard className="welcome-card">
+              <WelcomeCard onFeatureClick={(step: OnboardingStep) => setOnboardingStep(step)} />
             </DesktopOnboardingCard>
-            <Button
-              type="link"
-              className="skip-desktop-onboarding"
-              onClick={() => {
-                trackDesktopOnboardingStepSkipped(OnboardingStep.AUTH);
-                dispatch(globalActions.updateIsOnboardingCompleted(true));
-              }}
-            >
-              Continue without sign in
-            </Button>
-          </>
-        ) : null}
-      </div>
+          ) : onboardingStep === OnboardingStep.FOLDER_SELECTION ? (
+            <DesktopOnboardingCard className="local-workspace-card">
+              <WorkspaceCreationView
+                workspaceType={WorkspaceType.LOCAL}
+                onCancel={() => setOnboardingStep(OnboardingStep.FEATURE_SELECTION)}
+                callback={() => {
+                  dispatch(globalActions.updateIsOnboardingCompleted(true));
+                  redirectToApiClient(navigate);
+                }}
+                analyticEventSource="desktop_onboarding_modal"
+              />
+            </DesktopOnboardingCard>
+          ) : onboardingStep === OnboardingStep.AUTH ? (
+            <>
+              <DesktopOnboardingCard className="auth-card">
+                <AuthCard onBackClick={() => setOnboardingStep(OnboardingStep.FEATURE_SELECTION)} />
+              </DesktopOnboardingCard>
+              <Button
+                type="link"
+                className="skip-desktop-onboarding"
+                onClick={() => {
+                  trackDesktopOnboardingStepSkipped(OnboardingStep.AUTH);
+                  dispatch(globalActions.updateIsOnboardingCompleted(true));
+                }}
+              >
+                Continue without sign in
+              </Button>
+            </>
+          ) : null}
+        </div>
+      </WorkspaceCreationProvider>
     </Modal>
   );
 };

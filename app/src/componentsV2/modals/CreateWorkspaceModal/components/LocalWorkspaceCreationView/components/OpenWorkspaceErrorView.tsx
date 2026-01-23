@@ -3,6 +3,7 @@ import { RQButton } from "lib/design-system-v2/components";
 import { WorkspaceCreationErrorView } from "./WorkspaceCreationErrorView/WorkspaceCreationErrorView";
 import { displayFolderSelector } from "components/mode-specific/desktop/misc/FileDialogButton";
 import { trackLocalWorkspaceCreationConflictShown } from "modules/analytics/events/common/teams";
+import { useWorkspaceCreationContext } from "componentsV2/modals/CreateWorkspaceModal/context";
 
 interface Props {
   path: string;
@@ -19,6 +20,8 @@ export const OpenWorkspaceErrorView: React.FC<Props> = ({
   isOpeningWorkspaceLoading,
   analyticEventSource,
 }) => {
+  const { setFolderPath } = useWorkspaceCreationContext();
+
   useEffect(() => {
     trackLocalWorkspaceCreationConflictShown("config_missing_open_existing_attempted", analyticEventSource);
   }, [analyticEventSource]);
@@ -32,7 +35,14 @@ This error usually occurs when the wrong folder is selected, or if you've select
         path={path}
         actions={
           <>
-            <RQButton onClick={onNewWorkspaceClick}>Create a new workspace here</RQButton>
+            <RQButton
+              onClick={() => {
+                setFolderPath(path);
+                onNewWorkspaceClick();
+              }}
+            >
+              Create a new workspace here
+            </RQButton>
             <RQButton
               type="primary"
               onClick={() => displayFolderSelector((folderPath: string) => openWorkspace(folderPath))}

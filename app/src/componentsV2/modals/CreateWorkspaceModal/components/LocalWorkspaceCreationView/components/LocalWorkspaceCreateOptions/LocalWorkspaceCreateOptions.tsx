@@ -14,6 +14,7 @@ import {
   trackLocalWorkspaceCreationModeSelected,
   trackNewTeamCreationWorkflowStarted,
 } from "modules/analytics/events/common/teams";
+import { useWorkspaceCreationContext } from "componentsV2/modals/CreateWorkspaceModal/context";
 
 enum LocalWorkspaceCreationMode {
   QUICK_START = "quick_start",
@@ -43,6 +44,8 @@ export const LocalWorkspaceCreateOptions: React.FC<OptionsProps> = ({
     onCreateWorkspaceCallback: onCreationCallback,
   });
 
+  const { setFolderPath } = useWorkspaceCreationContext();
+
   const handleOptionClick = useCallback(
     (mode: LocalWorkspaceCreationMode) => {
       if (analyticEventSource === "desktop_onboarding_modal") {
@@ -71,12 +74,15 @@ export const LocalWorkspaceCreateOptions: React.FC<OptionsProps> = ({
       },
       {
         id: LocalWorkspaceCreationMode.CREATE_WORKSPACE,
-        title: "Create a new workspace",
+        title: "Select a folder to create local workspace",
         icon: <IoMdAdd />,
         info: "Choose where you want to store your project files and data.",
         onClick: () => {
           handleOptionClick(LocalWorkspaceCreationMode.CREATE_WORKSPACE);
-          onCreateWorkspaceClick();
+          displayFolderSelector((folderPath: string) => {
+            setFolderPath(folderPath);
+            onCreateWorkspaceClick();
+          });
         },
       },
       {
@@ -99,6 +105,7 @@ export const LocalWorkspaceCreateOptions: React.FC<OptionsProps> = ({
       openWorkspace,
       isOpeningWorkspaceLoading,
       handleOptionClick,
+      setFolderPath,
     ]
   );
 
