@@ -557,6 +557,7 @@ export const createBlankApiRecord = (
   recordType: RQAPI.RecordType,
   collectionId: string,
   apiClientRecordsRepository: ApiClientRecordsInterface<any>,
+  context: ApiClientFeatureContext,
   entryType?: RQAPI.ApiEntryType
 ) => {
   const newRecord: Partial<RQAPI.ApiClientRecord> = {};
@@ -567,6 +568,10 @@ export const createBlankApiRecord = (
     newRecord.data = getEmptyApiEntry(entryType ?? RQAPI.ApiEntryType.HTTP);
     newRecord.deleted = false;
     newRecord.collectionId = collectionId;
+    const rank = apiRecordsRankingManager.getRanksForNewApis(context, collectionId, [newRecord])[0];
+    if (rank) {
+      newRecord.rank = rank;
+    }
   }
 
   if (recordType === RQAPI.RecordType.COLLECTION) {
