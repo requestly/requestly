@@ -19,6 +19,7 @@ import { ImportErrorView } from "./components/ImporterErrorView";
 import { SuccessfulParseView } from "./components/SuccessfulParseView";
 import { wrapWithCustomSpan } from "utils/sentry";
 import { SPAN_STATUS_ERROR, SPAN_STATUS_OK } from "@sentry/core";
+import { apiRecordsRankingManager } from "features/apiClient/helpers/RankingManager";
 
 export interface ImportFile {
   content: string;
@@ -249,6 +250,11 @@ export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = (
         return { successfulRequests: [], failedCount: 0 };
       }
 
+      const ranks = apiRecordsRankingManager.getNextRanks(allRequests, allRequests);
+      allRequests.forEach((request, index) => {
+        request.rank = ranks[index];
+      });
+
       try {
         const createdRequests = await apiClientRecordsRepository.batchWriteApiRecords(allRequests);
         return { successfulRequests: createdRequests, failedCount: 0 };
@@ -274,15 +280,13 @@ export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = (
       try {
         const { flatCollections, collectionToRequestsMap } = flattenRootCollection(rootCollection);
 
-        const { successfulCollections, failedCount: failedCollectionsCount } = await createAllCollections(
-          flatCollections
-        );
+        const { successfulCollections, failedCount: failedCollectionsCount } =
+          await createAllCollections(flatCollections);
 
         dispatch(apiRecordsActions.upsertRecords(successfulCollections));
 
-        const { successfulRequests, failedCount: failedRequestsCount } = await createAllRequests(
-          collectionToRequestsMap
-        );
+        const { successfulRequests, failedCount: failedRequestsCount } =
+          await createAllRequests(collectionToRequestsMap);
 
         dispatch(apiRecordsActions.upsertRecords(successfulRequests));
 

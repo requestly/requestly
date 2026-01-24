@@ -11,6 +11,7 @@ import { ApiClientRecordsInterface } from "features/apiClient/helpers/modules/sy
 import { EnvironmentVariableData } from "features/apiClient/store/variables/types";
 import { createBodyContainer, getInferredKeyValueDataType } from "features/apiClient/screens/apiClient/utils";
 import { captureException } from "backend/apiClient/utils";
+import { apiRecordsRankingManager } from "features/apiClient/helpers/RankingManager";
 
 interface PostmanCollectionExport {
   info: {
@@ -301,7 +302,7 @@ const createApiRecord = (
     data: {
       type: RQAPI.ApiEntryType.HTTP,
       request: {
-        url: typeof request.url === "string" ? request.url : request.url?.raw ?? "",
+        url: typeof request.url === "string" ? request.url : (request.url?.raw ?? ""),
         method: request.method || RequestMethod.GET,
         queryParams,
         headers,
@@ -409,9 +410,16 @@ export const processPostmanCollectionData = (
   rootCollection.collectionId = "";
   const processedItems = processItems(fileContent.item, rootCollectionId);
 
+  // Generate ranks for all APIs together to maintain consistent ranking
+  const allApis = processedItems.apis;
+  const ranks = apiRecordsRankingManager.getNextRanks(allApis, allApis);
+
   return {
     collections: [rootCollection, ...processedItems.collections],
-    apis: processedItems.apis,
+    apis: allApis.map((api, index) => {
+      api.rank = ranks[index];
+      return api;
+    }),
   };
 };
 

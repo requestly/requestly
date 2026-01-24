@@ -6,6 +6,15 @@ import { ApiClientRecordsInterface } from "features/apiClient/helpers/modules/sy
 import { createBodyContainer } from "../apiClient/utils";
 import { EnvironmentVariableData } from "@requestly/shared/types/entities/apiClient";
 
+export type ProcessedBrunoData = {
+  collections: Partial<RQAPI.CollectionRecord>[];
+  apis: Partial<RQAPI.ApiRecord>[];
+  environments: Array<{
+    name: string;
+    variables: Record<string, EnvironmentVariableData>;
+  }>;
+};
+
 export const processBrunoScripts = (request: Bruno.Request) => {
   const scripts = {
     preRequest: request?.script?.req?.replace(/bru\./g, "rq.") || "",
@@ -131,23 +140,26 @@ const createCollectionRecord = (
 ): Partial<RQAPI.CollectionRecord> => {
   const allVars = [...(vars?.res || []), ...(vars?.req || []), ...(additionalVars || [])];
 
-  const variables = allVars.reduce((acc, v, index) => {
-    if (v.enabled && v.name) {
-      const varValue: EnvironmentVariableData = {
-        id: index,
-        syncValue: v.value,
-        type: v.type || EnvironmentVariableType.String,
-        isPersisted: true,
-      };
+  const variables = allVars.reduce(
+    (acc, v, index) => {
+      if (v.enabled && v.name) {
+        const varValue: EnvironmentVariableData = {
+          id: index,
+          syncValue: v.value,
+          type: v.type || EnvironmentVariableType.String,
+          isPersisted: true,
+        };
 
-      if (v.local) {
-        varValue.localValue = v.local;
+        if (v.local) {
+          varValue.localValue = v.local;
+        }
+
+        acc[v.name] = varValue;
       }
-
-      acc[v.name] = varValue;
-    }
-    return acc;
-  }, {} as Record<string, EnvironmentVariableData>);
+      return acc;
+    },
+    {} as Record<string, EnvironmentVariableData>
+  );
 
   return {
     id,
@@ -165,27 +177,23 @@ const createCollectionRecord = (
 export const processBrunoCollectionData = (
   fileContent: Bruno.RootCollection,
   apiClientRecordsRepository: ApiClientRecordsInterface<Record<string, any>>
-): {
-  collections: Partial<RQAPI.CollectionRecord>[];
-  apis: Partial<RQAPI.ApiRecord>[];
-  environments: {
-    name: string;
-    variables: Record<string, EnvironmentVariableData>;
-  }[];
-} => {
+): ProcessedBrunoData => {
   const environments = (fileContent.environments || []).map((env) => ({
     name: env.name,
-    variables: env.variables.reduce((acc, variable, index) => {
-      if (variable.enabled) {
-        acc[variable.name] = {
-          id: index,
-          syncValue: variable.value,
-          type: variable.type || EnvironmentVariableType.String,
-          isPersisted: true,
-        };
-      }
-      return acc;
-    }, {} as Record<string, EnvironmentVariableData>),
+    variables: env.variables.reduce(
+      (acc, variable, index) => {
+        if (variable.enabled) {
+          acc[variable.name] = {
+            id: index,
+            syncValue: variable.value,
+            type: variable.type || EnvironmentVariableType.String,
+            isPersisted: true,
+          };
+        }
+        return acc;
+      },
+      {} as Record<string, EnvironmentVariableData>
+    ),
   }));
 
   const processItems = (
@@ -199,32 +207,36 @@ export const processBrunoCollectionData = (
       variables: [] as Bruno.Variable[], // To track variables from requests
     };
 
-    items.forEach((item) => {
-      if (item.type === "folder" || (item.items && item.items.length > 0)) {
-        const id = apiClientRecordsRepository.generateCollectionId(item.name, parentCollectionId);
-        const subItems = item.items?.length
-          ? processItems(item.items, id, apiClientRecordsRepository)
-          : { collections: [], apis: [], variables: [] };
+    items
+      .sort((a, b) => {
+        return a.seq > b.seq ? 1 : -1;
+      })
+      .forEach((item) => {
+        if (item.type === "folder" || (item.items && item.items.length > 0)) {
+          const id = apiClientRecordsRepository.generateCollectionId(item.name, parentCollectionId);
+          const subItems = item.items?.length
+            ? processItems(item.items, id, apiClientRecordsRepository)
+            : { collections: [], apis: [], variables: [] };
 
-        const subCollection = createCollectionRecord(
-          item.name,
-          id,
-          parentCollectionId,
-          item.root?.request?.auth,
-          item.root?.request?.vars,
-          subItems.variables
-        );
+          const subCollection = createCollectionRecord(
+            item.name,
+            id,
+            parentCollectionId,
+            item.root?.request?.auth,
+            item.root?.request?.vars,
+            subItems.variables
+          );
 
-        result.collections.push(subCollection);
-        result.collections.push(...subItems.collections);
-        result.apis.push(...subItems.apis);
-      } else if (item.type === "http") {
-        result.apis.push(createApiRecord(item, parentCollectionId, apiClientRecordsRepository));
-        if (item.request?.vars) {
-          result.variables.push(...(item.request.vars.res || []), ...(item.request.vars.req || []));
+          result.collections.push(subCollection);
+          result.collections.push(...subItems.collections);
+          result.apis.push(...subItems.apis);
+        } else if (item.type === "http") {
+          result.apis.push(createApiRecord(item, parentCollectionId, apiClientRecordsRepository));
+          if (item.request?.vars) {
+            result.variables.push(...(item.request.vars.res || []), ...(item.request.vars.req || []));
+          }
         }
-      }
-    });
+      });
 
     return result;
   };

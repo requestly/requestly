@@ -383,8 +383,8 @@ export namespace RQAPI {
   export type ApiEntryMap<T extends ApiEntryType> = T extends ApiEntryType.HTTP
     ? HttpApiEntry
     : T extends ApiEntryType.GRAPHQL
-    ? GraphQLApiEntry
-    : never;
+      ? GraphQLApiEntry
+      : never;
 
   export type GraphQLApiEntry = {
     request: GraphQLRequest;
@@ -459,6 +459,7 @@ export namespace RQAPI {
     name: string;
     description?: string;
     collectionId: string | null;
+    rank?: string;
     isExample?: boolean;
     ownerId: string;
     deleted: boolean;
