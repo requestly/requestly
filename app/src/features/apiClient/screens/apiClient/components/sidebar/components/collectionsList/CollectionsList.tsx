@@ -3,8 +3,10 @@ import { useParams } from "react-router-dom";
 import { BulkActions, RQAPI } from "features/apiClient/types";
 import { notification } from "antd";
 import { useApiClientContext } from "features/apiClient/contexts";
-import { CollectionRow, ExportType } from "./collectionRow/CollectionRow";
+import { CollectionRow, ExportType, DraggableApiRecord } from "./collectionRow/CollectionRow";
 import { RequestRow } from "./requestRow/RequestRow";
+import { useDrop } from "react-dnd";
+import { useCommand } from "features/apiClient/commands";
 import {
   convertFlatRecordsToNestedRecords,
   isApiCollection,
@@ -44,11 +46,14 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
   const { collectionId, requestId } = useParams();
   const { validatePermission } = useRBAC();
   const { isValidPermission } = validatePermission("api_client_request", "create");
-  const [apiClientRecords, childParentMap] = useAPIRecords((state) => [state.apiClientRecords, state.childParentMap]);
+  const [apiClientRecords] = useAPIRecords((state) => [state.apiClientRecords]);
   const { isRecordBeingCreated } = useApiClientContext();
   const { onSaveRecord, onSaveBulkRecords } = useNewApiClientContext();
 
   const { apiClientRecordsRepository } = useApiClientRepository();
+  const {
+    api: { moveRecords },
+  } = useCommand();
 
   const [collectionsToExport, setCollectionsToExport] = useState<RQAPI.ApiClientRecord[]>([]);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
@@ -61,6 +66,8 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
   );
   const [searchValue, setSearchValue] = useState("");
   const [isAllRecordsSelected, setIsAllRecordsSelected] = useState(false);
+
+  const [childParentMap] = useAPIRecords((state) => [state.childParentMap]);
 
   useEffect(() => {
     const handleUpdates = () => {
@@ -354,6 +361,62 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
     }
   }, [collectionId, requestId, apiClientRecords]);
 
+  const handleDropToRoot = useCallback(
+    async (item: DraggableApiRecord) => {
+      try {
+        await moveRecords({
+          collectionId: "",
+          recordsToMove: [item.record],
+        });
+
+        toast.success(`Moved "${item.record.name}" to workspace root`);
+      } catch (error) {
+        toast.error((error as any)?.message || "Failed to move item. Please try again.");
+      }
+    },
+    [moveRecords]
+  );
+
+  // Shared drop configuration for all drop zones
+  const dropConfig = useMemo(
+    () => ({
+      accept: [RQAPI.RecordType.API, RQAPI.RecordType.COLLECTION],
+      drop: (item: DraggableApiRecord, monitor: any) => {
+        if (!monitor.isOver({ shallow: true })) return;
+        handleDropToRoot(item);
+      },
+      canDrop: (item: DraggableApiRecord) => {
+        return Boolean(item.record.collectionId);
+      },
+    }),
+    [handleDropToRoot]
+  );
+
+  // Background drop zone (entire content area)
+  const [, dropBackground] = useDrop(() => dropConfig, [dropConfig]);
+
+  // Top drop zone with hover indicator
+  const [{ isOverTopLevel }, dropTopLevel] = useDrop(
+    () => ({
+      ...dropConfig,
+      collect: (monitor) => ({
+        isOverTopLevel: monitor.isOver({ shallow: true }) && monitor.canDrop(),
+      }),
+    }),
+    [dropConfig]
+  );
+
+  // Bottom drop zone with hover indicator
+  const [{ isOverBottomLevel }, dropBottomLevel] = useDrop(
+    () => ({
+      ...dropConfig,
+      collect: (monitor) => ({
+        isOverBottomLevel: monitor.isOver({ shallow: true }) && monitor.canDrop(),
+      }),
+    }),
+    [dropConfig]
+  );
+
   return (
     <>
       <div className="api-client-sidebar-header-container">
@@ -374,7 +437,8 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
         )}
       </div>
       <div className={`collections-list-container ${showSelection ? "selection-enabled" : ""}`}>
-        <div className="collections-list-content">
+        <div ref={dropBackground} className="collections-list-content">
+          <div ref={dropTopLevel} className={`top-level-drop-zone ${isOverTopLevel ? "active" : ""}`} />
           <ExampleCollectionsNudge />
           {updatedRecords.count > 0 ? (
             <div className="collections-list">
@@ -420,6 +484,8 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
                   <SidebarPlaceholderItem name="New Request" />
                 </div>
               )}
+
+              <div ref={dropBottomLevel} className={`bottom-level-drop-zone ${isOverBottomLevel ? "active" : ""}`} />
             </div>
           ) : (
             <ApiRecordEmptyState
