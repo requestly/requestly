@@ -19,6 +19,7 @@ import { loadWorkspaces } from "./commands/multiView/loadPendingWorkspaces.comma
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { createRepository } from "./commands/context/setupContext.command";
 import Split from "react-split";
+import { AIChatView } from "./components/AIChat";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 
@@ -42,7 +43,7 @@ const ApiClientFeatureContainer: React.FC = () => {
   }, []);
 
   const getSecondPaneMinSize = () => {
-    return screenWidth < 1440 ? 700 : 800;
+    return screenWidth < 1440 ? 760 : 700;
   };
 
   useEffect(() => {
@@ -95,8 +96,8 @@ const ApiClientFeatureContainer: React.FC = () => {
             <Split
               className="api-client-container__split"
               direction="horizontal"
-              sizes={[20, 80]}
-              minSize={[300, getSecondPaneMinSize()]}
+              sizes={[20, 60, 20]}
+              minSize={[300, getSecondPaneMinSize(), 400]}
               gutter={(index, direction) => {
                 const gutterContainer = document.createElement("div");
                 gutterContainer.style.position = "relative";
@@ -114,6 +115,7 @@ const ApiClientFeatureContainer: React.FC = () => {
             >
               <APIClientSidebar />
               <TabsContainer />
+              <AIChatView />
             </Split>
           </ApiClientProvider>
         </div>
