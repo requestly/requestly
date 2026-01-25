@@ -11,6 +11,7 @@ import { IoIosArrowDown } from "@react-icons/all-files/io/IoIosArrowDown";
 import { useSetUrl } from "../hooks/useSetUrl";
 import PATHS from "config/constants/sub/paths";
 import { useCloseActiveTabShortcut } from "hooks/useCloseActiveTabShortcut";
+import { DraggableTab } from "./DraggableTab";
 import "./tabsContainer.scss";
 import { TabsMorePopover } from "./TabsMorePopover";
 
@@ -32,6 +33,7 @@ export const TabsContainer: React.FC = () => {
     resetPreviewTab,
     consumeIgnorePath,
     cleanupCloseBlockers,
+    reorderTabs,
   ] = useTabServiceWithSelector((state) => [
     state.activeTabId,
     state.activeTabSource,
@@ -44,6 +46,7 @@ export const TabsContainer: React.FC = () => {
     state.resetPreviewTab,
     state.consumeIgnorePath,
     state.cleanupCloseBlockers,
+    state.reorderTabs,
   ]);
 
   const { setUrl } = useSetUrl();
@@ -158,54 +161,56 @@ export const TabsContainer: React.FC = () => {
         key: tabState.id.toString(),
         closable: false,
         label: (
-          <div
-            className="tab-title-container"
-            onDoubleClick={() => {
-              if (tabState.preview) {
-                tabState.setPreview(false);
-                incrementVersion();
-                resetPreviewTab();
-              }
-            }}
-          >
-            <div className="tab-title">
-              {<div className="icon">{tabState.icon}</div>}
-              <Typography.Text
-                ellipsis={{
-                  tooltip: {
-                    title: tabState.title,
-                    placement: "bottom",
-                    color: "#000",
-                    mouseEnterDelay: 0.5,
-                  },
-                }}
-                className="title"
-              >
-                {tabState.preview ? <i>{tabState.title}</i> : tabState.title}
-              </Typography.Text>
-            </div>
+          <DraggableTab tabId={tabState.id} onReorder={reorderTabs}>
+            <div
+              className="tab-title-container"
+              onDoubleClick={() => {
+                if (tabState.preview) {
+                  tabState.setPreview(false);
+                  incrementVersion();
+                  resetPreviewTab();
+                }
+              }}
+            >
+              <div className="tab-title">
+                {<div className="icon">{tabState.icon}</div>}
+                <Typography.Text
+                  ellipsis={{
+                    tooltip: {
+                      title: tabState.title,
+                      placement: "bottom",
+                      color: "#000",
+                      mouseEnterDelay: 0.5,
+                    },
+                  }}
+                  className="title"
+                >
+                  {tabState.preview ? <i>{tabState.title}</i> : tabState.title}
+                </Typography.Text>
+              </div>
 
-            <div className="tab-actions">
-              <RQButton
-                size="small"
-                type="transparent"
-                className="tab-close-button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  closeTabById(tabState.id);
-                }}
-                icon={<MdClose />}
-              />
-              {tabState.unsaved ? <div className="unsaved-changes-indicator" /> : null}
+              <div className="tab-actions">
+                <RQButton
+                  size="small"
+                  type="transparent"
+                  className="tab-close-button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    closeTabById(tabState.id);
+                  }}
+                  icon={<MdClose />}
+                />
+                {tabState.unsaved ? <div className="unsaved-changes-indicator" /> : null}
+              </div>
             </div>
-          </div>
+          </DraggableTab>
         ),
         children: <TabItem store={tabStore}>{tabState.source.render()}</TabItem>,
       };
     });
     // We need _version in the dependency array
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tabs, _version]);
+  }, [tabs, _version, reorderTabs]);
 
   return tabItems.length === 0 ? (
     <div className="tabs-outlet-container">
