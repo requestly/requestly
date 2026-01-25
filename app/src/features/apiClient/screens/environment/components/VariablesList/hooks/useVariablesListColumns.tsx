@@ -68,7 +68,8 @@ export const useVariablesListColumns = ({
         title: "Type",
         handleVariableChange,
         isReadOnly,
-        options: ["string", "number", "boolean", "secret"],
+        // options: ["string", "number", "boolean", "secret"],
+        options: Object.values(EnvironmentVariableType).map((type) => type.toString()),
       }),
     },
     container === "environments"

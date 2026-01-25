@@ -18,6 +18,7 @@ export enum EnvironmentVariableType {
   Number = "number",
   Boolean = "boolean",
   Secret = "secret",
+  Enum = "enum",
 }
 
 export enum VariableScope {
