@@ -78,11 +78,7 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
     },
   })
   async createRecord(record: Partial<RQAPI.ApiClientRecord>) {
-    const result = await upsertApiRecord(this.meta.uid, record, this.meta.teamId);
-    if (!result.success) {
-      throw result.error;
-    }
-    return result;
+    return await upsertApiRecord(this.meta.uid, record, this.meta.teamId);
   }
 
   async createCollection(record: Partial<RQAPI.ApiClientRecord>) {
@@ -90,11 +86,7 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
   }
 
   async createRecordWithId(record: Partial<RQAPI.ApiClientRecord>, id: string) {
-    const result = await upsertApiRecord(this.meta.uid, record, this.meta.teamId, id);
-    if (!result.success) {
-      throw result.error;
-    }
-    return result;
+    return await upsertApiRecord(this.meta.uid, record, this.meta.teamId, id);
   }
 
   @SentryCustomSpan({
@@ -110,11 +102,7 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
     if (type) {
       sanitizedRecord.type = type;
     }
-    const result = await updateApiRecord(this.meta.uid, sanitizedRecord, this.meta.teamId);
-    if (!result.success) {
-      throw result.error;
-    }
-    return result;
+    return await updateApiRecord(this.meta.uid, sanitizedRecord, this.meta.teamId);
   }
 
   async deleteRecords(recordIds: string[]) {
