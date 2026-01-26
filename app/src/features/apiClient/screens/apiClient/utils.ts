@@ -378,38 +378,6 @@ export const parseMultipartFormDataString = (
   return result;
 };
 
-/**
- * Detects if the input string is a cURL command or a regular URL
- * @param input - The input string to check
- * @returns true if input appears to be a cURL command, false otherwise
- */
-export const isCurlCommand = (input: string): boolean => {
-  if (!input || typeof input !== "string") {
-    return false;
-  }
-  const trimmedInput = input.trim();
-  // Empty input is not a curl command
-  if (!trimmedInput) {
-    return false;
-  }
-  // Check for common cURL command patterns
-  // 1. Starts with 'curl ' (with space)
-  // 2. Has curl with flags like -X, --request, -H, --header, -d, --data, etc.
-  // 3. Handles multiline curl commands (with backslashes)
-  const curlPatterns = [
-    /^curl\s+/i, // Starts with 'curl '
-    /^curl$/i, // Just 'curl'
-    /\bcurl\s+-/i, // curl with flags
-    /\bcurl\s+--/i, // curl with long flags
-  ];
-  // Check if it matches any curl pattern
-  const matchesCurlPattern = curlPatterns.some((pattern) => pattern.test(trimmedInput));
-  if (matchesCurlPattern) {
-    return true;
-  }
-  return false;
-};
-
 export const parseCurlRequest = (curl: string): RQAPI.Request => {
   const requestJson = curlconverter.toJsonObject(curl);
   const queryParamsFromJson = generateKeyValuePairs(requestJson.queries);

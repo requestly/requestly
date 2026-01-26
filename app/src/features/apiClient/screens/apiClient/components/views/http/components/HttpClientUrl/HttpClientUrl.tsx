@@ -3,7 +3,6 @@ import {
   extractPathVariablesFromUrl,
   extractQueryParams,
   queryParamsToURLString,
-  isCurlCommand,
   parseCurlRequest,
 } from "features/apiClient/screens/apiClient/utils";
 import { KeyValuePair, RQAPI } from "features/apiClient/types";
@@ -11,7 +10,6 @@ import { useCallback, memo } from "react";
 import { ApiClientUrl } from "../../../components/request/components/ApiClientUrl/ApiClientUrl";
 import { BufferedHttpRecordEntity } from "features/apiClient/slices/entities";
 import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
-import { toast } from "utils/Toast";
 
 interface ApiClientUrlProps {
   entity: BufferedHttpRecordEntity;
@@ -27,20 +25,18 @@ const HttpApiClientUrl = ({ entity, onEnterPress, onUrlChange, onCurlImport }: A
 
   const handlePaste = useCallback(
     (pastedText: string): boolean => {
-      // Only try to parse if it looks like a curl command
-      if (isCurlCommand(pastedText)) {
-        try {
-          const requestFromCurl = parseCurlRequest(pastedText);
-          if (requestFromCurl?.url) {
-            onCurlImport?.(requestFromCurl);
-            return true; // Indicate that we handled the paste
-          }
-        } catch (error) {
-          console.error("Curl parsing error:", error);
-          toast.error("Failed to parse cURL command");
-        }
+      let requestFromPaste;
+      try {
+        requestFromPaste = parseCurlRequest(pastedText);
+      } catch (error) {
+        requestFromPaste = null;
       }
-      return false; // Let normal paste handling continue for regular URLs
+      if (requestFromPaste?.url) {
+        onCurlImport?.(requestFromPaste);
+        return true;
+      } else {
+        return false;
+      }
     },
     [onCurlImport]
   );

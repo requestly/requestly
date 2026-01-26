@@ -102,6 +102,21 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
                 event.preventDefault();
                 return true;
               }
+              // Handle multiline paste conversion
+              if (pastedText.includes("\n")) {
+                event.preventDefault();
+                const singleLineText = pastedText.replace(/\\\s*\n\s*/g, " ").replace(/\n/g, " ");
+                view.dispatch(
+                  view.state.update({
+                    changes: {
+                      from: view.state.selection.main.from,
+                      to: view.state.selection.main.to,
+                      insert: singleLineText,
+                    },
+                  })
+                );
+                return true;
+              }
             },
           }),
           highlightVariablesPlugin(
