@@ -30,8 +30,8 @@ export const OpenWorkspaceErrorView: React.FC<Props> = ({
     <>
       <WorkspaceCreationErrorView
         title="Workspace couldn’t be opened"
-        description="We couldn’t find the workspace config file (requestly.json) in this folder. 
-This error usually occurs when the wrong folder is selected, or if you've selected a subfolder instead of the workspace root."
+        description="We couldn’t find the workspace configuration file (requestly.json) in this folder. 
+      This error usually occurs when the wrong folder is selected, or if you've selected a subfolder instead of the workspace root."
         path={path}
         actions={
           <>

@@ -25,7 +25,13 @@
     .local-workspace-create-options__option-title {
       display: flex;
       align-items: center;
-      gap: var(--requestly-space-5, 12px);
+      gap: var(--requestly-space-3);
+      font-size: var(--requestly-font-size-sm);
+    }
+
+    svg {
+      width: 14px;
+      height: 14px;
     }
 
     &--primary {

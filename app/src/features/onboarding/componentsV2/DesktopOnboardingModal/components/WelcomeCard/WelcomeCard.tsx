@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Button } from "antd";
 import RQOnlyLogo from "/assets/media/common/RQ-only-logo.svg";
 import { useDispatch } from "react-redux";
@@ -26,6 +26,7 @@ export const WelcomeCard: React.FC<Props> = ({ onFeatureClick }) => {
   const dispatch = useDispatch();
   const [isApiClientCardExpanded, setIsApiClientCardExpanded] = useState(false);
   const [openWorkspaceError, setOpenWorkspaceError] = useState<FileSystemError | null>(null);
+  const apiClientCardRef = useRef<HTMLDivElement | null>(null);
 
   const { createWorkspace, isLoading } = useCreateDefaultLocalWorkspace({
     analyticEventSource: "desktop_onboarding_modal",
@@ -44,6 +45,24 @@ export const WelcomeCard: React.FC<Props> = ({ onFeatureClick }) => {
       setOpenWorkspaceError(error);
     },
   });
+
+  useEffect(() => {
+    if (!isApiClientCardExpanded) {
+      return;
+    }
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (apiClientCardRef.current && !apiClientCardRef.current.contains(event.target as Node)) {
+        setIsApiClientCardExpanded(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isApiClientCardExpanded]);
 
   const handleApiClientCardExpandToggle = () => {
     if (!isApiClientCardExpanded) {
@@ -90,7 +109,11 @@ export const WelcomeCard: React.FC<Props> = ({ onFeatureClick }) => {
             },
           }}
         >
-          <div className="api-client-onboard-card welcome-card-option" onClick={handleApiClientCardExpandToggle}>
+          <div
+            ref={apiClientCardRef}
+            className="api-client-onboard-card welcome-card-option"
+            onClick={handleApiClientCardExpandToggle}
+          >
             <div className="api-client-onboard-card__header">
               <WelcomeCardHeader
                 title="Start using API Client"
