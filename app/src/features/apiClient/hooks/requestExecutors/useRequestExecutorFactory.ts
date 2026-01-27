@@ -104,9 +104,8 @@ export const useRequestExecutorFactory = <T>(ExecutorClass: ExecutorConstructor<
             continue;
           }
           // For non-runtime entities, use ApiClientStoreState
-          const variablesToSave = (entity as Exclude<typeof entity, RuntimeVariablesEntity>).variables.getAll(
-            store.getState()
-          );
+          const variablesToSave = entity.variables.getAll(store.getState());
+
           if (entity.type === ApiClientEntityType.COLLECTION_RECORD) {
             await repositories.apiClientRecordsRepository.setCollectionVariables(entity.id, variablesToSave);
             continue;
