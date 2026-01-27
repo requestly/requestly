@@ -159,11 +159,10 @@ export const MultiEditableCell: React.FC<React.PropsWithChildren<EditableCellPro
                 ]}
                 defaultValue={record?.type ?? FormDropDownOptions.TEXT}
                 onChange={(value) => {
-                  record.type = value;
                   //clear the value if type is changed to file, because earlier value remains there
                   const newValue: string | [] = value === FormDropDownOptions.FILE ? [] : "";
-                  form.setFieldsValue({ value: newValue });
-                  save();
+                  form.setFieldsValue({ type: value, value: newValue });
+                  handleUpdatePair({ ...record, type: value, value: newValue });
                 }}
               />
             )}
