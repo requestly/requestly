@@ -1,4 +1,10 @@
-import { createListenerMiddleware, AnyAction } from "@reduxjs/toolkit";
+import {
+  createListenerMiddleware,
+  AnyAction,
+  ListenerEffectAPI,
+  Dispatch,
+  TypedStartListening,
+} from "@reduxjs/toolkit";
 import { bufferActions, findBufferByReferenceId } from "./slice";
 import { ApiClientEntityType } from "../entities/types";
 import {
@@ -14,6 +20,8 @@ import { environmentsAdapter } from "../environments/slice";
 import { runConfigAdapter } from "../runConfig/slice";
 import { EntitySyncedPayload } from "../common/actions";
 import { ApiClientStoreState } from "../workspaceView/helpers/ApiClientContextRegistry";
+
+type BufferListenerApi = ListenerEffectAPI<ApiClientRootState, Dispatch<AnyAction>>;
 
 interface BufferSyncRemote {
   entityTypes: ApiClientEntityType[];
@@ -87,12 +95,12 @@ const remotes: BufferSyncRemote[] = [
 ];
 
 function performBufferSync(
-  listenerApi: { getState: () => unknown; dispatch: (action: unknown) => unknown },
+  listenerApi: BufferListenerApi,
   remote: BufferSyncRemote,
   id: string,
   overrideData?: unknown
 ) {
-  const state = listenerApi.getState() as ApiClientStoreState;
+  const state = listenerApi.getState();
   const bufferState = state[BUFFER_SLICE_NAME];
 
   const buffer = findBufferByReferenceId(bufferState.entities, id);
@@ -116,7 +124,12 @@ function performBufferSync(
 
 export const bufferListenerMiddleware = createListenerMiddleware();
 
-bufferListenerMiddleware.startListening({
+const startAppListening = bufferListenerMiddleware.startListening as TypedStartListening<
+  ApiClientRootState,
+  Dispatch<AnyAction>
+>;
+
+startAppListening({
   predicate: (action) => {
     return action.type === "entities/synced" || remotes.some((remote) => remote.shouldHandleAction(action));
   },
@@ -124,22 +137,21 @@ bufferListenerMiddleware.startListening({
   effect: (action, listenerApi) => {
     if (action.type === "entities/synced") {
       const { entityId, entityType, data } = action.payload as EntitySyncedPayload;
-
       const remote = remotes.find((r) => r.entityTypes.includes(entityType));
 
-      if (remote && entityId) {
-        performBufferSync(listenerApi, remote, entityId, data);
-      }
+      if (!remote || !entityId) return;
+
+      performBufferSync(listenerApi, remote, entityId, data);
       return;
     }
 
     const remote = remotes.find((r) => r.shouldHandleAction(action));
-    if (remote) {
-      const id = remote.extractId(action);
-      if (id) {
-        performBufferSync(listenerApi, remote, id);
-      }
-    }
+    if (!remote) return;
+
+    const id = remote.extractId(action);
+    if (!id) return;
+
+    performBufferSync(listenerApi, remote, id);
   },
 });
 
