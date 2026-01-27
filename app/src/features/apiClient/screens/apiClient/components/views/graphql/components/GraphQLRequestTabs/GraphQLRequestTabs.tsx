@@ -47,7 +47,11 @@ export const GraphQLRequestTabs: React.FC<Props> = ({
       {
         key: GraphQLRequestTab.HEADERS,
         label: <RequestTabLabel label="Headers" />,
-        children: <RequestHeaders entity={entity} />,
+        children: (
+          <div className="non-scrollable-tab-content">
+            <RequestHeaders entity={entity} />
+          </div>
+        ),
       },
       {
         key: GraphQLRequestTab.AUTHORIZATION,

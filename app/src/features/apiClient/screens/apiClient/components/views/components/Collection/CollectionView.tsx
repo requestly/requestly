@@ -6,7 +6,7 @@ import { CollectionsVariablesView } from "./components/CollectionsVariablesView/
 import CollectionAuthorizationView from "./components/CollectionAuthorizationView/CollectionAuthorizationView";
 import "./collectionView.scss";
 import { useBufferByReferenceId, useEntity } from "features/apiClient/slices/entities/hooks";
-import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
+import { useApiClientDispatch, useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
 import { useApiClientRepository } from "features/apiClient/slices/workspaceView/helpers/ApiClientContextRegistry";
 import { ApiClientBreadCrumb, BreadcrumbType } from "../ApiClientBreadCrumb/ApiClientBreadCrumb";
 import { trackCollectionRunnerViewed } from "modules/analytics/events/features/apiClient";
@@ -28,6 +28,7 @@ interface CollectionViewProps {
 export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) => {
   const { apiClientRecordsRepository } = useApiClientRepository();
   const [activeTabKey, setActiveTabKey] = useState(TAB_KEYS.OVERVIEW);
+  const dispatch = useApiClientDispatch();
   const entity = useEntity({
     id: collectionId,
     type: ApiClientEntityType.COLLECTION_RECORD,

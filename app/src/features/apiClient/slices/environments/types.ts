@@ -5,6 +5,7 @@ export interface EnvironmentEntity {
   id: string;
   name: string;
   variables: EnvironmentVariables;
+  variablesOrder?: string[]; // Array of variable keys in display order
 }
 
 export interface EnvironmentsState {
@@ -12,4 +13,3 @@ export interface EnvironmentsState {
   globalEnvironment: EnvironmentEntity;
   activeEnvironmentId: string | null;
 }
-

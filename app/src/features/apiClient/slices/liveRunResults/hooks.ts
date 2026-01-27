@@ -9,7 +9,6 @@ import {
   selectLiveRunResultError,
   selectLiveRunResultCurrentlyExecutingRequest,
   selectLiveRunResultSummary,
-  selectLiveRunResultConfigId,
 } from "./selectors";
 import { LiveRunEntryState } from "./slice";
 import { createSelector } from "@reduxjs/toolkit";
@@ -63,8 +62,4 @@ export function useLiveRunResultSummary(collectionId: RQAPI.CollectionRecord["id
   }
 
   return summary;
-}
-
-export function useLiveRunResultConfigId(collectionId: RQAPI.CollectionRecord["id"]) {
-  return useApiClientSelector((state) => selectLiveRunResultConfigId(state, collectionId));
 }

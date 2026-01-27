@@ -34,8 +34,7 @@ export const RuntimeVariablesView: React.FC = () => {
     saveBuffer(
       {
         entity,
-        async save() {
-        },
+        async save() {},
       },
       {
         beforeSave() {
@@ -53,7 +52,7 @@ export const RuntimeVariablesView: React.FC = () => {
         },
       }
     );
-  }, [variablesData, globalDispatch, apiClientDispatch, entity.meta.id]);
+  }, [saveBuffer, entity]);
 
   const handleDeleteAll = useCallback(() => {
     try {

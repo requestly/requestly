@@ -90,7 +90,7 @@ export class FirebaseEnvSync implements EnvironmentInterface<ApiClientCloudMeta>
 
   async updateEnvironment(
     environmentId: string,
-    updates: Partial<Pick<EnvironmentData, "name" | "variables">>
+    updates: Partial<Pick<EnvironmentData, "name" | "variables" | "variablesOrder">>
   ): Promise<void> {
     if (updates.variables) {
       updates.variables = Object.fromEntries(Object.entries(updates.variables).filter(([key]) => key !== ""));

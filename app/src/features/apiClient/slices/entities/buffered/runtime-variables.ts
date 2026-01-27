@@ -9,12 +9,14 @@ import type { EntityDispatch } from "../types";
 import { BufferedApiClientEntity, BufferedApiClientEntityMeta } from "./factory";
 import { reduxStore } from "store";
 
-
-export class BufferedRuntimeVariablesEntity extends RuntimeVariablesEntity<BufferedApiClientEntityMeta> implements BufferedApiClientEntity {
-  origin = new RuntimeVariablesEntity(reduxStore.dispatch)
+export class BufferedRuntimeVariablesEntity
+  extends RuntimeVariablesEntity<BufferedApiClientEntityMeta>
+  implements BufferedApiClientEntity {
+  origin = new RuntimeVariablesEntity(reduxStore.dispatch);
   // @ts-expect-error - Shadowing parent's variables with buffered version that uses ApiClientRootState instead of RootState
-  override readonly variables = new ApiClientVariables<RuntimeVariablesRecord, ApiClientRootState>(
+  readonly variables = new ApiClientVariables<RuntimeVariablesRecord, ApiClientRootState>(
     (e) => e.variables,
+    (e) => e.variablesOrder,
     this.unsafePatch.bind(this),
     this.getEntityFromStateBuffered.bind(this)
   );
@@ -24,7 +26,6 @@ export class BufferedRuntimeVariablesEntity extends RuntimeVariablesEntity<Buffe
     (this as { meta: ApiClientEntityMeta }).meta = meta;
   }
 
-
   getEntityFromStateBuffered(state: ApiClientRootState): RuntimeVariablesRecord {
     const entry = bufferAdapterSelectors.selectById(state.buffer, this.meta.id);
     if (!entry) {
@@ -33,7 +34,7 @@ export class BufferedRuntimeVariablesEntity extends RuntimeVariablesEntity<Buffe
     return entry.current as RuntimeVariablesRecord;
   }
 
-  override dispatchUnsafePatch(patcher: (entity: RuntimeVariablesRecord) => void): void {
+  dispatchUnsafePatch(patcher: (entity: RuntimeVariablesRecord) => void): void {
     this.dispatch(
       bufferActions.unsafePatch({
         id: this.meta.id,
@@ -44,8 +45,7 @@ export class BufferedRuntimeVariablesEntity extends RuntimeVariablesEntity<Buffe
     );
   }
 
-
-  override clear(): void {
+  clear(): void {
     this.unsafePatch((entity) => {
       entity.variables = {};
     });

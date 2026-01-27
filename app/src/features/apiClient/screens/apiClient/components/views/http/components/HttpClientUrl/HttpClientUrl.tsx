@@ -72,7 +72,7 @@ const HttpApiClientUrl = ({ entity, onEnterPress, onUrlChange, onCurlImport }: A
       entity.setQueryParams(finalParams);
       onUrlChange(value, finalParams);
     },
-    [entity, onUrlChange, queryParams]
+    [onUrlChange, queryParams, entity]
   );
 
   return (

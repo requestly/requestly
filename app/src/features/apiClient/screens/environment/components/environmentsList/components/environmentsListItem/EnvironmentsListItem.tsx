@@ -21,7 +21,7 @@ import {
   useActiveEnvironment,
   useAllEnvironments,
 } from "features/apiClient/slices/environments/environments.hooks";
-import { useActiveTabId, useTabActions } from "componentsV2/Tabs/slice";
+import { useActiveTab, useTabActions } from "componentsV2/Tabs/slice";
 import { useWorkspaceId } from "features/apiClient/common/WorkspaceProvider";
 import { useApiClientDispatch } from "features/apiClient/slices/hooks/base.hooks";
 
@@ -63,8 +63,8 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
   const dispatch = useApiClientDispatch();
   const workspaceId = useWorkspaceId();
   const { environmentVariablesRepository } = useApiClientRepository();
-  const { openBufferedTab, closeTabByEntityId } = useTabActions();
-  const activeTabSourceId = useActiveTabId();
+  const { openBufferedTab } = useTabActions();
+  const activeTabSourceId = useActiveTab()?.source.getSourceId();
 
   const environment = useEnvironmentById(environmentId);
   const activeEnvironment = useActiveEnvironment();
@@ -157,13 +157,12 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
         })
       ).unwrap();
 
-      closeTabByEntityId({ entityId: environment.id });
       trackEnvironmentDeleted();
       toast.success("Environment deleted successfully");
     } catch (error) {
       toast.error("Failed to delete environment");
     }
-  }, [environment, dispatch, environmentVariablesRepository, closeTabByEntityId]);
+  }, [environment, dispatch, environmentVariablesRepository]);
 
   const menuItems = useMemo(() => {
     if (!environment) return [];

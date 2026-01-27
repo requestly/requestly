@@ -17,6 +17,7 @@ import { ExclamationCircleFilled } from "@ant-design/icons";
 import { Modal } from "antd";
 import { ApiClientViewMode, useViewMode, useWorkspaceViewActions } from "features/apiClient/slices";
 import { getWorkspaceInfo } from "features/apiClient/slices/workspaceView/utils";
+import { InvalidContextVersionError } from "features/apiClient/slices/workspaceView/helpers/ApiClientContextRegistry/ApiClientContextRegistry";
 
 //TODO: move it into top level hooks
 export const useWorkspaceSwitcher = () => {
@@ -70,47 +71,49 @@ export const useWorkspaceSwitcher = () => {
       }
 
       setIsWorkspaceLoading(true);
-
-      await switchContext({
-        userId,
-        workspace: getWorkspaceInfo(workspace),
-      });
-
-      // TBD: should we move switchWorkspace inside the switchContext
-      // Issues:
-      // 1. When in multiview and last workspace unchecked, workspace should be switched
-      // 2. When first workspace is checked, it should switch to that if not and then go in multiview
-      switchWorkspace(
-        {
-          teamId: workspace.id,
-          teamName: workspace.name,
-          teamMembersCount: workspace.accessCount,
-          workspaceType: workspace.workspaceType,
-        },
-        dispatch,
-        {
-          isSyncEnabled: workspace.workspaceType === WorkspaceType.SHARED ? user?.details?.isSyncEnabled : true,
-          isWorkspaceMode: isSharedWorkspace,
-        },
-        appMode,
-        undefined,
-        "workspaces_dropdown"
-      )
-        .then(() => {
-          if (!isWorkspaceLoading) {
-            showSwitchWorkspaceSuccessToast(workspace.name);
-          }
-
-          callback?.();
-
-          setIsWorkspaceLoading(false);
-        })
-        .catch((error) => {
-          setIsWorkspaceLoading(false);
-          toast.error(
-            "Failed to switch workspace. Please reload and try again. If the issue persists, please contact support."
-          );
+      try {
+        const result = await switchContext({
+          userId,
+          workspace: getWorkspaceInfo(workspace),
         });
+
+        if (result.payload?.error) {
+          if (result.payload.error.name === InvalidContextVersionError.name) {
+            return;
+          } else {
+            throw new Error(result.payload?.error);
+          }
+        }
+
+        await switchWorkspace(
+          {
+            teamId: workspace.id,
+            teamName: workspace.name,
+            teamMembersCount: workspace.accessCount,
+            workspaceType: workspace.workspaceType,
+          },
+          dispatch,
+          {
+            isSyncEnabled: workspace.workspaceType === WorkspaceType.SHARED ? user?.details?.isSyncEnabled : true,
+            isWorkspaceMode: isSharedWorkspace,
+          },
+          appMode,
+          undefined,
+          "workspaces_dropdown"
+        );
+
+        if (!isWorkspaceLoading) {
+          showSwitchWorkspaceSuccessToast(workspace.name);
+        }
+
+        callback?.();
+      } catch (error) {
+        toast.error(
+          "Failed to switch workspace. Please reload and try again. If the issue persists, please contact support."
+        );
+      } finally {
+        setIsWorkspaceLoading(false);
+      }
     },
     [
       activeWorkspace?.id,
@@ -161,24 +164,33 @@ export const useWorkspaceSwitcher = () => {
         return;
       }
     }
-    setIsWorkspaceLoading(true);
-    await switchContext({
-      userId,
-      workspace: { id: dummyPersonalWorkspace.id, meta: { type: WorkspaceType.PERSONAL } },
-    });
 
-    return clearCurrentlyActiveWorkspace(dispatch, appMode)
-      .then(() => {
-        showSwitchWorkspaceSuccessToast();
-      })
-      .catch(() => {
-        toast.error(
-          "Failed to switch workspace. Please reload and try again. If the issue persists, please contact support."
-        );
-      })
-      .finally(() => {
-        setIsWorkspaceLoading(false);
+    setIsWorkspaceLoading(true);
+
+    try {
+      const result = await switchContext({
+        userId,
+        workspace: { id: dummyPersonalWorkspace.id, meta: { type: WorkspaceType.PERSONAL } },
       });
+
+      if (result.payload?.error) {
+        if (result.payload.error.name === InvalidContextVersionError.name) {
+          return;
+        } else {
+          throw new Error(result.payload?.error);
+        }
+      }
+
+      await clearCurrentlyActiveWorkspace(dispatch, appMode);
+
+      showSwitchWorkspaceSuccessToast();
+    } catch (error) {
+      toast.error(
+        "Failed to switch workspace. Please reload and try again. If the issue persists, please contact support."
+      );
+    } finally {
+      setIsWorkspaceLoading(false);
+    }
   }, [viewMode, switchContext, userId, dispatch, appMode, activeWorkspace?.id]);
 
   return {
