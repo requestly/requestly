@@ -45,7 +45,7 @@ export const WorkspaceCreationView: React.FC<Props> = ({
         return (
           <ExistingWorkspaceConflictView
             path={currentSelectedFolderPathRef.current as string}
-            onChooseAnotherFolder={() => {
+            onFolderSelectionCallback={() => {
               currentSelectedFolderPathRef.current = null;
               setError(null);
             }}
@@ -69,6 +69,8 @@ export const WorkspaceCreationView: React.FC<Props> = ({
           isLoading={isLoading}
           onCancel={onCancel}
           isOpenedInModal={isOpenedInModal}
+          onSuccessCallback={callback}
+          analyticEventSource={analyticEventSource}
         />
       )}
     </>
