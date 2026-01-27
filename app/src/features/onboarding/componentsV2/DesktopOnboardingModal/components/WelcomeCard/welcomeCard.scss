@@ -35,3 +35,9 @@
     top: 32px;
   }
 }
+
+.api-client-onboard-card__options-container {
+  .local-workspace-create-options__option-title {
+    font-size: var(--requestly-font-size-md) !important;
+  }
+}
