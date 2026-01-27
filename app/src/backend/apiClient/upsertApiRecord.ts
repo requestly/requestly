@@ -87,7 +87,7 @@ const _createApiRecord = async (
   } else {
     const resultDocRef = await addDoc(rootApiRecordsCollectionRef, { ...newRecord });
     Logger.log(`Api document created ${resultDocRef.id}`);
-    updateDoc(resultDocRef, {
+    await updateDoc(resultDocRef, {
       id: resultDocRef.id,
     });
     return { success: true, data: { ...newRecord, id: resultDocRef.id } };
