@@ -19,6 +19,8 @@ import { useOpenLocalWorkspace } from "features/workspaces/hooks/useOpenLocalWor
 import { FileSystemError } from "features/apiClient/helpers/modules/sync/local/services/types";
 import { OpenWorkspaceErrorView } from "./components/OpenWorkspaceErrorView";
 import { useWorkspaceCreationContext } from "../../context";
+import { checkIsWorkspacePathAvailable } from "services/fsManagerServiceAdapter";
+import { ExistingWorkspaceConflictView } from "./components/ExistingWorkspaceConflictView";
 
 type FolderItem = {
   name: string;
@@ -57,13 +59,17 @@ const INVALID_FS_NAME_CHARACTERS = /[<>:"/\\|?*\x00-\x1f]/g;
 export const LocalWorkspaceCreationView = ({
   onCreateWorkspaceClick,
   onCancel,
+  onSuccessCallback,
   isLoading,
   isOpenedInModal,
+  analyticEventSource,
 }: {
   onCreateWorkspaceClick: (args: CreateWorkspaceArgs) => void;
-  isLoading: boolean;
   onCancel: () => void;
+  onSuccessCallback?: () => void;
+  isLoading: boolean;
   isOpenedInModal?: boolean;
+  analyticEventSource: string;
 }) => {
   const { workspaceName, folderPath, setWorkspaceName, setFolderPath } = useWorkspaceCreationContext();
 
@@ -72,10 +78,12 @@ export const LocalWorkspaceCreationView = ({
   const [isCreationOptionsVisible, setIsCreationOptionsVisible] = useState(isOpenedInModal ?? false);
   const [openWorkspaceError, setOpenWorkspaceError] = useState<FileSystemError | null>(null);
 
+  const [isSelectedFolderAvailable, setIsSelectedFolderAvailable] = useState(true);
+
   const { openWorkspace, isLoading: isOpenWorkspaceLoading } = useOpenLocalWorkspace({
     analyticEventSource: "create_workspace_modal",
     onOpenWorkspaceCallback: () => {
-      onCancel();
+      onSuccessCallback?.();
     },
     onError: (error) => {
       setOpenWorkspaceError(error);
@@ -138,6 +146,13 @@ export const LocalWorkspaceCreationView = ({
         if (result.success) {
           setFolderPreview(result);
           setFolderPath(result.folderPath);
+          checkIsWorkspacePathAvailable(result.folderPath)
+            .then((isEligible) => {
+              setIsSelectedFolderAvailable(isEligible);
+            })
+            .catch(() => {
+              setIsSelectedFolderAvailable(false);
+            });
         }
       })
       .catch((err: unknown) => {
@@ -163,6 +178,18 @@ export const LocalWorkspaceCreationView = ({
         openWorkspace={openWorkspace}
         isOpeningWorkspaceLoading={isOpenWorkspaceLoading}
         analyticEventSource="create_workspace_modal"
+      />
+    );
+  }
+
+  if (!isSelectedFolderAvailable) {
+    return (
+      <ExistingWorkspaceConflictView
+        path={folderPath}
+        onFolderSelectionCallback={() => {
+          setIsSelectedFolderAvailable(true);
+        }}
+        analyticEventSource={analyticEventSource}
       />
     );
   }
