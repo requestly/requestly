@@ -603,17 +603,18 @@ const HttpClientView: React.FC<Props> = ({
           record.id = apiEntryDetails?.id;
         }
 
-        const result = isCreateMode
-          ? await apiClientRecordsRepository.createRecordWithId(record, record.id!) // not the ideal way but had to assert because record is typed as Partial here
-          : await apiClientRecordsRepository.updateRecord(record, record.id!);
+        try {
+          const result = isCreateMode
+            ? await apiClientRecordsRepository.createRecordWithId(record, record.id!) // not the ideal way but had to assert because record is typed as Partial here
+            : await apiClientRecordsRepository.updateRecord(record, record.id!);
 
-        if (result.success && result.data.type === RQAPI.RecordType.API) {
+          // moved result.data to httpApiEntry
           const httpApiEntry = result.data as RQAPI.HttpApiRecord;
 
-          onSaveRecord({ ...(apiEntryDetails ?? {}), ...result.data, data: { ...result.data.data, ...record.data } });
+          onSaveRecord({ ...(apiEntryDetails ?? {}), ...httpApiEntry, data: { ...httpApiEntry.data, ...record.data } });
 
           setEntry({ ...httpApiEntry.data, response: entry.response, testResults: entry.testResults });
-          const { response, testResults, ...resultWithoutResponse } = result.data.data;
+          const { response, testResults, ...resultWithoutResponse } = httpApiEntry.data;
           resetChanges({ ...(resultWithoutResponse as RQAPI.HttpApiEntry), response: null });
           trackRequestSaved({
             src: "api_client_view",
@@ -628,15 +629,15 @@ const HttpClientView: React.FC<Props> = ({
           Sentry.getActiveSpan()?.setStatus({
             code: SPAN_STATUS_OK,
           });
-        } else {
-          notification.error({
-            message: `Could not save request.`,
-            description: result?.message,
-            placement: "bottomRight",
-          });
-          Sentry.captureException(new Error(`Could not save request: ${result?.message}`));
+        } catch (e) {
+          Sentry.captureException(e);
           Sentry.getActiveSpan()?.setStatus({
             code: SPAN_STATUS_ERROR,
+          });
+          notification.error({
+            message: `Could not save request.`,
+            description: e?.message,
+            placement: "bottomRight",
           });
         }
 
