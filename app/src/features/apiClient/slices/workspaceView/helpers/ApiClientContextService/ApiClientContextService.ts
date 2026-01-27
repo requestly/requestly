@@ -10,8 +10,6 @@ import { WorkspaceType } from "features/workspaces/types";
 import { toast } from "utils/Toast";
 import { ApiClientFeatureContext, ApiClientStore } from "../ApiClientContextRegistry/types";
 import { reduxStore } from "store";
-import { forceRefreshRecords } from "features/apiClient/commands/records";
-import { forceRefreshEnvironments } from "features/apiClient/commands/environments";
 import { reloadFsManager } from "services/fsManagerServiceAdapter";
 import { workspaceViewActions } from "../../slice";
 import {
@@ -20,6 +18,8 @@ import {
 } from "../ApiClientContextRegistry/ApiClientContextRegistry";
 import { configureStore, EntityState } from "@reduxjs/toolkit";
 import { apiRecordsSlice } from "features/apiClient/slices/apiRecords";
+import { forceRefreshRecords } from "features/apiClient/slices/apiRecords/thunks";
+import { forceRefreshEnvironments } from "features/apiClient/slices/environments/thunks";
 import { WorkspaceInfo } from "../../types";
 import persistStore from "redux-persist/es/persistStore";
 import { REHYDRATE } from "redux-persist";
@@ -66,6 +66,31 @@ function arrayToEntityState<T extends { id: string }>(items: T[]): EntityState<T
   };
 }
 
+function ensureVariablesOrder(env: EnvironmentData): EnvironmentData {
+  if (!env.variablesOrder && env.variables) {
+    return {
+      ...env,
+      variablesOrder: Object.keys(env.variables),
+    };
+  }
+  return env;
+}
+
+function ensureCollectionVariablesOrder(record: RQAPI.ApiClientRecord): RQAPI.ApiClientRecord {
+  if (record.type === RQAPI.RecordType.COLLECTION) {
+    if (!record.data.variablesOrder && record.data.variables) {
+      return {
+        ...record,
+        data: {
+          ...record.data,
+          variablesOrder: Object.keys(record.data.variables),
+        },
+      };
+    }
+  }
+  return record;
+}
+
 class ApiClientContextService {
   contextRegistry: ApiClientContextRegistry;
 
@@ -109,7 +134,7 @@ class ApiClientContextService {
     };
     const store = configureStore({
       devTools: {
-        name: `workspace-${workspaceId}`
+        name: `workspace-${workspaceId}`,
       },
       reducer: {
         [apiRecordsSlice.name]: createApiClientRecordsPersistedReducer(workspaceId || "null"),
@@ -329,12 +354,13 @@ class ApiClientContextService {
     });
   }
 
-  async createContext(workspace: WorkspaceInfo, userDetails: UserDetails): Promise<ApiClientFeatureContext> {
+  async createContext(workspace: WorkspaceInfo, userDetails: UserDetails): Promise<void> {
     const workspaceId = workspace.id;
 
+    const currentCtxVersion = this.contextRegistry.getVersion();
     const existing = this.contextRegistry.getContext(workspaceId);
     if (existing) {
-      return existing;
+      return;
     }
 
     const repo = this.createRepository({ workspaceId, workspaceMeta: workspace.meta, user: userDetails });
@@ -344,16 +370,17 @@ class ApiClientContextService {
 
     const result = await this.extractSetupDataFromRepository(repo);
 
-    // Convert environment data to EnvironmentEntity format
-    const environments: EnvironmentEntity[] = Object.values(result.environments.nonGlobalEnvironments).map((env) => ({
-      id: env.id,
-      name: env.name,
-      variables: env.variables,
-    }));
+    // Migrate and convert environment data to EnvironmentEntity format
+    const environments: EnvironmentEntity[] = Object.values(result.environments.nonGlobalEnvironments)
+      .map(ensureVariablesOrder)
+      .map((env) => ({
+        id: env.id,
+        name: env.name,
+        variables: env.variables,
+        variablesOrder: env.variablesOrder,
+      }));
     const globalEnvironment: EnvironmentEntity = {
-      id: result.environments.globalEnvironment.id,
-      name: result.environments.globalEnvironment.name,
-      variables: result.environments.globalEnvironment.variables,
+      ...ensureVariablesOrder(result.environments.globalEnvironment),
     };
 
     await this.hydrateInPlace({
@@ -396,9 +423,7 @@ class ApiClientContextService {
     });
 
     const ctx: ApiClientFeatureContext = { workspaceId, store, repositories: repo };
-    this.contextRegistry.addContext(ctx);
-
-    return ctx;
+    this.contextRegistry.addContext(ctx, currentCtxVersion);
   }
 
   async refreshContext(workspaceId: ApiClientFeatureContext["workspaceId"]): Promise<void> {
@@ -406,7 +431,7 @@ class ApiClientContextService {
       const context = this.contextRegistry.getContext(workspaceId);
 
       if (!context) {
-        throw new NativeError("Add the context to the store before trying to refresh it");
+        throw new NativeError(`Add the context to the store before trying to refresh it. Workspace ID: ${workspaceId}`);
       }
 
       if (context.repositories instanceof ApiClientLocalRepository) {
@@ -415,7 +440,14 @@ class ApiClientContextService {
 
       // TODO: Update to use new Redux store refresh logic
       // For now, using the old commands - these will need to be migrated
-      await Promise.all([forceRefreshRecords(context as any), forceRefreshEnvironments(context as any)]);
+      await Promise.all([
+        context.store.dispatch(
+          forceRefreshRecords({ repository: context.repositories.apiClientRecordsRepository }) as any
+        ),
+        context.store.dispatch(
+          forceRefreshEnvironments({ repository: context.repositories.environmentVariablesRepository }) as any
+        ),
+      ]);
     } catch (e) {
       reduxStore.dispatch(
         workspaceViewActions.setWorkspaceStatus({
@@ -462,7 +494,7 @@ class ApiClientContextService {
       });
     } else {
       records = {
-        records: fetchedRecordsResult.data.records,
+        records: fetchedRecordsResult.data.records.map(ensureCollectionVariablesOrder),
         erroredRecords: fetchedRecordsResult.data.erroredRecords,
       };
     }
@@ -483,8 +515,10 @@ class ApiClientContextService {
       }
 
       environments = {
-        globalEnvironment: globalEnv,
-        nonGlobalEnvironments: otherEnvs,
+        globalEnvironment: ensureVariablesOrder(globalEnv),
+        nonGlobalEnvironments: Object.fromEntries(
+          Object.entries(otherEnvs).map(([id, env]) => [id, ensureVariablesOrder(env)])
+        ),
         erroredRecords: fetchedEnvResult.data.erroredRecords,
       };
     }

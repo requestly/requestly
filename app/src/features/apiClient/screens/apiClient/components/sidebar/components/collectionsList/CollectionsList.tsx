@@ -27,13 +27,13 @@ import { MoveToCollectionModal } from "../../../modals/MoveToCollectionModal/Mov
 import ActionMenu from "./BulkActionsMenu";
 import { useRBAC } from "features/rbac";
 import * as Sentry from "@sentry/react";
-import { EXPANDED_RECORD_IDS_UPDATED } from "features/apiClient/exampleCollections/store";
 import { ExampleCollectionsNudge } from "../ExampleCollectionsNudge/ExampleCollectionsNudge";
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import APP_CONSTANTS from "config/constants";
 import { duplicateRecords, useAllRecords, useApiClientRepository, useChildToParent } from "features/apiClient/slices";
 import { useApiClientDispatch } from "features/apiClient/slices/hooks/base.hooks";
+import { EXPANDED_RECORD_IDS_UPDATED } from "features/apiClient/slices/exampleCollections";
 
 interface Props {
   onNewClick: (src: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType) => Promise<void>;
@@ -73,11 +73,16 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
   const [searchValue, setSearchValue] = useState("");
   const [isAllRecordsSelected, setIsAllRecordsSelected] = useState(false);
 
-  const debouncedTrackUserProperties = debounce(() => trackUserProperties(apiClientRecords), 1000);
+  const debouncedTrackUserProperties = useMemo(
+    () => debounce(() => trackUserProperties(apiClientRecords), 1000),
+    [] // Empty deps - debounce function should be stable
+  );
 
-  // TODO
   useEffect(() => {
     debouncedTrackUserProperties();
+    return () => {
+      debouncedTrackUserProperties.cancel();
+    };
   }, [apiClientRecords, debouncedTrackUserProperties]);
 
   useEffect(() => {

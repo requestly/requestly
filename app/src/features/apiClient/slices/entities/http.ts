@@ -114,7 +114,9 @@ export class HttpRecordEntity<M extends ApiClientEntityMeta = ApiClientEntityMet
       return;
     }
     const index = existingPathVariables.findIndex((v) => v.key === key);
-    existingPathVariables.splice(index, 1);
+    if (index >= 0) {
+      existingPathVariables.splice(index, 1);
+    }
   }
 
   setPathVariable(key: string, patch: Omit<RQAPI.PathVariable, "id" | "key">) {
@@ -154,7 +156,7 @@ export class HttpRecordEntity<M extends ApiClientEntityMeta = ApiClientEntityMet
     if (!supportsRequestBody(method)) {
       this.deleteBody();
       this.setContentType(RequestContentType.RAW);
-      this.deleteHeader((header) => header.key !== CONTENT_TYPE_HEADER);
+      this.deleteHeader((header) => header.key === CONTENT_TYPE_HEADER);
     }
     this.SET({ data: { request: { method } } });
   }
@@ -189,7 +191,7 @@ export class HttpRecordEntity<M extends ApiClientEntityMeta = ApiClientEntityMet
 
   deleteHeader(predicate: (header: KeyValuePair) => boolean): void {
     this.unsafePatch((state) => {
-      state.data.request.headers = state.data.request.headers.filter(predicate);
+      state.data.request.headers = state.data.request.headers.filter((header) => !predicate(header));
     });
   }
 

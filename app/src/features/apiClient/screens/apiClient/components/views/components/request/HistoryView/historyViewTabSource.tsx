@@ -21,8 +21,4 @@ export class HistoryViewTabSource extends BaseTabSource {
   static create(matchedPath: MatchedTabSource["matchedPath"]): HistoryViewTabSource {
     return new HistoryViewTabSource();
   }
-
-  getIsValidTab(): boolean {
-    return true;
-  }
 }

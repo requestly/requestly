@@ -10,9 +10,9 @@ import { ApiClientLocalDbQueryService } from "../helpers";
 import { ApiClientLocalDbTable } from "../helpers/types";
 import { v4 as uuidv4 } from "uuid";
 import { ResponsePromise } from "backend/types";
-import { SavedRunConfig, SavedRunConfigRecord } from "features/apiClient/commands/collectionRunner/types";
-import { RunResult, SavedRunResult } from "features/apiClient/store/collectionRunResult/runResult.store";
 import { LocalStore } from "./types";
+import { RunResult, SavedRunResult } from "features/apiClient/slices/common/runResults";
+import { SavedRunConfig, SavedRunConfigRecord } from "features/apiClient/slices/runConfig/types";
 
 export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClientLocalStoreMeta> {
   meta: ApiClientLocalStoreMeta;

@@ -30,11 +30,17 @@ import { useApiClientContext } from "features/apiClient/contexts";
 import { PostmanExportModal } from "../../../../modals/postmanCollectionExportModal/PostmanCollectionExportModal";
 import { MdOutlineVideoLibrary } from "@react-icons/all-files/md/MdOutlineVideoLibrary";
 import { CollectionRowOptionsCustomEvent, dispatchCustomEvent } from "./utils";
-import { ApiClientFeatureContext, getApiClientFeatureContext, moveRecords } from "features/apiClient/slices";
+import {
+  ApiClientFeatureContext,
+  EntityNotFound,
+  getApiClientFeatureContext,
+  moveRecords,
+} from "features/apiClient/slices";
 import { useWorkspaceId } from "features/apiClient/common/WorkspaceProvider";
 import { useActiveTab, useTabActions } from "componentsV2/Tabs/slice";
-import { getAncestorIds } from "features/apiClient/slices/apiRecords/utils";
+import { getAncestorIds, getRecord } from "features/apiClient/slices/apiRecords/utils";
 import { Workspace } from "features/workspaces/types";
+import { EnvironmentVariables } from "backend/environment/types";
 
 export enum ExportType {
   REQUESTLY = "requestly",
@@ -100,28 +106,31 @@ export const CollectionRow: React.FC<Props> = ({
   const activeTabSourceId = useActiveTab()?.source.getSourceId();
 
   const handleCollectionExport = useCallback((collection: RQAPI.CollectionRecord, exportType: ExportType) => {
-    // const collectionRecordState = getRecord(record.id, workspaceId);
-    // const collectionVariables = collectionRecordState?.data
-    // const removeLocalValue = (variables: Map<string, any>): Record<string, any> => {
-    //   // set localValue to empty before exporting
-    //   return Object.fromEntries([...variables.entries()].map(([k, v]) => [k, { ...v, localValue: "" }]));
-    // };
-    // const exportData: RQAPI.CollectionRecord = {
-    //   ...collection,
-    //   data: { ...collection.data, variables: removeLocalValue(collectionVariables) },
-    // };
-    // setCollectionsToExport((prev) => [...prev, exportData]);
-    // switch (exportType) {
-    //   case ExportType.REQUESTLY:
-    //     setIsExportModalOpen(true);
-    //     break;
-    //   case ExportType.POSTMAN:
-    //     setIsPostmanExportModalOpen(true);
-    //     break;
-    //   default:
-    //     console.warn(`Unknown export type: ${exportType}`);
-    // }
-  }, []);
+    const collectionRecordState = getRecord(record.id, workspaceId) as RQAPI.CollectionRecord | undefined;
+    if (!collectionRecordState) {
+      throw new EntityNotFound(record.id, "Collection record not found for export");
+    }
+    const collectionVariables = collectionRecordState.data.variables;
+    const removeLocalValue = (variables: EnvironmentVariables): Record<string, any> => {
+      // set localValue to empty before exporting
+      return Object.fromEntries(Object.entries(variables).map(([k, v]) => [k, { ...v, localValue: "" }]));
+    };
+    const exportData: RQAPI.CollectionRecord = {
+      ...collection,
+      data: { ...collection.data, variables: removeLocalValue(collectionVariables) },
+    };
+    setCollectionsToExport((prev) => [...prev, exportData]);
+    switch (exportType) {
+      case ExportType.REQUESTLY:
+        setIsExportModalOpen(true);
+        break;
+      case ExportType.POSTMAN:
+        setIsPostmanExportModalOpen(true);
+        break;
+      default:
+        console.warn(`Unknown export type: ${exportType}`);
+    }
+  }, [record.id, workspaceId]);
 
   const getCollectionOptions = useCallback(
     (record: RQAPI.CollectionRecord) => {

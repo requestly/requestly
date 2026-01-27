@@ -10,6 +10,7 @@ import { ApiClientVariables } from "../entities/api-client-variables";
 import { DeepPartial, EntityId } from "../types";
 import { entitySynced } from "../common/actions";
 import { ApiClientEntityType } from "../entities/types";
+import { EnvironmentVariables } from "backend/environment/types";
 
 export const environmentsAdapter = createEntityAdapter<EnvironmentEntity>({
   selectId: (env) => env.id,
@@ -105,8 +106,10 @@ export const environmentsSlice = createSlice({
       }>
     ) {
       const { environments, globalEnvironment, activeEnvironmentId } = action.payload;
+
       environmentsAdapter.setAll(state.environments, environments);
       state.globalEnvironment = globalEnvironment;
+
       if (activeEnvironmentId !== undefined) {
         state.activeEnvironmentId = activeEnvironmentId;
       }
@@ -146,11 +149,17 @@ const hydrationTransformer = createTransform<
   (inboundState) => {
     const inboundEntities = pickBy(inboundState.entities, (e) => !!e);
     const entities = mapValues(inboundEntities, (env) => {
+      const persistedData = ApiClientVariables.persist(
+        env.variables,
+        {
+          isPersisted: true, // always persist environment variables
+        },
+        env.variablesOrder
+      );
       return {
         id: env.id,
-        variables: ApiClientVariables.perist(env.variables, {
-          isPersisted: true, // always persist environment variables
-        }),
+        variables: persistedData.variables,
+        variablesOrder: persistedData.order,
       };
     });
 
@@ -159,9 +168,15 @@ const hydrationTransformer = createTransform<
     };
   },
   (outboundState) => {
+    const entities = mapValues(outboundState.entities, (env) => {
+      if (env && !env.variablesOrder && env.variables) {
+        return { ...env, variablesOrder: Object.keys(env.variables) };
+      }
+      return env;
+    });
     return {
       ids: [],
-      entities: outboundState.entities as EnvironmentsState["environments"]["entities"],
+      entities: entities as EnvironmentsState["environments"]["entities"],
     };
   },
   {
@@ -181,17 +196,46 @@ const globalEnvHydrationTransformer = createTransform<
         id: GLOBAL_ENVIRONMENT_ID,
         name: "Global Environment",
         variables: {},
+        variablesOrder: [],
       };
     }
+    const persistedData = ApiClientVariables.persist(
+      inboundState.variables,
+      {
+        isPersisted: true,
+      },
+      inboundState.variablesOrder
+    );
     return {
       id: inboundState.id,
-      variables: ApiClientVariables.perist(inboundState.variables, {
-        isPersisted: true,
-      }),
+      variables: persistedData.variables,
+      variablesOrder: persistedData.order,
     };
   },
   (outboundState) => {
-    return outboundState as EnvironmentsState["globalEnvironment"];
+    if (!outboundState) {
+      return {
+        id: GLOBAL_ENVIRONMENT_ID,
+        name: "Global Environment",
+        variables: {},
+        variablesOrder: [],
+      } as EnvironmentsState["globalEnvironment"];
+    }
+
+    // Ensure all required fields exist with proper types
+    const id = outboundState.id || GLOBAL_ENVIRONMENT_ID;
+    const name = outboundState.name || "Global Environment";
+    const variables = (outboundState.variables || {}) as EnvironmentVariables;
+    const variablesOrder =
+      outboundState.variablesOrder ||
+      (outboundState.variables ? Object.keys(outboundState.variables).filter((k): k is string => !!k) : []);
+
+    return {
+      id,
+      name,
+      variables,
+      variablesOrder,
+    } as EnvironmentsState["globalEnvironment"];
   },
   {
     whitelist: ["globalEnvironment"],

@@ -53,6 +53,7 @@ import { BufferedGraphQLRecordEntity, useIsBufferDirty } from "features/apiClien
 import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
 import {
   ApiClientStore,
+  bufferActions,
   bufferAdapterSelectors,
   useApiClientRepository,
   useApiClientStore,
@@ -315,7 +316,18 @@ const GraphQLClientView: React.FC<GraphQLClientViewProps> = ({
     [entity, repositories]
   );
 
-  const handleRevertChanges = () => {};
+  const handleRevertChanges = useCallback(() => {
+    if (!entity.meta.originExists) {
+      return; // Can't revert if there's no origin
+    }
+    const originState = entity.origin.getEntityFromState(store.getState());
+    store.dispatch(
+      bufferActions.revertChanges({
+        referenceId: entity.meta.referenceId!,
+        sourceData: originState,
+      })
+    );
+  }, [entity, store]);
 
   const resetState = useCallback(() => {
     setError(null);

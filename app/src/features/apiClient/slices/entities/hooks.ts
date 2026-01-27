@@ -19,8 +19,10 @@ import { RUNTIME_VARIABLES_ENTITY_ID } from "../common/constants";
 
 export function useEntity<T extends ApiClientEntityType>(params: { id: string; type: T }) {
   const dispatch = EntityFactory.GlobalStateOverrideConfig[params.type] ? useDispatch() : useApiClientDispatch();
-  const entity = EntityFactory.from(params, dispatch);
-  return useMemo(() => entity, [entity]);
+  return useMemo(
+    () => EntityFactory.from(params, dispatch),
+    [params, dispatch]
+  );
 }
 
 export function useEntitySelector<T extends Exclude<ApiClientEntityType, ApiClientEntityType.RUNTIME_VARIABLES>, R>(

@@ -4,32 +4,34 @@ import { EnvironmentEntity as EnvironmentRecord } from "../environments/types";
 import { selectEnvironmentById, selectGlobalEnvironment } from "../environments/selectors";
 import { environmentsActions } from "../environments/slice";
 import { EntityNotFound, UpdateCommand } from "../types";
-import { ApiClientEntityType}  from "./types";
+import { ApiClientEntityType } from "./types";
 import { GLOBAL_ENVIRONMENT_ID } from "../common/constants";
 import { ApiClientEntity, ApiClientEntityMeta } from "./base";
 import { Dispatch } from "@reduxjs/toolkit";
-
 
 /**
  * Entity class for regular (non-global) environments.
  * Supports full CRUD operations including delete.
  */
-export class EnvironmentEntity<M extends ApiClientEntityMeta = ApiClientEntityMeta> extends ApiClientEntity<EnvironmentRecord, M> {
+export class EnvironmentEntity<M extends ApiClientEntityMeta = ApiClientEntityMeta> extends ApiClientEntity<
+  EnvironmentRecord,
+  M
+> {
   dispatchCommand(command: UpdateCommand<EnvironmentRecord>): void {
-      throw new Error("Method not implemented.");
+    throw new Error("Method not implemented.");
   }
   readonly type = ApiClientEntityType.ENVIRONMENT;
 
   public readonly variables = new ApiClientVariables<EnvironmentRecord>(
     (e) => e.variables,
+    (e) => e.variablesOrder,
     this.unsafePatch.bind(this),
     this.getEntityFromState.bind(this)
   );
 
   upsert(params: EnvironmentRecord): void {
-      this.dispatch(environmentsActions.upsertEnvironment(params));
+    this.dispatch(environmentsActions.upsertEnvironment(params));
   }
-
 
   getName(state: ApiClientStoreState): string {
     return this.getEntityFromState(state).name;
@@ -81,6 +83,8 @@ export class EnvironmentEntity<M extends ApiClientEntityMeta = ApiClientEntityMe
 
   /**
    * Set this environment as the active environment.
+   * Note: This method dispatches directly to the Redux store, which is the standard
+   * pattern for entity classes. The dispatch is handled by the entity's dispatch function.
    */
   setAsActive(): void {
     this.dispatch(environmentsActions.setActiveEnvironment(this.id));
@@ -91,16 +95,18 @@ export class EnvironmentEntity<M extends ApiClientEntityMeta = ApiClientEntityMe
  * Entity class for the global environment.
  * Has limited operations compared to regular environments (no delete, no set as active).
  */
-export class GlobalEnvironmentEntity<M extends ApiClientEntityMeta = ApiClientEntityMeta> extends ApiClientEntity<EnvironmentRecord, M> {
+export class GlobalEnvironmentEntity<M extends ApiClientEntityMeta = ApiClientEntityMeta> extends ApiClientEntity<
+  EnvironmentRecord,
+  M
+> {
   dispatchCommand(command: UpdateCommand<EnvironmentRecord>): void {
-      throw new Error("Method not implemented.");
+    throw new Error("Method not implemented.");
   }
   readonly type = ApiClientEntityType.GLOBAL_ENVIRONMENT;
 
   upsert(params: EnvironmentRecord): void {
-      this.dispatch(environmentsActions.updateGlobalEnvironment(params));
+    this.dispatch(environmentsActions.updateGlobalEnvironment(params));
   }
-
 
   getName(state: ApiClientStoreState): string {
     return this.getEntityFromState(state).name;
@@ -108,14 +114,15 @@ export class GlobalEnvironmentEntity<M extends ApiClientEntityMeta = ApiClientEn
 
   public readonly variables = new ApiClientVariables<EnvironmentRecord>(
     (e) => e.variables,
+    (e) => e.variablesOrder,
     this.unsafePatch.bind(this),
     this.getEntityFromState.bind(this)
   );
 
   constructor(dispatch: Dispatch) {
-      super(dispatch, {
-        id: GLOBAL_ENVIRONMENT_ID,
-      } as M);
+    super(dispatch, {
+      id: GLOBAL_ENVIRONMENT_ID,
+    } as M);
   }
 
   getEntityFromState(state: ApiClientStoreState): EnvironmentRecord {
@@ -133,5 +140,4 @@ export class GlobalEnvironmentEntity<M extends ApiClientEntityMeta = ApiClientEn
       })
     );
   }
-
 }

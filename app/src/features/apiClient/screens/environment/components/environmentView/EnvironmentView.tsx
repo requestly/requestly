@@ -1,21 +1,22 @@
-import type React from "react";
-import { useCallback, useState } from "react";
-import "./environmentView.scss";
-import { useApiClientDispatch, useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
+import { ApiClientExportModal } from "features/apiClient/screens/apiClient/components/modals/exportModal/ApiClientExportModal";
+import { PostmanEnvironmentExportModal } from "features/apiClient/screens/apiClient/components/modals/postmanEnvironmentExportModal/PostmanEnvironmentExportModal";
+import { useSaveBuffer } from "features/apiClient/slices/buffer/hooks";
+import { useIsBufferDirty } from "features/apiClient/slices/entities";
 import type {
   BufferedEnvironmentEntity,
   BufferedGlobalEnvironmentEntity,
 } from "features/apiClient/slices/entities/buffered/environment";
-import { useApiClientRepository } from "features/apiClient/slices";
+import { OriginExists } from "features/apiClient/slices/entities/buffered/factory";
+import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
+import { ApiClientRootState } from "features/apiClient/slices/hooks/types";
+import { isEmpty } from "lodash";
+import type React from "react";
+import { useCallback, useState } from "react";
+import { toast } from "utils/Toast";
 import { EnvironmentVariablesList } from "../VariablesList/EnvironmentVariablesList";
 import { VariablesListHeader } from "../VariablesListHeader/VariablesListHeader";
-import { isEmpty } from "lodash";
-import { ApiClientExportModal } from "features/apiClient/screens/apiClient/components/modals/exportModal/ApiClientExportModal";
-import { PostmanEnvironmentExportModal } from "features/apiClient/screens/apiClient/components/modals/postmanEnvironmentExportModal/PostmanEnvironmentExportModal";
-import { ApiClientRootState } from "features/apiClient/slices/hooks/types";
-import { useBufferByBufferId, useIsBufferDirty } from "features/apiClient/slices/entities";
-import { useSaveBuffer } from "features/apiClient/slices/buffer/hooks";
-import { OriginExists } from "features/apiClient/slices/entities/buffered/factory";
+import "./environmentView.scss";
+import { ApiClientStoreState } from "features/apiClient/slices";
 
 interface EnvironmentViewProps {
   entity: OriginExists<BufferedEnvironmentEntity | BufferedGlobalEnvironmentEntity>;
@@ -24,17 +25,15 @@ interface EnvironmentViewProps {
 }
 
 export const EnvironmentView: React.FC<EnvironmentViewProps> = ({ entity, environmentId, isGlobal }) => {
-  const dispatch = useApiClientDispatch();
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [isPostmanExportModalOpen, setIsPostmanExportModalOpen] = useState(false);
 
-  const repositories = useApiClientRepository();
-  const isNewEnvironment = useApiClientSelector(s => s.buffer.entities[entity.id]?.isNew);
+  const isNewEnvironment = useApiClientSelector((s) => s.buffer.entities[entity.id]?.isNew);
 
   const [searchValue, setSearchValue] = useState("");
   const [isSaving, setIsSaving] = useState(false);
 
-  const environmentName = useApiClientSelector((s: ApiClientRootState) => entity.getName(s));
+  const environmentName = useApiClientSelector((s: ApiClientStoreState) => entity.getName(s));
   const variables = entity.variables;
   const variablesData = useApiClientSelector((state: ApiClientRootState) => variables.getAll(state));
 
@@ -43,8 +42,7 @@ export const EnvironmentView: React.FC<EnvironmentViewProps> = ({ entity, enviro
     type: "referenceId",
   });
 
-  const bufferEntry = useBufferByBufferId(entity.meta.id);
-  const saveBuffer  = useSaveBuffer();
+  const saveBuffer = useSaveBuffer();
   const handleSaveVariables = useCallback(async () => {
     saveBuffer(
       {
@@ -61,11 +59,14 @@ export const EnvironmentView: React.FC<EnvironmentViewProps> = ({ entity, enviro
           setIsSaving(false);
         },
         onError(error) {
-           console.error("Failed to update variables", error);
+          console.error("Failed to update variables", error);
+        },
+        onSuccess() {
+          toast.success("Variables updated successfully");
         },
       }
     );
-  }, [repositories,bufferEntry, variablesData, environmentId, dispatch, entity.meta.id]);
+  }, [saveBuffer, entity, environmentId]);
 
   return (
     <div key={environmentId} className="variables-list-view-container">
