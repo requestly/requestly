@@ -1,6 +1,6 @@
 import { RQAPI } from "features/apiClient/types";
 import { RBACButton, useRBAC } from "features/rbac";
-import { useTotalRecords } from "features/apiClient/slices";
+import { useIsAnyWorkspaceLoading, useTotalRecords } from "features/apiClient/slices";
 import {
   NewApiRecordDropdown,
   NewRecordDropdownItemType,
@@ -8,6 +8,7 @@ import {
 import "./apiClientEmptyView.scss";
 import { WorkspaceProvider } from "features/apiClient/common/WorkspaceProvider";
 import { useApiClientContext } from "features/apiClient/contexts";
+import { Skeleton } from "antd";
 
 const ApiClientEmptyViewContent = () => {
   const totalRecords = useTotalRecords();
@@ -80,6 +81,16 @@ const ApiClientEmptyViewContent = () => {
 };
 
 export const ApiClientEmptyView = () => {
+  const isLoading = useIsAnyWorkspaceLoading();
+
+  if (isLoading) {
+    return (
+      <div className="api-client-empty-view-container">
+        <Skeleton active className="api-client-header-skeleton" paragraph={{ rows: 3, width: "100%" }} />
+      </div>
+    );
+  }
+
   return (
     <WorkspaceProvider>
       <ApiClientEmptyViewContent />
