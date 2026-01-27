@@ -21,6 +21,7 @@ import { CollectionRecordEntity } from "features/apiClient/slices/entities/colle
 import { RuntimeVariablesEntity } from "features/apiClient/slices/entities/runtime-variables";
 import { EnvironmentVariables } from "backend/environment/types";
 import { ApiClientEntityType } from "features/apiClient/slices/entities/types";
+import { reduxStore } from "store";
 
 type ExecutorConstructor<T> = new (
   ctx: ApiClientFeatureContext,
@@ -72,17 +73,40 @@ export const useRequestExecutorFactory = <T>(ExecutorClass: ExecutorConstructor<
           }
 
           const variables = (state as any)[key] as EnvironmentVariables;
-          for (const key in variables) {
-            const variable = variables[key]!;
+
+          // Delete variables that exist in store but not in execution context (were unset)
+          // RuntimeVariablesEntity uses RootState, others use ApiClientStoreState
+          let currentVariables: EnvironmentVariables;
+          if (entity.type === ApiClientEntityType.RUNTIME_VARIABLES) {
+            currentVariables = entity.variables.getAll(reduxStore.getState() as any);
+          } else {
+            currentVariables = entity.variables.getAll(store.getState());
+          }
+
+          for (const currentKey in currentVariables) {
+            if (!(currentKey in variables)) {
+              const variableToDelete = currentVariables[currentKey];
+              if (variableToDelete?.id) {
+                entity.variables.delete(variableToDelete.id);
+              }
+            }
+          }
+
+          // Add or update variables from execution context
+          for (const variableKey in variables) {
+            const variable = variables[variableKey]!;
             entity.variables.add({
-              key,
+              key: variableKey,
               ...variable,
             });
           }
           if (entity.type === ApiClientEntityType.RUNTIME_VARIABLES) {
             continue;
           }
-          const variablesToSave = entity.variables.getAll(store.getState());
+          // For non-runtime entities, use ApiClientStoreState
+          const variablesToSave = (entity as Exclude<typeof entity, RuntimeVariablesEntity>).variables.getAll(
+            store.getState()
+          );
           if (entity.type === ApiClientEntityType.COLLECTION_RECORD) {
             await repositories.apiClientRecordsRepository.setCollectionVariables(entity.id, variablesToSave);
             continue;
