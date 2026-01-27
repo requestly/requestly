@@ -13,6 +13,7 @@ import { ResponsePromise } from "backend/types";
 import { SavedRunConfig, SavedRunConfigRecord } from "features/apiClient/commands/collectionRunner/types";
 import { RunResult, SavedRunResult } from "features/apiClient/store/collectionRunResult/runResult.store";
 import { LocalStore } from "./types";
+import { captureException } from "backend/apiClient/utils";
 
 export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClientLocalStoreMeta> {
   meta: ApiClientLocalStoreMeta;
@@ -105,8 +106,16 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
       updatedTs: Timestamp.now().toMillis(),
     } as RQAPI.ApiClientRecord;
 
-    await this.queryService.createRecord(newRecord);
-    return { success: true, data: newRecord };
+    return this.queryService
+      .createRecord(newRecord)
+      .then(() => {
+        return { success: true as true, data: newRecord };
+      })
+      .catch((err) => {
+        // removed success false response, as it was marked as fullfilled instead of rejection hence thrown error
+        captureException(err);
+        throw err;
+      });
   }
 
   async updateRecord(record: Partial<RQAPI.ApiClientRecord>, id: string): RQAPI.ApiClientRecordPromise {
@@ -120,8 +129,14 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
       updatedTs: Timestamp.now().toMillis(),
     } as RQAPI.ApiClientRecord;
 
-    await this.queryService.updateRecord(id, updatedRecord);
-    return { success: true, data: updatedRecord };
+    return this.queryService
+      .updateRecord(id, updatedRecord)
+      .then(() => {
+        return { success: true as true, data: updatedRecord };
+      })
+      .catch((e) => {
+        return { success: false, data: null, message: e.message };
+      });
   }
 
   async deleteRecords(recordIds: string[]): Promise<{ success: boolean; data: unknown; message?: string }> {
@@ -229,6 +244,7 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
         await writeFunction(entity);
       }
     } catch (error) {
+      captureException(error);
       return {
         success: false,
         message: error.message,

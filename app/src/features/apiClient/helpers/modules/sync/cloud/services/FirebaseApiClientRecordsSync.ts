@@ -22,6 +22,7 @@ import { ResponsePromise } from "backend/types";
 import { SavedRunConfig } from "features/apiClient/commands/collectionRunner/types";
 import { RunResult, SavedRunResult } from "features/apiClient/store/collectionRunResult/runResult.store";
 import { batchCreateCollectionRunDetailsInFirebase } from "backend/apiClient/batchCreateCollectionRunDetailsInFirebase";
+import { captureException } from "backend/apiClient/utils";
 import { SentryCustomSpan } from "utils/sentry";
 
 export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<ApiClientCloudMeta> {
@@ -189,6 +190,14 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
   ) {
     try {
       const result = await batchWrite(batchSize, entities, writeFunction);
+
+      result.forEach((r) => {
+        if (r.status === "rejected") {
+          const err = r.reason;
+          captureException(err);
+        }
+      });
+
       return {
         success: result.every((r) => r.status === "fulfilled"),
       };
