@@ -441,8 +441,8 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
         trackRQLastActivity(API_CLIENT.CURL_IMPORTED);
         trackRQDesktopLastActivity(API_CLIENT.CURL_IMPORTED);
       } catch (error) {
-        console.error("Error importing curl:", error);
         toast.error("Failed to import cURL command");
+        Sentry.captureException(error);
       }
     },
     [entity]
