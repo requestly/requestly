@@ -24,18 +24,17 @@ const HttpApiClientUrl = ({ entity, onEnterPress, onUrlChange, onCurlImport }: A
   const currentEnvironmentVariables = useScopedVariables(entity.meta.referenceId);
 
   const handlePaste = useCallback(
-    (pastedText: string): boolean => {
+    (e: ClipboardEvent, pastedText: string) => {
       let requestFromPaste;
       try {
         requestFromPaste = parseCurlRequest(pastedText);
       } catch (error) {
         requestFromPaste = null;
       }
+
       if (requestFromPaste?.url) {
+        e.preventDefault();
         onCurlImport?.(requestFromPaste);
-        return true;
-      } else {
-        return false;
       }
     },
     [onCurlImport]

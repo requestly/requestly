@@ -97,11 +97,7 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
             paste: (event, view) => {
               const pastedText = event.clipboardData?.getData("text/plain");
               if (!pastedText) return;
-              // Notify parent - if it returns true, it handled the paste
-              if (onPasteRef.current?.(pastedText)) {
-                event.preventDefault();
-                return true;
-              }
+
               // Handle multiline paste conversion
               if (pastedText.includes("\n")) {
                 event.preventDefault();
@@ -115,8 +111,9 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
                     },
                   })
                 );
-                return true;
               }
+
+              onPasteRef.current?.(event, pastedText);
             },
           }),
           highlightVariablesPlugin(
