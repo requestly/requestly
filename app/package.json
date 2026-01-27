@@ -162,7 +162,6 @@
     "rrweb-player": "2.0.0-alpha.14",
     "semver": "^7.5.4",
     "styled-components": "^6.1.8",
-    "typescript": "^5.7.3",
     "ua-parser-js": "^1.0.2",
     "uuid": "^8.3.2",
     "validator": "^13.7.0",
