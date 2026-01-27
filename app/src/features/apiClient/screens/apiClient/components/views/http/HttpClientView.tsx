@@ -438,8 +438,6 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
         // Update the entity with the parsed curl request data
         entity.setRequest(request as RQAPI.HttpRequest);
         toast.success("cURL command imported successfully");
-        trackRQLastActivity(API_CLIENT.CURL_IMPORTED);
-        trackRQDesktopLastActivity(API_CLIENT.CURL_IMPORTED);
       } catch (error) {
         toast.error("Failed to import cURL command");
         Sentry.captureException(error);

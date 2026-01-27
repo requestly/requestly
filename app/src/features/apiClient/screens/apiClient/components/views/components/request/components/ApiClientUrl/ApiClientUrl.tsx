@@ -9,7 +9,7 @@ interface ApiClientUrlProps {
   currentEnvironmentVariables: ScopedVariables;
   onEnterPress: (e: KeyboardEvent) => void;
   onUrlChange: (value: string) => void;
-  onPaste?: (text: string) => void;
+  onPaste?: (e: ClipboardEvent, text: string) => void;
 }
 
 export const ApiClientUrl = ({
