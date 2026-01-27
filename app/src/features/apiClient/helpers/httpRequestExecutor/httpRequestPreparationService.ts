@@ -58,6 +58,7 @@ export class HttpRequestPreparationService {
       return `:"${varName}"`;
     });
 
+    // A try catch is added here to prevent any runtime errors from breaking the request sending flow in case of any issues with path-to-regexp
     try {
       const toPath = compile(pathname);
       const renderedPath = toPath(variableValues);
