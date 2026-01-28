@@ -4,6 +4,6 @@ export function getOffsetFromLocation(doc: Text | any, line: number, column: num
   const totalLines = doc.lines;
   const clampedLine = Math.min(Math.max(line, 1), totalLines);
   const lineInfo = doc.line(clampedLine);
-  const colIndex = Math.max(column - 1, 0);
+  const colIndex = Math.min(Math.max(column - 1, 0), lineInfo.length);
   return lineInfo.from + colIndex;
 }
