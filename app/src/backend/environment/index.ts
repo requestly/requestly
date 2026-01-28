@@ -101,7 +101,7 @@ export const attachEnvironmentVariableListener = (
   environmentId: string,
   callback: (newVariables: EnvironmentData) => void
 ) => {
-  if (!ownerId) {
+  if (!ownerId || !environmentId) {
     return () => {};
   }
 

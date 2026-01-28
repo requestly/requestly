@@ -23,6 +23,7 @@ import { SavedRunConfig } from "features/apiClient/commands/collectionRunner/typ
 import { RunResult, SavedRunResult } from "features/apiClient/store/collectionRunResult/runResult.store";
 import { batchCreateCollectionRunDetailsInFirebase } from "backend/apiClient/batchCreateCollectionRunDetailsInFirebase";
 import { SentryCustomSpan } from "utils/sentry";
+import { captureException } from "backend/apiClient/utils";
 
 export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<ApiClientCloudMeta> {
   meta: ApiClientCloudMeta;
@@ -78,7 +79,7 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
     },
   })
   async createRecord(record: Partial<RQAPI.ApiClientRecord>) {
-    return upsertApiRecord(this.meta.uid, record, this.meta.teamId);
+    return await upsertApiRecord(this.meta.uid, record, this.meta.teamId);
   }
 
   async createCollection(record: Partial<RQAPI.ApiClientRecord>) {
@@ -86,7 +87,7 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
   }
 
   async createRecordWithId(record: Partial<RQAPI.ApiClientRecord>, id: string) {
-    return upsertApiRecord(this.meta.uid, record, this.meta.teamId, id);
+    return await upsertApiRecord(this.meta.uid, record, this.meta.teamId, id);
   }
 
   @SentryCustomSpan({
@@ -102,7 +103,7 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
     if (type) {
       sanitizedRecord.type = type;
     }
-    return updateApiRecord(this.meta.uid, sanitizedRecord, this.meta.teamId);
+    return await updateApiRecord(this.meta.uid, sanitizedRecord, this.meta.teamId);
   }
 
   async deleteRecords(recordIds: string[]) {
@@ -189,6 +190,12 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
   ) {
     try {
       const result = await batchWrite(batchSize, entities, writeFunction);
+      result.forEach((r) => {
+        if (r.status === "rejected") {
+          const error = r.reason;
+          captureException(error);
+        }
+      });
       return {
         success: result.every((r) => r.status === "fulfilled"),
       };
