@@ -5,7 +5,7 @@ import { RenderableError } from "errors/RenderableError";
 export class FsAccessError extends RenderableError {
   constructor(message: string, readonly path: string) {
     super(message);
-    this.errorCode = ErrorCode.PERMISSION_DENIED;
+    this.errorCode = ErrorCode.PermissionDenied;
     this.addContext({
       path,
     });
