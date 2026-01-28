@@ -33,7 +33,8 @@ import {
 } from "componentsV2/CodeEditor/components/EditorV2/plugins";
 import { placeholder as placeholderExtension } from "@codemirror/view";
 import { lintGutter } from "@codemirror/lint";
-import { javascriptLinter, jsonLinter } from "./lints/linters";
+import { jsonLinter } from "./lints/jsonLinter";
+import { javascriptLinter } from "./lints/javascriptLinter";
 
 interface EditorProps {
   value: string;
