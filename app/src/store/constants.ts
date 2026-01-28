@@ -8,6 +8,7 @@ export enum ReducerKeys {
   DESKTOP_TRAFFIC_TABLE = "desktopTrafficTable",
   RULES = "rules", // ALSO CONTAINS GROUPS
   BILLING = "billing",
+  EVENTS = "events",
   VARIABLES = "variables",
   WORKSPACE = "workspace",
   WORKSPACE_VIEW = "workspaceView",

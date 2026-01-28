@@ -21,6 +21,7 @@ import { BaseExecutionContext, ExecutionContext, ScriptExecutionContext } from "
 import { APIClientWorkloadManager } from "../modules/scriptsV2/workloadManager/APIClientWorkloadManager";
 import { BaseExecutionMetadata, IterationContext } from "../modules/scriptsV2/worker/script-internals/types";
 import { ApiClientFeatureContext, selectRecordById } from "features/apiClient/slices";
+import { EventLogger } from "store/features/apiclient/eventLogger";
 
 enum RQErrorHeaderValue {
   DNS_RESOLUTION_ERROR = "ERR_NAME_NOT_RESOLVED",
@@ -85,7 +86,8 @@ export class HttpRequestExecutor {
     private requestValidator: HttpRequestValidationService,
     private readonly workloadManager: APIClientWorkloadManager,
     private postScriptExecutionCallback: (state: BaseExecutionContext) => Promise<void>,
-    private appMode: string
+    private appMode: string,
+    private logger?: EventLogger
   ) {}
 
   private getEmptyRenderedVariables(renderedVariables: Record<string, any>): string[] {
@@ -274,9 +276,40 @@ export class HttpRequestExecutor {
     }
 
     try {
+      // Log the request
+      if (this.logger) {
+        this.logger.logRequest({
+          request: {
+             // @ts-ignore poc-ing
+            payload: preparedEntry.request as RQAPI.Request,
+          },
+          tag: {
+            recordId,
+            iteration: iterationContext.iteration,
+          },
+        });
+      }
+
+
       const response = await makeRequest(this.appMode, preparedEntry.request, this.abortController.signal);
+      
       preparedEntry.response = response;
       scriptExecutionContext.setResponse(response);
+
+      // Log the response
+      if (this.logger) {
+        this.logger.logResponse({
+          // @ts-ignore poc-ing
+          response: {
+            payload: response as RQAPI.Response
+          },
+          tag: {
+            recordId,
+            iteration: iterationContext.iteration,
+          },
+        });
+      }
+
       const rqErrorHeader = response?.headers?.find((header) => header.key === "x-rq-error");
 
       if (rqErrorHeader) {

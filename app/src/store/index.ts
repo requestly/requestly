@@ -17,6 +17,7 @@ import { runtimeVariablesReducerWithPersist } from "features/apiClient/slices/ru
 import { tabsReducerWithPersist, tabBufferMiddleware } from "componentsV2/Tabs/slice";
 import { tabCloseMiddleware } from "componentsV2/Tabs/slice/tabCloseMiddleware";
 import { exampleCollectionsReducerWithPersist } from "features/apiClient/slices/exampleCollections";
+import { eventsReducer } from "./features/apiclient/slice";
 
 export const reduxStore = configureStore({
   reducer: {
@@ -26,6 +27,7 @@ export const reduxStore = configureStore({
     [ReducerKeys.DESKTOP_TRAFFIC_TABLE]: desktopTrafficTableReducerWithLocalSync,
     [ReducerKeys.RULES]: recordsReducer, // SLICE ALSO CONTAINS GROUP RECORDS
     [ReducerKeys.BILLING]: billingReducer,
+    [ReducerKeys.EVENTS]: eventsReducer,
     [ReducerKeys.WORKSPACE]: workspaceReducerWithLocal,
     [ReducerKeys.VARIABLES]: variablesReducer,
     [ReducerKeys.WORKSPACE_VIEW]: workspaceViewReducerWithLocal,
