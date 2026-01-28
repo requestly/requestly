@@ -443,7 +443,7 @@ export const RunResultContainer: React.FC<{
 
   // Calculate split sizes based on whether a request is selected
   const splitSizes = useMemo(() => {
-    return selectedRequest ? [50, 50] : [50, 50];
+    return selectedRequest ? [50, 50] : [100, 0];
   }, [selectedRequest]);
 
   const handleDetailsClick = (requestResult: RequestExecutionResult) => {
@@ -550,25 +550,11 @@ export const RunResultContainer: React.FC<{
 
   return (
     <div className="run-result-view-details-wrapper">
-      {selectedRequest && (
-        <div className="run-result-view-details right">
-          <div className="result-header">
-            {runMetrics.map((data, index) => {
-              return (
-                <div key={index} className="run-metric">
-                  <span className="label">{data.label}:</span>
-                  <span className="value">{data.value}</span>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
       <Split
         direction="horizontal"
         sizes={splitSizes}
-        minSize={[500, 500]}
-        gutterSize={4}
+        minSize={[300, 400]}
+        gutterSize={selectedRequest ? 4 : 0}
         className="run-result-split-container"
       >
         <div className="run-result-view-details">
@@ -597,6 +583,20 @@ export const RunResultContainer: React.FC<{
           </div>
         </div>
         <div className="run-result-detail-panel-container">
+          {selectedRequest && (
+            <div className="run-result-view-details right-panel-opened">
+              <div className="result-header">
+                {runMetrics.map((data, index) => {
+                  return (
+                    <div key={index} className="run-metric">
+                      <span className="label">{data.label}:</span>
+                      <span className="value">{data.value}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
           {selectedRequest && (
             <RunResultDetailedView onClose={handlePanelClose} requestExecutionResult={selectedRequest} />
           )}
