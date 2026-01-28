@@ -21,7 +21,12 @@ import {
 import { selectCollectionHistoryStatus } from "features/apiClient/slices/runHistory/selectors";
 import { RunHistorySaveStatus } from "features/apiClient/slices/runHistory/types";
 
-export const RunResultView: React.FC = () => {
+interface RunResultViewProps {
+  isDetailedViewOpen?: boolean;
+  onToggleDetailedView?: (open: boolean) => void;
+}
+
+export const RunResultView: React.FC<RunResultViewProps> = ({ isDetailedViewOpen, onToggleDetailedView }) => {
   const { collectionId, bufferedEntity } = useCollectionView();
 
   const startTime = useApiClientSelector((s) => selectLiveRunResultStartTime(s, collectionId));
@@ -80,6 +85,8 @@ export const RunResultView: React.FC = () => {
           result={testResults}
           ranAt={startTime ?? Date.now()}
           totalIterationCount={totalIterationCount}
+          isDetailedViewOpen={isDetailedViewOpen}
+          onToggleDetailedView={onToggleDetailedView}
         />
       )}
       {runStatus === RunStatus.RUNNING ? <TestsRunningLoader /> : null}

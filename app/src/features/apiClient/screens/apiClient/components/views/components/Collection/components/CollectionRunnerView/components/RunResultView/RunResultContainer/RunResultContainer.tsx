@@ -1,5 +1,5 @@
 import React, { useMemo, useRef, useState } from "react";
-import { Badge, Collapse, Spin, Tabs } from "antd";
+import { Badge, Collapse, Spin, Tabs, Popover } from "antd";
 import {
   CurrentlyExecutingRequest,
   LiveRunResult,
@@ -28,6 +28,7 @@ import { useTabActions } from "componentsV2/Tabs/slice";
 import { useCollectionView } from "../../../../../collectionView.context";
 import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
 import { selectLiveRunResultCurrentlyExecutingRequest } from "features/apiClient/slices/liveRunResults/selectors";
+import { getAncestorIds, getRecord } from "features/apiClient/slices/apiRecords/utils";
 import { RunResultDetailedView } from "../RunResultDetailedView/RunResultDetailedView";
 import Split from "react-split";
 
@@ -93,6 +94,7 @@ const TestDetails: React.FC<{
 }> = React.memo(({ requestExecutionResult, onDetailsClick }) => {
   const workspaceId = useWorkspaceId();
   const { openBufferedTab } = useTabActions();
+  const [breadcrumbPopoverOpen, setBreadcrumbPopoverOpen] = useState(false);
 
   const responseDetails = useMemo(() => {
     return (
@@ -118,15 +120,80 @@ const TestDetails: React.FC<{
   ]);
 
   const requestNameDetails = useMemo(() => {
+    if (!workspaceId) return null;
+
+    const ancestorIds = getAncestorIds(requestExecutionResult.recordId, workspaceId);
+    const collectionPath = ancestorIds
+      .slice(0, -1) // Exclude current item
+      .map((id) => ({
+        id,
+        name: getRecord(id, workspaceId)?.name || "",
+      }))
+      .filter((item) => item.name)
+      .reverse();
+
+    const depth = collectionPath.length;
+    if (depth === 0) return null;
+
+    const [rootCollection, ...intermediateCollections] = collectionPath;
+    const shouldShowEllipsis = depth > 1;
+
+    const renderBreadcrumb = () => {
+      if (!shouldShowEllipsis) {
+        return (
+          <>
+            <span className="collection-name" title={rootCollection?.name}>
+              {rootCollection?.name}
+            </span>
+            <span className="breadcrumb-separator">/</span>
+          </>
+        );
+      }
+
+      return (
+        <>
+          <span className="collection-name" title={rootCollection?.name}>
+            {rootCollection?.name}
+          </span>
+          <span className="breadcrumb-separator">{">"}</span>
+          <Popover
+            content={
+              <div className="breadcrumb-popover-content">
+                {intermediateCollections.map((collection) => (
+                  <div key={collection.id} className="breadcrumb-popover-item">
+                    {collection.name}
+                  </div>
+                ))}
+              </div>
+            }
+            trigger="click"
+            open={breadcrumbPopoverOpen}
+            onOpenChange={setBreadcrumbPopoverOpen}
+            placement="bottom"
+          >
+            <span
+              className="breadcrumb-ellipsis"
+              onClick={(e) => {
+                e.stopPropagation();
+                setBreadcrumbPopoverOpen(!breadcrumbPopoverOpen);
+              }}
+            >
+              ...
+            </span>
+          </Popover>
+          <span className="breadcrumb-separator">{">"}</span>
+        </>
+      );
+    };
+
     return (
       <>
-        <span className="collection-name" title={requestExecutionResult.collectionName}>
-          {requestExecutionResult.collectionName} /
-        </span>
+        {renderBreadcrumb()}
         <span
           className="request-name"
           title={requestExecutionResult.recordName}
-          onClick={() => {
+          onClick={(e) => {
+            e.stopPropagation();
             openBufferedTab({
               preview: false,
               source: new RequestViewTabSource({
@@ -149,7 +216,18 @@ const TestDetails: React.FC<{
     requestExecutionResult.recordId,
     openBufferedTab,
     workspaceId,
+    breadcrumbPopoverOpen,
   ]);
+
+  const requestUrl = useMemo(() => {
+    const request = requestExecutionResult.request;
+    if (!request) return null;
+
+    if ("url" in request) {
+      return (request as RQAPI.HttpRequest).url;
+    }
+    return null;
+  }, [requestExecutionResult.request]);
 
   return (
     <div className="test-details-container" onClick={() => onDetailsClick(requestExecutionResult)}>
@@ -164,6 +242,13 @@ const TestDetails: React.FC<{
         {requestNameDetails}
         {responseDetails}
       </div>
+      {requestUrl && (
+        <div className="request-url">
+          <span className="url-text" title={requestUrl}>
+            {requestUrl}
+          </span>
+        </div>
+      )}
 
       {requestExecutionResult.status?.value === RQAPI.ExecutionStatus["ERROR"] ? (
         <RQTooltip title={requestExecutionResult.status.error.message || "Something went wrong!"}>
@@ -350,19 +435,25 @@ export const RunResultContainer: React.FC<{
   result: LiveRunResult | RunResult;
   running?: boolean;
   totalIterationCount?: number;
-}> = ({ ranAt, result, running = false, totalIterationCount }) => {
+  isDetailedViewOpen?: boolean;
+  onToggleDetailedView?: (open: boolean) => void;
+}> = ({ ranAt, result, running = false, totalIterationCount, isDetailedViewOpen, onToggleDetailedView }) => {
   const [activeTab, setActiveTab] = useState<RunResultTabKey>(RunResultTabKey.ALL);
   const [selectedRequest, setSelectedRequest] = useState<RequestExecutionResult | null>(null);
-  const [splitSizes, setSplitSizes] = useState<number[]>([100, 0]);
+
+  // Calculate split sizes based on whether a request is selected
+  const splitSizes = useMemo(() => {
+    return selectedRequest ? [50, 50] : [50, 50];
+  }, [selectedRequest]);
 
   const handleDetailsClick = (requestResult: RequestExecutionResult) => {
     setSelectedRequest(requestResult);
-    setSplitSizes([60, 40]);
+    onToggleDetailedView?.(true);
   };
 
   const handlePanelClose = () => {
     setSelectedRequest(null);
-    setSplitSizes([100, 0]);
+    onToggleDetailedView?.(false);
   };
 
   const metrics = useMemo(() => {
@@ -459,20 +550,8 @@ export const RunResultContainer: React.FC<{
 
   return (
     <div className="run-result-view-details-wrapper">
-      <Split
-        sizes={splitSizes}
-        minSize={[300, 0]}
-        snapOffset={50}
-        gutterSize={selectedRequest ? 8 : 0}
-        className="run-result-split-container"
-        onDragEnd={(newSizes) => {
-          setSplitSizes(newSizes);
-          if (newSizes[1] < 5) {
-            handlePanelClose();
-          }
-        }}
-      >
-        <div className="run-result-view-details">
+      {selectedRequest && (
+        <div className="run-result-view-details right">
           <div className="result-header">
             {runMetrics.map((data, index) => {
               return (
@@ -483,6 +562,28 @@ export const RunResultContainer: React.FC<{
               );
             })}
           </div>
+        </div>
+      )}
+      <Split
+        direction="horizontal"
+        sizes={splitSizes}
+        minSize={[500, 500]}
+        gutterSize={4}
+        className="run-result-split-container"
+      >
+        <div className="run-result-view-details">
+          {!selectedRequest && (
+            <div className="result-header">
+              {runMetrics.map((data, index) => {
+                return (
+                  <div key={index} className="run-metric">
+                    <span className="label">{data.label}:</span>
+                    <span className="value">{data.value}</span>
+                  </div>
+                );
+              })}
+            </div>
+          )}
           <div className="result-tabs-container">
             <Tabs
               moreIcon={null}
