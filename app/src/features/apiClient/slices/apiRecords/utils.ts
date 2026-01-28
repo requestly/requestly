@@ -21,7 +21,7 @@ export function getChildToParentMap(workspaceId: Workspace["id"]) {
   return selectChildToParent(state);
 }
 
-export function getAllDescendantApiRecordIds(id: EntityId, workspaceId: Workspace["id"] | undefined): EntityId[] {
+export function getAllDescendantApiRecordIds(id: EntityId, workspaceId: Workspace["id"]): EntityId[] {
   const { store } = getApiClientFeatureContext(workspaceId);
   const state = store.getState();
   return selectAllDescendantApiRecordIds(state, id);
