@@ -28,6 +28,10 @@ import { useTabActions } from "componentsV2/Tabs/slice";
 import { useCollectionView } from "../../../../../collectionView.context";
 import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
 import { selectLiveRunResultCurrentlyExecutingRequest } from "features/apiClient/slices/liveRunResults/selectors";
+import { RunResultDetailedView } from "../RunResultDetailedView/RunResultDetailedView";
+import Split from "react-split";
+import { getEventByRecordAndIt, getEventsForExecution } from "store/features/apiclient/selectors";
+import { useSelector } from "react-redux";
 
 enum RunResultTabKey {
   ALL = "all",
@@ -341,6 +345,19 @@ export const RunResultContainer: React.FC<{
   totalIterationCount?: number;
 }> = ({ ranAt, result, running = false, totalIterationCount }) => {
   const [activeTab, setActiveTab] = useState<RunResultTabKey>(RunResultTabKey.ALL);
+  const [selectedRequest, setSelectedRequest] = useState<RequestExecutionResult | null>(null);
+  const [splitSizes, setSplitSizes] = useState<number[]>([100, 0]);
+  
+
+  const handleDetailsClick = (requestResult: RequestExecutionResult) => {
+    setSelectedRequest(requestResult);
+    setSplitSizes([60, 40]);
+  };
+
+  const handlePanelClose = () => {
+    setSelectedRequest(null);
+    setSplitSizes([100, 0]);
+  };
 
   const metrics = useMemo(() => {
     return getRunMetrics(result.iterations);
