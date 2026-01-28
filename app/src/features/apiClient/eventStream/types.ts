@@ -1,4 +1,4 @@
-import { RQAPI } from "../../../../../shared/dist/types/entities/apiClient/api";
+import { RQAPI } from "../types";
 
 export enum EventFlow {
   API_EXECUTION = "API_EXECUTION",

@@ -1,37 +1,38 @@
-import { RequestEventData } from "@sentry/react";
-import { APIClientEvent, EventFlow, ResponseEventData, Tag } from "features/apiClient/eventStream/types";
-import { uuidv4 } from "zod/v4";
+import {
+  APIClientEvent,
+  EventFlow,
+  RequestEventData,
+  ResponseEventData,
+  Tag,
+} from "features/apiClient/eventStream/types";
+import { v4 as uuidv4 } from "uuid";
 
 export abstract class EventLogger {
   abstract pushEvent(event: APIClientEvent): void;
-  // TODO: Add workspaceId here
-  //   readonly workspaceId: WorkspaceId;
-  logRequest(params: { request: RequestEventData; tag?: Tag }) {
+  logRequest(params: { request: RequestEventData["payload"]; tag?: Tag }) {
     const event: APIClientEvent = {
-      id: uuidv4().toString(),
+      id: uuidv4(),
       timestamp: Date.now(),
       tag: params.tag ?? {},
       //   workspaceId: this.workspaceId,
       flow: EventFlow.API_EXECUTION,
       data: {
         type: "REQUEST",
-        // @ts-ignore poc-ing
-        // TODO: Remove ts-ignore and resolve issue
-        payload: params.request.payload,
+        payload: params.request,
       },
     };
     this.pushEvent(event);
   }
-  logResponse(params: { response: ResponseEventData; tag?: Tag }) {
+  logResponse(params: { response: ResponseEventData["payload"]; tag?: Tag }) {
     const event: APIClientEvent = {
-      id: uuidv4().toString(),
+      id: uuidv4(),
       timestamp: Date.now(),
       tag: params.tag ?? {},
       //   workspaceId: this.workspaceId,
       flow: EventFlow.API_EXECUTION,
       data: {
         type: "RESPONSE",
-        payload: params.response.payload,
+        payload: params.response,
       },
     };
     this.pushEvent(event);

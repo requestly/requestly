@@ -21,6 +21,7 @@ import { BaseExecutionContext, ExecutionContext, ScriptExecutionContext } from "
 import { APIClientWorkloadManager } from "../modules/scriptsV2/workloadManager/APIClientWorkloadManager";
 import { BaseExecutionMetadata, IterationContext } from "../modules/scriptsV2/worker/script-internals/types";
 import { ApiClientFeatureContext, selectRecordById } from "features/apiClient/slices";
+import { APIEventLogger } from "lib/eventStream/APILogger";
 
 enum RQErrorHeaderValue {
   DNS_RESOLUTION_ERROR = "ERR_NAME_NOT_RESOLVED",
@@ -273,6 +274,14 @@ export class HttpRequestExecutor {
       scriptExecutionContext.setRequest(preparedEntry.request);
     }
 
+    APIEventLogger.logRequest({
+      request: preparedEntry.request,
+      tag: {
+        recordId,
+        iteration: iterationContext.iteration,
+      },
+    });
+
     try {
       const response = await makeRequest(this.appMode, preparedEntry.request, this.abortController.signal);
       preparedEntry.response = response;
@@ -280,6 +289,13 @@ export class HttpRequestExecutor {
       const rqErrorHeader = response?.headers?.find((header) => header.key === "x-rq-error");
 
       if (rqErrorHeader) {
+        APIEventLogger.logResponse({
+          response,
+          tag: {
+            recordId,
+            iteration: iterationContext.iteration,
+          },
+        });
         return buildErroredExecutionResult(preparedEntry, this.buildErrorObjectFromHeader(rqErrorHeader));
       }
     } catch (err) {
@@ -332,6 +348,14 @@ export class HttpRequestExecutor {
         return buildErroredExecutionResult(preparedEntry, error);
       }
     }
+
+    APIEventLogger.logResponse({
+      response: preparedEntry.response,
+      tag: {
+        recordId,
+        iteration: iterationContext.iteration,
+      },
+    });
 
     const executionResult: RQAPI.ExecutionResult = {
       status: RQAPI.ExecutionStatus.SUCCESS,
