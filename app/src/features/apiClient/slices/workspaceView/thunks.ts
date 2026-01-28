@@ -32,6 +32,16 @@ function getUserDetails(userId?: string) {
   return userDetails;
 }
 
+async function closeAllTabsAndCheckRejection() {
+  const result = await reduxStore.dispatch(closeAllTabs({ skipUnsavedPrompt: true }));
+
+  if (closeAllTabs.rejected.match(result)) {
+    return false;
+  }
+
+  return true;
+}
+
 function getFallbackWorkspaceInfo(rootState: RootState): WorkspaceInfo {
   const fallbackWorkspaceId = rootState.workspaceView.fallbackWorkspaceId;
 
@@ -158,11 +168,18 @@ const removeWorkspacesFromView = createAsyncThunk<
         return workspaceIds.includes(tabWorkspaceId);
       });
 
-      await Promise.allSettled(
-        tabsToClose.map((tab) => reduxStore.dispatch(closeTab({ tabId: tab.id, skipUnsavedPrompt: true })).unwrap())
+      const results = await Promise.allSettled(
+        tabsToClose.map((tab) => reduxStore.dispatch(closeTab({ tabId: tab.id, skipUnsavedPrompt: true })))
       );
 
-      return true;
+      const hasAllSucceeded = results.every((result) => {
+        if (result.status === "fulfilled") {
+          return closeTab.fulfilled.match(result.value);
+        }
+        return false;
+      });
+
+      return hasAllSucceeded;
     },
   }
 );
@@ -175,10 +192,7 @@ const singleToMultiView = createAsyncThunk(
     return dispatch(addWorkspacesIntoMultiView(params)).unwrap();
   },
   {
-    condition: async () => {
-      await reduxStore.dispatch(closeAllTabs({ skipUnsavedPrompt: true })).unwrap();
-      return true;
-    },
+    condition: closeAllTabsAndCheckRejection,
   }
 );
 
@@ -193,10 +207,7 @@ export const switchContext = createAsyncThunk(
     return dispatch(addWorkspaceIntoView({ workspace, userDetails }));
   },
   {
-    condition: async () => {
-      await reduxStore.dispatch(closeAllTabs({ skipUnsavedPrompt: true })).unwrap();
-      return true;
-    },
+    condition: closeAllTabsAndCheckRejection,
   }
 );
 
@@ -328,10 +339,7 @@ export const setupWorkspaceView = createAsyncThunk(
     return dispatch(workspaceViewManager({ workspaces: selectedWorkspaces, userId, action: "add" })).unwrap();
   },
   {
-    condition: async () => {
-      await reduxStore.dispatch(closeAllTabs({ skipUnsavedPrompt: true })).unwrap();
-      return true;
-    },
+    condition: closeAllTabsAndCheckRejection,
   }
 );
 
@@ -342,9 +350,6 @@ export const resetWorkspaceView = createAsyncThunk(
     dispatch(workspaceViewActions.reset());
   },
   {
-    condition: async () => {
-      await reduxStore.dispatch(closeAllTabs({ skipUnsavedPrompt: true })).unwrap();
-      return true;
-    },
+    condition: closeAllTabsAndCheckRejection,
   }
 );

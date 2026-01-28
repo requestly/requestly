@@ -110,15 +110,18 @@ export const deleteRecords = createAsyncThunk<
     condition: async ({ records }) => {
       const allRecords = getAllRecords(records);
 
-      for (const r of allRecords) {
-        const result = await reduxStore.dispatch(closeTabByEntityId({ entityId: r.id, skipUnsavedPrompt: true }));
+      const results = await Promise.allSettled(
+        allRecords.map((r) => reduxStore.dispatch(closeTabByEntityId({ entityId: r.id, skipUnsavedPrompt: true })))
+      );
 
-        if (closeTabByEntityId.rejected.match(result)) {
-          return false;
+      const hasAllSucceeded = results.every((result) => {
+        if (result.status === "fulfilled") {
+          return closeTabByEntityId.fulfilled.match(result.value);
         }
-      }
+        return false;
+      });
 
-      return true;
+      return hasAllSucceeded;
     },
   }
 );
