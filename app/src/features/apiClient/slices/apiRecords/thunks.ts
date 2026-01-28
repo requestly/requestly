@@ -109,9 +109,15 @@ export const deleteRecords = createAsyncThunk<
   {
     condition: async ({ records }) => {
       const allRecords = getAllRecords(records);
+
       for (const r of allRecords) {
-        await reduxStore.dispatch(closeTabByEntityId({ entityId: r.id, skipUnsavedPrompt: true }));
+        const result = await reduxStore.dispatch(closeTabByEntityId({ entityId: r.id, skipUnsavedPrompt: true }));
+
+        if (closeTabByEntityId.rejected.match(result)) {
+          return false;
+        }
       }
+
       return true;
     },
   }
