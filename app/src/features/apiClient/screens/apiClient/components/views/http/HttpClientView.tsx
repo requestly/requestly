@@ -116,7 +116,7 @@ const HttpClientView: React.FC<Props> = ({
 
   const ctx = useApiClientFeatureContext();
 
-  const { apiClientRecordsRepository } = useApiClientRepository();
+  const { apiClientRecordsRepository, repoType } = useApiClientRepository();
 
   const { endAISession } = useAISessionContext();
   const scopedVariables = useScopedVariables(apiEntryDetails!.id!);
@@ -549,6 +549,7 @@ const HttpClientView: React.FC<Props> = ({
         forceTransaction: true,
         attributes: {
           "_attribute.is_create_mode": isCreateMode,
+          "_attribute.workspace_type": repoType,
         },
       },
       async () => {
@@ -657,6 +658,7 @@ const HttpClientView: React.FC<Props> = ({
     queryParams,
     getPathVariables,
     endAISession,
+    repoType,
   ]);
 
   const handleCancelRequest = useCallback(() => {
