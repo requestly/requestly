@@ -115,13 +115,13 @@ const processAuthorizationOptions = (item: PostmanAuth.Item | undefined, parentC
 
   const auth: RQAPI.Auth = { currentAuthType, authConfigStore: {} };
 
-  if (item.type === PostmanAuth.AuthType.BEARER_TOKEN) {
+  if (item.type === PostmanAuth.AuthType.BEARER_TOKEN && item[item.type]) {
     const authOptions = item[item.type];
-    const token = authOptions[0];
+    const token = authOptions?.[0];
     auth.authConfigStore[Authorization.Type.BEARER_TOKEN] = {
-      bearer: token.value,
+      bearer: token?.value ?? "",
     };
-  } else if (item.type === PostmanAuth.AuthType.BASIC_AUTH) {
+  } else if (item.type === PostmanAuth.AuthType.BASIC_AUTH && item[item.type]) {
     const basicAuthOptions = item[item.type];
     //if somehow username or password comes undefined return empty string in that case as fallback to avoid runtime error
     let username: PostmanAuth.KV<"username"> | undefined, password: PostmanAuth.KV<"password"> | undefined;
@@ -138,7 +138,7 @@ const processAuthorizationOptions = (item: PostmanAuth.Item | undefined, parentC
       username: username?.value ?? "",
       password: password?.value ?? "",
     };
-  } else if (item.type === PostmanAuth.AuthType.API_KEY) {
+  } else if (item.type === PostmanAuth.AuthType.API_KEY && item[item.type]) {
     const apiKeyOptions = item[item.type];
     let keyLabel: PostmanAuth.KV<"key"> | undefined;
     let apiKey: PostmanAuth.KV<"value"> | undefined;

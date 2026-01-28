@@ -17,6 +17,9 @@ export const getEditorParserConfig = async (language: EditorLanguage) => {
     case EditorLanguage.JSON:
       parser = "json";
       break;
+    case EditorLanguage.JSON5:
+      parser = "json5";
+      break;
     default:
       break;
   }

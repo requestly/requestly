@@ -18,9 +18,5 @@ export const RequestHeaders: React.FC<Props> = ({ requestId }) => {
       headers: newHeaders,
     });
   };
-  return (
-    <div className="graphql-request-tab-content">
-      <HeadersTable headers={headers} recordId={requestId} onHeadersChange={handleHeadersChange} />
-    </div>
-  );
+  return <HeadersTable headers={headers} recordId={requestId} onHeadersChange={handleHeadersChange} />;
 };
