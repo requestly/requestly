@@ -1,6 +1,6 @@
 import { RQAPI } from "features/apiClient/types";
 import { RBACButton, useRBAC } from "features/rbac";
-import { useIsAnyWorkspaceLoading, useTotalRecords } from "features/apiClient/slices";
+import { getApiClientFeatureContext, useIsAnyWorkspaceLoading, useTotalRecords } from "features/apiClient/slices";
 import {
   NewApiRecordDropdown,
   NewRecordDropdownItemType,
@@ -95,8 +95,10 @@ export const ApiClientEmptyView = () => {
     );
   }
 
+  const ctx = getApiClientFeatureContext();
+
   return (
-    <WorkspaceProvider>
+    <WorkspaceProvider workspaceId={ctx.workspaceId}>
       <ApiClientEmptyViewContent />
     </WorkspaceProvider>
   );
