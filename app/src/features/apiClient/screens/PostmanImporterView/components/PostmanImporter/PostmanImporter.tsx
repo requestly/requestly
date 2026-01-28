@@ -23,6 +23,7 @@ import { EnvironmentVariableData } from "features/apiClient/store/variables/type
 import { wrapWithCustomSpan } from "utils/sentry";
 import { SPAN_STATUS_ERROR, SPAN_STATUS_OK } from "@sentry/core";
 import { LocalApiClientRecordsSync } from "features/apiClient/helpers/modules/sync/local/services/LocalApiClientRecordsSync";
+import { captureException } from "backend/apiClient/utils";
 
 type ProcessedData = {
   environments: { name: string; variables: Record<string, EnvironmentVariableData>; isGlobal: boolean }[];
@@ -221,7 +222,15 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
             return !!result?.id;
           }
         });
+
         const results = await Promise.allSettled(importPromises);
+        results.forEach((result) => {
+          if (result.status === "rejected") {
+            const error = result.reason;
+            captureException(error);
+          }
+        });
+
         return results.filter((result) => result.status === "fulfilled" && result.value).length;
       }
     } catch (error) {
