@@ -1,37 +1,48 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { ApiClientImporterType, RQAPI } from "../../../../../types";
-import { useLocation, useParams } from "react-router-dom";
-import { notification, Tabs, TabsProps, Tooltip } from "antd";
-import { CgStack } from "@react-icons/all-files/cg/CgStack";
-import { MdOutlineHistory } from "@react-icons/all-files/md/MdOutlineHistory";
-import { CollectionsList } from "../components/collectionsList/CollectionsList";
-import { MdHorizontalSplit } from "@react-icons/all-files/md/MdHorizontalSplit";
-import { HistoryList } from "../components/historyList/HistoryList";
-import { ApiClientSidebarHeader } from "../components/apiClientSidebarHeader/ApiClientSidebarHeader";
-import { EnvironmentsList } from "features/apiClient/screens/environment/components/environmentsList/EnvironmentsList";
-import { useApiClientContext } from "features/apiClient/contexts";
-import { DeleteApiRecordModal, ImportFromCurlModal } from "../../modals";
-import { getEmptyApiEntry } from "../../../utils";
-import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
-import "./singleWorkspaceSidebar.scss";
-import { MdOutlineSpaceDashboard } from "@react-icons/all-files/md/MdOutlineSpaceDashboard";
-import { RuntimeVariables } from "features/apiClient/screens/environment/components/RuntimeVariables/runtimevariables";
-import { ApiClientFeatureContext, useApiClientFeatureContext, useApiClientRepository } from "features/apiClient/slices";
+import React, { useCallback, useEffect, useState } from 'react';
+import { ApiClientImporterType, RQAPI } from '../../../../../types';
+import { useLocation, useParams } from 'react-router-dom';
+import { notification, Tabs, TabsProps, Tooltip } from 'antd';
+import { CgStack } from '@react-icons/all-files/cg/CgStack';
+import { MdOutlineHistory } from '@react-icons/all-files/md/MdOutlineHistory';
+import { CollectionsList } from '../components/collectionsList/CollectionsList';
+import { MdHorizontalSplit } from '@react-icons/all-files/md/MdHorizontalSplit';
+import { HistoryList } from '../components/historyList/HistoryList';
+import { ApiClientSidebarHeader } from '../components/apiClientSidebarHeader/ApiClientSidebarHeader';
+import { EnvironmentsList } from 'features/apiClient/screens/environment/components/environmentsList/EnvironmentsList';
+import { useApiClientContext } from 'features/apiClient/contexts';
+import { DeleteApiRecordModal, ImportFromCurlModal } from '../../modals';
+import { getEmptyApiEntry } from '../../../utils';
+import { useNewApiClientContext } from 'features/apiClient/hooks/useNewApiClientContext';
+import './singleWorkspaceSidebar.scss';
+import { MdOutlineSpaceDashboard } from '@react-icons/all-files/md/MdOutlineSpaceDashboard';
+import { RuntimeVariables } from 'features/apiClient/screens/environment/components/RuntimeVariables/runtimevariables';
+import {
+  ApiClientFeatureContext,
+  useApiClientFeatureContext,
+  useApiClientRepository
+} from 'features/apiClient/slices';
+import { RuntimeVariablesSideNav } from 'features/apiClientV2/RuntimeVariables';
 
 interface Props {}
 
 export enum ApiClientSidebarTabKey {
-  HISTORY = "history",
-  COLLECTIONS = "collections",
-  ENVIRONMENTS = "environments",
-  RUNTIME_VARIABLES = "runtime_variables",
+  HISTORY = 'history',
+  COLLECTIONS = 'collections',
+  ENVIRONMENTS = 'environments',
+  RUNTIME_VARIABLES = 'runtime_variables',
+  RUNTIME_VARIABLES_2 = 'runtime_variables2'
 }
 
 export const SingleWorkspaceSidebar: React.FC<Props> = () => {
   const { state } = useLocation();
   const { requestId, collectionId } = useParams();
-  const [activeKey, setActiveKey] = useState<ApiClientSidebarTabKey>(ApiClientSidebarTabKey.COLLECTIONS);
-  const [recordTypeToBeCreated, setRecordTypeToBeCreated] = useState<RQAPI.RecordType | null>(null);
+  const [activeKey, setActiveKey] = useState<ApiClientSidebarTabKey>(
+    ApiClientSidebarTabKey.COLLECTIONS
+  );
+  const [
+    recordTypeToBeCreated,
+    setRecordTypeToBeCreated
+  ] = useState<RQAPI.RecordType | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const {
@@ -43,20 +54,25 @@ export const SingleWorkspaceSidebar: React.FC<Props> = () => {
     selectedHistoryIndex,
     isImportModalOpen,
     onImportRequestModalClose,
-    setIsImportModalOpen,
+    setIsImportModalOpen
   } = useApiClientContext();
 
   const { onSaveRecord } = useNewApiClientContext();
   const { apiClientRecordsRepository } = useApiClientRepository();
   const context = useApiClientFeatureContext();
 
-  const [recordsToBeDeleted, setRecordsToBeDeleted] = useState<RQAPI.ApiClientRecord[]>([]);
+  const [recordsToBeDeleted, setRecordsToBeDeleted] = useState<
+    RQAPI.ApiClientRecord[]
+  >([]);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
-  const handleRecordsToBeDeleted = useCallback((records: RQAPI.ApiClientRecord[]) => {
-    setRecordsToBeDeleted(records);
-    setIsDeleteModalOpen(true);
-  }, []);
+  const handleRecordsToBeDeleted = useCallback(
+    (records: RQAPI.ApiClientRecord[]) => {
+      setRecordsToBeDeleted(records);
+      setIsDeleteModalOpen(true);
+    },
+    []
+  );
 
   const onDeleteModalClose = useCallback(() => {
     setRecordsToBeDeleted([]);
@@ -64,13 +80,17 @@ export const SingleWorkspaceSidebar: React.FC<Props> = () => {
   }, []);
 
   const handleNewRecordClick = useCallback(
-    (recordType: RQAPI.RecordType, analyticEventSource: RQAPI.AnalyticsEventSource, entryType?: RQAPI.ApiEntryType) => {
+    (
+      recordType: RQAPI.RecordType,
+      analyticEventSource: RQAPI.AnalyticsEventSource,
+      entryType?: RQAPI.ApiEntryType
+    ) => {
       setRecordTypeToBeCreated(recordType);
 
       switch (recordType) {
         case RQAPI.RecordType.API: {
           setActiveKey(ApiClientSidebarTabKey.COLLECTIONS);
-          onNewClick(analyticEventSource, RQAPI.RecordType.API, "", entryType);
+          onNewClick(analyticEventSource, RQAPI.RecordType.API, '', entryType);
           return;
         }
 
@@ -94,21 +114,23 @@ export const SingleWorkspaceSidebar: React.FC<Props> = () => {
   );
 
   useEffect(() => {
-    if (requestId === "new") {
+    if (requestId === 'new') {
       setRecordTypeToBeCreated(RQAPI.RecordType.API);
-    } else if (collectionId === "new") {
+    } else if (collectionId === 'new') {
       setRecordTypeToBeCreated(RQAPI.RecordType.COLLECTION);
     }
   }, [requestId, collectionId]);
 
-  const items: TabsProps["items"] = [
+  const items: TabsProps['items'] = [
     {
       key: ApiClientSidebarTabKey.COLLECTIONS,
       label: (
         <Tooltip title="Collections" placement="right">
           <div
             onClick={() => setActiveKey(ApiClientSidebarTabKey.COLLECTIONS)}
-            className={`api-client-tab-link ${activeKey === ApiClientSidebarTabKey.COLLECTIONS ? "active" : ""}`}
+            className={`api-client-tab-link ${
+              activeKey === ApiClientSidebarTabKey.COLLECTIONS ? 'active' : ''
+            }`}
           >
             <CgStack />
           </div>
@@ -120,18 +142,22 @@ export const SingleWorkspaceSidebar: React.FC<Props> = () => {
           recordTypeToBeCreated={recordTypeToBeCreated}
           handleRecordsToBeDeleted={handleRecordsToBeDeleted}
         />
-      ),
+      )
     },
     {
       key: ApiClientSidebarTabKey.ENVIRONMENTS,
       label: (
         <Tooltip title="Environments" placement="right">
-          <div className={`api-client-tab-link ${activeKey === ApiClientSidebarTabKey.ENVIRONMENTS ? "active" : ""}`}>
+          <div
+            className={`api-client-tab-link ${
+              activeKey === ApiClientSidebarTabKey.ENVIRONMENTS ? 'active' : ''
+            }`}
+          >
             <MdHorizontalSplit />
           </div>
         </Tooltip>
       ),
-      children: <EnvironmentsList />,
+      children: <EnvironmentsList />
     },
     {
       key: ApiClientSidebarTabKey.HISTORY,
@@ -139,7 +165,9 @@ export const SingleWorkspaceSidebar: React.FC<Props> = () => {
         <Tooltip title="History" placement="right">
           <div
             onClick={() => setActiveKey(ApiClientSidebarTabKey.HISTORY)}
-            className={`api-client-tab-link ${activeKey === ApiClientSidebarTabKey.HISTORY ? "active" : ""}`}
+            className={`api-client-tab-link ${
+              activeKey === ApiClientSidebarTabKey.HISTORY ? 'active' : ''
+            }`}
           >
             <MdOutlineHistory />
           </div>
@@ -151,7 +179,7 @@ export const SingleWorkspaceSidebar: React.FC<Props> = () => {
           selectedHistoryIndex={selectedHistoryIndex}
           onSelectionFromHistory={setCurrentHistoryIndex}
         />
-      ),
+      )
     },
     {
       key: ApiClientSidebarTabKey.RUNTIME_VARIABLES,
@@ -159,9 +187,13 @@ export const SingleWorkspaceSidebar: React.FC<Props> = () => {
         <>
           <Tooltip title="Runtime variables" placement="right">
             <div
-              onClick={() => setActiveKey(ApiClientSidebarTabKey.RUNTIME_VARIABLES)}
+              onClick={() =>
+                setActiveKey(ApiClientSidebarTabKey.RUNTIME_VARIABLES)
+              }
               className={`api-client-tab-link ${
-                activeKey === ApiClientSidebarTabKey.RUNTIME_VARIABLES ? "active" : ""
+                activeKey === ApiClientSidebarTabKey.RUNTIME_VARIABLES
+                  ? 'active'
+                  : ''
               }`}
             >
               <MdOutlineSpaceDashboard />
@@ -169,8 +201,30 @@ export const SingleWorkspaceSidebar: React.FC<Props> = () => {
           </Tooltip>
         </>
       ),
-      children: <RuntimeVariables />,
+      children: <RuntimeVariables />
     },
+    {
+      key: ApiClientSidebarTabKey.RUNTIME_VARIABLES_2,
+      label: (
+        <>
+          <Tooltip title="Runtime variables New" placement="right">
+            <div
+              onClick={() =>
+                setActiveKey(ApiClientSidebarTabKey.RUNTIME_VARIABLES_2)
+              }
+              className={`api-client-tab-link ${
+                activeKey === ApiClientSidebarTabKey.RUNTIME_VARIABLES_2
+                  ? 'active'
+                  : ''
+              }`}
+            >
+              <MdOutlineSpaceDashboard />
+            </div>
+          </Tooltip>
+        </>
+      ),
+      children: <RuntimeVariablesSideNav />
+    }
   ];
 
   const handleActiveTabChange = (activeKey: ApiClientSidebarTabKey) => {
@@ -188,13 +242,13 @@ export const SingleWorkspaceSidebar: React.FC<Props> = () => {
 
         const record: Partial<RQAPI.ApiRecord> = {
           type: RQAPI.RecordType.API,
-          data: apiEntry,
+          data: apiEntry
         };
 
         const result = await apiClientRecordsRepository.createRecord(record);
 
         if (result.success) {
-          onSaveRecord(result.data, "open");
+          onSaveRecord(result.data, 'open');
 
           setIsImportModalOpen(false);
         } else {
@@ -202,11 +256,11 @@ export const SingleWorkspaceSidebar: React.FC<Props> = () => {
         }
         return result.data;
       } catch (error) {
-        console.error("Error importing request", error);
+        console.error('Error importing request', error);
         notification.error({
           message: `Error importing request`,
           description: error?.message,
-          placement: "bottomRight",
+          placement: 'bottomRight'
         });
         throw error;
       } finally {
@@ -239,7 +293,11 @@ export const SingleWorkspaceSidebar: React.FC<Props> = () => {
             onClearHistory={clearHistory}
             onImportClick={onImportClick}
             onNewClick={(recordType, entryType) =>
-              handleNewRecordClick(recordType, "api_client_sidebar_header", entryType)
+              handleNewRecordClick(
+                recordType,
+                'api_client_sidebar_header',
+                entryType
+              )
             }
           />
 
@@ -266,8 +324,8 @@ export const SingleWorkspaceSidebar: React.FC<Props> = () => {
 
       <ImportFromCurlModal
         initialCurlCommand={state?.curlCommand}
-        source={state?.source || ""}
-        pageURL={state?.pageURL || ""}
+        source={state?.source || ''}
+        pageURL={state?.pageURL || ''}
         isRequestLoading={isLoading}
         isOpen={isImportModalOpen}
         handleImportRequest={handleImportRequest}

@@ -1,9 +1,10 @@
-import { CollectionViewTabSource } from "features/apiClient/screens/apiClient/components/views/components/Collection/collectionViewTabSource";
-import { DraftRequestContainerTabSource } from "features/apiClient/screens/apiClient/components/views/components/DraftRequestContainer/draftRequestContainerTabSource";
-import { RequestViewTabSource } from "features/apiClient/screens/apiClient/components/views/components/RequestView/requestViewTabSource";
-import { HistoryViewTabSource } from "features/apiClient/screens/apiClient/components/views/components/request/HistoryView/historyViewTabSource";
-import { RuntimeVariablesViewTabSource } from "features/apiClient/screens/environment/components/RuntimeVariables/runtimevariablesTabSource";
-import { EnvironmentViewTabSource } from "features/apiClient/screens/environment/components/environmentView/EnvironmentViewTabSource";
+import { CollectionViewTabSource } from 'features/apiClient/screens/apiClient/components/views/components/Collection/collectionViewTabSource';
+import { DraftRequestContainerTabSource } from 'features/apiClient/screens/apiClient/components/views/components/DraftRequestContainer/draftRequestContainerTabSource';
+import { RequestViewTabSource } from 'features/apiClient/screens/apiClient/components/views/components/RequestView/requestViewTabSource';
+import { HistoryViewTabSource } from 'features/apiClient/screens/apiClient/components/views/components/request/HistoryView/historyViewTabSource';
+import { RuntimeVariablesViewTabSource } from 'features/apiClient/screens/environment/components/RuntimeVariables/runtimevariablesTabSource';
+import { RuntimeVariablesViewTabSource as RuntimeVariablesViewTabSourceV2 } from 'features/apiClientV2/RuntimeVariables/utils/runtimeVariableTabSource';
+import { EnvironmentViewTabSource } from 'features/apiClient/screens/environment/components/environmentView/EnvironmentViewTabSource';
 
 export const TAB_SOURCES_MAP = {
   [DraftRequestContainerTabSource.name]: DraftRequestContainerTabSource,
@@ -11,5 +12,6 @@ export const TAB_SOURCES_MAP = {
   [HistoryViewTabSource.name]: HistoryViewTabSource,
   [CollectionViewTabSource.name]: CollectionViewTabSource,
   [EnvironmentViewTabSource.name]: EnvironmentViewTabSource,
-  [RuntimeVariablesViewTabSource.name]: RuntimeVariablesViewTabSource,
+  [RuntimeVariablesViewTabSourceV2.name]: RuntimeVariablesViewTabSourceV2,
+  [RuntimeVariablesViewTabSource.name]: RuntimeVariablesViewTabSource
 };
