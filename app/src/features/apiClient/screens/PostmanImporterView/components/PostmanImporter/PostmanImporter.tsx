@@ -20,6 +20,10 @@ import { useCommand } from "features/apiClient/commands";
 import { useApiClientRepository } from "features/apiClient/contexts/meta";
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
 import { EnvironmentVariableData } from "features/apiClient/store/variables/types";
+import { wrapWithCustomSpan } from "utils/sentry";
+import { SPAN_STATUS_ERROR, SPAN_STATUS_OK } from "@sentry/core";
+import { LocalApiClientRecordsSync } from "features/apiClient/helpers/modules/sync/local/services/LocalApiClientRecordsSync";
+import { captureException } from "backend/apiClient/utils";
 
 type ProcessedData = {
   environments: { name: string; variables: Record<string, EnvironmentVariableData>; isGlobal: boolean }[];
@@ -48,136 +52,198 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
   const {
     env: { createEnvironment, patchEnvironmentVariables },
   } = useCommand();
+
   const { apiClientRecordsRepository, environmentVariablesRepository } = useApiClientRepository();
   const { onSaveRecord } = useNewApiClientContext();
+
+  const destinationRepository = apiClientRecordsRepository;
+  const isLocalFileSystem = destinationRepository instanceof LocalApiClientRecordsSync;
 
   const collectionsCount = useRef(0);
 
   const handleFileDrop = useCallback(
-    (files: File[]) => {
-      setProcessingStatus("processing");
-      setImportError(null);
+    async (files: File[]) => {
+      return wrapWithCustomSpan(
+        {
+          name: "[Transaction] api_client.postman_import.process_files",
+          op: "api_client.postman_import.process_files",
+          forceTransaction: true,
+          attributes: {},
+        },
+        async (files: File[]) => {
+          setProcessingStatus("processing");
+          setImportError(null);
 
-      const processFiles = files.map((file) => {
-        return new Promise((resolve, reject) => {
-          const reader = new FileReader();
+          const processFiles = files.map((file) => {
+            return new Promise((resolve, reject) => {
+              const reader = new FileReader();
 
-          reader.onerror = () => reject(new Error("Could not process the selected file!"));
+              reader.onerror = () => reject(new Error("Could not process the selected file!"));
 
-          reader.onload = () => {
-            try {
-              if (!file.type.includes("json")) {
-                throw new Error("Invalid file. Please upload valid Postman export files.");
+              reader.onload = () => {
+                try {
+                  if (!file.type.includes("json")) {
+                    throw new Error("Invalid file. Please upload valid Postman export files.");
+                  }
+
+                  const fileContent = JSON.parse(reader.result as string);
+                  const postmanFileType = getUploadedPostmanFileType(fileContent);
+                  if (!postmanFileType) {
+                    throw new Error("Invalid file. Please upload valid Postman export files.");
+                  }
+
+                  if (postmanFileType === "environment") {
+                    const processedData = processPostmanEnvironmentData(fileContent);
+                    resolve({ type: postmanFileType, data: processedData });
+                  } else {
+                    const processedApiRecords = processPostmanCollectionData(fileContent, apiClientRecordsRepository);
+                    resolve({
+                      type: postmanFileType,
+                      data: {
+                        type: postmanFileType,
+                        apiRecords: processedApiRecords,
+                      },
+                    });
+                  }
+                } catch (error) {
+                  Logger.error("Error processing postman file:", error);
+                  reject(error);
+                  Sentry.withScope((scope) => {
+                    scope.setTag("error_type", "api_client_postman_processing");
+                    Sentry.captureException(error);
+                  });
+                }
+              };
+              reader.readAsText(file);
+            });
+          });
+
+          await Promise.allSettled(processFiles)
+            .then((results) => {
+              const hasProcessingAllFilesFailed = !results.some((result) => result.status === "fulfilled");
+              if (hasProcessingAllFilesFailed) {
+                throw new Error(
+                  "Could not process the selected files!, Please check if the files are valid Postman export files."
+                );
               }
 
-              const fileContent = JSON.parse(reader.result as string);
-              const postmanFileType = getUploadedPostmanFileType(fileContent);
-              if (!postmanFileType) {
-                throw new Error("Invalid file. Please upload valid Postman export files.");
-              }
+              const processedRecords: ProcessedData = {
+                environments: [],
+                apiRecords: [],
+                variables: {},
+              };
 
-              if (postmanFileType === "environment") {
-                const processedData = processPostmanEnvironmentData(fileContent);
-                resolve({ type: postmanFileType, data: processedData });
-              } else {
-                const processedApiRecords = processPostmanCollectionData(fileContent, apiClientRecordsRepository);
-                resolve({
-                  type: postmanFileType,
-                  data: {
-                    type: postmanFileType,
-                    apiRecords: processedApiRecords,
-                  },
-                });
-              }
-            } catch (error) {
-              Logger.error("Error processing postman file:", error);
-              reject(error);
+              results.forEach((result: any) => {
+                if (result.status === "fulfilled") {
+                  if (result.value.type === "environment") {
+                    processedRecords.environments.push(result.value.data);
+                  } else {
+                    const { collections, apis } = result.value.data.apiRecords;
+                    processedRecords.variables = { ...processedRecords.variables, ...result.value.data.variables };
+                    processedRecords.apiRecords.push(...collections, ...apis);
+                    collectionsCount.current += collections.length;
+                    trackImportParsed(ApiClientImporterType.POSTMAN, collections.length, apis.length);
+                  }
+                } else {
+                  trackImportParseFailed(ApiClientImporterType.POSTMAN, result.reason);
+                }
+              });
+
+              setProcessedFileData(processedRecords);
+              setProcessingStatus("processed");
+              Sentry.getActiveSpan()?.setStatus({
+                code: SPAN_STATUS_OK,
+              });
+            })
+            .catch((error) => {
+              trackImportParseFailed(ApiClientImporterType.POSTMAN, error.message);
+              setImportError(error.message);
               Sentry.withScope((scope) => {
-                scope.setTag("error_type", "api_client_postman_processing");
+                scope.setTag("error_type", "api_client_postman_import");
                 Sentry.captureException(error);
               });
-            }
-          };
-          reader.readAsText(file);
-        });
-      });
-
-      Promise.allSettled(processFiles)
-        .then((results) => {
-          const hasProcessingAllFilesFailed = !results.some((result) => result.status === "fulfilled");
-          if (hasProcessingAllFilesFailed) {
-            throw new Error(
-              "Could not process the selected files!, Please check if the files are valid Postman export files."
-            );
-          }
-
-          const processedRecords: ProcessedData = {
-            environments: [],
-            apiRecords: [],
-            variables: {},
-          };
-
-          results.forEach((result: any) => {
-            if (result.status === "fulfilled") {
-              if (result.value.type === "environment") {
-                processedRecords.environments.push(result.value.data);
-              } else {
-                const { collections, apis } = result.value.data.apiRecords;
-                processedRecords.variables = { ...processedRecords.variables, ...result.value.data.variables };
-                processedRecords.apiRecords.push(...collections, ...apis);
-                collectionsCount.current += collections.length;
-                trackImportParsed(ApiClientImporterType.POSTMAN, collections.length, apis.length);
+              Sentry.getActiveSpan()?.setStatus({
+                code: SPAN_STATUS_ERROR,
+              });
+            })
+            .finally(() => {
+              if (importError) {
+                setProcessingStatus("idle");
               }
-            } else {
-              trackImportParseFailed(ApiClientImporterType.POSTMAN, result.reason);
-            }
-          });
-
-          setProcessedFileData(processedRecords);
-          setProcessingStatus("processed");
-        })
-        .catch((error) => {
-          trackImportParseFailed(ApiClientImporterType.POSTMAN, error.message);
-          setImportError(error.message);
-          Sentry.withScope((scope) => {
-            scope.setTag("error_type", "api_client_postman_import");
-            Sentry.captureException(error);
-          });
-        })
-        .finally(() => {
-          if (importError) {
-            setProcessingStatus("idle");
-          }
-        });
+            });
+        }
+      )(files);
     },
     [importError, apiClientRecordsRepository]
   );
 
   const handleImportEnvironments = useCallback(async () => {
     try {
-      const importPromises = processedFileData.environments.map(async (env) => {
-        if (env.isGlobal) {
-          await patchEnvironmentVariables({
-            environmentId: environmentVariablesRepository.getGlobalEnvironmentId(),
-            variables: env.variables,
-          });
-          return true;
-        } else {
-          await createEnvironment({
-            newEnvironmentName: env.name,
-            variables: env.variables,
-          });
+      // For local workspace use sequential way
+      if (isLocalFileSystem) {
+        let successCount = 0;
+        for (let index = 0; index < processedFileData.environments.length; index++) {
+          const env = processedFileData.environments[index];
+          try {
+            if (env.isGlobal) {
+              await patchEnvironmentVariables({
+                environmentId: environmentVariablesRepository.getGlobalEnvironmentId(),
+                variables: env.variables,
+              });
+              successCount++;
+            } else {
+              const result = await createEnvironment({
+                newEnvironmentName: env.name,
+                variables: env.variables,
+              });
+              if (result?.id) {
+                successCount++;
+              }
+            }
+          } catch (error) {
+            Sentry.captureException(error);
+          }
         }
-        return false;
-      });
 
-      const results = await Promise.allSettled(importPromises);
-      return results.filter((result) => result.status === "fulfilled").length;
+        return successCount;
+      } else {
+        const importPromises = processedFileData.environments.map(async (env) => {
+          if (env.isGlobal) {
+            await patchEnvironmentVariables({
+              environmentId: environmentVariablesRepository.getGlobalEnvironmentId(),
+              variables: env.variables,
+            });
+            return true;
+          } else {
+            const result = await createEnvironment({
+              newEnvironmentName: env.name,
+              variables: env.variables,
+            });
+            return !!result?.id;
+          }
+        });
+
+        const results = await Promise.allSettled(importPromises);
+        results.forEach((result) => {
+          if (result.status === "rejected") {
+            const error = result.reason;
+            captureException(error);
+          }
+        });
+
+        return results.filter((result) => result.status === "fulfilled" && result.value).length;
+      }
     } catch (error) {
       Logger.error("Postman data import failed:", error);
       throw error;
     }
-  }, [processedFileData.environments, patchEnvironmentVariables, environmentVariablesRepository, createEnvironment]);
+  }, [
+    processedFileData.environments,
+    patchEnvironmentVariables,
+    environmentVariablesRepository,
+    createEnvironment,
+    isLocalFileSystem,
+  ]);
 
   const handleImportCollectionsAndApis = useCallback(async () => {
     let importedCollectionsCount = 0;
