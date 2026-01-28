@@ -1,5 +1,6 @@
 import { Diagnostic, linter } from "@codemirror/lint";
 import * as eslint from "eslint-linter-browserify";
+import { getOffsetFromLocation } from "../utils";
 import { Diagnostic as JsonDiagnostic, getLanguageService } from "vscode-json-languageservice";
 import { TextDocument } from "vscode-languageserver-textdocument";
 import { DiagnosticSeverity as JsonDiagnosticSeverity } from "vscode-languageserver-types";
@@ -16,14 +17,6 @@ const eslintConfig = {
     "no-unused-vars": "warn",
   },
 } as const;
-
-function getOffsetFromLocation(doc: any, line: number, column: number): number {
-  const totalLines = doc.lines;
-  const clampedLine = Math.min(Math.max(line, 1), totalLines);
-  const lineInfo = doc.line(clampedLine);
-  const colIndex = Math.max(column - 1, 0);
-  return lineInfo.from + colIndex;
-}
 
 export function jsonLinter() {
   const uri = "inmemory://request-body.json";
