@@ -20,3 +20,4 @@ app/.env.local
 /requestly-1.0.0.tgz
 package
 *.code-workspace
+.npmrc
