@@ -1,30 +1,32 @@
-.run-result-view-details {
-  user-select: none;
-  flex: 1; // Use flex instead of height: 100%
-  min-height: 0; // Allow flex children to shrink
+.run-result-view-details-wrapper {
+  height: 100%;
   display: flex;
   flex-direction: column;
 
   .run-result-split-container {
     flex: 1;
-    min-height: 0;
+    display: flex;
+    > .gutter {
+      z-index: 1;
+      background-color: var(--requestly-color-primary);
+      background-clip: content-box;
+      cursor: col-resize;
+      opacity: 0;
 
-    .split {
-      height: 100%;
-      display: flex;
-
-      .gutter {
-        background-color: var(--requestly-color-border-primary);
-        cursor: col-resize;
-        position: relative;
-
-        &:hover {
-          background-color: var(--requestly-color-primary);
-        }
+      &:hover,
+      &:active {
+        opacity: 1;
       }
     }
   }
+}
 
+.run-result-view-details {
+  &.right-panel-opened {
+    display: flex;
+    background-color: #ff8080;
+    align-items: right;
+  }
   .result-header {
     display: flex;
     align-items: center;
@@ -269,6 +271,7 @@
           font-weight: 400;
           color: var(--requestly-color-text-subtle);
           font-size: var(--requestly-font-size-sm);
+          margin-left: 30px;
         }
 
         .loader {
@@ -364,12 +367,34 @@
           }
         }
 
+        .request-url {
+          display: flex;
+          align-items: center;
+          width: 100%;
+          padding-left: 30px;
+          margin-top: -5px;
+
+          .url-text {
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 1;
+            line-clamp: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: var(--requestly-color-text-placeholder);
+            font-size: var(--requestly-font-size-xs);
+            font-style: normal;
+            font-weight: 400;
+          }
+        }
+
         .results-list {
           display: flex;
           flex-direction: column;
           align-items: flex-start;
           gap: var(--space-3, 6px);
           align-self: stretch;
+          margin-left: 30px;
         }
       }
 
