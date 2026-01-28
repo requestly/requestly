@@ -1,19 +1,21 @@
 import { createListenerMiddleware } from "@reduxjs/toolkit";
 import { bufferActions, findBufferByReferenceId } from "./slice";
-import type { ApiClientRootState } from "../hooks/types";
 import { ApiClientEntityType } from "../entities/types";
 import {
   API_CLIENT_RECORDS_SLICE_NAME,
   API_CLIENT_ENVIRONMENTS_SLICE_NAME,
+  API_CLIENT_RUNNER_CONFIG_SLICE_NAME,
   BUFFER_SLICE_NAME,
 } from "../common/constants";
 import { apiRecordsAdapter } from "../apiRecords/slice";
 import { environmentsAdapter } from "../environments/slice";
+import { runConfigAdapter } from "../runConfig/slice";
 import { EntitySyncedPayload } from "../common/actions";
+import { ApiClientStoreState } from "../workspaceView/helpers/ApiClientContextRegistry";
 
 type SourceSelectorMap = {
   [K in ApiClientEntityType]?: {
-    selectById: (state: ApiClientRootState, id: string) => unknown | undefined;
+    selectById: (state: ApiClientStoreState, id: string) => unknown | undefined;
   };
 };
 
@@ -32,6 +34,9 @@ const BUFFER_SOURCE_SELECTORS: SourceSelectorMap = {
   },
   [ApiClientEntityType.GLOBAL_ENVIRONMENT]: {
     selectById: (state) => state.environments.globalEnvironment,
+  },
+  [ApiClientEntityType.RUN_CONFIG]: {
+    selectById: (state, id) => runConfigAdapter.getSelectors().selectById(state.runnerConfig.configs, id),
   },
 };
 
@@ -56,7 +61,7 @@ function syncBufferForId(
   referenceId: string,
   entityType?: ApiClientEntityType
 ) {
-  const currentState = listenerApi.getState() as ApiClientRootState;
+  const currentState = listenerApi.getState() as ApiClientStoreState;
   const bufferState = currentState[BUFFER_SLICE_NAME];
   const buffer = findBufferByReferenceId(bufferState.entities, referenceId);
 
@@ -94,6 +99,7 @@ bufferListenerMiddleware.startListening({
     return (
       action.type.startsWith(`${API_CLIENT_ENVIRONMENTS_SLICE_NAME}/`) ||
       action.type.startsWith(`${API_CLIENT_RECORDS_SLICE_NAME}/`) ||
+      action.type.startsWith(`${API_CLIENT_RUNNER_CONFIG_SLICE_NAME}/`) ||
       action.type === "entities/synced"
     );
   },
