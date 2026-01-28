@@ -70,11 +70,22 @@ export const useOpenLocalWorkspace = ({
           throw new Error(openWorkspaceResult.error.message, { cause: openWorkspaceResult });
         }
 
-        const workspace = openWorkspaceResult.content;
-        dispatch(workspaceActions.upsertWorkspace(workspace));
-        await handleWorkspaceSwitch(workspace.id, workspace.name);
+        const partialWorkspace = openWorkspaceResult.content;
+        const localWorkspace = {
+          id: partialWorkspace.id,
+          name: partialWorkspace.name,
+          owner: "",
+          accessCount: 1,
+          adminCount: 1,
+          members: {},
+          appsumo: undefined,
+          workspaceType: WorkspaceType.LOCAL,
+          rootPath: partialWorkspace.path,
+        };
+        dispatch(workspaceActions.upsertWorkspace(localWorkspace));
+        await handleWorkspaceSwitch(localWorkspace.id, localWorkspace.name);
         onOpenWorkspaceCallback?.();
-        trackNewTeamCreateSuccess(workspace.id, workspace.name, analyticEventSource, WorkspaceType.LOCAL);
+        trackNewTeamCreateSuccess(localWorkspace.id, localWorkspace.name, analyticEventSource, WorkspaceType.LOCAL);
       } catch (error) {
         trackNewTeamCreateFailure("Untitled", WorkspaceType.LOCAL);
         if (error.cause) {
