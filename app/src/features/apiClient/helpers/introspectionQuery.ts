@@ -43,6 +43,11 @@ export const fetchGraphQLIntrospectionData = async (
 
   try {
     const responseBodyJson = JSON.parse(response.body);
+
+    if (!responseBodyJson.data.__schema) {
+      throw new Error("Invalid introspection data received");
+    }
+
     return responseBodyJson.data;
   } catch (error) {
     throw new Error(`Failed to parse introspection data: ${error.message}`);
