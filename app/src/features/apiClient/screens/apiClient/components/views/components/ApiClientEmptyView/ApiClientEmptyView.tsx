@@ -81,6 +81,10 @@ const ApiClientEmptyViewContent = () => {
 };
 
 export const ApiClientEmptyView = () => {
+  // When we clear the context ie switch workspace, then for a instance there is flicker on screen
+  // with message `Context not found in registry` (which is valid, since we are in process to configure new context)
+  // but at same time empty view renders with workspace provider, so it breaks,
+  // loader helps to prevent that broken state.
   const isLoading = useIsAnyWorkspaceLoading();
 
   if (isLoading) {
