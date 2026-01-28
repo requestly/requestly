@@ -99,8 +99,10 @@ export function extractAuthHeadersAndParams(auth: RQAPI.Auth) {
     case Authorization.Type.NO_AUTH:
       break;
     case Authorization.Type.BASIC_AUTH: {
-      if (!auth.authConfigStore?.[Authorization.Type.BASIC_AUTH]) break; // invalid auth config gets stored as null for now
-      const { username = "", password = "" } = auth.authConfigStore[Authorization.Type.BASIC_AUTH];
+      // Basic Auth should always generate a header, even with empty credentials or missing config
+      // Unlike other auth types, Basic Auth's validate() always returns true, so we always generate the header
+      const basicAuthConfig = auth.authConfigStore?.[Authorization.Type.BASIC_AUTH];
+      const { username = "", password = "" } = basicAuthConfig || {};
       const credentials = `${username}:${password}`;
       // Use TextEncoder and btoa to handle UTF-8 characters properly
       const base64Credentials = btoa(String.fromCharCode(...new TextEncoder().encode(credentials)));
