@@ -53,6 +53,7 @@ interface EditorProps {
   hideToolbar?: boolean;
   autoFocus?: boolean;
   onFocus?: () => void;
+  onHeightChange?: (height: number) => void;
   onEditorReady?: (view: EditorView) => void;
   mergeView?: {
     incomingValue: string;
@@ -81,6 +82,7 @@ const Editor: React.FC<EditorProps> = ({
   hideToolbar = false,
   autoFocus = false,
   onFocus,
+  onHeightChange,
   onEditorReady,
   mergeView,
   disableDefaultAutoCompletions = false,
@@ -109,6 +111,8 @@ const Editor: React.FC<EditorProps> = ({
 
   const handleResize = (event: any, { element, size, handle }: any) => {
     setEditorHeight(size.height);
+    // Notify parent component about manual resize
+    onHeightChange?.(size.height);
   };
 
   const handleFullScreenToggle = useCallback(() => {
