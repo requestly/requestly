@@ -6,6 +6,8 @@
   .run-result-split-container {
     flex: 1;
     display: flex;
+    overflow: hidden;
+
     > .gutter {
       z-index: 1;
       background-color: var(--requestly-color-primary);
@@ -18,15 +20,28 @@
         opacity: 1;
       }
     }
+
+    > .run-result-view-details,
+    > .run-result-detail-panel-container {
+      height: 100%;
+      overflow: hidden;
+    }
+    > .run-result-detail-panel-container {
+      border-left: 1px solid var(--requestly-color-white-t-10);
+    }
   }
 }
 
 .run-result-view-details {
+  display: flex;
+  flex-direction: column;
+
   &.right-panel-opened {
     display: flex;
-    background-color: #ff8080;
-    align-items: right;
+    align-items: flex-end;
+    border-bottom: 1px solid var(--requestly-color-white-t-10);
   }
+
   .result-header {
     display: flex;
     align-items: center;
