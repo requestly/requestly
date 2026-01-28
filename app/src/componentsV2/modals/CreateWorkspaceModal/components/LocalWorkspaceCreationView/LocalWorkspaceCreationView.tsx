@@ -81,7 +81,7 @@ export const LocalWorkspaceCreationView = ({
   const [isSelectedFolderAvailable, setIsSelectedFolderAvailable] = useState(true);
 
   const { openWorkspace, isLoading: isOpenWorkspaceLoading } = useOpenLocalWorkspace({
-    analyticEventSource: "create_workspace_modal",
+    analyticEventSource: analyticEventSource,
     onOpenWorkspaceCallback: () => {
       onSuccessCallback?.();
     },
@@ -202,7 +202,7 @@ export const LocalWorkspaceCreationView = ({
         </div>
         <div style={{ padding: "12px 0" }}>
           <LocalWorkspaceCreateOptions
-            analyticEventSource="create_workspace_modal"
+            analyticEventSource={analyticEventSource}
             onCreateWorkspaceClick={() => {
               setOpenWorkspaceError(null);
               setIsCreationOptionsVisible(false);
