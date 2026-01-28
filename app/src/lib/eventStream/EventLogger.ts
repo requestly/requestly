@@ -3,10 +3,8 @@ import { APIClientEvent, EventFlow, ResponseEventData, Tag } from "features/apiC
 import { uuidv4 } from "zod/v4";
 
 export abstract class EventLogger {
-  // will have methods to log for every execution stage
-  // Each platform can choose how to implement this, can be a simple dispatch, or
-  // can be a daisy chain of relays.
   abstract pushEvent(event: APIClientEvent): void;
+  // TODO: Add workspaceId here
   //   readonly workspaceId: WorkspaceId;
   logRequest(params: { request: RequestEventData; tag?: Tag }) {
     const event: APIClientEvent = {

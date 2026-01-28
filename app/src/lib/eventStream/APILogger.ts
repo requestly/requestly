@@ -6,6 +6,7 @@ import { eventsActions } from "store/slices/eventsStream/slice";
 export class APILogger extends EventLogger {
   private dispatch: ReturnType<typeof useDispatch>;
 
+  // TODO: Figure out a way to do this without having to pass dispatch
   constructor(dispatch: ReturnType<typeof useDispatch>) {
     super();
     this.dispatch = dispatch;
