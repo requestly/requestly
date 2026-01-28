@@ -21,7 +21,7 @@ import { runConfigAdapter } from "../runConfig/slice";
 import { EntitySyncedPayload } from "../common/actions";
 import { ApiClientStoreState } from "../workspaceView/helpers/ApiClientContextRegistry";
 
-type BufferListenerApi = ListenerEffectAPI<ApiClientRootState, Dispatch<AnyAction>>;
+type BufferListenerApi = ListenerEffectAPI<ApiClientStoreState, Dispatch<AnyAction>>;
 
 interface BufferSyncRemote {
   entityTypes: ApiClientEntityType[];
@@ -125,7 +125,7 @@ function performBufferSync(
 export const bufferListenerMiddleware = createListenerMiddleware();
 
 const startAppListening = bufferListenerMiddleware.startListening as TypedStartListening<
-  ApiClientRootState,
+  ApiClientStoreState,
   Dispatch<AnyAction>
 >;
 
