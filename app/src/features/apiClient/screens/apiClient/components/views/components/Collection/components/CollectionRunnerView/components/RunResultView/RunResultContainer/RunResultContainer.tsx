@@ -1,5 +1,5 @@
 import React, { useMemo, useRef, useState } from "react";
-import { Badge, Collapse, Spin, Tabs, Popover } from "antd";
+import { Badge, Breadcrumb, Collapse, Spin, Tabs } from "antd";
 import {
   CurrentlyExecutingRequest,
   LiveRunResult,
@@ -94,7 +94,6 @@ const TestDetails: React.FC<{
 }> = React.memo(({ requestExecutionResult, onDetailsClick }) => {
   const workspaceId = useWorkspaceId();
   const { openBufferedTab } = useTabActions();
-  const [breadcrumbPopoverOpen, setBreadcrumbPopoverOpen] = useState(false);
 
   const responseDetails = useMemo(() => {
     return (
@@ -133,82 +132,48 @@ const TestDetails: React.FC<{
       .reverse();
 
     const depth = collectionPath.length;
-    if (depth === 0) return null;
-
-    const [rootCollection, ...intermediateCollections] = collectionPath;
-    const shouldShowEllipsis = depth > 1;
-
-    const renderBreadcrumb = () => {
-      if (!shouldShowEllipsis) {
-        return (
-          <>
-            <span className="collection-name" title={rootCollection?.name}>
-              {rootCollection?.name}
-            </span>
-            <span className="breadcrumb-separator">/</span>
-          </>
-        );
-      }
-
-      return (
-        <>
-          <span className="collection-name" title={rootCollection?.name}>
-            {rootCollection?.name}
-          </span>
-          <span className="breadcrumb-separator">{">"}</span>
-          <Popover
-            content={
-              <div className="breadcrumb-popover-content">
-                {intermediateCollections.map((collection) => (
-                  <div key={collection.id} className="breadcrumb-popover-item">
-                    {collection.name}
-                  </div>
-                ))}
-              </div>
-            }
-            trigger="click"
-            open={breadcrumbPopoverOpen}
-            onOpenChange={setBreadcrumbPopoverOpen}
-            placement="bottom"
-          >
-            <span
-              className="breadcrumb-ellipsis"
-              onClick={(e) => {
-                e.stopPropagation();
-                setBreadcrumbPopoverOpen(!breadcrumbPopoverOpen);
-              }}
-            >
-              ...
-            </span>
-          </Popover>
-          <span className="breadcrumb-separator">{">"}</span>
-        </>
-      );
-    };
 
     return (
-      <>
-        {renderBreadcrumb()}
-        <span
-          className="request-name"
-          title={requestExecutionResult.recordName}
-          onClick={(e) => {
-            e.stopPropagation();
-            openBufferedTab({
-              preview: false,
-              source: new RequestViewTabSource({
-                id: requestExecutionResult.recordId,
-                title: requestExecutionResult.recordName,
-                context: {
-                  id: workspaceId,
-                },
-              }),
-            });
-          }}
-        >
-          {requestExecutionResult.recordName}
-        </span>
-      </>
+      <Breadcrumb separator=">" className="request-name-details-breadcrumb">
+        {depth > 0 && (
+          <Breadcrumb.Item>
+            <span className="root-collection-name">{collectionPath[0]?.name}</span>
+          </Breadcrumb.Item>
+        )}
+        {depth > 1 && (
+          <Breadcrumb.Item
+            menu={{
+              items: collectionPath.slice(1).map((collection) => ({
+                key: collection.id,
+                label: collection.name,
+              })),
+            }}
+          >
+            ...
+          </Breadcrumb.Item>
+        )}
+        <Breadcrumb.Item>
+          <span
+            className="request-name"
+            title={requestExecutionResult.recordName}
+            onClick={(e) => {
+              e.stopPropagation();
+              openBufferedTab({
+                preview: false,
+                source: new RequestViewTabSource({
+                  id: requestExecutionResult.recordId,
+                  title: requestExecutionResult.recordName,
+                  context: {
+                    id: workspaceId,
+                  },
+                }),
+              });
+            }}
+          >
+            {requestExecutionResult.recordName}
+          </span>
+        </Breadcrumb.Item>
+      </Breadcrumb>
     );
   }, [
     requestExecutionResult.collectionName,
@@ -216,7 +181,6 @@ const TestDetails: React.FC<{
     requestExecutionResult.recordId,
     openBufferedTab,
     workspaceId,
-    breadcrumbPopoverOpen,
   ]);
 
   const requestUrl = useMemo(() => {
@@ -553,7 +517,7 @@ export const RunResultContainer: React.FC<{
       <Split
         direction="horizontal"
         sizes={splitSizes}
-        minSize={[300, 400]}
+        minSize={[500, 500]}
         gutterSize={selectedRequest ? 4 : 0}
         className="run-result-split-container"
       >
@@ -597,9 +561,11 @@ export const RunResultContainer: React.FC<{
               </div>
             </div>
           )}
-          {selectedRequest && (
-            <RunResultDetailedView onClose={handlePanelClose} requestExecutionResult={selectedRequest} />
-          )}
+          <div className="run-result-details">
+            {selectedRequest && (
+              <RunResultDetailedView onClose={handlePanelClose} requestExecutionResult={selectedRequest} />
+            )}
+          </div>
         </div>
       </Split>
     </div>
