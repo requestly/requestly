@@ -1,16 +1,16 @@
+import { IoIosArrowDown } from "@react-icons/all-files/io/IoIosArrowDown";
+import { MdClose } from "@react-icons/all-files/md/MdClose";
+import { Dropdown, MenuProps, Popover, Tabs, TabsProps, Typography } from "antd";
+import PATHS from "config/constants/sub/paths";
+import { DraftRequestContainerTabSource } from "features/apiClient/screens/apiClient/components/views/components/DraftRequestContainer/draftRequestContainerTabSource";
+import { useCloseActiveTabShortcut } from "hooks/useCloseActiveTabShortcut";
+import { RQButton } from "lib/design-system-v2/components";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Tabs, TabsProps, Typography, Popover } from "antd";
+import { Outlet, unstable_useBlocker } from "react-router-dom";
+import { useMatchedTabSource } from "../hooks/useMatchedTabSource";
+import { useSetUrl } from "../hooks/useSetUrl";
 import { useTabServiceWithSelector } from "../store/tabServiceStore";
 import { TabItem } from "./TabItem";
-import { useMatchedTabSource } from "../hooks/useMatchedTabSource";
-import { Outlet, unstable_useBlocker } from "react-router-dom";
-import { DraftRequestContainerTabSource } from "features/apiClient/screens/apiClient/components/views/components/DraftRequestContainer/draftRequestContainerTabSource";
-import { RQButton } from "lib/design-system-v2/components";
-import { MdClose } from "@react-icons/all-files/md/MdClose";
-import { IoIosArrowDown } from "@react-icons/all-files/io/IoIosArrowDown";
-import { useSetUrl } from "../hooks/useSetUrl";
-import PATHS from "config/constants/sub/paths";
-import { useCloseActiveTabShortcut } from "hooks/useCloseActiveTabShortcut";
 import "./tabsContainer.scss";
 import { TabsMorePopover } from "./TabsMorePopover";
 
@@ -152,53 +152,134 @@ export const TabsContainer: React.FC = () => {
   }, [activeTabSource, setUrl]);
 
   const tabItems: TabsProps["items"] = useMemo(() => {
-    return Array.from(tabs.values()).map((tabStore) => {
+    const tabsArray = Array.from(tabs.values());
+
+    return tabsArray.map((tabStore, index) => {
       const tabState = tabStore.getState();
+
+      const closeTabsToLeft = () => {
+        const tabsToClose = tabsArray.slice(0, index);
+        const unsavedTabs = tabsToClose.filter((tab) => tab.getState().unsaved || !tab.getState().canCloseTab());
+
+        if (unsavedTabs.length > 0) {
+          const shouldClose = window.confirm(
+            `${unsavedTabs.length} tab(s) have unsaved changes. Discard changes? Changes you made will not be saved.`
+          );
+          if (!shouldClose) {
+            return;
+          }
+        }
+
+        tabsToClose.forEach((tab) => {
+          closeTabById(tab.getState().id, true);
+        });
+      };
+
+      const closeTabsToRight = () => {
+        const tabsToClose = tabsArray.slice(index + 1);
+        const unsavedTabs = tabsToClose.filter((tab) => tab.getState().unsaved || !tab.getState().canCloseTab());
+
+        if (unsavedTabs.length > 0) {
+          const shouldClose = window.confirm(
+            `${unsavedTabs.length} tab(s) have unsaved changes. Discard changes? Changes you made will not be saved.`
+          );
+          if (!shouldClose) {
+            return;
+          }
+        }
+
+        tabsToClose.forEach((tab) => {
+          closeTabById(tab.getState().id, true);
+        });
+      };
+
+      const closeAllTabs = () => {
+        const unsavedTabs = tabsArray.filter((tab) => tab.getState().unsaved || !tab.getState().canCloseTab());
+
+        if (unsavedTabs.length > 0) {
+          const shouldClose = window.confirm(
+            `${unsavedTabs.length} tab(s) have unsaved changes. Discard changes? Changes you made will not be saved.`
+          );
+          if (!shouldClose) {
+            return;
+          }
+        }
+
+        tabsArray.forEach((tab) => {
+          closeTabById(tab.getState().id, true);
+        });
+      };
+
+      const contextMenuItems: MenuProps["items"] = [
+        {
+          key: "close-left",
+          label: "Close Tabs to the Left",
+          onClick: closeTabsToLeft,
+          disabled: index === 0,
+        },
+        {
+          key: "close-right",
+          label: "Close Tabs to the Right",
+          onClick: closeTabsToRight,
+          disabled: index === tabsArray.length - 1,
+        },
+        {
+          type: "divider",
+        },
+        {
+          key: "close-all",
+          label: "Close All Tabs",
+          onClick: closeAllTabs,
+        },
+      ];
+
       return {
         key: tabState.id.toString(),
         closable: false,
         label: (
-          <div
-            className="tab-title-container"
-            onDoubleClick={() => {
-              if (tabState.preview) {
-                tabState.setPreview(false);
-                incrementVersion();
-                resetPreviewTab();
-              }
-            }}
-          >
-            <div className="tab-title">
-              {<div className="icon">{tabState.icon}</div>}
-              <Typography.Text
-                ellipsis={{
-                  tooltip: {
-                    title: tabState.title,
-                    placement: "bottom",
-                    color: "#000",
-                    mouseEnterDelay: 0.5,
-                  },
-                }}
-                className="title"
-              >
-                {tabState.preview ? <i>{tabState.title}</i> : tabState.title}
-              </Typography.Text>
-            </div>
+          <Dropdown menu={{ items: contextMenuItems }} trigger={["contextMenu"]}>
+            <div
+              className="tab-title-container"
+              onDoubleClick={() => {
+                if (tabState.preview) {
+                  tabState.setPreview(false);
+                  incrementVersion();
+                  resetPreviewTab();
+                }
+              }}
+            >
+              <div className="tab-title">
+                {<div className="icon">{tabState.icon}</div>}
+                <Typography.Text
+                  ellipsis={{
+                    tooltip: {
+                      title: tabState.title,
+                      placement: "bottom",
+                      color: "#000",
+                      mouseEnterDelay: 0.5,
+                    },
+                  }}
+                  className="title"
+                >
+                  {tabState.preview ? <i>{tabState.title}</i> : tabState.title}
+                </Typography.Text>
+              </div>
 
-            <div className="tab-actions">
-              <RQButton
-                size="small"
-                type="transparent"
-                className="tab-close-button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  closeTabById(tabState.id);
-                }}
-                icon={<MdClose />}
-              />
-              {tabState.unsaved ? <div className="unsaved-changes-indicator" /> : null}
+              <div className="tab-actions">
+                <RQButton
+                  size="small"
+                  type="transparent"
+                  className="tab-close-button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    closeTabById(tabState.id);
+                  }}
+                  icon={<MdClose />}
+                />
+                {tabState.unsaved ? <div className="unsaved-changes-indicator" /> : null}
+              </div>
             </div>
-          </div>
+          </Dropdown>
         ),
         children: <TabItem store={tabStore}>{tabState.source.render()}</TabItem>,
       };
