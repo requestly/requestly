@@ -30,10 +30,18 @@
     padding-top: 2px;
   }
 
+  .cm-gutter-lint {
+    .cm-activeLineGutter {
+      position: relative;
+      top: 2px;
+    }
+  }
+
   .highlight-defined-variable {
     color: var(--requestly-color-primary-text) !important;
     cursor: pointer;
   }
+
   .highlight-defined-variable * {
     color: var(--requestly-color-primary-text) !important;
   }
@@ -42,6 +50,7 @@
     color: var(--requestly-color-error-text) !important;
     cursor: pointer;
   }
+
   .highlight-undefined-variable * {
     color: var(--requestly-color-error-text) !important;
   }
