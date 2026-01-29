@@ -20,7 +20,7 @@ import { MdOutlineIosShare } from "@react-icons/all-files/md/MdOutlineIosShare";
 import { Conditional } from "components/common/Conditional";
 import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
 import { CollectionViewTabSource } from "../../../../views/components/Collection/collectionViewTabSource";
-import { useDrag, useDrop } from "react-dnd";
+import { DropTargetMonitor, useDrag, useDrop } from "react-dnd";
 import { MdAdd } from "@react-icons/all-files/md/MdAdd";
 import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 import RequestlyIcon from "assets/img/brand/rq_logo.svg";
@@ -89,6 +89,7 @@ export const CollectionRow: React.FC<Props> = ({
   const [createNewField, setCreateNewField] = useState<RQAPI.RecordType | null>(null);
   const [hoveredId, setHoveredId] = useState("");
   const [isCollectionRowLoading, setIsCollectionRowLoading] = useState(false);
+  const hoverExpandTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
 
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [isPostmanExportModalOpen, setIsPostmanExportModalOpen] = useState(false);
@@ -223,6 +224,16 @@ export const CollectionRow: React.FC<Props> = ({
     [handleCollectionExport, openTab, context.id, handleRecordsToBeDeleted]
   );
 
+  const updateExpandedRecordIds = useCallback(
+    (newExpandedIds: RQAPI.ApiClientRecord["id"][]) => {
+      setExpandedRecordIds(newExpandedIds);
+      isEmpty(newExpandedIds)
+        ? sessionStorage.removeItem(SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY)
+        : sessionStorage.setItem(SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY, newExpandedIds);
+    },
+    [setExpandedRecordIds]
+  );
+
   const collapseChangeHandler = useCallback(
     (keys: RQAPI.ApiClientRecord["id"][]) => {
       let activeKeysCopy = [...expandedRecordIds];
@@ -231,12 +242,9 @@ export const CollectionRow: React.FC<Props> = ({
       } else if (!activeKeysCopy.includes(record.id)) {
         activeKeysCopy.push(record.id);
       }
-      setExpandedRecordIds(activeKeysCopy);
-      isEmpty(activeKeysCopy)
-        ? sessionStorage.removeItem(SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY)
-        : sessionStorage.setItem(SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY, activeKeysCopy);
+      updateExpandedRecordIds(activeKeysCopy);
     },
-    [record, expandedRecordIds, setExpandedRecordIds]
+    [record, expandedRecordIds, updateExpandedRecordIds]
   );
 
   useEffect(() => {
@@ -247,6 +255,14 @@ export const CollectionRow: React.FC<Props> = ({
     /* Temporary Change-> To remove previous key from session storage
        which was added due to the previous logic can be removed after some time */
     sessionStorage.removeItem("collapsed_collection_keys");
+
+    // clean up hover timeout on unmount
+    return () => {
+      if (hoverExpandTimeoutRef.current) {
+        clearTimeout(hoverExpandTimeoutRef.current);
+        hoverExpandTimeoutRef.current = null;
+      }
+    };
   }, []);
 
   const handleRecordDrop = useCallback(
@@ -269,8 +285,7 @@ export const CollectionRow: React.FC<Props> = ({
 
         if (!expandedRecordIds.includes(record.id)) {
           const newExpandedRecordIds = [...expandedRecordIds, destination.collectionId];
-          setExpandedRecordIds(newExpandedRecordIds);
-          sessionStorage.setItem(SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY, newExpandedRecordIds);
+          updateExpandedRecordIds(newExpandedRecordIds);
         }
       } catch (error) {
         notification.error({
@@ -282,7 +297,7 @@ export const CollectionRow: React.FC<Props> = ({
         setIsCollectionRowLoading(false);
       }
     },
-    [record.id, expandedRecordIds, setExpandedRecordIds]
+    [record.id, expandedRecordIds, updateExpandedRecordIds]
   );
 
   const checkCanDropItem = useCallback(
@@ -320,7 +335,27 @@ export const CollectionRow: React.FC<Props> = ({
     }),
     [record, context.id]
   );
-
+  const handleHoverExpand = useCallback(
+    (item: DraggableApiRecord, monitor: DropTargetMonitor) => {
+      const isOverAny = monitor.isOver();
+      if (!isOverAny) {
+        if (hoverExpandTimeoutRef.current) {
+          clearTimeout(hoverExpandTimeoutRef.current);
+          hoverExpandTimeoutRef.current = null;
+        }
+        return;
+      }
+      const IsTargetCollectionCollapsed = !expandedRecordIds.includes(record.id);
+      if (IsTargetCollectionCollapsed && !hoverExpandTimeoutRef.current) {
+        hoverExpandTimeoutRef.current = setTimeout(() => {
+          const newExpandedRecordIds = [...expandedRecordIds, record.id];
+          updateExpandedRecordIds(newExpandedRecordIds);
+          hoverExpandTimeoutRef.current = null;
+        }, 600);
+      }
+    },
+    [expandedRecordIds, record.id, updateExpandedRecordIds]
+  );
   const [{ isOver }, drop] = useDrop(
     () => ({
       accept: [RQAPI.RecordType.API, RQAPI.RecordType.COLLECTION],
@@ -332,6 +367,7 @@ export const CollectionRow: React.FC<Props> = ({
         setIsCollectionRowLoading(true);
         handleRecordDrop(item, context.id);
       },
+      hover: handleHoverExpand,
       canDrop: checkCanDropItem,
       collect: (monitor) => ({
         isOver: monitor.isOver({ shallow: true }),

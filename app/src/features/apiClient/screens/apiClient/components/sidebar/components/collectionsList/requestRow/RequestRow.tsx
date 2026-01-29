@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import { Typography, Dropdown, MenuProps, Checkbox, notification } from "antd";
 import { REQUEST_METHOD_BACKGROUND_COLORS, REQUEST_METHOD_COLORS } from "../../../../../../../../../constants";
 import { RequestMethod, RQAPI } from "features/apiClient/types";
@@ -22,13 +22,19 @@ import { MdMoveDown } from "@react-icons/all-files/md/MdMoveDown";
 import { Conditional } from "components/common/Conditional";
 import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
 import { RequestViewTabSource } from "../../../../views/components/RequestView/requestViewTabSource";
-import { useDrag } from "react-dnd";
+import { useDrag, useDrop } from "react-dnd";
 import { GrGraphQl } from "@react-icons/all-files/gr/GrGraphQl";
 import { useContextId } from "features/apiClient/contexts/contextId.context";
-import { useApiClientRepository } from "features/apiClient/contexts/meta";
+import { useApiClientRepository, useApiClientFeatureContext } from "features/apiClient/contexts/meta";
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
 import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 import { isGraphQLApiRecord, isHttpApiRecord } from "features/apiClient/screens/apiClient/utils";
+import { apiRecordsRankingManager } from "features/apiClient/helpers/RankingManager";
+import { saveOrUpdateRecord } from "features/apiClient/commands/store.utils";
+import clsx from "clsx";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import FEATURES from "config/constants/sub/features";
+import { getRankForDroppedRecord } from "features/apiClient/helpers/RankingManager/utils";
 
 interface Props {
   record: RQAPI.ApiRecord;
@@ -80,9 +86,13 @@ export const RequestRow: React.FC<Props> = ({
   const { selectedRecords, showSelection, recordsSelectionHandler, setShowSelection } = bulkActionOptions || {};
   const [isEditMode, setIsEditMode] = useState(false);
   const [recordToMove, setRecordToMove] = useState<RQAPI.ApiRecord | null>(null);
-
+  const [dropPosition, setDropPosition] = useState<"before" | "after" | null>(null);
+  const [isDropProcessing, setIsDropProcessing] = useState(false);
+  const dropPositionRef = useRef<"before" | "after" | null>(null);
+  const requestRowRef = useRef<HTMLDivElement>(null);
   const { apiClientRecordsRepository } = useApiClientRepository();
   const { onSaveRecord } = useNewApiClientContext();
+  const context = useApiClientFeatureContext();
 
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
 
@@ -101,13 +111,110 @@ export const RequestRow: React.FC<Props> = ({
       item: {
         record,
         contextId,
+        onDropComplete: () => setIsDropProcessing(false),
       },
       collect: (monitor) => ({
         isDragging: monitor.isDragging(),
       }),
+      end: (item, monitor) => {
+        if (monitor.didDrop()) {
+          setIsDropProcessing(true);
+        }
+      },
     }),
     [record, contextId]
   );
+
+  const [{ isOverCurrent }, drop] = useDrop(
+    () => ({
+      accept: [RQAPI.RecordType.API],
+      canDrop: (item: { record: RQAPI.ApiClientRecord; contextId: string; onDropComplete?: () => void }) => {
+        if (isReadOnly) return false;
+        if (!item || item.contextId !== contextId) return false;
+        if (item.record.id === record.id) return false;
+        if (!isFeatureCompatible(FEATURES.API_CLIENT_RECORDS_REORDERING)) {
+          return false;
+        }
+        return true;
+      },
+      hover: (item: { record: RQAPI.ApiClientRecord; contextId: string; onDropComplete?: () => void }, monitor) => {
+        if (!monitor.isOver({ shallow: true }) || !isFeatureCompatible(FEATURES.API_CLIENT_RECORDS_REORDERING)) {
+          return;
+        }
+
+        const hoverBoundingRect = monitor.getClientOffset();
+        const targetElement = requestRowRef.current;
+
+        if (hoverBoundingRect && targetElement) {
+          const targetRect = targetElement.getBoundingClientRect();
+          const hoverMiddleY = (targetRect.bottom - targetRect.top) / 2;
+          const hoverClientY = hoverBoundingRect.y - targetRect.top;
+          const dropPosition = hoverClientY < hoverMiddleY ? "before" : "after";
+          setDropPosition(dropPosition);
+          dropPositionRef.current = dropPosition;
+        }
+      },
+      drop: async (
+        item: { record: RQAPI.ApiClientRecord; contextId: string; onDropComplete?: () => void },
+        monitor
+      ) => {
+        if (!monitor.isOver({ shallow: true })) {
+          setDropPosition(null);
+          dropPositionRef.current = null;
+          return;
+        }
+
+        const currentDropPosition = dropPositionRef.current;
+        setDropPosition(null);
+        dropPositionRef.current = null;
+
+        try {
+          const rank = getRankForDroppedRecord({
+            context,
+            targetRecord: record,
+            droppedRecord: item.record,
+            dropPosition: currentDropPosition,
+          });
+
+          const targetCollectionId = record.collectionId;
+
+          const patch: Partial<RQAPI.ApiRecord> = {
+            id: item.record.id,
+            rank,
+            collectionId: targetCollectionId,
+          };
+
+          const result = await apiClientRecordsRepository.updateRecord(patch, item.record.id);
+
+          if (result.success) {
+            saveOrUpdateRecord(context, result.data);
+          } else {
+            throw new Error("Failed to move record");
+          }
+        } catch (error) {
+          notification.error({
+            message: "Error moving record",
+            description: error?.message || "Unexpected error. Please contact support.",
+            placement: "bottomRight",
+          });
+        } finally {
+          item.onDropComplete?.();
+        }
+      },
+      collect: (monitor) => ({
+        isOverCurrent: monitor.isOver({ shallow: true }),
+      }),
+    }),
+    [record, contextId, dropPosition, apiClientRecordsRepository, context]
+  );
+
+  // Clear drop position when no longer hovering
+  React.useEffect(() => {
+    if (!isOverCurrent && (dropPosition !== null || dropPositionRef.current !== null)) {
+      setDropPosition(null);
+      dropPositionRef.current = null;
+    }
+  }, [isOverCurrent, dropPosition]);
 
   const handleDropdownVisibleChange = (isOpen: boolean) => {
     setIsDropdownVisible(isOpen);
@@ -116,9 +223,14 @@ export const RequestRow: React.FC<Props> = ({
   const handleDuplicateRequest = useCallback(
     async (record: RQAPI.ApiRecord) => {
       const { id, ...rest } = record;
+
+      // Generate rank for the duplicated request to place it immediately after the original
+      const rank = apiRecordsRankingManager.getRankForDuplicatedApi(context, record, record.collectionId ?? "");
+
       const newRecord: Omit<RQAPI.ApiRecord, "id"> = {
         ...rest,
         name: `(Copy) ${record.name || record.data.request?.url}`,
+        rank, // Set the calculated rank
       };
 
       try {
@@ -138,7 +250,7 @@ export const RequestRow: React.FC<Props> = ({
         trackDuplicateRequestFailed();
       }
     },
-    [onSaveRecord, apiClientRecordsRepository]
+    [onSaveRecord, apiClientRecordsRepository, context]
   );
 
   const requestOptions = useMemo((): MenuProps["items"] => {
@@ -229,7 +341,18 @@ export const RequestRow: React.FC<Props> = ({
           }}
         />
       ) : (
-        <div className={`request-row`} ref={drag} style={{ opacity: isDragging ? 0.5 : 1 }}>
+        <div
+          className={clsx("request-row", {
+            "request-drop-before": dropPosition === "before",
+            "request-drop-after": dropPosition === "after",
+          })}
+          ref={(node) => {
+            requestRowRef.current = node;
+            drag(node);
+            drop(node);
+          }}
+          style={{ opacity: isDragging || isDropProcessing ? 0.5 : 1 }}
+        >
           <div
             className={`collections-list-item api ${record.id === activeTabSourceId ? "active" : ""} ${
               selectedRecords.has(record.id) && showSelection ? "selected" : ""

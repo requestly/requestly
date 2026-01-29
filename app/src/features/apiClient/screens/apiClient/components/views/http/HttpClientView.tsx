@@ -76,6 +76,7 @@ import { MdOutlineSyncAlt } from "@react-icons/all-files/md/MdOutlineSyncAlt";
 import { useAPIRecords, useAPIRecordsStore } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 import { Authorization } from "../components/request/components/AuthorizationView/types/AuthConfig";
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
+import { apiRecordsRankingManager } from "features/apiClient/helpers/RankingManager";
 import ErrorBoundary from "features/apiClient/components/ErrorBoundary/ErrorBoundary";
 import { useHttpRequestExecutor } from "features/apiClient/hooks/requestExecutors/useHttpRequestExecutor";
 import { PathVariablesProvider } from "features/apiClient/store/pathVariables/PathVariablesContextProvider";
@@ -515,6 +516,13 @@ const HttpClientView: React.FC<Props> = ({
       record.name = requestName;
     }
 
+    if (isCreateMode && !apiEntryDetails.rank) {
+      const newRank = apiRecordsRankingManager.getRanksForNewApis(ctx, apiEntryDetails?.collectionId || "", [
+        record as RQAPI.ApiClientRecord,
+      ])[0];
+      record.rank = newRank;
+    }
+
     const result = isCreateMode
       ? await apiClientRecordsRepository.createRecord(record)
       : await apiClientRecordsRepository.updateRecord(record, record.id!); // not the ideal way but had to assert because record is typed as Partial here
@@ -596,6 +604,8 @@ const HttpClientView: React.FC<Props> = ({
         if (isCreateMode) {
           const requestId = apiClientRecordsRepository.generateApiRecordId();
           record.id = requestId;
+          const collectionId = apiEntryDetails?.collectionId || "";
+          record.rank = apiRecordsRankingManager.getRanksForNewApis(ctx, collectionId, [record])[0];
         }
 
         //  Is this check necessary?
@@ -647,16 +657,17 @@ const HttpClientView: React.FC<Props> = ({
     )();
     // Little bit weird syntax but we need to call function to actually execute the wrapped function
   }, [
-    apiClientRecordsRepository,
-    apiEntryDetails,
     entry,
-    isCreateMode,
-    onSaveCallback,
-    onSaveRecord,
-    resetChanges,
     queryParams,
     getPathVariables,
+    isCreateMode,
+    apiEntryDetails,
+    apiClientRecordsRepository,
     endAISession,
+    ctx,
+    onSaveRecord,
+    resetChanges,
+    onSaveCallback,
   ]);
 
   const handleCancelRequest = useCallback(() => {

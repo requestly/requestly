@@ -13,6 +13,7 @@ import {
   getRecordIdsToBeExpanded,
   filterOutChildrenRecords,
   processRecordsForDuplication,
+  sortRecords,
 } from "../../../../utils";
 import { ApiRecordEmptyState } from "./apiRecordEmptyState/ApiRecordEmptyState";
 import { SidebarPlaceholderItem } from "../SidebarPlaceholderItem/SidebarPlaceholderItem";
@@ -32,7 +33,7 @@ import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsCon
 import { EXPANDED_RECORD_IDS_UPDATED } from "features/apiClient/exampleCollections/store";
 import { ExampleCollectionsNudge } from "../ExampleCollectionsNudge/ExampleCollectionsNudge";
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
-import { useApiClientRepository } from "features/apiClient/contexts/meta";
+import { useApiClientRepository, useApiClientFeatureContext } from "features/apiClient/contexts/meta";
 
 interface Props {
   onNewClick: (src: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType) => Promise<void>;
@@ -49,6 +50,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
   const { onSaveRecord, onSaveBulkRecords } = useNewApiClientContext();
 
   const { apiClientRecordsRepository } = useApiClientRepository();
+  const context = useApiClientFeatureContext();
 
   const [collectionsToExport, setCollectionsToExport] = useState<RQAPI.ApiClientRecord[]>([]);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
@@ -76,34 +78,12 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
   const prepareRecordsToRender = useCallback((records: RQAPI.ApiClientRecord[]) => {
     const { updatedRecords, recordsMap } = convertFlatRecordsToNestedRecords(records);
     setShowSelection(false);
-
-    updatedRecords.sort((recordA, recordB) => {
-      // If different type, then keep collection first
-      if (recordA.type === RQAPI.RecordType.COLLECTION && recordA.isExample && !recordB.isExample) {
-        return -1;
-      }
-
-      if (recordB.type === RQAPI.RecordType.COLLECTION && recordB.isExample && !recordA.isExample) {
-        return 1;
-      }
-
-      if (recordA.type !== recordB.type) {
-        return recordA.type === RQAPI.RecordType.COLLECTION ? -1 : 1;
-      }
-
-      // If types are the same, sort lexicographically by name
-      if (recordA.name.toLowerCase() !== recordB.name.toLowerCase()) {
-        return recordA.name.toLowerCase() < recordB.name.toLowerCase() ? -1 : 1;
-      }
-
-      // If names are the same, sort by creation date
-      return recordA.createdTs - recordB.createdTs;
-    });
+    const sortedRecords = sortRecords(updatedRecords);
 
     return {
-      count: updatedRecords.length,
-      collections: updatedRecords.filter((record) => isApiCollection(record)) as RQAPI.CollectionRecord[],
-      requests: updatedRecords.filter((record) => isApiRequest(record)) as RQAPI.ApiRecord[],
+      count: sortedRecords.length,
+      collections: sortedRecords.filter((record) => isApiCollection(record)) as RQAPI.CollectionRecord[],
+      requests: sortedRecords.filter((record) => isApiRequest(record)) as RQAPI.ApiRecord[],
       recordsMap: recordsMap,
     };
   }, []);
@@ -184,7 +164,11 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
       const processedRecords = filterOutChildrenRecords(selectedRecords, childParentMap, updatedRecords.recordsMap);
       switch (action) {
         case BulkActions.DUPLICATE: {
-          const recordsToDuplicate = processRecordsForDuplication(processedRecords, apiClientRecordsRepository);
+          const recordsToDuplicate = processRecordsForDuplication(
+            processedRecords,
+            apiClientRecordsRepository,
+            context
+          );
 
           try {
             const result = await apiClientRecordsRepository.duplicateApiEntities(recordsToDuplicate);
@@ -258,6 +242,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
       handleRecordsToBeDeleted,
       isAllRecordsSelected,
       apiClientRecordsRepository,
+      context,
       onSaveRecord,
       onSaveBulkRecords,
       addNestedCollection,
@@ -402,7 +387,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
                   </div>
                 )}
 
-              {updatedRecords.requests.map((record) => {
+              {updatedRecords.requests.map((record, _index) => {
                 return (
                   <RequestRow
                     key={record.id}

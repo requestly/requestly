@@ -6,6 +6,7 @@ import {
   filterRecordsBySearch,
   convertFlatRecordsToNestedRecords,
   filterOutChildrenRecords,
+  sortRecords,
 } from "../screens/apiClient/utils";
 import { getApiClientFeatureContext, getChildParentMap } from "./store.utils";
 import { isEmpty } from "lodash";
@@ -44,33 +45,12 @@ export function addNestedCollection(
 export function prepareRecordsToRender(records: RQAPI.ApiClientRecord[]) {
   const { updatedRecords, recordsMap } = convertFlatRecordsToNestedRecords(records);
 
-  updatedRecords.sort((recordA, recordB) => {
-    // If different type, then keep collection first
-    if (recordA.type === RQAPI.RecordType.COLLECTION && recordA.isExample) {
-      return -1;
-    }
-
-    if (recordB.type === RQAPI.RecordType.COLLECTION && recordB.isExample) {
-      return -1;
-    }
-
-    if (recordA.type !== recordB.type) {
-      return recordA.type === RQAPI.RecordType.COLLECTION ? -1 : 1;
-    }
-
-    // If types are the same, sort lexicographically by name
-    if (recordA.name.toLowerCase() !== recordB.name.toLowerCase()) {
-      return recordA.name.toLowerCase() < recordB.name.toLowerCase() ? -1 : 1;
-    }
-
-    // If names are the same, sort by creation date
-    return recordA.createdTs - recordB.createdTs;
-  });
+  const sortedRecords = sortRecords(updatedRecords);
 
   return {
-    count: updatedRecords.length,
-    collections: updatedRecords.filter((record) => isApiCollection(record)) as RQAPI.CollectionRecord[],
-    requests: updatedRecords.filter((record) => isApiRequest(record)) as RQAPI.ApiRecord[],
+    count: sortedRecords.length,
+    collections: sortedRecords.filter((record) => isApiCollection(record)) as RQAPI.CollectionRecord[],
+    requests: sortedRecords.filter((record) => isApiRequest(record)) as RQAPI.ApiRecord[],
     recordsMap: recordsMap,
   };
 }
