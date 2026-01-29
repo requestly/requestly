@@ -413,7 +413,7 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
                 description: e.message,
                 placement: "bottomRight",
               });
-              Sentry.captureException(new Error("Invalid Header or Auth Key"));
+              Sentry.captureException(e);
               Sentry.getActiveSpan()?.setStatus({
                 code: SPAN_STATUS_ERROR,
                 // message: "invalid_auth_header", // This somehow is breaking the status of the span on sentry. Comes as unknown if set
