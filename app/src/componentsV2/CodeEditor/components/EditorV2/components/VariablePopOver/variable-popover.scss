@@ -1,14 +1,4 @@
 .editor-popup-container {
-  .highlight-defined-variable {
-    color: var(--requestly-color-primary-text);
-    cursor: pointer;
-  }
-
-  .highlight-undefined-variable {
-    color: var(--requestly-color-error-text);
-    cursor: pointer;
-  }
-
   .cm-editor {
     margin-top: -4px;
   }
