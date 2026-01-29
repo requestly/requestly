@@ -434,7 +434,7 @@ const HttpClientView: React.FC<Props> = ({
               setIsFailed(true);
               setError(error ?? null);
               // Not the best way to handle this. But works for now.
-              if (error.name === UserAbortError.name) {
+              if (error?.name === UserAbortError.name) {
                 Sentry.getActiveSpan()?.setStatus({
                   code: SPAN_STATUS_OK,
                 });
