@@ -138,12 +138,12 @@ export const CollectionRunnerView: React.FC<Props> = ({ collectionId, activeTabK
             direction="horizontal"
             className="collection-runner-view-split"
           >
-            <div className={isDetailedViewOpen ? "hidden" : ""}>
-              <DataFileModalProvider>
+            <DataFileModalProvider>
+              <div className={isDetailedViewOpen ? "hidden" : ""}>
                 <RunConfigView activeTabKey={activeTabKey} />
-              </DataFileModalProvider>
-            </div>
-            <RunResultView {...runResultViewProps} />
+              </div>
+              <RunResultView {...runResultViewProps} />
+            </DataFileModalProvider>
           </Split>
         </div>
       </AutogenerateProvider>
