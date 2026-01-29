@@ -283,6 +283,7 @@ export class HttpRequestExecutor {
 
     APIEventLogger.logRequest({
       request: preparedEntry.request,
+      workspaceId: this.ctx.workspaceId,
       tag: {
         recordId,
         iteration: iterationContext.iteration,
@@ -299,6 +300,7 @@ export class HttpRequestExecutor {
       if (rqErrorHeader) {
         APIEventLogger.logResponse({
           response,
+          workspaceId: this.ctx.workspaceId,
           tag: {
             recordId,
             iteration: iterationContext.iteration,
@@ -360,6 +362,7 @@ export class HttpRequestExecutor {
 
     APIEventLogger.logResponse({
       response: preparedEntry.response,
+      workspaceId: this.ctx.workspaceId,
       tag: {
         recordId,
         iteration: iterationContext.iteration,
