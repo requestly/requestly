@@ -186,10 +186,11 @@ export const LocalWorkspaceCreationView = ({
     return (
       <ExistingWorkspaceConflictView
         path={folderPath}
-        onFolderSelectionCallback={() => {
+        onValidFolderSelection={() => {
           setIsSelectedFolderAvailable(true);
         }}
         analyticEventSource={analyticEventSource}
+        onOpenWorkspaceSuccess={onSuccessCallback}
       />
     );
   }

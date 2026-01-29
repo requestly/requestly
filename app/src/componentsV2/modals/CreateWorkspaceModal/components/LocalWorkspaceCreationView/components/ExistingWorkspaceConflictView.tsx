@@ -1,8 +1,6 @@
 import React, { useEffect } from "react";
 import { WorkspaceCreationErrorView } from "./WorkspaceCreationErrorView/WorkspaceCreationErrorView";
 import { RQButton } from "lib/design-system-v2/components";
-import { useDispatch } from "react-redux";
-import { globalActions } from "store/slices/global/slice";
 import { useOpenLocalWorkspace } from "features/workspaces/hooks/useOpenLocalWorkspace";
 import { trackLocalWorkspaceCreationConflictShown } from "modules/analytics/events/common/teams";
 import { displayFolderSelector } from "components/mode-specific/desktop/misc/FileDialogButton";
@@ -12,21 +10,21 @@ import { checkIsWorkspacePathAvailable } from "services/fsManagerServiceAdapter"
 interface Props {
   path: string;
   analyticEventSource: string;
-  onFolderSelectionCallback: () => void;
+  onValidFolderSelection: () => void;
+  onOpenWorkspaceSuccess?: () => void;
 }
 
 export const ExistingWorkspaceConflictView: React.FC<Props> = ({
   path,
   analyticEventSource,
-  onFolderSelectionCallback,
+  onValidFolderSelection,
+  onOpenWorkspaceSuccess,
 }) => {
-  const dispatch = useDispatch();
-
   const { setFolderPath } = useWorkspaceCreationContext();
   const { openWorkspace, isLoading: isOpeningWorkspaceLoading } = useOpenLocalWorkspace({
     analyticEventSource,
     onOpenWorkspaceCallback: () => {
-      dispatch(globalActions.updateIsOnboardingCompleted(true));
+      onOpenWorkspaceSuccess?.();
     },
   });
 
@@ -37,7 +35,7 @@ export const ExistingWorkspaceConflictView: React.FC<Props> = ({
       if (!isChosenFolderEligible) {
         return;
       }
-      onFolderSelectionCallback();
+      onValidFolderSelection();
     });
   };
 
