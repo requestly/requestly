@@ -295,7 +295,7 @@ const Editor: React.FC<EditorProps> = ({
       result.push(editorLanguage);
     }
 
-    const linterExtension = language ? getLinterExtension(language) : [];
+    const linterExtension = getLinterExtension(language);
     if (linterExtension.length) {
       result.push(...linterExtension);
     }
