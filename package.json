@@ -56,5 +56,8 @@
   "lint-staged": {
     "*.{js,jsx,mjs,ts,tsx,json,yaml,yml,css,scss}": "prettier --write",
     "(app/**).{js,jsx,mjs,ts,tsx}": "eslint -c .eslintrc.js --fix"
+  },
+  "dependencies": {
+    "capnweb": "^0.4.0"
   }
 }
