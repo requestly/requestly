@@ -32,9 +32,7 @@ import {
   generateCompletionsForVariables,
 } from "componentsV2/CodeEditor/components/EditorV2/plugins";
 import { placeholder as placeholderExtension } from "@codemirror/view";
-import { lintGutter } from "@codemirror/lint";
-import { jsonLinter } from "./lints/jsonLinter";
-import { javascriptLinter } from "./lints/javascriptLinter";
+import { getLinterExtension } from "./lints/linterRegistry";
 
 interface EditorProps {
   value: string;
@@ -297,12 +295,9 @@ const Editor: React.FC<EditorProps> = ({
       result.push(editorLanguage);
     }
 
-    if (language === EditorLanguage.JAVASCRIPT) {
-      result.push(lintGutter(), javascriptLinter());
-    }
-
-    if (language === EditorLanguage.JSON || language === EditorLanguage.JSON5) {
-      result.push(lintGutter(), jsonLinter());
+    const linterExtension = language ? getLinterExtension(language) : [];
+    if (linterExtension.length) {
+      result.push(...linterExtension);
     }
 
     if (customTheme) {
