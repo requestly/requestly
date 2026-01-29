@@ -1,0 +1,57 @@
+.active-workflow-modal-root {
+  .ant-modal-content {
+    background: var(--requestly-color-surface-0);
+    border-radius: 12px;
+    padding: 24px 40px 24px;
+  }
+
+  .ant-modal-body {
+    padding: 0;
+  }
+
+  .ant-modal-close {
+    top: 14px;
+    right: 24px;
+
+    svg {
+      width: 16px;
+      height: 16px;
+      color: var(--requestly-color-text-default);
+    }
+  }
+
+  .active-workflow-modal {
+    max-width: 960px;
+    color: var(--requestly-color-text-default);
+    font-family: var(--requestly-font-family-default);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .active-workflow-modal-title {
+    margin: 0 0 16px 0;
+    font-size: 20px;
+    font-weight: 500;
+    line-height: 32px;
+  }
+
+  .active-workflow-modal-description {
+    margin: 0 0 32px 0;
+    font-size: 14px;
+    line-height: 24px;
+    color: var(--requestly-color-text-subtle);
+  }
+
+  .active-workflow-modal-footer {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-top: auto;
+  }
+
+  .active-workflow-modal-footer .rq-button {
+    min-width: 220px;
+    height: 48px;
+    font-size: 16px;
+  }
+}
