@@ -45,11 +45,12 @@ export const WorkspaceCreationView: React.FC<Props> = ({
         return (
           <ExistingWorkspaceConflictView
             path={currentSelectedFolderPathRef.current as string}
-            onFolderSelectionCallback={() => {
+            onValidFolderSelection={() => {
               currentSelectedFolderPathRef.current = null;
               setError(null);
             }}
             analyticEventSource={analyticEventSource}
+            onOpenWorkspaceSuccess={callback}
           />
         );
     }
