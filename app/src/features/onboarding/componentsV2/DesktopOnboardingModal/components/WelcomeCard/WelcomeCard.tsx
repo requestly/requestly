@@ -16,6 +16,7 @@ import { useCreateDefaultLocalWorkspace } from "features/workspaces/hooks/useCre
 import { FileSystemError } from "features/apiClient/helpers/modules/sync/local/services/types";
 import { OpenWorkspaceErrorView } from "componentsV2/modals/CreateWorkspaceModal/components/LocalWorkspaceCreationView/components/OpenWorkspaceErrorView";
 import { useOpenLocalWorkspace } from "features/workspaces/hooks/useOpenLocalWorkspace";
+import { MdOutlineKeyboardArrowRight } from "@react-icons/all-files/md/MdOutlineKeyboardArrowRight";
 import "./welcomeCard.scss";
 
 interface Props {
@@ -92,7 +93,7 @@ export const WelcomeCard: React.FC<Props> = ({ onFeatureClick }) => {
         className={clsx("rq-desktop-onboarding-modal-content__card-header", isApiClientCardExpanded && "fade-out")}
         style={{ marginTop: "24px" }}
       >
-        Welcome to the Requestly
+        Welcome to Requestly
       </div>
       <div
         className={clsx("rq-desktop-onboarding-modal-content__card-description", isApiClientCardExpanded && "fade-out")}
@@ -150,7 +151,10 @@ export const WelcomeCard: React.FC<Props> = ({ onFeatureClick }) => {
           </div>
         </m.div>
         <div
-          className={clsx("welcome-card-option", isApiClientCardExpanded && "fade-out")}
+          className={clsx(
+            "welcome-card-option onboarding-interceptor-card-option",
+            isApiClientCardExpanded && "fade-out"
+          )}
           onClick={() => {
             trackDesktopOnboardingFeatureSelected("rules");
             onFeatureClick(OnboardingStep.AUTH);
@@ -161,6 +165,7 @@ export const WelcomeCard: React.FC<Props> = ({ onFeatureClick }) => {
             description="Capture and modify requests, responses, headers, and scripts in real time."
             iconSrc={"/assets/media/rules/rules-icon.svg"}
           />
+          <MdOutlineKeyboardArrowRight className="api-client-onboard-card__arrow" />
         </div>
       </div>
       <div className="skip-footer">

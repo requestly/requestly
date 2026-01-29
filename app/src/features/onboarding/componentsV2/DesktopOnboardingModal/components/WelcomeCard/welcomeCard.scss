@@ -41,3 +41,16 @@
     font-size: var(--requestly-font-size-md) !important;
   }
 }
+
+.onboarding-interceptor-card-option {
+  .api-client-onboard-card__arrow {
+    top: 35px;
+    opacity: 0;
+  }
+
+  &:hover {
+    .api-client-onboard-card__arrow {
+      opacity: 1;
+    }
+  }
+}
