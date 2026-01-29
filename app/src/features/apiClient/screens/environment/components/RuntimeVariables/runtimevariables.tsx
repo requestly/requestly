@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import { useSelector } from "react-redux";
 import { RuntimeVariablesViewTabSource } from "./runtimevariablesTabSource";
 import "./runtimevariables.scss";
@@ -17,7 +17,7 @@ export const RuntimeVariables: React.FC = () => {
     }
   }, [activeTab]);
 
-  const handleTabOpen = () => {
+  const handleTabOpen = useCallback(() => {
     openBufferedTab({
       source: new RuntimeVariablesViewTabSource({
         id: RUNTIME_VARIABLES_ENTITY_ID,
@@ -27,11 +27,11 @@ export const RuntimeVariables: React.FC = () => {
         },
       }),
     });
-  };
+  }, [openBufferedTab, workspaceId]);
 
   useEffect(() => {
     handleTabOpen();
-  }, []);
+  }, [handleTabOpen]);
 
   return (
     <div className="runtime-variables-container" onClick={handleTabOpen}>
