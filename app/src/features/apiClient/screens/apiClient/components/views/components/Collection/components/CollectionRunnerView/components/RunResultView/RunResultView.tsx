@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { RQButton } from "lib/design-system-v2/components";
 import { MdOutlineHistory } from "@react-icons/all-files/md/MdOutlineHistory";
+import { MdArrowBack } from "@react-icons/all-files/md/MdArrowBack";
 import { EmptyRunResultContainer, RunResultContainer } from "./RunResultContainer/RunResultContainer";
 import { TestsRunningLoader } from "./TestsRunningLoader/TestsRunningLoader";
 import { RunStatus } from "features/apiClient/slices/common/runResults/types";
@@ -55,7 +56,19 @@ export const RunResultView: React.FC<RunResultViewProps> = ({ isDetailedViewOpen
   return (
     <div className="run-result-view-container">
       <div className="run-result-view-header">
-        <span className="header">Test results</span>
+        <div className="left-section">
+          {isDetailedViewOpen && (
+            <RQButton
+              size="small"
+              type="secondary"
+              icon={<MdArrowBack />}
+              onClick={() => {
+                onToggleDetailedView?.(false);
+              }}
+            />
+          )}
+          <span className="header">Test results</span>
+        </div>
         <RQButton
           size="small"
           type="transparent"
