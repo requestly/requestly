@@ -1,4 +1,5 @@
 import { RootState } from "store/types";
+import { reduxStore } from "store";
 import { ApiClientVariables } from "./api-client-variables";
 import { RuntimeVariablesEntity as RuntimeVariablesRecord } from "../runtimeVariables/types";
 import { selectRuntimeVariablesEntity } from "../runtimeVariables/selectors";
@@ -6,8 +7,9 @@ import { runtimeVariablesActions } from "../runtimeVariables/slice";
 import { EntityNotFound, UpdateCommand } from "../types";
 import { ApiClientEntityType, EntityDispatch } from "./types";
 import { ApiClientEntity, ApiClientEntityMeta } from "./base";
-
-const RUNTIME_VARIABLES_ENTITY_ID = "runtime_variables";
+import { entitySynced } from "../common/actions";
+import { RUNTIME_VARIABLES_ENTITY_ID } from "../common/constants";
+import { apiClientContextRegistry } from "../workspaceView/helpers/ApiClientContextRegistry";
 
 /**
  * Entity class for runtime variables.
@@ -43,6 +45,20 @@ export class RuntimeVariablesEntity<M extends ApiClientEntityMeta = ApiClientEnt
         patcher,
       })
     );
+
+    // Runtime variables live in the global store, but buffers live in per-workspace ApiClient stores.
+    // Broadcast a synthetic sync event so each workspace's buffer middleware can sync if it has an open buffer.
+    const updated = selectRuntimeVariablesEntity(reduxStore.getState());
+
+    for (const ctx of apiClientContextRegistry.getAllContexts()) {
+      ctx.store.dispatch(
+        entitySynced({
+          entityType: ApiClientEntityType.RUNTIME_VARIABLES,
+          entityId: RUNTIME_VARIABLES_ENTITY_ID,
+          data: updated,
+        })
+      );
+    }
   }
 
   // Note: Uses RootState instead of ApiClientStoreState since runtime variables
