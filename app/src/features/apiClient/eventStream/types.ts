@@ -1,4 +1,5 @@
-import { RQAPI } from "../types";
+import { Iteration } from "../slices/common/runResults";
+import { ExecutionId, RQAPI } from "../types";
 
 export enum EventFlow {
   API_EXECUTION = "API_EXECUTION",
@@ -15,9 +16,11 @@ export interface ResponseEventData {
 
 type APIClientEventData = RequestEventData | ResponseEventData;
 
-type RecordTag = { recordId: string };
-type IterationTag = { iteration: number };
-export type Tag = Partial<RecordTag & IterationTag>;
+type RecordTag = { recordId: RQAPI.ApiClientRecord["id"] };
+type IterationTag = { iteration: Iteration };
+type ExecutionTag = { executionId: ExecutionId };
+
+export type Tag = Partial<RecordTag & IterationTag & ExecutionTag>;
 
 export interface APIClientEvent {
   id: string;
