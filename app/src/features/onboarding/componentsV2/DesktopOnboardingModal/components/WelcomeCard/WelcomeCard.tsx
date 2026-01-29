@@ -18,6 +18,8 @@ import { OpenWorkspaceErrorView } from "componentsV2/modals/CreateWorkspaceModal
 import { useOpenLocalWorkspace } from "features/workspaces/hooks/useOpenLocalWorkspace";
 import { MdOutlineKeyboardArrowRight } from "@react-icons/all-files/md/MdOutlineKeyboardArrowRight";
 import "./welcomeCard.scss";
+import { useNavigate } from "react-router-dom";
+import { redirectToApiClient } from "utils/RedirectionUtils";
 
 interface Props {
   onFeatureClick: (step: OnboardingStep) => void;
@@ -25,6 +27,7 @@ interface Props {
 
 export const WelcomeCard: React.FC<Props> = ({ onFeatureClick }) => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [isApiClientCardExpanded, setIsApiClientCardExpanded] = useState(false);
   const [openWorkspaceError, setOpenWorkspaceError] = useState<FileSystemError | null>(null);
   const apiClientCardRef = useRef<HTMLDivElement | null>(null);
@@ -34,6 +37,7 @@ export const WelcomeCard: React.FC<Props> = ({ onFeatureClick }) => {
     onCreateWorkspaceCallback: () => {
       trackDesktopOnboardingStepSkipped(OnboardingStep.FEATURE_SELECTION);
       dispatch(globalActions.updateIsOnboardingCompleted(true));
+      redirectToApiClient(navigate);
     },
   });
 
@@ -41,6 +45,7 @@ export const WelcomeCard: React.FC<Props> = ({ onFeatureClick }) => {
     analyticEventSource: "desktop_onboarding_modal",
     onOpenWorkspaceCallback: () => {
       dispatch(globalActions.updateIsOnboardingCompleted(true));
+      redirectToApiClient(navigate);
     },
     onError: (error: FileSystemError) => {
       setOpenWorkspaceError(error);
