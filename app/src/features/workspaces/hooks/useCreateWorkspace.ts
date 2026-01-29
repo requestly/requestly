@@ -9,7 +9,7 @@ import { Workspace, WorkspaceType } from "features/workspaces/types";
 
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getAppMode } from "store/selectors";
-import { isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
+import { getActiveWorkspace, isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 import { getAvailableBillingTeams } from "store/features/billing/selectors";
 import { workspaceActions } from "store/slices/workspaces/slice";
 
@@ -58,11 +58,16 @@ export const useCreateWorkspace = ({
   const user = useSelector(getUserAuthDetails);
   const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
   const billingTeams = useSelector(getAvailableBillingTeams);
+  const activeWorkspace = useSelector(getActiveWorkspace);
 
   const [isLoading, setIsLoading] = useState(false);
 
   const handlePostTeamCreationStep = useCallback(
     async (teamId: string, newTeamName: string, hasMembersInSameDomain: boolean, workspaceType: WorkspaceType) => {
+      if (activeWorkspace.id === teamId) {
+        return;
+      }
+
       await switchWorkspace(
         {
           teamId: teamId,
@@ -87,7 +92,15 @@ export const useCreateWorkspace = ({
         });
       }
     },
-    [dispatch, appMode, isSharedWorkspaceMode, navigate, user?.details?.isSyncEnabled, analyticEventSource]
+    [
+      dispatch,
+      appMode,
+      isSharedWorkspaceMode,
+      navigate,
+      user?.details?.isSyncEnabled,
+      analyticEventSource,
+      activeWorkspace.id,
+    ]
   );
 
   const handleDomainInvitesCreation = useCallback(

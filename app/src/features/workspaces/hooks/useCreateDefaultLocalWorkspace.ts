@@ -4,7 +4,7 @@ import { Workspace, WorkspaceType } from "../types";
 import { workspaceActions } from "store/slices/workspaces/slice";
 import { switchWorkspace } from "actions/TeamWorkspaceActions";
 import { useDispatch, useSelector } from "react-redux";
-import { isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
+import { getActiveWorkspace, isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 import { getAppMode } from "store/selectors";
 import * as Sentry from "@sentry/react";
 import { ErrorCode } from "errors/types";
@@ -26,9 +26,14 @@ export const useCreateDefaultLocalWorkspace = ({
   const [isLoading, setIsLoading] = useState(false);
   const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
   const appMode = useSelector(getAppMode);
+  const activeWorkspace = useSelector(getActiveWorkspace);
 
   const handleWorkspaceSwitch = useCallback(
     async (teamId: string, newTeamName: string) => {
+      if (activeWorkspace.id === teamId) {
+        return;
+      }
+
       await switchWorkspace(
         {
           teamId: teamId,
@@ -46,7 +51,7 @@ export const useCreateDefaultLocalWorkspace = ({
         analyticEventSource
       );
     },
-    [dispatch, appMode, isSharedWorkspaceMode, analyticEventSource]
+    [dispatch, appMode, isSharedWorkspaceMode, analyticEventSource, activeWorkspace.id]
   );
 
   const createWorkspace = useCallback(async () => {
