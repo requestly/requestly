@@ -1,5 +1,6 @@
 import { Iteration } from "../slices/common/runResults";
 import { ExecutionId, RQAPI } from "../types";
+import type { Workspace } from "features/workspaces/types";
 
 export enum EventFlow {
   API_EXECUTION = "API_EXECUTION",
@@ -26,7 +27,7 @@ export interface APIClientEvent {
   id: string;
   timestamp: number;
   flow: EventFlow;
-  //   workspaceId: WorkspaceId;
+  workspaceId: Workspace["id"];
   tag: Tag;
   data: APIClientEventData;
   _ctx?: any; // static context. Eg. execution env details, variable snapshot, etc.
