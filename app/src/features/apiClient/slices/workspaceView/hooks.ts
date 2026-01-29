@@ -25,12 +25,12 @@ export function useWorkspace(workspaceId: WorkspaceInfo["id"]) {
   return workspace;
 }
 
-const selectIsAllWorkspacesLoaded = createSelector([selectAllSelectedWorkspaces], (workspaces) =>
-  workspaces.every((w) => !w.status.loading)
+const selectIsAnyWorkspaceLoading = createSelector([selectAllSelectedWorkspaces], (workspaces) =>
+  workspaces.some((w) => w.status.loading)
 );
 
-export function useIsAllWorkspacesLoaded() {
-  return useSelector(selectIsAllWorkspacesLoaded);
+export function useIsAnyWorkspaceLoading() {
+  return useSelector(selectIsAnyWorkspaceLoading);
 }
 
 const selectViewMode = createSelector([getWorkspaceViewSlice], (s) => s.viewMode);

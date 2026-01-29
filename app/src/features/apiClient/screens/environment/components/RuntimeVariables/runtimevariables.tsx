@@ -23,7 +23,7 @@ export const RuntimeVariables: React.FC = () => {
         id: RUNTIME_VARIABLES_ENTITY_ID,
         title: "Runtime Variables",
         context: {
-          id: workspaceId,
+          id: workspaceId
         },
       }),
     });
