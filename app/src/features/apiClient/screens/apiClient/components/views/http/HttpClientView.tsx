@@ -82,6 +82,7 @@ import { PathVariablesProvider } from "features/apiClient/store/pathVariables/Pa
 import { usePathVariablesStore } from "features/apiClient/hooks/usePathVariables.store";
 import { useAISessionContext } from "features/ai/contexts/AISession";
 import { wrapWithCustomSpan } from "utils/sentry";
+import { UserAbortError } from "features/apiClient/errors/UserAbortError/UserAbortError";
 
 const requestMethodOptions = Object.values(RequestMethod).map((method) => ({
   value: method,
@@ -432,6 +433,14 @@ const HttpClientView: React.FC<Props> = ({
               const { error } = apiClientExecutionResult;
               setIsFailed(true);
               setError(error ?? null);
+              // Not the best way to handle this. But works for now.
+              if (error.name === UserAbortError.name) {
+                Sentry.getActiveSpan()?.setStatus({
+                  code: SPAN_STATUS_OK,
+                });
+                return;
+              }
+
               if (error) {
                 Sentry.withScope((scope) => {
                   scope.setTag("error_type", "api_request_failure");
