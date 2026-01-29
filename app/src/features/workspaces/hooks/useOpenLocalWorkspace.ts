@@ -3,7 +3,7 @@ import { useCallback, useState } from "react";
 import { openExistingLocalWorkspace } from "services/fsManagerServiceAdapter";
 import { WorkspaceType } from "../types";
 import { useDispatch, useSelector } from "react-redux";
-import { isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
+import { getActiveWorkspace, isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 import { getAppMode } from "store/selectors";
 import { ErrorCode } from "errors/types";
 import { workspaceActions } from "store/slices/workspaces/slice";
@@ -26,9 +26,13 @@ export const useOpenLocalWorkspace = ({
   const [isLoading, setIsLoading] = useState(false);
   const appMode = useSelector(getAppMode);
   const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
+  const activeWorkspace = useSelector(getActiveWorkspace);
 
   const handleWorkspaceSwitch = useCallback(
     async (teamId: string, newTeamName: string) => {
+      if (activeWorkspace.id === teamId) {
+        return;
+      }
       await switchWorkspace(
         {
           teamId: teamId,
@@ -46,7 +50,7 @@ export const useOpenLocalWorkspace = ({
         analyticEventSource
       );
     },
-    [dispatch, appMode, isSharedWorkspaceMode, analyticEventSource]
+    [dispatch, appMode, isSharedWorkspaceMode, analyticEventSource, activeWorkspace.id]
   );
 
   const openWorkspace = useCallback(
