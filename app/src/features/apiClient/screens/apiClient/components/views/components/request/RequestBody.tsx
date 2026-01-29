@@ -86,14 +86,14 @@ function getBodyFromBodyContainer<T extends RequestContentType>(
 }
 
 type RequestBodyProps = {
-  entity: BufferedHttpRecordEntity,
+  entity: BufferedHttpRecordEntity;
 };
 
 const RequestBody: React.FC<RequestBodyProps> = React.memo((props) => {
   const { entity } = props;
   const recordId = entity.meta.referenceId;
-  const contentType = useApiClientSelector(s => entity.getContentType(s));
-  const body = useApiClientSelector(s => entity.getBody(s));
+  const contentType = useApiClientSelector((s) => entity.getContentType(s));
+  const body = useApiClientSelector((s) => entity.getBody(s));
   const appMode = useSelector(getAppMode);
   const isFileBodyEnabled = useFeatureIsOn("api_client_file_body_support");
 
@@ -104,7 +104,7 @@ const RequestBody: React.FC<RequestBodyProps> = React.memo((props) => {
   });
 
   useEffect(() => {
-    if(!contentType || !body) {
+    if (!contentType || body === undefined || body === null) {
       return;
     }
     // Initializing the component level states based on the props
