@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import { Collapse } from "antd";
-import { RQAPI, KeyValuePair } from "features/apiClient/types";
+import { RQAPI } from "features/apiClient/types";
 import { PropertiesGrid } from "componentsV2/PropertiesGrid/PropertiesGrid";
 import { getContentTypeFromResponseHeaders } from "features/apiClient/screens/apiClient/utils";
 import { EmptyState } from "../../EmptyState/EmptyState";
@@ -47,65 +47,58 @@ export const DataTab: React.FC<DataTabProps> = ({ type, request, response, metho
   const data = type === "request" ? request : response;
 
   const isHttpRequest = type === "request" && data && "method" in data;
-  const httpRequest = isHttpRequest ? (data as RQAPI.HttpRequest) : null;
-  const graphqlRequest = type === "request" && data && !isHttpRequest ? (data as RQAPI.GraphQLRequest) : null;
-  const responseData = type === "response" && data ? (data as RQAPI.Response) : null;
+  const isGraphqlRequest = type === "request" && data && "operation" in data;
 
   const headers = useMemo(() => {
-    let headerData: KeyValuePair[] = [];
-    if (httpRequest) {
-      headerData = httpRequest.headers || [];
-    } else if (graphqlRequest) {
-      headerData = graphqlRequest.headers || [];
-    } else if (responseData) {
-      headerData = responseData.headers || [];
-    }
+    const headerData = data?.headers || [];
     return headerData.map((header) => ({
       key: header.key,
       value: header.value,
     }));
-  }, [httpRequest, graphqlRequest, responseData]);
+  }, [data]);
 
   const queryParams = useMemo(() => {
-    if (!httpRequest?.queryParams) return [];
-    return httpRequest.queryParams.map((param) => ({
+    if (!isHttpRequest) return [];
+    const httpRequest = data as RQAPI.HttpRequest;
+    return (httpRequest.queryParams || []).map((param) => ({
       key: param.key,
       value: param.value,
     }));
-  }, [httpRequest]);
+  }, [isHttpRequest, data]);
 
   const body = useMemo(() => {
     if (type === "request") {
-      if (httpRequest?.body) {
-        if (typeof httpRequest.body === "string") {
-          return httpRequest.body;
-        }
-        if (Array.isArray(httpRequest.body)) {
-          return JSON.stringify(httpRequest.body, null, 2);
-        }
+      if (isHttpRequest) {
+        const httpRequest = data as RQAPI.HttpRequest;
+        const requestBody = httpRequest.body;
+        if (!requestBody) return "";
+        if (typeof requestBody === "string") return requestBody;
+        if (Array.isArray(requestBody)) return JSON.stringify(requestBody, null, 2);
       }
-      if (graphqlRequest?.operation) {
-        return graphqlRequest.operation;
+      if (isGraphqlRequest) {
+        const graphqlRequest = data as RQAPI.GraphQLRequest;
+        return graphqlRequest.operation || "";
       }
-    } else {
-      return responseData?.body || "";
+      return "";
     }
-    return "";
-  }, [type, httpRequest, graphqlRequest, responseData]);
+    const responseData = data as RQAPI.Response;
+    return responseData?.body || "";
+  }, [type, isHttpRequest, isGraphqlRequest, data]);
 
   const contentType = useMemo(() => {
     if (type === "request") {
-      if (httpRequest?.contentType) {
-        return httpRequest.contentType;
+      if (isHttpRequest) {
+        const httpRequest = data as RQAPI.HttpRequest;
+        return httpRequest.contentType || "text/plain";
       }
-      if (graphqlRequest) {
+      if (isGraphqlRequest) {
         return "application/json";
       }
-    } else if (responseData) {
-      return getContentTypeFromResponseHeaders(responseData.headers) || "text/plain";
+      return "text/plain";
     }
-    return "text/plain";
-  }, [type, httpRequest, graphqlRequest, responseData]);
+    const responseData = data as RQAPI.Response;
+    return getContentTypeFromResponseHeaders(responseData?.headers || []) || "text/plain";
+  }, [type, isHttpRequest, isGraphqlRequest, data]);
 
   const emptyBodyMessage = useMemo(() => getEmptyBodyMessage(type, method, statusCode), [type, method, statusCode]);
 
@@ -124,7 +117,7 @@ export const DataTab: React.FC<DataTabProps> = ({ type, request, response, metho
       <Collapse defaultActiveKey={["body"]} ghost>
         <Collapse.Panel header={type === "request" ? "Body" : "BODY"} key="body" className="body-collapse-panel">
           {body ? (
-            <ResponseBody responseText={body} contentTypeHeader={contentType} disableResize />
+            <ResponseBody responseText={body} contentTypeHeader={contentType} />
           ) : (
             <EmptyState title={emptyBodyMessage} description="" imageSrc={EmptyInboxIcon} />
           )}
@@ -142,7 +135,7 @@ export const DataTab: React.FC<DataTabProps> = ({ type, request, response, metho
             />
           )}
         </Collapse.Panel>
-        {type === "request" && httpRequest && (
+        {isHttpRequest && (
           <Collapse.Panel header="Query Params" key="queryParams">
             {queryParams.length > 0 ? (
               <div className="request-details-properties">

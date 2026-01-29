@@ -10,9 +10,10 @@ import "./runResultDetailedView.scss";
 interface Props {
   onClose: () => void;
   requestExecutionResult: RequestExecutionResult | null;
+  headerBreadcrumb: React.ReactNode;
 }
 
-export const RunResultDetailedView: React.FC<Props> = ({ onClose, requestExecutionResult }) => {
+export const RunResultDetailedView: React.FC<Props> = ({ onClose, requestExecutionResult, headerBreadcrumb }) => {
   const method = useMemo(() => {
     const request = requestExecutionResult?.request;
     if (request && "method" in request) {
@@ -54,7 +55,7 @@ export const RunResultDetailedView: React.FC<Props> = ({ onClose, requestExecuti
   return (
     <div className="request-details-content">
       <div className="request-details-header">
-        <span className="header-title">Request Details</span>
+        {headerBreadcrumb}
         <RQButton size="small" type="transparent" icon={<MdClose />} onClick={onClose} className="close-button" />
       </div>
       <Tabs items={tabItems} defaultActiveKey="response" />

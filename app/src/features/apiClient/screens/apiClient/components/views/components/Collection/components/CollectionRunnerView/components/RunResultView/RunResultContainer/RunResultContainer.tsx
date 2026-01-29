@@ -1,5 +1,5 @@
 import React, { useMemo, useRef, useState } from "react";
-import { Badge, Breadcrumb, Collapse, Spin, Tabs } from "antd";
+import { Badge, Collapse, Spin, Tabs } from "antd";
 import {
   CurrentlyExecutingRequest,
   LiveRunResult,
@@ -16,20 +16,17 @@ import {
 import { EmptyState } from "../../EmptyState/EmptyState";
 import { LoadingOutlined } from "@ant-design/icons";
 import { MdOutlineArrowForwardIos } from "@react-icons/all-files/md/MdOutlineArrowForwardIos";
-import { RequestViewTabSource } from "../../../../../../RequestView/requestViewTabSource";
 import "./runResultContainer.scss";
 import { getFormattedStartTime, getFormattedTime } from "../utils";
 import { MdOutlineWarningAmber } from "@react-icons/all-files/md/MdOutlineWarningAmber";
 import { RQTooltip } from "lib/design-system-v2/components";
 import { useVirtualizer } from "@tanstack/react-virtual";
-import NetworkStatusField from "components/misc/NetworkStatusField";
 import { useWorkspaceId } from "features/apiClient/common/WorkspaceProvider";
-import { useTabActions } from "componentsV2/Tabs/slice";
 import { useCollectionView } from "../../../../../collectionView.context";
 import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
 import { selectLiveRunResultCurrentlyExecutingRequest } from "features/apiClient/slices/liveRunResults/selectors";
-import { getAncestorIds, getRecord } from "features/apiClient/slices/apiRecords/utils";
 import { RunResultDetailedView } from "../RunResultDetailedView/RunResultDetailedView";
+import { RequestDetailsHeader } from "./RequestDetailsHeader";
 import Split from "react-split";
 
 enum RunResultTabKey {
@@ -93,95 +90,6 @@ const TestDetails: React.FC<{
   onDetailsClick: (result: RequestExecutionResult) => void;
 }> = React.memo(({ requestExecutionResult, onDetailsClick }) => {
   const workspaceId = useWorkspaceId();
-  const { openBufferedTab } = useTabActions();
-
-  const responseDetails = useMemo(() => {
-    return (
-      <div className="response-details">
-        <span className="response-time">
-          {requestExecutionResult.entry.responseTime != null
-            ? Math.round(requestExecutionResult.entry.responseTime)
-            : 0}
-          ms
-        </span>
-        {requestExecutionResult.entry.statusCode ? (
-          <NetworkStatusField
-            status={requestExecutionResult.entry.statusCode}
-            statusText={requestExecutionResult.entry.statusText ?? undefined}
-          />
-        ) : null}
-      </div>
-    );
-  }, [
-    requestExecutionResult.entry.responseTime,
-    requestExecutionResult.entry.statusCode,
-    requestExecutionResult.entry.statusText,
-  ]);
-
-  const requestNameDetails = useMemo(() => {
-    if (!workspaceId) return null;
-
-    const ancestorIds = getAncestorIds(requestExecutionResult.recordId, workspaceId);
-    const collectionPath = ancestorIds
-      .slice(0, -1) // Exclude current item
-      .map((id) => ({
-        id,
-        name: getRecord(id, workspaceId)?.name || "",
-      }))
-      .filter((item) => item.name)
-      .reverse();
-
-    const depth = collectionPath.length;
-
-    return (
-      <Breadcrumb separator=">" className="request-name-details-breadcrumb">
-        {depth > 0 && (
-          <Breadcrumb.Item>
-            <span className="root-collection-name">{collectionPath[0]?.name}</span>
-          </Breadcrumb.Item>
-        )}
-        {depth > 1 && (
-          <Breadcrumb.Item
-            menu={{
-              items: collectionPath.slice(1).map((collection) => ({
-                key: collection.id,
-                label: collection.name,
-              })),
-            }}
-          >
-            ...
-          </Breadcrumb.Item>
-        )}
-        <Breadcrumb.Item>
-          <span
-            className="request-name"
-            title={requestExecutionResult.recordName}
-            onClick={(e) => {
-              e.stopPropagation();
-              openBufferedTab({
-                preview: false,
-                source: new RequestViewTabSource({
-                  id: requestExecutionResult.recordId,
-                  title: requestExecutionResult.recordName,
-                  context: {
-                    id: workspaceId,
-                  },
-                }),
-              });
-            }}
-          >
-            {requestExecutionResult.recordName}
-          </span>
-        </Breadcrumb.Item>
-      </Breadcrumb>
-    );
-  }, [
-    requestExecutionResult.collectionName,
-    requestExecutionResult.recordName,
-    requestExecutionResult.recordId,
-    openBufferedTab,
-    workspaceId,
-  ]);
 
   const requestUrl = useMemo(() => {
     const request = requestExecutionResult.request;
@@ -193,19 +101,16 @@ const TestDetails: React.FC<{
     return null;
   }, [requestExecutionResult.request]);
 
+  if (!workspaceId) return null;
+
   return (
     <div className="test-details-container" onClick={() => onDetailsClick(requestExecutionResult)}>
-      <div className="request-details">
-        <span className="icon">
-          {requestExecutionResult.entry.type === RQAPI.ApiEntryType.GRAPHQL ? (
-            <GraphQlIcon />
-          ) : (
-            <HttpMethodIcon method={requestExecutionResult.entry.method} />
-          )}
-        </span>
-        {requestNameDetails}
-        {responseDetails}
-      </div>
+      <RequestDetailsHeader
+        requestExecutionResult={requestExecutionResult}
+        workspaceId={workspaceId}
+        clickable={true}
+        showFullPath={true}
+      />
       {requestUrl && (
         <div className="request-url">
           <span className="url-text" title={requestUrl}>
@@ -250,14 +155,9 @@ const TestResultList: React.FC<{
   const parentRef = useRef<HTMLDivElement>(null);
   const resultsToShow = useMemo(() => Array.from(results), [results]);
 
-  // Initialize with all iterations expanded by default
   const [expandedKeys, setExpandedKeys] = useState<Set<number>>(() => {
-    if (!totalIterationCount) {
-      return new Set(resultsToShow.map(([iteration]) => iteration));
-    } else {
-      // fill the set with iteration numbers from 1 to totalIterationCount
-      return new Set(new Array(totalIterationCount).fill(0).map((_, idx) => idx + 1));
-    }
+    const iterationCount = totalIterationCount || resultsToShow.length;
+    return new Set(Array.from({ length: iterationCount }, (_, idx) => idx + 1));
   });
 
   const currentRunningRequest = currentlyExecutingRequest ? (
@@ -404,21 +304,9 @@ export const RunResultContainer: React.FC<{
 }> = ({ ranAt, result, running = false, totalIterationCount, isDetailedViewOpen, onToggleDetailedView }) => {
   const [activeTab, setActiveTab] = useState<RunResultTabKey>(RunResultTabKey.ALL);
   const [selectedRequest, setSelectedRequest] = useState<RequestExecutionResult | null>(null);
-
-  // Calculate split sizes based on whether a request is selected
-  const splitSizes = useMemo(() => {
-    return selectedRequest ? [50, 50] : [100, 0];
-  }, [selectedRequest]);
-
-  const handleDetailsClick = (requestResult: RequestExecutionResult) => {
-    setSelectedRequest(requestResult);
-    onToggleDetailedView?.(true);
-  };
-
-  const handlePanelClose = () => {
-    setSelectedRequest(null);
-    onToggleDetailedView?.(false);
-  };
+  const [userHasInteracted, setUserHasInteracted] = useState(false);
+  const [showDetailedView, setShowDetailedView] = useState(true);
+  const workspaceId = useWorkspaceId();
 
   const metrics = useMemo(() => {
     return getRunMetrics(result.iterations);
@@ -427,6 +315,65 @@ export const RunResultContainer: React.FC<{
   const summary = useMemo(() => {
     return getAllTestSummary(result.iterations);
   }, [result.iterations]);
+
+  // Get the current tab's results
+  const getCurrentTabResults = (tab: RunResultTabKey) => {
+    switch (tab) {
+      case RunResultTabKey.ALL:
+        return summary.totalTests;
+      case RunResultTabKey.PASSED:
+        return summary.successTests;
+      case RunResultTabKey.FAILED:
+        return summary.failedTests;
+      case RunResultTabKey.SKIPPED:
+        return summary.skippedTests;
+      default:
+        return new Map();
+    }
+  };
+
+  // Auto-select first result when tab changes (only if user has previously interacted)
+  const handleTabChange = (newTab: RunResultTabKey) => {
+    setActiveTab(newTab);
+
+    if (!userHasInteracted) return;
+
+    const tabResults = getCurrentTabResults(newTab);
+
+    if (tabResults.size === 0) {
+      setShowDetailedView(false);
+    } else {
+      // Select first result from the first iteration
+      const firstIterationResults = Array.from(tabResults.values())[0];
+      if (firstIterationResults && firstIterationResults.length > 0) {
+        const firstResult = firstIterationResults[0]?.requestExecutionResult;
+        if (firstResult) {
+          setSelectedRequest(firstResult);
+          setShowDetailedView(true);
+          onToggleDetailedView?.(true);
+        }
+        // If first result doesn't exist, keep current selectedRequest and showDetailedView state
+      }
+    }
+  };
+
+  // Calculate split sizes based on whether a request is selected
+  const splitSizes = useMemo(() => {
+    return showDetailedView && selectedRequest ? [50, 50] : [100, 0];
+  }, [showDetailedView, selectedRequest]);
+
+  const handleDetailsClick = (requestResult: RequestExecutionResult) => {
+    setSelectedRequest(requestResult);
+    setShowDetailedView(true);
+    setUserHasInteracted(true);
+    onToggleDetailedView?.(true);
+  };
+
+  const handlePanelClose = () => {
+    setShowDetailedView(false);
+    setUserHasInteracted(false);
+    onToggleDetailedView?.(false);
+  };
 
   const runMetrics = useMemo(() => {
     const { totalDuration, avgResponseTime } = metrics;
@@ -446,6 +393,31 @@ export const RunResultContainer: React.FC<{
       },
     ];
   }, [metrics, ranAt]);
+
+  const headerBreadcrumb = useMemo(() => {
+    if (!workspaceId || !selectedRequest) return null;
+
+    return (
+      <RequestDetailsHeader
+        requestExecutionResult={selectedRequest}
+        workspaceId={workspaceId}
+        clickable={false}
+        showFullPath={false}
+        showNetworkDetails={false}
+      />
+    );
+  }, [selectedRequest, workspaceId]);
+
+  const MetricsHeader = () => (
+    <div className="result-header">
+      {runMetrics.map((data, index) => (
+        <div key={index} className="run-metric">
+          <span className="label">{data.label}:</span>
+          <span className="value">{data.value}</span>
+        </div>
+      ))}
+    </div>
+  );
 
   const tabItems = useMemo(() => {
     return [
@@ -517,23 +489,12 @@ export const RunResultContainer: React.FC<{
       <Split
         direction="horizontal"
         sizes={splitSizes}
-        minSize={[500, 500]}
+        minSize={[500, 0]}
         gutterSize={selectedRequest ? 4 : 0}
         className="run-result-split-container"
       >
         <div className="run-result-view-details">
-          {!selectedRequest && (
-            <div className="result-header">
-              {runMetrics.map((data, index) => {
-                return (
-                  <div key={index} className="run-metric">
-                    <span className="label">{data.label}:</span>
-                    <span className="value">{data.value}</span>
-                  </div>
-                );
-              })}
-            </div>
-          )}
+          {!(showDetailedView && selectedRequest) && <MetricsHeader />}
           <div className="result-tabs-container">
             <Tabs
               moreIcon={null}
@@ -541,31 +502,28 @@ export const RunResultContainer: React.FC<{
               animated={false}
               activeKey={activeTab}
               destroyInactiveTabPane={true}
-              onChange={(activeKey) => setActiveTab(activeKey as RunResultTabKey)}
+              onChange={(activeKey) => handleTabChange(activeKey as RunResultTabKey)}
               className="test-result-tabs"
             />
           </div>
         </div>
         <div className="run-result-detail-panel-container">
-          {selectedRequest && (
-            <div className="run-result-view-details right-panel-opened">
-              <div className="result-header">
-                {runMetrics.map((data, index) => {
-                  return (
-                    <div key={index} className="run-metric">
-                      <span className="label">{data.label}:</span>
-                      <span className="value">{data.value}</span>
-                    </div>
-                  );
-                })}
+          {showDetailedView && selectedRequest && (
+            <>
+              <div className="run-result-view-details right-panel-opened">
+                <MetricsHeader />
               </div>
-            </div>
+              <div className="run-result-details">
+                {showDetailedView && selectedRequest && (
+                  <RunResultDetailedView
+                    onClose={handlePanelClose}
+                    requestExecutionResult={selectedRequest}
+                    headerBreadcrumb={headerBreadcrumb}
+                  />
+                )}
+              </div>
+            </>
           )}
-          <div className="run-result-details">
-            {selectedRequest && (
-              <RunResultDetailedView onClose={handlePanelClose} requestExecutionResult={selectedRequest} />
-            )}
-          </div>
         </div>
       </Split>
     </div>
