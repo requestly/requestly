@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Badge, Collapse, Spin, Tabs } from "antd";
 import {
   CurrentlyExecutingRequest,
@@ -307,6 +307,15 @@ export const RunResultContainer: React.FC<{
   const [userHasInteracted, setUserHasInteracted] = useState(false);
   const [showDetailedView, setShowDetailedView] = useState(true);
   const workspaceId = useWorkspaceId();
+
+  // Sync local state when parent's isDetailedViewOpen changes
+  useEffect(() => {
+    if (isDetailedViewOpen === false) {
+      setShowDetailedView(false);
+      setUserHasInteracted(false);
+      setActiveTab(RunResultTabKey.ALL);
+    }
+  }, [isDetailedViewOpen]);
 
   const metrics = useMemo(() => {
     return getRunMetrics(result.iterations);
