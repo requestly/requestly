@@ -9,12 +9,13 @@ import { v4 as uuidv4 } from "uuid";
 
 export abstract class EventLogger {
   abstract pushEvent(event: APIClientEvent): void;
-  logRequest(params: { request: RequestEventData["payload"]; tag?: Tag }) {
+
+  logRequest(params: { request: RequestEventData["payload"]; tag?: Tag; workspaceId: APIClientEvent["workspaceId"] }) {
     const event: APIClientEvent = {
       id: uuidv4(),
       timestamp: Date.now(),
+      workspaceId: params.workspaceId,
       tag: params.tag ?? {},
-      //   workspaceId: this.workspaceId,
       flow: EventFlow.API_EXECUTION,
       data: {
         type: "REQUEST",
@@ -23,12 +24,16 @@ export abstract class EventLogger {
     };
     this.pushEvent(event);
   }
-  logResponse(params: { response: ResponseEventData["payload"]; tag?: Tag }) {
+  logResponse(params: {
+    response: ResponseEventData["payload"];
+    tag?: Tag;
+    workspaceId: APIClientEvent["workspaceId"];
+  }) {
     const event: APIClientEvent = {
       id: uuidv4(),
       timestamp: Date.now(),
+      workspaceId: params.workspaceId,
       tag: params.tag ?? {},
-      //   workspaceId: this.workspaceId,
       flow: EventFlow.API_EXECUTION,
       data: {
         type: "RESPONSE",
