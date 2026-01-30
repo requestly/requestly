@@ -61,6 +61,36 @@ const defaultScripts = {
   postResponse: DEFAULT_SCRIPT_VALUES[RQAPI.ScriptType.POST_RESPONSE],
 };
 
+enum AIErrorCategory {
+  UNAUTHORIZED = "UNAUTHORIZED",
+  QUOTA_EXHAUSTED = "QUOTA_EXHAUSTED",
+  NETWORK_ERROR = "NETWORK_ERROR",
+  UNKNOWN = "UNKNOWN",
+}
+
+const parseErrorMessage = (errMessage: string): { message: string; errorType: AIErrorCategory } => {
+  const normalizedError = errMessage.toLowerCase();
+  let message: string;
+  let errorType: AIErrorCategory;
+
+  if (/quota exhausted/i.test(normalizedError)) {
+    message = "You have exhausted your AI credits.";
+    errorType = AIErrorCategory.QUOTA_EXHAUSTED;
+  } else if (/unauthorized|forbidden|permission/i.test(normalizedError)) {
+    message = "Unauthorized access.";
+    errorType = AIErrorCategory.UNAUTHORIZED;
+  } else if (/network|fetch|timeout|connection/i.test(normalizedError)) {
+    message = "Network error occurred.";
+    errorType = AIErrorCategory.NETWORK_ERROR;
+  } else {
+    message = "An unexpected error occurred.";
+    errorType = AIErrorCategory.UNKNOWN;
+  }
+
+  const separator = message.trim().endsWith(".") ? " " : ". ";
+  return { message: `${message}${separator}Please contact Support.`, errorType };
+};
+
 interface ScriptEditorProps {
   requestId: string;
   entry: RQAPI.ApiEntry;
@@ -160,11 +190,9 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
       }
     },
     onError: (finalError) => {
-      let reason = finalError.message;
-      trackAIErrorShown(reason);
-      const separator = reason.trim().endsWith(".") ? " " : ". ";
-      reason = `${reason}${separator}Please contact Support.`;
-      setNegativeFeedback(reason);
+      const { message, errorType } = parseErrorMessage(finalError.message);
+      trackAIErrorShown(errorType);
+      setNegativeFeedback(message);
     },
   });
 
