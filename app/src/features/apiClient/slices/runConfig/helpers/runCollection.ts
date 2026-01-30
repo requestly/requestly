@@ -51,6 +51,10 @@ function prepareExecutionResult(params: {
 
   const { iteration, recordId, recordName, collectionName, startTime } = currentExecutingRequest;
 
+  // Extract request and response from executedEntry
+  const request = isHTTPApiEntry(result.executedEntry) ? result.executedEntry.request : result.executedEntry.request;
+  const response = result.executedEntry.response;
+
   if (result.status === RQAPI.ExecutionStatus.ERROR) {
     return {
       executionId: result.executionId,
@@ -58,6 +62,8 @@ function prepareExecutionResult(params: {
       recordId,
       recordName,
       collectionName,
+      request,
+      response,
       entry: parseExecutingRequestEntry(result.executedEntry),
       status: { value: result.status, error: result.error },
       runDuration: null,
@@ -71,6 +77,8 @@ function prepareExecutionResult(params: {
     recordId,
     recordName,
     collectionName,
+    request,
+    response,
     runDuration: Date.now() - startTime,
     entry: parseExecutingRequestEntry(result.executedEntry),
     status: result.warning ? { value: result.status, warning: result.warning } : { value: result.status },
