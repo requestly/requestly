@@ -48,7 +48,10 @@ export const EnvironmentView: React.FC<EnvironmentViewProps> = ({ entity, enviro
       {
         entity: entity,
         async save(changes, repositories) {
-          await repositories.environmentVariablesRepository.updateEnvironment(environmentId, changes);
+          const { name: _ignoredName, ...changesWithoutName } = changes as typeof changes & {
+            name?: unknown;
+          };
+          await repositories.environmentVariablesRepository.updateEnvironment(environmentId, changesWithoutName);
         },
       },
       {
