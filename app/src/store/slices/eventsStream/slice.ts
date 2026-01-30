@@ -1,4 +1,4 @@
-import { createEntityAdapter, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createEntityAdapter, createSlice, PayloadAction, prepareAutoBatched } from "@reduxjs/toolkit";
 import { APIClientEvent } from "features/apiClient/eventStream/types";
 
 export const eventsAdapter = createEntityAdapter<APIClientEvent>({
@@ -12,8 +12,11 @@ export const eventsSlice = createSlice({
     events: eventsAdapter.getInitialState(),
   },
   reducers: {
-    eventAdd: (state, action: PayloadAction<APIClientEvent>) => {
-      eventsAdapter.addOne(state.events, action.payload);
+    eventAdd: {
+      reducer(state, action: PayloadAction<APIClientEvent>) {
+        eventsAdapter.addOne(state.events, action.payload);
+      },
+      prepare: prepareAutoBatched<APIClientEvent>(),
     },
     eventClearAll: (state) => {
       eventsAdapter.removeAll(state.events);
