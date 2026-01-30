@@ -29,6 +29,14 @@
         gap: var(--space-6, 16px);
         align-self: stretch;
 
+        .ms-text {
+          color: var(--requestly-color-text-placeholder);
+          font-size: var(--requestly-font-size-xs, 11px);
+          font-weight: 400;
+          margin-left: -10px;
+          margin-top: 2px;
+        }
+
         label {
           user-select: none;
           display: flex;
