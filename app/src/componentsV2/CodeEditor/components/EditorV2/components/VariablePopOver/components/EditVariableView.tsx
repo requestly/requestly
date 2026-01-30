@@ -5,14 +5,12 @@ import { VariableScope } from "backend/environment/types";
 import type { EnvironmentVariableType, VariableValueType } from "backend/environment/types";
 import type { CreateVariableFormData } from "../types";
 import { VariableUpsertSource } from "../types";
-import { useScopeOptions } from "../hooks/useScopeOptions";
+import { getScopeIcon } from "../hooks/useScopeOptions";
 import { captureException } from "backend/apiClient/utils";
 import { VariableFormFields } from "./VariableFormFields";
 import { FaListAlt } from "@react-icons/all-files/fa/FaListAlt";
 import { toast } from "utils/Toast";
-import { useCollectionIdByRecordId } from "features/apiClient/slices/apiRecords/apiRecords.hooks";
 import { trackVariablesSaved } from "modules/analytics/events/features/apiClient";
-import { useHostContext } from "hooks/useHostContext";
 import { parseRawVariable, mergeVariable } from "../utils/variableUtils";
 import { useVariableScopeAdapter } from "../hooks/useVariableScopeAdapter";
 
@@ -21,6 +19,7 @@ interface ExistingVariableData {
   syncValue: VariableValueType;
   localValue: VariableValueType;
   scope: VariableScope;
+  scopeId: string;
   scopeName: string;
 }
 
@@ -37,18 +36,12 @@ export const EditVariableView: React.FC<EditVariableViewProps> = ({
   onCancel,
   onSave,
 }) => {
-  const { getSourceId } = useHostContext();
-  const recordId = getSourceId();
-
-  const collectionId = useCollectionIdByRecordId(recordId);
-
-  const { scopeOptions } = useScopeOptions(collectionId);
-
   const [upserting, setUpserting] = useState(false);
 
   const { entity, saveVariablesToRepository, scopeDisplayName, store } = useVariableScopeAdapter(
     existingVariable.scope,
-    scopeOptions
+    [],
+    { scopeId: existingVariable.scopeId, scopeDisplayName: existingVariable.scopeName }
   );
 
   const [formData, setFormData] = useState({
@@ -97,7 +90,7 @@ export const EditVariableView: React.FC<EditVariableViewProps> = ({
       });
 
       await onSave(variableData);
-      toast.success(`Variable updated in ${scopeDisplayName || existingVariable.scopeName}`);
+      toast.success(`Variable updated in ${scopeDisplayName}`);
       trackVariablesSaved({
         source: VariableUpsertSource.VARIABLE_POPOVER,
         variable_scope: scope.toLowerCase(),
@@ -108,26 +101,17 @@ export const EditVariableView: React.FC<EditVariableViewProps> = ({
     } finally {
       setUpserting(false);
     }
-  }, [
-    variableName,
-    formData,
-    store,
-    entity,
-    saveVariablesToRepository,
-    scopeDisplayName,
-    existingVariable.scopeName,
-    onSave,
-  ]);
+  }, [variableName, formData, store, entity, saveVariablesToRepository, scopeDisplayName, onSave]);
 
-  const currentScopeOption = useMemo(() => {
-    return scopeOptions.find((o) => o.value === existingVariable.scope) || scopeOptions[0];
-  }, [existingVariable.scope, scopeOptions]);
+  const scopeIcon = useMemo(() => {
+    return getScopeIcon(existingVariable.scope) || <FaListAlt />;
+  }, [existingVariable.scope]);
 
   return (
     <div className="create-variable-view">
       <div className="edit-variable-header">
         <div className="edit-variable-scope-info">
-          <div className="scope-icon-wrapper">{currentScopeOption?.icon || <FaListAlt />}</div>
+          <div className="scope-icon-wrapper">{scopeIcon}</div>
           <span className="scope-name">{existingVariable.scopeName || "Environment"}</span>
         </div>
         <div className="edit-variable-actions">
