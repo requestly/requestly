@@ -3,11 +3,12 @@ import { useSelector } from "react-redux";
 import { Checkbox } from "antd";
 import { CreateWorkspaceHeader } from "../CreateWorkspaceHeader/CreateWorkspaceHeader";
 import { CreateWorkspaceFooter } from "../CreateWorkspaceFooter/CreateWorkspaceFooter";
-import { CreateWorkspaceArgs } from "../WorkspaceCreationView";
+import { CreateWorkspaceArgs } from "features/workspaces/hooks/useCreateWorkspace";
 import "./sharedWorkspaceCreationView.scss";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getDomainFromEmail } from "utils/FormattingHelper";
 import { WorkspaceType } from "features/workspaces/types";
+import { useWorkspaceCreationContext } from "../../context";
 
 export const SharedWorkspaceCreationView = ({
   onCreateWorkspaceClick,
@@ -19,8 +20,8 @@ export const SharedWorkspaceCreationView = ({
   onCancel: () => void;
 }) => {
   const user = useSelector(getUserAuthDetails);
+  const { workspaceName, setWorkspaceName } = useWorkspaceCreationContext();
 
-  const [workspaceName, setWorkspaceName] = useState("");
   const [isNotifyAllSelected, setIsNotifyAllSelected] = useState(false);
 
   const handleOnCreateWorkspaceClick = () => {
@@ -34,9 +35,11 @@ export const SharedWorkspaceCreationView = ({
   return (
     <>
       <CreateWorkspaceHeader
+        name={workspaceName}
         title="Create a new team workspace"
         description="Workspaces are where your team collaborate on rules, variables, and mocks."
         onWorkspaceNameChange={setWorkspaceName}
+        hasDuplicateWorkspaceName={false}
       />
       <div className="invite-all-domain-users-container">
         <Checkbox checked={isNotifyAllSelected} onChange={() => setIsNotifyAllSelected(!isNotifyAllSelected)} />{" "}

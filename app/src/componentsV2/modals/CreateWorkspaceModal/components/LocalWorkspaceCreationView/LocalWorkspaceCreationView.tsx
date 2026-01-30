@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Tooltip, Typography } from "antd";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Tooltip } from "antd";
 import { MdOutlineFolder } from "@react-icons/all-files/md/MdOutlineFolder";
 import { MdOutlineInsertDriveFile } from "@react-icons/all-files/md/MdOutlineInsertDriveFile";
 import { CreateWorkspaceHeader } from "../CreateWorkspaceHeader/CreateWorkspaceHeader";
@@ -8,10 +8,19 @@ import { displayFolderSelector } from "components/mode-specific/desktop/misc/Fil
 import { PiFolderOpen } from "@react-icons/all-files/pi/PiFolderOpen";
 import Logger from "lib/logger";
 import { RQButton } from "lib/design-system-v2/components";
-import { CreateWorkspaceArgs } from "../WorkspaceCreationView";
+import { CreateWorkspaceArgs } from "features/workspaces/hooks/useCreateWorkspace";
 import { MdOutlineInfo } from "@react-icons/all-files/md/MdOutlineInfo";
 import "./localWorkspaceCreationView.scss";
 import { WorkspaceType } from "features/workspaces/types";
+import { useDebounce } from "hooks/useDebounce";
+import { WorkspacePathEllipsis } from "features/workspaces/components/WorkspacePathEllipsis";
+import { LocalWorkspaceCreateOptions } from "./components/LocalWorkspaceCreateOptions/LocalWorkspaceCreateOptions";
+import { useOpenLocalWorkspace } from "features/workspaces/hooks/useOpenLocalWorkspace";
+import { FileSystemError } from "features/apiClient/helpers/modules/sync/local/services/types";
+import { OpenWorkspaceErrorView } from "./components/OpenWorkspaceErrorView";
+import { useWorkspaceCreationContext } from "../../context";
+import { checkIsWorkspacePathAvailable } from "services/fsManagerServiceAdapter";
+import { ExistingWorkspaceConflictView } from "./components/ExistingWorkspaceConflictView";
 
 type FolderItem = {
   name: string;
@@ -49,33 +58,42 @@ const INVALID_FS_NAME_CHARACTERS = /[<>:"/\\|?*\x00-\x1f]/g;
 
 export const LocalWorkspaceCreationView = ({
   onCreateWorkspaceClick,
-  isLoading,
   onCancel,
+  onSuccessCallback,
+  isLoading,
+  isOpenedInModal,
+  analyticEventSource,
 }: {
   onCreateWorkspaceClick: (args: CreateWorkspaceArgs) => void;
-  isLoading: boolean;
   onCancel: () => void;
+  onSuccessCallback?: () => void;
+  isLoading: boolean;
+  isOpenedInModal?: boolean;
+  analyticEventSource: string;
 }) => {
-  const [workspaceName, setWorkspaceName] = useState("");
-  const [folderPath, setFolderPath] = useState("");
+  const { workspaceName, folderPath, setWorkspaceName, setFolderPath } = useWorkspaceCreationContext();
+
   const [folderPreview, setFolderPreview] = useState<FolderPreview | null>(null);
+  const [hasDuplicateWorkspaceName, setHasDuplicateWorkspaceName] = useState(false);
+  const [isCreationOptionsVisible, setIsCreationOptionsVisible] = useState(isOpenedInModal ?? false);
+  const [openWorkspaceError, setOpenWorkspaceError] = useState<FileSystemError | null>(null);
+
+  const [isSelectedFolderAvailable, setIsSelectedFolderAvailable] = useState(true);
+
+  const { openWorkspace, isLoading: isOpenWorkspaceLoading } = useOpenLocalWorkspace({
+    analyticEventSource: analyticEventSource,
+    onOpenWorkspaceCallback: () => {
+      onSuccessCallback?.();
+    },
+    onError: (error) => {
+      setOpenWorkspaceError(error);
+    },
+  });
+
+  const workspaceNameRef = useRef<string>(workspaceName);
 
   const folderSelectCallback = async (folderPath: string) => {
     setFolderPath(folderPath);
-    try {
-      const result: FolderPreview = await window.RQ.DESKTOP.SERVICES.IPC.invokeEventInMain(
-        "get-workspace-folder-preview",
-        {
-          folderPath,
-        }
-      );
-      if (result.success) {
-        setFolderPreview(result);
-      }
-    } catch (err) {
-      Logger.log("Could not get workspace folder preview data", err);
-      // No OP
-    }
   };
 
   const handleOnCreateWorkspaceClick = () => {
@@ -99,48 +117,120 @@ export const LocalWorkspaceCreationView = ({
     ));
   };
 
+  const checkForDuplicateWorkspaceName = useCallback(
+    (value: string) => {
+      const workspaceName = value.replace(INVALID_FS_NAME_CHARACTERS, "-");
+      const isDuplicate = folderPreview?.existingContents.find((item) => item.name === workspaceName);
+      setHasDuplicateWorkspaceName(!!isDuplicate);
+    },
+    [folderPreview]
+  );
+
+  const debouncedCheckForDuplicateWorkspaceName = useDebounce(checkForDuplicateWorkspaceName);
+
+  const handleWorkspaceNameChange = useCallback(
+    (value: string) => {
+      const newName = value.replace(INVALID_FS_NAME_CHARACTERS, "-");
+      setWorkspaceName(newName);
+      workspaceNameRef.current = newName;
+      debouncedCheckForDuplicateWorkspaceName(newName);
+    },
+    [debouncedCheckForDuplicateWorkspaceName, setWorkspaceName]
+  );
+
   useEffect(() => {
     window.RQ.DESKTOP.SERVICES.IPC.invokeEventInMain("get-workspace-folder-preview", {
-      folderPath: "",
+      folderPath,
     })
       .then((result: FolderPreview) => {
         if (result.success) {
           setFolderPreview(result);
           setFolderPath(result.folderPath);
+          checkIsWorkspacePathAvailable(result.folderPath)
+            .then((isEligible) => {
+              setIsSelectedFolderAvailable(isEligible);
+            })
+            .catch(() => {
+              setIsSelectedFolderAvailable(false);
+            });
         }
       })
       .catch((err: unknown) => {
         Logger.log("Could not get workspace folder preview data", err);
         // No OP
       });
-  }, []);
+  }, [folderPath, setFolderPreview, setFolderPath]);
+
+  useEffect(() => {
+    if (folderPreview) {
+      checkForDuplicateWorkspaceName(workspaceNameRef.current);
+    }
+  }, [folderPreview, checkForDuplicateWorkspaceName]);
+
+  if (openWorkspaceError) {
+    return (
+      <OpenWorkspaceErrorView
+        path={openWorkspaceError.error.path}
+        onNewWorkspaceClick={() => {
+          setOpenWorkspaceError(null);
+          setIsCreationOptionsVisible(false);
+        }}
+        openWorkspace={openWorkspace}
+        isOpeningWorkspaceLoading={isOpenWorkspaceLoading}
+        analyticEventSource="create_workspace_modal"
+      />
+    );
+  }
+
+  if (!isSelectedFolderAvailable) {
+    return (
+      <ExistingWorkspaceConflictView
+        path={folderPath}
+        onValidFolderSelection={() => {
+          setIsSelectedFolderAvailable(true);
+        }}
+        analyticEventSource={analyticEventSource}
+        onOpenWorkspaceSuccess={onSuccessCallback}
+      />
+    );
+  }
+
+  if (isCreationOptionsVisible) {
+    return (
+      <>
+        <div className="create-workspace-header">
+          <div className="create-workspace-header__title">Add a local workspace</div>
+        </div>
+        <div style={{ padding: "12px 0" }}>
+          <LocalWorkspaceCreateOptions
+            analyticEventSource={analyticEventSource}
+            onCreateWorkspaceClick={() => {
+              setOpenWorkspaceError(null);
+              setIsCreationOptionsVisible(false);
+            }}
+            openWorkspace={openWorkspace}
+            isOpeningWorkspaceLoading={isOpenWorkspaceLoading}
+            isOpenedInModal
+          />
+        </div>
+      </>
+    );
+  }
 
   return (
     <>
       <CreateWorkspaceHeader
         title="Create a new local workspace"
         description=""
-        onWorkspaceNameChange={(value) => {
-          setWorkspaceName(value.replace(INVALID_FS_NAME_CHARACTERS, "-"));
-        }}
+        name={workspaceName}
+        onWorkspaceNameChange={handleWorkspaceNameChange}
+        hasDuplicateWorkspaceName={hasDuplicateWorkspaceName}
       />
       <div className="workspace-folder-selector">
         <RQButton icon={<MdOutlineFolder />} onClick={() => displayFolderSelector(folderSelectCallback)}>
           Select a folder
         </RQButton>
-        {folderPath.length ? (
-          <Typography.Text
-            ellipsis={{
-              tooltip: {
-                title: folderPath,
-                color: "#000",
-              },
-            }}
-            className="selected-folder-path"
-          >
-            {folderPath}
-          </Typography.Text>
-        ) : null}
+        {folderPath.length ? <WorkspacePathEllipsis path={folderPath} className="selected-folder-path" /> : null}
       </div>
 
       {folderPreview ? (
@@ -191,7 +281,7 @@ export const LocalWorkspaceCreationView = ({
         onCancel={onCancel}
         onCreateWorkspaceClick={handleOnCreateWorkspaceClick}
         isLoading={isLoading}
-        disabled={!workspaceName.length || !folderPath.length}
+        disabled={!workspaceName.length || !folderPath.length || hasDuplicateWorkspaceName}
       />
     </>
   );

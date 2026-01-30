@@ -241,6 +241,10 @@ export const TEAMS = {
   MULTI_WORKSPACE_SELECTED: "multi_workspace_selected",
   MULTI_WORKSPACE_DESELECTED: "multi_workspace_deselected",
   MANAGE_WORKSPACE_CLICKED: "manage_workspace_clicked",
+
+  NEW_TEAM_CREATION_WORKFLOW_STARTED: "new_team_creation_workflow_started",
+  LOCAL_WORKSPACE_CREATION_CONFLICT_SHOWN: "local_workspace_creation_conflict_shown",
+  LOCAL_WORKSPACE_CREATION_MODE_SELECTED: "local_workspace_creation_mode_selected",
 };
 
 export const TRAFFIC_TABLE = {
