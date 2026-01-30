@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useLayoutEffect, useState, useMemo } from "react";
-import { notification, Select, Space } from "antd";
+import { notification, Select, Space, Tooltip } from "antd";
 import { useDispatch } from "react-redux";
 import * as Sentry from "@sentry/react";
 import { SPAN_STATUS_ERROR, SPAN_STATUS_OK } from "@sentry/core";
@@ -761,6 +761,11 @@ const HttpClientView: React.FC<Props> = ({
 
   const enableHotkey = getIsActive();
 
+  const isSendButtonDisabled =
+    isLoadingResponse ||
+    !entry.request.url ||
+    (appMode === "EXTENSION" && entry.request.contentType === RequestContentType.MULTIPART_FORM);
+
   return isExtensionEnabled ? (
     <div className="api-client-view http-client-view">
       <div className="api-client-header-container">
@@ -815,20 +820,47 @@ const HttpClientView: React.FC<Props> = ({
                 currentEnvironmentVariables={scopedVariables}
               />
             </Space.Compact>
-            <RQButton
-              showHotKeyText
-              onClick={onSendButtonClick}
-              hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SEND_REQUEST.hotKey}
-              type="primary"
-              className="text-bold"
-              enableHotKey={enableHotkey}
-              disabled={
-                !entry.request.url ||
-                (appMode === "EXTENSION" && entry.request.contentType === RequestContentType.MULTIPART_FORM)
-              }
-            >
-              Send
-            </RQButton>
+
+            {isSendButtonDisabled ? (
+              <Tooltip
+                title={
+                  isLoadingResponse
+                    ? "Request in progress"
+                    : !entry.request.url
+                    ? "Please enter a URL"
+                    : appMode === "EXTENSION" && entry.request.contentType === RequestContentType.MULTIPART_FORM
+                    ? "Multipart form is not supported in extension mode"
+                    : ""
+                }
+                placement="bottom"
+              >
+                <span>
+                  <RQButton
+                    showHotKeyText
+                    onClick={onSendButtonClick}
+                    hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SEND_REQUEST.hotKey}
+                    type="primary"
+                    className="text-bold"
+                    enableHotKey={enableHotkey}
+                    disabled={isSendButtonDisabled}
+                  >
+                    Send
+                  </RQButton>
+                </span>
+              </Tooltip>
+            ) : (
+              <RQButton
+                showHotKeyText
+                onClick={onSendButtonClick}
+                hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SEND_REQUEST.hotKey}
+                type="primary"
+                className="text-bold"
+                enableHotKey={enableHotkey}
+                disabled={false}
+              >
+                Send
+              </RQButton>
+            )}
 
             <Conditional condition={!openInModal}>
               <RBACButton
