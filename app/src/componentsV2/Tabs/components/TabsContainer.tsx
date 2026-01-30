@@ -19,12 +19,13 @@ import {
   BufferModeTab,
   useTabTitle,
 } from "../slice";
-import { TabState } from "../slice/types";
+import { TabState, TabId } from "../slice/types";
 import { DraftRequestContainerTabSource } from "features/apiClient/screens/apiClient/components/views/components/DraftRequestContainer/draftRequestContainerTabSource";
 import { getEmptyDraftApiRecord } from "features/apiClient/screens/apiClient/utils";
 import { RQAPI } from "features/apiClient/types";
 import { useMatchedTabSource } from "../hooks/useMatchedTabSource";
 import { getHasActiveWorkflows, getHasAnyUnsavedChanges } from "../slice/utils";
+import { ActiveWorkflowModal } from "./ActiveWorkflowModal/ActiveWorkflowModal";
 
 interface BufferedTabLabelProps {
   tab: BufferModeTab;
@@ -135,6 +136,7 @@ export const TabsContainer: React.FC = () => {
   const previewTabId = usePreviewTabId();
   const { closeTab, setActiveTab, openBufferedTab, setPreviewTab } = useTabActions();
   const [isMorePopoverOpen, setIsMorePopoverOpen] = useState(false);
+  const [workflowModalTabId, setWorkflowModalTabId] = useState<TabId | null>(null);
 
   useCloseActiveTabShortcut();
 
@@ -256,6 +258,18 @@ export const TabsContainer: React.FC = () => {
     [previewTabId, setPreviewTab]
   );
 
+  const handleTabCloseRequest = useCallback(
+    (tab: TabState) => {
+      if (tab.activeWorkflows.size > 0) {
+        setWorkflowModalTabId(tab.id);
+        return;
+      }
+
+      closeTab({ tabId: tab.id });
+    },
+    [closeTab]
+  );
+
   const tabItems: TabsProps["items"] = useMemo(() => {
     return tabs.map((tab) => ({
       key: tab.id,
@@ -263,13 +277,26 @@ export const TabsContainer: React.FC = () => {
       label: (
         <TabLabel
           tab={tab}
-          onClose={() => closeTab({ tabId: tab.id })}
+          onClose={() => handleTabCloseRequest(tab)}
           onDoubleClick={() => handleUnpreviewTab(tab.id)}
         />
       ),
       children: <TabItem tabId={tab.id}>{tab.source.render()}</TabItem>,
     }));
-  }, [tabs, closeTab, handleUnpreviewTab]);
+  }, [tabs, handleTabCloseRequest, handleUnpreviewTab]);
+
+  const handleWorkflowModalCancel = useCallback(() => {
+    setWorkflowModalTabId(null);
+  }, []);
+
+  const handleWorkflowModalConfirm = useCallback(() => {
+    if (!workflowModalTabId) {
+      return;
+    }
+
+    closeTab({ tabId: workflowModalTabId, skipUnsavedPrompt: true, forceClose: true });
+    setWorkflowModalTabId(null);
+  }, [workflowModalTabId, closeTab]);
 
   return tabItems.length === 0 ? (
     <div className="tabs-outlet-container">
@@ -301,6 +328,11 @@ export const TabsContainer: React.FC = () => {
             });
           }
         }}
+      />
+      <ActiveWorkflowModal
+        open={workflowModalTabId !== null}
+        onCancel={handleWorkflowModalCancel}
+        onConfirm={handleWorkflowModalConfirm}
       />
     </div>
   );
