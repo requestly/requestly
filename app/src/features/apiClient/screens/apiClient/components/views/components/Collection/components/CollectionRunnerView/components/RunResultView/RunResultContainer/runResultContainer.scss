@@ -149,6 +149,10 @@
         font-style: normal;
         font-weight: 500;
         line-height: 17px; /* 154.545% */
+
+        &.failed {
+          color: var(--requestly-color-error-text);
+        }
       }
 
       .ant-badge {
@@ -170,6 +174,12 @@
 
           .ant-scroll-number-only {
             height: auto;
+          }
+        }
+        &.failed {
+          .ant-badge-count {
+            color: var(--requestly-color-error-text);
+            background-color: var(--requestly-color-error-800);
           }
         }
       }
@@ -254,6 +264,10 @@
         transition: background-color 0.2s ease;
 
         &:hover {
+          background-color: var(--requestly-color-white-t-5, rgba(255, 255, 255, 0.03));
+        }
+
+        &.selected {
           background-color: var(--requestly-color-white-t-5, rgba(255, 255, 255, 0.03));
         }
 

@@ -88,7 +88,8 @@ const RunningRequestPlaceholder: React.FC<{
 const TestDetails: React.FC<{
   requestExecutionResult: RequestExecutionResult;
   onDetailsClick: (result: RequestExecutionResult) => void;
-}> = React.memo(({ requestExecutionResult, onDetailsClick }) => {
+  selectedRequestId?: string;
+}> = React.memo(({ requestExecutionResult, onDetailsClick, selectedRequestId }) => {
   const workspaceId = useWorkspaceId();
 
   const requestUrl = useMemo(() => {
@@ -103,8 +104,12 @@ const TestDetails: React.FC<{
 
   if (!workspaceId) return null;
 
+  const isSelected = selectedRequestId === requestExecutionResult?.recordId;
   return (
-    <div className="test-details-container" onClick={() => onDetailsClick(requestExecutionResult)}>
+    <div
+      className={`test-details-container ${isSelected ? "selected" : ""}`}
+      onClick={() => onDetailsClick(requestExecutionResult)}
+    >
       <RequestDetailsHeader
         requestExecutionResult={requestExecutionResult}
         workspaceId={workspaceId}
@@ -146,7 +151,8 @@ const TestResultList: React.FC<{
   results: TestSummary;
   totalIterationCount?: number;
   onDetailsClick: (result: RequestExecutionResult) => void;
-}> = ({ tabKey, results, totalIterationCount, onDetailsClick }) => {
+  selectedRequestId?: string;
+}> = ({ tabKey, results, totalIterationCount, onDetailsClick, selectedRequestId }) => {
   const { collectionId } = useCollectionView();
   const currentlyExecutingRequest = useApiClientSelector((state) =>
     selectLiveRunResultCurrentlyExecutingRequest(state, collectionId)
@@ -202,6 +208,7 @@ const TestResultList: React.FC<{
               key={requestExecutionResult.recordId}
               requestExecutionResult={requestExecutionResult}
               onDetailsClick={onDetailsClick}
+              selectedRequestId={selectedRequestId}
             />
           );
         })}
@@ -258,6 +265,7 @@ const TestResultList: React.FC<{
                       key={requestExecutionResult.recordId}
                       requestExecutionResult={requestExecutionResult}
                       onDetailsClick={onDetailsClick}
+                      selectedRequestId={selectedRequestId}
                     />
                   ))}
                   {isCurrentIteration ? currentRunningRequest : null}
@@ -278,7 +286,8 @@ const TestResultTabTitle: React.FC<{ title: string; count: number; loading?: boo
 }) => {
   return (
     <div className="test-result-tab-title">
-      <span className="title">{title}</span> <Badge size="small" count={loading ? "..." : count} />
+      <span className={`title ${title?.toLowerCase()}`}>{title}</span>{" "}
+      <Badge size="small" count={loading ? "..." : count} className={`${title?.toLowerCase()}`} />
     </div>
   );
 };
@@ -439,6 +448,7 @@ export const RunResultContainer: React.FC<{
             results={summary.totalTests}
             totalIterationCount={totalIterationCount}
             onDetailsClick={handleDetailsClick}
+            selectedRequestId={selectedRequest?.recordId}
           />
         ),
       },
@@ -451,6 +461,7 @@ export const RunResultContainer: React.FC<{
             results={summary.successTests}
             totalIterationCount={totalIterationCount}
             onDetailsClick={handleDetailsClick}
+            selectedRequestId={selectedRequest?.recordId}
           />
         ),
       },
@@ -463,6 +474,7 @@ export const RunResultContainer: React.FC<{
             results={summary.failedTests}
             totalIterationCount={totalIterationCount}
             onDetailsClick={handleDetailsClick}
+            selectedRequestId={selectedRequest?.recordId}
           />
         ),
       },
@@ -475,6 +487,7 @@ export const RunResultContainer: React.FC<{
             results={summary.skippedTests}
             totalIterationCount={totalIterationCount}
             onDetailsClick={handleDetailsClick}
+            selectedRequestId={selectedRequest?.recordId}
           />
         ),
       },
@@ -491,6 +504,7 @@ export const RunResultContainer: React.FC<{
     summary.skippedTests,
     totalIterationCount,
     handleDetailsClick,
+    selectedRequest,
   ]);
 
   return (
