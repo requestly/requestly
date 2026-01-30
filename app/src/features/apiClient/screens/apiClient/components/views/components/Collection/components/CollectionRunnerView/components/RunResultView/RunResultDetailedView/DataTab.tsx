@@ -6,6 +6,7 @@ import { getContentTypeFromResponseHeaders } from "features/apiClient/screens/ap
 import { EmptyState } from "../../EmptyState/EmptyState";
 import EmptyInboxIcon from "/assets/media/rules/empty-inbox.svg";
 import ResponseBody from "../../../../../../response/ResponseBody/ResponseBody";
+import { getEmptyBodyMessage } from "../utils";
 
 interface DataTabProps {
   type: "request" | "response";
@@ -14,34 +15,6 @@ interface DataTabProps {
   method?: string;
   statusCode?: number;
 }
-
-const getEmptyBodyMessage = (type: "request" | "response", method?: string, statusCode?: number): string => {
-  if (type === "request") {
-    if (method === "GET" || method === "HEAD") {
-      return `${method} requests typically don't have a body`;
-    }
-    return "Request body not available";
-  }
-
-  // Response type
-  if (statusCode) {
-    if (statusCode >= 500) {
-      return "Server error - No response body";
-    }
-    if (statusCode >= 400) {
-      return "Client error - No response body";
-    }
-    if (statusCode === 204) {
-      return "No content (204)";
-    }
-  }
-
-  if (method === "GET" || method === "HEAD") {
-    return "No response body received";
-  }
-
-  return "No body content";
-};
 
 export const DataTab: React.FC<DataTabProps> = ({ type, request, response, method, statusCode }) => {
   const data = type === "request" ? request : response;

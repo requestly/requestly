@@ -22,3 +22,28 @@ export function getFormattedTime(time: number) {
 
   return result.join(" ") || "0ms";
 }
+
+export const getEmptyBodyMessage = (type: "request" | "response", method?: string, statusCode?: number): string => {
+  if (type === "request") {
+    if (method === "GET" || method === "HEAD") {
+      return `${method} requests typically don't have a body`;
+    }
+    return "Request body not available";
+  }
+  // Response type
+  if (statusCode) {
+    if (statusCode >= 500) {
+      return "Server error - No response body";
+    }
+    if (statusCode >= 400) {
+      return "Client error - No response body";
+    }
+    if (statusCode === 204) {
+      return "No content (204)";
+    }
+  }
+  if (method === "GET" || method === "HEAD") {
+    return "No response body received";
+  }
+  return "No body content";
+};
