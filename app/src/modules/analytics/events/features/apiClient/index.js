@@ -330,6 +330,10 @@ export const trackAITestGenerationSuccessful = (session_id, generation_id) => {
   trackEvent(API_CLIENT.AI_GENERATE_TESTS_SUCCESSFUL, { session_id, generation_id });
 };
 
+export const trackAIErrorShown = (error_type) => {
+  trackEvent(API_CLIENT.AI_ERROR_SHOWN, { error_type });
+};
+
 export const trackAITestGenerationEditPromptClicked = (session_id, generation_id) => {
   trackEvent(API_CLIENT.AI_GENERATE_TESTS_EDIT_PROMPT_CLICKED, { session_id, generation_id });
 };
