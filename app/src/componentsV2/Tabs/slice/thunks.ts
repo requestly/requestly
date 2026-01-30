@@ -26,38 +26,45 @@ function checkTabUnsavedChanges(tab: TabState): boolean {
 
 export const closeTab = createAsyncThunk<
   { tab: TabState } | void,
-  { tabId: TabId; skipUnsavedPrompt?: boolean },
+  { tabId: TabId; skipUnsavedPrompt?: boolean; forceClose?: boolean },
   { state: RootState }
->(`${SLICE_NAME}/closeTab`, async ({ tabId, skipUnsavedPrompt }, { dispatch, getState, rejectWithValue }) => {
-  const state = getState();
-  const tab = tabsAdapter.getSelectors().selectById(state.tabs.tabs, tabId);
+>(
+  `${SLICE_NAME}/closeTab`,
+  async ({ tabId, skipUnsavedPrompt, forceClose }, { dispatch, getState, rejectWithValue }) => {
+    const state = getState();
+    const tab = tabsAdapter.getSelectors().selectById(state.tabs.tabs, tabId);
 
-  if (!tab) {
-    return;
-  }
+    if (!tab) {
+      return;
+    }
 
-  if (!skipUnsavedPrompt) {
-    const canClose = checkTabUnsavedChanges(tab);
-    if (!canClose) {
-      return rejectWithValue("User cancelled tab close due to unsaved changes");
+    if (!skipUnsavedPrompt) {
+      const canClose = checkTabUnsavedChanges(tab);
+      if (!canClose) {
+        return rejectWithValue("User cancelled tab close due to unsaved changes");
+      }
     }
 
     if (tab.activeWorkflows.size > 0) {
-      const firstWorkflow = tab.activeWorkflows.values().next().value as ActiveWorkflow;
-      if (firstWorkflow) {
-        const canClose = window.confirm(firstWorkflow.cancelWarning || "Close this tab?");
-        if (!canClose) {
-          return rejectWithValue("User cancelled tab close due to active workflow");
-        }
-
+      if (forceClose) {
         cleanupTabActiveWorkflows(tab);
+      } else {
+        const firstWorkflow = tab.activeWorkflows.values().next().value as ActiveWorkflow;
+        if (firstWorkflow) {
+          const canClose = window.confirm(firstWorkflow.cancelWarning || "Close this tab?");
+          if (!canClose) {
+            return rejectWithValue("User cancelled tab close due to active workflow");
+          }
+
+          cleanupTabActiveWorkflows(tab);
+        }
       }
     }
-  }
 
-  dispatch(tabsActions.closeTab(tabId));
-  return { tab };
-});
+    dispatch(tabsActions.closeTab(tabId));
+    return { tab };
+  }
+);
 
 export const closeTabByEntityId = createAsyncThunk<
   { tab: TabState } | void,
