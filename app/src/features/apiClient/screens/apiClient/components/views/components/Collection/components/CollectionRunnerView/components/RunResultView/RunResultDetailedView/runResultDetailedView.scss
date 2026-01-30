@@ -6,12 +6,12 @@
 
   .api-client-response-body {
     .react-resizable {
-      height: 300px !important;
+      max-height: 300px !important;
       min-height: 20px !important;
     }
 
     .api-response-body-raw-content {
-      height: 300px;
+      max-height: 300px;
       overflow-y: auto;
     }
   }
@@ -138,7 +138,7 @@
       border: none;
 
       .ant-collapse-item {
-        border: 1px solid var(--requestly-color-border-primary);
+        border-bottom: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
         border-radius: 4px;
         padding: var(--space-4, 8px) var(--space-5, 12px);
         &:last-child {

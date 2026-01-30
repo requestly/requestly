@@ -21,6 +21,8 @@ import {
 } from "features/apiClient/slices/liveRunResults/selectors";
 import { selectCollectionHistoryStatus } from "features/apiClient/slices/runHistory/selectors";
 import { RunHistorySaveStatus } from "features/apiClient/slices/runHistory/types";
+import { useEntity } from "features/apiClient/slices/entities/hooks";
+import { ApiClientEntityType } from "features/apiClient/slices/entities/types";
 
 interface RunResultViewProps {
   isDetailedViewOpen?: boolean;
@@ -29,6 +31,12 @@ interface RunResultViewProps {
 
 export const RunResultView: React.FC<RunResultViewProps> = ({ isDetailedViewOpen, onToggleDetailedView }) => {
   const { collectionId, bufferedEntity } = useCollectionView();
+
+  const entity = useEntity({
+    id: collectionId,
+    type: ApiClientEntityType.COLLECTION_RECORD,
+  });
+  const collectionName = useApiClientSelector((s) => entity.getName(s));
 
   const startTime = useApiClientSelector((s) => selectLiveRunResultStartTime(s, collectionId));
   const runStatus = useApiClientSelector((s) => selectLiveRunResultRunStatus(s, collectionId));
@@ -55,7 +63,7 @@ export const RunResultView: React.FC<RunResultViewProps> = ({ isDetailedViewOpen
 
   return (
     <div className="run-result-view-container">
-      <div className="run-result-view-header">
+      <div className={`run-result-view-header ${isDetailedViewOpen ? "hide-border" : ""}`}>
         <div className="left-section">
           {isDetailedViewOpen && (
             <RQButton
@@ -68,6 +76,7 @@ export const RunResultView: React.FC<RunResultViewProps> = ({ isDetailedViewOpen
             />
           )}
           <span className="header">Test results</span>
+          {isDetailedViewOpen && <span className="collection-name">- {collectionName || ""}</span>}
         </div>
         <RQButton
           size="small"

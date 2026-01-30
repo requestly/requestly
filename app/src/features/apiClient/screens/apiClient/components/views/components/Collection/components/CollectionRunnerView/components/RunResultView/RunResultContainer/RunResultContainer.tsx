@@ -88,8 +88,8 @@ const RunningRequestPlaceholder: React.FC<{
 const TestDetails: React.FC<{
   requestExecutionResult: RequestExecutionResult;
   onDetailsClick: (result: RequestExecutionResult) => void;
-  selectedRequestId?: string;
-}> = React.memo(({ requestExecutionResult, onDetailsClick, selectedRequestId }) => {
+  selectedRequestExId?: string;
+}> = React.memo(({ requestExecutionResult, onDetailsClick, selectedRequestExId }) => {
   const workspaceId = useWorkspaceId();
 
   const requestUrl = useMemo(() => {
@@ -102,7 +102,7 @@ const TestDetails: React.FC<{
     return null;
   }, [requestExecutionResult.request]);
 
-  const isSelected = selectedRequestId === requestExecutionResult?.recordId;
+  const isSelected = selectedRequestExId === requestExecutionResult?.executionId;
   return (
     <div
       className={`test-details-container ${isSelected ? "selected" : ""}`}
@@ -149,8 +149,8 @@ const TestResultList: React.FC<{
   results: TestSummary;
   totalIterationCount?: number;
   onDetailsClick: (result: RequestExecutionResult) => void;
-  selectedRequestId?: string;
-}> = ({ tabKey, results, totalIterationCount, onDetailsClick, selectedRequestId }) => {
+  selectedRequestExId?: string;
+}> = ({ tabKey, results, totalIterationCount, onDetailsClick, selectedRequestExId }) => {
   const { collectionId } = useCollectionView();
   const currentlyExecutingRequest = useApiClientSelector((state) =>
     selectLiveRunResultCurrentlyExecutingRequest(state, collectionId)
@@ -206,7 +206,7 @@ const TestResultList: React.FC<{
               key={requestExecutionResult.recordId}
               requestExecutionResult={requestExecutionResult}
               onDetailsClick={onDetailsClick}
-              selectedRequestId={selectedRequestId}
+              selectedRequestExId={selectedRequestExId}
             />
           );
         })}
@@ -263,7 +263,7 @@ const TestResultList: React.FC<{
                       key={requestExecutionResult.recordId}
                       requestExecutionResult={requestExecutionResult}
                       onDetailsClick={onDetailsClick}
-                      selectedRequestId={selectedRequestId}
+                      selectedRequestExId={selectedRequestExId}
                     />
                   ))}
                   {isCurrentIteration ? currentRunningRequest : null}
@@ -449,7 +449,7 @@ export const RunResultContainer: React.FC<{
             results={summary.totalTests}
             totalIterationCount={totalIterationCount}
             onDetailsClick={handleDetailsClick}
-            selectedRequestId={selectedRequest?.recordId}
+            selectedRequestExId={selectedRequest?.executionId}
           />
         ),
       },
@@ -462,7 +462,7 @@ export const RunResultContainer: React.FC<{
             results={summary.successTests}
             totalIterationCount={totalIterationCount}
             onDetailsClick={handleDetailsClick}
-            selectedRequestId={selectedRequest?.recordId}
+            selectedRequestExId={selectedRequest?.executionId}
           />
         ),
       },
@@ -475,7 +475,7 @@ export const RunResultContainer: React.FC<{
             results={summary.failedTests}
             totalIterationCount={totalIterationCount}
             onDetailsClick={handleDetailsClick}
-            selectedRequestId={selectedRequest?.recordId}
+            selectedRequestExId={selectedRequest?.executionId}
           />
         ),
       },
@@ -488,7 +488,7 @@ export const RunResultContainer: React.FC<{
             results={summary.skippedTests}
             totalIterationCount={totalIterationCount}
             onDetailsClick={handleDetailsClick}
-            selectedRequestId={selectedRequest?.recordId}
+            selectedRequestExId={selectedRequest?.executionId}
           />
         ),
       },

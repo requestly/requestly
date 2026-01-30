@@ -65,6 +65,7 @@ export const RequestBreadcrumb: React.FC<RequestBreadcrumbProps> = ({
               label: collection.name,
             })),
           }}
+          className="breadcrumb-ellipsis"
         >
           ...
         </Breadcrumb.Item>

@@ -88,7 +88,7 @@ export const DataTab: React.FC<DataTabProps> = ({ type, request, response, metho
   return (
     <div className={`${type}-details-tab`}>
       <Collapse defaultActiveKey={["body"]} ghost>
-        <Collapse.Panel header={type === "request" ? "Body" : "BODY"} key="body" className="body-collapse-panel">
+        <Collapse.Panel header={type === "request" ? "Body" : "BODY"} key="body">
           {body ? (
             <ResponseBody responseText={body} contentTypeHeader={contentType} />
           ) : (

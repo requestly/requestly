@@ -37,6 +37,15 @@
   }
 }
 
+.breadcrumb-ellipsis {
+  &:hover {
+    border-radius: 4px;
+    background: var(--alias-tokens-color-white-t-20, rgba(255, 255, 255, 0.12));
+    padding: 0px 4px 4px;
+    text-align: center;
+  }
+}
+
 .run-result-view-details {
   display: flex;
   flex-direction: column;
