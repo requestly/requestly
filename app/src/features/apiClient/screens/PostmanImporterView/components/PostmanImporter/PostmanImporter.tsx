@@ -21,7 +21,7 @@ import { createEnvironment, updateEnvironmentVariables, useApiClientRepository }
 import { useApiClientDispatch } from "features/apiClient/slices/hooks/base.hooks";
 import { wrapWithCustomSpan } from "utils/sentry";
 import { SPAN_STATUS_ERROR, SPAN_STATUS_OK } from "@sentry/core";
-import { LocalApiClientRecordsSync } from "features/apiClient/helpers/modules/sync/local/services/LocalApiClientRecordsSync";
+import { EnvironmentVariableData } from "@requestly/shared/types/entities/apiClient";
 
 type ProcessedData = {
   environments: { name: string; variables: Record<string, EnvironmentVariableData>; isGlobal: boolean }[];
@@ -47,15 +47,9 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
     variables: {},
   });
 
-  const {
-    env: { createEnvironment, patchEnvironmentVariables },
-  } = useCommand();
-
   const { apiClientRecordsRepository, environmentVariablesRepository } = useApiClientRepository();
   const { onSaveRecord } = useNewApiClientContext();
-
-  const destinationRepository = apiClientRecordsRepository;
-  const isLocalFileSystem = destinationRepository instanceof LocalApiClientRecordsSync;
+  const dispatch = useApiClientDispatch();
 
   const collectionsCount = useRef(0);
 
@@ -177,63 +171,35 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
 
   const handleImportEnvironments = useCallback(async () => {
     try {
-      // For local workspace use sequential way
-      if (isLocalFileSystem) {
-        let successCount = 0;
-        for (let index = 0; index < processedFileData.environments.length; index++) {
-          const env = processedFileData.environments[index];
-          try {
-            if (env.isGlobal) {
-              await patchEnvironmentVariables({
-                environmentId: environmentVariablesRepository.getGlobalEnvironmentId(),
-                variables: env.variables,
-              });
-              successCount++;
-            } else {
-              const result = await createEnvironment({
-                newEnvironmentName: env.name,
-                variables: env.variables,
-              });
-              if (result?.id) {
-                successCount++;
-              }
-            }
-          } catch (error) {
-            Sentry.captureException(error);
-          }
-        }
-
-        return successCount;
-      } else {
-        const importPromises = processedFileData.environments.map(async (env) => {
-          if (env.isGlobal) {
-            await patchEnvironmentVariables({
+      const importPromises = processedFileData.environments.map(async (env) => {
+        if (env.isGlobal) {
+          await dispatch(
+            updateEnvironmentVariables({
               environmentId: environmentVariablesRepository.getGlobalEnvironmentId(),
               variables: env.variables,
-            });
-            return true;
-          } else {
-            const result = await createEnvironment({
-              newEnvironmentName: env.name,
+              repository: environmentVariablesRepository,
+            })
+          ).unwrap();
+          return true;
+        } else {
+          await dispatch(
+            createEnvironment({
+              name: env.name,
               variables: env.variables,
-            });
-            return !!result?.id;
-          }
-        });
-        const results = await Promise.allSettled(importPromises);
-        return results.filter((result) => result.status === "fulfilled" && result.value).length;
-      }
+              repository: environmentVariablesRepository,
+            })
+          ).unwrap();
+          return true;
+        }
+      });
+
+      const results = await Promise.allSettled(importPromises);
+      return results.filter((result) => result.status === "fulfilled").length;
     } catch (error) {
       Logger.error("Postman data import failed:", error);
       throw error;
     }
-  }, [
-    processedFileData.environments,
-    patchEnvironmentVariables,
-    environmentVariablesRepository,
-    createEnvironment,
-    isLocalFileSystem,
-  ]);
+  }, [processedFileData.environments, environmentVariablesRepository, dispatch]);
 
   const handleImportCollectionsAndApis = useCallback(async () => {
     let importedCollectionsCount = 0;
@@ -316,71 +282,97 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
     return { importedCollectionsCount, importedApisCount };
   }, [processedFileData.apiRecords, onSaveRecord, apiClientRecordsRepository]);
 
-  const handleImportPostmanData = useCallback(() => {
-    setIsImporting(true);
-    Promise.allSettled([handleImportEnvironments(), handleImportCollectionsAndApis()])
-      .then((results) => {
-        const [environmentsResult, collectionsResult] = results;
-        const importedEnvironments = environmentsResult.status === "fulfilled" ? environmentsResult.value : 0;
-        const importedCollectionsCount =
-          collectionsResult.status === "fulfilled" ? collectionsResult.value.importedCollectionsCount : 0;
-        const importedApisCount =
-          collectionsResult.status === "fulfilled" ? collectionsResult.value.importedApisCount : 0;
+  const handleImportPostmanData = useCallback(async () => {
+    return wrapWithCustomSpan(
+      {
+        name: "[Transaction] api_client.postman_import.import_data",
+        op: "api_client.postman_import.import_data",
+        forceTransaction: true,
+        attributes: {},
+      },
+      async () => {
+        setIsImporting(true);
+        await Promise.allSettled([handleImportEnvironments(), handleImportCollectionsAndApis()])
+          .then((results) => {
+            const [environmentsResult, collectionsResult] = results;
+            const importedEnvironments = environmentsResult.status === "fulfilled" ? environmentsResult.value : 0;
+            const importedCollectionsCount =
+              collectionsResult.status === "fulfilled" ? collectionsResult.value.importedCollectionsCount : 0;
+            const importedApisCount =
+              collectionsResult.status === "fulfilled" ? collectionsResult.value.importedApisCount : 0;
 
-        const failedEnvironments = processedFileData.environments.length - importedEnvironments;
-        const failedCollections = collectionsCount.current - importedCollectionsCount;
+            const failedEnvironments = processedFileData.environments.length - importedEnvironments;
+            const failedCollections = collectionsCount.current - importedCollectionsCount;
 
-        if (!importedEnvironments && !importedCollectionsCount) {
-          notification.error({
-            message: "Failed to import Postman data",
-            placement: "bottomRight",
+            if (!importedEnvironments && !importedCollectionsCount) {
+              notification.error({
+                message: "Failed to import Postman data",
+                placement: "bottomRight",
+              });
+              Sentry.captureException(
+                new Error("Failed to import Postman data. No environments or collections imported.")
+              );
+              Sentry.getActiveSpan()?.setStatus({
+                code: SPAN_STATUS_ERROR,
+              });
+              return;
+            }
+
+            const hasFailures = failedEnvironments > 0 || failedCollections > 0;
+            const hasSuccesses = importedEnvironments > 0 || importedCollectionsCount > 0;
+
+            if (hasFailures && hasSuccesses) {
+              const failureMessage = [
+                failedCollections > 0 ? `${failedCollections} collection${failedCollections !== 1 ? "s" : ""}` : "",
+                failedEnvironments > 0 ? `${failedEnvironments} environment${failedEnvironments !== 1 ? "s" : ""}` : "",
+              ]
+                .filter(Boolean)
+                .join(" and ");
+
+              toast.warn(`Partial import success. Failed to import: ${failureMessage}`);
+              Sentry.captureException(new Error(`Partial import success. Failed to import: ${failureMessage}`));
+              Sentry.getActiveSpan()?.setStatus({
+                code: SPAN_STATUS_ERROR,
+              });
+              return;
+            }
+
+            toast.success(
+              `Successfully imported ${[
+                importedCollectionsCount > 0
+                  ? `${importedCollectionsCount} collection${importedCollectionsCount !== 1 ? "s" : ""}`
+                  : "",
+                importedEnvironments > 0
+                  ? `${importedEnvironments} environment${importedEnvironments !== 1 ? "s" : ""}`
+                  : "",
+              ]
+                .filter(Boolean)
+                .join(" and ")}`
+            );
+
+            onSuccess?.();
+            trackImportSuccess(ApiClientImporterType.POSTMAN, importedCollectionsCount, importedApisCount);
+            Sentry.getActiveSpan()?.setStatus({
+              code: SPAN_STATUS_OK,
+            });
+          })
+          .catch((error) => {
+            Logger.error("Postman data import failed:", error);
+            setImportError("Something went wrong!, Couldn't import Postman data");
+            trackImportFailed(ApiClientImporterType.POSTMAN, JSON.stringify(error));
+            Sentry.withScope((scope) => {
+              scope.setTag("error_type", "api_client_postman_import");
+              Sentry.captureException(error);
+            });
+            Sentry.getActiveSpan()?.setStatus({
+              code: SPAN_STATUS_ERROR,
+            });
+          })
+          .finally(() => {
+            setIsImporting(false);
           });
-          return;
-        }
-
-        const hasFailures = failedEnvironments > 0 || failedCollections > 0;
-        const hasSuccesses = importedEnvironments > 0 || importedCollectionsCount > 0;
-
-        if (hasFailures && hasSuccesses) {
-          const failureMessage = [
-            failedCollections > 0 ? `${failedCollections} collection${failedCollections !== 1 ? "s" : ""}` : "",
-            failedEnvironments > 0 ? `${failedEnvironments} environment${failedEnvironments !== 1 ? "s" : ""}` : "",
-          ]
-            .filter(Boolean)
-            .join(" and ");
-
-          toast.warn(`Partial import success. Failed to import: ${failureMessage}`);
-          return;
-        }
-
-        toast.success(
-          `Successfully imported ${[
-            importedCollectionsCount > 0
-              ? `${importedCollectionsCount} collection${importedCollectionsCount !== 1 ? "s" : ""}`
-              : "",
-            importedEnvironments > 0
-              ? `${importedEnvironments} environment${importedEnvironments !== 1 ? "s" : ""}`
-              : "",
-          ]
-            .filter(Boolean)
-            .join(" and ")}`
-        );
-
-        onSuccess?.();
-        trackImportSuccess(ApiClientImporterType.POSTMAN, importedCollectionsCount, importedApisCount);
-      })
-      .catch((error) => {
-        Logger.error("Postman data import failed:", error);
-        setImportError("Something went wrong!, Couldn't import Postman data");
-        trackImportFailed(ApiClientImporterType.POSTMAN, JSON.stringify(error));
-        Sentry.withScope((scope) => {
-          scope.setTag("error_type", "api_client_postman_import");
-          Sentry.captureException(error);
-        });
-      })
-      .finally(() => {
-        setIsImporting(false);
-      });
+      }
+    )();
   }, [handleImportEnvironments, handleImportCollectionsAndApis, onSuccess, processedFileData.environments.length]);
 
   const handleResetImport = () => {
