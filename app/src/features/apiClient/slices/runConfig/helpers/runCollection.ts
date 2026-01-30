@@ -53,6 +53,7 @@ function prepareExecutionResult(params: {
 
   if (result.status === RQAPI.ExecutionStatus.ERROR) {
     return {
+      executionId: result.executionId,
       iteration,
       recordId,
       recordName,
@@ -65,6 +66,7 @@ function prepareExecutionResult(params: {
   }
 
   return {
+    executionId: result.executionId,
     iteration,
     recordId,
     recordName,
