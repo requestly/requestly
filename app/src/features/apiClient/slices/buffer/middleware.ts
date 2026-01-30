@@ -106,7 +106,16 @@ function performBufferSync(
   const buffer = findBufferByReferenceId(bufferState.entities, id);
   if (!buffer || !buffer.referenceId) return;
 
-  const sourceData = overrideData !== undefined ? overrideData : remote.selectData(state, id);
+  const remoteData = remote.selectData(state, id);
+  // When entitySynced sends partial data (e.g. { name } on rename), merge with full remote data
+  // so we don't replace buffer.current with a partial object and lose e.g. variables.
+  const isSpreadableObject = (v: unknown): v is Record<string, unknown> => typeof v === "object" && v !== null;
+  const sourceData =
+    overrideData !== undefined && isSpreadableObject(remoteData) && isSpreadableObject(overrideData)
+      ? { ...remoteData, ...overrideData }
+      : overrideData !== undefined
+      ? overrideData
+      : remoteData;
 
   if (sourceData !== undefined) {
     listenerApi.dispatch(
