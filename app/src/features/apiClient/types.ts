@@ -9,6 +9,8 @@ import {
 import { ErroredRecord } from "./helpers/modules/sync/local/services/types";
 import { ApiClientFile, FileId } from "./store/apiClientFilesStore";
 
+export type ExecutionId = string;
+
 export enum RequestMethod {
   GET = "GET",
   POST = "POST",
@@ -251,11 +253,13 @@ export namespace RQAPI {
 
   export type ExecutionResult =
     | {
+        executionId: ExecutionId;
         status: ExecutionStatus.SUCCESS;
         executedEntry: ApiEntry;
         warning?: ExecutionWarning;
       }
     | {
+        executionId: ExecutionId;
         status: ExecutionStatus.ERROR;
         executedEntry: ApiEntry;
         error: ExecutionError;
@@ -263,12 +267,14 @@ export namespace RQAPI {
 
   export type RerunResult =
     | {
+        executionId: ExecutionId;
         status: ExecutionStatus.SUCCESS;
         artifacts: {
           testResults: TestResult[];
         };
       }
     | {
+        executionId: ExecutionId;
         status: ExecutionStatus.ERROR;
         error: ExecutionError;
       };
