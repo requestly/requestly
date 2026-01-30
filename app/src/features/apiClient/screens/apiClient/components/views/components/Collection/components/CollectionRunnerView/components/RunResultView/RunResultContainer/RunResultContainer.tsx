@@ -102,8 +102,6 @@ const TestDetails: React.FC<{
     return null;
   }, [requestExecutionResult.request]);
 
-  if (!workspaceId) return null;
-
   const isSelected = selectedRequestId === requestExecutionResult?.recordId;
   return (
     <div
@@ -112,7 +110,7 @@ const TestDetails: React.FC<{
     >
       <RequestDetailsHeader
         requestExecutionResult={requestExecutionResult}
-        workspaceId={workspaceId}
+        workspaceId={workspaceId || null}
         clickable={true}
         showFullPath={true}
       />
@@ -314,13 +312,15 @@ export const RunResultContainer: React.FC<{
   const [activeTab, setActiveTab] = useState<RunResultTabKey>(RunResultTabKey.ALL);
   const [selectedRequest, setSelectedRequest] = useState<RequestExecutionResult | null>(null);
   const [userHasInteracted, setUserHasInteracted] = useState(false);
-  const [showDetailedView, setShowDetailedView] = useState(true);
   const workspaceId = useWorkspaceId();
+
+  // Derive showDetailedView from selectedRequest and isDetailedViewOpen
+  const showDetailedView = selectedRequest !== null && isDetailedViewOpen !== false;
 
   // Sync local state when parent's isDetailedViewOpen changes
   useEffect(() => {
     if (isDetailedViewOpen === false) {
-      setShowDetailedView(false);
+      setSelectedRequest(null);
       setUserHasInteracted(false);
       setActiveTab(RunResultTabKey.ALL);
     }
@@ -359,7 +359,7 @@ export const RunResultContainer: React.FC<{
     const tabResults = getCurrentTabResults(newTab);
 
     if (tabResults.size === 0) {
-      setShowDetailedView(false);
+      setSelectedRequest(null);
     } else {
       // Select first result from the first iteration
       const firstIterationResults = Array.from(tabResults.values())[0];
@@ -367,10 +367,8 @@ export const RunResultContainer: React.FC<{
         const firstResult = firstIterationResults[0]?.requestExecutionResult;
         if (firstResult) {
           setSelectedRequest(firstResult);
-          setShowDetailedView(true);
           onToggleDetailedView?.(true);
         }
-        // If first result doesn't exist, keep current selectedRequest and showDetailedView state
       }
     }
   };
@@ -380,15 +378,18 @@ export const RunResultContainer: React.FC<{
     return showDetailedView && selectedRequest ? [50, 50] : [100, 0];
   }, [showDetailedView, selectedRequest]);
 
+  const minSplitSizes = useMemo(() => {
+    return showDetailedView && selectedRequest ? [500, 500] : [500, 0];
+  }, [showDetailedView, selectedRequest]);
+
   const handleDetailsClick = (requestResult: RequestExecutionResult) => {
     setSelectedRequest(requestResult);
-    setShowDetailedView(true);
     setUserHasInteracted(true);
     onToggleDetailedView?.(true);
   };
 
   const handlePanelClose = () => {
-    setShowDetailedView(false);
+    setSelectedRequest(null);
     setUserHasInteracted(false);
     onToggleDetailedView?.(false);
   };
@@ -512,12 +513,12 @@ export const RunResultContainer: React.FC<{
       <Split
         direction="horizontal"
         sizes={splitSizes}
-        minSize={[500, 0]}
+        minSize={minSplitSizes}
         gutterSize={selectedRequest ? 4 : 0}
         className="run-result-split-container"
       >
         <div className="run-result-view-details">
-          {!(showDetailedView && selectedRequest) && <MetricsHeader />}
+          {!showDetailedView && <MetricsHeader />}
           <div className="result-tabs-container">
             <Tabs
               moreIcon={null}
@@ -531,13 +532,13 @@ export const RunResultContainer: React.FC<{
           </div>
         </div>
         <div className="run-result-detail-panel-container">
-          {showDetailedView && selectedRequest && (
+          {showDetailedView && (
             <>
               <div className="run-result-view-details right-panel-opened">
                 <MetricsHeader />
               </div>
               <div className="run-result-details">
-                {showDetailedView && selectedRequest && (
+                {showDetailedView && (
                   <RunResultDetailedView
                     onClose={handlePanelClose}
                     requestExecutionResult={selectedRequest}

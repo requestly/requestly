@@ -10,7 +10,7 @@ import { RequestBreadcrumb } from "./RequestBreadcrumb";
 
 interface RequestDetailsHeaderProps {
   requestExecutionResult: RequestExecutionResult;
-  workspaceId: string;
+  workspaceId: string | null;
   clickable?: boolean;
   showFullPath?: boolean;
   showNetworkDetails?: boolean;
@@ -18,7 +18,7 @@ interface RequestDetailsHeaderProps {
 
 export const RequestDetailsHeader: React.FC<RequestDetailsHeaderProps> = ({
   requestExecutionResult,
-  workspaceId,
+  workspaceId = null,
   clickable = false,
   showFullPath = true,
   showNetworkDetails = true,

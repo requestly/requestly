@@ -7,7 +7,7 @@ import { RequestViewTabSource } from "../../../../../../RequestView/requestViewT
 
 interface RequestBreadcrumbProps {
   requestExecutionResult: RequestExecutionResult;
-  workspaceId: string;
+  workspaceId: string | null;
   clickable?: boolean;
   showFullPath?: boolean;
   className?: string;
@@ -15,7 +15,7 @@ interface RequestBreadcrumbProps {
 
 export const RequestBreadcrumb: React.FC<RequestBreadcrumbProps> = ({
   requestExecutionResult,
-  workspaceId,
+  workspaceId = null,
   clickable = false,
   showFullPath = true,
   className = "request-name-details-breadcrumb",
@@ -23,20 +23,18 @@ export const RequestBreadcrumb: React.FC<RequestBreadcrumbProps> = ({
   const { openBufferedTab } = useTabActions();
 
   const collectionPath = useMemo(() => {
-    if (!workspaceId) return [];
-
     const ancestorIds = getAncestorIds(requestExecutionResult.recordId, workspaceId);
     return ancestorIds
-      .slice(0, -1) // Exclude current item
-      .map((id) => ({
+      ?.slice(0, -1)
+      ?.map((id) => ({
         id,
         name: getRecord(id, workspaceId)?.name || "",
       }))
-      .filter((item) => item.name)
-      .reverse();
+      ?.filter((item) => item?.name)
+      ?.reverse();
   }, [requestExecutionResult.recordId, workspaceId]);
 
-  const depth = collectionPath.length;
+  const depth = collectionPath?.length;
 
   const handleRequestClick = (e: React.MouseEvent) => {
     if (clickable) {
@@ -53,8 +51,6 @@ export const RequestBreadcrumb: React.FC<RequestBreadcrumbProps> = ({
       });
     }
   };
-
-  if (!workspaceId) return null;
 
   return (
     <Breadcrumb separator=">" className={className}>
