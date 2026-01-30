@@ -5,7 +5,6 @@ import Logger from "lib/logger";
 import lodash from "lodash";
 import { RQAPI } from "features/apiClient/types";
 import { captureException } from "./utils";
-import { wrapWithCustomSpan } from "utils/sentry";
 
 export function sanitizeRecord(record: Partial<RQAPI.ApiClientRecord>) {
   const sanitizedRecord = lodash.cloneDeep(record);
@@ -25,7 +24,7 @@ export function sanitizeRecord(record: Partial<RQAPI.ApiClientRecord>) {
   return sanitizedRecord;
 }
 
-const _upsertApiRecord = async (
+export const upsertApiRecord = async (
   uid: string,
   record: Partial<RQAPI.ApiClientRecord>,
   teamId?: string,
@@ -43,15 +42,8 @@ const _upsertApiRecord = async (
 
   return result;
 };
-export const upsertApiRecord = wrapWithCustomSpan(
-  {
-    name: "api_client.cloud.backend.upsertApiRecord",
-    op: "backend.upsert",
-  },
-  _upsertApiRecord
-);
 
-const _createApiRecord = async (
+const createApiRecord = async (
   uid: string,
   record: Partial<RQAPI.ApiClientRecord>,
   teamId?: string,
@@ -107,15 +99,8 @@ const _createApiRecord = async (
     }
   }
 };
-export const createApiRecord = wrapWithCustomSpan(
-  {
-    name: "api_client.cloud.backend.createApiRecord",
-    op: "backend.create",
-  },
-  _createApiRecord
-);
 
-const _updateApiRecord = async (
+export const updateApiRecord = async (
   uid: string,
   record: Partial<RQAPI.ApiClientRecord>,
   teamId?: string
@@ -143,13 +128,6 @@ const _updateApiRecord = async (
     return { success: false, data: null };
   }
 };
-export const updateApiRecord = wrapWithCustomSpan(
-  {
-    name: "api_client.cloud.backend.updateApiRecord",
-    op: "backend.update",
-  },
-  _updateApiRecord
-);
 
 export const batchUpsertApiRecords = async (
   uid: string,

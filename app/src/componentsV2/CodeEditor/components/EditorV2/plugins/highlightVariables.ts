@@ -2,7 +2,7 @@ import { Decoration, DecorationSet, EditorView, ViewPlugin, ViewUpdate } from "@
 import { ScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
 
 interface VariableSetters {
-  handleSetVariable: (token: string | null) => void;
+  setHoveredVariable: (token: string | null) => void;
   setPopupPosition: (position: { x: number; y: number }) => void;
 }
 
@@ -47,14 +47,9 @@ export const highlightVariablesPlugin = (setters: VariableSetters, variables: Sc
             variable,
           });
 
-          const isDefined = variables.has(variable);
-          const cls = `highlight-${isDefined ? "defined" : "undefined"}-variable`;
-          const colorVar = isDefined ? "var(--requestly-color-primary-text)" : "var(--requestly-color-error-text)";
-
           decorations.push(
             Decoration.mark({
-              class: cls,
-              attributes: { style: `color: ${colorVar} !important;` },
+              class: `highlight-${variables[variable] ? "defined" : "undefined"}-variable`,
             }).range(match.index, match.index + match[0].length)
           );
         }
@@ -77,16 +72,16 @@ export const highlightVariablesPlugin = (setters: VariableSetters, variables: Sc
             const coords = this.view.coordsAtPos(hoveredVar.start);
 
             const variable = token.slice(2, -2);
-            setters.handleSetVariable(variable);
+            setters.setHoveredVariable(variable);
             setters.setPopupPosition({
               x: coords.left,
               y: coords.top,
             });
           } else {
-            setters.handleSetVariable(null); // Hide popup if not hovering over a variable
+            setters.setHoveredVariable(null); // Hide popup if not hovering over a variable
           }
         } else {
-          setters.handleSetVariable(null);
+          setters.setHoveredVariable(null);
         }
       }
 

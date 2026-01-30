@@ -34,7 +34,6 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
   const onBlurRef = useRef(onBlur);
   const onChangeRef = useRef(onChange);
   const previousDefaultValueRef = useRef(defaultValue);
-  const isPopoverPinnedRef = useRef(false);
 
   const emptyVariables = useMemo(() => new Map(), []);
 
@@ -46,27 +45,6 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
   const [hoveredVariable, setHoveredVariable] = useState<string | null>(null); // Track hovered variable
   const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
   const [isPopoverPinned, setIsPopoverPinned] = useState(false);
-
-  useEffect(() => {
-    isPopoverPinnedRef.current = isPopoverPinned;
-  }, [isPopoverPinned]);
-
-  const handleMouseLeave = useCallback(() => {
-    if (!isPopoverPinnedRef.current) {
-      setHoveredVariable(null);
-    }
-  }, []);
-
-  const handleSetVariable = useCallback(
-    (variable: string | null) => {
-      if (!variable) {
-        handleMouseLeave();
-      } else {
-        setHoveredVariable(variable);
-      }
-    },
-    [handleMouseLeave]
-  );
 
   useEffect(() => {
     if (editorViewRef.current) {
@@ -116,7 +94,7 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
           }),
           highlightVariablesPlugin(
             {
-              handleSetVariable,
+              setHoveredVariable,
               setPopupPosition,
             },
             variables || emptyVariables
@@ -134,7 +112,7 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
     //Need to disable to implement the onChange handler
     // Shouldn't be recreated every render
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [placeholder, variables, handleSetVariable]);
+  }, [placeholder, variables]);
 
   useEffect(() => {
     if (defaultValue !== previousDefaultValueRef.current) {
@@ -159,6 +137,12 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
       }
     }
   }, [defaultValue]);
+
+  const handleMouseLeave = useCallback(() => {
+    if (!isPopoverPinned) {
+      setHoveredVariable(null);
+    }
+  }, [isPopoverPinned]);
 
   const handleClosePopover = useCallback(() => {
     setHoveredVariable(null);

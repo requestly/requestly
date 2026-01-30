@@ -7,15 +7,3 @@
   box-shadow: 0px 16px 24px -4px rgba(0, 0, 0, 0.32);
   z-index: 10;
 }
-
-// Adding redundant higlighting class here since base CSS file does not exist for editors
-// TODO: move such styles to a common base stylesheet
-.highlight-defined-variable {
-  color: var(--requestly-color-primary-text);
-  cursor: pointer;
-}
-
-.highlight-undefined-variable {
-  color: var(--requestly-color-error-text);
-  cursor: pointer;
-}
