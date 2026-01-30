@@ -68,7 +68,8 @@ const globalEnvironmentRemote: BufferSyncRemote = {
       action.type === `${API_CLIENT_ENVIRONMENTS_SLICE_NAME}/unsafePatchGlobal`
     );
   },
-  extractId: () => GLOBAL_ENVIRONMENT_ID,
+  // Prefer real id from payload/state (desktop/local uses a path-like id).
+  extractId: getPayloadId,
   selectData: (state) => state.environments.globalEnvironment,
 };
 
@@ -157,7 +158,12 @@ startAppListening({
     const remote = remotes.find((r) => r.shouldHandleAction(action));
     if (!remote) return;
 
-    const id = remote.extractId(action);
+    let id = remote.extractId(action);
+    // Some global-environment actions (e.g. unsafePatchGlobal) don't carry an id in payload.
+    // Use the actual global env id from state to sync the correct buffer entry.
+    if (!id && remote === globalEnvironmentRemote) {
+      id = listenerApi.getState().environments.globalEnvironment.id;
+    }
     if (!id) return;
 
     performBufferSync(listenerApi, remote, id);
