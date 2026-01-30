@@ -139,7 +139,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
         return {
           name: record.name || "Untitled Request",
           request: {
-            type: httpRecord.data.type,
+            type: httpRecord.data?.type ?? RQAPI.ApiEntryType.HTTP,
             url: httpRecord.data.request.url,
             scripts: httpRecord.data.scripts ?? { postResponse: "", preRequest: "" },
             method: httpRecord.data.request.method,
