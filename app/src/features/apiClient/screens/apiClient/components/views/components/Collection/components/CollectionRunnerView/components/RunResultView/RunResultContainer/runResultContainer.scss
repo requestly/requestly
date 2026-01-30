@@ -42,7 +42,6 @@
   flex-direction: column;
 
   &.right-panel-opened {
-    display: flex;
     align-items: flex-end;
     border-bottom: 1px solid var(--requestly-color-white-t-10);
   }
@@ -57,7 +56,6 @@
     .run-metric {
       flex-shrink: 0;
       font-size: var(--requestly-font-size-sm, 12px);
-      font-style: normal;
       font-weight: 400;
       line-height: 18px; /* 150% */
 
@@ -146,7 +144,6 @@
       .title {
         color: var(--requestly-color-text-default, #fff);
         font-size: var(--requestly-font-size-xs, 11px);
-        font-style: normal;
         font-weight: 500;
         line-height: 17px; /* 154.545% */
 
@@ -168,7 +165,6 @@
           box-shadow: none;
 
           font-size: var(--requestly-font-size-xs, 11px);
-          font-style: normal;
           font-weight: 400;
           line-height: 17px; /* 154.545% */
 
@@ -226,7 +222,6 @@
 
           color: var(--requestly-color-text-subtle, #bbb);
           font-size: var(--requestly-font-size-2xs, 9px);
-          font-style: normal;
           font-weight: 500;
           line-height: 13px; /* 144.444% */
           letter-spacing: 1px;
@@ -295,7 +290,6 @@
             text-overflow: ellipsis;
 
             font-size: var(--requestly-font-size-sm, 12px);
-            font-style: normal;
             font-weight: 400;
             line-height: 18px; /* 150% */
           }
@@ -350,7 +344,6 @@
           .request-method {
             background-color: transparent !important;
             font-size: var(--requestly-font-size-2xs, 9px);
-            font-style: normal;
             font-weight: 600;
             line-height: 13px; /* 144.444% */
             letter-spacing: 1.5px;
@@ -377,7 +370,6 @@
             color: var(--requestly-color-text-placeholder, #8f8f8f);
             text-overflow: ellipsis;
             font-size: var(--requestly-font-size-xs, 11px);
-            font-style: normal;
             font-weight: 500;
             line-height: 17px; /* 154.545% */
           }
@@ -391,7 +383,6 @@
             text-overflow: ellipsis;
             color: var(--requestly-color-text-default, #fff);
             font-size: var(--requestly-font-size-sm, 12px);
-            font-style: normal;
             font-weight: 500;
             line-height: 17px; /* 150% */
             margin-right: 4px;
@@ -413,7 +404,6 @@
             margin-right: 4px;
             color: var(--requestly-color-text-placeholder, #8f8f8f);
             font-size: var(--requestly-font-size-xs, 11px);
-            font-style: normal;
             font-weight: 400;
             line-height: 17px; /* 154.545% */
           }
@@ -435,7 +425,6 @@
             text-overflow: ellipsis;
             color: var(--requestly-color-text-placeholder);
             font-size: var(--requestly-font-size-xs);
-            font-style: normal;
             font-weight: 400;
           }
         }

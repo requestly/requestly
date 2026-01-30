@@ -1,3 +1,4 @@
+import { theme } from "lib/design-system-v2/helpers/ThemeProvider";
 import moment from "moment";
 
 /** time in ms */
@@ -46,4 +47,24 @@ export const getEmptyBodyMessage = (type: "request" | "response", method?: strin
     return "No response body received";
   }
   return "No body content";
+};
+
+export const getStatusColor = (statusCode: number | undefined) => {
+  if (!statusCode) {
+    return { color: theme.colors["error-300"], backgroundColor: "rgba(255, 128, 128, 0.12)" }; // ERROR
+  }
+
+  if (statusCode >= 200 && statusCode < 300) {
+    return { color: theme.colors["success-300"], backgroundColor: "rgba(77, 204, 143, 0.12)" }; // SUCCESS
+  }
+
+  if (statusCode >= 300 && statusCode < 400) {
+    return { color: theme.colors["warning-300"], backgroundColor: "rgba(253, 186, 15, 0.12)" }; // WARNING
+  }
+
+  if (statusCode >= 400) {
+    return { color: theme.colors["error-300"], backgroundColor: "rgba(255, 128, 128, 0.12)" }; // ERROR
+  }
+
+  return { color: theme.colors["primary-300"], backgroundColor: "rgba(99, 159, 249, 0.12)" }; // INFO
 };
