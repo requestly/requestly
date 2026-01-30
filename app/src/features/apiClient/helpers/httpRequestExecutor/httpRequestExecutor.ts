@@ -21,6 +21,8 @@ import { BaseExecutionContext, ExecutionContext, ScriptExecutionContext } from "
 import { APIClientWorkloadManager } from "../modules/scriptsV2/workloadManager/APIClientWorkloadManager";
 import { BaseExecutionMetadata, IterationContext } from "../modules/scriptsV2/worker/script-internals/types";
 import { ApiClientFeatureContext, selectRecordById } from "features/apiClient/slices";
+import { APIEventLogger } from "lib/eventStream/APILogger";
+import { v4 } from "uuid";
 
 enum RQErrorHeaderValue {
   DNS_RESOLUTION_ERROR = "ERR_NAME_NOT_RESOLVED",
@@ -54,8 +56,13 @@ function buildExecutionErrorObject(error: any, source: string, type: RQAPI.ApiCl
   return errorObject;
 }
 
-function buildErroredExecutionResult(entry: RQAPI.HttpApiEntry, error: RQAPI.ExecutionError): RQAPI.ExecutionResult {
+function buildErroredExecutionResult(
+  entry: RQAPI.HttpApiEntry,
+  error: RQAPI.ExecutionError,
+  executionId: string
+): RQAPI.ExecutionResult {
   return {
+    executionId,
     status: RQAPI.ExecutionStatus.ERROR,
     executedEntry: { ...entry, response: null },
     error,
@@ -64,7 +71,7 @@ function buildErroredExecutionResult(entry: RQAPI.HttpApiEntry, error: RQAPI.Exe
 
 class ExecutionError extends NativeError {
   result: RQAPI.ExecutionResult;
-  constructor(entry: RQAPI.HttpApiEntry, error: Error) {
+  constructor(entry: RQAPI.HttpApiEntry, error: Error, executionId: string) {
     super(error.message);
 
     const executionError = buildExecutionErrorObject(
@@ -73,7 +80,7 @@ class ExecutionError extends NativeError {
       (error as any).context?.type || RQAPI.ApiClientErrorType.PRE_VALIDATION
     );
 
-    this.result = buildErroredExecutionResult(entry, executionError);
+    this.result = buildErroredExecutionResult(entry, executionError, executionId);
   }
 }
 
@@ -189,13 +196,14 @@ export class HttpRequestExecutor {
       executionContext?: ExecutionContext;
     }
   ): Promise<RQAPI.ExecutionResult> {
+    const execId = v4();
     const { entry, recordId } = entryDetails;
     const { abortController, scopes, executionContext } = executionConfig ?? {};
 
     this.abortController = abortController || new AbortController();
     const preparationResult = (
       await this.prepareRequestWithValidation(recordId, entry, scopes, executionContext)
-    ).mapError((error) => new ExecutionError(entry, error));
+    ).mapError((error) => new ExecutionError(entry, error, execId));
 
     if (preparationResult.isError()) {
       return preparationResult.unwrapError().result;
@@ -250,7 +258,7 @@ export class HttpRequestExecutor {
           RQAPI.ApiClientErrorType.SCRIPT
         );
 
-        return buildErroredExecutionResult(preparedEntry, error);
+        return buildErroredExecutionResult(preparedEntry, error, execId);
       }
 
       // Re-prepare the request as pre-request script might have modified it.
@@ -261,7 +269,7 @@ export class HttpRequestExecutor {
           scopes,
           scriptExecutionContext.getContext() // Pass execution context to use runtime-modified variables
         )
-      ).mapError((error) => new ExecutionError(entry, error));
+      ).mapError((error) => new ExecutionError(entry, error, execId));
 
       if (rePreparationResult.isError()) {
         return rePreparationResult.unwrapError().result;
@@ -273,6 +281,16 @@ export class HttpRequestExecutor {
       scriptExecutionContext.setRequest(preparedEntry.request);
     }
 
+    APIEventLogger.logRequest({
+      request: preparedEntry.request,
+      workspaceId: this.ctx.workspaceId,
+      tag: {
+        recordId,
+        iteration: iterationContext.iteration,
+        executionId: execId,
+      },
+    });
+
     try {
       const response = await makeRequest(this.appMode, preparedEntry.request, this.abortController.signal);
       preparedEntry.response = response;
@@ -280,7 +298,16 @@ export class HttpRequestExecutor {
       const rqErrorHeader = response?.headers?.find((header) => header.key === "x-rq-error");
 
       if (rqErrorHeader) {
-        return buildErroredExecutionResult(preparedEntry, this.buildErrorObjectFromHeader(rqErrorHeader));
+        APIEventLogger.logResponse({
+          response,
+          workspaceId: this.ctx.workspaceId,
+          tag: {
+            recordId,
+            iteration: iterationContext.iteration,
+            executionId: execId,
+          },
+        });
+        return buildErroredExecutionResult(preparedEntry, this.buildErrorObjectFromHeader(rqErrorHeader), execId);
       }
     } catch (err) {
       const error = buildExecutionErrorObject(
@@ -295,7 +322,7 @@ export class HttpRequestExecutor {
         RQAPI.ApiClientErrorType.CORE
       );
 
-      return buildErroredExecutionResult(preparedEntry, error);
+      return buildErroredExecutionResult(preparedEntry, error, execId);
     }
 
     if (
@@ -329,11 +356,22 @@ export class HttpRequestExecutor {
           RQAPI.ApiClientErrorType.SCRIPT
         );
 
-        return buildErroredExecutionResult(preparedEntry, error);
+        return buildErroredExecutionResult(preparedEntry, error, execId);
       }
     }
 
+    APIEventLogger.logResponse({
+      response: preparedEntry.response,
+      workspaceId: this.ctx.workspaceId,
+      tag: {
+        recordId,
+        iteration: iterationContext.iteration,
+        executionId: execId,
+      },
+    });
+
     const executionResult: RQAPI.ExecutionResult = {
+      executionId: execId,
       status: RQAPI.ExecutionStatus.SUCCESS,
       executedEntry: {
         ...preparedEntry,
@@ -361,6 +399,7 @@ export class HttpRequestExecutor {
   }
 
   async rerun(recordId: string, entry: RQAPI.HttpApiEntry): Promise<RQAPI.RerunResult> {
+    const executionId = v4();
     this.abortController = new AbortController();
     const executionContext = new ScriptExecutionContext(this.ctx, recordId, entry);
     const recordName = selectRecordById(this.ctx.store.getState(), recordId)?.name ?? "";
@@ -383,6 +422,7 @@ export class HttpRequestExecutor {
         RQAPI.ApiClientErrorType.SCRIPT
       );
       return {
+        executionId,
         status: RQAPI.ExecutionStatus.ERROR,
         error,
       };
@@ -397,12 +437,14 @@ export class HttpRequestExecutor {
         RQAPI.ApiClientErrorType.SCRIPT
       );
       return {
+        executionId,
         status: RQAPI.ExecutionStatus.ERROR,
         error,
       };
     }
 
     return {
+      executionId,
       status: RQAPI.ExecutionStatus.SUCCESS,
       artifacts: {
         testResults: [
