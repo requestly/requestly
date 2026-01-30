@@ -192,6 +192,7 @@ const singleToMultiView = createAsyncThunk(
     return dispatch(addWorkspacesIntoMultiView(params)).unwrap();
   },
   {
+    // Prevent stale tabs from referencing cleared contexts.
     condition: closeAllTabsAndCheckRejection,
   }
 );
@@ -207,6 +208,7 @@ export const switchContext = createAsyncThunk(
     return dispatch(addWorkspaceIntoView({ workspace, userDetails }));
   },
   {
+    // Prevent stale tabs from referencing cleared contexts.
     condition: closeAllTabsAndCheckRejection,
   }
 );
@@ -338,9 +340,7 @@ export const setupWorkspaceView = createAsyncThunk(
 
     return dispatch(workspaceViewManager({ workspaces: selectedWorkspaces, userId, action: "add" })).unwrap();
   },
-  {
-    condition: closeAllTabsAndCheckRejection,
-  }
+  {}
 );
 
 export const resetWorkspaceView = createAsyncThunk(
@@ -350,6 +350,7 @@ export const resetWorkspaceView = createAsyncThunk(
     dispatch(workspaceViewActions.reset());
   },
   {
+    // Prevent stale tabs from referencing cleared contexts.
     condition: closeAllTabsAndCheckRejection,
   }
 );
