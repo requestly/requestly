@@ -92,7 +92,7 @@ export const DataTab: React.FC<DataTabProps> = ({ type, request, response, metho
           {body ? (
             <ResponseBody responseText={body} contentTypeHeader={contentType} />
           ) : (
-            <EmptyState title={emptyBodyMessage} description="" imageSrc={EmptyInboxIcon} />
+            <EmptyState title="No response body available" description={emptyBodyMessage} imageSrc={EmptyInboxIcon} />
           )}
         </Collapse.Panel>
         <Collapse.Panel header={type === "request" ? "Headers" : "HEADERS"} key="headers">
@@ -101,11 +101,7 @@ export const DataTab: React.FC<DataTabProps> = ({ type, request, response, metho
               <PropertiesGrid data={headers} />
             </div>
           ) : (
-            <EmptyState
-              title={type === "request" ? "Headers not available" : "No headers"}
-              description=""
-              imageSrc={EmptyInboxIcon}
-            />
+            <EmptyState title="No headers available" description="" imageSrc={EmptyInboxIcon} />
           )}
         </Collapse.Panel>
         {isHttpRequest && (
@@ -115,7 +111,7 @@ export const DataTab: React.FC<DataTabProps> = ({ type, request, response, metho
                 <PropertiesGrid data={queryParams} />
               </div>
             ) : (
-              <EmptyState title="Query parameters not available" description="" imageSrc={EmptyInboxIcon} />
+              <EmptyState title="No query parameters available" description="" imageSrc={EmptyInboxIcon} />
             )}
           </Collapse.Panel>
         )}
