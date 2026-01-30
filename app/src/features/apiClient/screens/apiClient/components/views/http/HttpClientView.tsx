@@ -321,7 +321,9 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
 
   const handleRecordNameUpdate = useCallback(
     async (name: string) => {
-      const result = await repositories.apiClientRecordsRepository.updateRecord({ name }, entity.meta.referenceId);
+      const record = lodash.cloneDeep(entity.getEntityFromState(store.getState()));
+      record.name = name;
+      const result = await repositories.apiClientRecordsRepository.updateRecord(record, entity.meta.referenceId);
       if (!result.success) {
         notification.error({
           message: "Could not rename record",
@@ -332,7 +334,7 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
       }
       entity.origin.setName(name);
     },
-    [entity, repositories]
+    [entity, repositories, store]
   );
 
   const onSaveButtonClick = useCallback(async () => {
