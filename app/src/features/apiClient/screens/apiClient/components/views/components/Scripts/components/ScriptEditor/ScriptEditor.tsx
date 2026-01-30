@@ -32,6 +32,7 @@ import {
   trackAITestGenerationRejectClicked,
   trackAITestGenerationReviewCompleted,
   trackAITestGenerationSuccessful,
+  trackAIErrorShown,
 } from "modules/analytics/events/features/apiClient";
 import { useAISessionContext } from "features/ai/contexts/AISession";
 import { getChunks } from "@codemirror/merge";
@@ -157,6 +158,13 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
         const proposedChanges = getChunks(editorViewRef.current?.state);
         updateGenerationMetrics("totalProposedChanges", proposedChanges?.chunks?.length ?? 0);
       }
+    },
+    onError: (finalError) => {
+      let reason = finalError.message;
+      trackAIErrorShown(reason);
+      const separator = reason.trim().endsWith(".") ? " " : ". ";
+      reason = `${reason}${separator}Please contact Support.`;
+      setNegativeFeedback(reason);
     },
   });
 
