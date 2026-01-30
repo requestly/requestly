@@ -1,29 +1,20 @@
-.request-details-panel {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  background: var(--requestly-color-surface-0);
-  border-left: 1px solid var(--requestly-color-border-primary);
-
-  .request-details-panel-header {
-    padding: 16px;
-    border-bottom: 1px solid var(--requestly-color-border-primary);
-    background: var(--requestly-color-surface-1);
-
-    .status-code,
-    .response-time {
-      color: var(--requestly-color-text-default);
-      font-size: 12px;
-      font-weight: 500;
-    }
-  }
-}
-
 .request-details-content {
   height: 100%;
   overflow: hidden;
   display: flex;
   flex-direction: column;
+
+  .api-client-response-body {
+    .react-resizable {
+      height: 300px !important;
+      min-height: 20px !important;
+    }
+
+    .api-response-body-raw-content {
+      height: 300px;
+      overflow-y: auto;
+    }
+  }
 
   .request-details-header {
     display: flex;
@@ -60,7 +51,6 @@
       .request-method {
         background-color: transparent !important;
         font-size: var(--requestly-font-size-2xs, 9px);
-        font-style: normal;
         font-weight: 600;
         line-height: 13px; /* 144.444% */
         letter-spacing: 1.5px;
@@ -87,7 +77,6 @@
         color: var(--requestly-color-text-placeholder, #8f8f8f);
         text-overflow: ellipsis;
         font-size: var(--requestly-font-size-xs, 11px);
-        font-style: normal;
         font-weight: 500;
         line-height: 17px; /* 154.545% */
       }
@@ -101,7 +90,6 @@
         text-overflow: ellipsis;
         color: var(--requestly-color-text-default, #fff);
         font-size: var(--requestly-font-size-sm, 12px);
-        font-style: normal;
         font-weight: 500;
         line-height: 17px; /* 150% */
         margin-right: 4px;
@@ -123,7 +111,6 @@
         margin-right: 4px;
         color: var(--requestly-color-text-placeholder, #8f8f8f);
         font-size: var(--requestly-font-size-xs, 11px);
-        font-style: normal;
         font-weight: 400;
         line-height: 17px; /* 154.545% */
       }
@@ -131,20 +118,14 @@
 
     .close-button {
       color: var(--requestly-color-text-subtle);
-      text-align: center;
-      font-family: "Material Symbols Outlined";
-      font-size: 14px;
-      font-style: normal;
-      font-weight: 400;
-      line-height: 16px; /* 114.286% */
 
       &:hover {
         background: var(--requestly-color-surface-2);
       }
 
       svg {
-        width: 16px;
-        height: 16px;
+        width: 14px;
+        height: 14px;
       }
     }
   }
@@ -159,7 +140,6 @@
       .ant-collapse-item {
         border: 1px solid var(--requestly-color-border-primary);
         border-radius: 4px;
-        border-bottom: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
         padding: var(--space-4, 8px) var(--space-5, 12px);
         &:last-child {
           margin-bottom: 0;
@@ -173,14 +153,8 @@
 
           .ant-collapse-expand-icon {
             color: var(--requestly-color-text-subtle, #bbb);
-            text-align: center;
-            font-family: "Material Symbols Outlined";
-            font-size: 14px;
-            font-style: normal;
-            font-weight: 400;
             display: flex;
-            flex-direction: column;
-            justify-content: center;
+            align-items: center;
 
             .ant-collapse-arrow svg {
               width: 10px !important;
@@ -192,9 +166,7 @@
             overflow: hidden;
             color: var(--requestly-color-text-subtle, #bbb);
             text-overflow: ellipsis;
-            font-family: var(--font-family-default, Inter);
             font-size: var(--font-size-2xs, 9px);
-            font-style: normal;
             font-weight: 500;
             line-height: 13px;
             letter-spacing: 1px;
@@ -251,5 +223,21 @@
         overflow: auto;
       }
     }
+  }
+}
+
+.tab-extra-content-details {
+  display: flex;
+  gap: 4px;
+
+  .status-code,
+  .response-time {
+    display: flex;
+    height: 18px;
+    padding: var(--space-1, 2px) var(--space-2, 4px);
+    align-items: center;
+    gap: var(--space-2, 4px);
+    font-family: var(--font-family-default, Inter);
+    font-size: 11px;
   }
 }
