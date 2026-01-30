@@ -21,6 +21,7 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
   placeholder,
   onPressEnter,
   onBlur,
+  onPaste,
   variables,
 }) => {
   const editorRef = useRef<HTMLDivElement>(null);
@@ -33,6 +34,7 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
   */
   const onBlurRef = useRef(onBlur);
   const onChangeRef = useRef(onChange);
+  const onPasteRef = useRef(onPaste);
   const previousDefaultValueRef = useRef(defaultValue);
   const isPopoverPinnedRef = useRef(false);
 
@@ -41,7 +43,8 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
   useEffect(() => {
     onBlurRef.current = onBlur;
     onChangeRef.current = onChange;
-  }, [onBlur, onChange]);
+    onPasteRef.current = onPaste;
+  }, [onBlur, onChange, onPaste]);
 
   const [hoveredVariable, setHoveredVariable] = useState<string | null>(null); // Track hovered variable
   const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
@@ -112,6 +115,27 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
               if (event.key === "Enter") {
                 onPressEnter?.(event, view.state.doc.toString());
               }
+            },
+            paste: (event, view) => {
+              const pastedText = event.clipboardData?.getData("text/plain");
+              if (!pastedText) return;
+
+              // Handle multiline paste conversion
+              if (pastedText.includes("\n")) {
+                event.preventDefault();
+                const singleLineText = pastedText.replace(/\\\s*\n\s*/g, " ").replace(/\n/g, " ");
+                view.dispatch(
+                  view.state.update({
+                    changes: {
+                      from: view.state.selection.main.from,
+                      to: view.state.selection.main.to,
+                      insert: singleLineText,
+                    },
+                  })
+                );
+              }
+
+              onPasteRef.current?.(event, pastedText);
             },
           }),
           highlightVariablesPlugin(
