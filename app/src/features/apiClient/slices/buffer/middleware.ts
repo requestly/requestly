@@ -68,7 +68,8 @@ const globalEnvironmentRemote: BufferSyncRemote = {
       action.type === `${API_CLIENT_ENVIRONMENTS_SLICE_NAME}/unsafePatchGlobal`
     );
   },
-  extractId: () => GLOBAL_ENVIRONMENT_ID,
+  // Prefer real id from payload/state (desktop/local uses a path-like id).
+  extractId: getPayloadId,
   selectData: (state) => state.environments.globalEnvironment,
 };
 
@@ -106,7 +107,16 @@ function performBufferSync(
   const buffer = findBufferByReferenceId(bufferState.entities, id);
   if (!buffer || !buffer.referenceId) return;
 
-  const sourceData = overrideData !== undefined ? overrideData : remote.selectData(state, id);
+  const remoteData = remote.selectData(state, id);
+  // When entitySynced sends partial data (e.g. { name } on rename), merge with full remote data
+  // so we don't replace buffer.current with a partial object and lose e.g. variables.
+  const isSpreadableObject = (v: unknown): v is Record<string, unknown> => typeof v === "object" && v !== null;
+  const sourceData =
+    overrideData !== undefined && isSpreadableObject(remoteData) && isSpreadableObject(overrideData)
+      ? { ...remoteData, ...overrideData }
+      : overrideData !== undefined
+      ? overrideData
+      : remoteData;
 
   if (sourceData !== undefined) {
     listenerApi.dispatch(
@@ -148,7 +158,12 @@ startAppListening({
     const remote = remotes.find((r) => r.shouldHandleAction(action));
     if (!remote) return;
 
-    const id = remote.extractId(action);
+    let id = remote.extractId(action);
+    // Some global-environment actions (e.g. unsafePatchGlobal) don't carry an id in payload.
+    // Use the actual global env id from state to sync the correct buffer entry.
+    if (!id && remote === globalEnvironmentRemote) {
+      id = listenerApi.getState().environments.globalEnvironment.id;
+    }
     if (!id) return;
 
     performBufferSync(listenerApi, remote, id);
