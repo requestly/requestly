@@ -129,11 +129,6 @@ const LocalWorkspaceActions = ({
     [workspace, workspaceViewManager, userId]
   );
 
-  const isSelected = useMemo(() => selectedWorkspaces.some((w) => w.id === workspace.id), [
-    selectedWorkspaces,
-    workspace.id,
-  ]);
-
   return (
     <>
       {activeWorkspace.id === workspace.id && viewMode === ApiClientViewMode.SINGLE ? (
@@ -156,7 +151,7 @@ const LocalWorkspaceActions = ({
         </Tooltip>
 
         <Checkbox
-          checked={isSelected && viewMode !== ApiClientViewMode.SINGLE}
+          checked={viewMode !== ApiClientViewMode.SINGLE && selectedWorkspaces.some((w) => w.id === workspace.id)}
           className="local-workspace-actions__checkbox"
           onChange={(e) => {
             handleMultiWorkspaceCheckbox(e.target.checked);
@@ -213,18 +208,16 @@ export const WorkspaceItem: React.FC<WorkspaceItemProps> = (props) => {
 
   const { workspace } = props;
   const isMultiView = viewMode === ApiClientViewMode.MULTI;
-  const isSelected = selectedWorkspaces.some((w) => w.id === workspace.id);
-  const isWorkspaceSwitchDisabled = isMultiView && isSelected;
 
   return (
     <div
-      className={`workspace-overlay__list-item ${isWorkspaceSwitchDisabled ? "disabled" : ""}  ${
-        isMultiView ? "multi-mode" : "single-mode"
-      } ${props.type === WorkspaceType.SHARED ? "workspace-overlay__list-item--shared" : ""} ${
-        props.type === WorkspaceType.LOCAL ? "workspace-overlay__list-item--local" : ""
-      }`}
+      className={`workspace-overlay__list-item ${
+        isMultiView && selectedWorkspaces.some((w) => w.id === workspace.id) ? "disabled" : ""
+      }  ${isMultiView ? "multi-mode" : "single-mode"} ${
+        props.type === WorkspaceType.SHARED ? "workspace-overlay__list-item--shared" : ""
+      } ${props.type === WorkspaceType.LOCAL ? "workspace-overlay__list-item--local" : ""}`}
       onClick={() => {
-        if (isWorkspaceSwitchDisabled) {
+        if (isMultiView && selectedWorkspaces.some((w) => w.id === workspace.id)) {
           return;
         }
 
@@ -232,7 +225,11 @@ export const WorkspaceItem: React.FC<WorkspaceItemProps> = (props) => {
       }}
     >
       <WorkspaceAvatar workspace={workspace} size={32} />
-      <div className={`workspace-overlay__list-item-details ${isWorkspaceSwitchDisabled ? "disabled" : ""}`}>
+      <div
+        className={`workspace-overlay__list-item-details ${
+          isMultiView && selectedWorkspaces.some((w) => w.id === workspace.id) ? "disabled" : ""
+        }`}
+      >
         <div className="workspace-list-item-name">{workspace.name}</div>
         <Typography.Text
           className="workspace-list-item-info"
