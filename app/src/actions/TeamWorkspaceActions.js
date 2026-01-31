@@ -105,9 +105,14 @@ export const switchWorkspace = async (
   //Refresh Rules List
   dispatch(globalActions.updateHardRefreshPendingStatus({ type: "rules" }));
 
-  // Notify other tabs
+  // Notify other tabs about workspace change
+  // Include tab ID so receiving tabs can identify if message is from themselves
+  const TAB_ID = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   window.activeWorkspaceBroadcastChannel &&
-    window.activeWorkspaceBroadcastChannel.postMessage("active_workspace_changed");
+    window.activeWorkspaceBroadcastChannel.postMessage({
+      type: "active_workspace_changed",
+      tabId: TAB_ID,
+    });
 };
 
 export const clearCurrentlyActiveWorkspace = async (dispatch, appMode) => {
