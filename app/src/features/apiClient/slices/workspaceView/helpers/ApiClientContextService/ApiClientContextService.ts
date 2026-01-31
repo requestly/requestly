@@ -23,6 +23,7 @@ import { forceRefreshEnvironments } from "features/apiClient/slices/environments
 import { WorkspaceInfo } from "../../types";
 import persistStore from "redux-persist/es/persistStore";
 import { REHYDRATE } from "redux-persist";
+import getStoredState from "redux-persist/es/getStoredState";
 import { ApiClientVariables } from "features/apiClient/slices/entities/api-client-variables";
 import {
   createApiClientRecordsPersistConfig,
@@ -33,7 +34,7 @@ import {
   createEnvironmentsPersistConfig,
   environmentsSlice,
 } from "features/apiClient/slices/environments";
-import { EnvironmentEntity } from "features/apiClient/slices/environments/types";
+import { EnvironmentEntity, EnvironmentsState } from "features/apiClient/slices/environments/types";
 import { bufferActions, bufferSlice, bufferSyncMiddleware } from "features/apiClient/slices/buffer";
 import { erroredRecordsSlice, ErroredRecordsState } from "features/apiClient/slices/erroredRecords";
 import { getEntityDataFromTabSource, GetEntityDataFromTabSourceState } from "componentsV2/Tabs/slice";
@@ -240,6 +241,32 @@ class ApiClientContextService {
 
     const environmentsPersistConfig = createEnvironmentsPersistConfig(workspaceId);
 
+    const isRecord = (value: unknown): value is Record<string, unknown> =>
+      typeof value === "object" && value !== null && !Array.isArray(value);
+
+    const persistedActiveEnvironmentId = await (async (): Promise<string | null | undefined> => {
+      try {
+        const storedState = await getStoredState(environmentsPersistConfig);
+        if (!isRecord(storedState)) {
+          return undefined;
+        }
+
+        const value = storedState["activeEnvironmentId"];
+        if (value === null) {
+          return null;
+        }
+        if (typeof value !== "string") {
+          return undefined;
+        }
+
+        // If the environment no longer exists, fall back to "No environment"
+        return environments.some((env) => env.id === value) ? value : null;
+      } catch {
+        // Storage access can fail in some environments; ignore and use default state.
+        return undefined;
+      }
+    })();
+
     // Hydrate environment variables in place
     await ApiClientVariables.hydrateInPlace({
       records: environments,
@@ -272,17 +299,19 @@ class ApiClientContextService {
       },
     });
 
+    // Important:
+    // - Don't pass `globalEnvironment: null` (violates slice type and can briefly wipe state)
+    // - Don't pass empty `environments` unless we intend to overwrite; we only need to mark rehydrated and
+    //   optionally restore `activeEnvironmentId`.
+    const rehydratePayload: Partial<EnvironmentsState> & { _persist: { version: number; rehydrated: true } } = {
+      ...(persistedActiveEnvironmentId !== undefined ? { activeEnvironmentId: persistedActiveEnvironmentId } : {}),
+      _persist: { version: 1, rehydrated: true },
+    };
+
     store.dispatch({
       type: REHYDRATE,
       key: environmentsPersistConfig.key,
-      payload: {
-        environments: {
-          ids: [],
-          entities: {},
-        },
-        globalEnvironment: null,
-        _persist: { version: 1, rehydrated: true },
-      },
+      payload: rehydratePayload,
       err: null,
       meta: { manual: true },
     });
