@@ -344,7 +344,9 @@ export const setupWorkspaceView = createAsyncThunk(
 
     return dispatch(workspaceViewManager({ workspaces: selectedWorkspaces, userId, action: "add" })).unwrap();
   },
-  {}
+  {
+    condition: closeAllTabsAndCheckRejection,
+  }
 );
 
 export const resetWorkspaceView = createAsyncThunk(
