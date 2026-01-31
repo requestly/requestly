@@ -357,7 +357,6 @@ class ApiClientContextService {
   async createContext(workspace: WorkspaceInfo, userDetails: UserDetails): Promise<void> {
     const workspaceId = workspace.id;
 
-    const currentCtxVersion = this.contextRegistry.getVersion();
     const existing = this.contextRegistry.getContext(workspaceId);
     if (existing) {
       return;
@@ -421,6 +420,15 @@ class ApiClientContextService {
       environments,
       globalEnvironment,
     });
+
+    // Get current version RIGHT BEFORE adding to avoid race condition
+    // when multiple workspaces are created in parallel
+    const currentCtxVersion = this.contextRegistry.getVersion();
+
+    // Double-check workspace wasn't added by another concurrent operation
+    if (this.contextRegistry.getContext(workspaceId)) {
+      return;
+    }
 
     const ctx: ApiClientFeatureContext = { workspaceId, store, repositories: repo };
     this.contextRegistry.addContext(ctx, currentCtxVersion);
