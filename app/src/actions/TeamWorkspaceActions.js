@@ -31,9 +31,11 @@ export const switchWorkspace = async (
   currentSyncingState,
   appMode,
   setLoader,
-  source
+  source,
+  options = {}
 ) => {
   const { teamId } = newWorkspaceDetails;
+  const { skipBroadcast = false } = options;
 
   let needToMergeRecords = false;
   await StorageService(appMode).waitForAllTransactions();
@@ -105,16 +107,23 @@ export const switchWorkspace = async (
   //Refresh Rules List
   dispatch(globalActions.updateHardRefreshPendingStatus({ type: "rules" }));
 
-  // Notify other tabs
-  window.activeWorkspaceBroadcastChannel &&
-    window.activeWorkspaceBroadcastChannel.postMessage("active_workspace_changed");
+  // Notify other tabs about workspace change
+  // Only broadcast when user explicitly switches workspaces, not during initialization
+  // This prevents multi-tab infinite reload loops
+  if (!skipBroadcast) {
+    window.activeWorkspaceBroadcastChannel &&
+      window.activeWorkspaceBroadcastChannel.postMessage("active_workspace_changed");
+  }
 };
 
-export const clearCurrentlyActiveWorkspace = async (dispatch, appMode) => {
+export const clearCurrentlyActiveWorkspace = async (dispatch, appMode, options = {}) => {
   await switchWorkspace(
     { teamId: null, teamName: null, teamMembersCount: null, workspaceType: WorkspaceType.PERSONAL },
     dispatch,
     null,
-    appMode
+    appMode,
+    undefined,
+    undefined,
+    options
   );
 };
