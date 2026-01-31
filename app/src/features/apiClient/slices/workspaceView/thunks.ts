@@ -231,7 +231,11 @@ async function switchToPrivateWorkspace() {
     },
     appMode,
     undefined, // setLoader
-    "switch_context_thunk" // source
+    "switch_context_thunk", // source
+    // WARNING: skipBroadcast prevents multi-tab infinite reload loops
+    // Only use this for initialization flows (setupWorkspaceView)
+    // User-initiated switches should ALWAYS broadcast so other tabs sync
+    { skipBroadcast: true }
   );
 }
 

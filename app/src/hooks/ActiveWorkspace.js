@@ -12,18 +12,12 @@ import {
 import { useCurrentWorkspaceUserRole } from "./useCurrentWorkspaceUserRole";
 import { trackAttr } from "modules/analytics";
 
-// Broadcast channel setup with tab ID to prevent self-triggering reloads
-// This fixes the multi-tab infinite reload loop where tabs keep reloading each other
-const TAB_ID = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-
 window.activeWorkspaceBroadcastChannel = new BroadcastChannel("active-workspace");
-window.activeWorkspaceBroadcastChannel.addEventListener("message", (event) => {
-  // Only reload if message is from a DIFFERENT tab, not from ourselves
-  // This prevents the infinite reload loop when multiple tabs are open
-  if (event.data?.tabId && event.data.tabId !== TAB_ID) {
-    // Refresh the webpage so that it could find updated state later on
-    window.location.reload();
-  }
+window.activeWorkspaceBroadcastChannel.addEventListener("message", (_event) => {
+  // Refresh the webpage so that it could find updated state later on
+  // Note: Broadcasts now only happen on explicit user workspace switches,
+  // not during tab initialization (which was causing infinite reload loops)
+  window.location.reload();
 });
 
 const ActiveWorkspace = () => {
