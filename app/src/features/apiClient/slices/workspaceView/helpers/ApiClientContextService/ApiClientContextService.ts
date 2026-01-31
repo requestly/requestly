@@ -425,11 +425,6 @@ class ApiClientContextService {
     // when multiple workspaces are created in parallel
     const currentCtxVersion = this.contextRegistry.getVersion();
 
-    // Double-check workspace wasn't added by another concurrent operation
-    if (this.contextRegistry.getContext(workspaceId)) {
-      return;
-    }
-
     const ctx: ApiClientFeatureContext = { workspaceId, store, repositories: repo };
     this.contextRegistry.addContext(ctx, currentCtxVersion);
   }
