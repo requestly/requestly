@@ -6,13 +6,13 @@ import {
   TypedStartListening,
 } from "@reduxjs/toolkit";
 import { bufferActions, findBufferByReferenceId } from "./slice";
+import { BufferEntry } from "./types";
 import { ApiClientEntityType } from "../entities/types";
 import {
   API_CLIENT_RECORDS_SLICE_NAME,
   API_CLIENT_ENVIRONMENTS_SLICE_NAME,
   API_CLIENT_RUNNER_CONFIG_SLICE_NAME,
   BUFFER_SLICE_NAME,
-  GLOBAL_ENVIRONMENT_ID,
   RUNTIME_VARIABLES_ENTITY_ID,
 } from "../common/constants";
 import { apiRecordsAdapter } from "../apiRecords/slice";
@@ -132,6 +132,32 @@ function performBufferSync(
   }
 }
 
+/**
+ * Sync all buffers matching the remote's entity types
+ */
+function performBulkBufferSync(listenerApi: BufferListenerApi, remote: BufferSyncRemote) {
+  const state = listenerApi.getState();
+  const bufferState = state[BUFFER_SLICE_NAME];
+
+  const allBuffers = Object.values(bufferState.entities).filter(
+    (buffer): buffer is BufferEntry => buffer !== undefined && remote.entityTypes.includes(buffer.entityType)
+  );
+
+  for (const buffer of allBuffers) {
+    if (!buffer.referenceId) continue;
+
+    const remoteData = remote.selectData(state, buffer.referenceId);
+    if (remoteData !== undefined) {
+      listenerApi.dispatch(
+        bufferActions.syncFromSource({
+          referenceId: buffer.referenceId,
+          sourceData: remoteData,
+        })
+      );
+    }
+  }
+}
+
 export const bufferListenerMiddleware = createListenerMiddleware();
 
 const startAppListening = bufferListenerMiddleware.startListening as TypedStartListening<
@@ -158,13 +184,13 @@ startAppListening({
     const remote = remotes.find((r) => r.shouldHandleAction(action));
     if (!remote) return;
 
-    let id = remote.extractId(action);
-    // Some global-environment actions (e.g. unsafePatchGlobal) don't carry an id in payload.
-    // Use the actual global env id from state to sync the correct buffer entry.
-    if (!id && remote === globalEnvironmentRemote) {
-      id = listenerApi.getState().environments.globalEnvironment.id;
+    const id = remote.extractId(action);
+
+    // If no id found, sync all buffers for this entity type
+    if (!id) {
+      performBulkBufferSync(listenerApi, remote);
+      return;
     }
-    if (!id) return;
 
     performBufferSync(listenerApi, remote, id);
   },
