@@ -224,28 +224,28 @@ export const fsManagerServiceAdapterProvider = new FsManagerServiceAdapterProvid
 /**
  * Builds the file system manager for a workspace.
  *
- * DEBUG RESOLUTION: Race condition in mutex initialization caused duplicate build() calls
+ * DEBUG RESOLUTION: RPC timeout and retry caused duplicate build() calls
  *
  * THE ISSUE:
- * When switching/adding workspaces, multiple parallel calls to get() for the same rootPath
- * could create duplicate FsManager builds in the desktop process. This caused:
- * 1. Two build() RPC calls for the same workspace
- * 2. Two separate FsManager instances watching the same directory
- * 3. Subsequent operations (updateRecord, createRecord, etc.) being sent to BOTH instances
- * 4. File conflicts: one instance would succeed, the other would fail with ENOENT
- * 5. User-facing errors: "File not found" when trying to save/update API records
+ * When adding workspaces in multiview, build() RPC had 1s timeout with retries enabled.
+ * For some workspaces, build takes > 1s on desktop side, causing:
+ * 1. Web app: build() RPC sent to desktop
+ * 2. Desktop: first build arrives, exposes channels over rpc (takes some time, response not yet sent)
+ * 3. Web app: 1s timeout hits, considers build failed, triggers RETRY
+ * 4. Desktop: retry arrives, again exposes channels over rpc
+ * 5. Subsequent operations (updateRecord, createRecord) talks to file system.
+ * 6. File conflicts: one succeeds, other fails with ENOENT
+ * 7. User sees "File not found" errors when saving/updating API records
  *
- * Root cause: Non-atomic mutex initialization allowed race condition:
- *   Thread A: get('/path') → lockMap.get() → undefined
- *   Thread B: get('/path') → lockMap.get() → undefined (before A sets it)
- *   Thread A: creates Mutex-A, sets lockMap['/path'] = Mutex-A
- *   Thread B: creates Mutex-B, OVERWRITES lockMap['/path'] = Mutex-B
- *   Thread A: acquires Mutex-A (no longer in map)
- *   Thread B: acquires Mutex-B (now in map)
- *   Both threads proceed to build independently → DUPLICATE BUILDS
+ * DEBUG PROCESS:
+ * Console logs showed duplicate RPC calls for same workspace:
+ *   RPC {method: 'build', args: ['/Users/srbh/Documents/uio']}
+ *   RPC {method: 'build', args: ['/Users/srbh/Documents/uio']} // DUPLICATE!
+ * Traced through IPC layer to find timeout was too aggressive for build operation.
  *
- * FIX: retryCount=0 (fail fast, don't retry expensive builds), timeout=30s (large workspaces
- * need time to parse, previous 1s was too aggressive).
+ * FIX:
+ * - retryCount: 0 → Fail fast instead of retrying expensive builds
+ * - timeout: 30s → Some workspaces need time to build ie to expose channels over rpc (previous 1s was too aggressive)
  */
 export function buildFsManager(rootPath: string) {
   return rpcWithRetry(
