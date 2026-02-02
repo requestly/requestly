@@ -165,11 +165,6 @@ export class LocalEnvSync implements EnvironmentInterface<ApiClientLocalMeta> {
   }
 
   private translateDisasterousId(id: string) {
-    // Some callers still use the stable constant "global" for global env.
-    // In local-file mode, the repository uses a path-like id (`<root>/environments/global.json`).
-    if (id === "global") {
-      id = this.getDisasterousGlobalId();
-    }
     if (id !== this.getDisasterousGlobalId()) {
       return id;
     }
