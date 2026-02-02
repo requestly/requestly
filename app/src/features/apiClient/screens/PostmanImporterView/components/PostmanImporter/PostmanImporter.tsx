@@ -17,8 +17,12 @@ import Logger from "lib/logger";
 import "./postmanImporter.scss";
 import * as Sentry from "@sentry/react";
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
-import { createEnvironment, updateEnvironmentVariables, useApiClientRepository } from "features/apiClient/slices";
-import { useApiClientDispatch } from "features/apiClient/slices/hooks/base.hooks";
+import {
+  createEnvironment,
+  getApiClientFeatureContext,
+  updateEnvironmentVariables,
+  useApiClientRepository,
+} from "features/apiClient/slices";
 import { wrapWithCustomSpan } from "utils/sentry";
 import { SPAN_STATUS_ERROR, SPAN_STATUS_OK } from "@sentry/core";
 import { EnvironmentVariableData } from "@requestly/shared/types/entities/apiClient";
@@ -51,7 +55,7 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
 
   const { apiClientRecordsRepository, environmentVariablesRepository } = useApiClientRepository();
   const { onSaveRecord } = useNewApiClientContext();
-  const dispatch = useApiClientDispatch();
+  const { dispatch } = getApiClientFeatureContext().store;
 
   const destinationRepository = apiClientRecordsRepository;
   const isLocalFileSystem = destinationRepository instanceof LocalApiClientRecordsSync;
@@ -188,7 +192,7 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
                   environmentId: environmentVariablesRepository.getGlobalEnvironmentId(),
                   variables: env.variables,
                   repository: environmentVariablesRepository,
-                })
+                }) as any
               ).unwrap();
               successCount++;
             } else {
@@ -197,7 +201,7 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
                   name: env.name,
                   variables: env.variables,
                   repository: environmentVariablesRepository,
-                })
+                }) as any
               ).unwrap();
               if (result?.id) {
                 successCount++;
@@ -216,7 +220,7 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
                 environmentId: environmentVariablesRepository.getGlobalEnvironmentId(),
                 variables: env.variables,
                 repository: environmentVariablesRepository,
-              })
+              }) as any
             ).unwrap();
             return true;
           } else {
@@ -225,7 +229,7 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
                 name: env.name,
                 variables: env.variables,
                 repository: environmentVariablesRepository,
-              })
+              }) as any
             ).unwrap();
             return !!result?.id;
           }
