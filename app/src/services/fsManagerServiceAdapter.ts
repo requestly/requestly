@@ -220,13 +220,23 @@ class FsManagerServiceAdapterProvider {
 }
 
 export const fsManagerServiceAdapterProvider = new FsManagerServiceAdapterProvider();
+
+/**
+ * Builds the file system manager for a workspace.
+ *
+ * Configuration choices:
+ * - retryCount: 0 - Build is expensive (parses entire workspace). If it fails,
+ *   we want to fail fast rather than hammer the desktop process with retries.
+ * - timeout: 30s - Large workspaces can take time to parse. Previous 1s timeout
+ *   was too aggressive and caused premature failures.
+ */
 export function buildFsManager(rootPath: string) {
   return rpcWithRetry(
     {
       namespace: LOCAL_SYNC_BUILDER_NAMESPACE,
       method: "build",
-      retryCount: 10,
-      timeout: 1000,
+      retryCount: 0,
+      timeout: 1000 * 30,
     },
     rootPath
   ) as Promise<void>;
