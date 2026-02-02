@@ -187,7 +187,7 @@ class FsManagerServiceAdapterProvider {
   async get(rootPath: string): Promise<FsManagerServiceAdapter> {
     let lock = this.lockMap.get(rootPath);
     if (!lock) {
-      lock = withTimeout(new Mutex(), 10 * 1000);
+      lock = withTimeout(new Mutex(), 30 * 1000);
       this.lockMap.set(rootPath, lock);
     }
     await lock.acquire();
