@@ -224,11 +224,28 @@ export const fsManagerServiceAdapterProvider = new FsManagerServiceAdapterProvid
 /**
  * Builds the file system manager for a workspace.
  *
- * Configuration choices:
- * - retryCount: 0 - Build is expensive (parses entire workspace). If it fails,
- *   we want to fail fast rather than hammer the desktop process with retries.
- * - timeout: 30s - Large workspaces can take time to parse. Previous 1s timeout
- *   was too aggressive and caused premature failures.
+ * DEBUG RESOLUTION: Race condition in mutex initialization caused duplicate build() calls
+ *
+ * THE ISSUE:
+ * When switching/adding workspaces, multiple parallel calls to get() for the same rootPath
+ * could create duplicate FsManager builds in the desktop process. This caused:
+ * 1. Two build() RPC calls for the same workspace
+ * 2. Two separate FsManager instances watching the same directory
+ * 3. Subsequent operations (updateRecord, createRecord, etc.) being sent to BOTH instances
+ * 4. File conflicts: one instance would succeed, the other would fail with ENOENT
+ * 5. User-facing errors: "File not found" when trying to save/update API records
+ *
+ * Root cause: Non-atomic mutex initialization allowed race condition:
+ *   Thread A: get('/path') → lockMap.get() → undefined
+ *   Thread B: get('/path') → lockMap.get() → undefined (before A sets it)
+ *   Thread A: creates Mutex-A, sets lockMap['/path'] = Mutex-A
+ *   Thread B: creates Mutex-B, OVERWRITES lockMap['/path'] = Mutex-B
+ *   Thread A: acquires Mutex-A (no longer in map)
+ *   Thread B: acquires Mutex-B (now in map)
+ *   Both threads proceed to build independently → DUPLICATE BUILDS
+ *
+ * FIX: retryCount=0 (fail fast, don't retry expensive builds), timeout=30s (large workspaces
+ * need time to parse, previous 1s was too aggressive).
  */
 export function buildFsManager(rootPath: string) {
   return rpcWithRetry(
