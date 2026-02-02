@@ -20,7 +20,7 @@ export const useWorkspaceViewSelector: TypedUseSelectorHook<ApiClientStoreState>
   WorkspaceStoreContext
 );
 
-const WorkspaceIdContext = createContext<Workspace["id"]>(null);
+const WorkspaceIdContext = createContext<Workspace["id"] | undefined>(undefined);
 
 export const WorkspaceIdContextProvider: React.FC<React.PropsWithChildren<{ id: Workspace["id"] }>> = ({
   id,
@@ -46,8 +46,8 @@ const WorkspaceStoreProvider: React.FC<React.PropsWithChildren> = (props) => {
 export const FakeWorkspaceStoreProvider: React.FC<React.PropsWithChildren & { store: ApiClientStore }> = (props) => {
   return (
     <WorkspaceIdContextProvider id={NoopContextId}>
-    <Provider context={WorkspaceStoreContext} store={props.store}>
-      {props.children}
+      <Provider context={WorkspaceStoreContext} store={props.store}>
+        {props.children}
       </Provider>
     </WorkspaceIdContextProvider>
   );
