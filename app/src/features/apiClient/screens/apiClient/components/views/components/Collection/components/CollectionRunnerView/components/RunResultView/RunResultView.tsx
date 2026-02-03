@@ -70,6 +70,7 @@ export const RunResultView: React.FC<RunResultViewProps> = ({ isDetailedViewOpen
               size="small"
               type="secondary"
               icon={<MdArrowBack />}
+              className="back-button"
               onClick={() => {
                 onToggleDetailedView?.(false);
               }}

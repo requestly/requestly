@@ -5,9 +5,10 @@
   flex-direction: column;
 
   .api-client-response-body {
-    .react-resizable {
-      max-height: 300px !important;
-      min-height: 20px !important;
+    .api-response-body-editor-container {
+      .react-resizable {
+        max-height: 300px !important;
+      }
     }
 
     .api-response-body-raw-content {
@@ -235,9 +236,25 @@
     display: flex;
     height: 18px;
     padding: var(--space-1, 2px) var(--space-2, 4px);
+    font-family: var(--font-family-default, Inter);
+  }
+
+  .response-time {
+    display: flex;
+    height: 18px;
     align-items: center;
     gap: var(--space-2, 4px);
-    font-family: var(--font-family-default, Inter);
     font-size: 11px;
+    border-radius: 4px;
+  }
+
+  .status-code {
+    text-align: center;
+    font-size: 9px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: var(--line-height-2xs, 13px); /* 144.444% */
+    letter-spacing: 1px;
+    text-transform: uppercase;
   }
 }

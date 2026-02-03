@@ -25,6 +25,10 @@
       display: flex;
       align-items: center;
       gap: 8px;
+
+      .back-button {
+        color: var(--requestly-color-text-subtle);
+      }
     }
 
     .header {
