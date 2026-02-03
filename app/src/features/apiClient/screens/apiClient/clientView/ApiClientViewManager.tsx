@@ -11,6 +11,7 @@ import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks
 import { selectRecordById } from "features/apiClient/slices";
 import { useBufferedEntity } from "features/apiClient/slices/entities/hooks";
 import { ApiClientEntityType } from "features/apiClient/slices/entities/types";
+import { isHttpApiRecord } from "features/apiClient/screens/apiClient/utils";
 
 type BaseProps = {
   apiEntryDetails?: RQAPI.ApiRecord;
@@ -22,11 +23,12 @@ type Props = BaseProps;
 
 export const ApiClientViewManager: React.FC<Props> = React.memo((props) => {
   const { requestId, isHistoryMode } = props;
-  const recordType = useApiClientSelector(s => (selectRecordById(s, requestId)?.data as RQAPI.ApiEntry).type);
-  const entityType = recordType === RQAPI.ApiEntryType.HTTP ? ApiClientEntityType.HTTP_RECORD : ApiClientEntityType.GRAPHQL_RECORD
+  const record = useApiClientSelector((s) => selectRecordById(s, requestId) as RQAPI.ApiRecord | undefined);
+  const entityType =
+    record && !isHttpApiRecord(record) ? ApiClientEntityType.GRAPHQL_RECORD : ApiClientEntityType.HTTP_RECORD;
   const entity = useBufferedEntity({
     id: requestId,
-    type: entityType
+    type: entityType,
   });
   const { history, addToHistory, setCurrentHistoryIndex } = useApiClientContext();
 
@@ -45,10 +47,7 @@ export const ApiClientViewManager: React.FC<Props> = React.memo((props) => {
       <div className="api-client-container-content">
         <AutogenerateProvider>
           <AISessionProvider>
-            <ClientViewFactory
-              entity={entity}
-              handleRequestFinished={handleAppRequestFinished}
-            />
+            <ClientViewFactory entity={entity} handleRequestFinished={handleAppRequestFinished} />
           </AISessionProvider>
         </AutogenerateProvider>
       </div>
