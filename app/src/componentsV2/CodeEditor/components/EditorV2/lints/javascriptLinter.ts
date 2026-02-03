@@ -1,42 +1,49 @@
 import { Diagnostic, linter } from "@codemirror/lint";
-import * as eslint from "eslint-linter-browserify";
+import { parse } from "@babel/parser";
 import { getOffsetFromLocation } from "../utils";
 
-const eslintLinter = new eslint.Linter();
-
-const eslintConfig = {
-  rules: {
-    "no-undef": "off",
-    "no-unreachable": "warn",
-    "no-dupe-keys": "error",
-    "no-unused-vars": "warn",
-  },
-} as const;
+function normalizeBabelMessage(error: any): string {
+  if (!error || typeof error.message !== "string") return "Syntax error";
+  return error.message.replace(/ \(\d+:\d+\)$/, "");
+}
 
 export function javascriptLinter() {
   return linter((view) => {
     const text = view.state.doc.toString();
     if (!text.trim()) return [];
 
-    const messages = eslintLinter.verify(text, eslintConfig as any, { filename: "script.js" });
+    try {
+      parse(text, {
+        sourceType: "unambiguous",
+        allowReturnOutsideFunction: true,
+        plugins: [
+          "jsx",
+          "classProperties",
+          "objectRestSpread",
+          "optionalChaining",
+          "nullishCoalescingOperator",
+          "topLevelAwait",
+        ],
+      });
 
-    return messages.map((msg: any) => {
-      const line = msg.line ?? 1;
-      const column = msg.column ?? 1;
-      const endLine = msg.endLine ?? line;
-      const endColumn = msg.endColumn ?? column + 1;
+      return [];
+    } catch (error: any) {
+      const loc = error?.loc || {};
+      const line = typeof loc.line === "number" ? loc.line : 1;
+      // Babel columns are 0-based; our helper expects 1-based.
+      const column = typeof loc.column === "number" ? loc.column + 1 : 1;
 
       const from = getOffsetFromLocation(view.state.doc, line, column);
-      const to = getOffsetFromLocation(view.state.doc, endLine, endColumn);
+      const to = Math.min(from + 1, view.state.doc.length);
 
-      const severity: Diagnostic["severity"] = msg.severity === 1 ? "warning" : "error";
-
-      return {
+      const diagnostic: Diagnostic = {
         from,
         to,
-        severity,
-        message: msg.message,
-      } as Diagnostic;
-    });
+        severity: "error",
+        message: normalizeBabelMessage(error),
+      };
+
+      return [diagnostic];
+    }
   });
 }
