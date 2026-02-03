@@ -21,6 +21,9 @@ import { OpenWorkspaceErrorView } from "./components/OpenWorkspaceErrorView";
 import { useWorkspaceCreationContext } from "../../context";
 import { checkIsWorkspacePathAvailable } from "services/fsManagerServiceAdapter";
 import { ExistingWorkspaceConflictView } from "./components/ExistingWorkspaceConflictView";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import FEATURES from "config/constants/sub/features";
+import { toast } from "utils/Toast";
 
 type FolderItem = {
   name: string;
@@ -75,7 +78,9 @@ export const LocalWorkspaceCreationView = ({
 
   const [folderPreview, setFolderPreview] = useState<FolderPreview | null>(null);
   const [hasDuplicateWorkspaceName, setHasDuplicateWorkspaceName] = useState(false);
-  const [isCreationOptionsVisible, setIsCreationOptionsVisible] = useState(isOpenedInModal ?? false);
+  const [isCreationOptionsVisible, setIsCreationOptionsVisible] = useState(
+    (isOpenedInModal && isFeatureCompatible(FEATURES.ONBOARDING_V2)) ?? false
+  );
   const [openWorkspaceError, setOpenWorkspaceError] = useState<FileSystemError | null>(null);
 
   const [isSelectedFolderAvailable, setIsSelectedFolderAvailable] = useState(true);
@@ -86,6 +91,10 @@ export const LocalWorkspaceCreationView = ({
       onSuccessCallback?.();
     },
     onError: (error) => {
+      if (!isFeatureCompatible(FEATURES.ONBOARDING_V2)) {
+        toast.error("Cannot open this workspace folder at the moment. Please try again later.");
+        return;
+      }
       setOpenWorkspaceError(error);
     },
   });
@@ -146,13 +155,23 @@ export const LocalWorkspaceCreationView = ({
         if (result.success) {
           setFolderPreview(result);
           setFolderPath(result.folderPath);
-          checkIsWorkspacePathAvailable(result.folderPath)
-            .then((isEligible) => {
-              setIsSelectedFolderAvailable(isEligible);
-            })
-            .catch(() => {
-              setIsSelectedFolderAvailable(false);
-            });
+          if (isFeatureCompatible(FEATURES.ONBOARDING_V2)) {
+            checkIsWorkspacePathAvailable(result.folderPath)
+              .then((isEligible) => {
+                if (!isFeatureCompatible(FEATURES.ONBOARDING_V2)) {
+                  toast.error("Cannot create a workspace in this folder. Please select a different folder.");
+                  return;
+                }
+                setIsSelectedFolderAvailable(isEligible);
+              })
+              .catch(() => {
+                if (!isFeatureCompatible(FEATURES.ONBOARDING_V2)) {
+                  toast.error("Cannot create a workspace in this folder. Please select a different folder.");
+                  return;
+                }
+                setIsSelectedFolderAvailable(false);
+              });
+          }
         }
       })
       .catch((err: unknown) => {
