@@ -15,7 +15,9 @@ const Daemon: React.FC = React.memo(() => {
   // Filter out workspaces that are still loading - their context doesn't exist in registry yet
   // Context is only added to registry after createContext completes (async)
   // But workspace is added to Redux state immediately in addWorkspaceIntoView.pending (sync)
-  const readyWorkspaces = selectedWorkspaces.filter((workspace) => !workspace.status.loading);
+  const readyWorkspaces = selectedWorkspaces.filter(
+    (workspace) => !workspace.status.loading && workspace.status.state.success === true
+  );
 
   const daemons = readyWorkspaces.map((workspace) => (
     <WorkspaceProvider workspaceId={workspace.id} key={workspace.id}>
