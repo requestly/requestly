@@ -5,6 +5,11 @@ import { RootState } from "store/types";
 import { ReducerKeys } from "store/constants";
 import { reduxStore } from "store";
 import { getIsTabDirty } from "./utils";
+import { HistoryViewTabSource } from "features/apiClient/screens/apiClient/components/views/components/request/HistoryView/historyViewTabSource";
+import { ApiClientEntityType } from "features/apiClient/slices/entities/types";
+import { RQAPI } from "features/apiClient/types";
+import { bufferActions, getApiClientFeatureContext } from "features/apiClient/slices";
+import { findBufferByReferenceId } from "features/apiClient/slices/buffer/slice";
 
 const SLICE_NAME = ReducerKeys.TABS;
 
@@ -115,4 +120,126 @@ export const closeAllTabs = createAsyncThunk<
 
   dispatch(tabsActions.resetTabs());
   return { tabs: allTabs };
+});
+
+export const openOrSwitchHistoryTab = createAsyncThunk<
+  void,
+  { workspaceId?: string; record?: RQAPI.ApiRecord },
+  { state: RootState }
+>(`${SLICE_NAME}/openOrSwitchHistoryTab`, async ({ workspaceId, record }, { dispatch, getState, rejectWithValue }) => {
+  const state = getState();
+  const allTabs = tabsAdapter.getSelectors().selectAll(state.tabs.tabs);
+
+  const historyTab = allTabs.find((t) => t.source.getSourceId() === "history" && t.source.getSourceName() === "history");
+
+  const targetWorkspaceId = workspaceId ?? getApiClientFeatureContext().workspaceId;
+  const targetEntryType = record?.data?.type ?? RQAPI.ApiEntryType.HTTP;
+  const isSingleWorkspaceMode = Boolean(record);
+  const targetEntityType =
+    targetEntryType === RQAPI.ApiEntryType.GRAPHQL ? ApiClientEntityType.GRAPHQL_RECORD : ApiClientEntityType.HTTP_RECORD;
+
+  const referenceId = `history:${targetWorkspaceId}:${targetEntryType}`;
+  const source = new HistoryViewTabSource({
+    context: {
+      id: targetWorkspaceId,
+    },
+  });
+
+  // Direct navigation: open/focus History tab without creating buffers.
+  if (!record) {
+    if (!historyTab) {
+      dispatch(
+        tabsActions.openTab({
+          source,
+          modeConfig: { mode: "entity", entityId: "history" },
+          preview: false,
+        })
+      );
+      return;
+    }
+
+    dispatch(
+      tabsActions.updateTab({
+        tabId: historyTab.id,
+        source,
+        modeConfig: { mode: "entity", entityId: "history" },
+      })
+    );
+    dispatch(tabsActions.setActiveTab(historyTab.id));
+    return;
+  }
+
+  const data = record;
+
+  const targetContext = getApiClientFeatureContext(targetWorkspaceId);
+  const targetStore = targetContext.store;
+  const targetStoreState = targetStore.getState();
+
+  const existingTargetBuffer = findBufferByReferenceId(targetStoreState.buffer.entities, referenceId);
+  const targetBufferId = (() => {
+    if (existingTargetBuffer) {
+      return existingTargetBuffer.id;
+    }
+    const openAction = targetStore.dispatch(
+      bufferActions.open({
+        entityType: targetEntityType,
+        isNew: false,
+        referenceId,
+        data,
+      })
+    );
+    return (openAction as any).meta.id as string;
+  })();
+
+  // When switching/overwriting due to a new history selection, confirm discarding any unsaved changes.
+  const shouldPrompt = isSingleWorkspaceMode;
+  if (shouldPrompt) {
+    const currentBufferIsDirty = (() => {
+      if (!historyTab || historyTab.modeConfig.mode !== "buffer") {
+        return false;
+      }
+      const currentWorkspaceId = historyTab.source.metadata.context?.id;
+      if (currentWorkspaceId === undefined) {
+        return false;
+      }
+      const currentStore = getApiClientFeatureContext(currentWorkspaceId).store;
+      const currentBuffer = currentStore.getState().buffer.entities[historyTab.modeConfig.entityId];
+      return currentBuffer?.isDirty ?? false;
+    })();
+
+    const targetBufferIsDirty = existingTargetBuffer?.isDirty ?? false;
+
+    if (currentBufferIsDirty || targetBufferIsDirty) {
+      const canDiscard = window.confirm("Discard changes? Changes you made will not be saved.");
+      if (!canDiscard) {
+        return rejectWithValue("User cancelled history selection due to unsaved changes");
+      }
+    }
+  }
+
+  if (!historyTab) {
+    dispatch(
+      tabsActions.openTab({
+        source,
+        modeConfig: { mode: "buffer", entityId: targetBufferId },
+        preview: false,
+      })
+    );
+  } else {
+    dispatch(
+      tabsActions.updateTab({
+        tabId: historyTab.id,
+        source,
+        modeConfig: { mode: "buffer", entityId: targetBufferId },
+      })
+    );
+    dispatch(tabsActions.setActiveTab(historyTab.id));
+  }
+
+  if (record) {
+    // Only required when we are reusing an existing stable buffer. For a newly created buffer, `open` already seeded it.
+    if (existingTargetBuffer) {
+      targetStore.dispatch(bufferActions.revertChanges({ referenceId, sourceData: data }));
+    }
+  }
 });

@@ -7,7 +7,6 @@ import { trackRQDesktopLastActivity, trackRQLastActivity } from "utils/Analytics
 import { API_CLIENT } from "modules/analytics/events/features/constants";
 import { TfiClose } from "@react-icons/all-files/tfi/TfiClose";
 import { useTabActions } from "componentsV2/Tabs/slice";
-import { DraftRequestContainerTabSource } from "../../../views/components/DraftRequestContainer/draftRequestContainerTabSource";
 import { getApiClientFeatureContext } from "features/apiClient/slices";
 
 interface Props {
@@ -17,13 +16,11 @@ interface Props {
 }
 
 export const HistoryList: React.FC<Props> = ({ history, selectedHistoryIndex, onSelectionFromHistory }) => {
-  const { openBufferedTab } = useTabActions();
+  const { openOrSwitchHistoryTab } = useTabActions();
   const [dismissNote, setDismissNote] = useState(false);
 
   const onHistoryLinkClick = useCallback(
-    (index: number) => {
-      onSelectionFromHistory(index);
-
+    async (index: number) => {
       const historyEntry = history[index];
       if (!historyEntry) {
         return;
@@ -31,34 +28,35 @@ export const HistoryList: React.FC<Props> = ({ history, selectedHistoryIndex, on
 
       const ctx = getApiClientFeatureContext();
 
-      const emptyRecord: RQAPI.ApiRecord = {
-        data: historyEntry,
-        type: RQAPI.RecordType.API,
-        id: "",
-        name: "Untitled request",
-        collectionId: "",
-        ownerId: "",
-        deleted: false,
-        createdBy: "",
-        updatedBy: "",
-        createdTs: Date.now(),
-        updatedTs: Date.now(),
-      };
+      try {
+        await openOrSwitchHistoryTab({
+          workspaceId: ctx.workspaceId,
+          record: {
+            data: historyEntry,
+            type: RQAPI.RecordType.API,
+            id: "",
+            name: "Untitled request",
+            collectionId: "",
+            ownerId: "",
+            deleted: false,
+            createdBy: "",
+            updatedBy: "",
+            createdTs: Date.now(),
+            updatedTs: Date.now(),
+          },
+        }).unwrap();
+      } catch {
+        // User cancelled due to unsaved changes.
+        return;
+      }
 
-      openBufferedTab({
-        source: new DraftRequestContainerTabSource({
-          apiEntryType: historyEntry.type,
-          emptyRecord,
-          context: { id: ctx.workspaceId },
-        }),
-        isNew: true,
-      });
+      onSelectionFromHistory(index);
 
       trackRequestSelectedFromHistory();
       trackRQLastActivity(API_CLIENT.REQUEST_SELECTED_FROM_HISTORY);
       trackRQDesktopLastActivity(API_CLIENT.REQUEST_SELECTED_FROM_HISTORY);
     },
-    [onSelectionFromHistory, openBufferedTab, history]
+    [onSelectionFromHistory, openOrSwitchHistoryTab, history]
   );
 
   const getTimelineItemColor = (entry: RQAPI.ApiEntry) => {
