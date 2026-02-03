@@ -15,6 +15,8 @@ export function javascriptLinter() {
     try {
       parse(text, {
         sourceType: "unambiguous",
+        // Scripts wrap user code in: return (async () => { userScript })();
+        // This allows return statements within the script context.
         allowReturnOutsideFunction: true,
         plugins: [
           "jsx",
