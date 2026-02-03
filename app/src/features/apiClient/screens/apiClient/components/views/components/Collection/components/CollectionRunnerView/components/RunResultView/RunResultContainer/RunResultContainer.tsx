@@ -312,7 +312,7 @@ export const RunResultContainer: React.FC<{
   const [activeTab, setActiveTab] = useState<RunResultTabKey>(RunResultTabKey.ALL);
   const [selectedRequest, setSelectedRequest] = useState<RequestExecutionResult | null>(null);
   const [userHasInteracted, setUserHasInteracted] = useState(false);
-  const workspaceId = useWorkspaceId();
+  const workspaceId = useWorkspaceId() || null;
 
   // Derive showDetailedView from selectedRequest and isDetailedViewOpen
   const showDetailedView = selectedRequest !== null && isDetailedViewOpen !== false;
@@ -414,7 +414,7 @@ export const RunResultContainer: React.FC<{
   }, [metrics, ranAt]);
 
   const headerBreadcrumb = useMemo(() => {
-    if (!workspaceId || !selectedRequest) return null;
+    if (!selectedRequest) return null;
 
     return (
       <RequestDetailsHeader
@@ -423,6 +423,7 @@ export const RunResultContainer: React.FC<{
         clickable={false}
         showFullPath={false}
         showNetworkDetails={false}
+        breadCrumbSeperator="/"
       />
     );
   }, [selectedRequest, workspaceId]);

@@ -14,6 +14,7 @@ interface RequestDetailsHeaderProps {
   clickable?: boolean;
   showFullPath?: boolean;
   showNetworkDetails?: boolean;
+  breadCrumbSeperator?: string;
 }
 
 export const RequestDetailsHeader: React.FC<RequestDetailsHeaderProps> = ({
@@ -22,6 +23,7 @@ export const RequestDetailsHeader: React.FC<RequestDetailsHeaderProps> = ({
   clickable = false,
   showFullPath = true,
   showNetworkDetails = true,
+  breadCrumbSeperator = ">",
 }) => {
   const responseDetails = useMemo(() => {
     return (
@@ -61,6 +63,7 @@ export const RequestDetailsHeader: React.FC<RequestDetailsHeaderProps> = ({
           workspaceId={workspaceId}
           clickable={clickable}
           showFullPath={showFullPath}
+          breadCrumbSeperator={breadCrumbSeperator}
         />
       </div>
       {showNetworkDetails && responseDetails}

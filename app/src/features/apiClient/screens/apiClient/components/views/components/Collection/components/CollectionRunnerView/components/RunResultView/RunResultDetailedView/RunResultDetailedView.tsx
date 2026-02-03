@@ -73,7 +73,7 @@ export const RunResultDetailedView: React.FC<Props> = ({ onClose, requestExecuti
     <div className="tab-extra-content-details">
       <StatusCodeIcon statusCode={requestExecutionResult?.entry?.statusCode || 0} />
       <span className="response-time">
-        {requestExecutionResult.entry.responseTime != null ? Math.round(requestExecutionResult.entry.responseTime) : 0}
+        {requestExecutionResult.entry.responseTime != null ? Math.round(requestExecutionResult.entry.responseTime) : 0}{" "}
         ms
       </span>
     </div>

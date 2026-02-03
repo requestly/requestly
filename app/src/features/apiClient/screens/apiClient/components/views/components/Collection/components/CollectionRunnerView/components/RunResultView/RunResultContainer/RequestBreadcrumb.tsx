@@ -11,6 +11,7 @@ interface RequestBreadcrumbProps {
   clickable?: boolean;
   showFullPath?: boolean;
   className?: string;
+  breadCrumbSeperator: string;
 }
 
 export const RequestBreadcrumb: React.FC<RequestBreadcrumbProps> = ({
@@ -19,6 +20,7 @@ export const RequestBreadcrumb: React.FC<RequestBreadcrumbProps> = ({
   clickable = false,
   showFullPath = true,
   className = "request-name-details-breadcrumb",
+  breadCrumbSeperator,
 }) => {
   const { openBufferedTab } = useTabActions();
 
@@ -53,7 +55,7 @@ export const RequestBreadcrumb: React.FC<RequestBreadcrumbProps> = ({
   };
 
   return (
-    <Breadcrumb separator=">" className={className}>
+    <Breadcrumb separator={breadCrumbSeperator} className={className}>
       <Breadcrumb.Item>
         <span className="root-collection-name">{collectionPath[0]?.name}</span>
       </Breadcrumb.Item>
