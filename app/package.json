@@ -103,7 +103,6 @@
     "curlconverter": "^4.12.0",
     "dependency-graph": "^1.0.0",
     "dexie": "^4.2.1",
-    "eslint-linter-browserify": "^9.39.2",
     "fflate": "^0.7.3",
     "file-saver": "^2.0.5",
     "firebase": "^10.8.1",
@@ -171,7 +170,8 @@
     "vscode-languageserver-types": "^3.17.5",
     "xml2js": "^0.6.2",
     "zod": "^4.1.13",
-    "zustand": "^5.0.3"
+    "zustand": "^5.0.3",
+    "@babel/parser": "^7.26.0"
   },
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
