@@ -153,6 +153,7 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
               syncValue: variable.syncValue ?? "",
               localValue: variable.localValue ?? "",
               scope: source.scope,
+              scopeId: source.scopeId,
               scopeName: source.name,
             }}
             onCancel={handleCancel}
