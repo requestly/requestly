@@ -133,7 +133,7 @@ export const TabsContainer: React.FC = () => {
   const tabs = useTabs();
   const activeTabId = useActiveTabId();
   const previewTabId = usePreviewTabId();
-  const { closeTab, setActiveTab, openBufferedTab, setPreviewTab } = useTabActions();
+  const { closeTab, setActiveTab, openBufferedTab, openOrSwitchHistoryTab, setPreviewTab } = useTabActions();
   const [isMorePopoverOpen, setIsMorePopoverOpen] = useState(false);
 
   useCloseActiveTabShortcut();
@@ -222,10 +222,15 @@ export const TabsContainer: React.FC = () => {
       return;
     }
 
-    openBufferedTab({
-      source: matchedTabSource.sourceFactory(matchedTabSource.matchedPath),
-    });
-  }, [matchedTabSource, openBufferedTab]);
+    const source = matchedTabSource.sourceFactory(matchedTabSource.matchedPath);
+    // History tab is singleton; opening it via openBufferedTab would leak buffers.
+    if (source.getSourceId() === "history" && source.getSourceName() === "history") {
+      openOrSwitchHistoryTab({ workspaceId: source.metadata.context?.id }).catch(() => {});
+      return;
+    }
+
+    openBufferedTab({ source });
+  }, [matchedTabSource, openBufferedTab, openOrSwitchHistoryTab]);
 
   const activeTab = tabs.find((t) => t.id === activeTabId);
   const activeTabSource = activeTab?.source;
