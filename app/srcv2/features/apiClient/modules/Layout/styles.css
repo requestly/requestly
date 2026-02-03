@@ -1,0 +1,17 @@
+/* Tailwind CSS for srcv2 - Utility Classes Only */
+/* Use Tailwind for: positioning, spacing, margins, flex, grid, etc. */
+/* Use Ant Design for: buttons, inputs, cards, modals, and all UI components */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+*,
+::before,
+::after {
+  box-sizing: border-box;
+  border-width: 0;
+  border-style: solid;
+}
+
+/* No custom components - Ant Design handles all UI */
