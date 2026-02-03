@@ -24,6 +24,7 @@ import RouterError from "components/misc/PageError/RouterError";
 import { BStackAuthStart } from "features/onboarding/screens/BStackAuthStart/BStackAuthStart";
 import ExtensionInstalledScreen from "views/misc/ExtensionInstalledScreen/";
 import AutomationTemplate from "views/misc/Automation/layout";
+import { routesV2Src } from "@v2/routes";
 
 export const routesV2: RouteObject[] = [
   /** Misc **/
@@ -62,6 +63,8 @@ export const routesV2: RouteObject[] = [
           ...miscRoutes,
           ...desktopSessionsRoutes,
           ...networkInspectorRoutes,
+          /**  V2 Routes - Components from srcv2 **/
+          ...routesV2Src,
         ],
       },
       {
@@ -85,6 +88,22 @@ export const routesV2: RouteObject[] = [
         path: "iframe",
         element: <FullScreenLayout />,
         children: [...sessionRoutes],
+      },
+    ],
+  },
+  {
+    path: "v2",
+    element: <AppLayout />,
+    errorElement: <RouterError />,
+    children: [
+      /** App Dashboard - Normal Paths **/
+      {
+        path: "",
+        element: <DashboardLayout />,
+        children: [
+          /**  V2 Routes - Components from srcv2 **/
+          ...routesV2Src,
+        ],
       },
     ],
   },

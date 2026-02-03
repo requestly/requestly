@@ -45,9 +45,6 @@
     "not ie <= 11",
     "not op_mini all"
   ],
-  "eslintConfig": {
-    "extends": "react-app"
-  },
   "dependencies": {
     "@ai-sdk/react": "^2.0.106",
     "@amplitude/analytics-browser": "^2",
@@ -127,7 +124,6 @@
     "parse-multipart-data": "^1.5.0",
     "path-to-regexp": "^8.3.0",
     "posthog-js": "^1.71.0",
-    "prettier": "^2.8.1",
     "re2js": "^0.4.1",
     "react": "^18.2.0",
     "react-calendly": "^4.3.0",
@@ -192,9 +188,15 @@
     "cross-env": "^7.0.3",
     "esbuild": "0.20.1",
     "eslint": "^8.57.0",
+    "eslint-config-prettier": "^8.8.0",
     "eslint-config-react-app": "^7.0.1",
+    "eslint-plugin-prettier": "^5.0.0",
+    "eslint-plugin-simple-import-sort": "^8.0.0",
+    "eslint-plugin-sonarjs": "^0.17.0",
+    "eslint-plugin-tailwindcss": "^3.8.0",
     "less": "^4.2.0",
     "patch-package": "^8.0.0",
+    "prettier": "^3.6.2",
     "sass": "^1.58.3",
     "source-map-loader": "^3.0.1",
     "typescript": "^5.7.3",

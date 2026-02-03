@@ -1,32 +1,3 @@
 {
-  "compilerOptions": {
-    "outDir": "build",
-    "target": "ESNext",
-    "lib": ["es2021", "dom", "dom.iterable"],
-    "module": "ESNext",
-    "jsx": "react-jsx",
-    "allowJs": true,
-    "checkJs": false,
-    "skipLibCheck": true,
-    "resolveJsonModule": true,
-    "noUnusedLocals": true,
-    "noImplicitAny": true,
-    "noImplicitReturns": false,
-    "moduleResolution": "bundler",
-    "allowSyntheticDefaultImports": true,
-    "strict": false,
-    "strictNullChecks": true,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "baseUrl": "./src",
-    "paths": {},
-    "types": ["vite/client", "vite-plugin-svgr/client", "chrome"],
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
-    "noFallthroughCasesInSwitch": true,
-    "noUncheckedIndexedAccess": true,
-    "noImplicitOverride": false
-  },
-  "exclude": ["node_modules", "build"],
-  "include": ["./src/**/*"]
+  "extends": "./tsconfig.base.json"
 }
