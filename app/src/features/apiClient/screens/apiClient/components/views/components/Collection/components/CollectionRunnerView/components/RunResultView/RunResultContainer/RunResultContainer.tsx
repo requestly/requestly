@@ -28,6 +28,8 @@ import { selectLiveRunResultCurrentlyExecutingRequest } from "features/apiClient
 import { RunResultDetailedView } from "../RunResultDetailedView/RunResultDetailedView";
 import { RequestDetailsHeader } from "./RequestDetailsHeader";
 import Split from "react-split";
+import { getEventByExecutionId } from "store/slices/eventsStream/selectors";
+import { useSelector } from "react-redux/es/hooks/useSelector";
 
 enum RunResultTabKey {
   ALL = "all",
@@ -92,15 +94,19 @@ const TestDetails: React.FC<{
 }> = React.memo(({ requestExecutionResult, onDetailsClick, selectedRequestExId }) => {
   const workspaceId = useWorkspaceId();
 
-  const requestUrl = useMemo(() => {
-    const request = requestExecutionResult.request;
-    if (!request) return null;
+  const events = useSelector((state) =>
+    requestExecutionResult?.executionId ? getEventByExecutionId(requestExecutionResult.executionId)(state as any) : []
+  );
+  const requestEvent = useMemo(() => events.find((e) => e.data.type === "REQUEST"), [events]);
 
-    if ("url" in request) {
-      return (request as RQAPI.HttpRequest).url;
+  const requestUrl = useMemo(() => {
+    if (!requestEvent) return null;
+    const request = requestEvent.data.payload as RQAPI.Request;
+    if (request.url) {
+      return request.url;
     }
     return null;
-  }, [requestExecutionResult.request]);
+  }, [requestEvent]);
 
   const isSelected = selectedRequestExId === requestExecutionResult?.executionId;
   return (

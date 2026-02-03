@@ -9,8 +9,6 @@ export type BaseRequestExecutionResult = {
   recordId: RQAPI.ApiRecord["id"];
   recordName: RQAPI.ApiRecord["name"];
   collectionName: RQAPI.CollectionRecord["name"];
-  request?: RQAPI.Request;
-  response?: RQAPI.Response;
   entry:
     | {
         type: RQAPI.ApiEntryType.HTTP;
