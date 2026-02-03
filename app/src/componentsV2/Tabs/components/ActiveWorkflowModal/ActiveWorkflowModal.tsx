@@ -10,31 +10,32 @@ interface ActiveWorkflowModalProps {
 }
 
 export const ActiveWorkflowModal: React.FC<ActiveWorkflowModalProps> = ({ open, onCancel, onConfirm }) => {
+  const header = <div className="active-workflow-modal-title">Collection is still running</div>;
+
+  const footer = (
+    <div className="active-workflow-modal-footer">
+      <RQButton type="secondary" onClick={onCancel}>
+        Continue running
+      </RQButton>
+      <RQButton type="danger" onClick={onConfirm}>
+        Stop and leave
+      </RQButton>
+    </div>
+  );
+
   return (
     <Modal
       open={open}
+      title={header}
       onCancel={onCancel}
-      footer={null}
+      footer={footer}
       maskClosable={false}
       destroyOnClose
       style={{ top: 80 }}
-      width={600}
+      width={480}
       className="active-workflow-modal-root"
     >
-      <div className="active-workflow-modal">
-        <h3 className="active-workflow-modal-title">Collection is still running</h3>
-        <p className="active-workflow-modal-description">
-          Leaving now will stop the run and discard remaining results.
-        </p>
-        <div className="active-workflow-modal-footer">
-          <RQButton type="secondary" onClick={onCancel}>
-            Continue running
-          </RQButton>
-          <RQButton type="danger" onClick={onConfirm}>
-            Stop and leave
-          </RQButton>
-        </div>
-      </div>
+      <p className="active-workflow-modal-description">Leaving now will stop the run and discard remaining results.</p>
     </Modal>
   );
 };
