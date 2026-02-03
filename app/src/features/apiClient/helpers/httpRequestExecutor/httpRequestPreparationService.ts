@@ -1,5 +1,5 @@
 import { addUrlSchemeIfMissing, queryParamsToURLString, sanitizeEntry } from "../../screens/apiClient/utils";
-import { RQAPI } from "../../types";
+import { KeyValuePair, RQAPI } from "../../types";
 import { updateRequestWithAuthOptions } from "../auth";
 import { cloneDeep, isEmpty } from "lodash";
 import { renderTemplate } from "backend/environment/utils";
@@ -17,8 +17,8 @@ import { VariableData } from "@requestly/shared/types/entities/apiClient";
 export class HttpRequestPreparationService {
   constructor(private ctx: ApiClientFeatureContext) {}
 
-  private renderPathVariables(url: string, pathVariables: RQAPI.PathVariable[]): string {
-    const variableValues: Record<RQAPI.PathVariable["key"], RQAPI.PathVariable["value"]> = {};
+  private renderPathVariables(url: string, pathVariables: KeyValuePair[]): string {
+    const variableValues: Record<KeyValuePair["key"], KeyValuePair["value"]> = {};
 
     if (!pathVariables || pathVariables.length === 0) {
       return url;

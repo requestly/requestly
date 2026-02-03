@@ -7,7 +7,6 @@ import { ApiClientEntityType } from "./types";
 import { ApiClientEntityMeta } from "./base";
 import { supportsRequestBody } from "features/apiClient/screens/apiClient/utils";
 import { CONTENT_TYPE_HEADER } from "features/apiClient/constants";
-import { v4 } from "uuid";
 
 export class HttpRecordEntity<M extends ApiClientEntityMeta = ApiClientEntityMeta> extends ApiClientRecordEntity<
   RQAPI.HttpApiRecord,
@@ -100,7 +99,8 @@ export class HttpRecordEntity<M extends ApiClientEntityMeta = ApiClientEntityMet
     }
     const existingPathVariables = state.data.request.pathVariables;
     existingPathVariables.push({
-      id: v4(),
+      isEnabled: true,
+      id: Date.now(),
       key,
       value: "",
       description: "",
@@ -119,7 +119,7 @@ export class HttpRecordEntity<M extends ApiClientEntityMeta = ApiClientEntityMet
     }
   }
 
-  setPathVariable(key: string, patch: Omit<RQAPI.PathVariable, "id" | "key">) {
+  setPathVariable(key: string, patch: Omit<KeyValuePair, "id" | "key">) {
     this.unsafePatch((s) => {
       const existingPathVariables = s.data.request.pathVariables;
       if (!existingPathVariables) {
@@ -177,7 +177,7 @@ export class HttpRecordEntity<M extends ApiClientEntityMeta = ApiClientEntityMet
     this.SET({ data: { request: { contentType } } });
   }
 
-  setPathVariables(pathVariables: RQAPI.PathVariable[]): void {
+  setPathVariables(pathVariables: KeyValuePair[]): void {
     this.SET({ data: { request: { pathVariables } } });
   }
 
