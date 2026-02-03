@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Badge, Collapse, Spin, Tabs } from "antd";
 import {
   CurrentlyExecutingRequest,
@@ -382,11 +382,14 @@ export const RunResultContainer: React.FC<{
     return showDetailedView && selectedRequest ? [500, 500] : [500, 0];
   }, [showDetailedView, selectedRequest]);
 
-  const handleDetailsClick = (requestResult: RequestExecutionResult) => {
-    setSelectedRequest(requestResult);
-    setUserHasInteracted(true);
-    onToggleDetailedView?.(true);
-  };
+  const handleDetailsClick = useCallback(
+    (requestResult: RequestExecutionResult) => {
+      setSelectedRequest(requestResult);
+      setUserHasInteracted(true);
+      onToggleDetailedView?.(true);
+    },
+    [onToggleDetailedView]
+  );
 
   const handlePanelClose = () => {
     setSelectedRequest(null);
@@ -538,10 +541,10 @@ export const RunResultContainer: React.FC<{
                 <MetricsHeader />
               </div>
               <div className="run-result-details">
-                {showDetailedView && (
+                {showDetailedView && selectedRequest && (
                   <RunResultDetailedView
                     onClose={handlePanelClose}
-                    requestExecutionResult={selectedRequest}
+                    executionId={selectedRequest.executionId}
                     headerBreadcrumb={headerBreadcrumb}
                   />
                 )}
