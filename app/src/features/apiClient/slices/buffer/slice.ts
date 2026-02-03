@@ -1,7 +1,7 @@
 import { createSlice, createEntityAdapter, PayloadAction } from "@reduxjs/toolkit";
 import { produceWithPatches, enablePatches, current } from "immer";
 import { v4 as uuidv4 } from "uuid";
-import { set, unset, cloneDeep, get } from "lodash";
+import { set, unset, cloneDeep } from "lodash";
 import { objectToSetOperations, objectToDeletePaths, isPathPresent } from "../utils/pathConverter";
 import { BufferEntry, BufferState } from "./types";
 import { ApiClientEntityType } from "../entities/types";
@@ -65,8 +65,8 @@ export const bufferSlice = createSlice({
         if (referenceId) {
           const existing = findBufferByReferenceId(state.entities, referenceId);
           if (existing) {
-            existing.current = cloneDeep(data);
-            existing.diff = {};
+            // existing.current = cloneDeep(data);
+            // existing.diff = {};
             return;
           }
         }
@@ -225,6 +225,7 @@ export const bufferSlice = createSlice({
           set(entry.diff as object, path, value);
         }
       }
+      entry.isNew = false;
     },
 
     markSaved(
@@ -255,6 +256,21 @@ export const bufferSlice = createSlice({
 
     clearAll(state) {
       bufferAdapter.removeAll(state);
+    },
+
+    revertChanges(
+      state,
+      action: PayloadAction<{
+        referenceId: string;
+        sourceData: unknown;
+      }>
+    ) {
+      const entry = findBufferByReferenceId(state.entities, action.payload.referenceId);
+      if (!entry) throw new EntityNotFound(action.payload.referenceId, "buffer");
+
+      entry.current = cloneDeep(action.payload.sourceData);
+      entry.diff = {};
+      entry.isDirty = false;
     },
   },
 });

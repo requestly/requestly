@@ -73,11 +73,16 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
   const [searchValue, setSearchValue] = useState("");
   const [isAllRecordsSelected, setIsAllRecordsSelected] = useState(false);
 
-  const debouncedTrackUserProperties = debounce(() => trackUserProperties(apiClientRecords), 1000);
+  const debouncedTrackUserProperties = useMemo(
+    () => debounce(() => trackUserProperties(apiClientRecords), 1000),
+    [] // Empty deps - debounce function should be stable
+  );
 
-  // TODO
   useEffect(() => {
     debouncedTrackUserProperties();
+    return () => {
+      debouncedTrackUserProperties.cancel();
+    };
   }, [apiClientRecords, debouncedTrackUserProperties]);
 
   useEffect(() => {

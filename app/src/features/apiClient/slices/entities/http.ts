@@ -23,11 +23,12 @@ export class HttpRecordEntity<M extends ApiClientEntityMeta = ApiClientEntityMet
         foundType: record?.type,
       });
     }
-    if (record.data?.type !== RQAPI.ApiEntryType.HTTP) {
+    const entryType = record.data?.type;
+    if (entryType && entryType !== RQAPI.ApiEntryType.HTTP) {
       throw new InvalidEntityShape({
         id: this.id,
         expectedType: RQAPI.ApiEntryType.HTTP,
-        foundType: record.data.type,
+        foundType: entryType,
       });
     }
     return record as RQAPI.HttpApiRecord;
@@ -114,7 +115,9 @@ export class HttpRecordEntity<M extends ApiClientEntityMeta = ApiClientEntityMet
       return;
     }
     const index = existingPathVariables.findIndex((v) => v.key === key);
-    existingPathVariables.splice(index, 1);
+    if (index >= 0) {
+      existingPathVariables.splice(index, 1);
+    }
   }
 
   setPathVariable(key: string, patch: Omit<RQAPI.PathVariable, "id" | "key">) {
@@ -154,7 +157,7 @@ export class HttpRecordEntity<M extends ApiClientEntityMeta = ApiClientEntityMet
     if (!supportsRequestBody(method)) {
       this.deleteBody();
       this.setContentType(RequestContentType.RAW);
-      this.deleteHeader((header) => header.key !== CONTENT_TYPE_HEADER);
+      this.deleteHeader((header) => header.key === CONTENT_TYPE_HEADER);
     }
     this.SET({ data: { request: { method } } });
   }
@@ -189,7 +192,7 @@ export class HttpRecordEntity<M extends ApiClientEntityMeta = ApiClientEntityMet
 
   deleteHeader(predicate: (header: KeyValuePair) => boolean): void {
     this.unsafePatch((state) => {
-      state.data.request.headers = state.data.request.headers.filter(predicate);
+      state.data.request.headers = state.data.request.headers.filter((header) => !predicate(header));
     });
   }
 

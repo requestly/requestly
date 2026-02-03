@@ -1,10 +1,7 @@
 import { notification } from "antd";
 import { VariablesListHeader } from "features/apiClient/screens/environment/components/VariablesListHeader/VariablesListHeader";
 import { useSaveBuffer } from "features/apiClient/slices/buffer/hooks";
-import {
-    useBufferedCollectionEntity,
-    useIsBufferDirty,
-} from "features/apiClient/slices/entities/hooks";
+import { useBufferedCollectionEntity, useIsBufferDirty } from "features/apiClient/slices/entities/hooks";
 import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
 import type { ApiClientRootState } from "features/apiClient/slices/hooks/types";
 import { trackVariablesSaved } from "modules/analytics/events/features/apiClient";
@@ -63,7 +60,7 @@ export const CollectionsVariablesView: React.FC<CollectionsVariablesViewProps> =
           toast.success("Variables updated successfully");
           trackVariablesSaved({
             type: "collection_variable",
-            num_variables: Object.keys(changes.data.variables).length,
+            num_variables: Object.keys(changes.data.variables ?? {}).length,
           });
         },
         beforeSave() {

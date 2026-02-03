@@ -357,7 +357,6 @@ class ApiClientContextService {
   async createContext(workspace: WorkspaceInfo, userDetails: UserDetails): Promise<void> {
     const workspaceId = workspace.id;
 
-    const currentCtxVersion = this.contextRegistry.getVersion();
     const existing = this.contextRegistry.getContext(workspaceId);
     if (existing) {
       return;
@@ -422,6 +421,10 @@ class ApiClientContextService {
       globalEnvironment,
     });
 
+    // Get current version RIGHT BEFORE adding to avoid race condition
+    // when multiple workspaces are created in parallel
+    const currentCtxVersion = this.contextRegistry.getVersion();
+
     const ctx: ApiClientFeatureContext = { workspaceId, store, repositories: repo };
     this.contextRegistry.addContext(ctx, currentCtxVersion);
   }
@@ -431,7 +434,7 @@ class ApiClientContextService {
       const context = this.contextRegistry.getContext(workspaceId);
 
       if (!context) {
-        throw new NativeError("Add the context to the store before trying to refresh it");
+        throw new NativeError(`Add the context to the store before trying to refresh it. Workspace ID: ${workspaceId}`);
       }
 
       if (context.repositories instanceof ApiClientLocalRepository) {

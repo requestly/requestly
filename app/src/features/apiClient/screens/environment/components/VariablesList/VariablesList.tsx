@@ -1,5 +1,6 @@
 import type React from "react";
 import { useState, useCallback, useMemo, useRef } from "react";
+import * as Sentry from "@sentry/react";
 import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
 import { EnvironmentVariableType } from "backend/environment/types";
 import type { EnvironmentVariables } from "backend/environment/types";
@@ -19,7 +20,6 @@ import { VariableData } from "@requestly/shared/types/entities/apiClient";
 
 const existsInBackend = (variablesData: EnvironmentVariables, id: string | number) =>
   Object.values(variablesData).some((v) => v.id === id);
-
 
 interface VariablesListProps {
   variablesData: EnvironmentVariables;
@@ -56,7 +56,7 @@ export const VariablesList: React.FC<VariablesListProps> = ({
           syncValue: "",
           localValue: "",
           isPersisted: true,
-        } as VariableRow,
+        },
       ];
     }
     emptyRowIdRef.current = uuidv4();
@@ -100,20 +100,29 @@ export const VariablesList: React.FC<VariablesListProps> = ({
 
   const handleVariableChange = useCallback(
     (row: VariableRow, fieldChanged: keyof VariableRow) => {
-      if (!existsInBackend(variablesData, row.id)) {
-        if (row.key) {
-          variables.add({
-            id: row.id,
-            key: row.key,
-            type: row.type,
-            syncValue: row.syncValue,
-            localValue: row.localValue,
-            isPersisted: true,
-          });
+      try {
+        if (!existsInBackend(variablesData, row.id)) {
+          if (row.key) {
+            variables.add({
+              id: row.id,
+              key: row.key,
+              type: row.type,
+              syncValue: row.syncValue,
+              localValue: row.localValue,
+              isPersisted: true,
+            });
+          }
+          return;
         }
-        return;
+        variables.set({ id: row.id, [fieldChanged]: row[fieldChanged] });
+      } catch (error) {
+        console.error("Failed to update variable", error);
+        Sentry.captureException(error instanceof Error ? error : new Error(String(error)), {
+          tags: { feature: "api_client", component: "variables_list" },
+          extra: { variableId: row.id, fieldChanged },
+        });
+        // Error is handled silently as it's a local state update
       }
-      variables.set({ id: row.id, [fieldChanged]: row[fieldChanged] });
     },
     [variables, variablesData]
   );
@@ -132,7 +141,8 @@ export const VariablesList: React.FC<VariablesListProps> = ({
   const handleDeleteVariable = useCallback(
     (id: number | string) => {
       if (!existsInBackend(variablesData, id)) return;
-      variables.delete(id);
+      // Safe cast: existsInBackend ensures the id is numeric (from backend)
+      variables.delete(id as number);
     },
     [variables, variablesData]
   );
@@ -151,7 +161,10 @@ export const VariablesList: React.FC<VariablesListProps> = ({
   const handleUpdatePersisted = useCallback(
     (id: number | string, isPersisted: boolean) => {
       if (!existsInBackend(variablesData, id)) return;
-      variables.set({ id, isPersisted: isPersisted as true });
+      // Safe cast: existsInBackend ensures the id is numeric (from backend)
+      // Note: Type assertion needed because Variable type expects isPersisted: true for persisted variables
+      // This is a design limitation - the type system doesn't allow boolean here
+      variables.set({ id: id as number, isPersisted: (isPersisted ? true : undefined) as any });
     },
     [variables, variablesData]
   );
