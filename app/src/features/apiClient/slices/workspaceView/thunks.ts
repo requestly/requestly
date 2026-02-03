@@ -252,8 +252,29 @@ export const setupWorkspaceView = createAsyncThunk(
     const { userId } = params;
     const rootState = getState() as RootState;
     const selectedWorkspaces = getAllSelectedWorkspaces(rootState.workspaceView);
+    const viewMode = getViewMode(rootState);
 
     if (!userId) {
+      // When logged out, preserve local workspace state if it exists
+      const activeWorkspaceId = rootState.workspace.activeWorkspaceIds[0];
+      const localWorkspaces = selectedWorkspaces.filter((ws) => ws.meta.type === WorkspaceType.LOCAL);
+      const activeLocalWorkspace = localWorkspaces.find((ws) => ws.id === activeWorkspaceId);
+
+      if (viewMode === ApiClientViewMode.SINGLE && activeLocalWorkspace) {
+        // Single mode with a local workspace that matches active - keep it active
+        return dispatch(
+          switchContext({
+            workspace: activeLocalWorkspace,
+          })
+        ).unwrap();
+      }
+
+      if (viewMode === ApiClientViewMode.MULTI && localWorkspaces.length > 0) {
+        // Multi-view mode with local workspaces - maintain that state
+        return dispatch(workspaceViewManager({ workspaces: localWorkspaces, action: "add" })).unwrap();
+      }
+
+      // No local workspaces, fallback to logged out workspace
       return dispatch(
         switchContext({
           workspace: {
@@ -306,14 +327,12 @@ export const setupWorkspaceView = createAsyncThunk(
       }
 
       try {
-        const result = await dispatch(
+        return dispatch(
           switchContext({
             workspace: selectedWorkspace,
             userId,
           })
-        ).unwrap();
-
-        return result;
+        );
       } catch (error) {
         if (isWorkspaceDeletedError(error)) {
           // workspace deleted, fallback to private
