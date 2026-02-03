@@ -85,6 +85,8 @@ export const DataTab: React.FC<DataTabProps> = ({ type, request, response, metho
     );
   }
 
+  const emptyBodyTitle = type === "request" ? "No request body available" : "No response body available";
+
   return (
     <div className={`${type}-details-tab`}>
       <Collapse defaultActiveKey={["body"]} ghost>
@@ -92,7 +94,7 @@ export const DataTab: React.FC<DataTabProps> = ({ type, request, response, metho
           {body ? (
             <ResponseBody responseText={body} contentTypeHeader={contentType} />
           ) : (
-            <EmptyState title="No response body available" description={emptyBodyMessage} imageSrc={EmptyInboxIcon} />
+            <EmptyState title={emptyBodyTitle} description={emptyBodyMessage} imageSrc={EmptyInboxIcon} />
           )}
         </Collapse.Panel>
         <Collapse.Panel header={type === "request" ? "Headers" : "HEADERS"} key="headers">
