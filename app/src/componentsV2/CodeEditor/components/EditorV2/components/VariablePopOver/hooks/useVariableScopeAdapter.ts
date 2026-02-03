@@ -33,19 +33,6 @@ export interface VariableScopeAdapter {
   store: Store;
 }
 
-type VariableScopeAdapterOverrides = {
-  /**
-   * Explicit scope entity id to use instead of inferring from `scopeOptions`.
-   * Needed when editing variables coming from ancestor collections.
-   */
-  scopeId?: string;
-  /**
-   * Optional display name override (used in toasts).
-   * If omitted, a name is derived from the entity/store.
-   */
-  scopeDisplayName?: string;
-};
-
 /**
  * Returns scope-specific Redux entity, repository save function, and correct store.
  * Abstracts the branching logic for different variable scopes.
@@ -60,15 +47,15 @@ type VariableScopeAdapterOverrides = {
 export function useVariableScopeAdapter(
   scope: VariableScope,
   scopeOptions: ScopeOption[],
-  overrides?: VariableScopeAdapterOverrides
+  scopeId?: string
 ): VariableScopeAdapter {
   const selectedScopeOption = scopeOptions.find((option) => option.value === scope && !option.disabled && option.id);
-  const scopeId = overrides?.scopeId ?? selectedScopeOption?.id;
-  if (!scopeId) {
+  const resolvedScopeId = scopeId ?? selectedScopeOption?.id;
+  if (!resolvedScopeId) {
     throw new EntityNotFound(scope, "scope");
   }
   const entity = useEntity({
-    id: scopeId,
+    id: resolvedScopeId,
     type:
       scope === VariableScope.ENVIRONMENT
         ? ApiClientEntityType.ENVIRONMENT
@@ -91,7 +78,7 @@ export function useVariableScopeAdapter(
         saveVariablesToRepository: async (variables: EnvironmentVariables) => {
           await repositories.environmentVariablesRepository.updateEnvironment(GLOBAL_ENVIRONMENT_ID, { variables });
         },
-        scopeDisplayName: overrides?.scopeDisplayName ?? "Global",
+        scopeDisplayName: "Global",
         store: workspaceStore,
       };
 
@@ -102,7 +89,7 @@ export function useVariableScopeAdapter(
         saveVariablesToRepository: async (variables: EnvironmentVariables) => {
           await repositories.environmentVariablesRepository.updateEnvironment(entity.id, { variables });
         },
-        scopeDisplayName: overrides?.scopeDisplayName ?? entity.getName(workspaceStore.getState()),
+        scopeDisplayName: entity.getName(workspaceStore.getState()),
         store: workspaceStore,
       };
 
@@ -113,7 +100,7 @@ export function useVariableScopeAdapter(
         saveVariablesToRepository: async (variables: EnvironmentVariables) => {
           await repositories.apiClientRecordsRepository.setCollectionVariables(entity.id, variables);
         },
-        scopeDisplayName: overrides?.scopeDisplayName ?? entity.getName(workspaceStore.getState()),
+        scopeDisplayName: entity.getName(workspaceStore.getState()),
         store: workspaceStore,
       };
 
@@ -124,7 +111,7 @@ export function useVariableScopeAdapter(
         saveVariablesToRepository: async () => {
           // No-op - runtime variables are not persisted to repository
         },
-        scopeDisplayName: overrides?.scopeDisplayName ?? "Runtime",
+        scopeDisplayName: "Runtime",
         store: globalStore,
       };
 

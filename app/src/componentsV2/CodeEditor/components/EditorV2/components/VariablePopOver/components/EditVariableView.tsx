@@ -38,10 +38,10 @@ export const EditVariableView: React.FC<EditVariableViewProps> = ({
 }) => {
   const [upserting, setUpserting] = useState(false);
 
-  const { entity, saveVariablesToRepository, scopeDisplayName, store } = useVariableScopeAdapter(
+  const { entity, saveVariablesToRepository, store } = useVariableScopeAdapter(
     existingVariable.scope,
     [],
-    { scopeId: existingVariable.scopeId, scopeDisplayName: existingVariable.scopeName }
+    existingVariable.scopeId
   );
 
   const [formData, setFormData] = useState({
@@ -90,7 +90,7 @@ export const EditVariableView: React.FC<EditVariableViewProps> = ({
       });
 
       await onSave(variableData);
-      toast.success(`Variable updated in ${scopeDisplayName}`);
+      toast.success(`Variable updated in ${existingVariable.scopeName}`);
       trackVariablesSaved({
         source: VariableUpsertSource.VARIABLE_POPOVER,
         variable_scope: scope.toLowerCase(),
@@ -101,7 +101,7 @@ export const EditVariableView: React.FC<EditVariableViewProps> = ({
     } finally {
       setUpserting(false);
     }
-  }, [variableName, formData, store, entity, saveVariablesToRepository, scopeDisplayName, onSave]);
+  }, [variableName, formData, store, entity, saveVariablesToRepository, existingVariable.scopeName, onSave]);
 
   const scopeIcon = useMemo(() => {
     return getScopeIcon(existingVariable.scope) || <FaListAlt />;
