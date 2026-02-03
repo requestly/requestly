@@ -12,7 +12,7 @@ import { fromSavedRunConfig, getRunnerConfigId } from "features/apiClient/slices
 import { AutogenerateProvider } from "features/apiClient/store/autogenerateContextProvider";
 import { RQAPI } from "features/apiClient/types";
 import { useHostContext } from "hooks/useHostContext";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import Split from "react-split";
 import { toast } from "utils/Toast";
 import { CollectionViewContextProvider } from "../../collectionView.context";
@@ -35,6 +35,7 @@ export const CollectionRunnerView: React.FC<Props> = ({ collectionId, activeTabK
   const apiClientDispatch = useApiClientDispatch();
   const [isLoading, setIsLoading] = useState(true);
   const [isResultsLoading, setIsResultsLoading] = useState(true);
+  const [isDetailedViewOpen, setIsDetailedViewOpen] = useState(false);
   const { registerSecondaryBuffer, unregisterSecondaryBuffer } = useHostContext();
 
   useEffect(() => {
@@ -110,6 +111,18 @@ export const CollectionRunnerView: React.FC<Props> = ({ collectionId, activeTabK
     })();
   }, [apiClientDispatch, collectionId, workspaceId]);
 
+  const handleToggleDetailedView = useCallback((open: boolean) => {
+    setIsDetailedViewOpen(open);
+  }, []);
+
+  const runResultViewProps = useMemo(
+    () => ({
+      isDetailedViewOpen,
+      onToggleDetailedView: handleToggleDetailedView,
+    }),
+    [isDetailedViewOpen, handleToggleDetailedView]
+  );
+
   if (isLoading || isResultsLoading) {
     return <RunnerViewLoader />;
   }
@@ -126,8 +139,10 @@ export const CollectionRunnerView: React.FC<Props> = ({ collectionId, activeTabK
             className="collection-runner-view-split"
           >
             <DataFileModalProvider>
-              <RunConfigView activeTabKey={activeTabKey} />
-              <RunResultView />
+              <div className={isDetailedViewOpen ? "hidden" : ""}>
+                <RunConfigView activeTabKey={activeTabKey} />
+              </div>
+              <RunResultView {...runResultViewProps} />
             </DataFileModalProvider>
           </Split>
         </div>
