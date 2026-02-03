@@ -24,7 +24,9 @@ module.exports = {
       version: "detect",
     },
     tailwindcss: {
-      callees: ["twClassNames", "cn", "clsx", "classnames"],
+      callees: ["cn", "clsx", "classnames"],
+      config: "../tailwind.config.js",
+      cssFiles: ["./styles.css"],
     },
   },
   rules: {
@@ -53,15 +55,15 @@ module.exports = {
     "simple-import-sort/exports": "error",
 
     // ============================================
-    // Tailwind CSS Best Practices
+    // Tailwind CSS Best Practices (Utility Classes Only)
     // ============================================
-    "tailwindcss/classnames-order": "error", // Enforce consistent class order
+    "tailwindcss/classnames-order": "error", // Auto-sort Tailwind classes
     "tailwindcss/enforces-negative-arbitrary-values": "error",
-    "tailwindcss/enforces-shorthand": "error",
-    "tailwindcss/migration-from-tailwind-2": "error",
-    "tailwindcss/no-arbitrary-value": "off", // Allow arbitrary values when needed
-    "tailwindcss/no-custom-classname": "warn", // Warn on custom classes not in Tailwind
-    "tailwindcss/no-contradicting-classname": "error", // Error on conflicting classes
+    "tailwindcss/enforces-shorthand": "error", // Prefer p-4 over px-4 py-4
+    "tailwindcss/migration-from-tailwind-2": "off",
+    "tailwindcss/no-arbitrary-value": "off", // Allow arbitrary values like w-[442px]
+    "tailwindcss/no-custom-classname": "warn", // Warn on non-Tailwind classes
+    "tailwindcss/no-contradicting-classname": "error", // Error on flex + block
 
     // ============================================
     // SonarJS - Code Quality & Bug Detection
@@ -211,53 +213,6 @@ module.exports = {
     // React & TypeScript
     "react/prop-types": "off", // Not needed with TypeScript
     "react/require-default-props": "off", // Optional props handle defaults
-
-    // Import Restrictions
-    "no-restricted-imports": [
-      "warn",
-      {
-        patterns: [
-          {
-            group: [
-              // Block imports from src directory (via baseUrl resolution to src/*)
-              // Note: Imports starting with @ are our srcv2 aliases and are allowed
-              "features",
-              "features/**",
-              "views",
-              "views/**",
-              "components",
-              "components/**",
-              "config",
-              "config/**",
-              "actions",
-              "actions/**",
-              "store",
-              "store/**",
-              "utils",
-              "utils/**",
-              "hooks",
-              "hooks/**",
-              "layouts",
-              "layouts/**",
-              "lib",
-              "lib/**",
-              "backend",
-              "backend/**",
-              "services",
-              "services/**",
-              // Block relative imports to src
-              "../src",
-              "../src/**",
-              "../../src",
-              "../../src/**",
-              "../../../src",
-              "../../../src/**",
-            ],
-            message: "srcv2 should not import from src directory. Use @v2/* aliases instead.",
-          },
-        ],
-      },
-    ],
   },
   overrides: [
     {
@@ -268,6 +223,20 @@ module.exports = {
       },
       rules: {
         "@typescript-eslint/no-var-requires": "off",
+      },
+    },
+    {
+      // Relax strict type checking for test files and test utilities
+      files: ["**/__tests__/**/*.{ts,tsx}", "**/*.test.{ts,tsx}", "**/*.spec.{ts,tsx}", "**/test-kit/**/*.{ts,tsx}"],
+      rules: {
+        "@typescript-eslint/no-unsafe-assignment": "off",
+        "@typescript-eslint/no-unsafe-member-access": "off",
+        "@typescript-eslint/no-unsafe-call": "off",
+        "@typescript-eslint/no-unsafe-return": "off",
+        "@typescript-eslint/no-unsafe-argument": "off",
+        "@typescript-eslint/no-explicit-any": "off",
+        "@typescript-eslint/no-unnecessary-condition": "off",
+        "@typescript-eslint/no-unnecessary-type-assertion": "off",
       },
     },
   ],

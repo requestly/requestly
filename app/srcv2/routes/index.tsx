@@ -1,4 +1,4 @@
-import { apiClientRoutesV2 } from "../features/apiClient";
+import { apiClientRoutesV2 } from "@v2features/apiClient";
 import { RouteObject } from "react-router-dom";
 
 /**
