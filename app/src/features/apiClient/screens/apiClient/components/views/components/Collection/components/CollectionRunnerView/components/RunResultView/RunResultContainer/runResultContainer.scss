@@ -1,21 +1,69 @@
-.run-result-view-details {
-  user-select: none;
-  flex: 1; // Use flex instead of height: 100%
-  min-height: 0; // Allow flex children to shrink
+.run-result-view-details-wrapper {
+  height: 100%;
   display: flex;
   flex-direction: column;
+
+  .run-result-split-container {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+
+    > .gutter {
+      z-index: 1;
+      background-color: var(--requestly-color-primary);
+      background-clip: content-box;
+      cursor: col-resize;
+      opacity: 0;
+
+      &:hover,
+      &:active {
+        opacity: 1;
+      }
+    }
+
+    > .run-result-view-details,
+    > .run-result-detail-panel-container {
+      height: 100%;
+      overflow: hidden;
+    }
+    > .run-result-detail-panel-container {
+      .run-result-details {
+        height: 100%;
+        overflow: auto;
+        border-left: 1px solid var(--requestly-color-white-t-10);
+      }
+    }
+  }
+}
+
+.breadcrumb-ellipsis {
+  &:hover {
+    border-radius: 4px;
+    background: var(--alias-tokens-color-white-t-20, rgba(255, 255, 255, 0.12));
+    padding: 0px 4px 4px;
+    text-align: center;
+  }
+}
+
+.run-result-view-details {
+  display: flex;
+  flex-direction: column;
+
+  &.right-panel-opened {
+    align-items: flex-end;
+    border-bottom: 1px solid var(--requestly-color-white-t-10);
+  }
 
   .result-header {
     display: flex;
     align-items: center;
     gap: var(--space-8, 24px);
-    padding: var(--space-4, 8px) var(--space-6, 16px);
-    flex-shrink: 0; // Prevent header from shrinking
+    padding: var(--space-5, 10px) var(--space-6, 16px);
+    flex-shrink: 0;
 
     .run-metric {
       flex-shrink: 0;
       font-size: var(--requestly-font-size-sm, 12px);
-      font-style: normal;
       font-weight: 400;
       line-height: 18px; /* 150% */
 
@@ -104,9 +152,12 @@
       .title {
         color: var(--requestly-color-text-default, #fff);
         font-size: var(--requestly-font-size-xs, 11px);
-        font-style: normal;
         font-weight: 500;
         line-height: 17px; /* 154.545% */
+
+        &.failed {
+          color: var(--requestly-color-error-text);
+        }
       }
 
       .ant-badge {
@@ -122,12 +173,17 @@
           box-shadow: none;
 
           font-size: var(--requestly-font-size-xs, 11px);
-          font-style: normal;
           font-weight: 400;
           line-height: 17px; /* 154.545% */
 
           .ant-scroll-number-only {
             height: auto;
+          }
+        }
+        &.failed {
+          .ant-badge-count {
+            color: var(--requestly-color-error-text);
+            background-color: var(--requestly-color-error-800);
           }
         }
       }
@@ -174,7 +230,6 @@
 
           color: var(--requestly-color-text-subtle, #bbb);
           font-size: var(--requestly-font-size-2xs, 9px);
-          font-style: normal;
           font-weight: 500;
           line-height: 13px; /* 144.444% */
           letter-spacing: 1px;
@@ -208,6 +263,16 @@
         gap: var(--space-4, 8px);
         align-self: stretch;
         border-bottom: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+
+        &:hover {
+          background-color: var(--requestly-color-white-t-5, rgba(255, 255, 255, 0.03));
+        }
+
+        &.selected {
+          background-color: var(--requestly-color-white-t-5, rgba(255, 255, 255, 0.03));
+        }
 
         .execution-error-message {
           display: flex;
@@ -233,7 +298,6 @@
             text-overflow: ellipsis;
 
             font-size: var(--requestly-font-size-sm, 12px);
-            font-style: normal;
             font-weight: 400;
             line-height: 18px; /* 150% */
           }
@@ -243,6 +307,7 @@
           font-weight: 400;
           color: var(--requestly-color-text-subtle);
           font-size: var(--requestly-font-size-sm);
+          margin-left: 30px;
         }
 
         .loader {
@@ -264,6 +329,12 @@
           display: flex;
           align-items: center;
           gap: 4px;
+          justify-content: space-between;
+          width: 100%;
+
+          .request-method-breadcrumb-section {
+            display: flex;
+          }
 
           .icon {
             margin-right: 4px;
@@ -281,11 +352,21 @@
           .request-method {
             background-color: transparent !important;
             font-size: var(--requestly-font-size-2xs, 9px);
-            font-style: normal;
             font-weight: 600;
             line-height: 13px; /* 144.444% */
             letter-spacing: 1.5px;
             text-transform: uppercase;
+          }
+          .request-name-details-breadcrumb {
+            margin-top: -2px;
+
+            .anticon-down {
+              display: none;
+            }
+          }
+
+          .root-collection-name {
+            font-size: var(--requestly-font-size-sm);
           }
 
           .collection-name {
@@ -297,7 +378,6 @@
             color: var(--requestly-color-text-placeholder, #8f8f8f);
             text-overflow: ellipsis;
             font-size: var(--requestly-font-size-xs, 11px);
-            font-style: normal;
             font-weight: 500;
             line-height: 17px; /* 154.545% */
           }
@@ -311,11 +391,11 @@
             text-overflow: ellipsis;
             color: var(--requestly-color-text-default, #fff);
             font-size: var(--requestly-font-size-sm, 12px);
-            font-style: normal;
             font-weight: 500;
             line-height: 17px; /* 150% */
             margin-right: 4px;
             cursor: pointer;
+            margin-top: 3px;
           }
 
           .response-details {
@@ -332,9 +412,28 @@
             margin-right: 4px;
             color: var(--requestly-color-text-placeholder, #8f8f8f);
             font-size: var(--requestly-font-size-xs, 11px);
-            font-style: normal;
             font-weight: 400;
             line-height: 17px; /* 154.545% */
+          }
+        }
+
+        .request-url {
+          display: flex;
+          align-items: center;
+          width: 100%;
+          margin-left: 30px;
+          margin-top: -5px;
+
+          .url-text {
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 1;
+            line-clamp: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: var(--requestly-color-text-placeholder);
+            font-size: var(--requestly-font-size-xs);
+            font-weight: 400;
           }
         }
 
@@ -344,6 +443,7 @@
           align-items: flex-start;
           gap: var(--space-3, 6px);
           align-self: stretch;
+          margin-left: 30px;
         }
       }
 
