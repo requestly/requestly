@@ -17,11 +17,33 @@
     flex-shrink: 0; // Prevent header from shrinking
     border-bottom: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
 
+    &.hide-border {
+      border-bottom: none;
+    }
+
+    .left-section {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      .back-button {
+        color: var(--requestly-color-text-subtle);
+      }
+    }
+
     .header {
       color: var(--requestly-color-text-default, #fff);
       font-size: var(--requestly-font-size-sm, 12px);
       font-weight: 500;
       line-height: 18px; /* 150% */
+    }
+
+    .collection-name {
+      color: var(--requestly-color-text-subtle);
+      font-size: var(--requestly-font-size-sm, 12px);
+      font-weight: 500;
+      line-height: 18px; /* 150% */
+      margin-left: -5px;
     }
   }
 }
