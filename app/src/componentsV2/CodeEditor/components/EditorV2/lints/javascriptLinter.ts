@@ -4,7 +4,7 @@ import { getOffsetFromLocation } from "../utils";
 
 function normalizeBabelMessage(error: any): string {
   if (!error || typeof error.message !== "string") return "Syntax error";
-  return error.message.replace(/ \(\d+:\d+\)$/, "");
+  return error.message;
 }
 
 export function javascriptLinter() {
