@@ -208,6 +208,7 @@ export const LocalWorkspaceCreationView = ({
               setOpenWorkspaceError(null);
               setIsCreationOptionsVisible(false);
             }}
+            onCreationCallback={onSuccessCallback}
             openWorkspace={openWorkspace}
             isOpeningWorkspaceLoading={isOpenWorkspaceLoading}
             isOpenedInModal

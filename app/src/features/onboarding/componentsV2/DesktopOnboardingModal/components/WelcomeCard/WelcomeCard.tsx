@@ -145,6 +145,7 @@ export const WelcomeCard: React.FC<Props> = ({ onFeatureClick }) => {
                       onCreateWorkspaceClick={() => onFeatureClick(OnboardingStep.FOLDER_SELECTION)}
                       onCreationCallback={() => {
                         dispatch(globalActions.updateIsOnboardingCompleted(true));
+                        redirectToApiClient(navigate);
                       }}
                       openWorkspace={openWorkspace}
                       isOpeningWorkspaceLoading={isOpeningWorkspaceLoading}
