@@ -107,12 +107,21 @@ export const deleteRecords = createAsyncThunk<
     };
   },
   {
-    condition: ({ records }) => {
-      getAllRecords(records).forEach(async (r) => {
-        await reduxStore.dispatch(closeTabByEntityId({ entityId: r.id, skipUnsavedPrompt: true }));
+    condition: async ({ records }) => {
+      const allRecords = getAllRecords(records);
+
+      const results = await Promise.allSettled(
+        allRecords.map((r) => reduxStore.dispatch(closeTabByEntityId({ entityId: r.id, skipUnsavedPrompt: true })))
+      );
+
+      const hasAllSucceeded = results.every((result) => {
+        if (result.status === "fulfilled") {
+          return closeTabByEntityId.fulfilled.match(result.value);
+        }
+        return false;
       });
 
-      return true;
+      return hasAllSucceeded;
     },
   }
 );

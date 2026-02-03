@@ -53,6 +53,7 @@ import { BufferedGraphQLRecordEntity, useIsBufferDirty } from "features/apiClien
 import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
 import {
   ApiClientStore,
+  bufferActions,
   bufferAdapterSelectors,
   useApiClientRepository,
   useApiClientStore,
@@ -297,10 +298,9 @@ const GraphQLClientView: React.FC<GraphQLClientViewProps> = ({
 
   const handleRecordNameUpdate = useCallback(
     async (newName: string) => {
-      const result = await repositories.apiClientRecordsRepository.updateRecord(
-        { name: newName },
-        entity.meta.referenceId
-      );
+      const record = lodash.cloneDeep(entity.getEntityFromState(store.getState()));
+      record.name = newName;
+      const result = await repositories.apiClientRecordsRepository.updateRecord(record, entity.meta.referenceId);
       if (!result.success) {
         notification.error({
           message: "Could not rename request",
@@ -312,10 +312,21 @@ const GraphQLClientView: React.FC<GraphQLClientViewProps> = ({
       entity.origin.setName(newName);
       trackRequestRenamed("breadcrumb");
     },
-    [entity, repositories]
+    [entity, repositories, store]
   );
 
-  const handleRevertChanges = () => {};
+  const handleRevertChanges = useCallback(() => {
+    if (!entity.meta.originExists) {
+      return; // Can't revert if there's no origin
+    }
+    const originState = entity.origin.getEntityFromState(store.getState());
+    store.dispatch(
+      bufferActions.revertChanges({
+        referenceId: entity.meta.referenceId!,
+        sourceData: originState,
+      })
+    );
+  }, [entity, store]);
 
   const resetState = useCallback(() => {
     setError(null);

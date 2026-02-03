@@ -24,7 +24,7 @@ function FsErrorHandler(_target: any, _key: string, descriptor: PropertyDescript
     try {
       const result = await originalMethod.apply(this, args);
       if (result.type === "error") {
-        if (result.error.code === ErrorCode.PERMISSION_DENIED) {
+        if (result.error.code === ErrorCode.PermissionDenied) {
           const message = result.error.message || "Permission denied for requested action";
           throw FsAccessError.from(message, result.error.path);
         }
@@ -32,7 +32,7 @@ function FsErrorHandler(_target: any, _key: string, descriptor: PropertyDescript
       }
       return result;
     } catch (error) {
-      if (error.code === "EACCESS" || error.code === ErrorCode.PERMISSION_DENIED) {
+      if (error.code === "EACCESS" || error.code === ErrorCode.PermissionDenied) {
         const message = error.message || "Permission denied for requested action";
         throw FsAccessError.from(message, error.meta);
       }

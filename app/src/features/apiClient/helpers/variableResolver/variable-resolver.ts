@@ -122,7 +122,8 @@ function getScopes(
   const globalEnvironment = selectGlobalEnvironment(state);
 
   // 0. Runtime Variables
-  if (runtimeVariables) {
+  const effectiveRuntimeVariables = override?.runtimeVariables ?? runtimeVariables;
+  if (effectiveRuntimeVariables) {
     scopes.push([
       {
         scope: VariableScope.RUNTIME,
@@ -130,7 +131,7 @@ function getScopes(
         name: "Runtime Variables",
         level: currentScopeLevel++,
       },
-      runtimeVariables,
+      effectiveRuntimeVariables,
     ]);
   }
 
@@ -227,7 +228,7 @@ export function resolveVariable(
 }
 
 export function useScopedVariables(id: string) {
-  const variableHolder = useMemo(() => new VariableHolder(), []);
+  const variableHolder = useMemo(() => new VariableHolder(), [id]);
   const runtimeVariables = useSelector(selectRuntimeVariables);
   return useApiClientSelector((state: ApiClientStoreState) =>
     getScopedVariables(state, runtimeVariables, id, { variableHolder })

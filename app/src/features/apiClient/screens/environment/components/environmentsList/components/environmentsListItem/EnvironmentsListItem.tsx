@@ -21,7 +21,7 @@ import {
   useActiveEnvironment,
   useAllEnvironments,
 } from "features/apiClient/slices/environments/environments.hooks";
-import { useActiveTabId, useTabActions } from "componentsV2/Tabs/slice";
+import { useActiveTab, useTabActions } from "componentsV2/Tabs/slice";
 import { useWorkspaceId } from "features/apiClient/common/WorkspaceProvider";
 import { useApiClientDispatch } from "features/apiClient/slices/hooks/base.hooks";
 
@@ -64,7 +64,7 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
   const workspaceId = useWorkspaceId();
   const { environmentVariablesRepository } = useApiClientRepository();
   const { openBufferedTab } = useTabActions();
-  const activeTabSourceId = useActiveTabId();
+  const activeTabSourceId = useActiveTab()?.source.getSourceId();
 
   const environment = useEnvironmentById(environmentId);
   const activeEnvironment = useActiveEnvironment();

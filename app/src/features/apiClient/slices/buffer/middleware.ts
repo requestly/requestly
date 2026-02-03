@@ -1,118 +1,157 @@
-import { createListenerMiddleware } from "@reduxjs/toolkit";
-import { bufferActions, bufferAdapterSelectors } from "./slice";
-import type { ApiClientRootState } from "../hooks/types";
+import {
+  createListenerMiddleware,
+  AnyAction,
+  ListenerEffectAPI,
+  Dispatch,
+  TypedStartListening,
+} from "@reduxjs/toolkit";
+import { bufferActions, findBufferByReferenceId } from "./slice";
+import { BufferEntry } from "./types";
 import { ApiClientEntityType } from "../entities/types";
 import {
   API_CLIENT_RECORDS_SLICE_NAME,
   API_CLIENT_ENVIRONMENTS_SLICE_NAME,
+  API_CLIENT_RUNNER_CONFIG_SLICE_NAME,
   BUFFER_SLICE_NAME,
+  RUNTIME_VARIABLES_ENTITY_ID,
 } from "../common/constants";
 import { apiRecordsAdapter } from "../apiRecords/slice";
 import { environmentsAdapter } from "../environments/slice";
+import { runConfigAdapter } from "../runConfig/slice";
+import { EntitySyncedPayload } from "../common/actions";
+import { ApiClientStoreState } from "../workspaceView/helpers/ApiClientContextRegistry";
 
-type SourceSelectorMap = {
-  [K in ApiClientEntityType]?: {
-    selectById: (state: ApiClientRootState, id: string) => unknown | undefined;
-    sliceName: string;
-  };
-};
+type BufferListenerApi = ListenerEffectAPI<ApiClientStoreState, Dispatch<AnyAction>>;
 
-type DirtySliceMap = Set<string>;
-
-const BUFFER_SOURCE_SELECTORS: SourceSelectorMap = {
-  [ApiClientEntityType.HTTP_RECORD]: {
-    selectById: (state, id) => apiRecordsAdapter.getSelectors().selectById(state.records.records, id),
-    sliceName: API_CLIENT_RECORDS_SLICE_NAME,
-  },
-  [ApiClientEntityType.COLLECTION_RECORD]: {
-    selectById: (state, id) => apiRecordsAdapter.getSelectors().selectById(state.records.records, id),
-    sliceName: API_CLIENT_RECORDS_SLICE_NAME,
-  },
-  [ApiClientEntityType.GRAPHQL_RECORD]: {
-    selectById: (state, id) => apiRecordsAdapter.getSelectors().selectById(state.records.records, id),
-    sliceName: API_CLIENT_RECORDS_SLICE_NAME,
-  },
-  [ApiClientEntityType.ENVIRONMENT]: {
-    selectById: (state, id) => environmentsAdapter.getSelectors().selectById(state.environments.environments, id),
-    sliceName: API_CLIENT_ENVIRONMENTS_SLICE_NAME,
-  },
-  [ApiClientEntityType.GLOBAL_ENVIRONMENT]: {
-    selectById: (state) =>
-      state.environments.globalEnvironment,
-    sliceName: API_CLIENT_ENVIRONMENTS_SLICE_NAME,
-  },    
-};
-
-const MONITORED_ROOT_SLICES: readonly string[] = [
-  API_CLIENT_RECORDS_SLICE_NAME,
-  API_CLIENT_ENVIRONMENTS_SLICE_NAME,
-] as const;
-
-function shouldRunSyncEffect(currentState: unknown, previousState: unknown): boolean {
-  const current = currentState as ApiClientRootState;
-  const previous = previousState as ApiClientRootState;
-
-  return MONITORED_ROOT_SLICES.some((sliceName) => {
-    const currentSlice = current[sliceName as keyof ApiClientRootState];
-    const previousSlice = previous[sliceName as keyof ApiClientRootState];
-    return currentSlice !== previousSlice;
-  });
+interface BufferSyncRemote {
+  entityTypes: ApiClientEntityType[];
+  shouldHandleAction: (action: AnyAction) => boolean;
+  extractId: (action: AnyAction) => string | undefined;
+  selectData: (state: ApiClientStoreState, id: string) => unknown | undefined;
 }
 
-function buildDirtySliceMap(currentState: ApiClientRootState, previousState: ApiClientRootState): DirtySliceMap {
-  const dirtySlices = new Set<string>();
+const getPayloadId = (action: AnyAction): string | undefined => {
+  const p = action.payload as any;
+  if (typeof p !== "object" || p === null) return undefined;
+  return p.id ?? p.entityId;
+};
 
-  for (const sliceName of MONITORED_ROOT_SLICES) {
-    const currentSlice = currentState[sliceName as keyof ApiClientRootState];
-    const previousSlice = previousState[sliceName as keyof ApiClientRootState];
+const recordsRemote: BufferSyncRemote = {
+  entityTypes: [
+    ApiClientEntityType.HTTP_RECORD,
+    ApiClientEntityType.COLLECTION_RECORD,
+    ApiClientEntityType.GRAPHQL_RECORD,
+  ],
+  shouldHandleAction: (action) => action.type.startsWith(`${API_CLIENT_RECORDS_SLICE_NAME}/`),
+  extractId: getPayloadId,
+  selectData: (state, id) => apiRecordsAdapter.getSelectors().selectById(state.records.records, id),
+};
 
-    if (currentSlice !== previousSlice) {
-      dirtySlices.add(sliceName);
-    }
+const environmentsRemote: BufferSyncRemote = {
+  entityTypes: [ApiClientEntityType.ENVIRONMENT],
+  shouldHandleAction: (action) => {
+    const isEnvAction = action.type.startsWith(`${API_CLIENT_ENVIRONMENTS_SLICE_NAME}/`);
+    const isGlobalAction =
+      action.type === `${API_CLIENT_ENVIRONMENTS_SLICE_NAME}/updateGlobalEnvironment` ||
+      action.type === `${API_CLIENT_ENVIRONMENTS_SLICE_NAME}/unsafePatchGlobal`;
+    return isEnvAction && !isGlobalAction;
+  },
+  extractId: getPayloadId,
+  selectData: (state, id) => environmentsAdapter.getSelectors().selectById(state.environments.environments, id),
+};
+
+const globalEnvironmentRemote: BufferSyncRemote = {
+  entityTypes: [ApiClientEntityType.GLOBAL_ENVIRONMENT],
+  shouldHandleAction: (action) => {
+    return (
+      action.type === `${API_CLIENT_ENVIRONMENTS_SLICE_NAME}/updateGlobalEnvironment` ||
+      action.type === `${API_CLIENT_ENVIRONMENTS_SLICE_NAME}/unsafePatchGlobal`
+    );
+  },
+  // Prefer real id from payload/state (desktop/local uses a path-like id).
+  extractId: getPayloadId,
+  selectData: (state) => state.environments.globalEnvironment,
+};
+
+const runtimeVariablesRemote: BufferSyncRemote = {
+  entityTypes: [ApiClientEntityType.RUNTIME_VARIABLES],
+  shouldHandleAction: (action) => false,
+  extractId: () => RUNTIME_VARIABLES_ENTITY_ID,
+  selectData: () => undefined,
+};
+
+const runConfigRemote: BufferSyncRemote = {
+  entityTypes: [ApiClientEntityType.RUN_CONFIG],
+  shouldHandleAction: (action) => action.type.startsWith(`${API_CLIENT_RUNNER_CONFIG_SLICE_NAME}/`),
+  extractId: getPayloadId,
+  selectData: (state, id) => runConfigAdapter.getSelectors().selectById(state.runnerConfig.configs, id),
+};
+
+const remotes: BufferSyncRemote[] = [
+  recordsRemote,
+  globalEnvironmentRemote,
+  environmentsRemote,
+  runtimeVariablesRemote,
+  runConfigRemote,
+];
+
+function performBufferSync(
+  listenerApi: BufferListenerApi,
+  remote: BufferSyncRemote,
+  id: string,
+  overrideData?: unknown
+) {
+  const state = listenerApi.getState();
+  const bufferState = state[BUFFER_SLICE_NAME];
+
+  const buffer = findBufferByReferenceId(bufferState.entities, id);
+  if (!buffer || !buffer.referenceId) return;
+
+  const remoteData = remote.selectData(state, id);
+  // When entitySynced sends partial data (e.g. { name } on rename), merge with full remote data
+  // so we don't replace buffer.current with a partial object and lose e.g. variables.
+  const isSpreadableObject = (v: unknown): v is Record<string, unknown> => typeof v === "object" && v !== null;
+  const sourceData =
+    overrideData !== undefined && isSpreadableObject(remoteData) && isSpreadableObject(overrideData)
+      ? { ...remoteData, ...overrideData }
+      : overrideData !== undefined
+      ? overrideData
+      : remoteData;
+
+  if (sourceData !== undefined) {
+    listenerApi.dispatch(
+      bufferActions.syncFromSource({
+        referenceId: buffer.referenceId,
+        sourceData: sourceData,
+      })
+    );
+  } else if (process.env.NODE_ENV === "development") {
+    console.warn(
+      `[BufferSync] Could not find data for ${remote.entityTypes[0]} (${id}). Ensure data is synced or in state.`
+    );
   }
-
-  return dirtySlices;
 }
 
-function syncActiveBuffers(listenerApi: {
-  getState: () => unknown;
-  getOriginalState: () => unknown;
-  dispatch: (action: unknown) => unknown;
-}) {
-  const currentState = listenerApi.getState() as ApiClientRootState;
-  const previousState = listenerApi.getOriginalState() as ApiClientRootState;
+/**
+ * Sync all buffers matching the remote's entity types
+ */
+function performBulkBufferSync(listenerApi: BufferListenerApi, remote: BufferSyncRemote) {
+  const state = listenerApi.getState();
+  const bufferState = state[BUFFER_SLICE_NAME];
 
-  const dirtySlices = buildDirtySliceMap(currentState, previousState);
-
-  const bufferState = currentState[BUFFER_SLICE_NAME];
-  const allBuffers = bufferAdapterSelectors.selectAll(bufferState);
+  const allBuffers = Object.values(bufferState.entities).filter(
+    (buffer): buffer is BufferEntry => buffer !== undefined && remote.entityTypes.includes(buffer.entityType)
+  );
 
   for (const buffer of allBuffers) {
-    if (!buffer.referenceId) {
-      continue;
-    }
+    if (!buffer.referenceId) continue;
 
-    const sourceSelector = BUFFER_SOURCE_SELECTORS[buffer.entityType];
-
-    if (!sourceSelector) {
-      if (process.env.NODE_ENV === "development") {
-        console.warn(`[Buffer Sync] No selector registered for entity type: ${buffer.entityType}`);
-      }
-      continue;
-    }
-
-    if (!dirtySlices.has(sourceSelector.sliceName)) {
-      continue;
-    }
-
-    const currentSourceData = sourceSelector.selectById(currentState, buffer.referenceId);
-    const previousSourceData = sourceSelector.selectById(previousState, buffer.referenceId);
-
-    if (currentSourceData !== previousSourceData && currentSourceData !== undefined) {
+    const remoteData = remote.selectData(state, buffer.referenceId);
+    if (remoteData !== undefined) {
       listenerApi.dispatch(
         bufferActions.syncFromSource({
           referenceId: buffer.referenceId,
-          sourceData: currentSourceData,
+          sourceData: remoteData,
         })
       );
     }
@@ -121,13 +160,39 @@ function syncActiveBuffers(listenerApi: {
 
 export const bufferListenerMiddleware = createListenerMiddleware();
 
-bufferListenerMiddleware.startListening({
-  predicate: (_action, currentState, previousState) => {
-    return shouldRunSyncEffect(currentState, previousState);
+const startAppListening = bufferListenerMiddleware.startListening as TypedStartListening<
+  ApiClientStoreState,
+  Dispatch<AnyAction>
+>;
+
+startAppListening({
+  predicate: (action) => {
+    return action.type === "entities/synced" || remotes.some((remote) => remote.shouldHandleAction(action));
   },
 
-  effect: (_action, listenerApi) => {
-    syncActiveBuffers(listenerApi);
+  effect: (action, listenerApi) => {
+    if (action.type === "entities/synced") {
+      const { entityId, entityType, data } = action.payload as EntitySyncedPayload;
+      const remote = remotes.find((r) => r.entityTypes.includes(entityType));
+
+      if (!remote || !entityId) return;
+
+      performBufferSync(listenerApi, remote, entityId, data);
+      return;
+    }
+
+    const remote = remotes.find((r) => r.shouldHandleAction(action));
+    if (!remote) return;
+
+    const id = remote.extractId(action);
+
+    // If no id found, sync all buffers for this entity type
+    if (!id) {
+      performBulkBufferSync(listenerApi, remote);
+      return;
+    }
+
+    performBufferSync(listenerApi, remote, id);
   },
 });
 

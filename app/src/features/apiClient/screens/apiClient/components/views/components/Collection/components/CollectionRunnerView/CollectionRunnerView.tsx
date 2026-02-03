@@ -1,7 +1,6 @@
 import * as Sentry from "@sentry/react";
 import { useWorkspaceId } from "features/apiClient/common/WorkspaceProvider";
 import { getApiClientFeatureContext } from "features/apiClient/slices";
-import { getAllDescendantApiRecordIds } from "features/apiClient/slices/apiRecords/utils";
 import { bufferActions } from "features/apiClient/slices/buffer";
 import { findBufferByReferenceId } from "features/apiClient/slices/buffer/slice";
 import { ApiClientEntityType } from "features/apiClient/slices/entities/types";
@@ -46,9 +45,6 @@ export const CollectionRunnerView: React.FC<Props> = ({ collectionId, activeTabK
         apiClientDispatch(runnerConfigActions.hydrateRunConfig(collectionId, result));
 
         const referenceId = getRunnerConfigId(collectionId, result.id);
-
-        const allRequestIds = getAllDescendantApiRecordIds(collectionId, workspaceId);
-        apiClientDispatch(runnerConfigActions.patchRunOrder({ id: referenceId, requestIds: allRequestIds }));
 
         // Need to fix
         const state = getApiClientFeatureContext(workspaceId).store.getState();

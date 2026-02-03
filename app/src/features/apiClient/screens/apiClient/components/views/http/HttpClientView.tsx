@@ -19,6 +19,7 @@ import { useHttpRequestExecutor } from "features/apiClient/hooks/requestExecutor
 import {
   ApiClientStore,
   bufferAdapterSelectors,
+  bufferActions,
   useApiClientRepository,
   useApiClientStore,
 } from "features/apiClient/slices";
@@ -195,7 +196,7 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
   }, [isGeneratingTests, setDeepLinkState, entity, store]);
 
   const onSendButtonClick = useCallback(async () => {
-    const { request, scripts, auth, response } = getEntry(entity, store);
+    const { request, scripts, auth } = getEntry(entity, store);
     const { url } = request;
     if (!url) {
       return;
@@ -286,7 +287,7 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
             Sentry.captureException(new Error(`API Request Failed: ${error.message || "Unknown error"}`));
           });
         }
-        trackRequestFailed(error.message, error.type, request.url, request.method, response?.status);
+        trackRequestFailed(error.message, error.type, request.url, request.method, executedEntry.response?.status);
         trackRQLastActivity(API_CLIENT.REQUEST_FAILED);
         trackRQDesktopLastActivity(API_CLIENT.REQUEST_FAILED);
       }
@@ -320,7 +321,9 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
 
   const handleRecordNameUpdate = useCallback(
     async (name: string) => {
-      const result = await repositories.apiClientRecordsRepository.updateRecord({ name }, entity.meta.referenceId);
+      const record = lodash.cloneDeep(entity.getEntityFromState(store.getState()));
+      record.name = name;
+      const result = await repositories.apiClientRecordsRepository.updateRecord(record, entity.meta.referenceId);
       if (!result.success) {
         notification.error({
           message: "Could not rename record",
@@ -331,7 +334,7 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
       }
       entity.origin.setName(name);
     },
-    [entity, repositories]
+    [entity, repositories, store]
   );
 
   const onSaveButtonClick = useCallback(async () => {
@@ -412,7 +415,7 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
                 description: e.message,
                 placement: "bottomRight",
               });
-              Sentry.captureException(new Error("Invalid Header or Auth Key"));
+              Sentry.captureException(e);
               Sentry.getActiveSpan()?.setStatus({
                 code: SPAN_STATUS_ERROR,
                 // message: "invalid_auth_header", // This somehow is breaking the status of the span on sentry. Comes as unknown if set
@@ -454,9 +457,18 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
     }
   }, [httpRequestExecutor, entity, store]);
 
-  const handleRevertChanges = () => {
-    // setEntry(apiEntryDetails?.data);
-  };
+  const handleRevertChanges = useCallback(() => {
+    if (!entity.meta.originExists) {
+      return; // Can't revert if there's no origin
+    }
+    const originState = entity.origin.getEntityFromState(store.getState());
+    store.dispatch(
+      bufferActions.revertChanges({
+        referenceId: entity.meta.referenceId!,
+        sourceData: originState,
+      })
+    );
+  }, [entity, store]);
 
   const enableHotkey = getIsActive();
 

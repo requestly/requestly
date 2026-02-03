@@ -30,7 +30,7 @@ import {
   trackCollectionRunnerConfigSaveFailed,
   trackInstallExtensionDialogShown,
 } from "modules/analytics/events/features/apiClient";
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch } from "react-redux";
 import { globalActions } from "store/slices/global/slice";
 import { isDesktopMode } from "utils/AppUtils";
@@ -46,6 +46,8 @@ import { getRunnerConfigId, toSavedRunConfig } from "features/apiClient/slices/r
 import { useSaveBuffer } from "features/apiClient/slices/buffer/hooks";
 import { DEFAULT_RUN_CONFIG_ID } from "features/apiClient/slices/runConfig/constants";
 import "./runConfigView.scss";
+import { useAllDescendantApiRecordIds } from "features/apiClient/slices";
+import { runnerConfigActions } from "features/apiClient/slices/runConfig/slice";
 
 const RunConfigSaveButton: React.FC<{ disabled?: boolean; isRunnerTabActive: boolean }> = ({
   disabled = false,
@@ -226,6 +228,8 @@ interface Props {
 export const RunConfigView: React.FC<Props> = ({ activeTabKey }) => {
   const ctx = useApiClientFeatureContext();
   const { collectionId, bufferedEntity } = useCollectionView();
+  const apiClientDispatch = useApiClientDispatch();
+  const descendantApiRecordIds = useAllDescendantApiRecordIds(collectionId);
 
   const isRunnerTabActive = activeTabKey === TAB_KEYS.RUNNER;
   const runOrderCount = useApiClientSelector((state) => bufferedEntity.getRunOrder(state).length);
@@ -245,6 +249,11 @@ export const RunConfigView: React.FC<Props> = ({ activeTabKey }) => {
   };
 
   const isEmpty = runOrderCount === 0;
+
+  useEffect(() => {
+    const referenceId = getRunnerConfigId(collectionId, DEFAULT_RUN_CONFIG_ID);
+    apiClientDispatch(runnerConfigActions.patchRunOrder({ id: referenceId, requestIds: descendantApiRecordIds }));
+  }, [descendantApiRecordIds, collectionId, apiClientDispatch]);
 
   return (
     <div className="run-config-view-container">
