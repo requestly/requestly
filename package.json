@@ -55,6 +55,7 @@
   ],
   "lint-staged": {
     "*.{js,jsx,mjs,ts,tsx,json,yaml,yml,css,scss}": "prettier --write",
-    "(app/**).{js,jsx,mjs,ts,tsx}": "eslint -c .eslintrc.js --fix"
+    "app/src/**/*.{js,jsx,mjs,ts,tsx}": "eslint -c .eslintrc.js --fix",
+    "app/srcv2/**/*.{ts,tsx,js}": "cd app && npx eslint --fix"
   }
 }

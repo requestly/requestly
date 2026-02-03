@@ -7,6 +7,7 @@ import { sentryVitePlugin } from "@sentry/vite-plugin";
 import { nodePolyfills } from "vite-plugin-node-polyfills";
 import { getThemeVariables } from "antd/dist/theme";
 import { theme } from "./src/lib/design-system/theme";
+import path from "path";
 
 // Either this with vite.config.mjs file or non top-level-import like below
 // import { viteStaticCopy } from "vite-plugin-static-copy";
@@ -74,6 +75,19 @@ const config = async ({ mode }) => {
         {
           find: /^~/,
           replacement: "",
+        },
+        // Regex pattern to match @v2/* and resolve to srcv2/*
+        {
+          find: /^@v2\/(.*)$/,
+          replacement: path.resolve(__dirname, "srcv2") + "/$1",
+        },
+        {
+          find: /^@v2features\/(.*)$/,
+          replacement: path.resolve(__dirname, "srcv2/features") + "/$1",
+        },
+        {
+          find: /^@apiClientV2\/(.*)$/,
+          replacement: path.resolve(__dirname, "srcv2/features/apiClient") + "/$1",
         },
       ],
     },
