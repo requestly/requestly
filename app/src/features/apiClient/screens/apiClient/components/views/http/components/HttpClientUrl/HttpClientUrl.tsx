@@ -5,21 +5,60 @@ import {
   queryParamsToURLString,
 } from "features/apiClient/screens/apiClient/utils";
 import { KeyValuePair } from "features/apiClient/types";
-import { useCallback, memo } from "react";
+import { useCallback, memo, useMemo, useEffect, useRef } from "react";
 import { ApiClientUrl } from "../../../components/request/components/ApiClientUrl/ApiClientUrl";
 import { BufferedHttpRecordEntity } from "features/apiClient/slices/entities";
 import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
 
 interface ApiClientUrlProps {
-  entity: BufferedHttpRecordEntity
+  entity: BufferedHttpRecordEntity;
   onEnterPress: (e: KeyboardEvent) => void;
   onUrlChange: (value: string, finalParams: KeyValuePair[]) => void;
 }
 
 const HttpApiClientUrl = ({ entity, onEnterPress, onUrlChange }: ApiClientUrlProps) => {
-  const url = useApiClientSelector(s => entity.getUrl(s));
-  const queryParams = useApiClientSelector(s => entity.getQueryParams(s) );
+  const url = useApiClientSelector((s) => entity.getUrl(s));
+  const queryParams = useApiClientSelector((s) => entity.getQueryParams(s));
+  const pathVariables = useApiClientSelector((s) => entity.getPathVariables(s) || []);
   const currentEnvironmentVariables = useScopedVariables(entity.meta.referenceId);
+
+  const previousPathVariablesRef = useRef(pathVariables);
+  useEffect(() => {
+    const currentVars = pathVariables;
+    const previousVars = previousPathVariablesRef.current;
+
+    if (currentVars.length === previousVars.length) {
+      let newUrl = url;
+      let hasChanges = false;
+
+      currentVars.forEach((currentVar, index) => {
+        const previousVar = previousVars[index];
+
+        if (previousVar && currentVar.key !== previousVar.key) {
+          const oldKey = previousVar.key;
+          const newKey = currentVar.key;
+
+          if (oldKey) {
+            const variableRegex = RegExp(`(?<!:):${oldKey}(?=[/:?#[\\]@!$&'()*+,;=\\s]|$)`, "g");
+            if (variableRegex.test(newUrl)) {
+              newUrl = newUrl.replace(variableRegex, `:${newKey}`);
+              hasChanges = true;
+            }
+          }
+        }
+      });
+
+      if (hasChanges && newUrl !== url) {
+        entity.setUrl(newUrl);
+      }
+    }
+
+    previousPathVariablesRef.current = currentVars;
+  }, [pathVariables, url, entity]);
+
+  const displayUrl = useMemo(() => {
+    return queryParamsToURLString(queryParams, url);
+  }, [queryParams, url]);
 
   const handleUrlChange = useCallback(
     (value: string) => {
@@ -57,7 +96,7 @@ const HttpApiClientUrl = ({ entity, onEnterPress, onUrlChange }: ApiClientUrlPro
 
   return (
     <ApiClientUrl
-      url={queryParamsToURLString(queryParams, url)}
+      url={displayUrl}
       placeholder="Enter or paste HTTP URL"
       currentEnvironmentVariables={currentEnvironmentVariables}
       onEnterPress={onEnterPress}

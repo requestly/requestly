@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState, useRef, useEffect } from "react";
+import React, { useCallback, useMemo, useState, useRef, useEffect, useContext, createContext } from "react";
 import type { TableProps } from "antd";
 import { Tooltip } from "antd";
 import { ContentListTable } from "componentsV2/ContentList";
@@ -18,6 +18,24 @@ import { AutoScrollContainer } from "../AutoScrollContainer";
 import Split from "react-split";
 import { BottomSheetPlacement, useBottomSheetContext } from "componentsV2/BottomSheet";
 import { KeyValueBulkEditor } from "./KeyValueBulkEditor/KeyValueBulkEditor";
+
+interface BulkEditRegistration {
+  id: string;
+  data: KeyValuePair[];
+  onChange: (data: KeyValuePair[]) => void;
+  title?: string;
+}
+
+interface KeyValueTableContextType {
+  activeId: string | null;
+  register: (config: BulkEditRegistration) => void;
+  unregister: (id: string) => void;
+  setActiveId: (id: string | null) => void;
+  isEmbedded: boolean;
+  triggerScroll: (target: React.RefObject<HTMLDivElement> | null) => void;
+}
+
+const KeyValueTableContext = createContext<KeyValueTableContextType | null>(null);
 
 type ColumnTypes = Exclude<TableProps<KeyValuePair>["columns"], undefined>;
 
@@ -39,6 +57,9 @@ interface KeyValueTableProps {
   };
   tableType?: string;
   headerContent?: React.ReactNode;
+  isEmbedded?: boolean;
+  hideIsEnabled?: boolean;
+  hideFooter?: boolean;
 }
 
 export const KeyValueTable: React.FC<React.PropsWithChildren<KeyValueTableProps>> = ({
@@ -50,8 +71,96 @@ export const KeyValueTable: React.FC<React.PropsWithChildren<KeyValueTableProps>
   tableType,
   children,
   headerContent,
+  isEmbedded = false,
+  hideIsEnabled = false,
+  hideFooter = false,
 }) => {
   const { checkInvalidCharacter = false } = config || {};
+  const context = useContext(KeyValueTableContext);
+
+  const tableId = tableType ?? "key-value-table";
+
+  const [registry, setRegistry] = useState<Record<string, BulkEditRegistration>>({});
+  const [hostActiveId, setHostActiveId] = useState<string | null>(null);
+
+  const [scrollFocus, setScrollFocus] = useState<{ triggerTs: any; target: React.RefObject<any> | null }>({
+    triggerTs: -1,
+    target: null,
+  });
+
+  const lastEntryRef = useRef<HTMLDivElement>(null);
+  const embeddedScrollContainerRef = useRef<HTMLDivElement>(null);
+
+  const register = useCallback(
+    (config: BulkEditRegistration) => {
+      if (isEmbedded && context) {
+        context.register(config);
+      } else {
+        setRegistry((prev) => ({ ...prev, [config.id]: config }));
+      }
+    },
+    [isEmbedded, context]
+  );
+
+  const unregister = useCallback(
+    (id: string) => {
+      if (isEmbedded && context) {
+        context.unregister(id);
+      } else {
+        setRegistry((prev) => {
+          const next = { ...prev };
+          delete next[id];
+          return next;
+        });
+      }
+    },
+    [isEmbedded, context]
+  );
+
+  const setActiveId = useCallback(
+    (id: string | null) => {
+      if (isEmbedded && context) {
+        context.setActiveId(id);
+      } else {
+        setHostActiveId(id);
+      }
+    },
+    [isEmbedded, context]
+  );
+
+  const triggerScroll = useCallback(
+    (target: React.RefObject<HTMLDivElement> | null) => {
+      if (isEmbedded && context) {
+        context.triggerScroll(target);
+      } else {
+        setScrollFocus({ triggerTs: Date.now(), target });
+      }
+    },
+    [isEmbedded, context]
+  );
+
+  const activeId = isEmbedded && context ? context.activeId : hostActiveId;
+
+  useEffect(() => {
+    register({
+      id: tableId,
+      data,
+      onChange,
+      title: tableType,
+    });
+    return () => {
+      unregister(tableId);
+    };
+  }, [tableId, data, onChange, tableType, register, unregister]);
+
+  const prevDataLength = useRef(data.length);
+
+  useEffect(() => {
+    if (data.length > prevDataLength.current) {
+      triggerScroll(isEmbedded ? null : lastEntryRef);
+    }
+    prevDataLength.current = data.length;
+  }, [data.length, isEmbedded, triggerScroll]);
 
   const isDescriptionVisible =
     hasDescription(extraColumns) &&
@@ -61,7 +170,6 @@ export const KeyValueTable: React.FC<React.PropsWithChildren<KeyValueTableProps>
     hasDataType(extraColumns) &&
     extraColumns.dataType.visible &&
     isFeatureCompatible(FEATURES.API_CLIENT_KEY_VALUE_TABLE_DATA_TYPE_COMPATIBILITY);
-  const [showBulkEditPanel, setShowBulkEditPanel] = useState(false);
 
   const { sheetPlacement } = useBottomSheetContext();
   const isBottomSheetAtBottom = sheetPlacement === BottomSheetPlacement.BOTTOM;
@@ -141,21 +249,22 @@ export const KeyValueTable: React.FC<React.PropsWithChildren<KeyValueTableProps>
 
   const columns = useMemo(() => {
     return [
-      {
-        title: "",
-        dataIndex: "isEnabled",
-        width: "40px",
-        editable: true,
-        className: "kv-col-border-right",
-        onCell: (record: KeyValuePair) => ({
-          record,
-          editable: true,
-          dataIndex: "isEnabled",
-          title: "isEnabled",
-          variables,
-          handleUpdatePair,
-        }),
-      },
+      !hideIsEnabled
+        ? {
+            title: "",
+            dataIndex: "isEnabled",
+            width: "40px",
+            editable: true,
+            className: "kv-col-border-right",
+            onCell: (record: KeyValuePair) => ({
+              record,
+              editable: true,
+              dataIndex: "isEnabled",
+              variables,
+              handleUpdatePair,
+            }),
+          }
+        : null,
       {
         title: "Key",
         dataIndex: "key",
@@ -242,10 +351,8 @@ export const KeyValueTable: React.FC<React.PropsWithChildren<KeyValueTableProps>
               >
                 <RQButton
                   size="small"
-                  onClick={() => {
-                    setShowBulkEditPanel(!showBulkEditPanel);
-                  }}
-                  className="key-value-bulk-edit-button"
+                  onClick={() => setActiveId(activeId === tableId ? null : tableId)}
+                  className={`key-value-bulk-edit-button ${activeId === tableId ? "active" : ""}`}
                 >
                   Bulk edit
                 </RQButton>
@@ -278,94 +385,109 @@ export const KeyValueTable: React.FC<React.PropsWithChildren<KeyValueTableProps>
     extraColumns,
     data.length,
     handleDeletePair,
-    showBulkEditPanel,
     tableType,
+    hideIsEnabled,
+    activeId,
+    tableId,
+    setActiveId,
   ]);
 
-  const lastEntryRef = useRef<HTMLDivElement>(null);
-
-  const [scrollFocus, setScrollFocus] = useState<{ triggerTs: any; target: React.RefObject<any> | null }>({
-    triggerTs: -1,
-    target: null,
-  });
-
-  const prevDataLength = useRef(memoizedData.length);
-
-  useEffect(() => {
-    if (memoizedData.length > prevDataLength.current) {
-      setScrollFocus({ triggerTs: Date.now(), target: lastEntryRef });
-    }
-    prevDataLength.current = memoizedData.length;
-  }, [memoizedData.length]);
-
   const minSplitPanelSizes = useMemo(() => {
-    if (!showBulkEditPanel) return [0, 0];
+    if (!activeId) return [0, 0];
+    return isBottomSheetAtBottom ? [600, 340] : [200, 300];
+  }, [activeId, isBottomSheetAtBottom]);
 
-    if (isBottomSheetAtBottom) {
-      return [600, 340];
-    } else {
-      return [200, 300];
-    }
-  }, [showBulkEditPanel, isBottomSheetAtBottom]);
-
-  return (
-    <Split
-      key={isBottomSheetAtBottom ? "horizontal" : "vertical"}
-      className={`key-value-split-${isBottomSheetAtBottom ? "horizontal" : "vertical"}`}
-      direction={isBottomSheetAtBottom ? "horizontal" : "vertical"}
-      sizes={showBulkEditPanel ? [75, 25] : [100, 0]}
-      minSize={minSplitPanelSizes}
-      gutterSize={showBulkEditPanel ? 6 : 0}
-    >
-      <div
-        className="key-value-table"
-        style={isBottomSheetAtBottom ? { minWidth: minSplitPanelSizes[0] } : { minHeight: minSplitPanelSizes[0] }}
-      >
-        <AutoScrollContainer trigger={scrollFocus.triggerTs} scrollTargetRef={scrollFocus.target}>
-          {headerContent}
-          <ContentListTable
-            id="api-key-value-table"
-            className="api-key-value-table"
-            bordered={false}
-            showHeader={isDataTypeVisible}
-            rowKey="id"
-            columns={columns as ColumnTypes}
-            data={memoizedData}
-            locale={{ emptyText: `No entries found` }}
-            components={{
-              body: {
-                row: KeyValueTableEditableRow,
-                cell: KeyValueTableEditableCell,
-              },
-            }}
-            scroll={{ x: 550 }}
-            footer={() => (
+  const RenderedTable = (
+    <ContentListTable
+      id={`api-key-value-table-${tableId}`}
+      className="api-key-value-table"
+      bordered={false}
+      showHeader={isDataTypeVisible}
+      rowKey="id"
+      columns={columns as ColumnTypes}
+      data={memoizedData}
+      locale={{ emptyText: `No entries found` }}
+      components={{ body: { row: KeyValueTableEditableRow, cell: KeyValueTableEditableCell } }}
+      scroll={{ x: 550 }}
+      footer={
+        hideFooter
+          ? undefined
+          : () => (
               <div className="api-key-value-table-footer">
                 <RQButton icon={<MdAdd />} size="small" onClick={handleAddPair} className="key-value-add-more-btn">
                   Add More
                 </RQButton>
               </div>
-            )}
-          />
-          <div ref={lastEntryRef} />
-          {children}
-        </AutoScrollContainer>
-      </div>
+            )
+      }
+    />
+  );
 
-      <div
-        className="key-value-bulk-editor"
-        style={isBottomSheetAtBottom ? { minWidth: minSplitPanelSizes[1] } : { minHeight: minSplitPanelSizes[1] }}
-      >
-        {showBulkEditPanel && (
-          <KeyValueBulkEditor
-            data={memoizedData}
-            onChange={onChange}
-            onClose={() => setShowBulkEditPanel(false)}
-            tableTitle={tableType}
-          />
-        )}
+  if (isEmbedded) {
+    return (
+      <div className="embedded-key-value-table" ref={embeddedScrollContainerRef}>
+        {headerContent}
+        {RenderedTable}
+        {children}
       </div>
-    </Split>
+    );
+  }
+
+  const activeEditorConfig = activeId ? registry[activeId] : null;
+
+  const hostWrapperStyle = !isEmbedded
+    ? isBottomSheetAtBottom
+      ? { minWidth: minSplitPanelSizes[0] }
+      : { minHeight: minSplitPanelSizes[0] }
+    : undefined;
+
+  return (
+    <KeyValueTableContext.Provider
+      value={{
+        activeId: hostActiveId,
+        register,
+        unregister,
+        setActiveId: setHostActiveId,
+        isEmbedded: true,
+        triggerScroll: (target) => setScrollFocus({ triggerTs: Date.now(), target }),
+      }}
+    >
+      <Split
+        key={isBottomSheetAtBottom ? "horizontal" : "vertical"}
+        className={`key-value-split-${isBottomSheetAtBottom ? "horizontal" : "vertical"}`}
+        direction={isBottomSheetAtBottom ? "horizontal" : "vertical"}
+        sizes={activeId ? [75, 25] : [100, 0]}
+        minSize={minSplitPanelSizes}
+        gutterSize={activeId ? 6 : 0}
+      >
+        <div style={{ display: "flex", flexDirection: "column", height: "100%", ...hostWrapperStyle }}>
+          {headerContent}
+          <div className="key-value-table" style={{ flex: 1, minHeight: 0, position: "relative" }}>
+            <AutoScrollContainer trigger={scrollFocus.triggerTs} scrollTargetRef={scrollFocus.target}>
+              <div>
+                {RenderedTable}
+                <div ref={lastEntryRef} />
+                {children}
+              </div>
+            </AutoScrollContainer>
+          </div>
+        </div>
+
+        <div
+          className="key-value-bulk-editor"
+          style={isBottomSheetAtBottom ? { minWidth: minSplitPanelSizes[1] } : { minHeight: minSplitPanelSizes[1] }}
+        >
+          {activeEditorConfig && (
+            <KeyValueBulkEditor
+              data={activeEditorConfig.data}
+              onChange={activeEditorConfig.onChange}
+              onClose={() => setActiveId(null)}
+              tableTitle={activeEditorConfig.title}
+            />
+          )}
+        </div>
+      </Split>
+    </KeyValueTableContext.Provider>
   );
 };
 
