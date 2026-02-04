@@ -4,6 +4,13 @@ import { getOffsetFromLocation } from "../utils";
 
 function normalizeBabelMessage(error: any): string {
   if (!error || typeof error.message !== "string") return "Syntax error";
+  if (
+    (error.reasonCode === "MissingOneOfPlugins" || error.code === "BABEL_PARSER_SYNTAX_ERROR") &&
+    /jsx|flow|typescript/i.test(error.message)
+  ) {
+    return "JSX / tags are not supported in this editor";
+  }
+
   return error.message;
 }
 
@@ -19,7 +26,6 @@ export function javascriptLinter() {
         // This allows return statements within the script context.
         allowReturnOutsideFunction: true,
         plugins: [
-          "jsx",
           "classProperties",
           "objectRestSpread",
           "optionalChaining",
