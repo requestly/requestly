@@ -179,7 +179,7 @@ const DashboardContent = () => {
             />
           ) : null}
           {!isOnboardingCompleted ? (
-            appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP && isFeatureCompatible(FEATURES.LOCAL_FIRST_DESKTOP_APP) ? (
+            appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP && isFeatureCompatible(FEATURES.ONBOARDING_V2) ? (
               <DesktopOnboardingModal />
             ) : (
               <OnboardingModal />

@@ -108,4 +108,6 @@ FEATURES.LOCAL_WORKSPACE_COMPATIBILITY = "local_workspace_compatibility";
 FEATURES.API_CLIENT_DESCRIPTION_COMPATIBILITY = "api_client_description_compatibility";
 FEATURES.API_CLIENT_KEY_VALUE_TABLE_DATA_TYPE_COMPATIBILITY = "api_client_key_value_data_type_compatibility";
 
+FEATURES.ONBOARDING_V2 = "onboarding_v2";
+
 export default FEATURES;
