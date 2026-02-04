@@ -2,7 +2,10 @@ import React, { useCallback, useMemo } from "react";
 import { RequestViewTabSource } from "../../RequestView/requestViewTabSource";
 import { RQAPI } from "features/apiClient/types";
 import { useApiClientContext } from "features/apiClient/contexts";
-import { GenericApiClient, GenericApiClientOverride } from "features/apiClient/screens/apiClient/clientView/GenericApiClient";
+import {
+  GenericApiClient,
+  GenericApiClientOverride,
+} from "features/apiClient/screens/apiClient/clientView/GenericApiClient";
 import "./historyView.scss";
 import {
   ApiClientViewMode,
@@ -17,6 +20,7 @@ import { useOriginUndefinedBufferedEntity } from "features/apiClient/slices/enti
 import { NativeError } from "errors/NativeError";
 import { ApiClientRepositoryInterface } from "features/apiClient/helpers/modules/sync/interfaces";
 import { saveOrUpdateRecord } from "features/apiClient/hooks/useNewApiClientContext";
+import { ApiClientEntityType } from "features/apiClient/slices/entities/types";
 
 const EmptyHistoryView: React.FC = () => {
   return (
@@ -35,7 +39,11 @@ const BufferedHistoryView: React.FC<{
 }> = ({ bufferId, selectedEntry, hideSaveBtn }) => {
   const { openBufferedTab } = useTabActions();
   const { history, addToHistory, setCurrentHistoryIndex } = useApiClientContext();
-  const scratchBuffer = useOriginUndefinedBufferedEntity({ bufferId });
+  const scratchBuffer = useOriginUndefinedBufferedEntity<
+    ApiClientEntityType.HTTP_RECORD | ApiClientEntityType.GRAPHQL_RECORD
+  >({
+    bufferId,
+  });
 
   const store = useApiClientStore();
   const ctx = useApiClientFeatureContext();
@@ -48,13 +56,16 @@ const BufferedHistoryView: React.FC<{
     [addToHistory, setCurrentHistoryIndex, history]
   );
 
-  const save = useCallback(async (record: RQAPI.ApiRecord, repos: ApiClientRepositoryInterface): Promise<RQAPI.ApiRecord> => {
-    const result = await repos.apiClientRecordsRepository.createRecord(record);
-    if (!result.success) {
-      throw new NativeError(result.message || "Could not save request!");
-    }
-    return result.data as RQAPI.ApiRecord;
-  }, []);
+  const save = useCallback(
+    async (record: RQAPI.ApiRecord, repos: ApiClientRepositoryInterface): Promise<RQAPI.ApiRecord> => {
+      const result = await repos.apiClientRecordsRepository.createRecord(record);
+      if (!result.success) {
+        throw new NativeError(result.message || "Could not save request!");
+      }
+      return result.data as RQAPI.ApiRecord;
+    },
+    []
+  );
 
   const override: GenericApiClientOverride | undefined = useMemo(() => {
     if (hideSaveBtn) {
@@ -65,31 +76,26 @@ const BufferedHistoryView: React.FC<{
       onSaveClick: {
         save,
         onSuccess: (savedRecord) => {
+          /**
+           * HISTORY SAVE FLOW EXPLANATION:
+           *
+           * Problem: saveBuffer() calls markSaved() with the saved record (which has an ID).
+           * This updates buffer.current to contain the saved record. On the next save,
+           * produceChanges uses buffer.current (which now has an ID), causing createRecord
+           * to do an upsert instead of creating a new record.
+           *
+           * Solution: Immediately call markSaved again with clean seed data (empty ID).
+           * This overwrites buffer.current with a fresh history entry state, ensuring
+           * each save from history creates a new independent record.
+           */
+
           const stableHistoryReferenceId = `history:${ctx.workspaceId}:${selectedEntry.type}`;
-          store.dispatch(
-            bufferActions.markSaved({
-              id: bufferId,
-              referenceId: stableHistoryReferenceId,
-            })
-          );
 
-          saveOrUpdateRecord(ctx, savedRecord);
-
-          openBufferedTab({
-            source: new RequestViewTabSource({
-              id: savedRecord.id,
-              apiEntryDetails: savedRecord,
-              title: savedRecord.name || savedRecord.data.request?.url,
-              context: { id: ctx.workspaceId },
-            }),
-            preview: false,
-          });
-
-          // Option B: reset History buffer back to the last selected seed (pre-edit).
+          // Prepare clean seed data with empty ID
           const seed: RQAPI.ApiRecord = {
             data: { ...selectedEntry },
             type: RQAPI.RecordType.API,
-            id: "",
+            id: "", // Empty ID forces createRecord to generate new ID on next save
             name: "Untitled request",
             collectionId: "",
             ownerId: "",
@@ -100,12 +106,28 @@ const BufferedHistoryView: React.FC<{
             updatedTs: Date.now(),
           };
 
+          // Override buffer state with clean seed data and stable reference ID
           store.dispatch(
-            bufferActions.revertChanges({
+            bufferActions.markSaved({
+              id: bufferId,
               referenceId: stableHistoryReferenceId,
-              sourceData: seed,
+              savedData: seed, // Reset buffer.current to seed with empty ID
             })
           );
+
+          saveOrUpdateRecord(ctx, savedRecord);
+
+          // Open new tab with the saved record
+          openBufferedTab({
+            source: new RequestViewTabSource({
+              id: savedRecord.id,
+              apiEntryDetails: savedRecord,
+              title: savedRecord.name || savedRecord.data.request?.url,
+              name: savedRecord.name,
+              context: { id: ctx.workspaceId },
+            }),
+            preview: false,
+          });
         },
       },
     };

@@ -8,6 +8,7 @@ import { API_CLIENT } from "modules/analytics/events/features/constants";
 import { TfiClose } from "@react-icons/all-files/tfi/TfiClose";
 import { useTabActions } from "componentsV2/Tabs/slice";
 import { getApiClientFeatureContext } from "features/apiClient/slices";
+import { HistoryViewTabSource } from "../../../views/components/request/HistoryView/historyViewTabSource";
 
 interface Props {
   history: RQAPI.ApiEntry[];
@@ -16,11 +17,11 @@ interface Props {
 }
 
 export const HistoryList: React.FC<Props> = ({ history, selectedHistoryIndex, onSelectionFromHistory }) => {
-  const { openOrSwitchHistoryTab } = useTabActions();
+  const { openBufferedTab } = useTabActions();
   const [dismissNote, setDismissNote] = useState(false);
 
   const onHistoryLinkClick = useCallback(
-    async (index: number) => {
+    (index: number) => {
       const historyEntry = history[index];
       if (!historyEntry) {
         return;
@@ -28,27 +29,29 @@ export const HistoryList: React.FC<Props> = ({ history, selectedHistoryIndex, on
 
       const ctx = getApiClientFeatureContext();
 
-      try {
-        await openOrSwitchHistoryTab({
-          workspaceId: ctx.workspaceId,
-          record: {
-            data: historyEntry,
-            type: RQAPI.RecordType.API,
-            id: "",
-            name: "Untitled request",
-            collectionId: "",
-            ownerId: "",
-            deleted: false,
-            createdBy: "",
-            updatedBy: "",
-            createdTs: Date.now(),
-            updatedTs: Date.now(),
-          },
-        }).unwrap();
-      } catch {
-        // User cancelled due to unsaved changes.
-        return;
-      }
+      const record: RQAPI.ApiRecord = {
+        data: historyEntry,
+        type: RQAPI.RecordType.API,
+        id: "",
+        name: "Untitled request",
+        collectionId: "",
+        ownerId: "",
+        deleted: false,
+        createdBy: "",
+        updatedBy: "",
+        createdTs: Date.now(),
+        updatedTs: Date.now(),
+      };
+
+      openBufferedTab({
+        source: new HistoryViewTabSource({
+          context: { id: ctx.workspaceId },
+          record,
+          entryType: historyEntry.type,
+        }),
+        preview: false,
+        singleton: true,
+      });
 
       onSelectionFromHistory(index);
 
@@ -56,7 +59,7 @@ export const HistoryList: React.FC<Props> = ({ history, selectedHistoryIndex, on
       trackRQLastActivity(API_CLIENT.REQUEST_SELECTED_FROM_HISTORY);
       trackRQDesktopLastActivity(API_CLIENT.REQUEST_SELECTED_FROM_HISTORY);
     },
-    [onSelectionFromHistory, openOrSwitchHistoryTab, history]
+    [onSelectionFromHistory, openBufferedTab, history]
   );
 
   const getTimelineItemColor = (entry: RQAPI.ApiEntry) => {

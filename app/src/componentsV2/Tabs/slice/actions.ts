@@ -6,4 +6,5 @@ export const openBufferedTab = createAction<{
   source: TabSource;
   preview?: boolean;
   isNew?: boolean;
+  singleton?: boolean;
 }>(`${ReducerKeys.TABS}/openBufferedTab`);

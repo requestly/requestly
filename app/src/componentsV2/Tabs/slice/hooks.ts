@@ -9,7 +9,6 @@ import {
   closeTab as _closeTab,
   closeAllTabs as _closeAllTabs,
   closeTabByEntityId as _closeTabByEntityId,
-  openOrSwitchHistoryTab as _openOrSwitchHistoryTab,
 } from "./thunks";
 import { BufferEntry, EntityNotFound, getApiClientFeatureContext } from "features/apiClient/slices";
 import { BufferedEntityFactory } from "features/apiClient/slices/entities";
@@ -67,10 +66,6 @@ export function useTabActions() {
 
       closeTabByEntityId(params: Parameters<typeof _closeTabByEntityId>[0]) {
         return dispatch(_closeTabByEntityId(params) as any);
-      },
-
-      openOrSwitchHistoryTab(params: Parameters<typeof _openOrSwitchHistoryTab>[0]) {
-        return dispatch(_openOrSwitchHistoryTab(params) as any);
       },
 
       setActiveTab(params: Parameters<typeof tabsActions.setActiveTab>[0]) {
