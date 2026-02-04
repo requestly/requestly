@@ -3,6 +3,15 @@
     color: var(--requestly-color-text-default, #fff);
     font-size: var(--requestly-font-size-md);
     font-weight: var(--requestly-font-weight-medium);
+    display: flex;
+    align-items: center;
+    gap: var(--requestly-space-4, 8px);
+
+    svg {
+      cursor: pointer;
+      width: 16px;
+      height: 16px;
+    }
   }
 
   &__description {

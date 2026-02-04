@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useSelector } from "react-redux";
-import { Checkbox } from "antd";
-import { CreateWorkspaceHeader } from "../CreateWorkspaceHeader/CreateWorkspaceHeader";
+import { Checkbox, Input } from "antd";
 import { CreateWorkspaceFooter } from "../CreateWorkspaceFooter/CreateWorkspaceFooter";
 import { CreateWorkspaceArgs } from "features/workspaces/hooks/useCreateWorkspace";
 import "./sharedWorkspaceCreationView.scss";
@@ -34,13 +33,22 @@ export const SharedWorkspaceCreationView = ({
 
   return (
     <>
-      <CreateWorkspaceHeader
-        name={workspaceName}
-        title="Create a new team workspace"
-        description="Workspaces are where your team collaborate on rules, variables, and mocks."
-        onWorkspaceNameChange={setWorkspaceName}
-        hasDuplicateWorkspaceName={false}
-      />
+      <div className="create-workspace-header">
+        <div className="create-workspace-header__title">Create a new team workspace</div>
+        <div className="create-workspace-header__description">
+          Workspaces are where your team collaborate on rules, variables, and mocks.
+        </div>
+        <label htmlFor="workspace-name" className="create-workspace-header__label">
+          Workspace name
+        </label>
+        <Input
+          autoFocus
+          value={workspaceName}
+          id="workspace-name"
+          className="create-workspace-header__input"
+          onChange={(e) => setWorkspaceName(e.target.value)}
+        />
+      </div>
       <div className="invite-all-domain-users-container">
         <Checkbox checked={isNotifyAllSelected} onChange={() => setIsNotifyAllSelected(!isNotifyAllSelected)} />{" "}
         <span className="invite-all-domain-users-text">

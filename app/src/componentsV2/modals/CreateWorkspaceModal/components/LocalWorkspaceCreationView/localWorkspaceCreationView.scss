@@ -1,11 +1,24 @@
+.workspace-folder-selector-label.create-workspace-header__label {
+  margin-top: var(--requestly-space-7);
+  display: flex;
+  align-items: center;
+  gap: var(--requestly-space-3, 4px);
+
+  svg {
+    color: var(--requestly-color-text-subtle);
+    width: 14px;
+    height: 14px;
+  }
+}
+
 .workspace-folder-selector {
   display: flex;
   align-items: center;
   gap: var(--space-4, 8px);
-  margin-top: 16px;
   width: 100%;
   border-radius: 4px;
   border: 1px solid var(--requestly-color-white-t-20, rgba(255, 255, 255, 0.12));
+  margin: var(--requestly-space-4) 0 var(--requestly-space-6) 0;
 
   .selected-folder-path {
     overflow: hidden;
@@ -13,6 +26,7 @@
     font-size: var(--requestly-font-size-sm, 12px);
     flex: 1;
   }
+
   .ant-btn.ant-btn-default {
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
@@ -24,12 +38,6 @@
       border: 1px solid var(--requestly-color-white-t-20, rgba(255, 255, 255, 0.12));
     }
   }
-}
-
-.workspace-folder-preview-description {
-  margin-top: 8px;
-  color: var(--requestly-color-text-subtle);
-  font-size: var(--requestly-font-size-sm);
 }
 
 .workspace-folder-preview {
@@ -47,7 +55,8 @@
       color: var(--alias-tokens-color-text-subtle, #bbb);
       font-size: var(--requestly-font-size-2xs, 9px);
       font-weight: 600;
-      line-height: 13px; /* 144.444% */
+      line-height: 13px;
+      /* 144.444% */
       letter-spacing: 1.5px;
       text-transform: uppercase;
     }
@@ -112,6 +121,7 @@
           height: 14px;
         }
       }
+
       &.new-workspace-item {
         .preview-folder-item-icon,
         .preview-folder-item-name {

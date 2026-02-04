@@ -6,6 +6,7 @@ import { ErrorCode } from "errors/types";
 import { ExistingWorkspaceConflictView } from "./LocalWorkspaceCreationView/components/ExistingWorkspaceConflictView";
 import { useCreateWorkspace } from "features/workspaces/hooks/useCreateWorkspace";
 import { toast } from "utils/Toast";
+import "./workspaceCreationView.scss";
 
 interface Props {
   workspaceType: WorkspaceType;
