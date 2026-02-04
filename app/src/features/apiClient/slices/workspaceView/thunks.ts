@@ -115,7 +115,7 @@ const addWorkspacesIntoMultiView = createAsyncThunk(
     const userDetails = getUserDetails(userId);
 
     for (const workspace of workspaces) {
-      await dispatch(addWorkspaceIntoView({ workspace, userDetails })).unwrap();
+      await dispatch(addWorkspaceIntoView({ workspace, userDetails }));
     }
   }
 );
