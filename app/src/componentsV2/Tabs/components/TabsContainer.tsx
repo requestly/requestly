@@ -301,7 +301,9 @@ export const TabsContainer: React.FC = () => {
         closable: false,
         label: (
           <Dropdown menu={{ items: contextMenuItems }} trigger={["contextMenu"]}>
-            <TabLabel tab={tab} onClose={() => closeTab({ tabId: tab.id })} onDoubleClick={handleDoubleClick} />
+            <div>
+              <TabLabel tab={tab} onClose={() => closeTab({ tabId: tab.id })} onDoubleClick={handleDoubleClick} />
+            </div>
           </Dropdown>
         ),
         children: <TabItem tabId={tab.id}>{tab.source.render()}</TabItem>,
