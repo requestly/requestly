@@ -1,26 +1,20 @@
-import React, { useCallback, useMemo } from "react";
-import { RequestViewTabSource } from "../../RequestView/requestViewTabSource";
-import { RQAPI } from "features/apiClient/types";
+import { useTabActions } from "componentsV2/Tabs/slice";
+import { NativeError } from "errors/NativeError";
 import { useApiClientContext } from "features/apiClient/contexts";
+import { ApiClientRepositoryInterface } from "features/apiClient/helpers/modules/sync/interfaces";
+import { saveOrUpdateRecord } from "features/apiClient/hooks/useNewApiClientContext";
 import {
   GenericApiClient,
   GenericApiClientOverride,
 } from "features/apiClient/screens/apiClient/clientView/GenericApiClient";
-import "./historyView.scss";
-import {
-  ApiClientViewMode,
-  bufferActions,
-  useApiClientFeatureContext,
-  useApiClientStore,
-  useViewMode,
-} from "features/apiClient/slices";
-import { useTabActions } from "componentsV2/Tabs/slice";
-import { useHostContext } from "hooks/useHostContext";
+import { ApiClientViewMode, useApiClientFeatureContext, useViewMode } from "features/apiClient/slices";
 import { useOriginUndefinedBufferedEntity } from "features/apiClient/slices/entities/hooks";
-import { NativeError } from "errors/NativeError";
-import { ApiClientRepositoryInterface } from "features/apiClient/helpers/modules/sync/interfaces";
-import { saveOrUpdateRecord } from "features/apiClient/hooks/useNewApiClientContext";
 import { ApiClientEntityType } from "features/apiClient/slices/entities/types";
+import { RQAPI } from "features/apiClient/types";
+import { useHostContext } from "hooks/useHostContext";
+import React, { useCallback, useMemo } from "react";
+import { RequestViewTabSource } from "../../RequestView/requestViewTabSource";
+import "./historyView.scss";
 
 const EmptyHistoryView: React.FC = () => {
   return (
@@ -45,7 +39,6 @@ const BufferedHistoryView: React.FC<{
     bufferId,
   });
 
-  const store = useApiClientStore();
   const ctx = useApiClientFeatureContext();
 
   const handleAppRequestFinished = useCallback(
