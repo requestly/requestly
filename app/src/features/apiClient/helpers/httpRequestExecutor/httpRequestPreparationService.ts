@@ -188,8 +188,6 @@ export class HttpRequestPreparationService {
     const workingEntry = cloneDeep(sanitizeEntry(entry));
 
     workingEntry.testResults = [];
-    workingEntry.request.url = queryParamsToURLString(workingEntry.request.queryParams, workingEntry.request.url);
-    workingEntry.request.queryParams = [];
 
     // This ensures encoded auth headers (like Basic Auth) are regenerated with updated variables
     if (!isEmpty(executionContext)) {
