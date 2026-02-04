@@ -35,4 +35,5 @@ export interface TabServiceState {
   tabs: EntityState<TabState>;
   activeTabId?: TabId;
   previewTabId?: TabId;
+  singletonTabIdsBySourceType: Record<string, TabId>;
 }
