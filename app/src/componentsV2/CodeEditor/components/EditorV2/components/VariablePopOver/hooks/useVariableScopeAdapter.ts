@@ -44,13 +44,18 @@ export interface VariableScopeAdapter {
  * @returns Adapter with entity, repository function, display name, and store
  * @throws Error if scope context is missing (e.g., no active environment)
  */
-export function useVariableScopeAdapter(scope: VariableScope, scopeOptions: ScopeOption[]): VariableScopeAdapter {
+export function useVariableScopeAdapter(
+  scope: VariableScope,
+  scopeOptions: ScopeOption[],
+  scopeId?: string
+): VariableScopeAdapter {
   const selectedScopeOption = scopeOptions.find((option) => option.value === scope && !option.disabled && option.id);
-  if (!selectedScopeOption) {
+  const resolvedScopeId = scopeId ?? selectedScopeOption?.id;
+  if (!resolvedScopeId) {
     throw new EntityNotFound(scope, "scope");
   }
   const entity = useEntity({
-    id: selectedScopeOption.id!,
+    id: resolvedScopeId,
     type:
       scope === VariableScope.ENVIRONMENT
         ? ApiClientEntityType.ENVIRONMENT
@@ -95,7 +100,7 @@ export function useVariableScopeAdapter(scope: VariableScope, scopeOptions: Scop
         saveVariablesToRepository: async (variables: EnvironmentVariables) => {
           await repositories.apiClientRecordsRepository.setCollectionVariables(entity.id, variables);
         },
-        scopeDisplayName: "Collection",
+        scopeDisplayName: entity.getName(workspaceStore.getState()),
         store: workspaceStore,
       };
 

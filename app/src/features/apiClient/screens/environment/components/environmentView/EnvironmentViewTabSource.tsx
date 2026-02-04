@@ -5,6 +5,7 @@ import PATHS from "config/constants/sub/paths";
 import { getApiClientFeatureContext } from "features/apiClient/slices";
 import { GLOBAL_ENVIRONMENT_ID } from "features/apiClient/slices/common/constants";
 import { EnvironmentViewManager } from "./EnvironmentViewManager";
+import { isGlobalEnvironment } from "../../utils";
 
 interface EnvironmentViewTabSourceMetadata extends TabSourceMetadata {
   isGlobal: boolean;
@@ -35,7 +36,7 @@ export class EnvironmentViewTabSource extends BaseTabSource {
       id: envId,
       title: "Environment",
       context: { id: ctx.workspaceId },
-      isGlobal: envId === GLOBAL_ENVIRONMENT_ID,
+      isGlobal: isGlobalEnvironment(envId),
     });
   }
 }

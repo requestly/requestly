@@ -1,4 +1,4 @@
-import { createAsyncThunk, Dispatch } from "@reduxjs/toolkit";
+import { createAsyncThunk } from "@reduxjs/toolkit";
 import { ApiClientViewMode, WorkspaceInfo, WorkspaceState } from "./types";
 import { RootState } from "store/types";
 import { apiClientContextService } from "./helpers/ApiClientContextService";
@@ -21,7 +21,7 @@ import { getAppMode } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { switchWorkspace } from "actions/TeamWorkspaceActions";
 import { NativeError } from "errors/NativeError";
-import { closeAllTabs } from "componentsV2/Tabs/slice";
+import { closeAllTabs, closeTab, tabsAdapter } from "componentsV2/Tabs/slice";
 
 const SLICE_NAME = ReducerKeys.WORKSPACE_VIEW;
 
@@ -30,6 +30,16 @@ type UserAction = "add" | "remove";
 function getUserDetails(userId?: string) {
   const userDetails: UserDetails = userId ? { uid: userId, loggedIn: true } : { loggedIn: false };
   return userDetails;
+}
+
+async function closeAllTabsAndCheckRejection() {
+  const result = await reduxStore.dispatch(closeAllTabs({ skipUnsavedPrompt: true }));
+
+  if (closeAllTabs.rejected.match(result)) {
+    return false;
+  }
+
+  return true;
 }
 
 function getFallbackWorkspaceInfo(rootState: RootState): WorkspaceInfo {
@@ -103,7 +113,6 @@ const addWorkspacesIntoMultiView = createAsyncThunk(
   async (params: { workspaces: WorkspaceInfo[]; userId?: string }, { dispatch }) => {
     const { workspaces, userId } = params;
     const userDetails = getUserDetails(userId);
-
     const results = await Promise.allSettled(
       workspaces.map(async (workspace) => {
         return dispatch(addWorkspaceIntoView({ workspace, userDetails })).unwrap();
@@ -136,16 +145,44 @@ const removeWorkspacesFromView = createAsyncThunk<
   PromiseSettledResult<{ workspaceId: WorkspaceState["id"]; result: Result<null, Error> }>[],
   { workspaceIds: WorkspaceState["id"][]; userId?: string },
   { state: RootState }
->(`${SLICE_NAME}/removeWorkspacesFromView`, async ({ workspaceIds }) => {
-  const results = await Promise.allSettled(
-    workspaceIds.map((workspaceId) => {
-      const result = removeWorkspaceFromView({ workspaceId });
-      return { workspaceId, result };
-    })
-  );
+>(
+  `${SLICE_NAME}/removeWorkspacesFromView`,
+  async ({ workspaceIds }) => {
+    const results = await Promise.allSettled(
+      workspaceIds.map((workspaceId) => {
+        const result = removeWorkspaceFromView({ workspaceId });
+        return { workspaceId, result };
+      })
+    );
 
-  return results;
-});
+    return results;
+  },
+  {
+    condition: async ({ workspaceIds }) => {
+      const currentState = reduxStore.getState();
+      const allTabs = tabsAdapter.getSelectors().selectAll(currentState.tabs.tabs);
+
+      const tabsToClose = allTabs.filter((tab) => {
+        const tabWorkspaceId = tab.source.metadata.context?.id;
+        // @ts-expect-error tabWorkspaceId can be undefined
+        return workspaceIds.includes(tabWorkspaceId);
+      });
+
+      const results = await Promise.allSettled(
+        tabsToClose.map((tab) => reduxStore.dispatch(closeTab({ tabId: tab.id, skipUnsavedPrompt: true })))
+      );
+
+      const hasAllSucceeded = results.every((result) => {
+        if (result.status === "fulfilled") {
+          return closeTab.fulfilled.match(result.value);
+        }
+        return false;
+      });
+
+      return hasAllSucceeded;
+    },
+  }
+);
 
 const singleToMultiView = createAsyncThunk(
   `${SLICE_NAME}/singleToMultiView`,
@@ -153,6 +190,9 @@ const singleToMultiView = createAsyncThunk(
     apiClientContextRegistry.clearAll();
     dispatch(workspaceViewActions.resetToMultiView());
     return dispatch(addWorkspacesIntoMultiView(params)).unwrap();
+  },
+  {
+    condition: closeAllTabsAndCheckRejection,
   }
 );
 
@@ -165,6 +205,9 @@ export const switchContext = createAsyncThunk(
 
     const userDetails = getUserDetails(userId);
     return dispatch(addWorkspaceIntoView({ workspace, userDetails }));
+  },
+  {
+    condition: closeAllTabsAndCheckRejection,
   }
 );
 
@@ -188,7 +231,11 @@ async function switchToPrivateWorkspace() {
     },
     appMode,
     undefined, // setLoader
-    "switch_context_thunk" // source
+    "switch_context_thunk", // source
+    // WARNING: skipBroadcast prevents multi-tab infinite reload loops
+    // Only use this for initialization flows (setupWorkspaceView)
+    // User-initiated switches should ALWAYS broadcast so other tabs sync
+    { skipBroadcast: true }
   );
 }
 
@@ -203,7 +250,6 @@ export const setupWorkspaceView = createAsyncThunk(
   `${SLICE_NAME}/setupWorkspaceView`,
   async (params: { userId?: string }, { dispatch, getState }) => {
     const { userId } = params;
-
     const rootState = getState() as RootState;
     const selectedWorkspaces = getAllSelectedWorkspaces(rootState.workspaceView);
 
@@ -295,13 +341,19 @@ export const setupWorkspaceView = createAsyncThunk(
     }
 
     return dispatch(workspaceViewManager({ workspaces: selectedWorkspaces, userId, action: "add" })).unwrap();
+  },
+  {
+    condition: closeAllTabsAndCheckRejection,
   }
 );
 
-export const resetWorkspaceView = () => {
-  return (dispatch: Dispatch, getState: () => RootState) => {
+export const resetWorkspaceView = createAsyncThunk(
+  `${SLICE_NAME}/resetWorkspaceView`,
+  async (_, { dispatch }) => {
     apiClientContextRegistry.clearAll();
-    reduxStore.dispatch(closeAllTabs({ skipUnsavedPrompt: true }));
     dispatch(workspaceViewActions.reset());
-  };
-};
+  },
+  {
+    condition: closeAllTabsAndCheckRejection,
+  }
+);
