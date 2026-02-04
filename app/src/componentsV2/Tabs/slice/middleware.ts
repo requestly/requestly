@@ -1,5 +1,6 @@
-import type { EntityState } from "@reduxjs/toolkit";
+import type { EntityState, ListenerErrorHandler } from "@reduxjs/toolkit";
 import { createListenerMiddleware } from "@reduxjs/toolkit";
+import * as Sentry from "@sentry/react";
 import { tabsActions } from "./slice";
 import { bufferActions, findBufferByReferenceId } from "features/apiClient/slices/buffer/slice";
 import { apiRecordsAdapter } from "features/apiClient/slices/apiRecords/slice";
@@ -182,7 +183,16 @@ function handleCloseAllTabsFulfilled(action: ReturnType<typeof closeAllTabs.fulf
   });
 }
 
-const tabBufferListenerMiddleware = createListenerMiddleware();
+const onError: ListenerErrorHandler = (error, errorInfo) => {
+  Sentry.captureException(error, {
+    tags: {
+      middleware: "tabBufferMiddleware",
+      raisedBy: errorInfo.raisedBy,
+    },
+  });
+};
+
+const tabBufferListenerMiddleware = createListenerMiddleware({ onError });
 
 tabBufferListenerMiddleware.startListening({
   predicate: (action) => {
