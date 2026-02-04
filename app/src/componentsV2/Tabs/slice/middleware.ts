@@ -1,5 +1,6 @@
-import type { EntityState } from "@reduxjs/toolkit";
+import type { EntityState, ListenerErrorHandler } from "@reduxjs/toolkit";
 import { createListenerMiddleware } from "@reduxjs/toolkit";
+import * as Sentry from "@sentry/react";
 import { tabsActions } from "./slice";
 import { bufferActions, findBufferByReferenceId } from "features/apiClient/slices/buffer/slice";
 import { apiRecordsAdapter } from "features/apiClient/slices/apiRecords/slice";
@@ -9,6 +10,7 @@ import { ApiClientEntityType } from "features/apiClient/slices/entities/types";
 import type { TabSource, TabSourceMetadata } from "componentsV2/Tabs/types";
 import { RQAPI } from "features/apiClient/types";
 import { NativeError } from "errors/NativeError";
+import { isHttpApiRecord } from "features/apiClient/screens/apiClient/utils";
 import { RequestViewTabSource } from "features/apiClient/screens/apiClient/components/views/components/RequestView/requestViewTabSource";
 import { DraftRequestContainerTabSource } from "features/apiClient/screens/apiClient/components/views/components/DraftRequestContainer/draftRequestContainerTabSource";
 import { CollectionViewTabSource } from "features/apiClient/screens/apiClient/components/views/components/Collection/collectionViewTabSource";
@@ -92,7 +94,7 @@ export function getEntityDataFromTabSource(
     const entityType =
       apiRecord.type === RQAPI.RecordType.COLLECTION
         ? ApiClientEntityType.COLLECTION_RECORD
-        : apiRecord.data.type === RQAPI.ApiEntryType.HTTP
+        : isHttpApiRecord(apiRecord as RQAPI.ApiRecord)
         ? ApiClientEntityType.HTTP_RECORD
         : ApiClientEntityType.GRAPHQL_RECORD;
 
@@ -225,7 +227,16 @@ function handleCloseAllTabsFulfilled(action: ReturnType<typeof closeAllTabs.fulf
   });
 }
 
-const tabBufferListenerMiddleware = createListenerMiddleware();
+const onError: ListenerErrorHandler = (error, errorInfo) => {
+  Sentry.captureException(error, {
+    tags: {
+      middleware: "tabBufferMiddleware",
+      raisedBy: errorInfo.raisedBy,
+    },
+  });
+};
+
+const tabBufferListenerMiddleware = createListenerMiddleware({ onError });
 
 tabBufferListenerMiddleware.startListening({
   predicate: (action) => {

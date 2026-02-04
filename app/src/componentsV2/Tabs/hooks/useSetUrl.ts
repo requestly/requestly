@@ -1,8 +1,9 @@
 import { useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 export const useSetUrl = () => {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const setUrl = useCallback(
     (newPath: string, preserveQueryParams = true) => {
@@ -18,9 +19,10 @@ export const useSetUrl = () => {
 
       navigate(`${newUrl.pathname}${newUrl.search}`, {
         replace: true,
+        state: location.state, // Preserve location state, when navigating from home to api client, state gets reset.
       });
     },
-    [navigate]
+    [navigate, location.state]
   );
 
   return { setUrl };
