@@ -116,20 +116,6 @@ function getApiClientStoreByTabSource(source: TabState["source"]) {
   return context.store;
 }
 
-function tryGetApiClientStoreByTabSource(source: TabState["source"]) {
-  try {
-    return getApiClientStoreByTabSource(source);
-  } catch (error) {
-    // Buffer cleanup is best-effort. During workspace/auth transitions (and sometimes during app hydration),
-    // the ApiClient context registry can be cleared before the tab-close listeners run.
-    // In that case there's nothing meaningful to clean up, so we skip silently.
-    if (error instanceof NativeError && error.message === "No context found in registry!") {
-      return null;
-    }
-    throw error;
-  }
-}
-
 function handleOpenBufferedTab(action: ReturnType<typeof openBufferedTab>) {
   const { source, isNew = false, preview } = action.payload;
   const apiClientStore = getApiClientStoreByTabSource(source);
@@ -169,10 +155,7 @@ function handleOpenBufferedTab(action: ReturnType<typeof openBufferedTab>) {
 }
 
 function closeBufferByTab(tab: TabState) {
-  const apiClientStore = tryGetApiClientStoreByTabSource(tab.source);
-  if (!apiClientStore) {
-    return;
-  }
+  const apiClientStore = getApiClientStoreByTabSource(tab.source);
   apiClientStore.dispatch(bufferActions.close(tab.modeConfig.entityId));
 
   tab.secondaryBufferIds.forEach((id) => {
