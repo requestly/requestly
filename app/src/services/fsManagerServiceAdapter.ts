@@ -24,7 +24,7 @@ function FsErrorHandler(_target: any, _key: string, descriptor: PropertyDescript
     try {
       const result = await originalMethod.apply(this, args);
       if (result.type === "error") {
-        if (result.error.code === ErrorCode.PERMISSION_DENIED) {
+        if (result.error.code === ErrorCode.PermissionDenied) {
           const message = result.error.message || "Permission denied for requested action";
           throw FsAccessError.from(message, result.error.path);
         }
@@ -32,7 +32,7 @@ function FsErrorHandler(_target: any, _key: string, descriptor: PropertyDescript
       }
       return result;
     } catch (error) {
-      if (error.code === "EACCESS" || error.code === ErrorCode.PERMISSION_DENIED) {
+      if (error.code === "EACCESS" || error.code === ErrorCode.PermissionDenied) {
         const message = error.message || "Permission denied for requested action";
         throw FsAccessError.from(message, error.meta);
       }
@@ -187,7 +187,7 @@ class FsManagerServiceAdapterProvider {
   async get(rootPath: string): Promise<FsManagerServiceAdapter> {
     let lock = this.lockMap.get(rootPath);
     if (!lock) {
-      lock = withTimeout(new Mutex(), 10 * 1000);
+      lock = withTimeout(new Mutex(), 30 * 1000);
       this.lockMap.set(rootPath, lock);
     }
     await lock.acquire();
@@ -220,13 +220,40 @@ class FsManagerServiceAdapterProvider {
 }
 
 export const fsManagerServiceAdapterProvider = new FsManagerServiceAdapterProvider();
+
+/**
+ * Builds the file system manager for a workspace.
+ *
+ * DEBUG RESOLUTION: RPC timeout and retry caused duplicate build() calls
+ *
+ * THE ISSUE:
+ * When adding workspaces in multiview, build() RPC had 1s timeout with retries enabled.
+ * For some workspaces, build takes > 1s on desktop side, causing:
+ * 1. Web app: build() RPC sent to desktop
+ * 2. Desktop: first build arrives, exposes channels over rpc (takes some time, response not yet sent)
+ * 3. Web app: 1s timeout hits, considers build failed, triggers RETRY
+ * 4. Desktop: retry arrives, again exposes channels over rpc
+ * 5. Subsequent operations (updateRecord, createRecord) talks to file system.
+ * 6. File conflicts: one succeeds, other fails with ENOENT
+ * 7. User sees "File not found" errors when saving/updating API records
+ *
+ * DEBUG PROCESS:
+ * Console logs showed duplicate RPC calls for same workspace:
+ *   RPC {method: 'build', args: ['/Users/srbh/Documents/uio']}
+ *   RPC {method: 'build', args: ['/Users/srbh/Documents/uio']} // DUPLICATE!
+ * Traced through IPC layer to find timeout was too aggressive for build operation.
+ *
+ * FIX:
+ * - retryCount: 0 → Fail fast instead of retrying expensive builds
+ * - timeout: 30s → Some workspaces need time to build ie to expose channels over rpc (previous 1s was too aggressive)
+ */
 export function buildFsManager(rootPath: string) {
   return rpcWithRetry(
     {
       namespace: LOCAL_SYNC_BUILDER_NAMESPACE,
       method: "build",
-      retryCount: 10,
-      timeout: 1000,
+      retryCount: 0,
+      timeout: 1000 * 30,
     },
     rootPath
   ) as Promise<void>;

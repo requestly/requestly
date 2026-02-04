@@ -56,7 +56,6 @@ export const EnterprisePlanCard: React.FC<Props> = ({ product = PRICING.PRODUCTS
             </div>
           </div>
           <div className="enterprise-contact-us-container">
-            <div className="enterprise-plan-price">Starts at $59</div>
             <RQButton
               type="primary"
               size="large"

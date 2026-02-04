@@ -98,7 +98,14 @@ export interface ApiClientRecordsInterface<Meta extends Record<string, any>> {
   ): ResponsePromise<SavedRunResult>;
 }
 
+export enum RepoType {
+  CLOUD = "cloud",
+  LOCAL = "local",
+  LOCALSTORE = "localstore",
+}
+
 export interface ApiClientRepositoryInterface {
+  readonly repoType: RepoType;
   environmentVariablesRepository: EnvironmentInterface<Record<string, any>>;
   apiClientRecordsRepository: ApiClientRecordsInterface<Record<string, any>>;
 }
