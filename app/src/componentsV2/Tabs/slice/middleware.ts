@@ -23,7 +23,6 @@ import { reduxStore } from "store";
 import { openBufferedTab } from "./actions";
 import { closeTab, closeAllTabs } from "./thunks";
 import { HistoryViewTabSource } from "features/apiClient/screens/apiClient/components/views/components/request/HistoryView/historyViewTabSource";
-import { isHttpApiRecord } from "features/apiClient/screens/apiClient/utils";
 
 export interface GetEntityDataFromTabSourceState {
   records: {
@@ -162,7 +161,7 @@ function handleOpenBufferedTab(action: ReturnType<typeof openBufferedTab>) {
   if (singleton && existingBuffer) {
     apiClientStore.dispatch(
       bufferActions.revertChanges({
-        referenceId: entityId,
+        referenceId: entityId as string,
         sourceData: data,
       })
     );
