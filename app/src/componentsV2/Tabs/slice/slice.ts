@@ -185,10 +185,7 @@ export const tabsSlice = createSlice({
               changes: { source, modeConfig },
             });
             state.activeTabId = existingSingletonId;
-            // Singleton is never a preview tab.
-            if (state.previewTabId === existingSingletonId) {
-              state.previewTabId = undefined;
-            }
+            state.previewTabId = undefined;
             return;
           }
 
@@ -203,14 +200,12 @@ export const tabsSlice = createSlice({
           modeConfig,
           activeWorkflows: new Set(),
           secondaryBufferIds: new Set(),
+          singleton: true,
         };
         tabsAdapter.addOne(state.tabs, newTab);
         state.singletonTabIdsBySourceType[sourceType] = tabId;
         state.activeTabId = tabId;
-        // Singleton is never a preview tab.
-        if (state.previewTabId === tabId) {
-          state.previewTabId = undefined;
-        }
+        state.previewTabId = undefined;
         return;
       }
 
@@ -230,6 +225,7 @@ export const tabsSlice = createSlice({
         modeConfig,
         activeWorkflows: new Set(),
         secondaryBufferIds: new Set(),
+        singleton: false,
       };
 
       if (preview) {

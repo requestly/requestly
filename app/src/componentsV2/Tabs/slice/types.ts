@@ -29,6 +29,7 @@ export interface TabState<T extends TabSource = TabSource> {
   activeWorkflows: Set<ActiveWorkflow>;
   secondaryBufferIds: Set<string>;
   modeConfig: TabModeConfig;
+  singleton?: boolean;
 }
 
 export interface TabServiceState {

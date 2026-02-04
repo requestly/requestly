@@ -217,6 +217,7 @@ const GraphQLClientView: React.FC<GraphQLClientViewProps> = ({
     saveBuffer(
       {
         entity,
+        skipMarkSaved: override?.onSaveClick?.skipMarkSaved,
         produceChanges(entity, state) {
           const record = lodash.cloneDeep(entity.getEntityFromState(state));
           const entry = record.data;
