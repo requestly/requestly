@@ -5,6 +5,8 @@ import { HistoryView } from "./HistoryView";
 import { MdOutlineHistory } from "@react-icons/all-files/md/MdOutlineHistory";
 import { getApiClientFeatureContext } from "features/apiClient/slices";
 import { RQAPI } from "features/apiClient/types";
+import { createDummyApiRecord } from "features/apiClient/components/common/APIClient/APIClient";
+import { getEmptyApiEntry } from "features/apiClient/screens/apiClient/utils";
 
 interface HistoryViewTabSourceMetadata extends TabSourceMetadata {
   record?: RQAPI.ApiRecord;
@@ -30,28 +32,16 @@ export class HistoryViewTabSource extends BaseTabSource {
   static create(matchedPath: MatchedTabSource["matchedPath"]): HistoryViewTabSource {
     const ctx = getApiClientFeatureContext();
     const entryType = RQAPI.ApiEntryType.HTTP;
+    const emptyEntry = getEmptyApiEntry(entryType);
+    const record = createDummyApiRecord(emptyEntry);
+    record.id = ""; // Override to empty for history entries
+
     return new HistoryViewTabSource({
       context: {
         id: ctx.workspaceId,
       },
       entryType,
-      record: {
-        data: {
-          type: entryType,
-          request: { url: "", method: "GET", headers: [], queryParams: [] },
-          response: null,
-        } as any,
-        type: RQAPI.RecordType.API,
-        id: "",
-        name: "",
-        collectionId: "",
-        ownerId: "",
-        deleted: false,
-        createdBy: "",
-        updatedBy: "",
-        createdTs: 0,
-        updatedTs: 0,
-      },
+      record,
     });
   }
 }

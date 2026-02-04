@@ -9,6 +9,7 @@ import { TfiClose } from "@react-icons/all-files/tfi/TfiClose";
 import { useTabActions } from "componentsV2/Tabs/slice";
 import { getApiClientFeatureContext } from "features/apiClient/slices";
 import { HistoryViewTabSource } from "../../../views/components/request/HistoryView/historyViewTabSource";
+import { createDummyApiRecord } from "features/apiClient/components/common/APIClient/APIClient";
 
 interface Props {
   history: RQAPI.ApiEntry[];
@@ -29,19 +30,8 @@ export const HistoryList: React.FC<Props> = ({ history, selectedHistoryIndex, on
 
       const ctx = getApiClientFeatureContext();
 
-      const record: RQAPI.ApiRecord = {
-        data: historyEntry,
-        type: RQAPI.RecordType.API,
-        id: "",
-        name: "Untitled request",
-        collectionId: "",
-        ownerId: "",
-        deleted: false,
-        createdBy: "",
-        updatedBy: "",
-        createdTs: Date.now(),
-        updatedTs: Date.now(),
-      };
+      const record = createDummyApiRecord(historyEntry);
+      record.id = ""; // Override to empty for history entries
 
       openBufferedTab({
         source: new HistoryViewTabSource({
