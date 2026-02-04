@@ -5,6 +5,8 @@ import Split from "react-split";
 
 import useApiClientLayout from "../hooks/useApiClientLayout";
 
+import Sidebar from "./Sidebar";
+
 import "../styles.css";
 
 const ApiClientLayout: React.FC = () => {
@@ -32,7 +34,7 @@ const ApiClientLayout: React.FC = () => {
           }}
           gutterAlign="center"
         >
-          <div className="border-r border-r-neutral-600 bg-surface-0">Sidebar</div>
+          <Sidebar />
           <div>Tabs Container</div>
         </Split>
       </div>
