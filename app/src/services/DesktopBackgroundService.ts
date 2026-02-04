@@ -470,8 +470,8 @@ setTimeout(() => {
 }, 10000);
 
 
-window.RQ.DESKTOP.SERVICES.IPC.onRegister((d: any) => {
-  console.log('yam', d);
+// window.RQ.DESKTOP.SERVICES.IPC.onRegister((d: any) => {
+  // console.log('yam', d);
   // port.start();
   // port.addEventListener('ass', (v) => {
   //   console.log('yam1', v)
@@ -479,7 +479,7 @@ window.RQ.DESKTOP.SERVICES.IPC.onRegister((d: any) => {
   // port.onmessage = (e) => {
   //   console.log('yam2', e);
   // };
-});
+// });
 
 // const {port1, port2} = new MessageChannel()
 // window.RQ.DESKTOP.SERVICES.IPC.sendPort(port1);
