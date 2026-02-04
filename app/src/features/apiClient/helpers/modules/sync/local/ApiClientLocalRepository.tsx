@@ -1,4 +1,4 @@
-import { ApiClientLocalMeta, ApiClientRepositoryInterface } from "../interfaces";
+import { ApiClientLocalMeta, ApiClientRepositoryInterface, RepoType } from "../interfaces";
 import { LocalEnvSync } from "./services/LocalApiClientEnvSync";
 import { LocalApiClientRecordsSync } from "./services/LocalApiClientRecordsSync";
 import { fsManagerServiceAdapterProvider } from "services/fsManagerServiceAdapter";
@@ -6,6 +6,7 @@ import { NativeError } from "errors/NativeError";
 
 export class ApiClientLocalRepository implements ApiClientRepositoryInterface {
   meta: ApiClientLocalMeta;
+  readonly repoType = RepoType.LOCAL;
   environmentVariablesRepository: LocalEnvSync;
   apiClientRecordsRepository: LocalApiClientRecordsSync;
 
