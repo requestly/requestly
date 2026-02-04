@@ -30,7 +30,7 @@ export const WorkspaceCreationView: React.FC<Props> = ({
     analyticEventSource,
     onCreateWorkspaceCallback: callback,
     onError: (err) => {
-      if (err.cause && err.cause.code === ErrorCode.WorkspacePathAlreadyInUse) {
+      if (err?.cause?.code === ErrorCode.WorkspacePathAlreadyInUse) {
         currentSelectedFolderPathRef.current = err.cause.path;
         setError(ErrorCode.WorkspacePathAlreadyInUse);
         return;
