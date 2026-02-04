@@ -12,10 +12,11 @@ import {
 import { useCurrentWorkspaceUserRole } from "./useCurrentWorkspaceUserRole";
 import { trackAttr } from "modules/analytics";
 
-// Broadcast channel setup
 window.activeWorkspaceBroadcastChannel = new BroadcastChannel("active-workspace");
 window.activeWorkspaceBroadcastChannel.addEventListener("message", (_event) => {
   // Refresh the webpage so that it could find updated state later on
+  // Note: Broadcasts now only happen on explicit user workspace switches,
+  // not during tab initialization (which was causing infinite reload loops)
   window.location.reload();
 });
 

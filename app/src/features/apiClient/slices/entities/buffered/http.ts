@@ -5,13 +5,15 @@ import { ApiClientRootState } from "../../hooks/types";
 import { HttpRecordEntity } from "../http";
 import { BufferedApiClientEntity, BufferedApiClientEntityMeta } from "./factory";
 
-export class BufferedHttpRecordEntity extends HttpRecordEntity<BufferedApiClientEntityMeta> implements BufferedApiClientEntity {
+export class BufferedHttpRecordEntity
+  extends HttpRecordEntity<BufferedApiClientEntityMeta>
+  implements BufferedApiClientEntity {
   origin = new HttpRecordEntity(this.dispatch, { id: this.meta.referenceId });
-  override dispatchCommand(command: UpdateCommand<RQAPI.HttpApiRecord>): void {
+  dispatchCommand(command: UpdateCommand<RQAPI.HttpApiRecord>): void {
     this.dispatch(bufferActions.applyPatch({ id: this.meta.id, command }));
   }
 
-  override getEntityFromState(state: ApiClientRootState): RQAPI.HttpApiRecord {
+  getEntityFromState(state: ApiClientRootState): RQAPI.HttpApiRecord {
     const entry = bufferAdapterSelectors.selectById(state.buffer, this.meta.id);
     if (!entry) {
       throw new EntityNotFound(this.id, this.type);
@@ -25,11 +27,12 @@ export class BufferedHttpRecordEntity extends HttpRecordEntity<BufferedApiClient
         foundType: record.type,
       });
     }
-    if (record.data?.type !== RQAPI.ApiEntryType.HTTP) {
+    const entryType = record.data?.type;
+    if (entryType && entryType !== RQAPI.ApiEntryType.HTTP) {
       throw new InvalidEntityShape({
         id: this.id,
         expectedType: RQAPI.ApiEntryType.HTTP,
-        foundType: record.data?.type,
+        foundType: entryType,
       });
     }
 
@@ -47,4 +50,3 @@ export class BufferedHttpRecordEntity extends HttpRecordEntity<BufferedApiClient
     );
   }
 }
-
