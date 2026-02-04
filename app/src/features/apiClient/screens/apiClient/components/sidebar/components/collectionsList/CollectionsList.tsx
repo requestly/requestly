@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { BulkActions, RQAPI } from "features/apiClient/types";
+import { RQAPI as SharedRQAPI } from "@requestly/shared/types/entities/apiClient";
 import { notification } from "antd";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { CollectionRow, ExportType } from "./collectionRow/CollectionRow";
@@ -22,8 +23,10 @@ import { debounce, head, isEmpty, union } from "lodash";
 import { SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY } from "features/apiClient/constants";
 import { ApiClientExportModal } from "../../../modals/exportModal/ApiClientExportModal";
 import { PostmanExportModal } from "../../../modals/postmanCollectionExportModal/PostmanCollectionExportModal";
+import { CommonApiClientExportModal, ExporterFunction } from "../../../modals/CommonApiClientExportModal";
 import { toast } from "utils/Toast";
 import { MoveToCollectionModal } from "../../../modals/MoveToCollectionModal/MoveToCollectionModal";
+import { createOpenApiExporter } from "features/apiClient/helpers/exporters/openapi";
 import ActionMenu from "./BulkActionsMenu";
 import { useRBAC } from "features/rbac";
 import * as Sentry from "@sentry/react";
@@ -64,6 +67,11 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
   const [collectionsToExport, setCollectionsToExport] = useState<RQAPI.ApiClientRecord[]>([]);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [isPostmanExportModalOpen, setIsPostmanExportModalOpen] = useState(false);
+  const [commonExporterConfig, setCommonExporterConfig] = useState<{
+    title: string;
+    exporter: ExporterFunction;
+    exportType: string;
+  } | null>(null);
   const [showSelection, setShowSelection] = useState(false);
   const [isMoveCollectionModalOpen, setIsMoveCollectionModalOpen] = useState(false);
   const [selectedRecords, setSelectedRecords] = useState<Set<RQAPI.ApiClientRecord["id"]>>(new Set());
@@ -252,6 +260,16 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
           setIsPostmanExportModalOpen(true);
           setCollectionsToExport(processedRecords);
           break;
+
+        case BulkActions.EXPORT_OPENAPI: {
+          const exporter = createOpenApiExporter(processedRecords as SharedRQAPI.ApiClientRecord[]);
+          setCommonExporterConfig({
+            exporter,
+            exportType: BulkActions.EXPORT_OPENAPI,
+            title: "OpenAPI 3.0",
+          });
+          break;
+        }
 
         case BulkActions.MOVE:
           setIsMoveCollectionModalOpen(true);
@@ -480,6 +498,16 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
             setCollectionsToExport([]);
             setIsPostmanExportModalOpen(false);
           }}
+        />
+      )}
+
+      {commonExporterConfig && (
+        <CommonApiClientExportModal
+          isOpen={true}
+          onClose={() => setCommonExporterConfig(null)}
+          title={commonExporterConfig.title}
+          exporter={commonExporterConfig.exporter}
+          exporterType={commonExporterConfig.exportType}
         />
       )}
 
