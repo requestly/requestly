@@ -1,6 +1,11 @@
 import { RQAPI } from "features/apiClient/types";
 import { RBACButton, useRBAC } from "features/rbac";
-import { getApiClientFeatureContext, useIsAnyWorkspaceLoading, useTotalRecords } from "features/apiClient/slices";
+import {
+  getApiClientFeatureContext,
+  useIsAnyWorkspaceLoading,
+  useTotalRecords,
+  useWorkspaceLoadingError,
+} from "features/apiClient/slices";
 import {
   NewApiRecordDropdown,
   NewRecordDropdownItemType,
@@ -86,6 +91,11 @@ export const ApiClientEmptyView = () => {
   // but at same time empty view renders with workspace provider, so it breaks,
   // loader helps to prevent that broken state.
   const isLoading = useIsAnyWorkspaceLoading();
+  const loadingError = useWorkspaceLoadingError();
+
+  if (loadingError) {
+    throw loadingError;
+  }
 
   if (isLoading) {
     return (
