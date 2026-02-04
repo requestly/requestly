@@ -6,6 +6,7 @@ import { WorkspaceItem } from "../WorkspaceListItem/WorkspaceListItem";
 import "./workspaceList.scss";
 import { useDispatch } from "react-redux";
 import { globalActions } from "store/slices/global/slice";
+import { trackNewTeamCreationWorkflowStarted } from "modules/analytics/events/common/teams";
 
 interface WorkspaceListProps {
   workspaces: Workspace[];
@@ -36,6 +37,7 @@ export const WorkspaceList: React.FC<WorkspaceListProps> = ({ workspaces, type, 
         },
       })
     );
+    trackNewTeamCreationWorkflowStarted(type, "workspace_dropdown");
     toggleDropdown();
   }, [dispatch, toggleDropdown, type]);
 
