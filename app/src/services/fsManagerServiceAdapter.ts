@@ -280,6 +280,15 @@ export function createWorkspaceFolder(name: string, path: string) {
     path
   ) as Promise<FileSystemResult<{ id: string; name: string; path: string }>>;
 }
+
+export function createDefaultWorkspace() {
+  return rpc({
+    namespace: LOCAL_SYNC_BUILDER_NAMESPACE,
+    method: "createDefaultWorkspace",
+    timeout: 80000,
+  }) as Promise<FileSystemResult<{ id: string; name: string; path: string }>>;
+}
+
 export function getAllWorkspaces() {
   return rpcWithRetry({
     namespace: LOCAL_SYNC_BUILDER_NAMESPACE,
@@ -287,6 +296,28 @@ export function getAllWorkspaces() {
     retryCount: 10,
     timeout: 1000,
   }) as Promise<FileSystemResult<{ id: string; name: string; path: string }[]>>;
+}
+
+export function openExistingLocalWorkspace(workspacePath: string) {
+  return rpc(
+    {
+      namespace: LOCAL_SYNC_BUILDER_NAMESPACE,
+      method: "openExistingLocalWorkspace",
+      timeout: 10000,
+    },
+    workspacePath
+  ) as Promise<FileSystemResult<{ id: string; name: string; path: string }>>;
+}
+
+export function checkIsWorkspacePathAvailable(path: string) {
+  return rpc(
+    {
+      namespace: LOCAL_SYNC_BUILDER_NAMESPACE,
+      method: "checkIsWorkspacePathAvailable",
+      timeout: 10000,
+    },
+    path
+  ) as Promise<boolean>;
 }
 
 export function removeWorkspace(
