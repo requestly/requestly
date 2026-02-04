@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Tooltip } from "antd";
+import { Input, Tooltip } from "antd";
 import { MdOutlineFolder } from "@react-icons/all-files/md/MdOutlineFolder";
 import { MdOutlineInsertDriveFile } from "@react-icons/all-files/md/MdOutlineInsertDriveFile";
-import { CreateWorkspaceHeader } from "../CreateWorkspaceHeader/CreateWorkspaceHeader";
 import { CreateWorkspaceFooter } from "../CreateWorkspaceFooter/CreateWorkspaceFooter";
 import { displayFolderSelector } from "components/mode-specific/desktop/misc/FileDialogButton";
 import { PiFolderOpen } from "@react-icons/all-files/pi/PiFolderOpen";
@@ -24,6 +23,8 @@ import { ExistingWorkspaceConflictView } from "./components/ExistingWorkspaceCon
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
 import { toast } from "utils/Toast";
+import { IoMdArrowBack } from "@react-icons/all-files/io/IoMdArrowBack";
+import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
 
 type FolderItem = {
   name: string;
@@ -239,26 +240,53 @@ export const LocalWorkspaceCreationView = ({
 
   return (
     <>
-      <CreateWorkspaceHeader
-        title="Create a new local workspace"
-        description=""
-        name={workspaceName}
-        onWorkspaceNameChange={handleWorkspaceNameChange}
-        hasDuplicateWorkspaceName={hasDuplicateWorkspaceName}
-      />
-      <div className="workspace-folder-selector">
-        <RQButton icon={<MdOutlineFolder />} onClick={() => displayFolderSelector(folderSelectCallback)}>
-          Select a folder
-        </RQButton>
-        {folderPath.length ? <WorkspacePathEllipsis path={folderPath} className="selected-folder-path" /> : null}
+      <div className="create-workspace-header">
+        <div className="create-workspace-header__title">
+          {!isOpenedInModal ? <IoMdArrowBack onClick={onCancel} /> : null}
+          Create a new local workspace
+        </div>
+
+        <label
+          htmlFor="workspace-folder-location"
+          className="create-workspace-header__label workspace-folder-selector-label"
+        >
+          Workspace folder location{" "}
+          <Tooltip
+            color="#000"
+            placement="right"
+            title="The selected folder will be used as the root of your workspace. Your APIs, variables and related metadata
+            will be stored in this."
+          >
+            <MdInfoOutline />
+          </Tooltip>
+        </label>
+        <div className="workspace-folder-selector">
+          <RQButton icon={<MdOutlineFolder />} onClick={() => displayFolderSelector(folderSelectCallback)}>
+            Select a folder
+          </RQButton>
+          {folderPath.length ? <WorkspacePathEllipsis path={folderPath} className="selected-folder-path" /> : null}
+        </div>
+        <label htmlFor="workspace-name" className="create-workspace-header__label">
+          Workspace name
+        </label>
+        <Input
+          autoFocus
+          value={workspaceName}
+          id="workspace-name"
+          className="create-workspace-header__input"
+          onChange={(e) => handleWorkspaceNameChange(e.target.value)}
+          status={hasDuplicateWorkspaceName ? "error" : undefined}
+        />
+        {hasDuplicateWorkspaceName ? (
+          <div className="create-workspace-header__input-error-message">
+            <MdInfoOutline />
+            Folder already exists. Use a different name or rename the existing folder.
+          </div>
+        ) : null}
       </div>
 
       {folderPreview ? (
         <>
-          <div className="workspace-folder-preview-description">
-            The selected folder will be used as the root of your workspace. Your APIs, variables and related metadata
-            will be stored in this.
-          </div>
           <div className="workspace-folder-preview">
             <>
               <div className="preview-header">
