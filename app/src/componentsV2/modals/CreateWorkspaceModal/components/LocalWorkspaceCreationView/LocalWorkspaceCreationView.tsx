@@ -159,17 +159,9 @@ export const LocalWorkspaceCreationView = ({
           if (isFeatureCompatible(FEATURES.ONBOARDING_V2)) {
             checkIsWorkspacePathAvailable(result.folderPath)
               .then((isEligible) => {
-                if (!isFeatureCompatible(FEATURES.ONBOARDING_V2)) {
-                  toast.error("Cannot create a workspace in this folder. Please select a different folder.");
-                  return;
-                }
                 setIsSelectedFolderAvailable(isEligible);
               })
               .catch(() => {
-                if (!isFeatureCompatible(FEATURES.ONBOARDING_V2)) {
-                  toast.error("Cannot create a workspace in this folder. Please select a different folder.");
-                  return;
-                }
                 setIsSelectedFolderAvailable(false);
               });
           }
