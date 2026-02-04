@@ -7,7 +7,7 @@ export const useMatchedTabSource = () => {
     for (const route of tabRoutes) {
       const matchedPath = matchPath(route.path, window.location.pathname);
       if (matchedPath) {
-        return { matchedPath, sourceFactory: route.tabSourceFactory };
+        return { matchedPath, sourceFactory: route.tabSourceFactory, route };
       }
     }
   }, []);
