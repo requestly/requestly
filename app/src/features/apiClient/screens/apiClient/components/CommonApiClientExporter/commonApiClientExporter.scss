@@ -1,0 +1,85 @@
+// Common API Client Exporter Styles - Matching Postman Design
+.common-api-client-export-modal {
+  .ant-modal-header {
+    border-bottom: none;
+  }
+
+  .ant-modal-body {
+    padding: 1rem;
+    padding-top: 0;
+  }
+
+  .export-modal-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: var(--requestly-font-size-lg);
+
+    svg {
+      font-size: var(--requestly-font-size-lg);
+    }
+  }
+
+  .common-api-client-exporter-content {
+    .export-format-selector {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 12px;
+      padding-top: 12px;
+
+      .export-format-label {
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--requestly-color-text-default);
+      }
+
+      .ant-radio-group {
+        display: flex;
+        gap: 8px;
+
+        .ant-radio-wrapper {
+          margin-right: 0;
+        }
+      }
+    }
+
+    .export-details-card {
+      border-radius: 4px;
+      padding: 6px 12px;
+      background: var(--requestly-color-surface-1);
+      border: 1px solid var(--requestly-color-surface-2);
+      color: var(--requestly-color-text-default);
+      font-size: var(--requestly-font-size-sm);
+
+      .export-name {
+        font-size: large;
+        font-weight: var(--requestly-font-weight-medium);
+      }
+
+      .export-details {
+        margin-top: 8px;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+
+      .export-details-item {
+        display: flex;
+        gap: 4px;
+        font-size: var(--requestly-font-size-xs);
+        color: var(--requestly-color-text-subtle);
+      }
+    }
+  }
+
+  .ant-alert {
+    margin-bottom: 8px;
+    padding: 10px;
+
+    &-message,
+    &-description {
+      font-size: var(--requestly-font-size-sm);
+    }
+  }
+}
