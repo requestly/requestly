@@ -25,17 +25,15 @@ export const WorkspaceProvider: React.FC<{
 
   if (workspace.status.state.success === false) {
     return (
-      <ReduxWorkspaceProvider workspaceId={workspaceId}>
-        <WorkspaceCollapse
-          expanded
-          type={type}
-          showEnvSwitcher={false}
-          showNewRecordBtn={false}
-          workspaceId={workspaceId}
-        >
-          <MultiViewError />
-        </WorkspaceCollapse>
-      </ReduxWorkspaceProvider>
+      <WorkspaceCollapse
+        expanded
+        type={type}
+        showEnvSwitcher={false}
+        showNewRecordBtn={false}
+        workspaceId={workspaceId}
+      >
+        <MultiViewError />
+      </WorkspaceCollapse>
     );
   }
 
