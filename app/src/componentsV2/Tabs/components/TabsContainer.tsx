@@ -222,8 +222,11 @@ export const TabsContainer: React.FC = () => {
       return;
     }
 
+    const source = matchedTabSource.sourceFactory(matchedTabSource.matchedPath);
+
     openBufferedTab({
-      source: matchedTabSource.sourceFactory(matchedTabSource.matchedPath),
+      source,
+      singleton: matchedTabSource.route.singleton,
     });
   }, [matchedTabSource, openBufferedTab]);
 

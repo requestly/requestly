@@ -400,6 +400,7 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
         saveBuffer(
           {
             entity,
+            skipMarkSaved: override?.onSaveClick?.skipMarkSaved,
             produceChanges(entity, state) {
               const record = lodash.cloneDeep(entity.getEntityFromState(state));
               record.data = sanitizeEntry(record.data);
