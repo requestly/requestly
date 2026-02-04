@@ -8,7 +8,7 @@ import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getWorkspaceViewSlice } from "./slices/workspaceView/slice";
 import Daemon from "./store/apiRecords/Daemon";
 import { ApiClientProvider } from "./contexts";
-import { resetWorkspaceView, setupWorkspaceView } from "./slices/workspaceView/thunks";
+import { setupWorkspaceView } from "./slices/workspaceView/thunks";
 import Split from "react-split";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
@@ -42,7 +42,6 @@ const ApiClientFeatureContainer: React.FC = () => {
 
     return () => {
       promise.abort();
-      dispatch(resetWorkspaceView as any);
     };
   }, [dispatch, user.details?.profile?.uid]);
 
