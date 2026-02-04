@@ -154,8 +154,12 @@ export function useIsTabDirty(tab: BufferModeTab) {
 }
 
 export function useTabTitle(tab: BufferModeTab) {
-  if (tab.source.getSourceId() === "history" && tab.source.getSourceName() === "history") {
-    return tab.source.getDefaultTitle();
-  }
-  return useTabBuffer(tab, ({ entity, state }) => entity.getName(state));
+  const title = useTabBuffer(tab, ({ entity, state }) => {
+    if (tab.singleton) {
+      return tab.source.getDefaultTitle();
+    }
+    return entity.getName(state);
+  });
+
+  return title;
 }

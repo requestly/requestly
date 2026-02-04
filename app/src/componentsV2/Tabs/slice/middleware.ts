@@ -21,6 +21,7 @@ import { reduxStore } from "store";
 import { openBufferedTab } from "./actions";
 import { closeTab, closeAllTabs } from "./thunks";
 import { HistoryViewTabSource } from "features/apiClient/screens/apiClient/components/views/components/request/HistoryView/historyViewTabSource";
+import { isHttpApiRecord } from "features/apiClient/screens/apiClient/utils";
 
 export interface GetEntityDataFromTabSourceState {
   records: {
@@ -69,9 +70,9 @@ export function getEntityDataFromTabSource(
       throw new NativeError("[Tab Buffer Middleware] HistoryViewTabSource missing record");
     }
 
-    const entryType = historyMetadata.entryType ?? record.data?.type ?? RQAPI.ApiEntryType.HTTP;
-    const entityType =
-      entryType === RQAPI.ApiEntryType.GRAPHQL ? ApiClientEntityType.GRAPHQL_RECORD : ApiClientEntityType.HTTP_RECORD;
+    const isHttp = isHttpApiRecord(record);
+    const entryType = record.data?.type ?? (isHttp ? RQAPI.ApiEntryType.HTTP : RQAPI.ApiEntryType.GRAPHQL);
+    const entityType = isHttp ? ApiClientEntityType.HTTP_RECORD : ApiClientEntityType.GRAPHQL_RECORD;
     const workspaceId = historySource.metadata.context?.id;
     const entityId = `history:${workspaceId}:${entryType}`;
 
@@ -152,7 +153,6 @@ function handleOpenBufferedTab(action: ReturnType<typeof openBufferedTab>) {
   const { entityType, entityId, data } = entityData;
 
   const existingBuffer = entityId ? findBufferByReferenceId(state.buffer.entities, entityId) : null;
-
 
   let bufferId: string;
 

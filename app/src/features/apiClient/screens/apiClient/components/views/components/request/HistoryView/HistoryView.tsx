@@ -75,46 +75,13 @@ const BufferedHistoryView: React.FC<{
     return {
       onSaveClick: {
         save,
+        skipMarkSaved: true,
         onSuccess: (savedRecord) => {
           /**
-           * HISTORY SAVE FLOW EXPLANATION:
-           *
-           * Problem: saveBuffer() calls markSaved() with the saved record (which has an ID).
-           * This updates buffer.current to contain the saved record. On the next save,
-           * produceChanges uses buffer.current (which now has an ID), causing createRecord
-           * to do an upsert instead of creating a new record.
-           *
-           * Solution: Immediately call markSaved again with clean seed data (empty ID).
-           * This overwrites buffer.current with a fresh history entry state, ensuring
-           * each save from history creates a new independent record.
+           * HISTORY SAVE FLOW:
+           * Skip markSaved() so buffer stays clean with empty ID.
+           * This ensures each save from history creates a new independent record.
            */
-
-          const stableHistoryReferenceId = `history:${ctx.workspaceId}:${selectedEntry.type}`;
-
-          // Prepare clean seed data with empty ID
-          const seed: RQAPI.ApiRecord = {
-            data: { ...selectedEntry },
-            type: RQAPI.RecordType.API,
-            id: "", // Empty ID forces createRecord to generate new ID on next save
-            name: "Untitled request",
-            collectionId: "",
-            ownerId: "",
-            deleted: false,
-            createdBy: "",
-            updatedBy: "",
-            createdTs: Date.now(),
-            updatedTs: Date.now(),
-          };
-
-          // Override buffer state with clean seed data and stable reference ID
-          store.dispatch(
-            bufferActions.markSaved({
-              id: bufferId,
-              referenceId: stableHistoryReferenceId,
-              savedData: seed, // Reset buffer.current to seed with empty ID
-            })
-          );
-
           saveOrUpdateRecord(ctx, savedRecord);
 
           // Open new tab with the saved record
@@ -131,7 +98,7 @@ const BufferedHistoryView: React.FC<{
         },
       },
     };
-  }, [bufferId, ctx, hideSaveBtn, openBufferedTab, save, selectedEntry, store]);
+  }, [ctx, hideSaveBtn, openBufferedTab, save]);
 
   return (
     <GenericApiClient

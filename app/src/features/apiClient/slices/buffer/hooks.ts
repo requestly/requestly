@@ -1,49 +1,55 @@
-import lodash from 'lodash';
+import lodash from "lodash";
 import { ApiClientRepositoryInterface } from "features/apiClient/helpers/modules/sync/interfaces";
 import { ApiClientEntity } from "../entities";
-import { ApiClientStore, ApiClientStoreState, useApiClientRepository, useApiClientStore } from "../workspaceView/helpers/ApiClientContextRegistry";
+import {
+  ApiClientStore,
+  ApiClientStoreState,
+  useApiClientRepository,
+  useApiClientStore,
+} from "../workspaceView/helpers/ApiClientContextRegistry";
 import { Try } from "utils/try";
 import { useMemo } from "react";
 import { Dispatch } from "@reduxjs/toolkit";
 import { bufferActions, bufferAdapterSelectors, getPathsToFilter } from "./slice";
 import { BufferedApiClientEntity, OriginExists } from "../entities/buffered/factory";
 import { EntityNotFound } from "../types";
-import { useApiClientDispatch } from '../hooks/base.hooks';
+import { useApiClientDispatch } from "../hooks/base.hooks";
 import { NativeError } from "errors/NativeError";
-import { ApiClientEntityType } from '../entities/types';
+import { ApiClientEntityType } from "../entities/types";
 
 function getDataToSave<T>(entityType: ApiClientEntityType, data: T) {
   const original = lodash.cloneDeep(data);
   const pathFilters = getPathsToFilter(entityType);
-  for(const path of pathFilters) {
+  for (const path of pathFilters) {
     lodash.unset(original as object, path);
   }
 
   return original;
 }
 
-function createSave(
-  repositories: ApiClientRepositoryInterface,
-  store: ApiClientStore,
-  dispatch: Dispatch,
-) {
-  async function save<T extends BufferedApiClientEntity, C extends T extends ApiClientEntity<infer K> ? K : never = T extends ApiClientEntity<infer K> ? K : never>(
+function createSave(repositories: ApiClientRepositoryInterface, store: ApiClientStore, dispatch: Dispatch) {
+  async function save<
+    T extends BufferedApiClientEntity,
+    C extends T extends ApiClientEntity<infer K> ? K : never = T extends ApiClientEntity<infer K> ? K : never
+  >(
     params: {
-      entity: T,
-      produceChanges?: (entity: T, state: ApiClientStoreState) => C,
-      save: (changes: C, repositories: ApiClientRepositoryInterface, entity: T) => T extends OriginExists<BufferedApiClientEntity> ? Promise<void> : Promise<C & { id: string }>,
+      entity: T;
+      produceChanges?: (entity: T, state: ApiClientStoreState) => C;
+      save: (
+        changes: C,
+        repositories: ApiClientRepositoryInterface,
+        entity: T
+      ) => T extends OriginExists<BufferedApiClientEntity> ? Promise<void> : Promise<C & { id: string }>;
+      skipMarkSaved?: boolean;
     },
     hooks: {
-      onError?: (e: Error) => void,
-      onSuccess?: (changes: C, entity: T) => void,
-      beforeSave?: () => void,
-      afterSave?: () => void,
-    } = {},
+      onError?: (e: Error) => void;
+      onSuccess?: (changes: C, entity: T) => void;
+      beforeSave?: () => void;
+      afterSave?: () => void;
+    } = {}
   ) {
-    const {
-      onSuccess = () => { },
-      onError = () => { },
-    } = hooks;
+    const { onSuccess = () => {}, onError = () => {} } = hooks;
     const state = store.getState();
     try {
       const buffer = bufferAdapterSelectors.selectById(state.buffer, params.entity.meta.id);
@@ -52,7 +58,7 @@ function createSave(
       }
       const dataToSave = getDataToSave(
         buffer.entityType,
-        params.produceChanges?.(params.entity, state) || buffer.current as C
+        params.produceChanges?.(params.entity, state) || (buffer.current as C)
       );
       hooks.beforeSave?.();
       const result = await Try(() => params.save(dataToSave, repositories, params.entity));
@@ -62,32 +68,36 @@ function createSave(
           hooks.afterSave?.();
         })
         .inspect((savedEntity) => {
-          if(!params.entity.meta.originExists && !savedEntity) {
-            throw new NativeError('The buffer you used does not have an origin, and the save function did not return an entity!');
+          if (!params.entity.meta.originExists && !savedEntity) {
+            throw new NativeError(
+              "The buffer you used does not have an origin, and the save function did not return an entity!"
+            );
           }
           hooks.afterSave?.();
           //We we will only acknowledge the result if we don't have an origin
-          const newState = params.entity.meta.originExists ? buffer.current as C : savedEntity;
+          const newState = params.entity.meta.originExists ? (buffer.current as C) : savedEntity;
           params.entity.origin.upsert(newState);
-          dispatch(
-            bufferActions.markSaved({
-              id: params.entity.meta.id,
-              referenceId: params.entity.meta.originExists ? undefined : savedEntity?.id,
-              savedData: newState,
-            })
-          );
-          onSuccess(newState!, params.entity)
-        }
-        );
+
+          if (!params.skipMarkSaved) {
+            dispatch(
+              bufferActions.markSaved({
+                id: params.entity.meta.id,
+                referenceId: params.entity.meta.originExists ? undefined : savedEntity?.id,
+                savedData: newState,
+              })
+            );
+          }
+
+          onSuccess(newState!, params.entity);
+        });
       return result;
-    }
-    catch (e) {
+    } catch (e) {
       hooks.afterSave?.();
       onError(e);
     }
   }
-  return save
-};
+  return save;
+}
 
 // t0: click save, e=s1, b=s2
 // t2: daemon updates e, e=s3, b=s2
