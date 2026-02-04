@@ -23,11 +23,12 @@ export class HttpRecordEntity<M extends ApiClientEntityMeta = ApiClientEntityMet
         foundType: record?.type,
       });
     }
-    if (record.data?.type !== RQAPI.ApiEntryType.HTTP) {
+    const entryType = record.data?.type;
+    if (entryType && entryType !== RQAPI.ApiEntryType.HTTP) {
       throw new InvalidEntityShape({
         id: this.id,
         expectedType: RQAPI.ApiEntryType.HTTP,
-        foundType: record.data.type,
+        foundType: entryType,
       });
     }
     return record as RQAPI.HttpApiRecord;

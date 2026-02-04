@@ -39,6 +39,26 @@ export function useViewMode() {
   return useSelector(selectViewMode);
 }
 
+const selectSingleViewWorkspaceError = createSelector([getWorkspaceViewSlice], (s) => {
+  // Only check for errors in single view mode
+  if (s.viewMode !== ApiClientViewMode.SINGLE) {
+    return null;
+  }
+
+  const workspaces = getAllSelectedWorkspaces(s);
+  const workspace = workspaces[0];
+
+  if (workspace && !workspace.status.loading && !workspace.status.state.success) {
+    return workspace.status.state.error;
+  }
+
+  return null;
+});
+
+export function useWorkspaceLoadingError() {
+  return useSelector(selectSingleViewWorkspaceError);
+}
+
 const selectSingleModeWorkspace = createSelector([getWorkspaceViewSlice], (s) => {
   if (s.viewMode !== ApiClientViewMode.SINGLE) {
     throw new NativeError("Can't use 'useGetSingleModeWorkspace' in single view mode!");

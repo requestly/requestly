@@ -113,17 +113,9 @@ const addWorkspacesIntoMultiView = createAsyncThunk(
   async (params: { workspaces: WorkspaceInfo[]; userId?: string }, { dispatch }) => {
     const { workspaces, userId } = params;
     const userDetails = getUserDetails(userId);
-    const results = await Promise.allSettled(
-      workspaces.map(async (workspace) => {
-        return dispatch(addWorkspaceIntoView({ workspace, userDetails })).unwrap();
-      })
-    );
 
-    const failures = results.filter((r) => r.status === "rejected");
-    if (failures.length > 0) {
-      console.error(`Failed to add ${failures.length} workspace(s):`, failures);
-      // Optionally show user notification
-      // toast.error(`Some workspaces failed to load`);
+    for (const workspace of workspaces) {
+      await dispatch(addWorkspaceIntoView({ workspace, userDetails }));
     }
   }
 );
@@ -252,8 +244,29 @@ export const setupWorkspaceView = createAsyncThunk(
     const { userId } = params;
     const rootState = getState() as RootState;
     const selectedWorkspaces = getAllSelectedWorkspaces(rootState.workspaceView);
+    const viewMode = getViewMode(rootState);
 
     if (!userId) {
+      // When logged out, preserve local workspace state if it exists
+      const activeWorkspaceId = rootState.workspace.activeWorkspaceIds[0];
+      const localWorkspaces = selectedWorkspaces.filter((ws) => ws.meta.type === WorkspaceType.LOCAL);
+      const activeLocalWorkspace = localWorkspaces.find((ws) => ws.id === activeWorkspaceId);
+
+      if (viewMode === ApiClientViewMode.SINGLE && activeLocalWorkspace) {
+        // Single mode with a local workspace that matches active - keep it active
+        return dispatch(
+          switchContext({
+            workspace: activeLocalWorkspace,
+          })
+        ).unwrap();
+      }
+
+      if (viewMode === ApiClientViewMode.MULTI && localWorkspaces.length > 0) {
+        // Multi-view mode with local workspaces - maintain that state
+        return dispatch(workspaceViewManager({ workspaces: localWorkspaces, action: "add" })).unwrap();
+      }
+
+      // No local workspaces, fallback to logged out workspace
       return dispatch(
         switchContext({
           workspace: {
@@ -306,14 +319,12 @@ export const setupWorkspaceView = createAsyncThunk(
       }
 
       try {
-        const result = await dispatch(
+        return dispatch(
           switchContext({
             workspace: selectedWorkspace,
             userId,
           })
-        ).unwrap();
-
-        return result;
+        );
       } catch (error) {
         if (isWorkspaceDeletedError(error)) {
           // workspace deleted, fallback to private
