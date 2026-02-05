@@ -10,3 +10,22 @@
     }
   }
 }
+
+.import-curl-modal {
+  &-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  &-info-icon {
+    color: var(--requestly-color-text-subtle);
+    cursor: pointer;
+    width: 16px;
+    height: 16px;
+
+    &:hover {
+      color: var(--requestly-color-primary);
+    }
+  }
+}
