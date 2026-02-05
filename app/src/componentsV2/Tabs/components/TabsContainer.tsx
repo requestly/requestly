@@ -1,13 +1,15 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Tabs, TabsProps, Typography, Popover } from "antd";
-import { TabItem } from "./TabItem";
-import { Outlet, unstable_useBlocker } from "react-router-dom";
-import { RQButton } from "lib/design-system-v2/components";
-import { MdClose } from "@react-icons/all-files/md/MdClose";
 import { IoIosArrowDown } from "@react-icons/all-files/io/IoIosArrowDown";
-import { useSetUrl } from "../hooks/useSetUrl";
-import { useCloseActiveTabShortcut } from "hooks/useCloseActiveTabShortcut";
+import { MdClose } from "@react-icons/all-files/md/MdClose";
+import { Dropdown, MenuProps, Popover, Tabs, TabsProps, Typography } from "antd";
 import PATHS from "config/constants/sub/paths";
+import { DraftRequestContainerTabSource } from "features/apiClient/screens/apiClient/components/views/components/DraftRequestContainer/draftRequestContainerTabSource";
+import { useCloseActiveTabShortcut } from "hooks/useCloseActiveTabShortcut";
+import { RQButton } from "lib/design-system-v2/components";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Outlet, unstable_useBlocker } from "react-router-dom";
+import { useMatchedTabSource } from "../hooks/useMatchedTabSource";
+import { useSetUrl } from "../hooks/useSetUrl";
+import { TabItem } from "./TabItem";
 import "./tabsContainer.scss";
 import { TabsMorePopover } from "./TabsMorePopover";
 import {
@@ -20,10 +22,8 @@ import {
   useTabTitle,
 } from "../slice";
 import { TabState } from "../slice/types";
-import { DraftRequestContainerTabSource } from "features/apiClient/screens/apiClient/components/views/components/DraftRequestContainer/draftRequestContainerTabSource";
 import { getEmptyDraftApiRecord } from "features/apiClient/screens/apiClient/utils";
 import { RQAPI } from "features/apiClient/types";
-import { useMatchedTabSource } from "../hooks/useMatchedTabSource";
 import { getHasActiveWorkflows, getHasAnyUnsavedChanges } from "../slice/utils";
 
 interface BufferedTabLabelProps {
@@ -133,7 +133,7 @@ export const TabsContainer: React.FC = () => {
   const tabs = useTabs();
   const activeTabId = useActiveTabId();
   const previewTabId = usePreviewTabId();
-  const { closeTab, setActiveTab, openBufferedTab, setPreviewTab } = useTabActions();
+  const { closeTab, closeAllTabs, setActiveTab, openBufferedTab, setPreviewTab } = useTabActions();
   const [isMorePopoverOpen, setIsMorePopoverOpen] = useState(false);
 
   useCloseActiveTabShortcut();
@@ -222,8 +222,11 @@ export const TabsContainer: React.FC = () => {
       return;
     }
 
+    const source = matchedTabSource.sourceFactory(matchedTabSource.matchedPath);
+
     openBufferedTab({
-      source: matchedTabSource.sourceFactory(matchedTabSource.matchedPath),
+      source,
+      singleton: matchedTabSource.route.singleton,
     });
   }, [matchedTabSource, openBufferedTab]);
 
@@ -247,29 +250,69 @@ export const TabsContainer: React.FC = () => {
     }
   }, [activeTabSource, setUrl]);
 
-  const handleUnpreviewTab = useCallback(
-    (tabId: string) => {
-      if (tabId === previewTabId) {
-        setPreviewTab(undefined);
-      }
-    },
-    [previewTabId, setPreviewTab]
-  );
-
   const tabItems: TabsProps["items"] = useMemo(() => {
-    return tabs.map((tab) => ({
-      key: tab.id,
-      closable: false,
-      label: (
-        <TabLabel
-          tab={tab}
-          onClose={() => closeTab({ tabId: tab.id })}
-          onDoubleClick={() => handleUnpreviewTab(tab.id)}
-        />
-      ),
-      children: <TabItem tabId={tab.id}>{tab.source.render()}</TabItem>,
-    }));
-  }, [tabs, closeTab, handleUnpreviewTab]);
+    return tabs.map((tab, index) => {
+      const handleCloseTabsToLeft = async () => {
+        const tabsToClose = tabs.slice(0, index);
+        for (const t of tabsToClose) {
+          await closeTab({ tabId: t.id });
+        }
+      };
+
+      const handleCloseTabsToRight = async () => {
+        const tabsToClose = tabs.slice(index + 1);
+        for (const t of tabsToClose) {
+          await closeTab({ tabId: t.id });
+        }
+      };
+
+      const handleCloseAllTabs = () => {
+        closeAllTabs({ skipUnsavedPrompt: true });
+      };
+
+      const contextMenuItems: MenuProps["items"] = [
+        {
+          key: "close-left",
+          label: "Close Tabs to the Left",
+          onClick: handleCloseTabsToLeft,
+          disabled: index === 0,
+        },
+        {
+          key: "close-right",
+          label: "Close Tabs to the Right",
+          onClick: handleCloseTabsToRight,
+          disabled: index === tabs.length - 1,
+        },
+        {
+          type: "divider",
+        },
+        {
+          key: "close-all",
+          label: "Close All Tabs",
+          onClick: handleCloseAllTabs,
+        },
+      ];
+
+      const handleDoubleClick = () => {
+        if (tab.id === previewTabId) {
+          setPreviewTab(undefined);
+        }
+      };
+
+      return {
+        key: tab.id.toString(),
+        closable: false,
+        label: (
+          <Dropdown menu={{ items: contextMenuItems }} trigger={["contextMenu"]}>
+            <div>
+              <TabLabel tab={tab} onClose={() => closeTab({ tabId: tab.id })} onDoubleClick={handleDoubleClick} />
+            </div>
+          </Dropdown>
+        ),
+        children: <TabItem tabId={tab.id}>{tab.source.render()}</TabItem>,
+      };
+    });
+  }, [tabs, closeTab, closeAllTabs, previewTabId, setPreviewTab]);
 
   return tabItems.length === 0 ? (
     <div className="tabs-outlet-container">

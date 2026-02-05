@@ -6,13 +6,13 @@ import {
   TypedStartListening,
 } from "@reduxjs/toolkit";
 import { bufferActions, findBufferByReferenceId } from "./slice";
+import { BufferEntry } from "./types";
 import { ApiClientEntityType } from "../entities/types";
 import {
   API_CLIENT_RECORDS_SLICE_NAME,
   API_CLIENT_ENVIRONMENTS_SLICE_NAME,
   API_CLIENT_RUNNER_CONFIG_SLICE_NAME,
   BUFFER_SLICE_NAME,
-  GLOBAL_ENVIRONMENT_ID,
   RUNTIME_VARIABLES_ENTITY_ID,
 } from "../common/constants";
 import { apiRecordsAdapter } from "../apiRecords/slice";
@@ -68,7 +68,8 @@ const globalEnvironmentRemote: BufferSyncRemote = {
       action.type === `${API_CLIENT_ENVIRONMENTS_SLICE_NAME}/unsafePatchGlobal`
     );
   },
-  extractId: () => GLOBAL_ENVIRONMENT_ID,
+  // Prefer real id from payload/state (desktop/local uses a path-like id).
+  extractId: getPayloadId,
   selectData: (state) => state.environments.globalEnvironment,
 };
 
@@ -106,7 +107,16 @@ function performBufferSync(
   const buffer = findBufferByReferenceId(bufferState.entities, id);
   if (!buffer || !buffer.referenceId) return;
 
-  const sourceData = overrideData !== undefined ? overrideData : remote.selectData(state, id);
+  const remoteData = remote.selectData(state, id);
+  // When entitySynced sends partial data (e.g. { name } on rename), merge with full remote data
+  // so we don't replace buffer.current with a partial object and lose e.g. variables.
+  const isSpreadableObject = (v: unknown): v is Record<string, unknown> => typeof v === "object" && v !== null;
+  const sourceData =
+    overrideData !== undefined && isSpreadableObject(remoteData) && isSpreadableObject(overrideData)
+      ? { ...remoteData, ...overrideData }
+      : overrideData !== undefined
+      ? overrideData
+      : remoteData;
 
   if (sourceData !== undefined) {
     listenerApi.dispatch(
@@ -119,6 +129,32 @@ function performBufferSync(
     console.warn(
       `[BufferSync] Could not find data for ${remote.entityTypes[0]} (${id}). Ensure data is synced or in state.`
     );
+  }
+}
+
+/**
+ * Sync all buffers matching the remote's entity types
+ */
+function performBulkBufferSync(listenerApi: BufferListenerApi, remote: BufferSyncRemote) {
+  const state = listenerApi.getState();
+  const bufferState = state[BUFFER_SLICE_NAME];
+
+  const allBuffers = Object.values(bufferState.entities).filter(
+    (buffer): buffer is BufferEntry => buffer !== undefined && remote.entityTypes.includes(buffer.entityType)
+  );
+
+  for (const buffer of allBuffers) {
+    if (!buffer.referenceId) continue;
+
+    const remoteData = remote.selectData(state, buffer.referenceId);
+    if (remoteData !== undefined) {
+      listenerApi.dispatch(
+        bufferActions.syncFromSource({
+          referenceId: buffer.referenceId,
+          sourceData: remoteData,
+        })
+      );
+    }
   }
 }
 
@@ -149,7 +185,12 @@ startAppListening({
     if (!remote) return;
 
     const id = remote.extractId(action);
-    if (!id) return;
+
+    // If no id found, sync all buffers for this entity type
+    if (!id) {
+      performBulkBufferSync(listenerApi, remote);
+      return;
+    }
 
     performBufferSync(listenerApi, remote, id);
   },

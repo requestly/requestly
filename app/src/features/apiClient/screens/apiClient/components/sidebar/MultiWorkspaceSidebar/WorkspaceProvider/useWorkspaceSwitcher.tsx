@@ -72,19 +72,6 @@ export const useWorkspaceSwitcher = () => {
 
       setIsWorkspaceLoading(true);
       try {
-        const result = await switchContext({
-          userId,
-          workspace: getWorkspaceInfo(workspace),
-        });
-
-        if (result.payload?.error) {
-          if (result.payload.error.name === InvalidContextVersionError.name) {
-            return;
-          } else {
-            throw new Error(result.payload?.error);
-          }
-        }
-
         await switchWorkspace(
           {
             teamId: workspace.id,
@@ -101,6 +88,19 @@ export const useWorkspaceSwitcher = () => {
           undefined,
           "workspaces_dropdown"
         );
+
+        const result = await switchContext({
+          userId,
+          workspace: getWorkspaceInfo(workspace),
+        });
+
+        if (result.payload?.error) {
+          if (result.payload.error.name === InvalidContextVersionError.name) {
+            return;
+          } else {
+            throw new Error(result.payload?.error);
+          }
+        }
 
         if (!isWorkspaceLoading) {
           showSwitchWorkspaceSuccessToast(workspace.name);
@@ -168,6 +168,8 @@ export const useWorkspaceSwitcher = () => {
     setIsWorkspaceLoading(true);
 
     try {
+      await clearCurrentlyActiveWorkspace(dispatch, appMode);
+
       const result = await switchContext({
         userId,
         workspace: { id: dummyPersonalWorkspace.id, meta: { type: WorkspaceType.PERSONAL } },
@@ -180,8 +182,6 @@ export const useWorkspaceSwitcher = () => {
           throw new Error(result.payload?.error);
         }
       }
-
-      await clearCurrentlyActiveWorkspace(dispatch, appMode);
 
       showSwitchWorkspaceSuccessToast();
     } catch (error) {

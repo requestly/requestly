@@ -24,6 +24,10 @@ import { workspaceActions } from "store/slices/workspaces/slice";
 import { getDomainFromEmail } from "utils/mailCheckerUtils";
 import { getAvailableBillingTeams } from "store/features/billing/selectors";
 import * as Sentry from "@sentry/react";
+import { getWorkspaceInfo, useWorkspaceViewActions } from "features/apiClient/slices";
+import { InvalidContextVersionError } from "features/apiClient/slices/workspaceView/helpers/ApiClientContextRegistry/ApiClientContextRegistry";
+import { NativeError } from "errors/NativeError";
+import { ErrorSeverity } from "errors/types";
 
 interface Props {
   workspaceType: WorkspaceType;
@@ -50,16 +54,18 @@ export const WorkspaceCreationView: React.FC<Props> = ({ workspaceType, analytic
   const navigate = useNavigate();
   const appMode = useSelector(getAppMode);
   const user = useSelector(getUserAuthDetails);
+  const userId = user?.details?.profile?.uid;
   const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
   const [isLoading, setIsLoading] = useState(false);
   const billingTeams = useSelector(getAvailableBillingTeams);
+  const { switchContext } = useWorkspaceViewActions();
 
   const handlePostTeamCreationStep = useCallback(
-    async (teamId: string, newTeamName: string, hasMembersInSameDomain: boolean) => {
+    async (workspace: Workspace, hasMembersInSameDomain: boolean) => {
       await switchWorkspace(
         {
-          teamId: teamId,
-          teamName: newTeamName,
+          teamId: workspace.id,
+          teamName: workspace.name,
           teamMembersCount: 1,
           workspaceType,
         },
@@ -72,8 +78,26 @@ export const WorkspaceCreationView: React.FC<Props> = ({ workspaceType, analytic
         null,
         analyticEventSource
       );
+
+      const result = await switchContext({
+        userId,
+        workspace: getWorkspaceInfo(workspace),
+      });
+
+      if (result.payload?.error) {
+        if (result.payload.error.name === InvalidContextVersionError.name) {
+          return;
+        } else {
+          const error = result.payload?.error;
+          throw new NativeError(error.message as string)
+            .setShowBoundary(true)
+            .setSeverity(ErrorSeverity.FATAL)
+            .set("stack", error.stack);
+        }
+      }
+
       if (workspaceType === WorkspaceType.SHARED) {
-        redirectToTeam(navigate, teamId, {
+        redirectToTeam(navigate, workspace.id, {
           state: {
             isNewTeam: hasMembersInSameDomain,
           },
@@ -81,13 +105,15 @@ export const WorkspaceCreationView: React.FC<Props> = ({ workspaceType, analytic
       }
     },
     [
-      dispatch,
-      appMode,
-      isSharedWorkspaceMode,
-      navigate,
-      user?.details?.isSyncEnabled,
       workspaceType,
+      dispatch,
+      user?.details?.isSyncEnabled,
+      isSharedWorkspaceMode,
+      appMode,
       analyticEventSource,
+      switchContext,
+      userId,
+      navigate,
     ]
   );
 
@@ -144,7 +170,7 @@ export const WorkspaceCreationView: React.FC<Props> = ({ workspaceType, analytic
           : ({ type: WorkspaceType.SHARED } as SharedOrPrivateWorkspaceConfig);
 
       try {
-        const teamId = await (async () => {
+        const workspace = await (async () => {
           if (config.type === WorkspaceType.LOCAL) {
             const workspaceCreationResult = await createWorkspaceFolder(workspaceName, config.rootPath);
             if (workspaceCreationResult.type === "error") {
@@ -163,16 +189,24 @@ export const WorkspaceCreationView: React.FC<Props> = ({ workspaceType, analytic
               rootPath: partialWorkspace.path,
             };
             dispatch(workspaceActions.upsertWorkspace(localWorkspace));
-            return partialWorkspace.id;
+            return localWorkspace;
           } else {
             const response: any = await createTeam({
               teamName: workspaceName,
               config,
             });
-            return response.data.teamId;
+
+            const workspace: Workspace & { workspaceType: WorkspaceType.SHARED } = {
+              id: response.data.teamId,
+              name: workspaceName,
+              workspaceType: WorkspaceType.SHARED,
+            };
+
+            return workspace;
           }
         })();
 
+        const teamId = workspace.id;
         toast.info("Workspace Created");
 
         let hasMembersInSameDomain = true;
@@ -200,7 +234,7 @@ export const WorkspaceCreationView: React.FC<Props> = ({ workspaceType, analytic
           args.workspaceType === WorkspaceType.SHARED ? args.isNotifyAllSelected : false
         );
 
-        await handlePostTeamCreationStep(teamId, workspaceName, hasMembersInSameDomain);
+        await handlePostTeamCreationStep(workspace, hasMembersInSameDomain);
 
         callback?.();
       } catch (err) {

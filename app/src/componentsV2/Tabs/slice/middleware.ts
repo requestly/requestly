@@ -1,14 +1,16 @@
-import type { EntityState } from "@reduxjs/toolkit";
+import type { EntityState, ListenerErrorHandler } from "@reduxjs/toolkit";
 import { createListenerMiddleware } from "@reduxjs/toolkit";
+import * as Sentry from "@sentry/react";
 import { tabsActions } from "./slice";
 import { bufferActions, findBufferByReferenceId } from "features/apiClient/slices/buffer/slice";
 import { apiRecordsAdapter } from "features/apiClient/slices/apiRecords/slice";
 import { environmentsAdapter } from "features/apiClient/slices/environments/slice";
 import type { ApiClientStoreState } from "features/apiClient/slices/workspaceView/helpers/ApiClientContextRegistry/types";
 import { ApiClientEntityType } from "features/apiClient/slices/entities/types";
-import type { TabSource } from "componentsV2/Tabs/types";
+import type { TabSource, TabSourceMetadata } from "componentsV2/Tabs/types";
 import { RQAPI } from "features/apiClient/types";
 import { NativeError } from "errors/NativeError";
+import { isHttpApiRecord } from "features/apiClient/screens/apiClient/utils";
 import { RequestViewTabSource } from "features/apiClient/screens/apiClient/components/views/components/RequestView/requestViewTabSource";
 import { DraftRequestContainerTabSource } from "features/apiClient/screens/apiClient/components/views/components/DraftRequestContainer/draftRequestContainerTabSource";
 import { CollectionViewTabSource } from "features/apiClient/screens/apiClient/components/views/components/Collection/collectionViewTabSource";
@@ -20,6 +22,7 @@ import { TabState } from "./types";
 import { reduxStore } from "store";
 import { openBufferedTab } from "./actions";
 import { closeTab, closeAllTabs } from "./thunks";
+import { HistoryViewTabSource } from "features/apiClient/screens/apiClient/components/views/components/request/HistoryView/historyViewTabSource";
 
 export interface GetEntityDataFromTabSourceState {
   records: {
@@ -43,6 +46,7 @@ export function getEntityDataFromTabSource(
   const isCollection = source instanceof CollectionViewTabSource;
   const isEnvironment = source instanceof EnvironmentViewTabSource;
   const isRuntimeVariables = source instanceof RuntimeVariablesViewTabSource;
+  const isHistory = source instanceof HistoryViewTabSource;
 
   if (isDraftRequest) {
     const draftSource = source as DraftRequestContainerTabSource;
@@ -52,6 +56,31 @@ export function getEntityDataFromTabSource(
           ? ApiClientEntityType.HTTP_RECORD
           : ApiClientEntityType.GRAPHQL_RECORD,
       data: draftSource.metadata.emptyRecord,
+    };
+  }
+
+  if (isHistory) {
+    const historySource = source as HistoryViewTabSource;
+    const historyMetadata = historySource.metadata as {
+      record?: RQAPI.ApiRecord;
+      entryType?: RQAPI.ApiEntryType;
+    } & TabSourceMetadata;
+
+    const record = historyMetadata.record;
+    if (!record) {
+      throw new NativeError("[Tab Buffer Middleware] HistoryViewTabSource missing record");
+    }
+
+    const isHttp = isHttpApiRecord(record);
+    const entryType = record.data?.type ?? (isHttp ? RQAPI.ApiEntryType.HTTP : RQAPI.ApiEntryType.GRAPHQL);
+    const entityType = isHttp ? ApiClientEntityType.HTTP_RECORD : ApiClientEntityType.GRAPHQL_RECORD;
+    const workspaceId = historySource.metadata.context?.id;
+    const entityId = `history:${workspaceId}:${entryType}`;
+
+    return {
+      entityType,
+      entityId,
+      data: record,
     };
   }
 
@@ -65,7 +94,7 @@ export function getEntityDataFromTabSource(
     const entityType =
       apiRecord.type === RQAPI.RecordType.COLLECTION
         ? ApiClientEntityType.COLLECTION_RECORD
-        : apiRecord.data.type === RQAPI.ApiEntryType.HTTP
+        : isHttpApiRecord(apiRecord as RQAPI.ApiRecord)
         ? ApiClientEntityType.HTTP_RECORD
         : ApiClientEntityType.GRAPHQL_RECORD;
 
@@ -115,7 +144,7 @@ function getApiClientStoreByTabSource(source: TabState["source"]) {
 }
 
 function handleOpenBufferedTab(action: ReturnType<typeof openBufferedTab>) {
-  const { source, isNew = false, preview } = action.payload;
+  const { source, isNew = false, preview, singleton } = action.payload;
   const apiClientStore = getApiClientStoreByTabSource(source);
   const state = apiClientStore.getState() as ApiClientStoreState;
   const entityData = getEntityDataFromTabSource(source, {
@@ -126,28 +155,44 @@ function handleOpenBufferedTab(action: ReturnType<typeof openBufferedTab>) {
 
   const existingBuffer = entityId ? findBufferByReferenceId(state.buffer.entities, entityId) : null;
 
-  const payloadAction = apiClientStore.dispatch(
-    bufferActions.open(
-      {
-        isNew,
-        entityType: entityType,
-        referenceId: entityId,
-        data: data,
-      },
-      {
-        id: existingBuffer?.id,
-      }
-    )
-  );
+  let bufferId: string;
+
+  // Singleton with existing buffer: skip open, just revert to new data
+  if (singleton && existingBuffer) {
+    apiClientStore.dispatch(
+      bufferActions.revertChanges({
+        referenceId: entityId as string,
+        sourceData: data,
+      })
+    );
+    bufferId = existingBuffer.id;
+  } else {
+    // Regular flow: open buffer (creates new or reuses existing)
+    const payloadAction = apiClientStore.dispatch(
+      bufferActions.open(
+        {
+          isNew,
+          entityType: entityType,
+          referenceId: entityId,
+          data: data,
+        },
+        {
+          id: existingBuffer?.id,
+        }
+      )
+    );
+    bufferId = payloadAction.meta.id;
+  }
 
   reduxStore.dispatch(
     tabsActions.openTab({
       source,
       modeConfig: {
         mode: "buffer",
-        entityId: payloadAction.meta.id,
+        entityId: bufferId,
       },
       preview,
+      singleton,
     })
   );
 }
@@ -181,7 +226,16 @@ function handleCloseAllTabsFulfilled(action: ReturnType<typeof closeAllTabs.fulf
   });
 }
 
-const tabBufferListenerMiddleware = createListenerMiddleware();
+const onError: ListenerErrorHandler = (error, errorInfo) => {
+  Sentry.captureException(error, {
+    tags: {
+      middleware: "tabBufferMiddleware",
+      raisedBy: errorInfo.raisedBy,
+    },
+  });
+};
+
+const tabBufferListenerMiddleware = createListenerMiddleware({ onError });
 
 tabBufferListenerMiddleware.startListening({
   predicate: (action) => {

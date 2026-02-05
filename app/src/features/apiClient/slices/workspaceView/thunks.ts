@@ -21,7 +21,7 @@ import { getAppMode } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { switchWorkspace } from "actions/TeamWorkspaceActions";
 import { NativeError } from "errors/NativeError";
-import { closeAllTabs, closeTab, tabsAdapter } from "componentsV2/Tabs/slice";
+import { closeTab, closeAllTabs, tabsAdapter } from "componentsV2/Tabs/slice";
 
 const SLICE_NAME = ReducerKeys.WORKSPACE_VIEW;
 
@@ -32,11 +32,24 @@ function getUserDetails(userId?: string) {
   return userDetails;
 }
 
-async function closeAllTabsAndCheckRejection() {
-  const result = await reduxStore.dispatch(closeAllTabs({ skipUnsavedPrompt: true }));
+async function closeTabsNotInWorkspaces(allowedWorkspaceIds: WorkspaceInfo["id"][]) {
+  const currentState = reduxStore.getState();
+  const allTabs = tabsAdapter.getSelectors().selectAll(currentState.tabs.tabs);
+  const allowedIds = new Set(allowedWorkspaceIds);
 
-  if (closeAllTabs.rejected.match(result)) {
-    return false;
+  const orphanedTabs = allTabs.filter((tab) => {
+    const tabWorkspaceId = tab.source.metadata.context?.id;
+    if (tabWorkspaceId === undefined) {
+      return false;
+    }
+    return !allowedIds.has(tabWorkspaceId);
+  });
+
+  for (const tab of orphanedTabs) {
+    const result = await reduxStore.dispatch(closeTab({ tabId: tab.id, skipUnsavedPrompt: true }));
+    if (closeTab.rejected.match(result)) {
+      return false;
+    }
   }
 
   return true;
@@ -113,17 +126,9 @@ const addWorkspacesIntoMultiView = createAsyncThunk(
   async (params: { workspaces: WorkspaceInfo[]; userId?: string }, { dispatch }) => {
     const { workspaces, userId } = params;
     const userDetails = getUserDetails(userId);
-    const results = await Promise.allSettled(
-      workspaces.map(async (workspace) => {
-        return dispatch(addWorkspaceIntoView({ workspace, userDetails })).unwrap();
-      })
-    );
 
-    const failures = results.filter((r) => r.status === "rejected");
-    if (failures.length > 0) {
-      console.error(`Failed to add ${failures.length} workspace(s):`, failures);
-      // Optionally show user notification
-      // toast.error(`Some workspaces failed to load`);
+    for (const workspace of workspaces) {
+      await dispatch(addWorkspaceIntoView({ workspace, userDetails }));
     }
   }
 );
@@ -192,13 +197,16 @@ const singleToMultiView = createAsyncThunk(
     return dispatch(addWorkspacesIntoMultiView(params)).unwrap();
   },
   {
-    condition: closeAllTabsAndCheckRejection,
+    condition: async () => {
+      const result = await reduxStore.dispatch(closeAllTabs({ skipUnsavedPrompt: true }));
+      return !closeAllTabs.rejected.match(result);
+    },
   }
 );
 
 export const switchContext = createAsyncThunk(
   `${SLICE_NAME}/switchContext`,
-  async (params: { workspace: WorkspaceInfo; userId?: string }, { dispatch, rejectWithValue }) => {
+  async (params: { workspace: WorkspaceInfo; userId?: string }, { dispatch }) => {
     const { workspace, userId } = params;
     apiClientContextRegistry.clearAll();
     dispatch(workspaceViewActions.resetToSingleView());
@@ -207,7 +215,9 @@ export const switchContext = createAsyncThunk(
     return dispatch(addWorkspaceIntoView({ workspace, userDetails }));
   },
   {
-    condition: closeAllTabsAndCheckRejection,
+    condition: async (params) => {
+      return closeTabsNotInWorkspaces([params.workspace.id]);
+    },
   }
 );
 
@@ -252,8 +262,29 @@ export const setupWorkspaceView = createAsyncThunk(
     const { userId } = params;
     const rootState = getState() as RootState;
     const selectedWorkspaces = getAllSelectedWorkspaces(rootState.workspaceView);
+    const viewMode = getViewMode(rootState);
 
     if (!userId) {
+      // When logged out, preserve local workspace state if it exists
+      const activeWorkspaceId = rootState.workspace.activeWorkspaceIds[0];
+      const localWorkspaces = selectedWorkspaces.filter((ws) => ws.meta.type === WorkspaceType.LOCAL);
+      const activeLocalWorkspace = localWorkspaces.find((ws) => ws.id === activeWorkspaceId);
+
+      if (viewMode === ApiClientViewMode.SINGLE && activeLocalWorkspace) {
+        // Single mode with a local workspace that matches active - keep it active
+        return dispatch(
+          switchContext({
+            workspace: activeLocalWorkspace,
+          })
+        ).unwrap();
+      }
+
+      if (viewMode === ApiClientViewMode.MULTI && localWorkspaces.length > 0) {
+        // Multi-view mode with local workspaces - maintain that state
+        return dispatch(workspaceViewManager({ workspaces: localWorkspaces, action: "add" })).unwrap();
+      }
+
+      // No local workspaces, fallback to logged out workspace
       return dispatch(
         switchContext({
           workspace: {
@@ -306,14 +337,12 @@ export const setupWorkspaceView = createAsyncThunk(
       }
 
       try {
-        const result = await dispatch(
+        return dispatch(
           switchContext({
             workspace: selectedWorkspace,
             userId,
           })
-        ).unwrap();
-
-        return result;
+        );
       } catch (error) {
         if (isWorkspaceDeletedError(error)) {
           // workspace deleted, fallback to private
@@ -341,19 +370,5 @@ export const setupWorkspaceView = createAsyncThunk(
     }
 
     return dispatch(workspaceViewManager({ workspaces: selectedWorkspaces, userId, action: "add" })).unwrap();
-  },
-  {
-    condition: closeAllTabsAndCheckRejection,
-  }
-);
-
-export const resetWorkspaceView = createAsyncThunk(
-  `${SLICE_NAME}/resetWorkspaceView`,
-  async (_, { dispatch }) => {
-    apiClientContextRegistry.clearAll();
-    dispatch(workspaceViewActions.reset());
-  },
-  {
-    condition: closeAllTabsAndCheckRejection,
   }
 );
