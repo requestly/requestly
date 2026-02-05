@@ -11,3 +11,4 @@ export * from "features/apiClient/slices/workspaceView/helpers/ApiClientContextR
 export * from "features/apiClient/slices/workspaceView/helpers/ApiClientContextService";
 export * from "features/apiClient/slices/workspaceView/slice";
 export * from "features/apiClient/slices/workspaceView/thunks";
+export * from "features/workspaces/types";

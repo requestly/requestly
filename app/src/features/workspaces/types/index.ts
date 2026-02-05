@@ -1,5 +1,5 @@
 export interface Workspace {
-  id: string | null; // null for personal workspace
+  id: string | null | undefined; // null for personal workspace
   name: string;
   accessCount?: number;
   adminCount?: any;

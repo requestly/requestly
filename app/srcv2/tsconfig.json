@@ -1,39 +1,26 @@
 {
   "extends": "../tsconfig.base.json",
   "compilerOptions": {
-    // Strict Type Checking - Enable all strict mode options
-    "strict": true,
-    "noImplicitAny": true,
-    "strictNullChecks": true,
-    "strictFunctionTypes": true,
-    "strictBindCallApply": true,
-    "strictPropertyInitialization": true,
-    "noImplicitThis": true,
-    "alwaysStrict": true,
-
-    // Additional Type Checking
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
-    "noUncheckedIndexedAccess": true,
-    "noImplicitOverride": true,
-    "noPropertyAccessFromIndexSignature": true,
-
-    // Module Resolution
     "moduleResolution": "bundler",
-    "resolveJsonModule": true,
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "forceConsistentCasingInFileNames": true,
+    "verbatimModuleSyntax": true,
 
-    // Emit
-    "noEmit": true,
+    // Compilation speed
+    "incremental": true,
     "skipLibCheck": true,
+    "isolatedModules": true,
 
-    // Advanced
-    "allowUnreachableCode": false,
-    "allowUnusedLabels": false,
+    // Bundle size
+    "importHelpers": true,
+    "removeComments": true,
+    "noEmit": true,
+
+    // Tree-shaking
+    "moduleDetection": "force",
+    "useDefineForClassFields": true,
+
+    // Type safety (helps write better code)
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true
   },
   "include": ["./**/*"],
