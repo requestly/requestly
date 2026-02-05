@@ -30,7 +30,8 @@
       "@v2": ["./srcv2"],
       "@v2/*": ["./srcv2/*"],
       "@v2features/*": ["./srcv2/features/*"],
-      "@apiClientV2/*": ["./srcv2/features/apiClient/*"]
+      "@apiClientV2/*": ["./srcv2/features/apiClient/*"],
+      "@adapters/*": ["./srcv2/adapters/*"]
     }
   },
   "include": ["./src/**/*", "./srcv2/**/*"],

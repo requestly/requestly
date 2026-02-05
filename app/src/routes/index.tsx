@@ -63,8 +63,6 @@ export const routesV2: RouteObject[] = [
           ...miscRoutes,
           ...desktopSessionsRoutes,
           ...networkInspectorRoutes,
-          /**  V2 Routes - Components from srcv2 **/
-          ...routesV2Src,
         ],
       },
       {

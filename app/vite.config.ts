@@ -89,6 +89,10 @@ const config = async ({ mode }) => {
           find: /^@apiClientV2\/(.*)$/,
           replacement: path.resolve(__dirname, "srcv2/features/apiClient") + "/$1",
         },
+        {
+          find: /^@adapters\/(.*)$/,
+          replacement: path.resolve(__dirname, "srcv2/adapters") + "/$1",
+        },
       ],
     },
     optimizeDeps: {
