@@ -4,9 +4,14 @@
   }
 
   &-title {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: 8px;
+
+    a {
+      display: inline-flex;
+      align-items: center;
+    }
   }
 
   &-info-icon {

@@ -7,6 +7,11 @@
     font-weight: var(--requestly-font-weight-medium);
     font-size: var(--requestly-font-size-lg);
 
+    a {
+      display: inline-flex;
+      align-items: center;
+    }
+
     &-info-icon {
       color: var(--requestly-color-text-subtle);
       cursor: pointer;
