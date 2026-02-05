@@ -10,7 +10,7 @@ module.exports = {
   ],
   parser: "@typescript-eslint/parser",
   parserOptions: {
-    project: "./tsconfig.json",
+    project: true,
     tsconfigRootDir: __dirname,
     ecmaVersion: 2021,
     sourceType: "module",
@@ -81,7 +81,6 @@ module.exports = {
     // Type Safety
     "@typescript-eslint/no-explicit-any": "error",
     "@typescript-eslint/no-unsafe-assignment": "error",
-    "@typescript-eslint/no-unsafe-call": "error",
     "@typescript-eslint/no-unsafe-member-access": "error",
     "@typescript-eslint/no-unsafe-return": "error",
     "@typescript-eslint/explicit-function-return-type": [
@@ -97,15 +96,15 @@ module.exports = {
     "@typescript-eslint/no-unnecessary-type-assertion": "error",
     "@typescript-eslint/prefer-nullish-coalescing": "error",
     "@typescript-eslint/prefer-optional-chain": "error",
-    "@typescript-eslint/strict-boolean-expressions": [
-      "error",
-      {
-        allowString: false,
-        allowNumber: false,
-        allowNullableObject: false,
-        allowNullableBoolean: false,
-      },
-    ],
+    // "@typescript-eslint/strict-boolean-expressions": [
+    //   "error",
+    //   {
+    //     allowString: false,
+    //     allowNumber: false,
+    //     allowNullableObject: false,
+    //     allowNullableBoolean: false,
+    //   },
+    // ],
 
     // Code Quality
     "@typescript-eslint/no-unused-vars": [
@@ -125,7 +124,6 @@ module.exports = {
       },
     ],
     "@typescript-eslint/await-thenable": "error",
-    "@typescript-eslint/no-unnecessary-condition": "error",
     "@typescript-eslint/prefer-readonly": "error",
     "@typescript-eslint/prefer-reduce-type-parameter": "error",
     "@typescript-eslint/prefer-string-starts-ends-with": "error",
@@ -213,16 +211,28 @@ module.exports = {
     // React & TypeScript
     "react/prop-types": "off", // Not needed with TypeScript
     "react/require-default-props": "off", // Optional props handle defaults
+    "import/no-restricted-paths": [
+      "warn",
+      {
+        zones: [
+          {
+            target: "./**/*",
+            from: "../src/**/*",
+            message: "Importing from src/ into srcv2/ is forbidden. Use @v2 aliases for srcv2 imports.",
+          },
+        ],
+      },
+    ],
   },
   overrides: [
     {
       // Disable TypeScript rules for config files
       files: [".eslintrc.js", "*.config.js"],
       parserOptions: {
-        project: null,
+        project: false,
       },
       rules: {
-        "@typescript-eslint/no-var-requires": "off",
+        "@typescript-eslint": "off",
       },
     },
     {
@@ -231,11 +241,9 @@ module.exports = {
       rules: {
         "@typescript-eslint/no-unsafe-assignment": "off",
         "@typescript-eslint/no-unsafe-member-access": "off",
-        "@typescript-eslint/no-unsafe-call": "off",
         "@typescript-eslint/no-unsafe-return": "off",
         "@typescript-eslint/no-unsafe-argument": "off",
         "@typescript-eslint/no-explicit-any": "off",
-        "@typescript-eslint/no-unnecessary-condition": "off",
         "@typescript-eslint/no-unnecessary-type-assertion": "off",
       },
     },

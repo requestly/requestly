@@ -1,0 +1,13 @@
+# Ignore ESLint configuration files to avoid type-checking issues
+.eslintrc.js
+*.config.js
+vitest.config.ts
+vite.config.ts
+
+# Build outputs
+build/
+dist/
+coverage/
+
+# Dependencies
+node_modules/

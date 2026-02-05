@@ -10,7 +10,11 @@ import Sidebar from "./Sidebar";
 import "../styles.css";
 
 const ApiClientLayout: React.FC = () => {
-  const { getSecondPaneMinSize } = useApiClientLayout();
+  const { getSecondPaneMinSize, isSetupDone } = useApiClientLayout();
+
+  if (!isSetupDone) {
+    return <div>Loading...</div>;
+  }
   return (
     <DndProvider backend={HTML5Backend} context={window}>
       <div className="h-full w-full">
