@@ -1,5 +1,6 @@
+import type { RouteObject } from "react-router-dom";
+
 import { apiClientRoutesV2 } from "@v2features/apiClient";
-import { RouteObject } from "react-router-dom";
 
 /**
  * V2 Routes - All routes under /v2/* will use components from srcv2
