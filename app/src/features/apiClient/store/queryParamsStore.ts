@@ -14,7 +14,7 @@ const getSyncedQueryParams = (entry: RQAPI.HttpApiEntry) => {
     return [];
   }
   const paramsFromUrl = extractQueryParams(request.url);
-  const paramsObject = request.queryParams;
+  const paramsObject = request.queryParams ?? [];
 
   const keysFromObject = new Set(paramsObject.map((param) => param.key));
   const finalParams: KeyValuePair[] = [...paramsObject];
