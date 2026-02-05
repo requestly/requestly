@@ -256,7 +256,7 @@ export const tabsSlice = createSlice({
 const tabsPersistConfig = {
   key: "rq_tabs_store",
   storage,
-  throttle: 1000,
+  throttle: 100,
   transforms: [tabsPersistTransform],
 };
 
