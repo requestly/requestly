@@ -8,11 +8,9 @@ import * as Sentry from "@sentry/react";
 import "./singleLineEditor.scss";
 import { SingleLineEditorProps } from "./types";
 import { Conditional } from "components/common/Conditional";
-import {
-  customKeyBinding,
-  highlightVariablesPlugin,
-  generateCompletionsForVariables,
-} from "componentsV2/CodeEditor/components/EditorV2/plugins";
+import { customKeyBinding, highlightVariablesPlugin } from "componentsV2/CodeEditor/components/EditorV2/plugins";
+import { VariableAutocompletePopover } from "./VariableAutocompletePopover";
+import { getClosingBraces } from "componentsV2/CodeEditor/components/EditorV2/plugins/generateAutoCompletions";
 
 export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
   className,
@@ -43,9 +41,18 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
     onChangeRef.current = onChange;
   }, [onBlur, onChange]);
 
-  const [hoveredVariable, setHoveredVariable] = useState<string | null>(null); // Track hovered variable
+  const [hoveredVariable, setHoveredVariable] = useState<string | null>(null);
   const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
   const [isPopoverPinned, setIsPopoverPinned] = useState(false);
+
+  // Simplified autocomplete state
+  const [autocompleteState, setAutocompleteState] = useState<{
+    show: boolean;
+    position: { x: number; y: number };
+    filter: string;
+    from: number;
+    to: number;
+  }>({ show: false, position: { x: 0, y: 0 }, filter: "", from: 0, to: 0 });
 
   useEffect(() => {
     isPopoverPinnedRef.current = isPopoverPinned;
@@ -103,10 +110,37 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
             if (update.docChanged) {
               onChangeRef.current?.(update.state.doc.toString());
             }
+            // Check for autocomplete trigger on document or selection changes
+            if (update.docChanged || update.selectionSet) {
+              // Check focus first to avoid unnecessary work
+              if (!update.view.hasFocus) {
+                if (autocompleteState.show) setAutocompleteState((prev) => ({ ...prev, show: false }));
+                return;
+              }
+              const doc = update.state.doc.toString();
+              const cursorPos = update.state.selection.main.head;
+              const beforeCursor = doc.slice(0, cursorPos);
+              const match = beforeCursor.match(/\{\{([^}]*)$/);
+              if (match) {
+                const coords = update.view.coordsAtPos(cursorPos);
+                if (coords) {
+                  setAutocompleteState({
+                    show: true,
+                    position: { x: coords.left, y: coords.bottom },
+                    filter: match[1] || "",
+                    from: cursorPos - (match[1]?.length || 0),
+                    to: cursorPos,
+                  });
+                }
+              } else {
+                setAutocompleteState((prev) => ({ ...prev, show: false }));
+              }
+            }
           }),
           EditorView.domEventHandlers({
             blur: (_, view) => {
               onBlurRef.current?.(view.state.doc.toString());
+              setAutocompleteState((prev) => ({ ...prev, show: false }));
             },
             keypress: (event, view) => {
               if (event.key === "Enter") {
@@ -121,7 +155,6 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
             },
             variables || emptyVariables
           ),
-          generateCompletionsForVariables(variables),
           cmPlaceHolder(placeholder ?? "Input here"),
         ].filter((ext): ext is NonNullable<typeof ext> => ext !== null),
       }),
@@ -165,22 +198,49 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
     setIsPopoverPinned(false);
   }, []);
 
+  const handleSelectVariable = useCallback(
+    (variableKey: string) => {
+      if (!editorViewRef.current) return;
+      const view = editorViewRef.current;
+      const closingChars = getClosingBraces(view, autocompleteState.to);
+      view.dispatch({
+        changes: { from: autocompleteState.from, to: autocompleteState.to, insert: variableKey + closingChars },
+        selection: { anchor: autocompleteState.from + variableKey.length + closingChars.length },
+      });
+      setAutocompleteState((prev) => ({ ...prev, show: false }));
+      view.focus();
+    },
+    [autocompleteState.from, autocompleteState.to]
+  );
+
   return (
-    <div
-      ref={editorRef}
-      className={`${className ?? ""} editor-popup-container ant-input`}
-      onMouseLeave={handleMouseLeave}
-    >
-      <Conditional condition={!!hoveredVariable}>
-        <VariablePopover
-          editorRef={editorRef as React.RefObject<HTMLDivElement>}
-          hoveredVariable={hoveredVariable || ""}
-          popupPosition={popupPosition}
-          variables={variables || emptyVariables}
-          onClose={handleClosePopover}
-          onPinChange={setIsPopoverPinned}
-        />
-      </Conditional>
-    </div>
+    <>
+      <div
+        ref={editorRef}
+        className={`${className ?? ""} editor-popup-container ant-input`}
+        onMouseLeave={handleMouseLeave}
+      >
+        <Conditional condition={!!hoveredVariable}>
+          <VariablePopover
+            editorRef={editorRef as React.RefObject<HTMLDivElement>}
+            hoveredVariable={hoveredVariable || ""}
+            popupPosition={popupPosition}
+            variables={variables || emptyVariables}
+            onClose={handleClosePopover}
+            onPinChange={setIsPopoverPinned}
+          />
+        </Conditional>
+      </div>
+
+      <VariableAutocompletePopover
+        show={autocompleteState.show}
+        position={autocompleteState.position}
+        filter={autocompleteState.filter}
+        variables={variables}
+        onSelect={handleSelectVariable}
+        onClose={() => setAutocompleteState((prev) => ({ ...prev, show: false }))}
+        editorRef={editorRef}
+      />
+    </>
   );
 };

@@ -40,27 +40,31 @@ const createIconWithWrapper = (
   );
 };
 
-export const getScopeIcon = (scope: VariableScope): React.ReactNode => {
+export const getScopeIcon = (scope: VariableScope, showBackgroundColor: boolean = true): React.ReactNode => {
   switch (scope) {
     case VariableScope.ENVIRONMENT:
       return createIconWithWrapper(
         MdHorizontalSplit,
         "var(--requestly-color-primary-text)",
-        "var(--requestly-color-primary-darker)"
+        showBackgroundColor ? "var(--requestly-color-primary-darker)" : "transparent"
       );
     case VariableScope.COLLECTION:
-      return createIconWithWrapper(BiNote, "var(--requestly-color-text-subtle)", "var(--requestly-color-surface-2)");
+      return createIconWithWrapper(
+        BiNote,
+        "var(--requestly-color-text-subtle)",
+        showBackgroundColor ? "var(--requestly-color-surface-2)" : "transparent"
+      );
     case VariableScope.GLOBAL:
       return createIconWithWrapper(
         BsGlobeCentralSouthAsia,
         "var(--requestly-color-success-text)",
-        "var(--requestly-color-success-darker)"
+        showBackgroundColor ? "var(--requestly-color-success-darker)" : "transparent"
       );
     case VariableScope.RUNTIME:
       return createIconWithWrapper(
         MdOutlineCategory,
-        "var(--requestly-color-text-subtle)",
-        "var(--requestly-color-warning-darker)"
+        "var(--requestly-color-warning-dark)",
+        showBackgroundColor ? "var(--requestly-color-warning-darker)" : "transparent"
       );
     default:
       return null;

@@ -35,6 +35,25 @@ export function generateCompletionSource(
   };
 }
 
+// Helper to calculate closing braces - exported for reuse
+export function getClosingBraces(view: EditorView, to: number): string {
+  const LOOK_AHEAD_BUFFER = 10;
+  const lookahead = view.state.doc.sliceString(to, to + LOOK_AHEAD_BUFFER);
+  const nextChars = lookahead.trimStart().slice(0, 2);
+  return nextChars.startsWith("}}") ? "" : nextChars.startsWith("}") ? "}" : "}}";
+}
+
+// Helper to apply variable completion - exported for reuse
+export function applyVariableCompletion(view: EditorView, variableLabel: string, from: number, to: number): void {
+  const closingChars = getClosingBraces(view, to);
+  const finalCompletion = variableLabel + closingChars;
+  view.dispatch(insertCompletionText(view.state, finalCompletion, from, to));
+}
+
+// Variable pattern constant - exported for reuse
+export const VARIABLE_COMPLETION_PATTERN = /\{\{.*?/g;
+export const VARIABLE_PATTERN_OFFSET = 2; // Number of chars to skip from start ({{)
+
 // VARIABLE COMPLETIONS
 function varCompletionSource(envVariables: ScopedVariables): CompletionSource {
   const varCompletions = Object.keys(envVariables).map((key) => {
@@ -49,17 +68,11 @@ function varCompletionSource(envVariables: ScopedVariables): CompletionSource {
           : ((variable.localValue ?? variable.syncValue) as string),
       type: variable.localValue ? "local variable" : "sync variable",
       apply: (view: EditorView, completion: Completion, from: number, to: number): void => {
-        // Look ahead up to 10 characters, skip spaces, then check for and add closing braces
-        const LOOK_AHEAD_BUFFER = 10;
-        const lookahead = view.state.doc.sliceString(to, to + LOOK_AHEAD_BUFFER);
-        const nextChars = lookahead.trimStart().slice(0, 2);
-        const closingChars = nextChars.startsWith("}}") ? "" : nextChars.startsWith("}") ? "}" : "}}";
-        const finalCompletion = completion.label + closingChars;
-        view.dispatch(insertCompletionText(view.state, finalCompletion, from, to));
+        applyVariableCompletion(view, completion.label, from, to);
       },
     };
   });
-  return generateCompletionSource(/\{\{.*?/g, varCompletions, 2);
+  return generateCompletionSource(VARIABLE_COMPLETION_PATTERN, varCompletions, VARIABLE_PATTERN_OFFSET);
 }
 
 /* CORE PLUGIN */

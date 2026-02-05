@@ -1,0 +1,137 @@
+.variable-autocomplete-popup {
+  .ant-popover-inner-content {
+    margin-top: -10px;
+    display: flex;
+    width: 240px !important;
+    max-height: 400px !important;
+    padding: var(--space-3, 6px);
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-1, 2px);
+    border-radius: 4px;
+    border: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
+    background: var(--requestly-color-surface-1, #282828);
+    box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.16);
+  }
+
+  .ant-popover-arrow {
+    display: none;
+  }
+
+  .variable-autocomplete-item {
+    display: flex;
+    padding: var(--space-3, 6px);
+    flex-direction: row;
+    width: 225px;
+    border-bottom: none;
+    justify-content: space-between;
+    cursor: pointer;
+    &:hover {
+      background-color: var(--requestly-color-white-t-10) !important;
+    }
+
+    .item-left-section {
+      display: flex;
+      flex-direction: row;
+      gap: var(--space-4, 8px);
+
+      .scope-tooltip {
+        .ant-tooltip-inner {
+          background-color: var(--requestly-color-black);
+          color: var(--requestly-color-text-default);
+          border-radius: 4px;
+          padding: 6px 8px;
+          font-size: var(--requestly-font-size-xs);
+          font-weight: 400;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+          word-wrap: break-word;
+          max-width: 280px;
+          max-height: 480px;
+        }
+      }
+    }
+
+    .info-icon {
+      display: flex;
+      width: 12px;
+      height: 12px;
+      color: var(--requestly-color-text-placeholder);
+      font-family: "Material Symbols Outlined";
+      font-size: 14px;
+      font-style: normal;
+      font-weight: 400;
+      opacity: 0.5;
+    }
+
+    .variable-label {
+      color: var(--requestly-color-text-default);
+      font-family: var(--font-family-default, Inter);
+      font-size: var(--font-size-sm, 12px);
+      font-style: normal;
+      font-weight: 400;
+      line-height: 18px; /* 150% */
+    }
+  }
+}
+
+.example-tooltip {
+  .ant-tooltip-inner {
+    border-radius: 4px;
+    border: 1px solid var(--requestly-color-white-t-20, rgba(255, 255, 255, 0.12));
+    background: var(--requestly-color-surface-0, #212121);
+    box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.16);
+    margin-left: -10px;
+    display: flex;
+    max-width: 280px;
+    max-height: 400px;
+    padding: var(--space-4, 8px) var(--space-5, 12px);
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-4, 8px);
+
+    .example-popover {
+      width: 100%;
+      .example-header {
+        color: var(--requestly-color-text-default, #fff);
+        font-family: var(--font-family-default, Inter);
+        font-size: var(--font-size-sm, 12px);
+        font-style: normal;
+        font-weight: 400;
+        padding: 0;
+      }
+
+      .example-body {
+        display: flex;
+        padding-top: var(--space-4, 8px);
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-2, 4px);
+        align-self: stretch;
+        border-top: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
+        font-style: normal;
+        font-weight: 400;
+        line-height: 17px; /* 154.545% */
+
+        .example-title {
+          color: var(--requestly-color-text-placeholder, #8f8f8f);
+          font-family: var(--font-family-default, Inter);
+          font-size: var(--font-size-xs, 11px);
+        }
+
+        .example-content {
+          color: var(--requestly-color-text-subtle, #bbb);
+          font-family: var(--font-family-default, Inter);
+          font-size: var(--font-size-xs, 11px);
+          overflow: auto;
+          max-height: 330px;
+          scrollbar-width: none; /* Firefox */
+          -ms-overflow-style: none; /* IE and Edge */
+
+          &::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
+          }
+        }
+      }
+    }
+  }
+}
