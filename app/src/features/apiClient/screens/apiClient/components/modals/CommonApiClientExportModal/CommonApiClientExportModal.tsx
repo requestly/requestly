@@ -113,7 +113,8 @@ export const CommonApiClientExportModal: React.FC<Props> = ({ isOpen, onClose, t
       toast.success(`Successfully exported ${title}`);
       onClose();
     } catch (error) {
-      const errorMessage = error.message || "Failed to download file. Please try again.";
+      const errorMessage =
+        error instanceof Error ? error.message : new Error("Failed to download file. Please try again.").message;
       toast.error(errorMessage);
       Sentry.captureException(error);
     }

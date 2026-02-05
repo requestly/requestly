@@ -19,9 +19,8 @@ export const CommonApiClientExporter: React.FC<CommonApiClientExporterProps> = (
   onFileSelect,
 }) => {
   const hasMultipleFiles = exportResult?.file && exportResult.file.length > 1;
-  const fileName = hasMultipleFiles
-    ? exportResult.file[selectedFileIndex]?.fileName
-    : exportResult?.file?.[0]?.fileName;
+  const safeIndex = Math.min(selectedFileIndex, (exportResult?.file?.length ?? 1) - 1);
+  const fileName = hasMultipleFiles ? exportResult.file[safeIndex]?.fileName : exportResult?.file?.[0]?.fileName;
 
   return (
     <div className="common-api-client-exporter-content">
