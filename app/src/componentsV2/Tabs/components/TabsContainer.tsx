@@ -309,7 +309,11 @@ export const TabsContainer: React.FC = () => {
             </div>
           </Dropdown>
         ),
-        children: <TabItem tabId={tab.id}>{tab.source.render()}</TabItem>,
+        children: (
+          <TabItem tabId={tab.id}>
+            <React.Fragment key={tab.source.getSourceId()}>{tab.source.render()}</React.Fragment>
+          </TabItem>
+        ),
       };
     });
   }, [tabs, closeTab, closeAllTabs, previewTabId, setPreviewTab]);
