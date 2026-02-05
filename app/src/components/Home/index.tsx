@@ -6,6 +6,7 @@ import UserAvatar from "../../assets/images/illustrations/avatar.svg?react";
 import { APIMockingCard } from "./components/APIMockingCard";
 import { RulesCard } from "./components/RulesCard";
 import { HomeScreenProvider } from "./contexts";
+import ApiClientCard from "./components/ApiClientCard";
 import "./home.scss";
 
 export const Home: React.FC = () => {
@@ -24,7 +25,7 @@ export const Home: React.FC = () => {
           </Row>
           <Row className="homepage-primary-cards-wrapper">
             <RulesCard />
-            {/*<ApiClientCard />*/}
+            <ApiClientCard />
             <APIMockingCard />
           </Row>
         </Col>
