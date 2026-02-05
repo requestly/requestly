@@ -74,7 +74,7 @@ const LINKS = {
     "https://docs.requestly.com/general/http-rules-(modify-traffic)/rule-types/modify-headers#faqs",
 
   REQUESTLY_NETWORK_INSPECTOR_DOCS:
-    "https://docs.requestly.com/guides/inspect-traffic-and-apply-modifications-from-chrome-devtools-using-requestly",
+    "https://docs.requestly.com/general/http-interceptor/browser-extension/browser-interception",
 
   /** API Client docs */
   REQUESTLY_API_CLIENT_DOCS: "https://docs.requestly.com/general/api-client/overview",
