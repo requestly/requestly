@@ -30,6 +30,7 @@ import { ApiClientSidebarTabKey } from "../../MultiWorkspaceSidebar";
 import { trackManageWorkspaceClicked, trackMultiWorkspaceDeselected } from "modules/analytics/events/common/teams";
 import LoadingModal from "layouts/DashboardLayout/MenuHeader/WorkspaceSelector/components/LoadingModal";
 import { useWorkspaceSwitcher } from "../useWorkspaceSwitcher";
+import { PiFolderOpen } from "@react-icons/all-files/pi/PiFolderOpen";
 
 interface WorkspaceCollapseProps {
   workspaceId: string;
@@ -92,6 +93,14 @@ export const WorkspaceCollapse: React.FC<WorkspaceCollapseProps> = ({
           }
 
           trackMultiWorkspaceDeselected("sidebar_context_menu");
+        },
+      },
+      {
+        key: "3",
+        label: "Show in folder",
+        icon: <PiFolderOpen />,
+        onClick: () => {
+          // TODO: Implement logic to show in folder for local workspace
         },
       },
     ];
