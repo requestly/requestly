@@ -268,6 +268,9 @@
 
         &:hover {
           background-color: var(--requestly-color-white-t-5, rgba(255, 255, 255, 0.03));
+          .request-name {
+            text-decoration: underline;
+          }
         }
 
         &.selected {
