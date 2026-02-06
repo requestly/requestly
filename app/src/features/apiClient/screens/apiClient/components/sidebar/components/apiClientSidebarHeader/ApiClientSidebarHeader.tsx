@@ -25,6 +25,7 @@ import { SiOpenapiinitiative } from "@react-icons/all-files/si/SiOpenapiinitiati
 import { CommonApiClientImportModal } from "../../../modals/CommonApiClientImportModal/CommonApiClientImportModal";
 import { ApiClientImporterMethod, openApiImporter } from "@requestly/alternative-importers";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import LINKS from "config/constants/sub/links";
 
 interface Props {
   activeTab: ApiClientSidebarTabKey;
@@ -40,6 +41,7 @@ interface ImportModalConfig {
   supportedFileTypes: string[];
   importer: ApiClientImporterMethod<any>;
   importerType: ApiClientImporterType;
+  docsLink?: string;
 }
 
 export const ApiClientSidebarHeader: React.FC<Props> = ({
@@ -86,6 +88,7 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
             supportedFileTypes: ["application/yaml", "application/json", "application/x-yaml", "application/x-json"],
             importer: openApiImporter,
             importerType: ApiClientImporterType.OPENAPI,
+            docsLink: LINKS.REQUESTLY_API_CLIENT_IMPORT_OPENAPI_DOCS,
           });
         },
       },
@@ -148,6 +151,7 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
             supportedFileTypes: ["application/yaml", "application/json", "application/x-yaml", "application/x-json"],
             importer: openApiImporter,
             importerType: ApiClientImporterType.OPENAPI,
+            docsLink: LINKS.REQUESTLY_API_CLIENT_IMPORT_OPENAPI_DOCS,
           });
           break;
         default:
@@ -220,6 +224,7 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
           importer={commonImportModalConfig.importer}
           isOpen={Boolean(commonImportModalConfig)}
           importerType={commonImportModalConfig.importerType}
+          docsLink={commonImportModalConfig.docsLink}
           onClose={() => setCommonImportModalConfig(null)}
         />
       )}
