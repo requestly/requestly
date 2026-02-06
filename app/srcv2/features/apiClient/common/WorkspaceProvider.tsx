@@ -10,11 +10,15 @@ export const NoopContextId = "__stub_context_id";
 
 export const WorkspaceStoreContext = createContext<ReactReduxContextValue<ApiClientStoreState> | null>(null);
 
-export const useWorkspaceViewStore = createStoreHook(WorkspaceStoreContext);
-export const useWorkspaceViewDispatch = createDispatchHook(WorkspaceStoreContext);
+export const useWorkspaceViewStore = createStoreHook(
+  WorkspaceStoreContext as React.Context<ReactReduxContextValue<ApiClientStoreState>>
+);
+export const useWorkspaceViewDispatch = createDispatchHook(
+  WorkspaceStoreContext as React.Context<ReactReduxContextValue<ApiClientStoreState>>
+);
 
 export const useWorkspaceViewSelector: TypedUseSelectorHook<ApiClientStoreState> = createSelectorHook(
-  WorkspaceStoreContext
+  WorkspaceStoreContext as React.Context<ReactReduxContextValue<ApiClientStoreState>>
 );
 
 const WorkspaceIdContext = createContext<Workspace["id"] | undefined>(undefined);
@@ -34,7 +38,10 @@ const WorkspaceStoreProvider: React.FC<React.PropsWithChildren> = (props) => {
   const store = useApiClientStore();
 
   return (
-    <Provider context={WorkspaceStoreContext} store={store}>
+    <Provider
+      context={WorkspaceStoreContext as React.Context<ReactReduxContextValue<ApiClientStoreState>>}
+      store={store}
+    >
       {props.children}
     </Provider>
   );
@@ -43,7 +50,10 @@ const WorkspaceStoreProvider: React.FC<React.PropsWithChildren> = (props) => {
 export const FakeWorkspaceStoreProvider: React.FC<React.PropsWithChildren & { store: ApiClientStore }> = (props) => {
   return (
     <WorkspaceIdContextProvider id={NoopContextId}>
-      <Provider context={WorkspaceStoreContext} store={props.store}>
+      <Provider
+        context={WorkspaceStoreContext as React.Context<ReactReduxContextValue<ApiClientStoreState>>}
+        store={props.store}
+      >
         {props.children}
       </Provider>
     </WorkspaceIdContextProvider>

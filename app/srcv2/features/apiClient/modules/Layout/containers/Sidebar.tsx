@@ -4,11 +4,13 @@ import { useGetSingleModeWorkspace, useViewMode } from "@adapters/workspace";
 import { WorkspaceProvider } from "@apiClientV2/common/WorkspaceProvider";
 import { EnvironmentSwitcher } from "@apiClientV2/modules/Environments";
 
+import { ApiClientLoadingView } from "../components/ApiClientLoadingView";
+
 const SidebarContent: React.FC = () => {
   const workspace = useGetSingleModeWorkspace();
 
   if (workspace.status.loading) {
-    return <div>Loading...</div>;
+    return <ApiClientLoadingView />;
   }
 
   return (
