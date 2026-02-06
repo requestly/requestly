@@ -156,7 +156,7 @@ export namespace RQAPI {
   export type HttpRequest = {
     url: string;
     queryParams: KeyValuePair[];
-    pathVariables?: PathVariable[];
+    pathVariables?: KeyValuePair[];
     method: RequestMethod;
     headers: KeyValuePair[];
     body?: RequestBody;
