@@ -50,11 +50,13 @@ export const createOpenApiExporter = (input: RQAPI.CollectionRecord | RQAPI.ApiC
       const result = openApiExporter(collectionToExport);
       return result;
     } catch (error) {
+      const inputSummary = Array.isArray(input)
+        ? { recordCount: input.length, recordIds: input.map((r) => r.id) }
+        : { id: input.id, name: input.name, type: input.type };
       Sentry.captureException(error, {
-        extra: {
-          input,
-        },
+        extra: { input: inputSummary },
       });
+
       throw error;
     }
   };
