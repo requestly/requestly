@@ -456,19 +456,14 @@
         gap: 8px;
 
         &-status-badge {
-          font-size: var(--requestly-font-size-2xs);
-          padding: var(--space-1, 2px) var(--space-2, 4px);
-          border-radius: 4px;
+          font-size: var(--requestly-font-size-3xs, 8px);
+          padding: 1px 4px;
+          border-radius: 3px;
           letter-spacing: 1px;
           font-weight: 500;
           display: flex;
           align-items: center;
-          gap: 4px;
-
-          svg {
-            width: 14px;
-            height: 14px;
-          }
+          gap: 2px;
 
           &.passed {
             color: var(--requestly-color-success-200);
