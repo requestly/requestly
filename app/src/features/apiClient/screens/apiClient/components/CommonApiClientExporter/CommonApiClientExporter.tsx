@@ -1,6 +1,6 @@
 import React from "react";
 import { Alert, Radio } from "antd";
-import { ExportResult } from "../modals/CommonApiClientExportModal";
+import { ExportResult } from "features/apiClient/helpers/exporters/types";
 import "./commonApiClientExporter.scss";
 
 export interface CommonApiClientExporterProps {
