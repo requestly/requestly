@@ -6,27 +6,14 @@ import { wrapWithCustomSpan } from "utils/sentry";
 import { SPAN_STATUS_ERROR, SPAN_STATUS_OK } from "@sentry/core";
 import * as Sentry from "@sentry/react";
 import { MdOutlineIosShare } from "@react-icons/all-files/md/MdOutlineIosShare";
-
-export interface ExportResult {
-  file: {
-    fileName: string;
-    content: Blob;
-    type: string;
-  }[];
-  metadata: Array<{
-    key: string;
-    value: string[] | number | string;
-  }>;
-}
-
-export type ExporterFunction = () => Promise<ExportResult>;
+import { ExportResult, ExportType, ExporterFunction } from "features/apiClient/helpers/exporters/types";
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
   title: string;
   exporter: ExporterFunction;
-  exporterType: string;
+  exporterType: ExportType;
 }
 
 export const CommonApiClientExportModal: React.FC<Props> = ({ isOpen, onClose, title, exporter, exporterType }) => {
@@ -61,7 +48,7 @@ export const CommonApiClientExportModal: React.FC<Props> = ({ isOpen, onClose, t
           setExportError(null);
 
           try {
-            let result: ExportResult = await exporter();
+            let result: ExportResult = exporter();
 
             setExportResult(result);
 
