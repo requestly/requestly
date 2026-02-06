@@ -29,7 +29,8 @@ import "./CollectionRow.scss";
 import { ApiClientExportModal } from "../../../../modals/exportModal/ApiClientExportModal";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { PostmanExportModal } from "../../../../modals/postmanCollectionExportModal/PostmanCollectionExportModal";
-import { CommonApiClientExportModal, ExporterFunction } from "../../../../modals/CommonApiClientExportModal";
+import { CommonApiClientExportModal } from "../../../../modals/CommonApiClientExportModal";
+import { ExporterFunction } from "features/apiClient/helpers/exporters/types";
 import { createOpenApiExporter } from "features/apiClient/helpers/exporters/openapi";
 import { MdOutlineVideoLibrary } from "@react-icons/all-files/md/MdOutlineVideoLibrary";
 import { CollectionRowOptionsCustomEvent, dispatchCustomEvent } from "./utils";
@@ -45,12 +46,7 @@ import { getAncestorIds, getRecord } from "features/apiClient/slices/apiRecords/
 import { Workspace } from "features/workspaces/types";
 import { EnvironmentVariables } from "backend/environment/types";
 import { SiOpenapiinitiative } from "@react-icons/all-files/si/SiOpenapiinitiative";
-
-export enum ExportType {
-  REQUESTLY = "requestly",
-  POSTMAN = "postman",
-  OPENAPI = "openapi",
-}
+import { ExportType } from "features/apiClient/helpers/exporters/types";
 
 interface Props {
   record: RQAPI.CollectionRecord;
@@ -106,7 +102,6 @@ export const CollectionRow: React.FC<Props> = ({
     exportType: ExportType;
     title: string;
   } | null>(null);
-  const [isCommonExportModalOpen, setIsCommonExportModalOpen] = useState(false);
 
   const [collectionsToExport, setCollectionsToExport] = useState<RQAPI.CollectionRecord[]>([]);
 
@@ -140,7 +135,6 @@ export const CollectionRow: React.FC<Props> = ({
           setIsPostmanExportModalOpen(true);
           break;
         case ExportType.OPENAPI:
-          setIsCommonExportModalOpen(true);
           setCommonExporterConfig({
             exporter: createOpenApiExporter(exportData as SharedRQAPI.CollectionRecord),
             exportType: ExportType.OPENAPI,
@@ -400,16 +394,16 @@ export const CollectionRow: React.FC<Props> = ({
         />
       )}
 
-      {isCommonExportModalOpen && commonExporterConfig && (
+      {commonExporterConfig && (
         <CommonApiClientExportModal
-          isOpen={isCommonExportModalOpen}
+          isOpen={!!commonExporterConfig}
           onClose={() => {
             setCollectionsToExport([]);
-            setIsCommonExportModalOpen(false);
+            setCommonExporterConfig(null);
           }}
-          title={commonExporterConfig?.title}
+          title={commonExporterConfig.title}
           exporter={commonExporterConfig.exporter}
-          exporterType={commonExporterConfig?.exportType}
+          exporterType={commonExporterConfig.exportType}
         />
       )}
 
