@@ -1,58 +1,51 @@
-import { Authorization, RQAPI } from "@requestly/shared/types/entities/apiClient";
+import { RQAPI } from "@requestly/shared/types/entities/apiClient";
+import { stringify as yamlStringify } from "yaml";
 import { openApiExporter } from "@requestly/alternative-importers";
-import {
-  ExporterFunction,
-  ExportResult,
-} from "features/apiClient/screens/apiClient/components/modals/CommonApiClientExportModal";
+import { ExporterFunction, ExportResult } from "../types";
 import * as Sentry from "@sentry/react";
 
 /**
  * Creates an OpenAPI exporter function for a given collection or array of records
  */
-export const createOpenApiExporter = (input: RQAPI.CollectionRecord | RQAPI.ApiClientRecord[]): ExporterFunction => {
-  return async (): Promise<ExportResult> => {
+export const createOpenApiExporter = (collectionRecord: RQAPI.CollectionRecord): ExporterFunction => {
+  return (): ExportResult => {
     try {
-      let collectionToExport: RQAPI.CollectionRecord;
-
-      // Check if input is a single collection or an array of records
-      if (Array.isArray(input)) {
-        // Create a dummy collection from the array of records
-        const dummyCollection: RQAPI.CollectionRecord = {
-          id: `rq-collection-${Date.now()}`,
-          name: "Requestly Collection",
-          description: "Exported from Requestly API Client",
-          type: RQAPI.RecordType.COLLECTION,
-          collectionId: null,
-          deleted: false,
-          data: {
-            children: [],
-            variables: {},
-            auth: {
-              currentAuthType: Authorization.Type.INHERIT,
-              authConfigStore: {},
-            },
-          },
-          createdTs: Date.now(),
-          updatedTs: Date.now(),
-          ownerId: "",
-          createdBy: "",
-          updatedBy: "",
-        };
-
-        dummyCollection.data.children = input;
-        collectionToExport = dummyCollection;
-      } else {
-        // Input is already a single collection, use it directly
-        collectionToExport = input;
-      }
-
       // The exporter now returns both JSON and YAML formats with metadata
-      const result = openApiExporter(collectionToExport);
-      return result;
+      const openapiExport = openApiExporter(collectionRecord);
+      const sanitizedName = collectionRecord.name.replace(/[^a-z0-9]/gi, "-");
+
+      const jsonExport = new Blob([JSON.stringify(openapiExport, null, 2)], { type: "application/json" });
+      const yamlExport = new Blob([yamlStringify(openapiExport)], { type: "application/x-yaml" });
+
+      const pathCount = Object.keys(openapiExport.paths || {}).length;
+      const serverCount = openapiExport.servers?.length || 0;
+      const securitySchemeCount = Object.keys(openapiExport.components?.securitySchemes || {}).length;
+
+      const exportResult: ExportResult = {
+        file: [
+          {
+            fileName: `${sanitizedName}.json`,
+            content: jsonExport,
+            type: "application/json",
+          },
+          {
+            fileName: `${sanitizedName}.yaml`,
+            content: yamlExport,
+            type: "application/x-yaml",
+          },
+        ],
+        metadata: [
+          { key: "Paths", value: pathCount },
+          { key: "Servers", value: serverCount },
+          { key: "Security Schemes", value: securitySchemeCount },
+        ],
+      };
+      return exportResult;
     } catch (error) {
-      const inputSummary = Array.isArray(input)
-        ? { recordCount: input.length, recordIds: input.map((r) => r.id) }
-        : { id: input.id, name: input.name, type: input.type };
+      const inputSummary = {
+        collectionId: collectionRecord.id,
+        childrenIds: collectionRecord.data.children?.map((child) => child.id) || [],
+      };
       Sentry.captureException(error, {
         extra: { input: inputSummary },
       });

@@ -1,10 +1,11 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { BulkActions, RQAPI } from "features/apiClient/types";
-import { RQAPI as SharedRQAPI } from "@requestly/shared/types/entities/apiClient";
+import { Authorization, RQAPI as SharedRQAPI } from "@requestly/shared/types/entities/apiClient";
 import { notification } from "antd";
 import { useApiClientContext } from "features/apiClient/contexts";
-import { CollectionRow, ExportType } from "./collectionRow/CollectionRow";
+import { CollectionRow } from "./collectionRow/CollectionRow";
+import { ExportType } from "features/apiClient/helpers/exporters/types";
 import { RequestRow } from "./requestRow/RequestRow";
 import {
   convertFlatRecordsToNestedRecords,
@@ -23,7 +24,8 @@ import { debounce, head, isEmpty, union } from "lodash";
 import { SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY } from "features/apiClient/constants";
 import { ApiClientExportModal } from "../../../modals/exportModal/ApiClientExportModal";
 import { PostmanExportModal } from "../../../modals/postmanCollectionExportModal/PostmanCollectionExportModal";
-import { CommonApiClientExportModal, ExporterFunction } from "../../../modals/CommonApiClientExportModal";
+import { CommonApiClientExportModal } from "../../../modals/CommonApiClientExportModal";
+import { ExporterFunction } from "features/apiClient/helpers/exporters/types";
 import { toast } from "utils/Toast";
 import { MoveToCollectionModal } from "../../../modals/MoveToCollectionModal/MoveToCollectionModal";
 import { createOpenApiExporter } from "features/apiClient/helpers/exporters/openapi";
@@ -43,6 +45,32 @@ interface Props {
   recordTypeToBeCreated: RQAPI.RecordType | null;
   handleRecordsToBeDeleted: (records: RQAPI.ApiClientRecord[]) => void;
 }
+
+const wrapRecordsInCollection = (processedRecords: RQAPI.ApiClientRecord[]): RQAPI.CollectionRecord => {
+  const dummyCollection: RQAPI.CollectionRecord = {
+    id: `rq-collection-${Date.now()}`,
+    name: "Requestly Collection",
+    description: "Exported from Requestly API Client",
+    type: RQAPI.RecordType.COLLECTION,
+    collectionId: null,
+    deleted: false,
+    data: {
+      children: processedRecords,
+      variables: {},
+      auth: {
+        currentAuthType: Authorization.Type.INHERIT,
+        authConfigStore: {},
+      },
+    },
+    createdTs: Date.now(),
+    updatedTs: Date.now(),
+    ownerId: "",
+    createdBy: "",
+    updatedBy: "",
+  };
+
+  return dummyCollection;
+};
 
 const trackUserProperties = (records: RQAPI.ApiClientRecord[]) => {
   const totalCollections = records.filter((record) => isApiCollection(record)).length;
@@ -213,6 +241,9 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
       }
 
       const processedRecords = filterOutChildrenRecords(selectedRecords, childParentMap, updatedRecords.recordsMap);
+
+      const dummyCollection = wrapRecordsInCollection(processedRecords);
+
       switch (action) {
         case BulkActions.DUPLICATE: {
           try {
@@ -262,7 +293,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
           break;
 
         case BulkActions.EXPORT_OPENAPI: {
-          const exporter = createOpenApiExporter(processedRecords as SharedRQAPI.ApiClientRecord[]);
+          const exporter = createOpenApiExporter(dummyCollection as SharedRQAPI.CollectionRecord);
           setCommonExporterConfig({
             exporter,
             exportType: ExportType.OPENAPI,
