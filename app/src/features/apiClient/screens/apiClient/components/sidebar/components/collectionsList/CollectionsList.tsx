@@ -70,7 +70,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
   const [commonExporterConfig, setCommonExporterConfig] = useState<{
     title: string;
     exporter: ExporterFunction;
-    exportType: string;
+    exportType: ExportType;
   } | null>(null);
   const [showSelection, setShowSelection] = useState(false);
   const [isMoveCollectionModalOpen, setIsMoveCollectionModalOpen] = useState(false);
@@ -265,7 +265,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
           const exporter = createOpenApiExporter(processedRecords as SharedRQAPI.ApiClientRecord[]);
           setCommonExporterConfig({
             exporter,
-            exportType: BulkActions.EXPORT_OPENAPI,
+            exportType: ExportType.OPENAPI,
             title: "OpenAPI 3.0",
           });
           break;

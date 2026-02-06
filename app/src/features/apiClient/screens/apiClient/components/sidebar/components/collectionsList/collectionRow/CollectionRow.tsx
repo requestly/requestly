@@ -142,7 +142,7 @@ export const CollectionRow: React.FC<Props> = ({
         case ExportType.OPENAPI:
           setIsCommonExportModalOpen(true);
           setCommonExporterConfig({
-            exporter: createOpenApiExporter(record as SharedRQAPI.CollectionRecord),
+            exporter: createOpenApiExporter(exportData as SharedRQAPI.CollectionRecord),
             exportType: ExportType.OPENAPI,
             title: "OpenAPI 3.0",
           });
