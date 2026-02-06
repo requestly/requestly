@@ -67,7 +67,9 @@ export class ScriptExecutionWorker implements ScriptExecutionWorkerInterface {
       "use strict";
       ${globalScript}
       try {
-      return (async () => { ${userScript} })();
+      return (async () => {
+        ${userScript}
+      })();
       } catch (error) {
         console.error(\`\${error.name}: \${error.message}\`);
         throw error;
