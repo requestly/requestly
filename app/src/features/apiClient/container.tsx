@@ -34,15 +34,11 @@ const ApiClientFeatureContainer: React.FC = () => {
   };
 
   useEffect(() => {
-    const promise = dispatch(
+    dispatch(
       setupWorkspaceView({
         userId: user.details?.profile?.uid,
       }) as any
     );
-
-    return () => {
-      promise.abort();
-    };
   }, [dispatch, user.details?.profile?.uid]);
 
   if (!isSetupDone) {
