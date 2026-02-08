@@ -67,6 +67,13 @@
 
       .root-collection-name {
         font-size: var(--requestly-font-size-sm);
+        display: inline-block;
+        max-width: 140px;
+        line-height: 17px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        vertical-align: middle;
       }
 
       .collection-name {
@@ -83,19 +90,19 @@
       }
 
       .request-name {
-        display: -webkit-box;
-        -webkit-box-orient: vertical;
-        -webkit-line-clamp: 1;
-        line-clamp: 1;
+        display: inline-block;
+        max-width: 180px;
         overflow: hidden;
         text-overflow: ellipsis;
+        white-space: nowrap;
         color: var(--requestly-color-text-default, #fff);
         font-size: var(--requestly-font-size-sm, 12px);
         font-weight: 500;
         line-height: 17px; /* 150% */
         margin-right: 4px;
+        vertical-align: middle;
         cursor: pointer;
-        margin-top: 3px;
+        margin-top: 1px;
       }
 
       .response-details {
