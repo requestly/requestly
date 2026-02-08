@@ -1,4 +1,3 @@
-import { RQAPI } from "features/apiClient/types";
 import { ApiClientRequestTabs } from "../../../components/request/components/ApiClientRequestTabs/ApiClientRequestTabs";
 import React, { useMemo } from "react";
 import { RequestTabLabel } from "../../../components/request/components/ApiClientRequestTabs/components/RequestTabLabel/RequestTabLabel";
@@ -8,6 +7,7 @@ import { GraphQLAuthView } from "./components/GraphQLAuthView/GraphQLAuthView";
 import { GraphQLScripts } from "./components/GraphQLAuthView/GraphQLScripts";
 import { RQButton } from "lib/design-system/components";
 import { MdOutlineBallot } from "@react-icons/all-files/md/MdOutlineBallot";
+import { BufferedGraphQLRecordEntity } from "features/apiClient/slices/entities";
 
 enum GraphQLRequestTab {
   QUERY = "query",
@@ -17,8 +17,7 @@ enum GraphQLRequestTab {
 }
 
 interface Props {
-  requestId: RQAPI.ApiRecord["id"];
-  collectionId: RQAPI.ApiRecord["collectionId"];
+  entity: BufferedGraphQLRecordEntity;
   isSchemaBuilderOpen: boolean;
   setIsSchemaBuilderOpen: (isOpen: boolean) => void;
   focusPostResponseScriptEditor?: boolean;
@@ -26,8 +25,7 @@ interface Props {
 }
 
 export const GraphQLRequestTabs: React.FC<Props> = ({
-  requestId,
-  collectionId,
+  entity,
   isSchemaBuilderOpen,
   setIsSchemaBuilderOpen,
   focusPostResponseScriptEditor,
@@ -39,7 +37,11 @@ export const GraphQLRequestTabs: React.FC<Props> = ({
         key: GraphQLRequestTab.QUERY,
         label: <RequestTabLabel label="Query" />,
         children: (
-          <QueryView isSchemaBuilderOpen={isSchemaBuilderOpen} setIsSchemaBuilderOpen={setIsSchemaBuilderOpen} />
+          <QueryView
+            entity={entity}
+            isSchemaBuilderOpen={isSchemaBuilderOpen}
+            setIsSchemaBuilderOpen={setIsSchemaBuilderOpen}
+          />
         ),
       },
       {
@@ -47,32 +49,35 @@ export const GraphQLRequestTabs: React.FC<Props> = ({
         label: <RequestTabLabel label="Headers" />,
         children: (
           <div className="non-scrollable-tab-content">
-            <RequestHeaders requestId={requestId} />
+            <RequestHeaders entity={entity} />
           </div>
         ),
       },
       {
         key: GraphQLRequestTab.AUTHORIZATION,
         label: <RequestTabLabel label="Authorization" />,
-        children: <GraphQLAuthView recordId={requestId} collectionId={collectionId} />,
+        children: <GraphQLAuthView entity={entity} />,
       },
       {
         key: GraphQLRequestTab.SCRIPTS,
         label: <RequestTabLabel label="Scripts" />,
-        children: <GraphQLScripts key={`${scriptEditorVersion}`} focusPostResponse={focusPostResponseScriptEditor} />,
+        children: (
+          <GraphQLScripts
+            key={`${scriptEditorVersion}`}
+            entity={entity}
+            focusPostResponse={focusPostResponseScriptEditor}
+          />
+        ),
       },
     ];
-  }, [
-    requestId,
-    collectionId,
-    setIsSchemaBuilderOpen,
-    isSchemaBuilderOpen,
-    scriptEditorVersion,
-    focusPostResponseScriptEditor,
-  ]);
+  }, [entity, setIsSchemaBuilderOpen, isSchemaBuilderOpen, scriptEditorVersion, focusPostResponseScriptEditor]);
   return (
     <div style={{ position: "relative", height: "100%", overflow: "hidden" }}>
-      <ApiClientRequestTabs requestId={requestId} items={tabItems} defaultActiveKey={GraphQLRequestTab.QUERY} />
+      <ApiClientRequestTabs
+        requestId={entity.meta.referenceId}
+        items={tabItems}
+        defaultActiveKey={GraphQLRequestTab.QUERY}
+      />
       {!isSchemaBuilderOpen && (
         <RQButton
           className="schema-builder-toggle-button"

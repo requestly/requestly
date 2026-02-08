@@ -6,11 +6,11 @@ import { getAppMode, getIsRulesListLoading } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 import { RecordType, Rule } from "@requestly/shared/types/entities/rules";
-import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
 import { useFetchMockRecords } from "features/mocks/screens/mocksList/components/MocksList/hooks/useFetchMockRecords";
 import { MockType, RQMockMetadataSchema } from "components/features/mocksV2/types";
 import * as Sentry from "@sentry/react";
 import clientRuleStorageService from "services/clientStorageService/features/rule";
+import { useTabs } from "componentsV2/Tabs/slice";
 
 interface HomeScreenContextInterface {
   // rules
@@ -44,7 +44,7 @@ export const HomeScreenProvider: React.FC<HomeScreenProviderProps> = ({ children
   const hasUserChanged = useHasChanged(user?.details?.profile?.uid);
   const [rules, setRules] = useState<Rule[]>([]);
   const [isRulesLoading, setIsRulesLoading] = useState(true);
-  const [tabs] = useTabServiceWithSelector((state) => [state.tabs]);
+  const tabs = useTabs();
   const { isLoading: isFetchingMocks, mockRecords } = useFetchMockRecords(MockType.API, false);
 
   useEffect(() => {
@@ -69,7 +69,7 @@ export const HomeScreenProvider: React.FC<HomeScreenProviderProps> = ({ children
     }
   }, [appMode, activeWorkspaceId, hasUserChanged, isRulesListLoading]);
 
-  const isAnyRecordExist = rules.length > 0 || tabs.size > 0 || mockRecords.length > 0;
+  const isAnyRecordExist = rules.length > 0 || tabs.length > 0 || mockRecords.length > 0;
   const value = {
     rules,
     isRulesLoading: isRulesLoading || isRulesListLoading,

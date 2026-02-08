@@ -1,23 +1,21 @@
-import { RequestContentType, RQAPI } from "features/apiClient/types";
+import { useFeatureValue } from "@growthbook/growthbook-react";
+import { Checkbox } from "antd";
+import { Conditional } from "components/common/Conditional";
+import FEATURES from "config/constants/sub/features";
+import { sanitizeKeyValuePairs, supportsRequestBody } from "features/apiClient/screens/apiClient/utils";
+import { BufferedHttpRecordEntity } from "features/apiClient/slices/entities";
+import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
+import { RQAPI } from "features/apiClient/types";
+import React, { useMemo } from "react";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import { ApiClientRequestTabs } from "../../../components/request/components/ApiClientRequestTabs/ApiClientRequestTabs";
+import { RequestTabLabel } from "../../../components/request/components/ApiClientRequestTabs/components/RequestTabLabel/RequestTabLabel";
+import AuthorizationView from "../../../components/request/components/AuthorizationView";
+import { HeadersTable } from "../../../components/request/components/HeadersTable/HeadersTable";
 import { QueryParamsTable } from "../../../components/request/components/QueryParamsTable/QueryParamsTable";
 import RequestBody from "../../../components/request/RequestBody";
-import { captureException } from "@sentry/react";
-import { HeadersTable } from "../../../components/request/components/HeadersTable/HeadersTable";
-import AuthorizationView from "../../../components/request/components/AuthorizationView";
-import React, { useCallback, useMemo, useEffect } from "react";
-import { ApiClientRequestTabs } from "../../../components/request/components/ApiClientRequestTabs/ApiClientRequestTabs";
-import { sanitizeKeyValuePairs, supportsRequestBody } from "features/apiClient/screens/apiClient/utils";
-import { useFeatureValue } from "@growthbook/growthbook-react";
-import { useQueryParamStore } from "features/apiClient/hooks/useQueryParamStore";
-import { useHeadersStore } from "features/apiClient/hooks/useHeadersStore";
-import { Conditional } from "components/common/Conditional";
-import { isFeatureCompatible } from "utils/CompatibilityUtils";
-import FEATURES from "config/constants/sub/features";
-import { Checkbox } from "antd";
-import { RequestTabLabel } from "../../../components/request/components/ApiClientRequestTabs/components/RequestTabLabel/RequestTabLabel";
-import { PathVariableTable } from "../PathVariableTable";
-import { usePathVariablesStore } from "features/apiClient/hooks/usePathVariables.store";
 import { ScriptEditor } from "../../../components/Scripts/components/ScriptEditor/ScriptEditor";
+import { PathVariableTable } from "../PathVariableTable";
 
 export enum RequestTab {
   QUERY_PARAMS = "query_params",
@@ -29,10 +27,7 @@ export enum RequestTab {
 
 interface Props {
   error: RQAPI.ExecutionError | null;
-  requestEntry: RQAPI.HttpApiEntry;
-  requestId: RQAPI.ApiRecord["id"];
-  collectionId: RQAPI.ApiRecord["collectionId"];
-  setRequestEntry: (updater: (prev: RQAPI.HttpApiEntry) => RQAPI.HttpApiEntry) => void;
+  entity: BufferedHttpRecordEntity;
   handleAuthChange: (newAuth: RQAPI.Auth) => void;
   focusPostResponseScriptEditor?: boolean;
   scriptEditorVersion?: number;
@@ -40,119 +35,59 @@ interface Props {
 
 const HttpRequestTabs: React.FC<Props> = ({
   error,
-  requestEntry,
-  requestId,
-  collectionId,
-  setRequestEntry,
+  entity,
   handleAuthChange,
   focusPostResponseScriptEditor,
   scriptEditorVersion,
 }) => {
   const showCredentialsCheckbox = useFeatureValue("api-client-include-credentials", false);
 
-  const getContentTypeWithAlert = useCallback(
-    (contentType: RequestContentType | undefined): RequestContentType => {
-      if (contentType === undefined) {
-        captureException(new Error("Request contentType is undefined"), {
-          extra: {
-            requestId,
-            requestEntry,
-          },
-        });
-        return RequestContentType.RAW;
-      }
-      return contentType;
-    },
-    [requestEntry, requestId]
-  );
+  const queryParams = useApiClientSelector((s) => entity.getQueryParams(s));
+  const pathVariables = useApiClientSelector((s) => entity.getPathVariables(s));
+  const method = useApiClientSelector((s) => entity.getMethod(s));
+  const bodyLength = useApiClientSelector((s) => entity.getBody(s)?.length || 0);
+  const headersLength = useApiClientSelector((s) => sanitizeKeyValuePairs(entity.getHeaders(s)).length);
+  const auth = useApiClientSelector((s) => entity.getAuth(s));
+  const isRootLevelRecord = useApiClientSelector((s) => !!entity.getCollectionId(s));
 
-  const isRequestBodySupported = supportsRequestBody(requestEntry.request.method);
+  const requestEntry = useApiClientSelector((s) => entity.getEntityFromState(s).data);
 
-  const pathVariables = usePathVariablesStore((state) => state.pathVariables);
-  const queryParams = useQueryParamStore((state) => state.queryParams);
-  const headers = useHeadersStore((state) => state.headers);
-
+  const isRequestBodySupported = supportsRequestBody(method);
   const hasScriptError = error?.type === RQAPI.ApiClientErrorType.SCRIPT;
 
   const items = useMemo(() => {
     return [
       {
         key: RequestTab.QUERY_PARAMS,
-        label: <RequestTabLabel label="Params" count={queryParams.length || pathVariables.length} showDot={true} />,
+        label: <RequestTabLabel label="Params" count={queryParams.length || pathVariables?.length} showDot={true} />,
         children: (
           <div className="non-scrollable-tab-content">
-            <QueryParamsTable
-              recordId={requestId}
-              title={<div className="params-table-title">Query Params</div>}
-              onQueryParamsChange={(newParams) => {
-                setRequestEntry((prev) => ({
-                  ...prev,
-                  request: {
-                    ...prev.request,
-                    queryParams: newParams,
-                  },
-                }));
-              }}
-            >
-              <PathVariableTable
-                recordId={requestId}
-                onChange={(newVariables) => {
-                  setRequestEntry((prev) => ({
-                    ...prev,
-                    request: { ...prev.request, pathVariables: newVariables },
-                  }));
-                }}
-              />
+            <QueryParamsTable entity={entity}>
+              <PathVariableTable entity={entity} />
             </QueryParamsTable>
           </div>
         ),
       },
       {
         key: RequestTab.BODY,
-        label: (
-          <RequestTabLabel
-            label="Body"
-            count={requestEntry.request.body?.length ? 1 : 0}
-            showDot={isRequestBodySupported}
-          />
-        ),
-        children: (
-          <RequestBody
-            recordId={requestId}
-            body={requestEntry.request.body ?? ""}
-            contentType={getContentTypeWithAlert(requestEntry.request.contentType)}
-            setRequestEntry={setRequestEntry}
-          />
-        ),
+        label: <RequestTabLabel label="Body" count={bodyLength ? 1 : 0} showDot={isRequestBodySupported} />,
+        children: <RequestBody entity={entity} />,
         disabled: !isRequestBodySupported,
       },
       {
         key: RequestTab.HEADERS,
-        label: <RequestTabLabel label="Headers" count={sanitizeKeyValuePairs(headers).length} />,
-        children: (
-          <div className="non-scrollable-tab-content">
-            <HeadersTable
-              recordId={requestId}
-              headers={requestEntry.request.headers}
-              onHeadersChange={(newHeaders) => {
-                setRequestEntry((prev) => ({
-                  ...prev,
-                  request: { ...prev.request, headers: newHeaders },
-                }));
-              }}
-            />
-          </div>
-        ),
+        label: <RequestTabLabel label="Headers" count={headersLength} />,
+        children: <HeadersTable entity={entity} />,
       },
       {
         key: RequestTab.AUTHORIZATION,
         label: <RequestTabLabel label="Authorization" />,
         children: (
           <AuthorizationView
-            recordId={requestId}
-            defaults={requestEntry.auth}
+            recordId={entity.meta.referenceId}
+            defaults={auth}
             onAuthUpdate={handleAuthChange}
-            isRootLevelRecord={!collectionId}
+            isRootLevelRecord={isRootLevelRecord}
           />
         ),
       },
@@ -169,34 +104,39 @@ const HttpRequestTabs: React.FC<Props> = ({
         children: (
           <ScriptEditor
             key={`${scriptEditorVersion}`}
-            requestId={requestId}
+            requestId={entity.meta.referenceId}
             entry={requestEntry}
-            onScriptsChange={(scripts) => setRequestEntry((prev) => ({ ...prev, scripts }))}
-            aiTestsExcutionCallback={(testResults) => setRequestEntry((prev) => ({ ...prev, testResults }))}
+            onScriptsChange={(scripts) => {
+              if (!scripts) {
+                return;
+              }
+              entity.setScripts(scripts);
+            }}
+            aiTestsExcutionCallback={(testResults) => entity.setTestResults(testResults)}
             focusPostResponse={focusPostResponseScriptEditor ?? false}
           />
         ),
       },
     ];
   }, [
-    hasScriptError,
-    requestId,
-    collectionId,
-    handleAuthChange,
-    isRequestBodySupported,
     queryParams.length,
-    pathVariables.length,
-    headers,
+    pathVariables?.length,
+    entity,
+    bodyLength,
+    isRequestBodySupported,
+    headersLength,
+    auth,
+    handleAuthChange,
+    isRootLevelRecord,
+    hasScriptError,
     requestEntry,
-    setRequestEntry,
-    focusPostResponseScriptEditor,
     scriptEditorVersion,
-    getContentTypeWithAlert,
+    focusPostResponseScriptEditor,
   ]);
 
   return (
     <ApiClientRequestTabs
-      requestId={requestId}
+      requestId={entity.meta.referenceId}
       items={items}
       defaultActiveKey={RequestTab.QUERY_PARAMS}
       tabBarExtraContent={
@@ -205,13 +145,7 @@ const HttpRequestTabs: React.FC<Props> = ({
         >
           <Checkbox
             onChange={(e) => {
-              setRequestEntry((prev) => ({
-                ...prev,
-                request: {
-                  ...prev.request,
-                  includeCredentials: e.target.checked,
-                },
-              }));
+              entity.setIncludeCredentials(e.target.checked);
             }}
             checked={requestEntry.request.includeCredentials}
           >

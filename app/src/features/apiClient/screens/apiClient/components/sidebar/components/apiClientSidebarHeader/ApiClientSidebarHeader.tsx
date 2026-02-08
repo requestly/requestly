@@ -5,7 +5,6 @@ import { BsCollection } from "@react-icons/all-files/bs/BsCollection";
 import { RQButton } from "lib/design-system-v2/components";
 import { ClearOutlined, CodeOutlined } from "@ant-design/icons";
 import { RQAPI, ApiClientImporterType } from "@requestly/shared/types/entities/apiClient";
-import { EnvironmentSwitcher } from "./components/environmentSwitcher/EnvironmentSwitcher";
 import { trackImportStarted } from "modules/analytics/events/features/apiClient";
 import { ApiClientImportModal } from "../../../modals/importModal/ApiClientImportModal";
 import { SiPostman } from "@react-icons/all-files/si/SiPostman";
@@ -17,14 +16,12 @@ import { useLocation } from "react-router-dom";
 import { RoleBasedComponent } from "features/rbac";
 import { NewApiRecordDropdown } from "../NewApiRecordDropdown/NewApiRecordDropdown";
 import { ApiClientSidebarTabKey } from "../../SingleWorkspaceSidebar/SingleWorkspaceSidebar";
-import {
-  ApiClientViewMode,
-  useApiClientMultiWorkspaceView,
-} from "features/apiClient/store/multiWorkspaceView/multiWorkspaceView.store";
 import { SiOpenapiinitiative } from "@react-icons/all-files/si/SiOpenapiinitiative";
 import { CommonApiClientImportModal } from "../../../modals/CommonApiClientImportModal/CommonApiClientImportModal";
 import { ApiClientImporterMethod, openApiImporter } from "@requestly/alternative-importers";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import { ApiClientViewMode, useViewMode } from "features/apiClient/slices";
+import { EnvironmentSwitcher } from "./components/environmentSwitcher/EnvironmentSwitcher";
 import LINKS from "config/constants/sub/links";
 
 interface Props {
@@ -51,8 +48,8 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
   history,
   onClearHistory,
 }) => {
-  const viewMode = useApiClientMultiWorkspaceView((s) => s.viewMode);
   const { state } = useLocation();
+  const viewMode = useViewMode();
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isPostmanImporterModalOpen, setIsPostmanImporterModalOpen] = useState(false);
   const [isBrunoImporterModalOpen, setIsBrunoImporterModalOpen] = useState(false);

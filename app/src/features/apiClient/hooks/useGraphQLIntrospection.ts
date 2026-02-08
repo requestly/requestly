@@ -1,21 +1,17 @@
-import { useGraphQLRecordStore } from "./useGraphQLRecordStore";
 import { fetchGraphQLIntrospectionData } from "../helpers/introspectionQuery";
 import { useSelector } from "react-redux";
 import { getAppMode } from "store/selectors";
 import { renderVariables } from "backend/environment/utils";
-import { useApiClientFeatureContext } from "../contexts/meta";
 import { useAutogenerateStore } from "./useAutogenerateStore";
+import { useGraphQLRecordStore } from "./useGraphQLRecordStore";
+import { useApiClientFeatureContext } from "../slices";
 
-export const useGraphQLIntrospection = () => {
+export const useGraphQLIntrospection = (params: { recordId: string; url: string }) => {
   const [
-    recordId,
-    url,
     setIntrospectionData,
     setIsFetchingIntrospectionData,
     setHasIntrospectionFailed,
   ] = useGraphQLRecordStore((state) => [
-    state.recordId,
-    state.entry.request.url,
     state.setIntrospectionData,
     state.setIsFetchingIntrospectionData,
     state.setHasIntrospectionFailed,
@@ -30,7 +26,7 @@ export const useGraphQLIntrospection = () => {
   const introspectAndSaveSchema = async () => {
     setIsFetchingIntrospectionData(true);
     try {
-      const { result: renderedUrl } = renderVariables(url, recordId, ctx);
+      const { result: renderedUrl } = renderVariables(params.url, params.recordId, ctx);
       const introspectionData = await fetchGraphQLIntrospectionData(
         renderedUrl,
         appMode,

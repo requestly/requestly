@@ -1,25 +1,34 @@
+import type React from "react";
 import { VariablesList } from "features/apiClient/screens/environment/components/VariablesList/VariablesList";
-import React from "react";
+import type { EnvironmentVariables } from "backend/environment/types";
+import type { ApiClientVariables } from "features/apiClient/slices/entities/api-client-variables";
+import type { RQAPI } from "features/apiClient/types";
+import type { ApiClientRootState } from "features/apiClient/slices/hooks/types";
+import { useRBAC } from "features/rbac";
 
 interface CollectionsVariablesListProps {
+  variablesData: EnvironmentVariables;
+  variables: ApiClientVariables<RQAPI.CollectionRecord, ApiClientRootState>;
   searchValue: string;
-  onVariablesChange: (variables: any[]) => void;
-  variables: any[];
   onSearchValueChange: (value: string) => void;
 }
 
 export const CollectionsVariablesList: React.FC<CollectionsVariablesListProps> = ({
-  searchValue,
+  variablesData,
   variables,
-  onVariablesChange,
+  searchValue,
   onSearchValueChange,
 }) => {
+  const { validatePermission } = useRBAC();
+  const { isValidPermission } = validatePermission("api_client_collection", "create");
+
   return (
     <VariablesList
-      searchValue={searchValue}
+      variablesData={variablesData}
       variables={variables}
-      onVariablesChange={onVariablesChange}
+      searchValue={searchValue}
       onSearchValueChange={onSearchValueChange}
+      isReadOnly={!isValidPermission}
       container="environments"
     />
   );

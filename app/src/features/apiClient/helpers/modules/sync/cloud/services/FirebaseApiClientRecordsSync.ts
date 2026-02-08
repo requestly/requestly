@@ -19,9 +19,9 @@ import { sanitizeRecord, updateApiRecord } from "backend/apiClient/upsertApiReco
 import { EnvironmentVariables } from "backend/environment/types";
 import { ErroredRecord } from "../../local/services/types";
 import { ResponsePromise } from "backend/types";
-import { SavedRunConfig } from "features/apiClient/commands/collectionRunner/types";
-import { RunResult, SavedRunResult } from "features/apiClient/store/collectionRunResult/runResult.store";
 import { batchCreateCollectionRunDetailsInFirebase } from "backend/apiClient/batchCreateCollectionRunDetailsInFirebase";
+import { RunResult, SavedRunResult } from "features/apiClient/slices/common/runResults";
+import { SavedRunConfig } from "features/apiClient/slices/runConfig/types";
 import { SentryCustomSpan } from "utils/sentry";
 import { captureException } from "backend/apiClient/utils";
 

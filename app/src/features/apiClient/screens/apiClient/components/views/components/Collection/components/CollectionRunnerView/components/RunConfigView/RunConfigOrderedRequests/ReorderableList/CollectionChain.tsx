@@ -1,8 +1,7 @@
 import React, { useMemo } from "react";
 import { RQAPI } from "features/apiClient/types";
 import { RQTooltip } from "lib/design-system-v2/components";
-import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
-import { useApiRecord } from "features/apiClient/hooks/useApiRecord.hook";
+import { useRecordById, useAncestorRecords } from "features/apiClient/slices";
 
 interface Props {
   recordId: RQAPI.ApiClientRecord["id"];
@@ -12,7 +11,7 @@ const CollectionChainItem: React.FC<{ collectionId: RQAPI.CollectionRecord["id"]
   collectionId,
   isLastItem,
 }) => {
-  const collection = useApiRecord(collectionId);
+  const collection = useRecordById(collectionId);
 
   return (
     <div className="collection-path-item">
@@ -31,17 +30,13 @@ const CollectionChainItem: React.FC<{ collectionId: RQAPI.CollectionRecord["id"]
 };
 
 export const CollectionChain: React.FC<Props> = ({ recordId }) => {
-  const [getParentChain, getData] = useAPIRecords((s) => [s.getParentChain, s.getData]);
+  const ancestorRecords = useAncestorRecords(recordId);
 
   const collections = useMemo(() => {
-    const parentIds = getParentChain(recordId);
-    const parents = parentIds
-      .map((id) => getData(id))
-      .filter((record): record is RQAPI.CollectionRecord => Boolean(record))
+    return ancestorRecords
+      .filter((record): record is RQAPI.CollectionRecord => record.type === RQAPI.RecordType.COLLECTION)
       .reverse();
-
-    return parents;
-  }, [getData, getParentChain, recordId]);
+  }, [ancestorRecords]);
 
   return collections.length > 0 ? (
     <div className="collection-path-container">

@@ -47,7 +47,7 @@ export const highlightVariablesPlugin = (setters: VariableSetters, variables: Sc
             variable,
           });
 
-          const isDefined = variables.has(variable);
+          const isDefined = variables[variable];
           const cls = `highlight-${isDefined ? "defined" : "undefined"}-variable`;
           const colorVar = isDefined ? "var(--requestly-color-primary-text)" : "var(--requestly-color-error-text)";
 

@@ -12,14 +12,11 @@ import { EnvironmentsList } from "features/apiClient/screens/environment/compone
 import { useApiClientContext } from "features/apiClient/contexts";
 import { DeleteApiRecordModal, ImportFromCurlModal } from "../../modals";
 import { getEmptyApiEntry } from "../../../utils";
-import { ErrorFilesList } from "../components/ErrorFilesList/ErrorFileslist";
-import { useApiClientRepository } from "features/apiClient/contexts/meta";
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
 import "./singleWorkspaceSidebar.scss";
-import { useApiClientFeatureContext } from "features/apiClient/contexts/meta";
-import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 import { MdOutlineSpaceDashboard } from "@react-icons/all-files/md/MdOutlineSpaceDashboard";
 import { RuntimeVariables } from "features/apiClient/screens/environment/components/RuntimeVariables/runtimevariables";
+import { ApiClientFeatureContext, useApiClientFeatureContext, useApiClientRepository } from "features/apiClient/slices";
 
 interface Props {}
 
@@ -256,7 +253,7 @@ export const SingleWorkspaceSidebar: React.FC<Props> = () => {
             onChange={handleActiveTabChange}
           />
         </div>
-        <ErrorFilesList />
+        {/* <ErrorFilesList /> */}
       </div>
 
       {isDeleteModalOpen ? (
