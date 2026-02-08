@@ -2,10 +2,10 @@ import { compile } from "handlebars";
 import { EnvironmentVariables } from "./types";
 import Logger from "lib/logger";
 import { isEmpty } from "lodash";
-import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 import { getScopedVariables, Scope } from "features/apiClient/helpers/variableResolver/variable-resolver";
-import { getApiClientRecordsStore } from "features/apiClient/commands/store.utils";
 import { EnvironmentVariableData, VariableData } from "features/apiClient/store/variables/types";
+import { ApiClientFeatureContext } from "features/apiClient/slices";
+import { reduxStore } from "store";
 import { DepGraph } from "dependency-graph";
 
 type Variables = Record<string, string | number | boolean>;
@@ -23,9 +23,11 @@ export function renderVariables<T extends string | Record<string, any>>(
   renderedVariables?: Record<string, unknown>;
   result: T;
 } {
-  const parents = getApiClientRecordsStore(ctx).getState().getParentChain(recordId);
+  const state = ctx.store.getState();
+  const runtimeVariables = reduxStore.getState().runtimeVariables.entity.variables;
+  const scopedVariables = getScopedVariables(state, runtimeVariables, recordId, { scopes });
   const variables = Object.fromEntries(
-    Array.from(getScopedVariables(parents, ctx.stores, scopes)).map(([key, [variable, _]]) => {
+    Object.entries(scopedVariables).map(([key, [variable, _]]) => {
       return [key, variable];
     })
   );

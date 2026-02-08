@@ -2,7 +2,6 @@ import React, { useEffect, useMemo, useRef } from "react";
 import { NativeError } from "errors/NativeError";
 import { useSelector } from "react-redux";
 import { getActiveWorkspace } from "store/slices/workspaces/selectors";
-import { getTabServiceActions } from "componentsV2/Tabs/tabUtils";
 import { WorkspaceType } from "features/workspaces/types";
 import { ErrorSeverity } from "errors/types";
 import { ErrorScreen } from "./components/ErrorScreen";
@@ -64,7 +63,7 @@ class ErrorBoundary extends React.Component<Props, State> {
       "componentDidCatch",
       ErrorSeverity.FATAL,
       true,
-      this.props.defaultTags,
+      this.props.defaultTags
     );
   }
 
@@ -90,7 +89,7 @@ class ErrorBoundary extends React.Component<Props, State> {
           "onunhandledrejection",
           undefined,
           showBoundary,
-          this.props.defaultTags,
+          this.props.defaultTags
         );
         this.setState({ showBoundary, error: error });
 
@@ -104,7 +103,6 @@ class ErrorBoundary extends React.Component<Props, State> {
   };
 
   private handleResetError = () => {
-    getTabServiceActions().resetTabs(true);
     this.setState({ showBoundary: false, error: null });
   };
 

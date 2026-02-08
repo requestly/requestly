@@ -19,6 +19,7 @@ export const apiClientTabRoutes: TabRoute[] = [
   {
     path: PATHS.API_CLIENT.HISTORY.ABSOLUTE,
     tabSourceFactory: HistoryViewTabSource.create,
+    singleton: true,
   },
   {
     path: PATHS.API_CLIENT.COLLECTION.ABSOLUTE,

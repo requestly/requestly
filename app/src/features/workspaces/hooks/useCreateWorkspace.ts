@@ -26,6 +26,10 @@ import {
   trackNewTeamCreateFailure,
   trackNewTeamCreateSuccess,
 } from "modules/analytics/events/features/teams";
+import { getWorkspaceInfo, useWorkspaceViewActions } from "features/apiClient/slices";
+import { InvalidContextVersionError } from "features/apiClient/slices/workspaceView/helpers/ApiClientContextRegistry/ApiClientContextRegistry";
+import { NativeError } from "errors/NativeError";
+import { ErrorSeverity } from "errors/types";
 
 export type CreateWorkspaceArgs = {
   workspaceName: string;
@@ -56,22 +60,27 @@ export const useCreateWorkspace = ({
 
   const appMode = useSelector(getAppMode);
   const user = useSelector(getUserAuthDetails);
+  const userId = user?.details?.profile?.uid;
   const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
   const billingTeams = useSelector(getAvailableBillingTeams);
   const activeWorkspace = useSelector(getActiveWorkspace);
 
+  const { switchContext } = useWorkspaceViewActions();
+
   const [isLoading, setIsLoading] = useState(false);
 
   const handlePostTeamCreationStep = useCallback(
-    async (teamId: string, newTeamName: string, hasMembersInSameDomain: boolean, workspaceType: WorkspaceType) => {
-      if (activeWorkspace.id === teamId) {
+    async (workspace: Workspace, hasMembersInSameDomain: boolean) => {
+      const { workspaceType } = workspace;
+
+      if (activeWorkspace.id === workspace.id) {
         return;
       }
 
       await switchWorkspace(
         {
-          teamId: teamId,
-          teamName: newTeamName,
+          teamId: workspace.id,
+          teamName: workspace.name,
           teamMembersCount: 1,
           workspaceType,
         },
@@ -84,8 +93,26 @@ export const useCreateWorkspace = ({
         null,
         analyticEventSource
       );
+
+      const result = await switchContext({
+        userId,
+        workspace: getWorkspaceInfo(workspace),
+      });
+
+      if (result.payload?.error) {
+        if (result.payload.error.name === InvalidContextVersionError.name) {
+          return;
+        } else {
+          const error = result.payload?.error;
+          throw new NativeError(error.message as string)
+            .setShowBoundary(true)
+            .setSeverity(ErrorSeverity.FATAL)
+            .set("stack", error.stack);
+        }
+      }
+
       if (workspaceType === WorkspaceType.SHARED) {
-        redirectToTeam(navigate, teamId, {
+        redirectToTeam(navigate, workspace.id, {
           state: {
             isNewTeam: hasMembersInSameDomain,
           },
@@ -93,13 +120,15 @@ export const useCreateWorkspace = ({
       }
     },
     [
+      WorkspaceType,
       dispatch,
-      appMode,
-      isSharedWorkspaceMode,
-      navigate,
       user?.details?.isSyncEnabled,
+      isSharedWorkspaceMode,
+      appMode,
       analyticEventSource,
-      activeWorkspace.id,
+      switchContext,
+      userId,
+      navigate,
     ]
   );
 
@@ -151,7 +180,7 @@ export const useCreateWorkspace = ({
       const upsertTeamCommonInvite = httpsCallable(functions, "invites-upsertTeamCommonInvite");
 
       try {
-        const teamId = await (async () => {
+        const workspace = await (async () => {
           if (args.workspaceType === WorkspaceType.LOCAL) {
             const workspaceCreationResult = await createWorkspaceFolder(workspaceName, args.folderPath);
             if (workspaceCreationResult.type === "error") {
@@ -170,7 +199,7 @@ export const useCreateWorkspace = ({
               rootPath: partialWorkspace.path,
             };
             dispatch(workspaceActions.upsertWorkspace(localWorkspace));
-            return partialWorkspace.id;
+            return localWorkspace;
           } else {
             const response: any = await createTeam({
               teamName: workspaceName,
@@ -178,10 +207,17 @@ export const useCreateWorkspace = ({
                 type: WorkspaceType.SHARED,
               },
             });
-            return response.data.teamId;
+
+            const workspace: Workspace & { workspaceType: WorkspaceType.SHARED } = {
+              id: response.data.teamId,
+              name: workspaceName,
+              workspaceType: WorkspaceType.SHARED,
+            };
+
+            return workspace;
           }
         })();
-
+        const teamId = workspace.id;
         toast.info("Workspace Created");
 
         let hasMembersInSameDomain = true;
@@ -205,7 +241,7 @@ export const useCreateWorkspace = ({
 
         trackNewTeamCreateSuccess(teamId, workspaceName, analyticEventSource, args.workspaceType, isNotifyAllSelected);
 
-        await handlePostTeamCreationStep(teamId, workspaceName, hasMembersInSameDomain, args.workspaceType);
+        await handlePostTeamCreationStep(workspace, hasMembersInSameDomain);
 
         onCreateWorkspaceCallback?.();
       } catch (err: any) {

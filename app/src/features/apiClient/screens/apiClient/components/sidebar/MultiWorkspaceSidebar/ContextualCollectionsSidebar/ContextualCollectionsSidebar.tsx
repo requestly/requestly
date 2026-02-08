@@ -1,25 +1,25 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useApiClientMultiWorkspaceView } from "features/apiClient/store/multiWorkspaceView/multiWorkspaceView.store";
+import { useGetAllSelectedWorkspaces } from "features/apiClient/slices/workspaceView/hooks";
 import { BulkActions, RQAPI } from "features/apiClient/types";
 import { useRBAC } from "features/rbac";
 import { SidebarListHeader } from "../../components/sidebarListHeader/SidebarListHeader";
-import { ContextId } from "features/apiClient/contexts/contextId.context";
-import { WorkspaceProvider } from "../WorkspaceProvider/WorkspaceProvider";
 import ActionMenu, { ActionMenuProps } from "../../components/collectionsList/BulkActionsMenu";
 import { toast } from "utils/Toast";
-import {
-  ApiClientFeatureContext,
-  apiClientFeatureContextProviderStore,
-} from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 import { MoveToCollectionModal } from "../../../modals/MoveToCollectionModal/MoveToCollectionModal";
 import { getProcessedRecords } from "features/apiClient/commands/utils";
-import { getApiClientFeatureContext } from "features/apiClient/commands/store.utils";
-import { duplicateRecords } from "features/apiClient/commands/records/duplicateRecords.command";
+import {
+  ApiClientFeatureContext,
+  duplicateRecords,
+  getApiClientFeatureContext,
+  WorkspaceInfo,
+} from "features/apiClient/slices";
 import { ApiClientExportModal } from "../../../modals/exportModal/ApiClientExportModal";
 import { captureException } from "backend/apiClient/utils";
 import { DeleteApiRecordModal } from "../../../modals";
 import { ContextualCollectionsList } from "./CollectionsList/ContextualCollectionsList";
 import { PostmanExportModal } from "../../../modals/postmanCollectionExportModal/PostmanCollectionExportModal";
+import { WorkspaceProvider } from "../WorkspaceProvider/WorkspaceProvider";
+import { WorkspaceIdContextProvider } from "features/apiClient/common/WorkspaceProvider";
 import "./contextualCollectionsSidebar.scss";
 
 export const ContextualCollectionsSidebar: React.FC<{
@@ -28,7 +28,7 @@ export const ContextualCollectionsSidebar: React.FC<{
 }> = ({ onNewClick, recordTypeToBeCreated }) => {
   const { validatePermission } = useRBAC();
   const { isValidPermission } = validatePermission("api_client_request", "create");
-  const selectedWorkspaces = useApiClientMultiWorkspaceView((s) => s.selectedWorkspaces);
+  const selectedWorkspaces = useGetAllSelectedWorkspaces();
 
   const [searchValue, setSearchValue] = useState("");
   const [showSelection, setShowSelection] = useState(false);
@@ -39,8 +39,8 @@ export const ContextualCollectionsSidebar: React.FC<{
   const [isMoveCollectionModalOpen, setIsMoveCollectionModalOpen] = useState(false);
 
   const [selectedRecordsInSingleContext, setSelectedRecordsInSingleContext] = useState<
-    [string | undefined, RQAPI.ApiClientRecord[]]
-  >([undefined, []]);
+    [WorkspaceInfo["id"], RQAPI.ApiClientRecord[]]
+  >([null, []]);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [isPostmanExportModalOpen, setIsPostmanExportModalOpen] = useState(false);
 
@@ -55,19 +55,19 @@ export const ContextualCollectionsSidebar: React.FC<{
     setIsDeleteModalOpen(true);
   }, []);
 
-  const selectedRecordsAcrossWorkspaces = useRef<
-    Record<string, { recordIds: Set<string>; isAllRecordsSelected: boolean }>
-  >({});
+  const selectedRecordsAcrossWorkspaces = useRef<{
+    [key: WorkspaceInfo["id"]]: { recordIds: Set<string>; isAllRecordsSelected: boolean };
+  }>({});
 
   useEffect(() => {
     if (!selectedRecordsAcrossWorkspaces.current) {
       selectedRecordsAcrossWorkspaces.current = {};
     }
 
-    selectedWorkspaces.forEach((workspaceStore) => {
-      const prevState = selectedRecordsAcrossWorkspaces.current[workspaceStore.getState()?.id];
+    selectedWorkspaces.forEach((workspace) => {
+      const prevState = selectedRecordsAcrossWorkspaces.current[workspace.id];
       if (!prevState) {
-        selectedRecordsAcrossWorkspaces.current[workspaceStore.getState()?.id] = {
+        selectedRecordsAcrossWorkspaces.current[workspace.id] = {
           recordIds: new Set(),
           isAllRecordsSelected: false,
         };
@@ -124,9 +124,16 @@ export const ContextualCollectionsSidebar: React.FC<{
 
   const handleDuplicateRecords = useCallback(async () => {
     try {
-      const promises = Object.entries(selectedRecordsAcrossWorkspaces.current).map(([ctxId, value]) => {
+      const promises = Object.entries(selectedRecordsAcrossWorkspaces.current).map(async ([ctxId, value]) => {
         const context = getApiClientFeatureContext(ctxId);
-        return duplicateRecords(context, { recordIds: value?.recordIds });
+        return context.store
+          .dispatch(
+            duplicateRecords({
+              recordIds: value?.recordIds,
+              repository: context.repositories.apiClientRecordsRepository,
+            }) as any
+          )
+          .unwrap();
       });
 
       // TODO: TBD, what to do in partial fail cases?
@@ -141,7 +148,7 @@ export const ContextualCollectionsSidebar: React.FC<{
     setIsDeleteModalOpen(true);
   }, [setIsDeleteModalOpen]);
 
-  const getSelectedRecordsInSingleContext: () => [string | undefined, RQAPI.ApiClientRecord[]] = useCallback(() => {
+  const getSelectedRecordsInSingleContext: () => [WorkspaceInfo["id"], RQAPI.ApiClientRecord[]] = useCallback(() => {
     const workspacesWithSelectedRecords = Object.entries(selectedRecordsAcrossWorkspaces.current ?? {}).filter(
       ([ctxId, value]) => value.recordIds.size > 0
     );
@@ -241,7 +248,7 @@ export const ContextualCollectionsSidebar: React.FC<{
     records: RQAPI.ApiClientRecord[];
   }[] => {
     const recordsWithContext = Object.entries(selectedRecordsAcrossWorkspaces.current ?? {}).map(([ctxId, value]) => {
-      const context = apiClientFeatureContextProviderStore.getState().getContext(ctxId);
+      const context = getApiClientFeatureContext(ctxId);
       return {
         context,
         // TODO: check why some records are undefind
@@ -289,10 +296,8 @@ export const ContextualCollectionsSidebar: React.FC<{
 
       <div className="multi-view-collections-sidebar">
         {selectedWorkspaces.map((workspace) => {
-          const workspaceId = workspace.getState().id;
-
           return (
-            <WorkspaceProvider key={workspaceId} workspaceId={workspaceId}>
+            <WorkspaceProvider key={workspace.id} workspaceId={workspace.id}>
               <ContextualCollectionsList
                 selectAll={selectAll}
                 showSelection={showSelection}
@@ -309,8 +314,7 @@ export const ContextualCollectionsSidebar: React.FC<{
       </div>
 
       {isMoveCollectionModalOpen ? (
-        // TODO: TBD on modals
-        <ContextId id={selectedRecordsInSingleContext[0] ?? null}>
+        <WorkspaceIdContextProvider id={selectedRecordsInSingleContext[0] ?? null}>
           <MoveToCollectionModal
             isBulkActionMode={showSelection}
             recordsToMove={selectedRecordsInSingleContext[1]}
@@ -319,7 +323,7 @@ export const ContextualCollectionsSidebar: React.FC<{
               setIsMoveCollectionModalOpen(false);
             }}
           />
-        </ContextId>
+        </WorkspaceIdContextProvider>
       ) : null}
 
       {isExportModalOpen ? (

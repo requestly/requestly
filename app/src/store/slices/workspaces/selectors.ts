@@ -26,7 +26,7 @@ export const getActiveWorkspaceIds = (state: RootState) => {
   return sliceRootState(state).activeWorkspaceIds;
 };
 
-const dummyPersonalWorkspace: Workspace = {
+export const dummyPersonalWorkspace: Workspace = {
   id: null,
   name: "Private Workspace",
   membersCount: 1,

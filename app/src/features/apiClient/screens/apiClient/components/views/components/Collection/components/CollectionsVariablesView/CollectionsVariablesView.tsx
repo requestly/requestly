@@ -1,92 +1,77 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import { RQAPI } from "features/apiClient/types";
+import { notification } from "antd";
 import { VariablesListHeader } from "features/apiClient/screens/environment/components/VariablesListHeader/VariablesListHeader";
-import { toast } from "utils/Toast";
-import { useHasUnsavedChanges } from "hooks";
+import { useSaveBuffer } from "features/apiClient/slices/buffer/hooks";
+import { useBufferedCollectionEntity, useIsBufferDirty } from "features/apiClient/slices/entities/hooks";
+import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
+import type { ApiClientRootState } from "features/apiClient/slices/hooks/types";
 import { trackVariablesSaved } from "modules/analytics/events/features/apiClient";
-import { useGenericState } from "hooks/useGenericState";
-import { convertEnvironmentToMap, mapToEnvironmentArray } from "features/apiClient/screens/environment/utils";
-import "./collectionsVariablesView.scss";
-import { useCommand } from "features/apiClient/commands";
-import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
-import { CollectionRecordState } from "features/apiClient/store/apiRecords/apiRecords.store";
-import { useVariableStore } from "features/apiClient/hooks/useVariable.hook";
-import { NativeError } from "errors/NativeError";
+import type React from "react";
+import { useCallback, useState } from "react";
+import { toast } from "utils/Toast";
+import { TAB_KEYS } from "../../CollectionView";
 import { CollectionsVariablesList } from "../CollectionsVariablesList";
-import { VariableRow } from "features/apiClient/screens/environment/components/VariablesList/VariablesList";
+import "./collectionsVariablesView.scss";
 
 interface CollectionsVariablesViewProps {
-  collection: RQAPI.CollectionRecord;
+  collectionId: string;
+  activeTabKey: string;
 }
 
-export const CollectionsVariablesView: React.FC<CollectionsVariablesViewProps> = ({ collection }) => {
-  const getRecord = useAPIRecords((s) => s.getRecordStore);
-
-  const collectionRecord = getRecord(collection.id);
-  if (!collectionRecord) throw new NativeError(`Collection Record ${collection.id} not found`);
-  const collectionRecordState = collectionRecord.getState() as CollectionRecordState;
-
-  const variablesMap = useVariableStore(collectionRecordState.collectionVariables);
-  const variables = useMemo(() => Object.fromEntries(variablesMap.data), [variablesMap]);
-
-  const {
-    api: { setCollectionVariables },
-  } = useCommand();
-  const pendingVariablesRef = useRef<VariableRow[]>([]);
-
-  const [pendingVariables, setPendingVariables] = useState(mapToEnvironmentArray(variables) || []);
+export const CollectionsVariablesView: React.FC<CollectionsVariablesViewProps> = ({ collectionId, activeTabKey }) => {
   const [searchValue, setSearchValue] = useState("");
   const [isSaving, setIsSaving] = useState(false);
 
-  const { setPreview, setUnsaved } = useGenericState();
-  const { hasUnsavedChanges, resetChanges } = useHasUnsavedChanges(pendingVariables);
+  const isActiveInnerTab = activeTabKey === TAB_KEYS.VARIABLES;
 
-  useEffect(() => {
-    setUnsaved(hasUnsavedChanges);
+  const entity = useBufferedCollectionEntity(collectionId);
+  const name = useApiClientSelector((s) => entity.getName(s));
 
-    if (hasUnsavedChanges) {
-      setPreview(false);
-    }
-  }, [setUnsaved, setPreview, hasUnsavedChanges]);
+  // Get variables from buffered entity
+  const variables = entity.variables;
+  const variablesData = useApiClientSelector((state: ApiClientRootState) => variables.getAll(state));
 
-  useEffect(() => {
-    if (!isSaving) {
-      handleSetPendingVariables(
-        pendingVariablesRef.current.length > 0 ? pendingVariablesRef.current : mapToEnvironmentArray(variables)
-      );
-    }
-  }, [collection.id, collection?.data?.variables, variables, isSaving]);
+  // Track dirty state using dedicated hook
+  const hasUnsavedChanges = useIsBufferDirty({
+    referenceId: collectionId,
+    type: "referenceId",
+  });
 
-  const handleSetPendingVariables = (variables: VariableRow[]) => {
-    setPendingVariables(variables);
-    pendingVariablesRef.current = variables;
-  };
+  const saveBuffer = useSaveBuffer();
 
-  const handleSaveVariables = async () => {
-    setIsSaving(true);
-
-    const variablesToSave = convertEnvironmentToMap(pendingVariables);
-    return setCollectionVariables({
-      collectionId: collection.id,
-      variables: variablesToSave,
-    })
-      .then(() => {
-        toast.success("Variables updated successfully");
-        trackVariablesSaved({
-          type: "collection_variable",
-          num_variables: pendingVariables.length,
-        });
-
-        resetChanges();
-      })
-      .catch((error) => {
-        toast.error("Failed to update variables");
-        console.error("Failed to updated variables: ", error);
-      })
-      .finally(() => {
-        setIsSaving(false);
-      });
-  };
+  // Save handler
+  const handleSaveVariables = useCallback(async () => {
+    saveBuffer(
+      {
+        entity,
+        async save(changes, repositories) {
+          await repositories.apiClientRecordsRepository.updateRecord(changes, changes.id);
+        },
+      },
+      {
+        onError(error) {
+          console.error("Failed to update variables", error);
+          notification.error({
+            message: "Failed to update variables",
+            description: error?.message || "An unexpected error occurred",
+            placement: "bottomRight",
+          });
+        },
+        onSuccess(changes) {
+          toast.success("Variables updated successfully");
+          trackVariablesSaved({
+            type: "collection_variable",
+            num_variables: Object.keys(changes.data.variables ?? {}).length,
+          });
+        },
+        beforeSave() {
+          setIsSaving(true);
+        },
+        afterSave() {
+          setIsSaving(false);
+        },
+      }
+    );
+  }, [entity, saveBuffer]);
 
   return (
     <div className="collection-variables-view">
@@ -94,15 +79,16 @@ export const CollectionsVariablesView: React.FC<CollectionsVariablesViewProps> =
         hideBreadcrumb
         searchValue={searchValue}
         onSearchValueChange={setSearchValue}
-        currentEnvironmentName={collection.name}
-        environmentId={collection.id}
+        currentEnvironmentName={name}
+        environmentId={collectionId}
         onSave={handleSaveVariables}
         hasUnsavedChanges={hasUnsavedChanges}
         isSaving={isSaving}
+        isActiveInnerTab={isActiveInnerTab}
       />
       <CollectionsVariablesList
-        variables={pendingVariables}
-        onVariablesChange={handleSetPendingVariables}
+        variablesData={variablesData}
+        variables={variables}
         searchValue={searchValue}
         onSearchValueChange={setSearchValue}
       />

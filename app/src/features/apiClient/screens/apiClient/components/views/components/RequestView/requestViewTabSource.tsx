@@ -6,8 +6,7 @@ import { MatchedTabSource, TabSourceMetadata } from "componentsV2/Tabs/types";
 import { MdOutlineSyncAlt } from "@react-icons/all-files/md/MdOutlineSyncAlt";
 import { GrGraphQl } from "@react-icons/all-files/gr/GrGraphQl";
 import { ReactNode } from "react";
-import { getApiClientRecordsStore } from "features/apiClient/commands/store.utils";
-import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
+import { getApiClientFeatureContext, selectRecordById, EntityNotFound } from "features/apiClient/slices";
 
 interface RequestViewTabSourceMetadata extends TabSourceMetadata {
   apiEntryDetails?: RQAPI.ApiRecord;
@@ -16,9 +15,7 @@ interface RequestViewTabSourceMetadata extends TabSourceMetadata {
 export class RequestViewTabSource extends BaseTabSource {
   constructor(metadata: RequestViewTabSourceMetadata) {
     super();
-    this.component = (
-      <RequestView key={metadata.id} requestId={metadata.id} apiEntryDetails={metadata.apiEntryDetails} />
-    );
+    this.component = <RequestView key={metadata.id} requestId={metadata.id} />;
     this.metadata = {
       ...metadata,
       name: "request",
@@ -29,12 +26,20 @@ export class RequestViewTabSource extends BaseTabSource {
 
   static create(matchedPath: MatchedTabSource["matchedPath"]): RequestViewTabSource {
     const { requestId } = matchedPath.params;
+    const ctx = getApiClientFeatureContext();
 
     if (!requestId) {
       throw new Error("Request id not found!");
     }
 
-    return new RequestViewTabSource({ id: requestId, title: "Request", context: {} });
+    // Validate that the request exists in the store
+    const state = ctx.store.getState();
+    const record = selectRecordById(state, requestId);
+    if (!record) {
+      throw new EntityNotFound(requestId, "request");
+    }
+
+    return new RequestViewTabSource({ id: requestId, title: "Request", context: { id: ctx.workspaceId } });
   }
 
   private getTabIcon(type: RQAPI.ApiEntryType): ReactNode {
@@ -46,11 +51,5 @@ export class RequestViewTabSource extends BaseTabSource {
       default:
         return <MdOutlineSyncAlt />;
     }
-  }
-
-  getIsValidTab(context: ApiClientFeatureContext): boolean {
-    const store = getApiClientRecordsStore(context);
-    const isExist = store.getState().getData(this.metadata.id);
-    return !!isExist;
   }
 }

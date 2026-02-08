@@ -1,46 +1,40 @@
 import { memo, useCallback } from "react";
-import { ScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
+import { useScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
 import { ApiClientUrl } from "features/apiClient/screens/apiClient/components/views/components/request/components/ApiClientUrl/ApiClientUrl";
 import { MdOutlineCheckCircle } from "@react-icons/all-files/md/MdOutlineCheckCircle";
 import { MdOutlineWarningAmber } from "@react-icons/all-files/md/MdOutlineWarningAmber";
 import { Spin, Tooltip } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
-import { useGraphQLRecordStore } from "features/apiClient/hooks/useGraphQLRecordStore";
 import { IoMdRefresh } from "@react-icons/all-files/io/IoMdRefresh";
 import { MdOutlineAddLink } from "@react-icons/all-files/md/MdOutlineAddLink";
 import { RQButton } from "lib/design-system-v2/components";
 import "./graphqlClientUrl.scss";
 import { DEMO_GRAPHQL_API_URL } from "features/apiClient/constants";
+import { useGraphQLRecordStore } from "features/apiClient/hooks/useGraphQLRecordStore";
 import { useGraphQLIntrospection } from "features/apiClient/hooks/useGraphQLIntrospection";
+import { BufferedGraphQLRecordEntity } from "features/apiClient/slices/entities";
+import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
 
 interface GraphQLClientUrlProps {
-  url: string;
-  currentEnvironmentVariables: ScopedVariables;
+  entity: BufferedGraphQLRecordEntity;
   onEnterPress: (e: KeyboardEvent) => void;
   onUrlChange: (value: string) => void;
-  fetchingIntrospectionData: boolean;
-  isIntrospectionDataFetchingFailed: boolean;
 }
 
-const GraphQLClientUrl = ({
-  url,
-  currentEnvironmentVariables,
-  onEnterPress,
-  onUrlChange,
-  fetchingIntrospectionData,
-  isIntrospectionDataFetchingFailed,
-}: GraphQLClientUrlProps) => {
-  const [introspectionData, updateEntryRequest] = useGraphQLRecordStore((state) => [
-    state.introspectionData,
-    state.updateEntryRequest,
-  ]);
-  const { introspectAndSaveSchema } = useGraphQLIntrospection();
+const GraphQLClientUrl = ({ entity, onEnterPress, onUrlChange }: GraphQLClientUrlProps) => {
+  const url = useApiClientSelector((s) => entity.getUrl(s));
+  const currentEnvironmentVariables = useScopedVariables(entity.meta.referenceId);
 
+  const [introspectionData, isFetchingIntrospectionData, hasIntrospectionFailed] = useGraphQLRecordStore((state) => [
+    state.introspectionData,
+    state.isFetchingIntrospectionData,
+    state.hasIntrospectionFailed,
+  ]);
+
+  const { introspectAndSaveSchema } = useGraphQLIntrospection({ recordId: entity.meta.referenceId, url });
   const handleUseExampleUrl = useCallback(() => {
-    updateEntryRequest({
-      url: DEMO_GRAPHQL_API_URL,
-    });
-  }, [updateEntryRequest]);
+    onUrlChange(DEMO_GRAPHQL_API_URL);
+  }, [onUrlChange]);
 
   return (
     <div className="gql-url-container">
@@ -63,7 +57,7 @@ const GraphQLClientUrl = ({
             Use example URL
           </RQButton>
         ) : null}
-        {!fetchingIntrospectionData && url.length ? (
+        {!isFetchingIntrospectionData && url.length ? (
           <RQButton
             className="ant-btn-sm"
             size="small"
@@ -74,14 +68,14 @@ const GraphQLClientUrl = ({
             Refresh
           </RQButton>
         ) : null}
-        {fetchingIntrospectionData ? (
+        {isFetchingIntrospectionData ? (
           <div className="gql-url-container__loading">
             <Spin indicator={<LoadingOutlined spin />} size="small" />
             <span>Fetching schema</span>
           </div>
         ) : (
           <div className="gql-url__fetch-status">
-            {isIntrospectionDataFetchingFailed ? (
+            {hasIntrospectionFailed ? (
               <Tooltip
                 color="#000"
                 title="Error while fetching the schema. The endpoint may not exist or misconfigured."

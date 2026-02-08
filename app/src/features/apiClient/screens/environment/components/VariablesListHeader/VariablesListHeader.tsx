@@ -1,25 +1,28 @@
 import React from "react";
-import { Input, Dropdown } from "antd";
+import { Input, Dropdown, notification } from "antd";
 import { MdOutlineSearch } from "@react-icons/all-files/md/MdOutlineSearch";
 import { RQBreadcrumb, RQButton } from "lib/design-system-v2/components";
 import PATHS from "config/constants/sub/paths";
 import { isGlobalEnvironment } from "../../utils";
 import { KEYBOARD_SHORTCUTS } from "../../../../../../constants/keyboardShortcuts";
 import { RoleBasedComponent } from "features/rbac";
-import { useGenericState } from "hooks/useGenericState";
-import { useCommand } from "features/apiClient/commands";
 import "./variablesListHeader.scss";
 import RequestlyIcon from "assets/img/brand/rq_logo.svg";
 import PostmanIcon from "assets/img/brand/postman-icon.svg";
 import { toast } from "utils/Toast";
+import { updateEnvironmentName, useApiClientRepository } from "features/apiClient/slices";
+import { useApiClientDispatch } from "features/apiClient/slices/hooks/base.hooks";
+import { useHostContext } from "hooks/useHostContext";
 
 interface VariablesListHeaderProps {
   searchValue: string;
   currentEnvironmentName: string;
   environmentId: string;
-  hasUnsavedChanges: boolean;
   hideBreadcrumb?: boolean;
-  isSaving: boolean;
+  hasUnsavedChanges?: boolean;
+  isSaving?: boolean;
+  isNewEnvironment?: boolean;
+  isActiveInnerTab?: boolean;
   exportActions?: {
     showExport: boolean;
     enableExport: boolean;
@@ -34,28 +37,39 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
   searchValue,
   onSearchValueChange,
   environmentId,
-  hasUnsavedChanges,
-  isSaving,
   currentEnvironmentName = "New",
   hideBreadcrumb = false,
   onSave,
   exportActions,
+  hasUnsavedChanges,
+  isSaving,
+  isNewEnvironment,
+  isActiveInnerTab = true,
 }) => {
-  const {
-    env: { renameEnvironment },
-  } = useCommand();
-  const { setTitle, getIsActive, getIsNew, setIsNew } = useGenericState();
-  const enableHotKey = getIsActive();
-  const isNewEnvironment = getIsNew();
+  const dispatch = useApiClientDispatch();
+  const repos = useApiClientRepository();
+  const contextID = useHostContext();
+  const enableHotKey = contextID.getIsActive() && isActiveInnerTab;
 
   const handleNewEnvironmentNameChange = async (newName: string) => {
     try {
       const updatedName = newName || "New Environment";
 
-      await renameEnvironment({ environmentId, newName: updatedName });
-      setTitle(updatedName);
+      await dispatch(
+        updateEnvironmentName({
+          environmentId,
+          name: updatedName,
+          repository: repos.environmentVariablesRepository,
+        })
+      ).unwrap();
+
+      toast.success("Environment name updated successfully");
     } catch (error) {
-      toast.error(error.message || "Could not rename environment!");
+      notification.error({
+        message: "Failed to update environment name",
+        description: error?.message || "An unexpected error occurred",
+        placement: "bottomRight",
+      });
     }
   };
 
@@ -69,7 +83,6 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
             recordName={currentEnvironmentName}
             onBlur={(newName) => {
               handleNewEnvironmentNameChange(newName);
-              setIsNew(false);
             }}
             disabled={isGlobalEnvironment(environmentId)}
             defaultBreadcrumbs={[
@@ -132,7 +145,7 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
 
           <RQButton
             showHotKeyText
-            hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SAVE_ENVIRONMENT.hotKey}
+            hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SAVE_ENVIRONMENT?.hotKey}
             enableHotKey={enableHotKey}
             type="primary"
             onClick={onSave}

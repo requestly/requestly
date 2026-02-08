@@ -12,14 +12,13 @@ import {
   filterRecordsBySearch,
   getRecordIdsToBeExpanded,
   filterOutChildrenRecords,
-  processRecordsForDuplication,
 } from "../../../../utils";
 import { ApiRecordEmptyState } from "./apiRecordEmptyState/ApiRecordEmptyState";
 import { SidebarPlaceholderItem } from "../SidebarPlaceholderItem/SidebarPlaceholderItem";
 import { sessionStorage } from "utils/sessionStorage";
 import { SidebarListHeader } from "../sidebarListHeader/SidebarListHeader";
 import "./collectionsList.scss";
-import { head, isEmpty, union } from "lodash";
+import { debounce, head, isEmpty, union } from "lodash";
 import { SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY } from "features/apiClient/constants";
 import { ApiClientExportModal } from "../../../modals/exportModal/ApiClientExportModal";
 import { PostmanExportModal } from "../../../modals/postmanCollectionExportModal/PostmanCollectionExportModal";
@@ -28,11 +27,13 @@ import { MoveToCollectionModal } from "../../../modals/MoveToCollectionModal/Mov
 import ActionMenu from "./BulkActionsMenu";
 import { useRBAC } from "features/rbac";
 import * as Sentry from "@sentry/react";
-import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
-import { EXPANDED_RECORD_IDS_UPDATED } from "features/apiClient/exampleCollections/store";
 import { ExampleCollectionsNudge } from "../ExampleCollectionsNudge/ExampleCollectionsNudge";
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
-import { useApiClientRepository } from "features/apiClient/contexts/meta";
+import { submitAttrUtil } from "utils/AnalyticsUtils";
+import APP_CONSTANTS from "config/constants";
+import { duplicateRecords, useAllRecords, useApiClientRepository, useChildToParent } from "features/apiClient/slices";
+import { useApiClientDispatch } from "features/apiClient/slices/hooks/base.hooks";
+import { EXPANDED_RECORD_IDS_UPDATED } from "features/apiClient/slices/exampleCollections";
 
 interface Props {
   onNewClick: (src: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType) => Promise<void>;
@@ -40,15 +41,25 @@ interface Props {
   handleRecordsToBeDeleted: (records: RQAPI.ApiClientRecord[]) => void;
 }
 
+const trackUserProperties = (records: RQAPI.ApiClientRecord[]) => {
+  const totalCollections = records.filter((record) => isApiCollection(record)).length;
+  const totalRequests = records.length - totalCollections;
+  submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_COLLECTIONS, totalCollections);
+  submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_REQUESTS, totalRequests);
+};
+
 export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCreated, handleRecordsToBeDeleted }) => {
   const { collectionId, requestId } = useParams();
   const { validatePermission } = useRBAC();
   const { isValidPermission } = validatePermission("api_client_request", "create");
-  const [apiClientRecords, childParentMap] = useAPIRecords((state) => [state.apiClientRecords, state.childParentMap]);
+  const apiClientRecords = useAllRecords();
+  const childParentMap = useChildToParent();
+
   const { isRecordBeingCreated } = useApiClientContext();
-  const { onSaveRecord, onSaveBulkRecords } = useNewApiClientContext();
+  const { onSaveRecord } = useNewApiClientContext();
 
   const { apiClientRecordsRepository } = useApiClientRepository();
+  const dispatch = useApiClientDispatch();
 
   const [collectionsToExport, setCollectionsToExport] = useState<RQAPI.ApiClientRecord[]>([]);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
@@ -61,6 +72,18 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
   );
   const [searchValue, setSearchValue] = useState("");
   const [isAllRecordsSelected, setIsAllRecordsSelected] = useState(false);
+
+  const debouncedTrackUserProperties = useMemo(
+    () => debounce(() => trackUserProperties(apiClientRecords), 1000),
+    [] // Empty deps - debounce function should be stable
+  );
+
+  useEffect(() => {
+    debouncedTrackUserProperties();
+    return () => {
+      debouncedTrackUserProperties.cancel();
+    };
+  }, [apiClientRecords, debouncedTrackUserProperties]);
 
   useEffect(() => {
     const handleUpdates = () => {
@@ -117,10 +140,10 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
       filteredRecords.forEach((record) => {
         if (record.collectionId) {
           recordsToExpand.push(record.collectionId);
-          let parentId = childParentMap.get(record.collectionId);
+          let parentId = childParentMap[record.collectionId];
           while (parentId) {
             recordsToExpand.push(parentId);
-            parentId = childParentMap.get(parentId);
+            parentId = childParentMap[parentId];
           }
         }
       });
@@ -184,13 +207,18 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
       const processedRecords = filterOutChildrenRecords(selectedRecords, childParentMap, updatedRecords.recordsMap);
       switch (action) {
         case BulkActions.DUPLICATE: {
-          const recordsToDuplicate = processRecordsForDuplication(processedRecords, apiClientRecordsRepository);
-
           try {
-            const result = await apiClientRecordsRepository.duplicateApiEntities(recordsToDuplicate);
+            const { duplicatedRecords } = await dispatch(
+              duplicateRecords({
+                recordIds: selectedRecords,
+                repository: apiClientRecordsRepository,
+              })
+            ).unwrap();
 
             toast.success("Records Duplicated successfully");
-            result.length === 1 ? onSaveRecord(head(result)!, "open") : onSaveBulkRecords(result);
+            if (duplicatedRecords.length === 1) {
+              onSaveRecord(head(duplicatedRecords)!, "open");
+            }
           } catch (error) {
             console.error("Error Duplicating records: ", error);
             notification.error({
@@ -257,9 +285,9 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
       updatedRecords.requests,
       handleRecordsToBeDeleted,
       isAllRecordsSelected,
+      dispatch,
       apiClientRecordsRepository,
       onSaveRecord,
-      onSaveBulkRecords,
       addNestedCollection,
     ]
   );
@@ -292,7 +320,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
         newSelectedRecords: Set<RQAPI.ApiClientRecord["id"]>
       ) => {
         const { recordsMap } = updatedRecords;
-        let parentId = childParentMap.get(recordId);
+        let parentId = childParentMap[recordId];
         while (parentId) {
           const parentRecord = recordsMap[parentId];
           if (!parentRecord || !isApiCollection(parentRecord)) break;
@@ -303,7 +331,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
           } else if (!checked && parentRecord.data.children?.some((child) => !newSelectedRecords.has(child.id))) {
             newSelectedRecords.delete(parentId);
           }
-          parentId = childParentMap.get(parentId);
+          parentId = childParentMap[parentId];
         }
       };
 

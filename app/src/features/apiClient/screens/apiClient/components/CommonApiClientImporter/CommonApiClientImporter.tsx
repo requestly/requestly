@@ -4,13 +4,16 @@ import { FilePicker } from "components/common/FilePicker";
 import { HiOutlineExternalLink } from "@react-icons/all-files/hi/HiOutlineExternalLink";
 import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
 import { Col, Tooltip } from "antd";
-import { RQAPI, ApiClientImporterType } from "@requestly/shared/types/entities/apiClient";
+import { RQAPI, ApiClientImporterType, EnvironmentData } from "@requestly/shared/types/entities/apiClient";
 import { ApiClientImporterMethod, ApiClientImporterOutput } from "@requestly/alternative-importers";
-import { EnvironmentData } from "backend/environment/types";
 import { toast } from "utils/Toast";
-import { getApiClientFeatureContext } from "features/apiClient/commands/store.utils";
-import { useCommand } from "features/apiClient/commands";
-import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
+import {
+  apiRecordsActions,
+  createEnvironment,
+  getApiClientFeatureContext,
+  useApiClientRepository,
+} from "features/apiClient/slices";
+import { useApiClientDispatch } from "features/apiClient/slices/hooks/base.hooks";
 import {
   trackImportFailed,
   trackImportParsed,
@@ -53,13 +56,8 @@ export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = (
   const [environmentsData, setEnvironmentsData] = useState<EnvironmentData[]>([]);
   const [importError, setImportError] = useState<string | null>(null);
 
-  const {
-    repositories: { apiClientRecordsRepository },
-  } = getApiClientFeatureContext();
-  const {
-    env: { createEnvironment },
-  } = useCommand();
-  const { onSaveBulkRecords } = useNewApiClientContext();
+  const { environmentVariablesRepository, apiClientRecordsRepository } = useApiClientRepository();
+  const { dispatch } = getApiClientFeatureContext().store;
 
   const handleResetImport = () => {
     setImportError(null);
@@ -141,16 +139,20 @@ export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = (
 
   const handleImportEnvironments = useCallback(
     async (environments: EnvironmentData[]) => {
-      const importPromises = [];
-      for (const environment of environments) {
-        importPromises.push(
-          createEnvironment({ newEnvironmentName: environment.name, variables: environment.variables })
-        );
-      }
-      const importResults = await Promise.allSettled(importPromises);
-      return importResults;
+      const importPromises = environments.map(async (environment) => {
+        await dispatch(
+          createEnvironment({
+            name: environment.name,
+            variables: environment.variables,
+            repository: environmentVariablesRepository,
+          }) as any
+        ).unwrap();
+        return true;
+      });
+      const results = await Promise.allSettled(importPromises);
+      return results;
     },
-    [createEnvironment]
+    [dispatch, environmentVariablesRepository]
   );
 
   //flatten a single root collection and create mapping
@@ -215,8 +217,8 @@ export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = (
       const successfulCollections: RQAPI.CollectionRecord[] = [];
       let failedCount = 0;
 
-      /* 
-      Iterating over collection sequentially because local sync if we create collections asyncronously,it may break if a sub-collection is created before its parent 
+      /*
+      Iterating over collection sequentially because local sync if we create collections asyncronously,it may break if a sub-collection is created before its parent
       */
       for (const collection of flatCollections) {
         try {
@@ -237,12 +239,7 @@ export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = (
   );
 
   const createAllRequests = useCallback(
-    async (
-      collectionToRequestsMap: Map<string, RQAPI.ApiRecord[]>
-    ): Promise<{
-      successfulRequests: RQAPI.ApiRecord[];
-      failedCount: number;
-    }> => {
+    async (collectionToRequestsMap: Map<string, RQAPI.ApiRecord[]>) => {
       const allRequests: RQAPI.ApiRecord[] = [];
       collectionToRequestsMap.forEach((requests) => {
         allRequests.push(...requests);
@@ -254,7 +251,6 @@ export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = (
 
       try {
         const createdRequests = await apiClientRecordsRepository.batchWriteApiRecords(allRequests);
-
         return { successfulRequests: createdRequests, failedCount: 0 };
       } catch (error) {
         return { successfulRequests: [], failedCount: allRequests.length };
@@ -281,12 +277,14 @@ export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = (
         const { successfulCollections, failedCount: failedCollectionsCount } = await createAllCollections(
           flatCollections
         );
-        onSaveBulkRecords(successfulCollections);
+
+        dispatch(apiRecordsActions.upsertRecords(successfulCollections));
 
         const { successfulRequests, failedCount: failedRequestsCount } = await createAllRequests(
           collectionToRequestsMap
         );
-        onSaveBulkRecords(successfulRequests);
+
+        dispatch(apiRecordsActions.upsertRecords(successfulRequests));
 
         const totalImportedCount = successfulCollections.length + successfulRequests.length;
         const totalFailedCount = failedCollectionsCount + failedRequestsCount;
@@ -316,7 +314,7 @@ export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = (
         };
       }
     },
-    [flattenRootCollection, createAllCollections, onSaveBulkRecords, createAllRequests]
+    [flattenRootCollection, createAllCollections, dispatch, createAllRequests]
   );
 
   const handleImportCollections = useCallback(
@@ -402,7 +400,7 @@ export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = (
           let totalImported = 0;
           let totalFailed = 0;
 
-          if (environmentResults.status === "fulfilled") {
+          if (environmentResults && environmentResults.status === "fulfilled") {
             const envResults = environmentResults.value as PromiseSettledResult<{ id: string; name: string }>[];
             const successfulEnvironments = envResults.filter((result) => result.status === "fulfilled").length;
             totalImported += successfulEnvironments;
@@ -411,7 +409,7 @@ export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = (
             totalFailed += environmentsData.length;
           }
 
-          if (collectionResults.status === "fulfilled") {
+          if (collectionResults && collectionResults.status === "fulfilled") {
             const collectionResult = collectionResults.value as {
               success: boolean;
               importedCount: number;
