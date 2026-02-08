@@ -1,7 +1,8 @@
 import React, { useCallback, useEffect } from "react";
 import { toast } from "utils/Toast";
-import { refreshAllContexts } from "./commands/context/refreshAllContexts.command";
+// import { refreshAllContexts } from "./commands/context/refreshAllContexts.command";
 
+async function refreshAllContexts(): Promise<void> {}
 export const LocalSyncRefreshHandler: React.FC = () => {
   const handleRefresh = useCallback(async () => {
     const result = await refreshAllContexts();

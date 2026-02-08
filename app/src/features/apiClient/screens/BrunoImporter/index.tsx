@@ -1,30 +1,29 @@
-import React, { useCallback, useRef, useState } from "react";
-import { FilePicker } from "components/common/FilePicker";
-import { processBrunoCollectionData } from "./utils";
-import { toast } from "utils/Toast";
-import { RQButton } from "lib/design-system-v2/components";
-import { ApiClientImporterType, RQAPI } from "features/apiClient/types";
 import { IoMdCloseCircleOutline } from "@react-icons/all-files/io/IoMdCloseCircleOutline";
 import { MdCheckCircleOutline } from "@react-icons/all-files/md/MdCheckCircleOutline";
+import { EnvironmentVariableData } from "@requestly/shared/types/entities/apiClient";
+import { SPAN_STATUS_ERROR, SPAN_STATUS_OK } from "@sentry/core";
+import * as Sentry from "@sentry/react";
 import { notification, Row } from "antd";
-import Logger from "lib/logger";
-import "./brunoImporter.scss";
-import { useNavigate } from "react-router-dom";
-import { redirectToApiClient } from "utils/RedirectionUtils";
+import { FilePicker } from "components/common/FilePicker";
+import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
+import { createEnvironment, getApiClientFeatureContext, useApiClientRepository } from "features/apiClient/slices";
+import { ApiClientImporterType, RQAPI } from "features/apiClient/types";
+import { RQButton } from "lib/design-system-v2/components";
 import { RQModal } from "lib/design-system/components";
+import Logger from "lib/logger";
 import {
   trackImportFailed,
   trackImportParsed,
   trackImportParseFailed,
   trackImportSuccess,
 } from "modules/analytics/events/features/apiClient";
-import * as Sentry from "@sentry/react";
-import { useCommand } from "features/apiClient/commands";
-import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
-import { useApiClientRepository } from "features/apiClient/contexts/meta";
-import { EnvironmentVariableData } from "features/apiClient/store/variables/types";
+import React, { useCallback, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { redirectToApiClient } from "utils/RedirectionUtils";
 import { wrapWithCustomSpan } from "utils/sentry";
-import { SPAN_STATUS_ERROR, SPAN_STATUS_OK } from "@sentry/core";
+import { toast } from "utils/Toast";
+import "./brunoImporter.scss";
+import { processBrunoCollectionData } from "./utils";
 
 interface BrunoImporterProps {
   onSuccess?: () => void;
@@ -47,10 +46,8 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
   }>({ collections: [], apis: [], environments: [] });
 
   const { onSaveRecord } = useNewApiClientContext();
-  const { apiClientRecordsRepository } = useApiClientRepository();
-  const {
-    env: { createEnvironment },
-  } = useCommand();
+  const { apiClientRecordsRepository, environmentVariablesRepository } = useApiClientRepository();
+  const { dispatch } = getApiClientFeatureContext().store;
 
   const collectionsCount = useRef(0);
 
@@ -236,10 +233,14 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
 
     try {
       const importPromises = processedFileData.environments.map(async (env) => {
-        return createEnvironment({
-          newEnvironmentName: env.name,
-          variables: env.variables,
-        });
+        await dispatch(
+          createEnvironment({
+            name: env.name,
+            variables: env.variables,
+            repository: environmentVariablesRepository,
+          }) as any
+        ).unwrap();
+        return true;
       });
 
       await Promise.all(importPromises);
@@ -248,7 +249,7 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
       Logger.error("Environment import failed:", error);
       return importedEnvCount;
     }
-  }, [createEnvironment, processedFileData.environments]);
+  }, [processedFileData.environments, dispatch, environmentVariablesRepository]);
 
   const handleImportBrunoData = useCallback(async () => {
     return wrapWithCustomSpan(
@@ -260,14 +261,18 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
       },
       async () => {
         setIsImporting(true);
-        await Promise.all([handleImportEnvironments(), handleImportCollectionsAndApis()])
+        Promise.all([handleImportEnvironments(), handleImportCollectionsAndApis()])
           .then(([importedEnvs, recordsResult]) => {
             if (
               recordsResult.importedApisCount === 0 &&
               importedEnvs === 0 &&
               recordsResult.importedCollectionsCount === 0
             ) {
-              throw new Error("Failed to import Bruno data.");
+              notification.error({
+                message: "Failed to import Bruno data",
+                placement: "bottomRight",
+              });
+              return;
             }
 
             const successMessage = [

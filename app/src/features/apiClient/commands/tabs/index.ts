@@ -1,1 +1,0 @@
-export { closeCorruptedTabs } from "./closeCorruptedTabs";

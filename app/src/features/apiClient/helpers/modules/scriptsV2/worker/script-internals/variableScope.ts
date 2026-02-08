@@ -57,7 +57,12 @@ export class VariableScope {
         ...currentVariables,
         [key]:
           key in currentVariables
-            ? { ...currentVariables[key], localValue: value, isPersisted: !!options?.persist }
+            ? {
+                ...currentVariables[key],
+                localValue: value,
+                isPersisted:
+                  options?.persist !== undefined ? !!options.persist : currentVariables[key].isPersisted ?? false,
+              }
             : { localValue: value, type: typeof value, isPersisted: !!options?.persist },
       });
     } else {

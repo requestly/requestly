@@ -1,12 +1,12 @@
-import React from "react";
 import { Col, Row } from "antd";
-import { RulesCard } from "./components/RulesCard";
-import ApiClientCard from "./components/ApiClientCard";
-import UserAvatar from "../../assets/images/illustrations/avatar.svg?react";
-import { getUserAuthDetails } from "store/slices/global/user/selectors";
+import React from "react";
 import { useSelector } from "react-redux";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
+import UserAvatar from "../../assets/images/illustrations/avatar.svg?react";
 import { APIMockingCard } from "./components/APIMockingCard";
+import { RulesCard } from "./components/RulesCard";
 import { HomeScreenProvider } from "./contexts";
+import ApiClientCard from "./components/ApiClientCard";
 import "./home.scss";
 
 export const Home: React.FC = () => {

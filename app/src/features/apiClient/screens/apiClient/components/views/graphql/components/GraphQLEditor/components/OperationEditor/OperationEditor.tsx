@@ -1,26 +1,22 @@
-import { useGraphQLRecordStore } from "features/apiClient/hooks/useGraphQLRecordStore";
 import { GraphQLEditor } from "../../GraphQLEditor";
 import { useDebounce } from "hooks/useDebounce";
-import { extractOperationNames } from "../../../../utils";
-import { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { parse } from "graphql";
 import { MdClose } from "@react-icons/all-files/md/MdClose";
+import { BufferedGraphQLRecordEntity } from "features/apiClient/slices/entities";
+import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
 import "./operationsEditor.css";
 
-export const OperationEditor = () => {
-  const [operation, introspectionData, updateEntryRequest, updateOperationNames] = useGraphQLRecordStore((state) => [
-    state.entry.request.operation,
-    state.introspectionData,
-    state.updateEntryRequest,
-    state.updateOperationNames,
-  ]);
+interface Props {
+  entity: BufferedGraphQLRecordEntity;
+  introspectionData?: any;
+}
+
+export const OperationEditor: React.FC<Props> = ({ entity, introspectionData }) => {
+  const operation = useApiClientSelector((s) => entity.getOperation(s) || "");
 
   const [isUsingSubscriptionOperation, setIsUsingSubscriptionOperation] = useState(false);
   const [isWarningVisible, setIsWarningVisible] = useState(false);
-
-  const debouncedUpdateOperationNames = useDebounce((operationNames: string[]) => {
-    updateOperationNames(operationNames);
-  }, 500);
 
   const debouncedCheckForSubscriptionOperation = useDebounce(() => {
     if (!operation || typeof operation !== "string") {
@@ -45,17 +41,13 @@ export const OperationEditor = () => {
     }
   }, 500);
 
-  const handleChange = (value: string) => {
-    updateEntryRequest({
-      operation: value,
-    });
-
-    const operationNames = extractOperationNames(value);
-    if (operationNames.length > 0) {
-      debouncedUpdateOperationNames(operationNames);
-    }
-    debouncedCheckForSubscriptionOperation();
-  };
+  const handleChange = useCallback(
+    (value: string) => {
+      entity.setOperation(value);
+      debouncedCheckForSubscriptionOperation();
+    },
+    [entity, debouncedCheckForSubscriptionOperation]
+  );
 
   return (
     <>

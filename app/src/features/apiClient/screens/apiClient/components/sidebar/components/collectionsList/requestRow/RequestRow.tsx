@@ -20,15 +20,14 @@ import { MdContentCopy } from "@react-icons/all-files/md/MdContentCopy";
 import { MdOutlineDelete } from "@react-icons/all-files/md/MdOutlineDelete";
 import { MdMoveDown } from "@react-icons/all-files/md/MdMoveDown";
 import { Conditional } from "components/common/Conditional";
-import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
 import { RequestViewTabSource } from "../../../../views/components/RequestView/requestViewTabSource";
 import { useDrag } from "react-dnd";
 import { GrGraphQl } from "@react-icons/all-files/gr/GrGraphQl";
-import { useContextId } from "features/apiClient/contexts/contextId.context";
-import { useApiClientRepository } from "features/apiClient/contexts/meta";
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
-import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 import { isGraphQLApiRecord, isHttpApiRecord } from "features/apiClient/screens/apiClient/utils";
+import { ApiClientFeatureContext, useApiClientRepository } from "features/apiClient/slices";
+import { useActiveTab, useTabActions } from "componentsV2/Tabs/slice";
+import { useWorkspaceId } from "features/apiClient/common/WorkspaceProvider";
 
 interface Props {
   record: RQAPI.ApiRecord;
@@ -61,6 +60,9 @@ export const HttpMethodIcon = ({ method }: { method: RequestMethod }) => {
 export const GraphQlIcon = () => <GrGraphQl className="graphql-request-icon" />;
 
 export const RequestIcon = ({ record }: { record: RQAPI.ApiRecord }) => {
+  if (!record?.data) {
+    return null;
+  }
   if (isHttpApiRecord(record)) {
     return <HttpMethodIcon method={record.data.request?.method} />;
   } else if (isGraphQLApiRecord(record)) {
@@ -80,33 +82,26 @@ export const RequestRow: React.FC<Props> = ({
   const { selectedRecords, showSelection, recordsSelectionHandler, setShowSelection } = bulkActionOptions || {};
   const [isEditMode, setIsEditMode] = useState(false);
   const [recordToMove, setRecordToMove] = useState<RQAPI.ApiRecord | null>(null);
-
-  const { apiClientRecordsRepository } = useApiClientRepository();
-  const { onSaveRecord } = useNewApiClientContext();
-
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
 
-  const contextId = useContextId();
-  const [activeTabSource, openTab] = useTabServiceWithSelector((state) => [state.activeTabSource, state.openTab]);
-
-  const activeTabSourceId = useMemo(() => {
-    if (activeTabSource) {
-      return activeTabSource.getSourceId();
-    }
-  }, [activeTabSource]);
+  const workspaceId = useWorkspaceId();
+  const { openBufferedTab } = useTabActions();
+  const { onSaveRecord } = useNewApiClientContext();
+  const { apiClientRecordsRepository } = useApiClientRepository();
+  const activeTabSourceId = useActiveTab()?.source.getSourceId();
 
   const [{ isDragging }, drag] = useDrag(
     () => ({
       type: RQAPI.RecordType.API,
       item: {
         record,
-        contextId,
+        workspaceId,
       },
       collect: (monitor) => ({
         isDragging: monitor.isDragging(),
       }),
     }),
-    [record, contextId]
+    [record, workspaceId]
   );
 
   const handleDropdownVisibleChange = (isOpen: boolean) => {
@@ -240,17 +235,16 @@ export const RequestRow: React.FC<Props> = ({
                 return;
               }
 
-              openTab(
-                new RequestViewTabSource({
+              openBufferedTab({
+                source: new RequestViewTabSource({
                   id: record.id,
                   apiEntryDetails: record,
                   title: record.name || record.data.request?.url,
                   context: {
-                    id: contextId,
+                    id: workspaceId,
                   },
                 }),
-                { preview: true }
-              );
+              });
             }}
           >
             {showSelection && (

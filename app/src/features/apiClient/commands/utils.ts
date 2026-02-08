@@ -1,4 +1,5 @@
 import { EnvironmentVariables, EnvironmentVariableType } from "backend/environment/types";
+import { EnvironmentVariableData } from "@requestly/shared/types/entities/apiClient";
 import { RQAPI } from "../types";
 import {
   isApiRequest,
@@ -7,19 +8,23 @@ import {
   convertFlatRecordsToNestedRecords,
   filterOutChildrenRecords,
 } from "../screens/apiClient/utils";
-import { getApiClientFeatureContext, getChildParentMap } from "./store.utils";
 import { isEmpty } from "lodash";
+import { selectAllRecords as selectAllRecordsFromSlice, selectChildToParent } from "../slices/apiRecords/selectors";
+import { Workspace } from "features/workspaces/types";
+import { getApiClientFeatureContext, WorkspaceInfo } from "../slices";
+
+export const NoopContextId = "__stub_context_id";
 
 export function sanitizePatch(patch: EnvironmentVariables) {
   return Object.fromEntries(
-    Object.entries(patch).map(([key, value], index) => {
+    Object.entries(patch).map(([key, value]: [string, EnvironmentVariableData], index) => {
       const typeToSaveInDB =
         value.type === EnvironmentVariableType.Secret
           ? EnvironmentVariableType.Secret
           : (typeof value.syncValue as EnvironmentVariableType);
       return [
         key.trim(),
-        { localValue: value.localValue, syncValue: value.syncValue, type: typeToSaveInDB, id: index },
+        { localValue: value.localValue ?? "", syncValue: value.syncValue ?? "", type: typeToSaveInDB, id: index },
       ];
     })
   );
@@ -76,7 +81,7 @@ export function prepareRecordsToRender(records: RQAPI.ApiClientRecord[]) {
 }
 
 export function getRecordsToExpandBySearchValue(params: {
-  contextId: string;
+  contextId: WorkspaceInfo["id"];
   apiClientRecords: RQAPI.ApiClientRecord[];
   searchValue?: string;
 }): undefined | RQAPI.ApiClientRecord["id"][] {
@@ -87,17 +92,18 @@ export function getRecordsToExpandBySearchValue(params: {
   }
 
   const context = getApiClientFeatureContext(contextId);
-  const childParentMap = getChildParentMap(context);
+  const state = context?.store.getState();
+  const childParentMap = state ? selectChildToParent(state) : {};
   const filteredRecords = filterRecordsBySearch(apiClientRecords, searchValue);
 
   const recordsToExpand: string[] = [];
   filteredRecords.forEach((record) => {
     if (record.collectionId) {
       recordsToExpand.push(record.collectionId);
-      let parentId = childParentMap.get(record.collectionId);
+      let parentId = childParentMap[record.collectionId];
       while (parentId) {
         recordsToExpand.push(parentId);
-        parentId = childParentMap.get(parentId);
+        parentId = childParentMap[parentId];
       }
     }
   });
@@ -114,13 +120,14 @@ export function getRecordsToRender(params: { apiClientRecords: RQAPI.ApiClientRe
   return recordsToRender;
 }
 
-export function selectAllRecords(params: { contextId: string; searchValue: string }) {
+export function selectAllRecords(params: { contextId: WorkspaceInfo["id"]; searchValue: string }) {
   const { contextId, searchValue } = params;
 
   const newSelectedRecords: Set<RQAPI.ApiClientRecord["id"]> = new Set();
 
   const context = getApiClientFeatureContext(contextId);
-  const apiClientRecords = context.stores.records.getState().apiClientRecords;
+  const state = context.store.getState();
+  const apiClientRecords = selectAllRecordsFromSlice(state);
 
   const records = getRecordsToRender({
     apiClientRecords,
@@ -140,17 +147,19 @@ export function selectAllRecords(params: { contextId: string; searchValue: strin
 
 export function getProcessedRecords(contextId: string, selectedRecords: Set<RQAPI.ApiClientRecord["id"]>) {
   const context = getApiClientFeatureContext(contextId);
+  const state = context.store.getState();
 
-  const childParentMap = getChildParentMap(context);
-  const apiClientRecords = context.stores.records.getState().apiClientRecords;
+  const childParentMap = selectChildToParent(state);
+  const apiClientRecords = selectAllRecordsFromSlice(state);
   const records = getRecordsToRender({ apiClientRecords });
 
   return filterOutChildrenRecords(selectedRecords, childParentMap, records.recordsMap);
 }
 
-export const getCollectionOptionsToMoveIn = (contextId: string, recordsToMove: RQAPI.ApiClientRecord[]) => {
-  const context = getApiClientFeatureContext(contextId);
-  const apiClientRecords = context.stores.records.getState().apiClientRecords;
+export const getCollectionOptionsToMoveIn = (workspaceId: Workspace["id"], recordsToMove: RQAPI.ApiClientRecord[]) => {
+  const context = getApiClientFeatureContext(workspaceId);
+  const state = context.store.getState();
+  const apiClientRecords = selectAllRecordsFromSlice(state);
 
   const exclusions = new Set();
 
