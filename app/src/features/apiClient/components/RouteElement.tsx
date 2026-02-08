@@ -1,10 +1,6 @@
 import FEATURES from "config/constants/sub/features";
 import { useMemo } from "react";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
-import {
-  useApiClientMultiWorkspaceView,
-  ApiClientViewMode,
-} from "../store/multiWorkspaceView/multiWorkspaceView.store";
 import { getActiveWorkspace } from "store/slices/workspaces/selectors";
 import { useSelector } from "react-redux";
 import { WorkspaceType } from "features/workspaces/types";
@@ -12,9 +8,10 @@ import { WindowsAndLinuxGatedHoc } from "componentsV2/WindowsAndLinuxGatedHoc";
 import MandatoryUpdateScreen from "components/mode-specific/desktop/UpdateDialog/MandatoryUpdateScreen";
 import ApiClientFeatureContainer from "../container";
 import ApiClientErrorBoundary from "./ErrorBoundary/ErrorBoundary";
+import { ApiClientViewMode, useViewMode } from "../slices";
 
 export const ApiClientRouteElement = () => {
-  const currentViewMode = useApiClientMultiWorkspaceView((state) => state.viewMode);
+  const currentViewMode = useViewMode();
   const activeWorkspace = useSelector(getActiveWorkspace);
   const isApiClientCompatible = useMemo(() => {
     const isOlderDesktopVersion = !isFeatureCompatible(FEATURES.LOCAL_WORKSPACE_COMPATIBILITY);

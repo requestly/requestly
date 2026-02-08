@@ -1,22 +1,22 @@
-import { RQButton } from "lib/design-system-v2/components";
-import React, { useCallback } from "react";
-import "./dataFileModalWrapper.scss";
-import { useRunConfigStore } from "../../../../run.context";
-import { getFileExtension } from "features/apiClient/screens/apiClient/utils";
-import { DataFileView } from "./DataFileView";
-import { WarningView } from "./WarningView";
-import { ErroredStateView } from "./ErroredStateView";
-import { LargeFileView } from "./LargeFileView";
-import { LoadingView } from "./LoadingView";
-import { FileFeature } from "features/apiClient/store/apiClientFilesStore";
-import { useDataFileModalContext, DataFileModalViewMode } from "./DataFileModalContext";
-import { RQModal } from "lib/design-system/components";
 import { MdOutlineClose } from "@react-icons/all-files/md/MdOutlineClose";
+import { API_CLIENT_DOCS } from "features/apiClient/constants";
+import { getFileExtension } from "features/apiClient/screens/apiClient/utils";
+import { FileFeature } from "features/apiClient/store/apiClientFilesStore";
+import { RQButton } from "lib/design-system-v2/components";
+import { RQModal } from "lib/design-system/components";
 import {
   trackCollectionRunnerFileCleared,
   trackCollectionRunnerTruncatedFileUsed,
 } from "modules/analytics/events/features/apiClient";
-import { API_CLIENT_DOCS } from "features/apiClient/constants";
+import React, { useCallback } from "react";
+import { useCollectionView } from "../../../../../../collectionView.context";
+import { DataFileModalViewMode, useDataFileModalContext } from "./DataFileModalContext";
+import "./dataFileModalWrapper.scss";
+import { DataFileView } from "./DataFileView";
+import { ErroredStateView } from "./ErroredStateView";
+import { LargeFileView } from "./LargeFileView";
+import { LoadingView } from "./LoadingView";
+import { WarningView } from "./WarningView";
 
 interface buttonSchema {
   label: string;
@@ -87,20 +87,15 @@ interface PreviewModalProps {
 
 export const DataFileModalWrapper: React.FC<PreviewModalProps> = ({ onClose, onFileSelected }) => {
   const { viewMode, parsedData, dataFileMetadata } = useDataFileModalContext();
-
-  const [removeDataFile, setDataFile, setIterations] = useRunConfigStore((s) => [
-    s.removeDataFile,
-    s.setDataFile,
-    s.setIterations,
-  ]);
+  const { bufferedEntity } = useCollectionView();
 
   const confirmUseDataFile = useCallback(() => {
     if (!dataFileMetadata) return;
     // remove previously set data file
-    removeDataFile();
+    bufferedEntity.removeDataFile();
 
     const fileId = dataFileMetadata.name + "-" + Date.now();
-    setDataFile({
+    bufferedEntity.setDataFile({
       id: fileId,
       name: dataFileMetadata.name,
       path: dataFileMetadata.path,
@@ -109,16 +104,16 @@ export const DataFileModalWrapper: React.FC<PreviewModalProps> = ({ onClose, onF
       fileFeature: FileFeature.COLLECTION_RUNNER,
     });
     if (parsedData) {
-      setIterations(parsedData.data.length > 0 ? parsedData.data.length : 1);
+      bufferedEntity.setIterations(parsedData.data.length > 0 ? parsedData.data.length : 1);
     }
     onClose(); // Close modal immediately after confirming
-  }, [removeDataFile, dataFileMetadata, setDataFile, setIterations, onClose, parsedData]);
+  }, [dataFileMetadata, bufferedEntity, onClose, parsedData]);
 
   const handleDataFileRemoval = useCallback(() => {
-    removeDataFile();
-    setIterations(1);
+    bufferedEntity.removeDataFile();
+    bufferedEntity.setIterations(1);
     onClose();
-  }, [onClose, removeDataFile, setIterations]);
+  }, [onClose, bufferedEntity]);
 
   const buttonOptions = (): buttonTypes => {
     switch (viewMode) {

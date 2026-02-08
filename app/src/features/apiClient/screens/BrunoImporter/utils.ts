@@ -3,8 +3,8 @@ import { KeyValuePair, RequestContentType, RequestMethod, RQAPI } from "features
 import { Bruno } from "./types";
 import { Authorization } from "../apiClient/components/views/components/request/components/AuthorizationView/types/AuthConfig";
 import { ApiClientRecordsInterface } from "features/apiClient/helpers/modules/sync/interfaces";
-import { EnvironmentVariableData } from "features/apiClient/store/variables/types";
 import { createBodyContainer } from "../apiClient/utils";
+import { EnvironmentVariableData } from "@requestly/shared/types/entities/apiClient";
 
 export const processBrunoScripts = (request: Bruno.Request) => {
   const scripts = {
