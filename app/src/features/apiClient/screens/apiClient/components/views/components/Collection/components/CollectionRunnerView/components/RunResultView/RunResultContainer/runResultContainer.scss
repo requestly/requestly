@@ -37,12 +37,24 @@
 }
 
 .breadcrumb-ellipsis {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px 4px;
+  border-radius: 4px;
+  text-align: center;
+
   &:hover {
-    border-radius: 4px;
     background: var(--alias-tokens-color-white-t-20, rgba(255, 255, 255, 0.12));
-    padding: 0px 4px 4px;
-    text-align: center;
   }
+}
+
+.breadcrumb-dropdown-item {
+  display: block;
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .run-result-view-details {
@@ -337,6 +349,7 @@
 
           .request-method-breadcrumb-section {
             display: flex;
+            align-items: center;
           }
 
           .icon {
@@ -370,6 +383,13 @@
 
           .root-collection-name {
             font-size: var(--requestly-font-size-sm);
+            display: inline-block;
+            max-width: 140px;
+            line-height: 17px; /* match request-name */
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            vertical-align: middle;
           }
 
           .collection-name {
@@ -386,19 +406,19 @@
           }
 
           .request-name {
-            display: -webkit-box;
-            -webkit-box-orient: vertical;
-            -webkit-line-clamp: 1;
-            line-clamp: 1;
+            display: inline-block;
+            max-width: 180px;
             overflow: hidden;
             text-overflow: ellipsis;
+            white-space: nowrap;
             color: var(--requestly-color-text-default, #fff);
             font-size: var(--requestly-font-size-sm, 12px);
             font-weight: 500;
             line-height: 17px; /* 150% */
             margin-right: 4px;
             cursor: pointer;
-            margin-top: 3px;
+            margin-top: 1px;
+            vertical-align: middle;
           }
 
           .response-details {

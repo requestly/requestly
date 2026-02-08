@@ -57,14 +57,20 @@ export const RequestBreadcrumb: React.FC<RequestBreadcrumbProps> = ({
   return (
     <Breadcrumb separator={breadCrumbSeperator} className={className}>
       <Breadcrumb.Item>
-        <span className="root-collection-name">{collectionPath[0]?.name}</span>
+        <span className="root-collection-name" title={collectionPath[0]?.name}>
+          {collectionPath[0]?.name}
+        </span>
       </Breadcrumb.Item>
       {showFullPath && depth > 1 && (
         <Breadcrumb.Item
           menu={{
             items: collectionPath.slice(1).map((collection) => ({
               key: collection.id,
-              label: collection.name,
+              label: (
+                <span className="breadcrumb-dropdown-item" title={collection.name}>
+                  {collection.name}
+                </span>
+              ),
             })),
           }}
           className="breadcrumb-ellipsis"
