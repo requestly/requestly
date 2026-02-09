@@ -90,6 +90,7 @@
   .ant-tabs {
     .ant-tabs-nav-wrap {
       padding: 0 16px;
+
       .ant-tabs-tab {
         padding: 6px 4px;
       }
@@ -188,11 +189,13 @@
     justify-content: center;
   }
 
-  .api-response-status-line {
+  .api-response-status-row {
     font-size: var(--requestly-font-size-xs);
     display: flex;
     align-items: center;
     gap: 8px;
+    border-right: 1px solid var(--requestly-color-white-t-20);
+    padding-right: var(--requestly-space-4);
 
     .ant-space-item {
       display: flex;

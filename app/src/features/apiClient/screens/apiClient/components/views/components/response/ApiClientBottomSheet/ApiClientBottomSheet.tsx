@@ -16,9 +16,6 @@ import { RequestError } from "../../errors/RequestError";
 import { ApiClientWarningPanel } from "../../errors/ApiClientWarningPanel/ApiClientWarningPanel";
 import "./apiclientBottomSheet.scss";
 import { ApiClientLargeFileLoader } from "../../../../clientView/components/response/LargeFileLoadingPlaceholder";
-import { MdDataObject } from "@react-icons/all-files/md/MdDataObject";
-import { PiTag } from "@react-icons/all-files/pi/PiTag";
-import { MdOutlineScience } from "@react-icons/all-files/md/MdOutlineScience";
 import { BottomSheetTabLabel } from "componentsV2/BottomSheet/components/BottomSheetLayout/components/BottomSheetTabLabel/BottomSheetTabLabel";
 
 interface Props {
@@ -87,7 +84,6 @@ export const ApiClientBottomSheet: React.FC<Props> = ({
         label: (
           <BottomSheetTabLabel label="Body">
             <span className="bottom-sheet-tab">
-              <MdDataObject />
               <span>Body</span>
             </span>
           </BottomSheetTabLabel>
@@ -99,7 +95,6 @@ export const ApiClientBottomSheet: React.FC<Props> = ({
         label: (
           <BottomSheetTabLabel label="Headers">
             <span className="bottom-sheet-tab">
-              <PiTag />
               <span>
                 Headers {response?.headers?.length ? <Tag className="count">{response?.headers?.length}</Tag> : null}
               </span>
@@ -113,7 +108,6 @@ export const ApiClientBottomSheet: React.FC<Props> = ({
         label: (
           <BottomSheetTabLabel label="Test results">
             <span className="bottom-sheet-tab">
-              <MdOutlineScience />
               <span>Test results {testResultsStats}</span>
             </span>
           </BottomSheetTabLabel>

@@ -21,4 +21,40 @@
       background-color: var(--requestly-color-error-800);
     }
   }
+
+  .api-client-sheet-panel {
+    .ant-tabs {
+      .ant-tabs-nav-wrap {
+        padding-left: 0;
+      }
+    }
+
+    .api-response-status-row__time {
+      color: var(--requestly-color-text-subtle);
+      font-size: var(--requestly-font-size-xs);
+    }
+
+    .api-response-status-row__redirected {
+      background: var(--requestly-color-surface-2);
+      display: flex;
+      height: 18px;
+      padding: var(--requestly-space-1, 2px) var(--requestly-space-2, 4px);
+      align-items: center;
+      gap: var(--requestly-space-2, 4px);
+      color: var(--requestly-color-text-subtle);
+      font-weight: var(--requestly-font-weight-medium);
+      border-radius: 4px;
+      letter-spacing: 1px;
+      font-size: var(--requestly-font-size-2xs);
+
+      span {
+        align-self: center;
+      }
+
+      svg {
+        width: 12px;
+        height: 12px;
+      }
+    }
+  }
 }
