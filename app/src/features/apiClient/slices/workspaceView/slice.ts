@@ -15,9 +15,10 @@ export const workspaceViewAdapter = createEntityAdapter<WorkspaceState>({
 const workspacesSelectors = workspaceViewAdapter.getSelectors<WorkspaceViewState>((s) => s.selectedWorkspaces);
 
 export const getSelectedWorkspaceIds = workspacesSelectors.selectIds;
-export const getAllSelectedWorkspaces = workspacesSelectors.selectAll;
+export const getAllSelectedWorkspaces = (state: WorkspaceViewState) =>
+  workspacesSelectors.selectAll(state).filter((w): w is WorkspaceState => w !== undefined);
 export const getSelectedWorkspacesEntities = workspacesSelectors.selectEntities;
-export const getSelectedWorkspaceCount = workspacesSelectors.selectTotal;
+export const getSelectedWorkspaceCount = (state: WorkspaceViewState) => getAllSelectedWorkspaces(state).length;
 export const getWorkspaceById = workspacesSelectors.selectById;
 
 export function getIsSelected(state: RootState, id: string) {
