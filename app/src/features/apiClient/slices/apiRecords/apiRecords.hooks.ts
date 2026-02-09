@@ -1,0 +1,116 @@
+import { useMemo } from "react";
+import { shallowEqual } from "react-redux";
+import { RQAPI } from "features/apiClient/types";
+import { EntityId } from "../types";
+import {
+  selectAllRecords,
+  selectRecordById,
+  selectAncestorIds,
+  selectAncestorRecords,
+  selectChildrenIds,
+  selectChildRecords,
+  selectAllDescendantIds,
+  selectAllDescendantApiRecordIds,
+  selectRootRecords,
+  selectCollections,
+  selectApiRecords,
+  selectTotalRecords,
+  selectCollectionPath,
+  makeSelectRecordById,
+  makeSelectChildrenIds,
+  makeSelectAncestorIds,
+  selectChildToParent,
+} from "./selectors";
+import { useApiClientSelector } from "../hooks/base.hooks";
+
+export function useAllRecords(): RQAPI.ApiClientRecord[] {
+  return useApiClientSelector(selectAllRecords);
+}
+
+export function useRecordById(id: EntityId): RQAPI.ApiClientRecord | undefined {
+  return useApiClientSelector((state) => selectRecordById(state, id));
+}
+
+export function useRecordByIdMemoized(id: EntityId): RQAPI.ApiClientRecord | undefined {
+  const selectRecord = useMemo(makeSelectRecordById, []);
+  return useApiClientSelector((state) => selectRecord(state, id)) ?? undefined;
+}
+
+export function useAncestorIds(id: EntityId): EntityId[] {
+  return useApiClientSelector((state) => selectAncestorIds(state, id));
+}
+
+export function useAncestorIdsMemoized(id: EntityId): EntityId[] {
+  const selectAncestors = useMemo(makeSelectAncestorIds, []);
+  return useApiClientSelector((state) => selectAncestors(state, id));
+}
+
+export function useAncestorRecords(id: EntityId): RQAPI.ApiClientRecord[] {
+  return useApiClientSelector((state) => selectAncestorRecords(state, id));
+}
+
+export function useChildrenIds(id: EntityId): EntityId[] {
+  return useApiClientSelector((state) => selectChildrenIds(state, id));
+}
+
+export function useChildrenIdsMemoized(id: EntityId): EntityId[] {
+  const selectChildren = useMemo(makeSelectChildrenIds, []);
+  return useApiClientSelector((state) => selectChildren(state, id));
+}
+
+export function useChildRecords(id: EntityId): RQAPI.ApiClientRecord[] {
+  return useApiClientSelector((state) => selectChildRecords(state, id));
+}
+
+export function useAllDescendantIds(id: EntityId): EntityId[] {
+  return useApiClientSelector((state) => selectAllDescendantIds(state, id));
+}
+
+export function useAllDescendantApiRecordIds(id: EntityId): EntityId[] {
+  return useApiClientSelector((state) => selectAllDescendantApiRecordIds(state, id), shallowEqual);
+}
+
+export function useRootRecords(): RQAPI.ApiClientRecord[] {
+  return useApiClientSelector(selectRootRecords);
+}
+
+export function useCollections(): RQAPI.CollectionRecord[] {
+  return useApiClientSelector(selectCollections);
+}
+
+export function useApiRecordsOnly(): RQAPI.ApiRecord[] {
+  return useApiClientSelector(selectApiRecords);
+}
+
+export function useTotalRecords(): number {
+  return useApiClientSelector(selectTotalRecords);
+}
+
+export function useCollectionPath(id: EntityId): RQAPI.ApiClientRecord[] {
+  return useApiClientSelector((state) => selectCollectionPath(state, id));
+}
+
+export function useChildToParent() {
+  return useApiClientSelector(selectChildToParent);
+}
+
+export function useCollectionIdByRecordId(recordId: EntityId | undefined): string | undefined {
+  return useApiClientSelector((state) => {
+    if (!recordId) return undefined;
+
+    const record = selectRecordById(state, recordId);
+    if (!record) return undefined;
+
+    // If the current record is a collection, use its ID
+    if (record.type === RQAPI.RecordType.COLLECTION) {
+      return record.id;
+    }
+
+    // If the current record is a request, use its parent collection ID
+    if (record.type === RQAPI.RecordType.API) {
+      return record.collectionId || undefined;
+    }
+
+    return undefined;
+  });
+}

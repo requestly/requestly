@@ -41,6 +41,7 @@ async function _addRunResultInFirebase(
 
     return { success: true, data: savedRunResult };
   } catch (e) {
+    console.log(e);
     Sentry.captureException(e, {
       extra: { collectionId, runResult },
     });

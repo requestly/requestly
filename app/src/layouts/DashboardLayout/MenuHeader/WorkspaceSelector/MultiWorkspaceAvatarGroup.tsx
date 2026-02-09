@@ -1,9 +1,9 @@
 import { Avatar } from "antd";
-import { useApiClientMultiWorkspaceView } from "features/apiClient/store/multiWorkspaceView/multiWorkspaceView.store";
+import { useGetAllSelectedWorkspaces } from "features/apiClient/slices/workspaceView/hooks";
 import React from "react";
 
 export const MultiWorkspaceAvatarGroup: React.FC = () => {
-  const selectedWorkspaces = useApiClientMultiWorkspaceView((s) => s.selectedWorkspaces);
+  const selectedWorkspaces = useGetAllSelectedWorkspaces();
 
   return (
     <div className="workspace-selector-dropdown__content">
@@ -17,18 +17,18 @@ export const MultiWorkspaceAvatarGroup: React.FC = () => {
           fontSize: "var(--requestly-font-size-sm)",
         }}
       >
-        {selectedWorkspaces.map((w) => {
-          const workspace = w.getState();
+        {selectedWorkspaces.map((workspace) => {
+          const avatarText = workspace.id ? workspace.id[0]?.toUpperCase() ?? "?" : "?";
           return (
             <Avatar
               size={20}
-              key={workspace.id}
+              key={workspace.id ?? "private"}
               className="local-workspace-avatar"
               style={{
                 fontSize: "var(--requestly-font-size-sm)",
               }}
             >
-              {workspace.name ? workspace.name[0].toUpperCase() : "?"}
+              {avatarText}
             </Avatar>
           );
         })}

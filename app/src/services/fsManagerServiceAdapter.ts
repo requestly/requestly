@@ -200,15 +200,15 @@ class FsManagerServiceAdapterProvider {
       return fsManagerServiceAdapter;
     }
     try {
-      console.log("calling build", Date.now());
+      // console.log(`calling build for rootPath=${rootPath}`, Date.now());
       await buildFsManager(rootPath);
-      console.log("received build", Date.now());
+      // console.log(`received build for rootPath=${rootPath}`, Date.now());
       const service = new FsManagerServiceAdapter(rootPath);
       this.cache.set(rootPath, service);
       return service;
     } catch (e) {
       const isAccessIssue = (arg: any) => typeof arg === "string" && arg.includes("EACCES:");
-      console.error("build error", e);
+      // console.error(`build error for rootPath=${rootPath}`, e);
       if (isAccessIssue(e) || isAccessIssue(e.message)) {
         throw new FsAccessError(e.message || e, rootPath);
       }
@@ -226,7 +226,7 @@ export function buildFsManager(rootPath: string) {
       namespace: LOCAL_SYNC_BUILDER_NAMESPACE,
       method: "build",
       retryCount: 10,
-      timeout: 1000,
+      timeout: 1000 * 30,
     },
     rootPath
   ) as Promise<void>;

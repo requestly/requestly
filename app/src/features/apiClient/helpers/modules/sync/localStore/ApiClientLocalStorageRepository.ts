@@ -11,6 +11,10 @@ export class ApiClientLocalStoreRepository implements ApiClientRepositoryInterfa
     this.environmentVariablesRepository = new LocalStoreEnvSync(meta);
     this.apiClientRecordsRepository = new LocalStoreRecordsSync(meta);
   }
+
+  async validateConnection() {
+    return { isValid: true };
+  }
 }
 
 const localStoreRepository = new ApiClientLocalStoreRepository({ version: 1 });

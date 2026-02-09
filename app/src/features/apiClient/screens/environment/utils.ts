@@ -1,19 +1,53 @@
 import { EnvironmentVariables } from "backend/environment/types";
 import { VariableRow } from "./components/VariablesList/VariablesList";
+import { GLOBAL_ENVIRONMENT_ID } from "features/apiClient/slices/common/constants";
 
 export const isGlobalEnvironment = (environmentId: string) => {
-  // FIXME: isGlobalEnvironment should be a method, which operates on an object or a flag.
   if (!environmentId) {
     return false;
   }
-  return environmentId === "global" || environmentId.endsWith("/environments/global.json");
+  // Standardized to use constant
+  return environmentId === GLOBAL_ENVIRONMENT_ID || environmentId.endsWith("/environments/global.json");
 };
 
-export const mapToEnvironmentArray = (variables: EnvironmentVariables): VariableRow[] => {
-  return Object.keys(variables).map((key) => ({
-    key,
-    ...variables[key],
-  }));
+export const mapToEnvironmentArray = (variables: EnvironmentVariables, order?: string[]): VariableRow[] => {
+  // If order is provided, use it
+  if (order && order.length > 0) {
+    const orderedKeys = new Set(order);
+
+    // Build ordered list first
+    const orderedVariables = order
+      .filter((key) => key in variables) // Use "in" to detect existing keys even if falsy
+      .map(
+        (key) =>
+          ({
+            key,
+            ...variables[key],
+          } as VariableRow)
+      );
+
+    // Append any remaining keys not in order
+    const remainingVariables = Object.keys(variables)
+      .filter((key) => !orderedKeys.has(key))
+      .map(
+        (key) =>
+          ({
+            key,
+            ...variables[key],
+          } as VariableRow)
+      );
+
+    return [...orderedVariables, ...remainingVariables];
+  }
+
+  // Fallback to Object.keys order (backward compatibility)
+  return Object.keys(variables).map(
+    (key) =>
+      ({
+        key,
+        ...variables[key],
+      } as VariableRow)
+  );
 };
 
 export const convertEnvironmentToMap = (variables: VariableRow[]) => {
