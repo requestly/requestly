@@ -49,7 +49,20 @@ const selectSingleViewWorkspaceError = createSelector([getWorkspaceViewSlice], (
   const workspace = workspaces[0];
 
   if (workspace && !workspace.status.loading && !workspace.status.state.success) {
-    return workspace.status.state.error;
+    const error = workspace.status.state.error;
+
+    // After rehydration from localStorage, errorTransform returns errors as plain objects:
+    // { __isError: true, message: "...", name: "...", stack: "..." }
+    // Reconstruct the Error instance so consumers can throw it normally
+    if (error && typeof error === "object" && "__isError" in error) {
+      const err = new Error(error.message);
+      err.name = error.name;
+      err.stack = error.stack;
+      return err;
+    }
+
+    // Fresh errors (before persistence) are already Error instances
+    return error;
   }
 
   return null;
