@@ -72,7 +72,7 @@
     "@devtools-ds/themes": "^1.2.1",
     "@graphiql/plugin-explorer": "^5.1.1",
     "@growthbook/growthbook-react": "^1.3.1",
-    "@prettier/plugin-xml": "^3.4.2",
+    "@prettier/plugin-xml": "^2.2.0",
     "@react-icons/all-files": "https://github.com/react-icons/react-icons/releases/download/v5.4.0/react-icons-all-files-5.4.0.tgz",
     "@readme/httpsnippet": "^11.0.0",
     "@reduxjs/toolkit": "^1.9.0",
