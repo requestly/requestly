@@ -5,6 +5,12 @@ import { ScopedVariables } from "features/apiClient/helpers/variableResolver/var
 import "./variableAutocompletePopover.scss";
 import { InfoCircleOutlined } from "@ant-design/icons";
 import { getScopeIcon } from "componentsV2/CodeEditor/components/EditorV2/components/VariablePopOver/hooks/useScopeOptions";
+import { flattenVariablesList } from "../../utils";
+import {
+  DynamicVariableInfoPopover,
+  DynamicVariableInfoTypes,
+} from "../DynamicVariableInfoPopover/DynamicVariableInfoPopover";
+
 interface VariableAutocompleteProps {
   show: boolean;
   position: { x: number; y: number };
@@ -15,6 +21,14 @@ interface VariableAutocompleteProps {
   editorRef: React.RefObject<HTMLDivElement | null>;
 }
 
+/**
+ * Legacy wrapper for DynamicVariableInfoPopover component.
+ * Kept for backward compatibility.
+ * @deprecated Use DynamicVariableInfoPopover component directly instead.
+ */
+export const dynamicVariableExample = (variable: DynamicVariableInfoTypes) => (
+  <DynamicVariableInfoPopover variable={variable} />
+);
 export const VariableAutocompletePopover: React.FC<VariableAutocompleteProps> = ({
   show,
   position,
@@ -26,11 +40,7 @@ export const VariableAutocompletePopover: React.FC<VariableAutocompleteProps> = 
 }) => {
   const filteredVariables = useMemo(() => {
     if (!variables) return [];
-    const flattened = Object.entries(variables).map(([label, arr]) => ({
-      label,
-      ...Object.assign({}, ...arr),
-    }));
-
+    const flattened = flattenVariablesList(variables);
     // Filter variables based on the user's input
     if (!filter) return flattened;
 
@@ -62,16 +72,6 @@ export const VariableAutocompletePopover: React.FC<VariableAutocompleteProps> = 
     zIndex: 9999,
   };
 
-  const examplePopOver = (header: string, content: string) => (
-    <div className="example-popover">
-      <p className="example-header">{header}</p>
-      <div className="example-body">
-        <span className="example-title">Example:</span>
-        <div className="example-content">{content}</div>
-      </div>
-    </div>
-  );
-
   const content = (
     <List
       size="small"
@@ -100,7 +100,7 @@ export const VariableAutocompletePopover: React.FC<VariableAutocompleteProps> = 
           </div>
           {item.scope === "global" && (
             <Tooltip
-              title={examplePopOver("A random boolean value", "true")}
+              title={dynamicVariableExample(item)}
               placement="rightTop"
               showArrow={false}
               overlayClassName="example-tooltip"
