@@ -47,7 +47,7 @@ const ApiClientFeatureContainer: React.FC = () => {
         if (result.error.name === InvalidContextVersionError.name) {
           return;
         } else {
-          throw new Error(result?.error);
+          throw new Error(result?.error?.message);
         }
       }
     })();
