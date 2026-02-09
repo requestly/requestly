@@ -5,6 +5,7 @@ import Logger from "lib/logger";
 import lodash from "lodash";
 import { RQAPI } from "features/apiClient/types";
 import { captureException } from "./utils";
+import { wrapWithCustomSpan } from "utils/sentry";
 
 export function sanitizeRecord(record: Partial<RQAPI.ApiClientRecord>) {
   const sanitizedRecord = lodash.cloneDeep(record);
@@ -24,7 +25,7 @@ export function sanitizeRecord(record: Partial<RQAPI.ApiClientRecord>) {
   return sanitizedRecord;
 }
 
-export const upsertApiRecord = async (
+const _upsertApiRecord = async (
   uid: string,
   record: Partial<RQAPI.ApiClientRecord>,
   teamId?: string,
@@ -42,8 +43,15 @@ export const upsertApiRecord = async (
 
   return result;
 };
+export const upsertApiRecord = wrapWithCustomSpan(
+  {
+    name: "api_client.cloud.backend.upsertApiRecord",
+    op: "backend.upsert",
+  },
+  _upsertApiRecord
+);
 
-const createApiRecord = async (
+const _createApiRecord = async (
   uid: string,
   record: Partial<RQAPI.ApiClientRecord>,
   teamId?: string,
@@ -73,34 +81,28 @@ const createApiRecord = async (
   if (docId) {
     // Creating a new record with a given id
     const docRef = doc(db, "apis", docId);
-    try {
-      await setDoc(docRef, { ...newRecord, id: docId });
-      Logger.log(`Api document created with ID ${docId}`);
-      return { success: true, data: { ...newRecord, id: docId } };
-    } catch (e) {
-      captureException(e);
-      Logger.error(`Error creating Api document with ID ${docId}`);
-      return { success: false, data: null };
-    }
+    await setDoc(docRef, { ...newRecord, id: docId });
+    Logger.log(`Api document created with ID ${docId}`);
+    return { success: true, data: { ...newRecord, id: docId } };
   } else {
-    try {
-      const resultDocRef = await addDoc(rootApiRecordsCollectionRef, { ...newRecord });
-      Logger.log(`Api document created ${resultDocRef.id}`);
-      // TODO: Figure out why do we need this? Why update the id with its own id?
-      updateDoc(resultDocRef, {
-        id: resultDocRef.id,
-      });
-
-      return { success: true, data: { ...newRecord, id: resultDocRef.id } };
-    } catch (err) {
-      captureException(err);
-      Logger.error("Error while creating api record", err);
-      return { success: false, data: null };
-    }
+    const resultDocRef = await addDoc(rootApiRecordsCollectionRef, { ...newRecord });
+    Logger.log(`Api document created ${resultDocRef.id}`);
+    await updateDoc(resultDocRef, {
+      id: resultDocRef.id,
+    });
+    return { success: true, data: { ...newRecord, id: resultDocRef.id } };
   }
 };
 
-export const updateApiRecord = async (
+export const createApiRecord = wrapWithCustomSpan(
+  {
+    name: "api_client.cloud.backend.createApiRecord",
+    op: "backend.create",
+  },
+  _createApiRecord
+);
+
+const _updateApiRecord = async (
   uid: string,
   record: Partial<RQAPI.ApiClientRecord>,
   teamId?: string
@@ -118,16 +120,17 @@ export const updateApiRecord = async (
     updatedTs: Timestamp.now().toMillis(),
   } as RQAPI.ApiClientRecord;
 
-  try {
-    await updateDoc(apiRecordDocRef, { ...updatedRecord });
-    Logger.log(`Api document updated`);
-    return { success: true, data: updatedRecord };
-  } catch (err) {
-    captureException(err);
-    Logger.error("Error while updating api record", err);
-    return { success: false, data: null };
-  }
+  await updateDoc(apiRecordDocRef, { ...updatedRecord });
+  Logger.log(`Api document updated`);
+  return { success: true, data: updatedRecord };
 };
+export const updateApiRecord = wrapWithCustomSpan(
+  {
+    name: "api_client.cloud.backend.updateApiRecord",
+    op: "backend.update",
+  },
+  _updateApiRecord
+);
 
 export const batchUpsertApiRecords = async (
   uid: string,

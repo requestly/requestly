@@ -4,9 +4,11 @@ import { getUploadedPostmanFileType, processPostmanCollectionData, processPostma
 import { toast } from "utils/Toast";
 import { RQButton } from "lib/design-system-v2/components";
 import { MdCheckCircleOutline } from "@react-icons/all-files/md/MdCheckCircleOutline";
+import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
 import { ApiClientImporterType, RQAPI } from "features/apiClient/types";
 import { IoMdCloseCircleOutline } from "@react-icons/all-files/io/IoMdCloseCircleOutline";
-import { notification, Row } from "antd";
+import { notification, Row, Tooltip } from "antd";
+import LINKS from "config/constants/sub/links";
 import {
   trackImportFailed,
   trackImportParsed,
@@ -17,11 +19,17 @@ import Logger from "lib/logger";
 import "./postmanImporter.scss";
 import * as Sentry from "@sentry/react";
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
-import { createEnvironment, updateEnvironmentVariables, useApiClientRepository } from "features/apiClient/slices";
-import { useApiClientDispatch } from "features/apiClient/slices/hooks/base.hooks";
+import {
+  createEnvironment,
+  getApiClientFeatureContext,
+  updateEnvironmentVariables,
+  useApiClientRepository,
+} from "features/apiClient/slices";
 import { wrapWithCustomSpan } from "utils/sentry";
 import { SPAN_STATUS_ERROR, SPAN_STATUS_OK } from "@sentry/core";
 import { EnvironmentVariableData } from "@requestly/shared/types/entities/apiClient";
+import { LocalApiClientRecordsSync } from "features/apiClient/helpers/modules/sync/local/services/LocalApiClientRecordsSync";
+import { captureException } from "backend/apiClient/utils";
 
 type ProcessedData = {
   environments: { name: string; variables: Record<string, EnvironmentVariableData>; isGlobal: boolean }[];
@@ -49,7 +57,10 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
 
   const { apiClientRecordsRepository, environmentVariablesRepository } = useApiClientRepository();
   const { onSaveRecord } = useNewApiClientContext();
-  const dispatch = useApiClientDispatch();
+  const { dispatch } = getApiClientFeatureContext().store;
+
+  const destinationRepository = apiClientRecordsRepository;
+  const isLocalFileSystem = destinationRepository instanceof LocalApiClientRecordsSync;
 
   const collectionsCount = useRef(0);
 
@@ -171,35 +182,76 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
 
   const handleImportEnvironments = useCallback(async () => {
     try {
-      const importPromises = processedFileData.environments.map(async (env) => {
-        if (env.isGlobal) {
-          await dispatch(
-            updateEnvironmentVariables({
-              environmentId: environmentVariablesRepository.getGlobalEnvironmentId(),
-              variables: env.variables,
-              repository: environmentVariablesRepository,
-            })
-          ).unwrap();
-          return true;
-        } else {
-          await dispatch(
-            createEnvironment({
-              name: env.name,
-              variables: env.variables,
-              repository: environmentVariablesRepository,
-            })
-          ).unwrap();
-          return true;
-        }
-      });
+      if (isLocalFileSystem) {
+        let successCount = 0;
+        for (let index = 0; index < processedFileData.environments.length; index++) {
+          const env = processedFileData.environments[index];
 
-      const results = await Promise.allSettled(importPromises);
-      return results.filter((result) => result.status === "fulfilled").length;
+          try {
+            if (env.isGlobal) {
+              await dispatch(
+                updateEnvironmentVariables({
+                  environmentId: environmentVariablesRepository.getGlobalEnvironmentId(),
+                  variables: env.variables,
+                  repository: environmentVariablesRepository,
+                }) as any
+              ).unwrap();
+              successCount++;
+            } else {
+              const result = await dispatch(
+                createEnvironment({
+                  name: env.name,
+                  variables: env.variables,
+                  repository: environmentVariablesRepository,
+                }) as any
+              ).unwrap();
+              if (result?.id) {
+                successCount++;
+              }
+            }
+          } catch (error) {
+            Sentry.captureException(error);
+          }
+        }
+        return successCount;
+      } else {
+        const importPromises = processedFileData.environments.map(async (env) => {
+          if (env.isGlobal) {
+            await dispatch(
+              updateEnvironmentVariables({
+                environmentId: environmentVariablesRepository.getGlobalEnvironmentId(),
+                variables: env.variables,
+                repository: environmentVariablesRepository,
+              }) as any
+            ).unwrap();
+            return true;
+          } else {
+            const result = await dispatch(
+              createEnvironment({
+                name: env.name,
+                variables: env.variables,
+                repository: environmentVariablesRepository,
+              }) as any
+            ).unwrap();
+            return !!result?.id;
+          }
+        });
+
+        const results = await Promise.allSettled(importPromises);
+        results.forEach((result) => {
+          if (result.status === "rejected") {
+            const error = result.reason;
+            captureException(error);
+          }
+        });
+
+        return results.filter((result) => result.status === "fulfilled" && result.value).length;
+      }
     } catch (error) {
       Logger.error("Postman data import failed:", error);
       throw error;
     }
-  }, [processedFileData.environments, environmentVariablesRepository, dispatch]);
+  }, [isLocalFileSystem, processedFileData.environments, dispatch, environmentVariablesRepository]);
 
   const handleImportCollectionsAndApis = useCallback(async () => {
     let importedCollectionsCount = 0;
@@ -391,6 +443,11 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
     <div className="postman-importer">
       <div className="postman-importer__header">
         <span>Import from Postman</span>
+        <Tooltip title="Learn more about importing from Postman">
+          <a href={LINKS.REQUESTLY_API_CLIENT_IMPORT_POSTMAN_DOCS} target="_blank" rel="noreferrer">
+            <MdInfoOutline className="postman-importer__header-info-icon" />
+          </a>
+        </Tooltip>
       </div>
       {importError ? (
         <div className="postman-importer__post-parse-view postman-importer__post-parse-view--error">

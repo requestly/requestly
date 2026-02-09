@@ -2,7 +2,7 @@ import { getScopedVariables, Scope, ScopedVariables } from "../variableResolver/
 import { EnvironmentVariables, VariableScope } from "backend/environment/types";
 import { RQAPI } from "features/apiClient/types";
 import { isEmpty } from "lodash";
-import { ApiClientFeatureContext } from "features/apiClient/slices";
+import { ApiClientFeatureContext, selectRecordById } from "features/apiClient/slices";
 import { reduxStore } from "store";
 import { VariableData } from "@requestly/shared/types/entities/apiClient";
 
@@ -57,8 +57,36 @@ export class ScriptExecutionContext {
   }
 
   private getScopedVariables(recordId: string) {
-    return getScopedVariables(this.ctx.store.getState(), reduxStore.getState().runtimeVariables.entity.variables, recordId, {scopes: this.scopes});
+    const scoped = getScopedVariables(
+      this.ctx.store.getState(),
+      reduxStore.getState().runtimeVariables.entity.variables,
+      recordId,
+      { scopes: this.scopes }
+    );
 
+    // Only expose the *immediate* collection's variables in script context.
+    // (Requests in nested collections can still resolve ancestor vars during rendering via normal store resolution.)
+    const record = selectRecordById(this.ctx.store.getState(), recordId);
+    const effectiveCollectionId =
+      record?.type === RQAPI.RecordType.COLLECTION ? record.id : record?.collectionId ?? null;
+
+    if (!effectiveCollectionId) {
+      return scoped;
+    }
+
+    const filtered: ScopedVariables = {};
+    for (const key in scoped) {
+      const tuple = scoped[key];
+      if (!tuple) continue;
+
+      const [_variableData, variableSource] = tuple;
+      if (variableSource.scope === VariableScope.COLLECTION && variableSource.scopeId !== effectiveCollectionId) {
+        continue;
+      }
+      filtered[key] = tuple;
+    }
+
+    return filtered;
   }
 
   private convertScopedVariablesToRecord(scopedVariables: ScopedVariables) {

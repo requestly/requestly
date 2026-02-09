@@ -25,18 +25,38 @@ export function useWorkspace(workspaceId: WorkspaceInfo["id"]) {
   return workspace;
 }
 
-const selectIsAllWorkspacesLoaded = createSelector([selectAllSelectedWorkspaces], (workspaces) =>
-  workspaces.every((w) => !w.status.loading)
+const selectIsAnyWorkspaceLoading = createSelector([selectAllSelectedWorkspaces], (workspaces) =>
+  workspaces.some((w) => w.status.loading)
 );
 
-export function useIsAllWorkspacesLoaded() {
-  return useSelector(selectIsAllWorkspacesLoaded);
+export function useIsAnyWorkspaceLoading() {
+  return useSelector(selectIsAnyWorkspaceLoading);
 }
 
 const selectViewMode = createSelector([getWorkspaceViewSlice], (s) => s.viewMode);
 
 export function useViewMode() {
   return useSelector(selectViewMode);
+}
+
+const selectSingleViewWorkspaceError = createSelector([getWorkspaceViewSlice], (s) => {
+  // Only check for errors in single view mode
+  if (s.viewMode !== ApiClientViewMode.SINGLE) {
+    return null;
+  }
+
+  const workspaces = getAllSelectedWorkspaces(s);
+  const workspace = workspaces[0];
+
+  if (workspace && !workspace.status.loading && !workspace.status.state.success) {
+    return workspace.status.state.error;
+  }
+
+  return null;
+});
+
+export function useWorkspaceLoadingError() {
+  return useSelector(selectSingleViewWorkspaceError);
 }
 
 const selectSingleModeWorkspace = createSelector([getWorkspaceViewSlice], (s) => {

@@ -2,11 +2,17 @@ import * as Sentry from "@sentry/react";
 import React, { useCallback, useState } from "react";
 import { FilePicker } from "components/common/FilePicker";
 import { HiOutlineExternalLink } from "@react-icons/all-files/hi/HiOutlineExternalLink";
-import { Col } from "antd";
+import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
+import { Col, Tooltip } from "antd";
 import { RQAPI, ApiClientImporterType, EnvironmentData } from "@requestly/shared/types/entities/apiClient";
 import { ApiClientImporterMethod, ApiClientImporterOutput } from "@requestly/alternative-importers";
 import { toast } from "utils/Toast";
-import { apiRecordsActions, createEnvironment, useApiClientRepository } from "features/apiClient/slices";
+import {
+  apiRecordsActions,
+  createEnvironment,
+  getApiClientFeatureContext,
+  useApiClientRepository,
+} from "features/apiClient/slices";
 import { useApiClientDispatch } from "features/apiClient/slices/hooks/base.hooks";
 import {
   trackImportFailed,
@@ -51,7 +57,7 @@ export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = (
   const [importError, setImportError] = useState<string | null>(null);
 
   const { environmentVariablesRepository, apiClientRecordsRepository } = useApiClientRepository();
-  const dispatch = useApiClientDispatch();
+  const { dispatch } = getApiClientFeatureContext().store;
 
   const handleResetImport = () => {
     setImportError(null);
@@ -133,24 +139,18 @@ export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = (
 
   const handleImportEnvironments = useCallback(
     async (environments: EnvironmentData[]) => {
-      try {
-        const importPromises = environments.map(async (environment) => {
-          await dispatch(
-            createEnvironment({
-              name: environment.name,
-              variables: environment.variables,
-              repository: environmentVariablesRepository,
-            })
-          ).unwrap();
-          return true;
-        });
-        const results = await Promise.allSettled(importPromises);
-        const successCount = results.filter((result) => result.status === "fulfilled").length;
-        const failedCount = results.length - successCount;
-        return { successCount, failedCount };
-      } catch (error) {
-        return { successCount: 0, failedCount: environments.length };
-      }
+      const importPromises = environments.map(async (environment) => {
+        await dispatch(
+          createEnvironment({
+            name: environment.name,
+            variables: environment.variables,
+            repository: environmentVariablesRepository,
+          }) as any
+        ).unwrap();
+        return true;
+      });
+      const results = await Promise.allSettled(importPromises);
+      return results;
     },
     [dispatch, environmentVariablesRepository]
   );
@@ -476,8 +476,16 @@ export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = (
   const HeaderComponent: React.FC<{}> = () => {
     return (
       <div className="common-api-client-importer-header">
-        <Col className="importer-header-heading">Import {productName}</Col>
-        {/* <CopyButton icon={<LinkOutlined />} type={"transparent"} title={"Share"} copyText={props.shareLink} /> */}
+        <Col className="importer-header-heading">
+          Import {productName}
+          {docsLink && (
+            <Tooltip title={`Learn more about importing ${productName}`}>
+              <a href={docsLink} target="_blank" rel="noreferrer">
+                <MdInfoOutline className="importer-header-info-icon" />
+              </a>
+            </Tooltip>
+          )}
+        </Col>
       </div>
     );
   };

@@ -109,10 +109,19 @@ export const deleteRecords = createAsyncThunk<
   {
     condition: async ({ records }) => {
       const allRecords = getAllRecords(records);
-      for (const r of allRecords) {
-        await reduxStore.dispatch(closeTabByEntityId({ entityId: r.id, skipUnsavedPrompt: true }));
-      }
-      return true;
+
+      const results = await Promise.allSettled(
+        allRecords.map((r) => reduxStore.dispatch(closeTabByEntityId({ entityId: r.id, skipUnsavedPrompt: true })))
+      );
+
+      const hasAllSucceeded = results.every((result) => {
+        if (result.status === "fulfilled") {
+          return closeTabByEntityId.fulfilled.match(result.value);
+        }
+        return false;
+      });
+
+      return hasAllSucceeded;
     },
   }
 );

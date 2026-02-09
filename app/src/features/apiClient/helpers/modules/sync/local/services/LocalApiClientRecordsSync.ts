@@ -268,11 +268,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
     );
 
     if (result.type === "error") {
-      return {
-        success: false,
-        data: null,
-        message: result.error.message,
-      };
+      throw new Error(result.error.message);
     }
 
     const [parsedApiRecord] = this.parseAPIEntities([result.content]);
@@ -303,11 +299,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
     );
 
     if (result.type === "error") {
-      return {
-        success: false,
-        data: null,
-        message: result.error.message,
-      };
+      throw new Error(result.error.message);
     }
 
     const [parsedApiRecord] = this.parseAPIEntities([result.content]);

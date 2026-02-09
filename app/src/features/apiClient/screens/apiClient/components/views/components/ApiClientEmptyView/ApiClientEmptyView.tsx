@@ -1,6 +1,11 @@
 import { RQAPI } from "features/apiClient/types";
 import { RBACButton, useRBAC } from "features/rbac";
-import { useTotalRecords } from "features/apiClient/slices";
+import {
+  getApiClientFeatureContext,
+  useIsAnyWorkspaceLoading,
+  useTotalRecords,
+  useWorkspaceLoadingError,
+} from "features/apiClient/slices";
 import {
   NewApiRecordDropdown,
   NewRecordDropdownItemType,
@@ -8,6 +13,7 @@ import {
 import "./apiClientEmptyView.scss";
 import { WorkspaceProvider } from "features/apiClient/common/WorkspaceProvider";
 import { useApiClientContext } from "features/apiClient/contexts";
+import { Skeleton } from "antd";
 
 const ApiClientEmptyViewContent = () => {
   const totalRecords = useTotalRecords();
@@ -80,8 +86,29 @@ const ApiClientEmptyViewContent = () => {
 };
 
 export const ApiClientEmptyView = () => {
+  // When we clear the context ie switch workspace, then for a instance there is flicker on screen
+  // with message `Context not found in registry` (which is valid, since we are in process to configure new context)
+  // but at same time empty view renders with workspace provider, so it breaks,
+  // loader helps to prevent that broken state.
+  const isLoading = useIsAnyWorkspaceLoading();
+  const loadingError = useWorkspaceLoadingError();
+
+  if (loadingError) {
+    throw loadingError;
+  }
+
+  if (isLoading) {
+    return (
+      <div className="api-client-empty-view-container">
+        <Skeleton active className="api-client-header-skeleton" paragraph={{ rows: 3, width: "100%" }} />
+      </div>
+    );
+  }
+
+  const ctx = getApiClientFeatureContext();
+
   return (
-    <WorkspaceProvider>
+    <WorkspaceProvider workspaceId={ctx.workspaceId}>
       <ApiClientEmptyViewContent />
     </WorkspaceProvider>
   );

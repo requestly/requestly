@@ -16,6 +16,7 @@ import { captureMessage } from "@sentry/react";
 import { useRBAC } from "features/rbac";
 import { useWorkspaceId } from "features/apiClient/common/WorkspaceProvider";
 import { NoopContextId } from "features/apiClient/commands/utils";
+import { createPortal } from "react-dom";
 
 type VariableData = ScopedVariable[0];
 
@@ -30,7 +31,6 @@ const PopoverViewTransitions: Record<PopoverView, PopoverView[]> = {
 interface VariablePopoverProps {
   hoveredVariable: string;
   popupPosition: { x: number; y: number };
-  editorRef: React.RefObject<HTMLDivElement>;
   variables: ScopedVariables;
   onClose?: () => void;
   onPinChange?: (pinned: boolean) => void;
@@ -50,7 +50,6 @@ interface InfoFieldConfig {
 
 export const VariablePopover: React.FC<VariablePopoverProps> = ({
   hoveredVariable,
-  editorRef,
   popupPosition,
   variables,
   onClose,
@@ -154,6 +153,7 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
               syncValue: variable.syncValue ?? "",
               localValue: variable.localValue ?? "",
               scope: source.scope,
+              scopeId: source.scopeId,
               scopeName: source.name,
             }}
             onCancel={handleCancel}
@@ -174,14 +174,18 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
 
   const popupStyle: React.CSSProperties = {
     position: "absolute",
-    top: (popupPosition?.y ?? 0) - (editorRef.current?.getBoundingClientRect().top ?? 0) + 10,
-    left: (popupPosition?.x ?? 0) - (editorRef.current?.getBoundingClientRect().left ?? 0) + 100,
+    top: (popupPosition?.y ?? 0) + 10,
+    left: (popupPosition?.x ?? 0) + 100,
     zIndex: 1000,
   };
 
   const isFormMode = currentView === PopoverView.CREATE_FORM || currentView === PopoverView.EDIT_FORM;
 
-  return (
+  // createPortal is being used to bypass the styling override behavior
+  // by antd, and ensure that the desired styling and positioning
+  // applies to the popover
+  // A full refactor will be carried out for the editor in the future
+  return createPortal(
     <Popover
       content={<div className="variable-info-body">{popoverContent}</div>}
       open
@@ -199,8 +203,9 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
         currentView === PopoverView.CREATE_FORM || currentView === PopoverView.EDIT_FORM ? "create-form-view" : ""
       }`}
     >
-      <div style={popupStyle} className="variable-info-div" />
-    </Popover>
+      <div style={popupStyle} className="variable-info-div"></div>
+    </Popover>,
+    document.body
   );
 };
 

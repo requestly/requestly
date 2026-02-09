@@ -74,10 +74,19 @@ const LINKS = {
     "https://docs.requestly.com/general/http-rules-(modify-traffic)/rule-types/modify-headers#faqs",
 
   REQUESTLY_NETWORK_INSPECTOR_DOCS:
-    "https://docs.requestly.com/guides/inspect-traffic-and-apply-modifications-from-chrome-devtools-using-requestly",
+    "https://docs.requestly.com/general/http-interceptor/browser-extension/browser-interception",
 
   /** API Client docs */
   REQUESTLY_API_CLIENT_DOCS: "https://docs.requestly.com/general/api-client/overview",
+
+  /** API Client Import docs */
+  REQUESTLY_API_CLIENT_IMPORT_POSTMAN_DOCS:
+    "https://docs.requestly.com/general/api-client/import-export/import-from-postman",
+  REQUESTLY_API_CLIENT_IMPORT_OPENAPI_DOCS:
+    "https://docs.requestly.com/general/api-client/import-export/import-openapi-spec",
+  REQUESTLY_API_CLIENT_IMPORT_COLLECTIONS_DOCS:
+    "https://docs.requestly.com/general/api-client/import-export/import-export-api-collections",
+  REQUESTLY_API_CLIENT_IMPORT_CURL_DOCS: "https://docs.requestly.com/general/api-client/import-export/import-from-curl",
 
   /** LANDING PAGES **/
 

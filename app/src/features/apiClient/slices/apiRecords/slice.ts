@@ -109,7 +109,7 @@ export const apiRecordsSlice = createSlice({
     ) {
       const entity = state.records.entities[action.payload.id];
       if (entity == null) {
-        throw new EntityNotFound(action.payload.id, "apiClientrecord");
+        return;
       }
 
       action.payload.patcher(entity);

@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { shallowEqual } from "react-redux";
 import { RQAPI } from "features/apiClient/types";
 import { EntityId } from "../types";
 import {
@@ -9,6 +10,7 @@ import {
   selectChildrenIds,
   selectChildRecords,
   selectAllDescendantIds,
+  selectAllDescendantApiRecordIds,
   selectRootRecords,
   selectCollections,
   selectApiRecords,
@@ -62,6 +64,10 @@ export function useChildRecords(id: EntityId): RQAPI.ApiClientRecord[] {
 
 export function useAllDescendantIds(id: EntityId): EntityId[] {
   return useApiClientSelector((state) => selectAllDescendantIds(state, id));
+}
+
+export function useAllDescendantApiRecordIds(id: EntityId): EntityId[] {
+  return useApiClientSelector((state) => selectAllDescendantApiRecordIds(state, id), shallowEqual);
 }
 
 export function useRootRecords(): RQAPI.ApiClientRecord[] {

@@ -957,6 +957,23 @@ export const checkForLargeFiles = (body: RQAPI.RequestBody): boolean => {
   return false;
 };
 
+/**
+ * Generates a regular expression for identifying path variables
+ *
+ * The pattern matches a colon followed by a variable name, excluding URL reserved
+ * characters (: / ? # [ ] @ ! $ & ' ( ) * + , ; =) and whitespace and control characters
+ *
+ * @param includeLookBehind - Whether to include a negative look behind assertion to avoid matching colons preceded by word characters (e.g. to avoid matching "urn:uuid")
+ * @returns A RegExp object for matching path variables.
+ */
+export function getPathVariableRegex(includeLookBehind: boolean) {
+  const variableRegex = /([^:/?#[\]@!$&'()*+,;=\s]+)/;
+  if (includeLookBehind) {
+    return new RegExp(`(?<!\\w):${variableRegex.source}`, "g");
+  }
+  return new RegExp(`:${variableRegex.source}`, "g");
+}
+
 export const extractPathVariablesFromUrl = (url: string) => {
   if (!url) {
     return [];
@@ -971,13 +988,11 @@ export const extractPathVariablesFromUrl = (url: string) => {
     return [];
   }
 
-  // Allow all characters except URL reserved characters: : / ? # [ ] @ ! $ & ' ( ) * + , ; =
-  // Also exclude whitespace and control characters for practical reasons
-  const variablePattern = /(?<!:):([^:/?#[\]@!$&'()*+,;=\s]+)/g;
+  const variableRegex = getPathVariableRegex(true);
   const variables: string[] = [];
   let match;
 
-  while ((match = variablePattern.exec(pathname)) !== null) {
+  while ((match = variableRegex.exec(pathname)) !== null) {
     const variableName = match[1];
     if (!variables.includes(variableName)) {
       variables.push(variableName);
