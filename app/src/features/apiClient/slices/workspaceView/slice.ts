@@ -3,9 +3,12 @@ import { ApiClientViewMode, WorkspaceState, WorkspaceViewState } from "./types";
 import { ReducerKeys } from "store/constants";
 import { addWorkspaceIntoView, setupWorkspaceView, switchContext } from "./thunks";
 import { RootState } from "store/types";
-import getReducerWithLocalStorageSync from "store/getReducerWithLocalStorageSync";
 import { NativeError } from "errors/NativeError";
 import { ErrorSeverity } from "errors/types";
+import { persistReducer } from "redux-persist";
+import { getPersistConfig } from "redux-deep-persist";
+import storage from "redux-persist/lib/storage";
+import { errorTransform } from "./errorTransform";
 
 export const workspaceViewAdapter = createEntityAdapter<WorkspaceState>({
   selectId: (workspace) => workspace.id as string,
@@ -106,7 +109,7 @@ export const workspaceViewSlice = createSlice({
           changes: {
             status: {
               loading: false,
-              state: { success: false, error: action.error.message ?? "Unknown error" },
+              state: { success: false, error: new Error(action.error.message) },
             },
           },
         });
@@ -148,8 +151,13 @@ export const workspaceViewSlice = createSlice({
 
 export const workspaceViewActions = workspaceViewSlice.actions;
 
-export const workspaceViewReducerWithLocal = getReducerWithLocalStorageSync(
-  ReducerKeys.WORKSPACE_VIEW,
-  workspaceViewSlice.reducer,
-  ["viewMode", "selectedWorkspaces"]
-);
+// Apply error serialization transform only to this slice
+const persistConfig = getPersistConfig({
+  storage,
+  key: ReducerKeys.WORKSPACE_VIEW,
+  rootReducer: workspaceViewSlice.reducer,
+  whitelist: ["viewMode", "selectedWorkspaces"],
+  transforms: [errorTransform],
+});
+
+export const workspaceViewReducerWithLocal = persistReducer(persistConfig, workspaceViewSlice.reducer);

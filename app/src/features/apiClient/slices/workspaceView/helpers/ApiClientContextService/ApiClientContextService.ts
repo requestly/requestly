@@ -485,7 +485,7 @@ class ApiClientContextService {
             loading: false,
             state: {
               success: false,
-              error: e instanceof Error ? e.message : String(e),
+              error: e instanceof Error ? e : new Error(String(e)),
             },
           },
         })

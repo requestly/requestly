@@ -94,7 +94,7 @@ export const ApiClientEmptyView = () => {
   const loadingError = useWorkspaceLoadingError();
 
   if (loadingError) {
-    throw new Error(loadingError);
+    throw loadingError;
   }
 
   if (isLoading) {

@@ -1,14 +1,13 @@
 import { EntityState } from "@reduxjs/toolkit";
 import { Workspace, WorkspaceType } from "features/workspaces/types";
+import { RawResult } from "utils/try";
 
 export enum ApiClientViewMode {
   SINGLE = "SINGLE",
   MULTI = "MULTI",
 }
 
-export type WorkspaceStatus =
-  | { loading: true }
-  | { loading: false; state: { success: true; result: null } | { success: false; error: string } };
+export type WorkspaceStatus = { loading: true } | { loading: false; state: RawResult<null> };
 
 export type WorkspaceMeta =
   | {
