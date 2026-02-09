@@ -25,15 +25,15 @@ export const RequestBreadcrumb: React.FC<RequestBreadcrumbProps> = ({
   const { openBufferedTab } = useTabActions();
 
   const collectionPath = useMemo(() => {
-    const ancestorIds = getAncestorIds(requestExecutionResult.recordId, workspaceId);
+    const ancestorIds = getAncestorIds(requestExecutionResult.recordId, workspaceId) ?? [];
     return ancestorIds
-      ?.slice(0, -1)
-      ?.map((id) => ({
+      .slice(0, -1)
+      .map((id) => ({
         id,
         name: getRecord(id, workspaceId)?.name || "",
       }))
-      ?.filter((item) => item?.name)
-      ?.reverse();
+      .filter((item) => item?.name)
+      .reverse();
   }, [requestExecutionResult.recordId, workspaceId]);
 
   const depth = collectionPath?.length;
