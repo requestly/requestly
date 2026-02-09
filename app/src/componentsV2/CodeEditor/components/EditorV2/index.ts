@@ -5,7 +5,7 @@ const Editor = lazyWithRetry(
     import(/* webpackChunkName: "EditorComponent" */ "./Editor").then((module) => {
       return module;
     }),
-  null as any
+  null
 );
 
 export default Editor;
