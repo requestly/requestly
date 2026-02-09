@@ -77,7 +77,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
   focusPostResponse,
 }) => {
   const dispatch = useDispatch();
-  const addUserToList = httpsCallable(getFunctions(), "billing-reviewBillingTeamJoiningRequest");
+  const addUserToList = httpsCallable(getFunctions(), "premiumNotifications-addUserToList");
   const activeScriptType = entry?.scripts?.[RQAPI.ScriptType.PRE_REQUEST]
     ? RQAPI.ScriptType.PRE_REQUEST
     : entry?.scripts?.[RQAPI.ScriptType.POST_RESPONSE]
@@ -150,7 +150,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
         if (result.object?.code?.content) {
           setLastGeneratedCode(result.object.code.content);
           trackAITestGenerationSuccessful(sessionId, currentGenerationId);
-          addUserToList().catch(console.error); // suppress error
+          addUserToList({ listId: 184 }).catch(console.error); // suppress error
         }
       }
       setIsTestsStreamingFinished(true);
