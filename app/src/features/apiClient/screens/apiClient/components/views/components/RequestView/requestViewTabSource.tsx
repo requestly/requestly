@@ -32,13 +32,6 @@ export class RequestViewTabSource extends BaseTabSource {
       throw new Error("Request id not found!");
     }
 
-    // Validate that the request exists in the store
-    const state = ctx.store.getState();
-    const record = selectRecordById(state, requestId);
-    if (!record) {
-      throw new EntityNotFound(requestId, "request");
-    }
-
     return new RequestViewTabSource({ id: requestId, title: "Request", context: { id: ctx.workspaceId } });
   }
 
