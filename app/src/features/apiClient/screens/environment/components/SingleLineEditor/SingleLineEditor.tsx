@@ -9,8 +9,8 @@ import "./singleLineEditor.scss";
 import { SingleLineEditorProps } from "./types";
 import { Conditional } from "components/common/Conditional";
 import { customKeyBinding, highlightVariablesPlugin } from "componentsV2/CodeEditor/components/EditorV2/plugins";
-import { VariableAutocompletePopover } from "./VariableAutocompletePopover";
 import { getClosingBraces } from "componentsV2/CodeEditor/components/EditorV2/plugins/generateAutoCompletions";
+import { VariableAutocompletePopover } from "../VariableAutocompletePopover/VariableAutocompletePopover";
 
 export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
   className,
