@@ -2,7 +2,7 @@ import React from "react";
 import { Spin } from "antd";
 import "./pageLoader.scss";
 
-const PageLoader = ({ message = "Loading..." }) => {
+const PageLoader: React.FC<{ message?: string }> = ({ message = "Loading..." }) => {
   return (
     <div className="page-loader-container">
       <Spin size="large" tip={message} />
