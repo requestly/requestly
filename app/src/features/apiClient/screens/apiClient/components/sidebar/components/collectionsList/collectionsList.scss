@@ -35,7 +35,7 @@
 
   .collections-list-content {
     overflow: auto;
-    padding: 0 var(--requestly-space-3, 6px);
+    padding: 0 var(--requestly-space-2, 4px);
 
     .collections-list {
       display: flex;
@@ -100,7 +100,6 @@
       color: var(--requestly-color-text-subtle);
       font-size: var(--requestly-font-size-sm, 13px);
       min-height: 26px;
-      margin-top: 2px;
 
       &.api {
         height: 28px;
@@ -192,7 +191,7 @@
           user-select: none;
           display: flex;
           align-items: center;
-          gap: var(--requestly-space-3, 6px);
+          gap: var(--requestly-space-2, 4px);
           color: var(--requestly-color-text-subtle);
 
           &-text {
@@ -264,7 +263,7 @@
 
         .ant-collapse-content-box {
           margin-left: 13px;
-          padding: 2px 0px 0px 6px;
+          padding: 1px 0px 0px 6px;
           border-left: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.12));
 
           &:hover {
