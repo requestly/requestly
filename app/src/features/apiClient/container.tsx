@@ -13,6 +13,7 @@ import Split from "react-split";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { RootState } from "store/types";
+import { InvalidContextVersionError } from "./slices/workspaceView/helpers/ApiClientContextRegistry/ApiClientContextRegistry";
 
 const ApiClientFeatureContainer: React.FC = () => {
   const dispatch = useDispatch();
@@ -34,11 +35,20 @@ const ApiClientFeatureContainer: React.FC = () => {
   };
 
   useEffect(() => {
-    dispatch(
-      setupWorkspaceView({
-        userId: user.details?.profile?.uid,
-      }) as any
-    );
+    (async () => {
+      const result = await dispatch(
+        setupWorkspaceView({
+          userId: user.details?.profile?.uid,
+        }) as any
+      ).unwrap();
+      if (result?.error) {
+        if (result.error.name === InvalidContextVersionError.name) {
+          return;
+        } else {
+          throw new Error(result?.error);
+        }
+      }
+    })();
   }, [dispatch, user.details?.profile?.uid]);
 
   if (!isSetupDone) {
