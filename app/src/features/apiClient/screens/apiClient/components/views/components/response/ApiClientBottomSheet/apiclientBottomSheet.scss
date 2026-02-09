@@ -6,23 +6,7 @@
   .api-client-sheet-panel {
     flex: 1;
     overflow-y: hidden;
-  }
 
-  .test-results-stats {
-    letter-spacing: -0.4px;
-
-    &.passed {
-      color: var(--requestly-color-success-300);
-      background-color: var(--requestly-color-success-800);
-    }
-
-    &.failed {
-      color: var(--requestly-color-error-300);
-      background-color: var(--requestly-color-error-800);
-    }
-  }
-
-  .api-client-sheet-panel {
     .ant-tabs {
       .ant-tabs-nav-wrap {
         padding-left: 0;
@@ -55,6 +39,21 @@
         width: 12px;
         height: 12px;
       }
+    }
+  }
+
+  .test-results-stats {
+    letter-spacing: -0.4px;
+    font-size: var(--requestly-font-size-2xs) !important;
+
+    &.passed {
+      color: var(--requestly-color-success-300);
+      background-color: var(--requestly-color-success-800);
+    }
+
+    &.failed {
+      color: var(--requestly-color-error-300);
+      background-color: var(--requestly-color-error-800);
     }
   }
 }
