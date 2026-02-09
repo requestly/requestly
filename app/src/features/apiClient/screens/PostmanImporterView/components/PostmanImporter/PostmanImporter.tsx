@@ -4,9 +4,11 @@ import { getUploadedPostmanFileType, processPostmanCollectionData, processPostma
 import { toast } from "utils/Toast";
 import { RQButton } from "lib/design-system-v2/components";
 import { MdCheckCircleOutline } from "@react-icons/all-files/md/MdCheckCircleOutline";
+import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
 import { ApiClientImporterType, RQAPI } from "features/apiClient/types";
 import { IoMdCloseCircleOutline } from "@react-icons/all-files/io/IoMdCloseCircleOutline";
-import { notification, Row } from "antd";
+import { notification, Row, Tooltip } from "antd";
+import LINKS from "config/constants/sub/links";
 import {
   trackImportFailed,
   trackImportParsed,
@@ -332,71 +334,97 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
     return { importedCollectionsCount, importedApisCount };
   }, [processedFileData.apiRecords, onSaveRecord, apiClientRecordsRepository]);
 
-  const handleImportPostmanData = useCallback(() => {
-    setIsImporting(true);
-    Promise.allSettled([handleImportEnvironments(), handleImportCollectionsAndApis()])
-      .then((results) => {
-        const [environmentsResult, collectionsResult] = results;
-        const importedEnvironments = environmentsResult.status === "fulfilled" ? environmentsResult.value : 0;
-        const importedCollectionsCount =
-          collectionsResult.status === "fulfilled" ? collectionsResult.value.importedCollectionsCount : 0;
-        const importedApisCount =
-          collectionsResult.status === "fulfilled" ? collectionsResult.value.importedApisCount : 0;
+  const handleImportPostmanData = useCallback(async () => {
+    return wrapWithCustomSpan(
+      {
+        name: "[Transaction] api_client.postman_import.import_data",
+        op: "api_client.postman_import.import_data",
+        forceTransaction: true,
+        attributes: {},
+      },
+      async () => {
+        setIsImporting(true);
+        await Promise.allSettled([handleImportEnvironments(), handleImportCollectionsAndApis()])
+          .then((results) => {
+            const [environmentsResult, collectionsResult] = results;
+            const importedEnvironments = environmentsResult.status === "fulfilled" ? environmentsResult.value : 0;
+            const importedCollectionsCount =
+              collectionsResult.status === "fulfilled" ? collectionsResult.value.importedCollectionsCount : 0;
+            const importedApisCount =
+              collectionsResult.status === "fulfilled" ? collectionsResult.value.importedApisCount : 0;
 
-        const failedEnvironments = processedFileData.environments.length - importedEnvironments;
-        const failedCollections = collectionsCount.current - importedCollectionsCount;
+            const failedEnvironments = processedFileData.environments.length - importedEnvironments;
+            const failedCollections = collectionsCount.current - importedCollectionsCount;
 
-        if (!importedEnvironments && !importedCollectionsCount) {
-          notification.error({
-            message: "Failed to import Postman data",
-            placement: "bottomRight",
+            if (!importedEnvironments && !importedCollectionsCount) {
+              notification.error({
+                message: "Failed to import Postman data",
+                placement: "bottomRight",
+              });
+              Sentry.captureException(
+                new Error("Failed to import Postman data. No environments or collections imported.")
+              );
+              Sentry.getActiveSpan()?.setStatus({
+                code: SPAN_STATUS_ERROR,
+              });
+              return;
+            }
+
+            const hasFailures = failedEnvironments > 0 || failedCollections > 0;
+            const hasSuccesses = importedEnvironments > 0 || importedCollectionsCount > 0;
+
+            if (hasFailures && hasSuccesses) {
+              const failureMessage = [
+                failedCollections > 0 ? `${failedCollections} collection${failedCollections !== 1 ? "s" : ""}` : "",
+                failedEnvironments > 0 ? `${failedEnvironments} environment${failedEnvironments !== 1 ? "s" : ""}` : "",
+              ]
+                .filter(Boolean)
+                .join(" and ");
+
+              toast.warn(`Partial import success. Failed to import: ${failureMessage}`);
+              Sentry.captureException(new Error(`Partial import success. Failed to import: ${failureMessage}`));
+              Sentry.getActiveSpan()?.setStatus({
+                code: SPAN_STATUS_ERROR,
+              });
+              return;
+            }
+
+            toast.success(
+              `Successfully imported ${[
+                importedCollectionsCount > 0
+                  ? `${importedCollectionsCount} collection${importedCollectionsCount !== 1 ? "s" : ""}`
+                  : "",
+                importedEnvironments > 0
+                  ? `${importedEnvironments} environment${importedEnvironments !== 1 ? "s" : ""}`
+                  : "",
+              ]
+                .filter(Boolean)
+                .join(" and ")}`
+            );
+
+            onSuccess?.();
+            trackImportSuccess(ApiClientImporterType.POSTMAN, importedCollectionsCount, importedApisCount);
+            Sentry.getActiveSpan()?.setStatus({
+              code: SPAN_STATUS_OK,
+            });
+          })
+          .catch((error) => {
+            Logger.error("Postman data import failed:", error);
+            setImportError("Something went wrong!, Couldn't import Postman data");
+            trackImportFailed(ApiClientImporterType.POSTMAN, JSON.stringify(error));
+            Sentry.withScope((scope) => {
+              scope.setTag("error_type", "api_client_postman_import");
+              Sentry.captureException(error);
+            });
+            Sentry.getActiveSpan()?.setStatus({
+              code: SPAN_STATUS_ERROR,
+            });
+          })
+          .finally(() => {
+            setIsImporting(false);
           });
-          return;
-        }
-
-        const hasFailures = failedEnvironments > 0 || failedCollections > 0;
-        const hasSuccesses = importedEnvironments > 0 || importedCollectionsCount > 0;
-
-        if (hasFailures && hasSuccesses) {
-          const failureMessage = [
-            failedCollections > 0 ? `${failedCollections} collection${failedCollections !== 1 ? "s" : ""}` : "",
-            failedEnvironments > 0 ? `${failedEnvironments} environment${failedEnvironments !== 1 ? "s" : ""}` : "",
-          ]
-            .filter(Boolean)
-            .join(" and ");
-
-          toast.warn(`Partial import success. Failed to import: ${failureMessage}`);
-          return;
-        }
-
-        toast.success(
-          `Successfully imported ${[
-            importedCollectionsCount > 0
-              ? `${importedCollectionsCount} collection${importedCollectionsCount !== 1 ? "s" : ""}`
-              : "",
-            importedEnvironments > 0
-              ? `${importedEnvironments} environment${importedEnvironments !== 1 ? "s" : ""}`
-              : "",
-          ]
-            .filter(Boolean)
-            .join(" and ")}`
-        );
-
-        onSuccess?.();
-        trackImportSuccess(ApiClientImporterType.POSTMAN, importedCollectionsCount, importedApisCount);
-      })
-      .catch((error) => {
-        Logger.error("Postman data import failed:", error);
-        setImportError("Something went wrong!, Couldn't import Postman data");
-        trackImportFailed(ApiClientImporterType.POSTMAN, JSON.stringify(error));
-        Sentry.withScope((scope) => {
-          scope.setTag("error_type", "api_client_postman_import");
-          Sentry.captureException(error);
-        });
-      })
-      .finally(() => {
-        setIsImporting(false);
-      });
+      }
+    )();
   }, [handleImportEnvironments, handleImportCollectionsAndApis, onSuccess, processedFileData.environments.length]);
 
   const handleResetImport = () => {
@@ -415,6 +443,11 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
     <div className="postman-importer">
       <div className="postman-importer__header">
         <span>Import from Postman</span>
+        <Tooltip title="Learn more about importing from Postman">
+          <a href={LINKS.REQUESTLY_API_CLIENT_IMPORT_POSTMAN_DOCS} target="_blank" rel="noreferrer">
+            <MdInfoOutline className="postman-importer__header-info-icon" />
+          </a>
+        </Tooltip>
       </div>
       {importError ? (
         <div className="postman-importer__post-parse-view postman-importer__post-parse-view--error">
