@@ -199,4 +199,8 @@ export class HttpRecordEntity<M extends ApiClientEntityMeta = ApiClientEntityMet
   setResponse(response: RQAPI.HttpResponse): void {
     this.SETCOMMON({ data: { response } });
   }
+
+  setRequest(request: RQAPI.HttpRequest): void {
+    this.SET({ data: { request } });
+  }
 }
