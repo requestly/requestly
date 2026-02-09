@@ -20,10 +20,10 @@
 
   .variable-autocomplete-item {
     display: flex;
-    padding: var(--space-3, 6px);
+    padding: var(--space-3, 6px) !important;
     flex-direction: row;
     width: 225px;
-    border-bottom: none;
+    border: none !important;
     justify-content: space-between;
     cursor: pointer;
     &:hover {

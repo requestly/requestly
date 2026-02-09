@@ -11,6 +11,9 @@
     font-style: normal;
     font-weight: 400;
     padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
 
     .header-with-icon {
       display: flex;
@@ -36,13 +39,14 @@
     }
 
     .header-text {
-      margin-top: var(--space-2, 4px);
+      font-weight: 500;
+      padding-bottom: 8px;
     }
   }
 
   .popover-body {
     display: flex;
-    padding-top: var(--space-4, 8px);
+    padding-top: var(--space-3, 6px);
     flex-direction: column;
     align-items: flex-start;
     gap: var(--space-2, 4px);
