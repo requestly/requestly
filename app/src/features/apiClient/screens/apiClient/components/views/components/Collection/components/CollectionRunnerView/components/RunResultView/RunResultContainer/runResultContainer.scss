@@ -37,12 +37,24 @@
 }
 
 .breadcrumb-ellipsis {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px 4px;
+  border-radius: 4px;
+  text-align: center;
+
   &:hover {
-    border-radius: 4px;
     background: var(--alias-tokens-color-white-t-20, rgba(255, 255, 255, 0.12));
-    padding: 0px 4px 4px;
-    text-align: center;
   }
+}
+
+.breadcrumb-dropdown-item {
+  display: block;
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .run-result-view-details {
@@ -268,6 +280,9 @@
 
         &:hover {
           background-color: var(--requestly-color-white-t-5, rgba(255, 255, 255, 0.03));
+          .request-name {
+            text-decoration: underline;
+          }
         }
 
         &.selected {
@@ -291,8 +306,8 @@
           .message {
             display: -webkit-box;
             -webkit-box-orient: vertical;
-            -webkit-line-clamp: 1;
-            line-clamp: 1;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
             overflow: hidden;
 
             text-overflow: ellipsis;
@@ -334,6 +349,7 @@
 
           .request-method-breadcrumb-section {
             display: flex;
+            align-items: center;
           }
 
           .icon {
@@ -341,7 +357,7 @@
             display: flex;
             align-items: center;
             flex-shrink: 0;
-            margin-top: -1px;
+            margin-top: -4px;
           }
 
           svg.graphql-request-icon {
@@ -367,6 +383,13 @@
 
           .root-collection-name {
             font-size: var(--requestly-font-size-sm);
+            display: inline-block;
+            max-width: 140px;
+            line-height: 17px; /* match request-name */
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            vertical-align: middle;
           }
 
           .collection-name {
@@ -383,19 +406,19 @@
           }
 
           .request-name {
-            display: -webkit-box;
-            -webkit-box-orient: vertical;
-            -webkit-line-clamp: 1;
-            line-clamp: 1;
+            display: inline-block;
+            max-width: 180px;
             overflow: hidden;
             text-overflow: ellipsis;
+            white-space: nowrap;
             color: var(--requestly-color-text-default, #fff);
             font-size: var(--requestly-font-size-sm, 12px);
             font-weight: 500;
             line-height: 17px; /* 150% */
             margin-right: 4px;
             cursor: pointer;
-            margin-top: 3px;
+            margin-top: 1px;
+            vertical-align: middle;
           }
 
           .response-details {
@@ -453,19 +476,14 @@
         gap: 8px;
 
         &-status-badge {
-          font-size: var(--requestly-font-size-2xs);
-          padding: var(--space-1, 2px) var(--space-2, 4px);
-          border-radius: 4px;
+          font-size: var(--requestly-font-size-3xs, 8px);
+          padding: 1px 4px;
+          border-radius: 3px;
           letter-spacing: 1px;
           font-weight: 500;
           display: flex;
           align-items: center;
-          gap: 4px;
-
-          svg {
-            width: 14px;
-            height: 14px;
-          }
+          gap: 2px;
 
           &.passed {
             color: var(--requestly-color-success-200);
