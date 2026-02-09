@@ -58,7 +58,7 @@ const ApiClientFeatureContainer: React.FC = () => {
   }
 
   if (loadingError) {
-    throw loadingError;
+    throw new Error(loadingError);
   }
 
   return (

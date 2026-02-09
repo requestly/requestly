@@ -106,7 +106,7 @@ export const workspaceViewSlice = createSlice({
           changes: {
             status: {
               loading: false,
-              state: { success: false, error: new Error(action.error.message) },
+              state: { success: false, error: action.error.message ?? "Unknown error" },
             },
           },
         });
