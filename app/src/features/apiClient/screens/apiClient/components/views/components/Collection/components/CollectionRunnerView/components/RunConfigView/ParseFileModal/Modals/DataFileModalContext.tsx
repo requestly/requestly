@@ -5,7 +5,7 @@ import {
   trackCollectionRunnerFileParseFailed,
 } from "modules/analytics/events/features/apiClient";
 import { parseCollectionRunnerDataFile } from "features/apiClient/screens/apiClient/utils";
-import { ITERATIONS_MAX_LIMIT } from "features/apiClient/store/collectionRunConfig/runConfig.store";
+import { ITERATIONS_MAX_LIMIT } from "features/apiClient/slices/runConfig/constants";
 
 export enum DataFileModalViewMode {
   LOADING = "loading",

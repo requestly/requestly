@@ -1,20 +1,21 @@
-import React, { useCallback, useMemo } from "react";
-import { useApiClientFileStore } from "features/apiClient/store/apiClientFilesStore";
-import { RQButton, RQTooltip } from "lib/design-system-v2/components";
-import { MdOutlineRemoveRedEye } from "@react-icons/all-files/md/MdOutlineRemoveRedEye";
 import { BiError } from "@react-icons/all-files/bi/BiError";
-import { getFileExtension, truncateString } from "features/apiClient/screens/apiClient/utils";
-import { RxCross2 } from "@react-icons/all-files/rx/RxCross2";
-import { useRunConfigStore } from "../../../run.context";
 import { MdOutlineFileUpload } from "@react-icons/all-files/md/MdOutlineFileUpload";
 import { MdOutlineInfo } from "@react-icons/all-files/md/MdOutlineInfo";
-import { useCollectionRunnerFileSelection } from "../hooks/useCollectionRunnerFileSelection.hook";
-import { DataFileModalWrapper } from "../ParseFileModal/Modals/DataFileModalWrapper";
-import { DataFileModalViewMode, useDataFileModalContext } from "../ParseFileModal/Modals/DataFileModalContext";
+import { MdOutlineRemoveRedEye } from "@react-icons/all-files/md/MdOutlineRemoveRedEye";
+import { RxCross2 } from "@react-icons/all-files/rx/RxCross2";
+import { getFileExtension, truncateString } from "features/apiClient/screens/apiClient/utils";
+import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
+import { useApiClientFileStore } from "features/apiClient/store/apiClientFilesStore";
+import { RQButton, RQTooltip } from "lib/design-system-v2/components";
 import {
   trackCollectionRunnerFileCleared,
   trackCollectionRunnerSelectFileClicked,
 } from "modules/analytics/events/features/apiClient";
+import React, { useCallback, useMemo } from "react";
+import { useCollectionView } from "../../../../../collectionView.context";
+import { useCollectionRunnerFileSelection } from "../hooks/useCollectionRunnerFileSelection.hook";
+import { DataFileModalViewMode, useDataFileModalContext } from "../ParseFileModal/Modals/DataFileModalContext";
+import { DataFileModalWrapper } from "../ParseFileModal/Modals/DataFileModalWrapper";
 
 export const DataFileSelector: React.FC = () => {
   const {
@@ -26,21 +27,22 @@ export const DataFileSelector: React.FC = () => {
     setShowModal,
   } = useDataFileModalContext();
 
-  const [dataFile, removeDataFile, setIterations] = useRunConfigStore((s) => [
-    s.dataFile,
-    s.removeDataFile,
-    s.setIterations,
-  ]);
+  const { bufferedEntity } = useCollectionView();
+
+  const dataFile = useApiClientSelector((state) => bufferedEntity.getDataFile(state));
+
   const [getFilesByIds, isFilePresentLocally, storeFiles] = useApiClientFileStore((s) => [
     s.getFilesByIds,
     s.isFilePresentLocally,
     s.files,
   ]);
+
   const file = useMemo(
     () => {
       if (!dataFile) {
         return null;
       }
+
       return getFilesByIds([dataFile?.id])?.[0] ?? null;
     },
 
@@ -48,6 +50,7 @@ export const DataFileSelector: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [dataFile?.id, getFilesByIds, storeFiles]
   );
+
   const { openFileSelector } = useCollectionRunnerFileSelection();
 
   const handleFileSelection = useCallback(() => {
@@ -63,9 +66,9 @@ export const DataFileSelector: React.FC = () => {
 
   const handleRemoveFile = useCallback(() => {
     setDataFileMetadata(null);
-    removeDataFile();
-    setIterations(1);
-  }, [removeDataFile, setDataFileMetadata, setIterations]);
+    bufferedEntity.removeDataFile();
+    bufferedEntity.setIterations(1);
+  }, [bufferedEntity, setDataFileMetadata]);
 
   const handleViewExistingFile = useCallback(async () => {
     if (dataFile) {

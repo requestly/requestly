@@ -143,7 +143,7 @@ export class LocalEnvSync implements EnvironmentInterface<ApiClientLocalMeta> {
 
   async updateEnvironment(
     environmentId: string,
-    updates: Partial<Pick<EnvironmentData, "name" | "variables">>
+    updates: Partial<Pick<EnvironmentData, "name" | "variables" | "variablesOrder">>
   ): Promise<void> {
     environmentId = this.translateDisasterousId(environmentId);
     const service = await this.getAdapter();

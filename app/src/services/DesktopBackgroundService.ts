@@ -45,7 +45,7 @@ export async function rpcWithRetry(
 ) {
   let retries = params.retryCount;
   while (retries >= 0) {
-    console.log("attempt", retries);
+    // console.log(`attempt`, { ...params, retries, args, timestamp: Date.now() });
     try {
       return await rpc(
         {
@@ -56,9 +56,14 @@ export async function rpcWithRetry(
         ...args
       );
     } catch (err) {
-      console.log("attempt error", retries, err);
+      // console.log(`attempt error`, { ...params, retries, err, args, timestamp: Date.now() });
       if (err instanceof TimoutError) {
         retries--;
+
+        if (retries < 0) {
+          throw err;
+        }
+
         continue;
       }
       console.log("weird error", retries, err);

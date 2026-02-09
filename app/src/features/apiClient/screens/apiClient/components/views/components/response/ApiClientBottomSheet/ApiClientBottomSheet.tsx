@@ -7,7 +7,7 @@ import { BottomSheet } from "componentsV2/BottomSheet";
 import StatusLine from "../StatusLine";
 import { TabsProps, Tag } from "antd";
 import { TestsView } from "../TestsView/TestsView";
-import { TestResult, TestStatus } from "features/apiClient/helpers/modules/scriptsV2/worker/script-internals/types";
+import { TestStatus } from "features/apiClient/helpers/modules/scriptsV2/worker/script-internals/types";
 import { ApiClientErrorPanel } from "../../errors/ApiClientErrorPanel/ApiClientErrorPanel";
 import { ApiClientLoader } from "../LoadingPlaceholder/ApiClientLoader";
 import { EmptyResponsePlaceholder } from "../EmptyResponsePlaceholder/EmptyResponsePlaceholder";
@@ -17,13 +17,14 @@ import { ApiClientWarningPanel } from "../../errors/ApiClientWarningPanel/ApiCli
 import "./apiclientBottomSheet.scss";
 import { ApiClientLargeFileLoader } from "../../../../clientView/components/response/LargeFileLoadingPlaceholder";
 import { BottomSheetTabLabel } from "componentsV2/BottomSheet/components/BottomSheetLayout/components/BottomSheetTabLabel/BottomSheetTabLabel";
+import { GraphQLRecordEntity, HttpRecordEntity } from "features/apiClient/slices/entities";
+import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
+import { hasTests } from "features/apiClient/helpers/testGeneration/buildPostResponseTests";
 
 interface Props {
+  entity: HttpRecordEntity | GraphQLRecordEntity,
   onGenerateTests?: () => void;
   isGeneratingTests?: boolean;
-  canGenerateTests?: boolean;
-  response: RQAPI.Response;
-  testResults: TestResult[];
   isLoading: boolean;
   isLongRequest?: boolean;
   isFailed: boolean;
@@ -43,11 +44,9 @@ const BOTTOM_SHEET_TAB_KEYS = {
 };
 
 export const ApiClientBottomSheet: React.FC<Props> = ({
+  entity,
   onGenerateTests,
   isGeneratingTests = false,
-  canGenerateTests = false,
-  response,
-  testResults,
   isLoading,
   isFailed,
   isLongRequest,
@@ -59,6 +58,16 @@ export const ApiClientBottomSheet: React.FC<Props> = ({
   executeRequest,
   onDismissError,
 }) => {
+  const response = useApiClientSelector(s => entity.getResponse(s));
+  const postResponseScript = useApiClientSelector(s => entity.getPostResponseScript(s));
+  const testResults = useApiClientSelector(s => entity.getTestResults(s));
+
+   const canGenerateTests = useMemo(() => {
+    const responseExists = Boolean(postResponseScript);
+    if (!responseExists) return false;
+    return !hasTests(postResponseScript);
+  }, [postResponseScript]);
+
   const contentTypeHeader = useMemo(() => {
     return response?.headers ? getContentTypeFromResponseHeaders(response.headers) ?? "" : "";
   }, [response?.headers]);

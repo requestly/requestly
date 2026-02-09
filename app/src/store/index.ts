@@ -12,6 +12,11 @@ import { workspaceReducerWithLocal } from "./slices/workspaces/slice";
 import { variablesReducer } from "./features/variables/slice";
 
 import { globalReducers } from "./slices/global/slice";
+import { workspaceViewReducerWithLocal } from "features/apiClient/slices";
+import { runtimeVariablesReducerWithPersist } from "features/apiClient/slices/runtimeVariables";
+import { tabsReducerWithPersist, tabBufferMiddleware } from "componentsV2/Tabs/slice";
+import { tabCloseMiddleware } from "componentsV2/Tabs/slice/tabCloseMiddleware";
+import { exampleCollectionsReducerWithPersist } from "features/apiClient/slices/exampleCollections";
 
 export const reduxStore = configureStore({
   reducer: {
@@ -23,13 +28,18 @@ export const reduxStore = configureStore({
     [ReducerKeys.BILLING]: billingReducer,
     [ReducerKeys.WORKSPACE]: workspaceReducerWithLocal,
     [ReducerKeys.VARIABLES]: variablesReducer,
+    [ReducerKeys.WORKSPACE_VIEW]: workspaceViewReducerWithLocal,
+    [ReducerKeys.TABS]: tabsReducerWithPersist,
+    [ReducerKeys.RUNTIME_VARIABLES]: runtimeVariablesReducerWithPersist,
+    [ReducerKeys.EXAMPLE_COLLECTIONS]: exampleCollectionsReducerWithPersist,
   },
   middleware: (getDefaultMiddleware) => {
     // In development mode redux-toolkit will
     // check for non-serializable values in actions,
     // in our case we have functions in payload,
     // so avoiding this check.
-    return getDefaultMiddleware({ serializableCheck: false });
+    const middlewares = getDefaultMiddleware({ serializableCheck: false });
+    return middlewares.concat(tabBufferMiddleware).concat(tabCloseMiddleware);
   },
   enhancers: (existingEnhancers) => {
     // Add the autobatch enhancer to the store setup
