@@ -342,7 +342,7 @@ export const setupWorkspaceView = createAsyncThunk(
             workspace: selectedWorkspace,
             userId,
           })
-        );
+        ).unwrap();
       } catch (error) {
         if (isWorkspaceDeletedError(error)) {
           // workspace deleted, fallback to private
