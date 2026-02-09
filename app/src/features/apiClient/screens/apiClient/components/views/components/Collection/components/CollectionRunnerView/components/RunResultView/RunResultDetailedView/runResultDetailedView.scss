@@ -7,12 +7,12 @@
   .api-client-response-body {
     .api-response-body-editor-container {
       .react-resizable {
-        height: 300px !important;
+        height: 56vh !important;
       }
     }
 
     .api-response-body-raw-content {
-      max-height: 300px;
+      max-height: 56vh;
       overflow-y: auto;
     }
   }
@@ -53,10 +53,11 @@
         background-color: transparent !important;
         font-size: var(--requestly-font-size-2xs, 9px);
         font-weight: 600;
-        line-height: 13px; /* 144.444% */
+        line-height: 13px;
         letter-spacing: 1.5px;
         text-transform: uppercase;
       }
+
       .request-name-details-breadcrumb {
         margin-top: -2px;
 
@@ -86,7 +87,7 @@
         text-overflow: ellipsis;
         font-size: var(--requestly-font-size-xs, 11px);
         font-weight: 500;
-        line-height: 17px; /* 154.545% */
+        line-height: 17px;
       }
 
       .request-name {
@@ -98,7 +99,7 @@
         color: var(--requestly-color-text-default, #fff);
         font-size: var(--requestly-font-size-sm, 12px);
         font-weight: 500;
-        line-height: 17px; /* 150% */
+        line-height: 17px;
         margin-right: 4px;
         vertical-align: middle;
         cursor: pointer;
@@ -120,7 +121,7 @@
         color: var(--requestly-color-text-placeholder, #8f8f8f);
         font-size: var(--requestly-font-size-xs, 11px);
         font-weight: 400;
-        line-height: 17px; /* 154.545% */
+        line-height: 17px;
       }
     }
 
@@ -142,13 +143,17 @@
   .response-details-tab {
     height: 100%;
     overflow-y: auto;
+
     .ant-collapse {
+      height: 70vh;
       border: none;
+      overflow-y: scroll;
 
       .ant-collapse-item {
         border-bottom: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
         border-radius: 4px;
         padding: var(--space-4, 8px) var(--space-5, 12px);
+
         &:last-child {
           margin-bottom: 0;
         }
@@ -227,7 +232,6 @@
       }
 
       .request-details-properties {
-        max-height: 400px !important;
         overflow: auto;
       }
     }
@@ -260,7 +264,7 @@
     font-size: 9px;
     font-style: normal;
     font-weight: 500;
-    line-height: var(--line-height-2xs, 13px); /* 144.444% */
+    line-height: var(--line-height-2xs, 13px);
     letter-spacing: 1px;
     text-transform: uppercase;
   }
