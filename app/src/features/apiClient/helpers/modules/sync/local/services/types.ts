@@ -9,6 +9,7 @@ export type FileSystemError = {
     path: string;
     fileType: FileType;
     code: ErrorCode;
+    metadata?: Record<string, any>;
   };
 };
 export type ContentfulSuccess<T> = T extends void ? { type: "success" } : { type: "success"; content: T };
