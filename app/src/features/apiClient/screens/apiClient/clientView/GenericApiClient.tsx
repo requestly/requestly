@@ -14,6 +14,7 @@ export type GenericApiClientOverride = {
   onSaveClick?: {
     save: (record: RQAPI.ApiRecord, repositories: ApiClientRepositoryInterface) => Promise<RQAPI.ApiRecord>;
     onSuccess: (record: RQAPI.ApiRecord) => void;
+    skipMarkSaved?: boolean;
   };
 };
 

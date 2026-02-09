@@ -3,13 +3,13 @@ import type { EnvironmentMap, EnvironmentVariables } from "backend/environment/t
 import type { EnvironmentInterface } from "../../helpers/modules/sync/interfaces";
 import { entitySynced } from "../common/actions";
 import { ApiClientEntityType } from "../entities/types";
-import { GLOBAL_ENVIRONMENT_ID } from "../common/constants";
 import { environmentsActions } from "./slice";
 import { EnvironmentEntity } from "./types";
 import { parseEnvironmentEntityToData } from "./utils";
 import { erroredRecordsActions } from "../erroredRecords";
 import { reduxStore } from "store";
 import { closeTabByEntityId } from "componentsV2/Tabs/slice";
+import { isGlobalEnvironment } from "features/apiClient/screens/environment/utils";
 
 type Repository = EnvironmentInterface<Record<string, unknown>>;
 
@@ -57,7 +57,7 @@ export const updateEnvironmentVariables = createAsyncThunk<
     await repository.updateEnvironment(environmentId, { variables });
 
     // Notify that environment was synced (slice will update via extraReducers)
-    const isGlobal = environmentId === GLOBAL_ENVIRONMENT_ID;
+    const isGlobal = isGlobalEnvironment(environmentId);
     dispatch(
       entitySynced({
         entityType: isGlobal ? ApiClientEntityType.GLOBAL_ENVIRONMENT : ApiClientEntityType.ENVIRONMENT,
@@ -82,7 +82,7 @@ export const updateEnvironmentName = createAsyncThunk<
   try {
     await repository.updateEnvironment(environmentId, { name });
 
-    const isGlobal = environmentId === GLOBAL_ENVIRONMENT_ID;
+    const isGlobal = isGlobalEnvironment(environmentId);
     dispatch(
       entitySynced({
         entityType: isGlobal ? ApiClientEntityType.GLOBAL_ENVIRONMENT : ApiClientEntityType.ENVIRONMENT,

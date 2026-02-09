@@ -3,46 +3,26 @@ import {
   extractPathVariablesFromUrl,
   extractQueryParams,
   queryParamsToURLString,
-  parseCurlRequest,
 } from "features/apiClient/screens/apiClient/utils";
-import { KeyValuePair, RQAPI } from "features/apiClient/types";
+import { KeyValuePair } from "features/apiClient/types";
 import { useCallback, memo } from "react";
 import { ApiClientUrl } from "../../../components/request/components/ApiClientUrl/ApiClientUrl";
 import { BufferedHttpRecordEntity } from "features/apiClient/slices/entities";
 import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
 
 interface ApiClientUrlProps {
-  entity: BufferedHttpRecordEntity;
+  entity: BufferedHttpRecordEntity
   onEnterPress: (e: KeyboardEvent) => void;
   onUrlChange: (value: string, finalParams: KeyValuePair[]) => void;
-  onCurlImport?: (request: RQAPI.Request) => void;
 }
 
-const HttpApiClientUrl = ({ entity, onEnterPress, onUrlChange, onCurlImport }: ApiClientUrlProps) => {
-  const url = useApiClientSelector((s) => entity.getUrl(s));
-  const queryParams = useApiClientSelector((s) => entity.getQueryParams(s));
+const HttpApiClientUrl = ({ entity, onEnterPress, onUrlChange }: ApiClientUrlProps) => {
+  const url = useApiClientSelector(s => entity.getUrl(s));
+  const queryParams = useApiClientSelector(s => entity.getQueryParams(s) );
   const currentEnvironmentVariables = useScopedVariables(entity.meta.referenceId);
-
-  const handlePaste = useCallback(
-    (e: ClipboardEvent, pastedText: string) => {
-      let requestFromPaste;
-      try {
-        requestFromPaste = parseCurlRequest(pastedText);
-      } catch (error) {
-        requestFromPaste = null;
-      }
-
-      if (requestFromPaste?.url) {
-        e.preventDefault();
-        onCurlImport?.(requestFromPaste);
-      }
-    },
-    [onCurlImport]
-  );
 
   const handleUrlChange = useCallback(
     (value: string) => {
-      // Regular URL handling
       const pathVariables = extractPathVariablesFromUrl(value);
       entity.reconcilePathKeys(pathVariables);
 
@@ -78,11 +58,10 @@ const HttpApiClientUrl = ({ entity, onEnterPress, onUrlChange, onCurlImport }: A
   return (
     <ApiClientUrl
       url={queryParamsToURLString(queryParams, url)}
-      placeholder="Enter or paste HTTP URL or cURL command"
+      placeholder="Enter or paste HTTP URL"
       currentEnvironmentVariables={currentEnvironmentVariables}
       onEnterPress={onEnterPress}
       onUrlChange={handleUrlChange}
-      onPaste={handlePaste}
     />
   );
 };

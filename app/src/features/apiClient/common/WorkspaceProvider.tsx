@@ -7,20 +7,22 @@ import {
   ReactReduxContextValue,
   TypedUseSelectorHook,
 } from "react-redux";
-import { ApiClientStoreState, useApiClientStore } from "../slices";
+import { ApiClientStore, ApiClientStoreState, useApiClientStore } from "../slices";
 import { Workspace } from "features/workspaces/types";
+import { NoopContextId } from "../commands/utils";
 
-const WorkspaceStoreContext = createContext<ReactReduxContextValue<ApiClientStoreState> | null>(null);
+export const WorkspaceStoreContext = createContext<ReactReduxContextValue<ApiClientStoreState> | null>(null);
 
 export const useWorkspaceViewStore = createStoreHook(WorkspaceStoreContext);
 export const useWorkspaceViewDispatch = createDispatchHook(WorkspaceStoreContext);
 
-export const useWorkspaceViewSelector: TypedUseSelectorHook<ApiClientStoreState> =
-  createSelectorHook(WorkspaceStoreContext);
+export const useWorkspaceViewSelector: TypedUseSelectorHook<ApiClientStoreState> = createSelectorHook(
+  WorkspaceStoreContext
+);
 
 const WorkspaceIdContext = createContext<Workspace["id"] | undefined>(undefined);
 
-export const WorkspaceIdContextProvider: React.FC<React.PropsWithChildren<{ id?: Workspace["id"] }>> = ({
+export const WorkspaceIdContextProvider: React.FC<React.PropsWithChildren<{ id: Workspace["id"] }>> = ({
   id,
   children,
 }) => {
@@ -41,7 +43,17 @@ const WorkspaceStoreProvider: React.FC<React.PropsWithChildren> = (props) => {
   );
 };
 
-export const WorkspaceProvider: React.FC<React.PropsWithChildren<{ workspaceId?: Workspace["id"] }>> = (props) => {
+export const FakeWorkspaceStoreProvider: React.FC<React.PropsWithChildren & { store: ApiClientStore }> = (props) => {
+  return (
+    <WorkspaceIdContextProvider id={NoopContextId}>
+      <Provider context={WorkspaceStoreContext} store={props.store}>
+        {props.children}
+      </Provider>
+    </WorkspaceIdContextProvider>
+  );
+};
+
+export const WorkspaceProvider: React.FC<React.PropsWithChildren<{ workspaceId: Workspace["id"] }>> = (props) => {
   return (
     <WorkspaceIdContextProvider id={props.workspaceId}>
       <WorkspaceStoreProvider>{props.children}</WorkspaceStoreProvider>

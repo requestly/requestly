@@ -7,8 +7,9 @@ import { trackRQDesktopLastActivity, trackRQLastActivity } from "utils/Analytics
 import { API_CLIENT } from "modules/analytics/events/features/constants";
 import { TfiClose } from "@react-icons/all-files/tfi/TfiClose";
 import { useTabActions } from "componentsV2/Tabs/slice";
-import { DraftRequestContainerTabSource } from "../../../views/components/DraftRequestContainer/draftRequestContainerTabSource";
 import { getApiClientFeatureContext } from "features/apiClient/slices";
+import { HistoryViewTabSource } from "../../../views/components/request/HistoryView/historyViewTabSource";
+import { createDummyApiRecord } from "features/apiClient/components/common/APIClient/APIClient";
 
 interface Props {
   history: RQAPI.ApiEntry[];
@@ -22,8 +23,6 @@ export const HistoryList: React.FC<Props> = ({ history, selectedHistoryIndex, on
 
   const onHistoryLinkClick = useCallback(
     (index: number) => {
-      onSelectionFromHistory(index);
-
       const historyEntry = history[index];
       if (!historyEntry) {
         return;
@@ -31,28 +30,20 @@ export const HistoryList: React.FC<Props> = ({ history, selectedHistoryIndex, on
 
       const ctx = getApiClientFeatureContext();
 
-      const emptyRecord: RQAPI.ApiRecord = {
-        data: historyEntry,
-        type: RQAPI.RecordType.API,
-        id: "",
-        name: "Untitled request",
-        collectionId: "",
-        ownerId: "",
-        deleted: false,
-        createdBy: "",
-        updatedBy: "",
-        createdTs: Date.now(),
-        updatedTs: Date.now(),
-      };
+      const record = createDummyApiRecord(historyEntry);
+      record.id = ""; // Override to empty for history entries
 
       openBufferedTab({
-        source: new DraftRequestContainerTabSource({
-          apiEntryType: historyEntry.type,
-          emptyRecord,
+        source: new HistoryViewTabSource({
           context: { id: ctx.workspaceId },
+          record,
+          entryType: historyEntry.type,
         }),
-        isNew: true,
+        preview: false,
+        singleton: true,
       });
+
+      onSelectionFromHistory(index);
 
       trackRequestSelectedFromHistory();
       trackRQLastActivity(API_CLIENT.REQUEST_SELECTED_FROM_HISTORY);

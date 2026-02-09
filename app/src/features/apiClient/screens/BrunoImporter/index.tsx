@@ -1,30 +1,29 @@
-import React, { useCallback, useRef, useState } from "react";
-import { FilePicker } from "components/common/FilePicker";
-import { processBrunoCollectionData } from "./utils";
-import { toast } from "utils/Toast";
-import { RQButton } from "lib/design-system-v2/components";
-import { ApiClientImporterType, RQAPI } from "features/apiClient/types";
 import { IoMdCloseCircleOutline } from "@react-icons/all-files/io/IoMdCloseCircleOutline";
 import { MdCheckCircleOutline } from "@react-icons/all-files/md/MdCheckCircleOutline";
+import { EnvironmentVariableData } from "@requestly/shared/types/entities/apiClient";
+import { SPAN_STATUS_ERROR, SPAN_STATUS_OK } from "@sentry/core";
+import * as Sentry from "@sentry/react";
 import { notification, Row } from "antd";
-import Logger from "lib/logger";
-import "./brunoImporter.scss";
-import { useNavigate } from "react-router-dom";
-import { redirectToApiClient } from "utils/RedirectionUtils";
+import { FilePicker } from "components/common/FilePicker";
+import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
+import { createEnvironment, getApiClientFeatureContext, useApiClientRepository } from "features/apiClient/slices";
+import { ApiClientImporterType, RQAPI } from "features/apiClient/types";
+import { RQButton } from "lib/design-system-v2/components";
 import { RQModal } from "lib/design-system/components";
+import Logger from "lib/logger";
 import {
   trackImportFailed,
   trackImportParsed,
   trackImportParseFailed,
   trackImportSuccess,
 } from "modules/analytics/events/features/apiClient";
-import * as Sentry from "@sentry/react";
-import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
-import { createEnvironment, useApiClientRepository } from "features/apiClient/slices";
-import { useApiClientDispatch } from "features/apiClient/slices/hooks/base.hooks";
-import { EnvironmentVariableData } from "@requestly/shared/types/entities/apiClient";
+import React, { useCallback, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { redirectToApiClient } from "utils/RedirectionUtils";
 import { wrapWithCustomSpan } from "utils/sentry";
-import { SPAN_STATUS_ERROR, SPAN_STATUS_OK } from "@sentry/core";
+import { toast } from "utils/Toast";
+import "./brunoImporter.scss";
+import { processBrunoCollectionData } from "./utils";
 
 interface BrunoImporterProps {
   onSuccess?: () => void;
@@ -48,7 +47,7 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
 
   const { onSaveRecord } = useNewApiClientContext();
   const { apiClientRecordsRepository, environmentVariablesRepository } = useApiClientRepository();
-  const dispatch = useApiClientDispatch();
+  const { dispatch } = getApiClientFeatureContext().store;
 
   const collectionsCount = useRef(0);
 
@@ -147,7 +146,7 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
               });
             });
         }
-      );
+      )(files);
     },
     [apiClientRecordsRepository]
   );
@@ -239,7 +238,7 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
             name: env.name,
             variables: env.variables,
             repository: environmentVariablesRepository,
-          })
+          }) as any
         ).unwrap();
         return true;
       });
@@ -313,7 +312,7 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
             setIsImporting(false);
           });
       }
-    );
+    )();
   }, [handleImportEnvironments, handleImportCollectionsAndApis, onSuccess]);
 
   const handleResetImport = () => {

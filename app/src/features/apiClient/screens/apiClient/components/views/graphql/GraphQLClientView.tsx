@@ -217,6 +217,7 @@ const GraphQLClientView: React.FC<GraphQLClientViewProps> = ({
     saveBuffer(
       {
         entity,
+        skipMarkSaved: override?.onSaveClick?.skipMarkSaved,
         produceChanges(entity, state) {
           const record = lodash.cloneDeep(entity.getEntityFromState(state));
           const entry = record.data;
@@ -298,10 +299,9 @@ const GraphQLClientView: React.FC<GraphQLClientViewProps> = ({
 
   const handleRecordNameUpdate = useCallback(
     async (newName: string) => {
-      const result = await repositories.apiClientRecordsRepository.updateRecord(
-        { name: newName },
-        entity.meta.referenceId
-      );
+      const record = lodash.cloneDeep(entity.getEntityFromState(store.getState()));
+      record.name = newName;
+      const result = await repositories.apiClientRecordsRepository.updateRecord(record, entity.meta.referenceId);
       if (!result.success) {
         notification.error({
           message: "Could not rename request",
@@ -313,7 +313,7 @@ const GraphQLClientView: React.FC<GraphQLClientViewProps> = ({
       entity.origin.setName(newName);
       trackRequestRenamed("breadcrumb");
     },
-    [entity, repositories]
+    [entity, repositories, store]
   );
 
   const handleRevertChanges = useCallback(() => {

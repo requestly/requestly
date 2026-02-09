@@ -19,6 +19,7 @@ const initialState: TabServiceState = {
   tabs: tabsAdapter.getInitialState(),
   activeTabId: undefined,
   previewTabId: undefined,
+  singletonTabIdsBySourceType: {},
 };
 
 export const tabsSlice = createSlice({
@@ -31,6 +32,13 @@ export const tabsSlice = createSlice({
       const currentIndex = tabsArray.findIndex((t) => t.id === tabId);
 
       tabsAdapter.removeOne(state.tabs, tabId);
+
+      // Cleanup singleton mapping
+      Object.keys(state.singletonTabIdsBySourceType).forEach((sourceType) => {
+        if (state.singletonTabIdsBySourceType[sourceType] === tabId) {
+          delete state.singletonTabIdsBySourceType[sourceType];
+        }
+      });
 
       if (state.previewTabId === tabId) {
         state.previewTabId = undefined;
@@ -150,6 +158,7 @@ export const tabsSlice = createSlice({
       state.tabs = tabsAdapter.getInitialState();
       state.activeTabId = undefined;
       state.previewTabId = undefined;
+      state.singletonTabIdsBySourceType = {};
     },
 
     openTab(
@@ -158,11 +167,47 @@ export const tabsSlice = createSlice({
         source: TabSource;
         modeConfig: TabModeConfig;
         preview?: boolean;
+        singleton?: boolean;
       }>
     ) {
-      const { source, modeConfig, preview = true } = action.payload;
+      const { source, modeConfig, preview = true, singleton } = action.payload;
       const sourceId = source.getSourceId();
       const sourceName = source.getSourceName();
+      const sourceType = source.type;
+
+      if (singleton) {
+        const existingSingletonId = state.singletonTabIdsBySourceType[sourceType];
+        if (existingSingletonId) {
+          const existingSingletonTab = tabsAdapter.getSelectors().selectById(state.tabs, existingSingletonId);
+          if (existingSingletonTab) {
+            tabsAdapter.updateOne(state.tabs, {
+              id: existingSingletonId,
+              changes: { source, modeConfig },
+            });
+            state.activeTabId = existingSingletonId;
+            state.previewTabId = undefined;
+            return;
+          }
+
+          // Stale mapping, remove and fallthrough to create.
+          delete state.singletonTabIdsBySourceType[sourceType];
+        }
+
+        const tabId = uuidv4();
+        const newTab: TabState = {
+          id: tabId,
+          source,
+          modeConfig,
+          activeWorkflows: new Set(),
+          secondaryBufferIds: new Set(),
+          singleton: true,
+        };
+        tabsAdapter.addOne(state.tabs, newTab);
+        state.singletonTabIdsBySourceType[sourceType] = tabId;
+        state.activeTabId = tabId;
+        state.previewTabId = undefined;
+        return;
+      }
 
       const allTabs = tabsAdapter.getSelectors().selectAll(state.tabs);
       const existingTab = allTabs.find(
@@ -180,6 +225,7 @@ export const tabsSlice = createSlice({
         modeConfig,
         activeWorkflows: new Set(),
         secondaryBufferIds: new Set(),
+        singleton: false,
       };
 
       if (preview) {
@@ -210,7 +256,7 @@ export const tabsSlice = createSlice({
 const tabsPersistConfig = {
   key: "rq_tabs_store",
   storage,
-  throttle: 1000,
+  throttle: 100,
   transforms: [tabsPersistTransform],
 };
 
