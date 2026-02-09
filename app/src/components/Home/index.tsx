@@ -25,7 +25,7 @@ export const Home: React.FC = () => {
           </Row>
           <Row className="homepage-primary-cards-wrapper">
             <RulesCard />
-            {/*<ApiClientCard />*/}
+            <ApiClientCard />
             <APIMockingCard />
           </Row>
         </Col>
