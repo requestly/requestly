@@ -24,14 +24,15 @@ export function generateCompletionSource(
 ): CompletionSource {
   return (context) => {
     const match = context.matchBefore(matchPattern);
-    if (match) {
+    if (match || context.explicit) {
       return {
-        from: match.from + lengthOfStartingChars,
-        to: match.to,
+        from: match ? match.from + lengthOfStartingChars : context.pos,
+        to: match ? match.to : context.pos,
         options: completions,
         filter: true,
       } as CompletionResult;
     }
+    return null;
   };
 }
 
@@ -63,17 +64,36 @@ function varCompletionSource(envVariables: ScopedVariables): CompletionSource {
 }
 
 /* CORE PLUGIN */
-export default function generateCompletionsForVariables(envVariables?: ScopedVariables) {
+export default function generateCompletionsForVariables(
+  envVariables?: ScopedVariables,
+  suggestions?: Array<{ value: string }>
+) {
   const customCompletions = [];
+
+  if (suggestions && suggestions.length > 0) {
+    const suggestionsCompletions = suggestions.map((suggestion) => ({
+      label: suggestion.value,
+    }));
+
+    const suggestionsSource: CompletionSource = (context) => {
+      const before = context.matchBefore(/.*/);
+      return {
+        from: before ? before.from : context.pos,
+        options: suggestionsCompletions,
+      };
+    };
+
+    customCompletions.push(suggestionsSource);
+  }
+
   if (envVariables) {
     customCompletions.push(varCompletionSource(envVariables));
   }
 
   if (!customCompletions.length) return null;
   return autocompletion({
-    activateOnTyping: true,
     override: customCompletions,
-    tooltipClass: () => "popup-tooltip",
-    optionClass: () => "popup-option",
+    tooltipClass: () => "cm-autocomplete-custom",
+    optionClass: () => "cm-autocomplete-option-custom",
   });
 }
