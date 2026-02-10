@@ -120,8 +120,11 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
               const pastedText = event.clipboardData?.getData("text/plain");
               if (!pastedText) return;
 
-              // Handle multiline paste conversion
-              if (pastedText.includes("\n")) {
+              // Call the onPaste handler first to let parent decide if it should handle the paste
+              // (e.g., for cURL import)
+              onPasteRef.current?.(event, pastedText);
+              // If parent didn't prevent default, handle multiline paste conversion
+              if (!event.defaultPrevented && pastedText.includes("\n")) {
                 event.preventDefault();
                 const singleLineText = pastedText.replace(/\\\s*\n\s*/g, " ").replace(/\n/g, " ");
                 view.dispatch(
@@ -134,8 +137,6 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
                   })
                 );
               }
-
-              onPasteRef.current?.(event, pastedText);
             },
           }),
           highlightVariablesPlugin(
