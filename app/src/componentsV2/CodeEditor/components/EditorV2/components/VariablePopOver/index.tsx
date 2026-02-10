@@ -17,6 +17,8 @@ import { useRBAC } from "features/rbac";
 import { useWorkspaceId } from "features/apiClient/common/WorkspaceProvider";
 import { NoopContextId } from "features/apiClient/commands/utils";
 import { createPortal } from "react-dom";
+import { flattenVariablesList } from "features/apiClient/screens/environment/utils";
+import { DynamicVariableInfoPopover } from "features/apiClient/screens/environment/components/DynamicVariableInfoPopover/DynamicVariableInfoPopover";
 
 type VariableData = ScopedVariable[0];
 
@@ -108,6 +110,10 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
     onClose?.();
   }, [transitionToView, onClose, onPinChange]);
 
+  const flattenedVariables = variableData ? flattenVariablesList({ [hoveredVariable]: variableData }) : null;
+  const firstVariable = flattenedVariables?.[0];
+  const isDynamicVariable = firstVariable?.scope === "global";
+
   const popoverContent = (() => {
     switch (currentView) {
       case PopoverView.IDLE: {
@@ -117,14 +123,20 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
       case PopoverView.VARIABLE_INFO: {
         if (!variableData) return null;
         return (
-          <VariableInfo
-            params={{
-              name: hoveredVariable,
-              variable: variableData,
-            }}
-            onEditClick={handleEditClick}
-            isNoopContext={isNoopContext}
-          />
+          <>
+            {!isDynamicVariable ? (
+              <VariableInfo
+                params={{
+                  name: hoveredVariable,
+                  variable: variableData,
+                }}
+                onEditClick={handleEditClick}
+                isNoopContext={isNoopContext}
+              />
+            ) : (
+              <DynamicVariableInfoPopover variable={firstVariable} showIconHeader />
+            )}
+          </>
         );
       }
 
@@ -187,7 +199,9 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
   // A full refactor will be carried out for the editor in the future
   return createPortal(
     <Popover
-      content={<div className="variable-info-body">{popoverContent}</div>}
+      content={
+        <div className={`variable-info-body ${isDynamicVariable ? "dynamic-variable-view" : ""}`}>{popoverContent}</div>
+      }
       open
       destroyTooltipOnHide
       onOpenChange={(nextOpen) => {
