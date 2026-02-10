@@ -524,8 +524,8 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
   const handleCurlImport = useCallback(
     (request: RQAPI.Request) => {
       try {
-        // Use replaceRequest to completely replace the request with imported cURL
-        entity.replaceRequest(request as RQAPI.HttpRequest);
+        // Use setRequest to set the request with imported cURL
+        entity.setRequest(request as RQAPI.HttpRequest);
         toast.success("cURL command imported successfully");
       } catch (error) {
         toast.error("Failed to import cURL command");
