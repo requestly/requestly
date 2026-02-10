@@ -1,12 +1,10 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { Modal } from "antd";
 import { CommonApiClientExporter } from "../../CommonApiClientExporter/CommonApiClientExporter";
 import { toast } from "utils/Toast";
-import { wrapWithCustomSpan } from "utils/sentry";
-import { SPAN_STATUS_ERROR, SPAN_STATUS_OK } from "@sentry/core";
 import * as Sentry from "@sentry/react";
 import { MdOutlineIosShare } from "@react-icons/all-files/md/MdOutlineIosShare";
-import { ExportResult, ExportType, ExporterFunction } from "features/apiClient/helpers/exporters/types";
+import { ExportType, ExporterFunction } from "features/apiClient/helpers/exporters/types";
 
 interface Props {
   isOpen: boolean;
@@ -17,61 +15,19 @@ interface Props {
 }
 
 export const CommonApiClientExportModal: React.FC<Props> = ({ isOpen, onClose, title, exporter, exporterType }) => {
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [exportError, setExportError] = useState<string | null>(null);
-  const [exportResult, setExportResult] = useState<ExportResult | null>(null);
   const [selectedFileIndex, setSelectedFileIndex] = useState<number>(0);
 
-  // Run exporter when modal opens to show preview
-  useEffect(() => {
-    if (!isOpen) {
-      // Reset state when modal closes
-      setExportResult(null);
-      setExportError(null);
-      setSelectedFileIndex(0);
-      return;
+  // Convert data using useMemo - exporter handles its own Sentry tracking
+  const { exportResult, exportError } = useMemo(() => {
+    try {
+      return { exportResult: exporter(), exportError: null };
+    } catch (error) {
+      return {
+        exportResult: null,
+        exportError: error.message || "Failed to convert data. Please try again.",
+      };
     }
-    if (exportResult) {
-      return;
-    }
-
-    const convertData = async () => {
-      return wrapWithCustomSpan(
-        {
-          name: `[Transaction] api_client.${exporterType.toLowerCase()}_export.convert_data`,
-          op: `api_client.${exporterType.toLowerCase()}_export.convert_data`,
-          forceTransaction: true,
-          attributes: {},
-        },
-        async () => {
-          setIsLoading(true);
-          setExportError(null);
-
-          try {
-            let result: ExportResult = exporter();
-
-            setExportResult(result);
-
-            Sentry.getActiveSpan()?.setStatus({
-              code: SPAN_STATUS_OK,
-            });
-          } catch (error) {
-            const errorMessage = error.message || "Failed to convert data. Please try again.";
-            setExportError(errorMessage);
-
-            Sentry.captureException(error);
-            Sentry.getActiveSpan()?.setStatus({
-              code: SPAN_STATUS_ERROR,
-            });
-          } finally {
-            setIsLoading(false);
-          }
-        }
-      )();
-    };
-
-    convertData();
-  }, [isOpen, exporterType, exportResult, exporter]);
+  }, [exporter]);
 
   const handleExport = useCallback(async () => {
     if (!exportResult || !exportResult.files || exportResult.files.length === 0) {
@@ -121,7 +77,6 @@ export const CommonApiClientExportModal: React.FC<Props> = ({ isOpen, onClose, t
       onCancel={onClose}
       onOk={handleExport}
       okText="Export"
-      confirmLoading={isLoading}
       okButtonProps={{ disabled: !exportResult || !!exportError }}
       width={600}
     >
