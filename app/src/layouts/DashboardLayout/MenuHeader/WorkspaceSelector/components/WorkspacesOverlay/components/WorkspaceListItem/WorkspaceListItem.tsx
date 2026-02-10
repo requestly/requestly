@@ -213,7 +213,7 @@ export const WorkspaceItem: React.FC<WorkspaceItemProps> = (props) => {
 
   const { workspace } = props;
   const isMultiView = viewMode === ApiClientViewMode.MULTI;
-  const isSelected = selectedWorkspaces.some((w) => w.id === workspace.id);
+  const isSelected = selectedWorkspaces.some((w) => w && w.id === workspace.id);
   const isWorkspaceSwitchDisabled = isMultiView && isSelected;
 
   return (

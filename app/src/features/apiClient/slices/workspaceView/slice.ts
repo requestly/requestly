@@ -6,9 +6,10 @@ import { RootState } from "store/types";
 import { NativeError } from "errors/NativeError";
 import { ErrorSeverity } from "errors/types";
 import { InvalidContextVersionError } from "./helpers/ApiClientContextRegistry/ApiClientContextRegistry";
-import { persistReducer } from "redux-persist";
+import { persistReducer, createTransform } from "redux-persist";
 import { getPersistConfig } from "redux-deep-persist";
 import storage from "redux-persist/lib/storage";
+import { EntityState } from "@reduxjs/toolkit";
 
 export const workspaceViewAdapter = createEntityAdapter<WorkspaceState>({
   selectId: (workspace) => workspace.id as string,
@@ -166,59 +167,58 @@ export const workspaceViewSlice = createSlice({
 
 export const workspaceViewActions = workspaceViewSlice.actions;
 
+const selectedWorkspacesTransform = createTransform(
+  (inboundState: EntityState<WorkspaceState>) => {
+    if (!inboundState?.entities) return inboundState;
+
+    const sanitizedEntities: Record<string, WorkspaceInfo> = {};
+    const sanitizedIds: string[] = [];
+
+    Object.entries(inboundState.entities).forEach(([key, workspace]) => {
+      if (workspace && "id" in workspace && workspace.id !== undefined) {
+        sanitizedEntities[key] = {
+          id: workspace.id,
+          meta: workspace.meta,
+        };
+        sanitizedIds.push(key);
+      }
+    });
+
+    return {
+      ids: sanitizedIds,
+      entities: sanitizedEntities,
+    };
+  },
+  (outboundState: EntityState<WorkspaceInfo>) => {
+    if (!outboundState?.entities) return outboundState;
+
+    const rehydratedEntities: Record<string, WorkspaceState> = {};
+    const rehydratedIds: string[] = [];
+
+    Object.entries(outboundState.entities).forEach(([key, workspaceInfo]) => {
+      if (workspaceInfo && "id" in workspaceInfo && workspaceInfo.id !== undefined) {
+        rehydratedEntities[key] = {
+          ...workspaceInfo,
+          status: { loading: true },
+        } as WorkspaceState;
+        rehydratedIds.push(key);
+      }
+    });
+
+    return {
+      ids: rehydratedIds,
+      entities: rehydratedEntities,
+    };
+  },
+  { whitelist: ["selectedWorkspaces"] }
+);
+
 const workspaceViewPersistConfig = getPersistConfig({
   storage,
   key: ReducerKeys.WORKSPACE_VIEW,
   rootReducer: workspaceViewSlice.reducer,
   whitelist: ["viewMode", "selectedWorkspaces"],
-  transforms: [
-    {
-      in: (state: WorkspaceViewState) => {
-        if (!state?.selectedWorkspaces?.entities) return state;
-
-        // Transform WorkspaceState to WorkspaceInfo (strip status)
-        const sanitizedEntities: Record<string, WorkspaceInfo> = {};
-        Object.entries(state.selectedWorkspaces.entities).forEach(([id, workspace]) => {
-          if (workspace) {
-            sanitizedEntities[id] = {
-              id: workspace.id,
-              meta: workspace.meta,
-            };
-          }
-        });
-
-        return {
-          ...state,
-          selectedWorkspaces: {
-            ...state.selectedWorkspaces,
-            entities: sanitizedEntities,
-          },
-        };
-      },
-      out: (state: WorkspaceViewState) => {
-        if (!state?.selectedWorkspaces?.entities) return state;
-
-        // Rehydrate with default status
-        const rehydratedEntities: Record<string, WorkspaceState> = {};
-        Object.entries(state.selectedWorkspaces.entities).forEach(([id, workspaceInfo]) => {
-          if (workspaceInfo && workspaceInfo.id) {
-            rehydratedEntities[id] = {
-              ...workspaceInfo,
-              status: { loading: false, state: { success: true, result: null } },
-            } as WorkspaceState;
-          }
-        });
-
-        return {
-          ...state,
-          selectedWorkspaces: {
-            ...state.selectedWorkspaces,
-            entities: rehydratedEntities,
-          },
-        };
-      },
-    },
-  ],
+  transforms: [selectedWorkspacesTransform],
 });
 
 export const workspaceViewReducerWithLocal = persistReducer(workspaceViewPersistConfig, workspaceViewSlice.reducer);
