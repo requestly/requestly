@@ -39,7 +39,7 @@ export const EmptyEnvironmentsCreateCard: React.FC<EmptyEnvironmentsCreateCardPr
           id,
           title: name,
           isNewTab: true,
-          context: workspaceId ? { id: workspaceId } : {},
+          context: { id: workspaceId },
           isGlobal: false,
         }),
       });
