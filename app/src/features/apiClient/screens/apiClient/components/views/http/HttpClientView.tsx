@@ -541,6 +541,7 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
         <div className="api-client-header-container__header">
           <div className="api-client-breadcrumb-container">
             <ApiClientBreadCrumb
+              isDraft={!!isNew}
               id={entity.meta.referenceId}
               openInModal={openInModal}
               placeholder="Untitled request"
