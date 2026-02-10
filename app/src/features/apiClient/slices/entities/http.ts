@@ -200,7 +200,13 @@ export class HttpRecordEntity<M extends ApiClientEntityMeta = ApiClientEntityMet
     this.SETCOMMON({ data: { response } });
   }
 
-  setRequest(request: RQAPI.HttpRequest): void {
-    this.SET({ data: { request } });
+  replaceRequest(request: RQAPI.HttpRequest): void {
+    this.unsafePatch((state) => {
+      state.data.request = {
+        ...request,
+        body: request.body ?? "",
+        bodyContainer: request.bodyContainer ?? {},
+      };
+    });
   }
 }
