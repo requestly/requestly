@@ -13,12 +13,15 @@ import Split from "react-split";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { RootState } from "store/types";
+import { InvalidContextVersionError } from "./slices/workspaceView/helpers/ApiClientContextRegistry/ApiClientContextRegistry";
+import { useWorkspaceLoadingError } from "./slices";
 
 const ApiClientFeatureContainer: React.FC = () => {
   const dispatch = useDispatch();
   const user: Record<string, any> = useSelector(getUserAuthDetails);
   const isSetupDone = useSelector((s: RootState) => getWorkspaceViewSlice(s).isSetupDone);
   const [screenWidth, setScreenWidth] = useState(window.innerWidth);
+  const loadingError = useWorkspaceLoadingError();
 
   useLayoutEffect(() => {
     const handleResize = () => {
@@ -34,15 +37,28 @@ const ApiClientFeatureContainer: React.FC = () => {
   };
 
   useEffect(() => {
-    dispatch(
-      setupWorkspaceView({
-        userId: user.details?.profile?.uid,
-      }) as any
-    );
+    (async () => {
+      const result = await dispatch(
+        setupWorkspaceView({
+          userId: user.details?.profile?.uid,
+        }) as any
+      ).unwrap();
+      if (result?.error) {
+        if (result.error.name === InvalidContextVersionError.name) {
+          return;
+        } else {
+          throw new Error(result?.error?.message);
+        }
+      }
+    })();
   }, [dispatch, user.details?.profile?.uid]);
 
   if (!isSetupDone) {
     return <ApiClientLoadingView />;
+  }
+
+  if (loadingError) {
+    throw loadingError;
   }
 
   return (

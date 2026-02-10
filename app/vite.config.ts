@@ -78,7 +78,6 @@ const config = async ({ mode }) => {
       ],
     },
     optimizeDeps: {
-      force: true,
       esbuildOptions: {
         target: "esnext",
         loader: {
