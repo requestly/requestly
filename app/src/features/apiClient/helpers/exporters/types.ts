@@ -5,7 +5,7 @@ export enum ExportType {
 }
 
 export interface ExportResult {
-  file: {
+  files: {
     fileName: string;
     content: Blob;
     type: string;

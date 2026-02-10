@@ -18,9 +18,9 @@ export const CommonApiClientExporter: React.FC<CommonApiClientExporterProps> = (
   selectedFileIndex = 0,
   onFileSelect,
 }) => {
-  const hasMultipleFiles = exportResult?.file && exportResult.file.length > 1;
-  const safeIndex = Math.min(selectedFileIndex, (exportResult?.file?.length ?? 1) - 1);
-  const fileName = hasMultipleFiles ? exportResult.file[safeIndex]?.fileName : exportResult?.file?.[0]?.fileName;
+  const hasMultipleFiles = exportResult?.files && exportResult.files.length > 1;
+  const safeIndex = Math.min(selectedFileIndex, (exportResult?.files?.length ?? 1) - 1);
+  const fileName = hasMultipleFiles ? exportResult.files[safeIndex]?.fileName : exportResult?.files?.[0]?.fileName;
 
   return (
     <div className="common-api-client-exporter-content">
@@ -55,7 +55,7 @@ export const CommonApiClientExporter: React.FC<CommonApiClientExporterProps> = (
             <div className="export-format-selector">
               <div className="export-format-label">Export as:</div>
               <Radio.Group value={selectedFileIndex} onChange={(e) => onFileSelect(e.target.value)}>
-                {exportResult.file.map((file, index) => (
+                {exportResult.files.map((file, index) => (
                   <Radio key={index} value={index}>
                     {file.type}
                   </Radio>
