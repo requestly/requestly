@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { AutoComplete, Checkbox, Form, FormInstance, Input } from "antd";
+import { Checkbox, Form, FormInstance } from "antd";
 import { KeyValueDataType, KeyValuePair } from "features/apiClient/types";
 import SingleLineEditor from "features/apiClient/screens/environment/components/SingleLineEditor";
 import InfoIcon from "components/misc/InfoIcon";
@@ -119,48 +119,17 @@ export const KeyValueTableEditableCell: React.FC<React.PropsWithChildren<Editabl
           }
         `}
           >
-            {tableType === "Headers" && dataIndex === "key" ? (
-              <AutoComplete
-                options={HEADER_SUGGESTIONS.Request}
-                onChange={(value) => {
-                  form.setFieldsValue({ [dataIndex]: value?.trim() });
-                  save();
-                }}
-                filterOption={(input, option) =>
-                  option?.value ? option.value.toLowerCase().includes(input.toLowerCase()) : false
-                }
-                value={record?.[dataIndex] as string}
-                style={{ width: "100%" }}
-              >
-                <Input
-                  className={`key-value-table-input ${
-                    record.isEnabled === false ? "key-value-table-input-disabled" : ""
-                  }`}
-                  placeholder="Header Name"
-                  style={{
-                    width: "100%",
-                    border: "1px solid transparent",
-                    background: "transparent",
-                    padding: "4px 0px",
-                    height: "24px",
-                    fontSize: "var(--requestly-font-size-sm)",
-                  }}
-                />
-              </AutoComplete>
-            ) : (
-              <SingleLineEditor
-                className={`key-value-table-input ${
-                  record.isEnabled === false ? "key-value-table-input-disabled" : ""
-                }`}
-                placeholder={dataIndex === "key" ? "Key" : "Value"}
-                defaultValue={record?.[dataIndex] as string}
-                onChange={(value) => {
-                  form.setFieldsValue({ [dataIndex]: value });
-                  save();
-                }}
-                variables={variables}
-              />
-            )}
+            <SingleLineEditor
+              className={`key-value-table-input ${record.isEnabled === false ? "key-value-table-input-disabled" : ""}`}
+              placeholder={dataIndex === "key" ? "Key" : "Value"}
+              defaultValue={record?.[dataIndex] as string}
+              onChange={(value) => {
+                form.setFieldsValue({ [dataIndex]: value });
+                save();
+              }}
+              variables={variables}
+              suggestions={tableType === "Headers" && dataIndex === "key" ? HEADER_SUGGESTIONS.Request : undefined}
+            />
 
             <Conditional
               condition={INVALID_KEY_CHARACTERS.test(record?.key) && dataIndex === "key" && checkInvalidCharacter}

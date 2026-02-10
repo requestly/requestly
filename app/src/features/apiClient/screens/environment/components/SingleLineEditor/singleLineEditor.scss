@@ -8,8 +8,114 @@
   z-index: 10;
 }
 
-// Adding redundant higlighting class here since base CSS file does not exist for editors
-// TODO: move such styles to a common base stylesheet
+.cm-autocomplete-custom {
+  background: #1f1f1f !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 6px 16px 0 rgba(0, 0, 0, 0.32), 0 3px 6px -4px rgba(0, 0, 0, 0.48) !important;
+  padding: 8px 8px 8px 8px !important;
+  max-height: 256px !important;
+  width: 320px !important;
+  overflow-y: auto !important;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+  z-index: 1050 !important;
+  transform: translateX(-8px) !important;
+
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+    margin: 8px 0;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #000000;
+    border-radius: 4px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: #1a1a1a;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+
+  ul {
+    margin: 0 !important;
+    padding: 0 8px 0 0 !important;
+    list-style: none !important;
+  }
+
+  li {
+    padding: 0 !important;
+    margin: 2px 0 0 0 !important;
+  }
+}
+
+.cm-autocomplete-option-custom {
+  padding: 5px 120px !important;
+  font-size: 14px !important;
+  line-height: 22px !important;
+  color: rgba(255, 255, 255, 0.88) !important;
+  cursor: pointer !important;
+  border-radius: 4px !important;
+  margin: 0 !important;
+  transition: all 0.2s cubic-bezier(0.645, 0.045, 0.355, 1) !important;
+  display: flex !important;
+  align-items: center !important;
+  min-height: 32px !important;
+  position: relative !important;
+  font-weight: 400 !important;
+
+  &[aria-selected="true"] {
+    background: rgba(255, 255, 255, 0.08) !important;
+    color: rgba(255, 255, 255, 0.88) !important;
+  }
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.08) !important;
+    color: rgba(255, 255, 255, 0.88) !important;
+  }
+
+  .cm-completionLabel {
+    flex: 1;
+    font-weight: 400;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .cm-completionDetail {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.45);
+    margin-left: 8px;
+    flex-shrink: 0;
+  }
+
+  &:active {
+    background: rgba(255, 255, 255, 0.12) !important;
+  }
+}
+
+.cm-completionMatchedText {
+  font-weight: 600 !important;
+  text-decoration: none !important;
+}
+
+.cm-completionInfo {
+  background: #1f1f1f !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 8px !important;
+  padding: 12px !important;
+  margin-left: 4px !important;
+  box-shadow: 0 6px 16px 0 rgba(0, 0, 0, 0.32) !important;
+  max-width: 300px !important;
+}
+
+// TODO: move to common base stylesheet
 .highlight-defined-variable {
   color: var(--requestly-color-primary-text);
   cursor: pointer;

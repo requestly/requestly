@@ -8,4 +8,5 @@ export interface SingleLineEditorProps {
   onPressEnter?: (event: KeyboardEvent, text: string) => void;
   onBlur?: (text: string) => void;
   variables?: ScopedVariables;
+  suggestions?: Array<{ value: string }>;
 }
