@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
 import { Checkbox, Collapse, Dropdown, MenuProps, Skeleton, Typography, notification } from "antd";
 import { RQAPI } from "features/apiClient/types";
+import { RQAPI as SharedRQAPI } from "@requestly/shared/types/entities/apiClient";
 import { RQButton } from "lib/design-system-v2/components";
 import { NewRecordNameInput } from "../newRecordNameInput/NewRecordNameInput";
 import { RequestRow } from "../requestRow/RequestRow";
@@ -28,6 +29,9 @@ import "./CollectionRow.scss";
 import { ApiClientExportModal } from "../../../../modals/exportModal/ApiClientExportModal";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { PostmanExportModal } from "../../../../modals/postmanCollectionExportModal/PostmanCollectionExportModal";
+import { CommonApiClientExportModal } from "../../../../modals/CommonApiClientExportModal";
+import { ExporterFunction } from "features/apiClient/helpers/exporters/types";
+import { createOpenApiExporter } from "features/apiClient/helpers/exporters/openapi";
 import { MdOutlineVideoLibrary } from "@react-icons/all-files/md/MdOutlineVideoLibrary";
 import { CollectionRowOptionsCustomEvent, dispatchCustomEvent } from "./utils";
 import {
@@ -41,11 +45,8 @@ import { useActiveTab, useTabActions } from "componentsV2/Tabs/slice";
 import { getAncestorIds, getRecord } from "features/apiClient/slices/apiRecords/utils";
 import { Workspace } from "features/workspaces/types";
 import { EnvironmentVariables } from "backend/environment/types";
-
-export enum ExportType {
-  REQUESTLY = "requestly",
-  POSTMAN = "postman",
-}
+import { SiOpenapiinitiative } from "@react-icons/all-files/si/SiOpenapiinitiative";
+import { ExportType } from "features/apiClient/helpers/exporters/types";
 
 interface Props {
   record: RQAPI.CollectionRecord;
@@ -96,6 +97,11 @@ export const CollectionRow: React.FC<Props> = ({
 
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [isPostmanExportModalOpen, setIsPostmanExportModalOpen] = useState(false);
+  const [commonExporterConfig, setCommonExporterConfig] = useState<{
+    exporter: ExporterFunction;
+    exportType: ExportType;
+    title: string;
+  } | null>(null);
 
   const [collectionsToExport, setCollectionsToExport] = useState<RQAPI.CollectionRecord[]>([]);
 
@@ -105,32 +111,42 @@ export const CollectionRow: React.FC<Props> = ({
   const { openBufferedTab } = useTabActions();
   const activeTabSourceId = useActiveTab()?.source.getSourceId();
 
-  const handleCollectionExport = useCallback((collection: RQAPI.CollectionRecord, exportType: ExportType) => {
-    const collectionRecordState = getRecord(record.id, workspaceId) as RQAPI.CollectionRecord | undefined;
-    if (!collectionRecordState) {
-      throw new EntityNotFound(record.id, "Collection record not found for export");
-    }
-    const collectionVariables = collectionRecordState.data.variables;
-    const removeLocalValue = (variables: EnvironmentVariables): Record<string, any> => {
-      // set localValue to empty before exporting
-      return Object.fromEntries(Object.entries(variables).map(([k, v]) => [k, { ...v, localValue: "" }]));
-    };
-    const exportData: RQAPI.CollectionRecord = {
-      ...collection,
-      data: { ...collection.data, variables: removeLocalValue(collectionVariables) },
-    };
-    setCollectionsToExport((prev) => [...prev, exportData]);
-    switch (exportType) {
-      case ExportType.REQUESTLY:
-        setIsExportModalOpen(true);
-        break;
-      case ExportType.POSTMAN:
-        setIsPostmanExportModalOpen(true);
-        break;
-      default:
-        console.warn(`Unknown export type: ${exportType}`);
-    }
-  }, [record.id, workspaceId]);
+  const handleCollectionExport = useCallback(
+    (collection: RQAPI.CollectionRecord, exportType: ExportType) => {
+      const collectionRecordState = getRecord(record.id, workspaceId) as RQAPI.CollectionRecord | undefined;
+      if (!collectionRecordState) {
+        throw new EntityNotFound(record.id, "Collection record not found for export");
+      }
+      const collectionVariables = collectionRecordState.data.variables;
+      const removeLocalValue = (variables: EnvironmentVariables): Record<string, any> => {
+        // set localValue to empty before exporting
+        return Object.fromEntries(Object.entries(variables).map(([k, v]) => [k, { ...v, localValue: "" }]));
+      };
+      const exportData: RQAPI.CollectionRecord = {
+        ...collection,
+        data: { ...collection.data, variables: removeLocalValue(collectionVariables) },
+      };
+      setCollectionsToExport((prev) => [...prev, exportData]);
+      switch (exportType) {
+        case ExportType.REQUESTLY:
+          setIsExportModalOpen(true);
+          break;
+        case ExportType.POSTMAN:
+          setIsPostmanExportModalOpen(true);
+          break;
+        case ExportType.OPENAPI:
+          setCommonExporterConfig({
+            exporter: createOpenApiExporter(exportData as SharedRQAPI.CollectionRecord),
+            exportType: ExportType.OPENAPI,
+            title: "OpenAPI 3.0",
+          });
+          break;
+        default:
+          console.warn(`Unknown export type: ${exportType}`);
+      }
+    },
+    [record, workspaceId]
+  );
 
   const getCollectionOptions = useCallback(
     (record: RQAPI.CollectionRecord) => {
@@ -174,6 +190,15 @@ export const CollectionRow: React.FC<Props> = ({
               onClick: (itemInfo) => {
                 itemInfo.domEvent?.stopPropagation?.();
                 handleCollectionExport(record, ExportType.POSTMAN);
+              },
+            },
+            {
+              key: "1-3",
+              label: "OpenAPI 3.0",
+              icon: <SiOpenapiinitiative style={{ width: 16, height: 16, marginRight: 8 }} />,
+              onClick: (itemInfo) => {
+                itemInfo.domEvent?.stopPropagation?.();
+                handleCollectionExport(record, ExportType.OPENAPI);
               },
             },
           ],
@@ -366,6 +391,19 @@ export const CollectionRow: React.FC<Props> = ({
             setCollectionsToExport([]);
             setIsPostmanExportModalOpen(false);
           }}
+        />
+      )}
+
+      {commonExporterConfig && (
+        <CommonApiClientExportModal
+          isOpen={!!commonExporterConfig}
+          onClose={() => {
+            setCollectionsToExport([]);
+            setCommonExporterConfig(null);
+          }}
+          title={commonExporterConfig.title}
+          exporter={commonExporterConfig.exporter}
+          exporterType={commonExporterConfig.exportType}
         />
       )}
 
