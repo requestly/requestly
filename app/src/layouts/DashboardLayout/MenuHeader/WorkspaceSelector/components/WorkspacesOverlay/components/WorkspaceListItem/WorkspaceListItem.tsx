@@ -129,7 +129,7 @@ const LocalWorkspaceActions = ({
     [workspace, workspaceViewManager, userId]
   );
 
-  const isSelected = useMemo(() => selectedWorkspaces.some((w) => w.id === workspace.id), [
+  const isSelected = useMemo(() => selectedWorkspaces.some((w) => w && w.id === workspace.id), [
     selectedWorkspaces,
     workspace.id,
   ]);
