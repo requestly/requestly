@@ -205,7 +205,6 @@ export class HttpRecordEntity<M extends ApiClientEntityMeta = ApiClientEntityMet
       state.data.request = {
         ...request,
         body: request.body ?? "",
-        bodyContainer: request.bodyContainer ?? {},
       };
     });
   }

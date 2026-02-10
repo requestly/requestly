@@ -33,8 +33,10 @@ const HttpApiClientUrl = ({ entity, onEnterPress, onUrlChange, onCurlImport }: A
       }
 
       if (requestFromPaste?.url) {
-        e.preventDefault();
-        onCurlImport?.(requestFromPaste);
+        if (onCurlImport) {
+          e.preventDefault();
+          onCurlImport(requestFromPaste);
+        }
       }
     },
     [onCurlImport]
