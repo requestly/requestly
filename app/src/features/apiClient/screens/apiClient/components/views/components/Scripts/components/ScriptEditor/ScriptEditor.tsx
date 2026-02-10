@@ -37,6 +37,7 @@ import {
 import { useAISessionContext } from "features/ai/contexts/AISession";
 import { getChunks } from "@codemirror/merge";
 import { debounce } from "lodash";
+import { getFunctions, httpsCallable } from "firebase/functions";
 
 const TestGenerationOutputSchema = z.object({
   text: z
@@ -107,7 +108,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
   focusPostResponse,
 }) => {
   const dispatch = useDispatch();
-
+  const addUserToList = httpsCallable(getFunctions(), "premiumNotifications-addUserToList");
   const activeScriptType = entry?.scripts?.[RQAPI.ScriptType.PRE_REQUEST]
     ? RQAPI.ScriptType.PRE_REQUEST
     : entry?.scripts?.[RQAPI.ScriptType.POST_RESPONSE]
@@ -180,6 +181,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
         if (result.object?.code?.content) {
           setLastGeneratedCode(result.object.code.content);
           trackAITestGenerationSuccessful(sessionId, currentGenerationId);
+          addUserToList({ listId: 184 }).catch(console.error); // suppress error
         }
       }
       setIsTestsStreamingFinished(true);
@@ -407,7 +409,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
                   disabled={scriptType !== RQAPI.ScriptType.POST_RESPONSE || !entry?.response || !isAIEnabledGlobally}
                   onCancelClick={stop}
                   negativeFeedback={negativeFeedback}
-                  label={hasPostResponseScript ? "Update with AI" : "Generate tests"}
+                  label={hasPostResponseScript ? "Improve tests" : "Generate tests"}
                 />
               </>
             </Tooltip>

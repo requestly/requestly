@@ -6,9 +6,8 @@ import { RQButton } from "lib/design-system-v2/components";
 import { NewRecordNameInput } from "../newRecordNameInput/NewRecordNameInput";
 import { RequestRow } from "../requestRow/RequestRow";
 import { ApiRecordEmptyState } from "../apiRecordEmptyState/ApiRecordEmptyState";
-import { MdOutlineFolder } from "@react-icons/all-files/md/MdOutlineFolder";
-import { MdOutlineFolderSpecial } from "@react-icons/all-files/md/MdOutlineFolderSpecial";
-import { PiFolderOpen } from "@react-icons/all-files/pi/PiFolderOpen";
+import { MdKeyboardArrowDown } from "@react-icons/all-files/md/MdKeyboardArrowDown";
+import { MdKeyboardArrowRight } from "@react-icons/all-files/md/MdKeyboardArrowRight";
 import { IoChevronForward } from "@react-icons/all-files/io5/IoChevronForward";
 import { SidebarPlaceholderItem } from "../../SidebarPlaceholderItem/SidebarPlaceholderItem";
 import { isEmpty } from "lodash";
@@ -105,32 +104,35 @@ export const CollectionRow: React.FC<Props> = ({
   const { openBufferedTab } = useTabActions();
   const activeTabSourceId = useActiveTab()?.source.getSourceId();
 
-  const handleCollectionExport = useCallback((collection: RQAPI.CollectionRecord, exportType: ExportType) => {
-    const collectionRecordState = getRecord(record.id, workspaceId) as RQAPI.CollectionRecord | undefined;
-    if (!collectionRecordState) {
-      throw new EntityNotFound(record.id, "Collection record not found for export");
-    }
-    const collectionVariables = collectionRecordState.data.variables;
-    const removeLocalValue = (variables: EnvironmentVariables): Record<string, any> => {
-      // set localValue to empty before exporting
-      return Object.fromEntries(Object.entries(variables).map(([k, v]) => [k, { ...v, localValue: "" }]));
-    };
-    const exportData: RQAPI.CollectionRecord = {
-      ...collection,
-      data: { ...collection.data, variables: removeLocalValue(collectionVariables) },
-    };
-    setCollectionsToExport((prev) => [...prev, exportData]);
-    switch (exportType) {
-      case ExportType.REQUESTLY:
-        setIsExportModalOpen(true);
-        break;
-      case ExportType.POSTMAN:
-        setIsPostmanExportModalOpen(true);
-        break;
-      default:
-        console.warn(`Unknown export type: ${exportType}`);
-    }
-  }, [record.id, workspaceId]);
+  const handleCollectionExport = useCallback(
+    (collection: RQAPI.CollectionRecord, exportType: ExportType) => {
+      const collectionRecordState = getRecord(record.id, workspaceId) as RQAPI.CollectionRecord | undefined;
+      if (!collectionRecordState) {
+        throw new EntityNotFound(record.id, "Collection record not found for export");
+      }
+      const collectionVariables = collectionRecordState.data.variables;
+      const removeLocalValue = (variables: EnvironmentVariables): Record<string, any> => {
+        // set localValue to empty before exporting
+        return Object.fromEntries(Object.entries(variables).map(([k, v]) => [k, { ...v, localValue: "" }]));
+      };
+      const exportData: RQAPI.CollectionRecord = {
+        ...collection,
+        data: { ...collection.data, variables: removeLocalValue(collectionVariables) },
+      };
+      setCollectionsToExport((prev) => [...prev, exportData]);
+      switch (exportType) {
+        case ExportType.REQUESTLY:
+          setIsExportModalOpen(true);
+          break;
+        case ExportType.POSTMAN:
+          setIsPostmanExportModalOpen(true);
+          break;
+        default:
+          console.warn(`Unknown export type: ${exportType}`);
+      }
+    },
+    [record.id, workspaceId]
+  );
 
   const getCollectionOptions = useCallback(
     (record: RQAPI.CollectionRecord) => {
@@ -398,16 +400,11 @@ export const CollectionRow: React.FC<Props> = ({
                       />
                     </div>
                   )}
-                  {
-                    // @ts-ignore
-                    record.isExampleRoot ? (
-                      <MdOutlineFolderSpecial className="collection-expand-icon" />
-                    ) : isActive ? (
-                      <PiFolderOpen className="collection-expand-icon" />
-                    ) : (
-                      <MdOutlineFolder className="collection-expand-icon" />
-                    )
-                  }
+                  {isActive ? (
+                    <MdKeyboardArrowDown className="collection-expand-icon" />
+                  ) : (
+                    <MdKeyboardArrowRight className="collection-expand-icon" />
+                  )}
                 </>
               );
             }}
