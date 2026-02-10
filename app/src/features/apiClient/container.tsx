@@ -1,20 +1,19 @@
-import React, { useEffect, useLayoutEffect, useState } from "react";
-import APIClientSidebar from "./screens/apiClient/components/sidebar/APIClientSidebar";
 import { TabsContainer } from "componentsV2/Tabs/components/TabsContainer";
-import "./container.scss";
-import { ApiClientLoadingView } from "./screens/apiClient/components/views/components/ApiClientLoadingView/ApiClientLoadingView";
-import { useSelector, useDispatch } from "react-redux";
-import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getWorkspaceViewSlice } from "./slices/workspaceView/slice";
-import Daemon from "./store/apiRecords/Daemon";
-import { ApiClientProvider } from "./contexts";
-import { setupWorkspaceView } from "./slices/workspaceView/thunks";
-import Split from "react-split";
+import React, { useEffect, useLayoutEffect, useState } from "react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
+import { useDispatch, useSelector } from "react-redux";
+import Split from "react-split";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { RootState } from "store/types";
-import { InvalidContextVersionError } from "./slices/workspaceView/helpers/ApiClientContextRegistry/ApiClientContextRegistry";
+import "./container.scss";
+import { ApiClientProvider } from "./contexts";
+import APIClientSidebar from "./screens/apiClient/components/sidebar/APIClientSidebar";
+import { ApiClientLoadingView } from "./screens/apiClient/components/views/components/ApiClientLoadingView/ApiClientLoadingView";
 import { useWorkspaceLoadingError } from "./slices";
+import { getWorkspaceViewSlice } from "./slices/workspaceView/slice";
+import { setupWorkspaceView } from "./slices/workspaceView/thunks";
+import Daemon from "./store/apiRecords/Daemon";
 
 const ApiClientFeatureContainer: React.FC = () => {
   const dispatch = useDispatch();
@@ -37,20 +36,11 @@ const ApiClientFeatureContainer: React.FC = () => {
   };
 
   useEffect(() => {
-    (async () => {
-      const result = await dispatch(
-        setupWorkspaceView({
-          userId: user.details?.profile?.uid,
-        }) as any
-      ).unwrap();
-      if (result?.error) {
-        if (result.error.name === InvalidContextVersionError.name) {
-          return;
-        } else {
-          throw new Error(result?.error?.message);
-        }
-      }
-    })();
+    dispatch(
+      setupWorkspaceView({
+        userId: user.details?.profile?.uid,
+      }) as any
+    );
   }, [dispatch, user.details?.profile?.uid]);
 
   if (!isSetupDone) {

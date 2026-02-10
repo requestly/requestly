@@ -3,9 +3,10 @@ import { ApiClientViewMode, WorkspaceState, WorkspaceViewState } from "./types";
 import { ReducerKeys } from "store/constants";
 import { addWorkspaceIntoView, setupWorkspaceView, switchContext } from "./thunks";
 import { RootState } from "store/types";
-import getReducerWithLocalStorageSync from "store/getReducerWithLocalStorageSync";
 import { NativeError } from "errors/NativeError";
 import { ErrorSeverity } from "errors/types";
+import { InvalidContextVersionError } from "./helpers/ApiClientContextRegistry/ApiClientContextRegistry";
+import getReducerWithLocalStorageSync from "store/getReducerWithLocalStorageSync";
 
 export const workspaceViewAdapter = createEntityAdapter<WorkspaceState>({
   selectId: (workspace) => workspace.id as string,
@@ -101,12 +102,19 @@ export const workspaceViewSlice = createSlice({
         const { workspace } = action.meta.arg;
         const id = workspace.id as string;
 
+        if (action.error.name === InvalidContextVersionError.name) {
+          return;
+        }
+
+        const error = new Error(action.error.message);
+        error.stack = action.error.stack;
+
         workspaceViewAdapter.updateOne(state.selectedWorkspaces, {
           id,
           changes: {
             status: {
               loading: false,
-              state: { success: false, error: new Error(action.error.message) },
+              state: { success: false, error },
             },
           },
         });
@@ -126,6 +134,10 @@ export const workspaceViewSlice = createSlice({
         });
       })
       .addCase(switchContext.rejected, (state, action) => {
+        if (action.error.name === InvalidContextVersionError.name) {
+          return;
+        }
+
         throw new NativeError(action.error.message as string)
           .setShowBoundary(true)
           .setSeverity(ErrorSeverity.FATAL)
@@ -135,6 +147,10 @@ export const workspaceViewSlice = createSlice({
         state.isSetupDone = false;
       })
       .addCase(setupWorkspaceView.rejected, (state, action) => {
+        if (action.error.name === InvalidContextVersionError.name) {
+          return;
+        }
+
         throw new NativeError(action.error.message as string)
           .setShowBoundary(true)
           .setSeverity(ErrorSeverity.FATAL)
