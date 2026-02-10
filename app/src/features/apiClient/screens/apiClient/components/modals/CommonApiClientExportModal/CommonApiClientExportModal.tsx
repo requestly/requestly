@@ -74,14 +74,14 @@ export const CommonApiClientExportModal: React.FC<Props> = ({ isOpen, onClose, t
   }, [isOpen, exporterType, exportResult, exporter]);
 
   const handleExport = useCallback(async () => {
-    if (!exportResult || !exportResult.file || exportResult.file.length === 0) {
+    if (!exportResult || !exportResult.files || exportResult.files.length === 0) {
       toast.error("No data to export");
       return;
     }
 
     try {
       // Get the selected file
-      const selectedFile = exportResult.file[selectedFileIndex];
+      const selectedFile = exportResult.files[selectedFileIndex];
       if (!selectedFile) {
         toast.error("Invalid file selection");
         return;

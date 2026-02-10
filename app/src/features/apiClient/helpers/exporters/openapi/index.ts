@@ -22,7 +22,7 @@ export const createOpenApiExporter = (collectionRecord: RQAPI.CollectionRecord):
       const securitySchemeCount = Object.keys(openapiExport.components?.securitySchemes || {}).length;
 
       const exportResult: ExportResult = {
-        file: [
+        files: [
           {
             fileName: `${sanitizedName}.json`,
             content: jsonExport,
