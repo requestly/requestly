@@ -24,6 +24,7 @@ import { RunResult, SavedRunResult } from "features/apiClient/slices/common/runR
 import { SavedRunConfig } from "features/apiClient/slices/runConfig/types";
 import { SentryCustomSpan } from "utils/sentry";
 import { captureException } from "backend/apiClient/utils";
+import { apiRecordsRankingManager } from "features/apiClient/helpers/RankingManager";
 
 export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<ApiClientCloudMeta> {
   meta: ApiClientCloudMeta;
@@ -98,6 +99,12 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
     },
   })
   async updateRecord(record: Partial<RQAPI.ApiClientRecord>, id: string, type?: RQAPI.ApiClientRecord["type"]) {
+    if (!record.rank) {
+      const existingRecord = await this.getRecord(id);
+      if (existingRecord?.success && existingRecord.data) {
+        record.rank = apiRecordsRankingManager.getEffectiveRank(existingRecord.data);
+      }
+    }
     const sanitizedRecord = sanitizeRecord(record as RQAPI.ApiClientRecord);
     sanitizedRecord.id = id;
     if (type) {
