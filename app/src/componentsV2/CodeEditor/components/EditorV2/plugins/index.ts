@@ -1,5 +1,5 @@
 import customKeyBinding from "./customKeyBinding";
 import { highlightVariablesPlugin } from "./highlightVariables";
-import generateCompletionsForVariables from "./generateAutoCompletions";
+import generateCompletionsForVariables, { generateCompletionSource } from "./generateAutoCompletions";
 
-export { customKeyBinding, highlightVariablesPlugin, generateCompletionsForVariables };
+export { customKeyBinding, highlightVariablesPlugin, generateCompletionsForVariables, generateCompletionSource };
