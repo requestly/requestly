@@ -525,7 +525,9 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
     (request: RQAPI.Request) => {
       try {
         // Type assertion: parseCurlRequest always returns an HTTP request
-        // Update the entity with the parsed curl request data
+        // Completely replace the request with the imported cURL request
+        // Delete the existing request to ensure a clean slate, then set the new request
+        entity.DELETE({ data: { request: null } });
         entity.setRequest(request as RQAPI.HttpRequest);
         toast.success("cURL command imported successfully");
       } catch (error) {
