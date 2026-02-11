@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import { Checkbox, Form, FormInstance } from "antd";
-import { KeyValueDataType, KeyValuePair } from "features/apiClient/types";
+import { KeyValueDataType, KeyValueFormType, KeyValuePair } from "features/apiClient/types";
 import SingleLineEditor from "features/apiClient/screens/environment/components/SingleLineEditor";
 import InfoIcon from "components/misc/InfoIcon";
 import { Conditional } from "components/common/Conditional";
@@ -128,7 +128,9 @@ export const KeyValueTableEditableCell: React.FC<React.PropsWithChildren<Editabl
                 save();
               }}
               variables={variables}
-              suggestions={tableType === "Headers" && dataIndex === "key" ? HEADER_SUGGESTIONS.Request : undefined}
+              suggestions={
+                tableType === KeyValueFormType.HEADERS && dataIndex === "key" ? HEADER_SUGGESTIONS.Request : undefined
+              }
             />
 
             <Conditional
