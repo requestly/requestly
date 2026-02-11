@@ -12,8 +12,8 @@
   background: var(--requestly-color-surface-0) !important;
   border: 1px solid var(--requestly-color-white-t-10) !important;
   border-radius: 8px !important;
-  box-shadow: 0 6px 16px 0 rgba(0, 0, 0, 0.32), 0 3px 6px -4px rgba(0, 0, 0, 0.48) !important;
-  padding: 8px 8px 8px 8px !important;
+  box-shadow: 0 6px 16px 0 rgb(0 0 0 / 0.32), 0 3px 6px -4px rgb(0 0 0 / 0.48) !important;
+  padding: 8px !important;
   max-height: 256px !important;
   width: 320px !important;
   overflow-y: auto !important;
@@ -51,7 +51,7 @@
 
   li {
     padding: 0 0 0 8px !important;
-    margin: 2px 0 0 0 !important;
+    margin: 2px 0 0 !important;
   }
 }
 
