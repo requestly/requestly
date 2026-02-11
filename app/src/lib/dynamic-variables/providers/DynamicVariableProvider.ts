@@ -5,7 +5,7 @@ export abstract class DynamicVariableProvider {
   abstract readonly name: string;
   abstract readonly variables: Map<string, DynamicVariable>;
 
-  generate(name: string, ...args: unknown[]): string | number | boolean {
+  generate(name: string, ...args: unknown[]): ReturnType<DynamicVariable["generate"]> {
     const variable = this.variables.get(name);
 
     if (!variable) {
