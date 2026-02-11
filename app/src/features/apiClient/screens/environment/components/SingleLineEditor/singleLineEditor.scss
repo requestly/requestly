@@ -50,7 +50,7 @@
   }
 
   li {
-    padding: 0 !important;
+    padding: 0 0 0 8px !important;
     margin: 2px 0 0 0 !important;
   }
 }
@@ -78,6 +78,10 @@
   &:hover {
     background: var(--requestly-color-white-t-10) !important;
     color: var(--requestly-color-text-default) !important;
+  }
+
+  .cm-completionIcon {
+    display: none !important;
   }
 
   .cm-completionLabel {
