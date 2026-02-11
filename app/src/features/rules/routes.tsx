@@ -1,15 +1,20 @@
+import { lazy } from "react";
 import { Navigate, RouteObject } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
-import { RulesContainer } from "views/containers/RulesContainer";
-import RuleEditor from "views/features/rules/RuleEditor";
 import { joinPaths } from "utils/PathUtils";
 
-// V2 Imports
-import RulesContainerV2 from "./container";
-import { RulesListScreen } from "./screens/rulesList";
-import { SharedListsScreen } from "./screens/sharedLists";
-import { TemplatesList } from "./screens/templatesList";
-import { SharedListViewerScreen } from "./screens/sharedListViewer";
+// Lazy-loaded components for better code splitting
+const RulesContainer = lazy(() =>
+  import("views/containers/RulesContainer").then((m) => ({ default: m.RulesContainer }))
+);
+const RuleEditor = lazy(() => import("views/features/rules/RuleEditor"));
+const RulesContainerV2 = lazy(() => import("./container"));
+const RulesListScreen = lazy(() => import("./screens/rulesList").then((m) => ({ default: m.RulesListScreen })));
+const SharedListsScreen = lazy(() => import("./screens/sharedLists").then((m) => ({ default: m.SharedListsScreen })));
+const TemplatesList = lazy(() => import("./screens/templatesList").then((m) => ({ default: m.TemplatesList })));
+const SharedListViewerScreen = lazy(() =>
+  import("./screens/sharedListViewer").then((m) => ({ default: m.SharedListViewerScreen }))
+);
 
 export const ruleRoutes: RouteObject[] = [
   {
