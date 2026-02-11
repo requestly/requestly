@@ -74,14 +74,6 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
       editorViewRef.current = null;
     }
 
-    if (typeof defaultValue !== "string") {
-      Sentry.captureException(new Error("Editor defaultValue must be a string"), {
-        extra: {
-          defaultValue,
-        },
-      });
-    }
-
     if (!editorRef.current) return;
     /*
     CodeMirror uses extensions to configure DOM interactions.
