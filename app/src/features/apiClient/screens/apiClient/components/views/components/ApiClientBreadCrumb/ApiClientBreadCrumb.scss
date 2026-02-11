@@ -1,7 +1,33 @@
-.api-client-local-workspace-path-breadcrumb {
+.api-client-breadcrumb-wrapper {
   display: flex;
-  flex-direction: row;
   align-items: center;
-  gap: 4px;
-  color: var(--requestly-color-text-subtle);
+  gap: var(--requestly-space-3, 4px);
+
+  .api-client-breadcrumb-draft-badge {
+    display: flex;
+    max-width: 160px;
+    padding: var(--requestly-space-1, 2px) var(--requestly-space-3, 6px);
+    align-items: center;
+    gap: var(--requestly-space-3, 6px);
+    border-radius: 40px;
+    background: var(--requestly-color-white-t-20, rgba(255, 255, 255, 0.12));
+    color: var(--requestly-color-text-subtle);
+
+    span {
+      font-size: var(--requestly-font-size-xs);
+    }
+
+    svg {
+      width: 12px;
+      height: 12px;
+    }
+  }
+
+  .api-client-local-workspace-path-breadcrumb {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 4px;
+    color: var(--requestly-color-text-subtle);
+  }
 }

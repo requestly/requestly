@@ -3,14 +3,18 @@ import Split from "react-split";
 import { OperationEditor } from "../GraphQLEditor/components/OperationEditor/OperationEditor";
 import { VariablesEditor } from "../GraphQLEditor/components/VariablesEditor/VariablesEditor";
 import { SchemaBuilder } from "../SchemaBuilder/SchemaBuilder";
+import { BufferedGraphQLRecordEntity } from "features/apiClient/slices/entities";
+import { useGraphQLRecordStore } from "features/apiClient/hooks/useGraphQLRecordStore";
 import "./queryView.scss";
 
 interface Props {
+  entity: BufferedGraphQLRecordEntity;
   setIsSchemaBuilderOpen: (isOpen: boolean) => void;
   isSchemaBuilderOpen: boolean;
 }
 
-export const QueryView: React.FC<Props> = ({ setIsSchemaBuilderOpen, isSchemaBuilderOpen }) => {
+export const QueryView: React.FC<Props> = ({ entity, setIsSchemaBuilderOpen, isSchemaBuilderOpen }) => {
+  const introspectionData = useGraphQLRecordStore((state) => state.introspectionData);
   return (
     <Split
       className="gql-split-horizontal"
@@ -22,16 +26,16 @@ export const QueryView: React.FC<Props> = ({ setIsSchemaBuilderOpen, isSchemaBui
       <Split className="gql-split-vertical" sizes={[60, 40]} direction="vertical" gutterSize={6}>
         <div className="pane gql-operation-editor">
           <div className="gql-editor-header">OPERATIONS</div>
-          <OperationEditor />
+          <OperationEditor entity={entity} introspectionData={introspectionData} />
         </div>
         <div className="pane gql-variables-editor">
           <div className="gql-editor-header">VARIABLES</div>
-          <VariablesEditor />
+          <VariablesEditor entity={entity} />
         </div>
       </Split>
       {isSchemaBuilderOpen && (
         <div className="pane">
-          <SchemaBuilder setIsSchemaBuilderOpen={setIsSchemaBuilderOpen} />
+          <SchemaBuilder entity={entity} setIsSchemaBuilderOpen={setIsSchemaBuilderOpen} />
         </div>
       )}
     </Split>

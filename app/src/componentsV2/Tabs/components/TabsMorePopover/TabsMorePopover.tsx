@@ -1,38 +1,144 @@
-import React, { useState, useRef, useEffect, useMemo } from "react";
+import React, { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import { Input, List, Tooltip } from "antd";
 import type { InputRef } from "antd";
 import { MdClose } from "@react-icons/all-files/md/MdClose";
 import "./tabsMorePopover.scss";
 import { TabsEmptyState } from "../TabsEmptyState";
-import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
 import { CloseAllTabsButton } from "../CloseAllTabsButton/CloseAllTabsButton";
 import { RQButton } from "lib/design-system-v2/components";
+import {
+  useTabActions,
+  useTabs,
+  useTabTitle,
+  useIsTabDirty,
+  BufferModeTab,
+  getTabBufferedEntity,
+} from "componentsV2/Tabs/slice";
+import { TabState, TabId } from "componentsV2/Tabs/slice/types";
+import { getIsTabDirty } from "componentsV2/Tabs/slice/utils";
+
 interface TabsMorePopoverProps {
-  onTabItemClick: (id: number) => void;
+  onTabItemClick: (id: TabId) => void;
 }
 
+const NonBufferedTabListItem: React.FC<{
+  tab: TabState;
+  onTabClick: (id: TabId) => void;
+  onCloseTab: (id: TabId) => void;
+}> = ({ tab, onTabClick, onCloseTab }) => {
+  const title = tab.source.getDefaultTitle();
+
+  return (
+    <List.Item className="tabs-ops-item" onClick={() => onTabClick(tab.id)}>
+      <div className="tab-ops-item-container">
+        {title.length > 30 ? (
+          <Tooltip title={title} overlayClassName="tab-title-tooltip" placement="top" showArrow={false}>
+            <span className="tab-ops-item-title">{title}</span>
+          </Tooltip>
+        ) : (
+          <span className="tab-ops-item-title">{title}</span>
+        )}
+      </div>
+
+      <div className="tab-ops-item-actions">
+        <RQButton
+          size="small"
+          type="transparent"
+          className="tab-ops-item-close-button"
+          onClick={(e) => {
+            e.stopPropagation();
+            onCloseTab(tab.id);
+          }}
+          icon={<MdClose />}
+        />
+      </div>
+    </List.Item>
+  );
+};
+
+const BufferedTabListItem: React.FC<{
+  tab: BufferModeTab;
+  onTabClick: (id: TabId) => void;
+  onCloseTab: (id: TabId) => void;
+}> = ({ tab, onTabClick, onCloseTab }) => {
+  const title = useTabTitle(tab);
+  const isDirty = useIsTabDirty(tab);
+
+  return (
+    <List.Item className="tabs-ops-item" onClick={() => onTabClick(tab.id)}>
+      <div className="tab-ops-item-container">
+        {title.length > 30 ? (
+          <Tooltip title={title} overlayClassName="tab-title-tooltip" placement="top" showArrow={false}>
+            <span className="tab-ops-item-title">{title}</span>
+          </Tooltip>
+        ) : (
+          <span className="tab-ops-item-title">{title}</span>
+        )}
+      </div>
+
+      <div className="tab-ops-item-actions">
+        <RQButton
+          size="small"
+          type="transparent"
+          className="tab-ops-item-close-button"
+          onClick={(e) => {
+            e.stopPropagation();
+            onCloseTab(tab.id);
+          }}
+          icon={<MdClose />}
+        />
+        {isDirty ? <div className="unsaved-changes-indicator" /> : null}
+      </div>
+    </List.Item>
+  );
+};
+
 export const TabsMorePopover: React.FC<TabsMorePopoverProps> = ({ onTabItemClick }) => {
-  const [closeAllTabs, closeTabById] = useTabServiceWithSelector((state) => [state.closeAllTabs, state.closeTabById]);
+  const { closeTab, closeAllTabs } = useTabActions();
 
   const closeAllOpenTabs = (mode: string) => {
     if (mode === "force") {
-      closeAllTabs(true); // Skip unsaved prompt when closing all tabs
+      closeAllTabs({ skipUnsavedPrompt: true }); // Skip unsaved prompt when closing all tabs
     } else {
-      closeAllTabs(); // Normal close all tabs
+      closeAllTabs({ skipUnsavedPrompt: false }); // Normal close all tabs
     }
   };
 
   const [query, setQuery] = useState("");
   const inputRef = useRef<InputRef>(null);
-  const tabs = useTabServiceWithSelector((state) => state.tabs);
-  const tabList = useMemo(() => {
-    return Array.from(tabs.values()).map((t) => t.getState());
-  }, [tabs.size]);
+  const tabs = useTabs();
 
-  const filtered = tabList.filter((tab) => (tab.title ?? "").toLowerCase().includes(query.toLowerCase()));
-  const unSavedTabs = useMemo(() => {
-    return tabList.filter((tab) => tab.unsaved);
-  }, [tabList]);
+  const getTabTitleForFilter = useCallback((tab: TabState): string => {
+    if (tab.modeConfig.mode === "buffer") {
+      try {
+        const { entity, store } = getTabBufferedEntity(tab as BufferModeTab);
+        return entity.getName(store.getState());
+      } catch {
+        return tab.source.getDefaultTitle();
+      }
+    }
+
+    return tab.source.getDefaultTitle();
+  }, []);
+
+  const filteredTabs = useMemo(
+    () =>
+      tabs.filter((tab) => {
+        if (!query) return true;
+        return getTabTitleForFilter(tab).toLowerCase().includes(query.toLowerCase());
+      }),
+    [tabs, query, getTabTitleForFilter]
+  );
+
+  const unSavedTabsCount = useMemo(() => {
+    return tabs.filter((tab) => {
+      try {
+        return getIsTabDirty(tab);
+      } catch {
+        return false;
+      }
+    }).length;
+  }, [tabs]);
 
   useEffect(() => {
     if (inputRef.current) {
@@ -44,14 +150,21 @@ export const TabsMorePopover: React.FC<TabsMorePopoverProps> = ({ onTabItemClick
     setQuery("");
   };
 
+  const handleCloseTab = useCallback(
+    (tabId: TabId) => {
+      closeTab({ tabId });
+    },
+    [closeTab]
+  );
+
   return (
     <div className="tabs-operations-popover-content">
       <div className="opened-tabs-header">
         <div className="header-left-section">
           <span className="opened-tabs-title">Opened tabs</span>
-          <span className="opened-tabs-count">・{tabList?.length}</span>
+          <span className="opened-tabs-count">・{tabs.length}</span>
         </div>
-        <CloseAllTabsButton unSavedTabsCount={unSavedTabs?.length} closeAllOpenTabs={closeAllOpenTabs} />
+        <CloseAllTabsButton unSavedTabsCount={unSavedTabsCount} closeAllOpenTabs={closeAllOpenTabs} />
       </div>
       <Input
         ref={inputRef}
@@ -64,41 +177,20 @@ export const TabsMorePopover: React.FC<TabsMorePopoverProps> = ({ onTabItemClick
 
       <List
         size="small"
-        dataSource={filtered}
+        dataSource={filteredTabs}
         className="tabs-popover-list"
-        renderItem={(tab) => (
-          <List.Item className="tabs-ops-item" onClick={() => onTabItemClick(tab.id)}>
-            <div className="tab-ops-item-container">
-              {tab.icon ?? null}
-              {(tab.title ?? "Untitled").length > 30 ? (
-                <Tooltip
-                  title={tab.title ?? "Untitled"}
-                  overlayClassName="tab-title-tooltip"
-                  placement="top"
-                  showArrow={false}
-                >
-                  <span className="tab-ops-item-title">{tab.title ?? "Untitled"}</span>
-                </Tooltip>
-              ) : (
-                <span className="tab-ops-item-title">{tab.title ?? "Untitled"}</span>
-              )}
-            </div>
-
-            <div className="tab-ops-item-actions">
-              <RQButton
-                size="small"
-                type="transparent"
-                className="tab-ops-item-close-button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  closeTabById(tab.id);
-                }}
-                icon={<MdClose />}
-              />
-              {tab.unsaved ? <div className="unsaved-changes-indicator" /> : null}
-            </div>
-          </List.Item>
-        )}
+        renderItem={(tab) =>
+          tab.modeConfig.mode === "buffer" ? (
+            <BufferedTabListItem
+              key={tab.id}
+              tab={tab as BufferModeTab}
+              onTabClick={onTabItemClick}
+              onCloseTab={handleCloseTab}
+            />
+          ) : (
+            <NonBufferedTabListItem key={tab.id} tab={tab} onTabClick={onTabItemClick} onCloseTab={handleCloseTab} />
+          )
+        }
         locale={{
           emptyText: <TabsEmptyState onClearFilter={onClearFilter} />,
         }}

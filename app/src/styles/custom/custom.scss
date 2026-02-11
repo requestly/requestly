@@ -7,8 +7,8 @@ $theme-primary-color: #0a48b3;
 $theme-primary-color-gradient: linear-gradient(87deg, #0b52cb 0, $theme-primary-color 100%);
 
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 5px;
+  height: 5px;
 }
 
 ::-webkit-scrollbar-thumb {
@@ -66,11 +66,13 @@ button.ant-input-search-button {
     margin-bottom: 1rem !important;
   }
 }
+
 .margin-bottom-1-when-sm {
   @media screen and (max-width: 768px) {
     margin-bottom: 1rem !important;
   }
 }
+
 .margin-bottom-1-when-md {
   @media screen and (max-width: 992px) {
     margin-bottom: 1rem !important;
@@ -81,15 +83,19 @@ button.ant-input-search-button {
   .mb-2 {
     margin-bottom: 2em;
   }
+
   .mb-3 {
     margin-bottom: 3em;
   }
+
   .mb-4 {
     margin-bottom: 4em;
   }
+
   .mb-8 {
     margin-bottom: 8em;
   }
+
   .mt-1 {
     margin-top: 1em;
   }
@@ -119,6 +125,7 @@ button.ant-input-search-button {
 .max-width-80-percent {
   max-width: 80%;
 }
+
 .max-width-70-percent {
   max-width: 70%;
 }
@@ -152,9 +159,11 @@ button.ant-input-search-button {
 .one-padding-top {
   padding-top: 1rem;
 }
+
 .one-padding-bottom {
   padding-bottom: 1rem;
 }
+
 .has-dark-text,
 .has-dark-text:focus {
   color: #4a5868;
@@ -177,6 +186,7 @@ button.ant-input-search-button {
     -webkit-transform: rotate(0deg);
     transform: rotate(0deg);
   }
+
   100% {
     -webkit-transform: rotate(359deg);
     transform: rotate(359deg);
@@ -188,6 +198,7 @@ button.ant-input-search-button {
     -webkit-transform: rotate(0deg);
     transform: rotate(0deg);
   }
+
   100% {
     -webkit-transform: rotate(359deg);
     transform: rotate(359deg);
@@ -213,12 +224,15 @@ button.ant-input-search-button {
 .mr-1 {
   margin-right: 1%;
 }
+
 .mr-2 {
   margin-right: 2%;
 }
+
 .ml-2 {
   margin-left: 2%;
 }
+
 .mr-5-px {
   margin-right: 5px;
 }
@@ -226,18 +240,22 @@ button.ant-input-search-button {
 .ml-8 {
   margin-left: 8%;
 }
+
 .mr-9 {
   margin-right: 9px !important;
 }
 
 .bw-color-on-hover {
-  filter: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'><filter id='grayscale'><feColorMatrix type='matrix' values='0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0 0 0 1 0'/></filter></svg>#grayscale"); /* Firefox 10+, Firefox on Android */
+  filter: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'><filter id='grayscale'><feColorMatrix type='matrix' values='0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0 0 0 1 0'/></filter></svg>#grayscale");
+  /* Firefox 10+, Firefox on Android */
   -webkit-filter: grayscale(100%);
   -moz-filter: grayscale(100%);
   -ms-filter: grayscale(100%);
   filter: grayscale(100%);
-  filter: gray; /* IE 6-9 */
+  filter: gray;
+  /* IE 6-9 */
 }
+
 .bw-color-on-hover:hover {
   -webkit-filter: none;
   -moz-filter: none;
@@ -252,6 +270,7 @@ button.ant-input-search-button {
   margin-right: 40px;
   cursor: pointer;
 }
+
 .ant-pro-global-footer-links .ant-typography:hover {
   color: rgba(0, 0, 0, 0.85);
 }
@@ -360,7 +379,9 @@ input[id^="react-select-"] {
 @keyframes rotate {
   100% {
     transform: rotate(1turn);
-  } // or 360deg
+  }
+
+  // or 360deg
 }
 
 //mock type tag
@@ -576,12 +597,15 @@ div.react-multi-email .multi-email-tag {
   & .ant-modal {
     & .ant-modal-content {
       background: var(--requestly-color-surface-0);
+
       & .ant-modal-header {
         background: var(--requestly-color-surface-0);
+
         & .ant-modal-title {
           color: var(--requestly-color-text-default);
         }
       }
+
       & .ant-modal-footer {
         background: var(--requestly-color-surface-0);
       }

@@ -1,30 +1,43 @@
-import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
-import React, { useEffect, useMemo } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
+import { useSelector } from "react-redux";
 import { RuntimeVariablesViewTabSource } from "./runtimevariablesTabSource";
 import "./runtimevariables.scss";
-
-const tabSource = {
-  RUNTIME_VARIABLES: "runtime",
-};
+import { useTabActions, selectActiveTab } from "componentsV2/Tabs/slice";
+import { RUNTIME_VARIABLES_ENTITY_ID } from "features/apiClient/slices/common/constants";
+import { getApiClientFeatureContext } from "features/apiClient/slices";
 
 export const RuntimeVariables: React.FC = () => {
-  const [openTab, activeTabSource] = useTabServiceWithSelector((state) => [state.openTab, state.activeTabSource]);
-
-  useEffect(() => {
-    openTab(new RuntimeVariablesViewTabSource());
-  }, [openTab]);
+  const workspaceId = getApiClientFeatureContext().workspaceId;
+  const activeTab = useSelector(selectActiveTab);
+  const { openBufferedTab } = useTabActions();
 
   const activeTabSourceId = useMemo(() => {
-    if (activeTabSource) {
-      return activeTabSource.getSourceId();
+    if (activeTab) {
+      return activeTab.source.getSourceId();
     }
-  }, [activeTabSource]);
+  }, [activeTab]);
+
+  const handleTabOpen = useCallback(() => {
+    openBufferedTab({
+      source: new RuntimeVariablesViewTabSource({
+        id: RUNTIME_VARIABLES_ENTITY_ID,
+        title: "Runtime Variables",
+        context: {
+          id: workspaceId
+        },
+      }),
+    });
+  }, [openBufferedTab, workspaceId]);
+
+  useEffect(() => {
+    handleTabOpen();
+  }, [handleTabOpen]);
 
   return (
-    <div className="runtime-variables-container" onClick={() => openTab(new RuntimeVariablesViewTabSource())}>
+    <div className="runtime-variables-container" onClick={handleTabOpen}>
       <div
         className={`runtime-variables-text-placeholder ${
-          activeTabSourceId === tabSource.RUNTIME_VARIABLES ? "active" : ""
+          activeTabSourceId === RUNTIME_VARIABLES_ENTITY_ID ? "active" : ""
         }`}
       >
         <span className="text">Runtime variables</span>

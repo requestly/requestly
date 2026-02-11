@@ -3,23 +3,24 @@ import { RQButton } from "lib/design-system-v2/components";
 import { trackNewEnvironmentClicked } from "modules/analytics/events/features/apiClient";
 import { toast } from "utils/Toast";
 import { EnvironmentViewTabSource } from "features/apiClient/screens/environment/components/environmentView/EnvironmentViewTabSource";
-import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
-import { useCommand } from "features/apiClient/commands";
+import { useTabActions } from "componentsV2/Tabs/slice";
+import { createEnvironment, useApiClientRepository } from "features/apiClient/slices";
+import { useApiClientDispatch } from "features/apiClient/slices/hooks/base.hooks";
+import { Workspace } from "features/workspaces/types";
 import "./emptyEnvironmentsCreateCard.scss";
 
 interface EmptyEnvironmentsCreateCardProps {
-  contextId: string | null;
+  workspaceId: Workspace["id"];
   isValidPermission: boolean;
 }
 
 export const EmptyEnvironmentsCreateCard: React.FC<EmptyEnvironmentsCreateCardProps> = ({
-  contextId,
+  workspaceId,
   isValidPermission,
 }) => {
-  const {
-    env: { createEnvironment },
-  } = useCommand();
-  const [openTab] = useTabServiceWithSelector((state) => [state.openTab]);
+  const dispatch = useApiClientDispatch();
+  const { openBufferedTab } = useTabActions();
+  const { environmentVariablesRepository } = useApiClientRepository();
   const [isCreatingEnvironment, setIsCreatingEnvironment] = useState(false);
 
   const handleCreateEnvironment = useCallback(async () => {
@@ -28,22 +29,34 @@ export const EmptyEnvironmentsCreateCard: React.FC<EmptyEnvironmentsCreateCardPr
     try {
       setIsCreatingEnvironment(true);
       trackNewEnvironmentClicked("environment_list_empty_state");
-      const { id, name } = await createEnvironment({ newEnvironmentName: "New Environment" });
-      openTab(
-        new EnvironmentViewTabSource({
+      const { id, name } = await dispatch(
+        createEnvironment({ name: "New Environment", repository: environmentVariablesRepository })
+      ).unwrap();
+
+      openBufferedTab({
+        isNew: true,
+        source: new EnvironmentViewTabSource({
           id,
           title: name,
           isNewTab: true,
-          context: contextId ? { id: contextId } : {},
-        })
-      );
+          context: { id: workspaceId },
+          isGlobal: false,
+        }),
+      });
       toast.success("Environment created");
     } catch (error: any) {
       toast.error(error?.message || "Failed to create environment");
     } finally {
       setIsCreatingEnvironment(false);
     }
-  }, [createEnvironment, openTab, contextId, isCreatingEnvironment, isValidPermission]);
+  }, [
+    isCreatingEnvironment,
+    isValidPermission,
+    dispatch,
+    environmentVariablesRepository,
+    openBufferedTab,
+    workspaceId,
+  ]);
 
   return (
     <div className="environments-empty-create-card">

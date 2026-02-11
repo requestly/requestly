@@ -1,10 +1,9 @@
 import React, { useMemo, useState } from "react";
 import { RQButton } from "lib/design-system-v2/components";
 import { MdOutlineHistory } from "@react-icons/all-files/md/MdOutlineHistory";
-import { useRunConfigStore, useRunResultStore } from "../../run.context";
-import { RunResultContainer } from "./RunResultContainer/RunResultContainer";
+import { EmptyRunResultContainer, RunResultContainer } from "./RunResultContainer/RunResultContainer";
 import { TestsRunningLoader } from "./TestsRunningLoader/TestsRunningLoader";
-import { HistorySaveStatus, RunStatus } from "features/apiClient/store/collectionRunResult/runResult.store";
+import { RunStatus } from "features/apiClient/slices/common/runResults/types";
 import "./runResultView.scss";
 import { HistoryDrawer } from "./HistoryDrawer/HistoryDrawer";
 import { useCollectionView } from "../../../../collectionView.context";
@@ -12,25 +11,40 @@ import { trackCollectionRunHistoryViewed } from "modules/analytics/events/featur
 import { HistoryNotSavedBanner } from "./HistoryNotSavedBanner/HistoryNotSavedBanner";
 import { RenderableError } from "errors/RenderableError";
 import DefaultErrorComponent from "./errors/DefaultCollectionRunnerErrorComponent/DefaultCollectionRunnerErrorComponent";
+import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
+import {
+  selectLiveRunResultStartTime,
+  selectLiveRunResultRunStatus,
+  selectLiveRunResultError,
+  selectLiveRunResultByCollectionId,
+} from "features/apiClient/slices/liveRunResults/selectors";
+import { selectCollectionHistoryStatus } from "features/apiClient/slices/runHistory/selectors";
+import { RunHistorySaveStatus } from "features/apiClient/slices/runHistory/types";
 
 export const RunResultView: React.FC = () => {
-  const [iterations, startTime, getRunSummary, runStatus, historySaveStatus, error] = useRunResultStore((s) => [
-    s.iterations,
-    s.startTime,
-    s.getRunSummary,
-    s.runStatus,
-    s.historySaveStatus,
-    s.error,
-  ]);
-  const [totalIterationCount] = useRunConfigStore((s) => [s.iterations]);
+  const { collectionId, bufferedEntity } = useCollectionView();
 
-  const testResults = useMemo(
-    () => getRunSummary(),
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- need `iterations` for reactivity
-    [getRunSummary, iterations]
-  );
+  const startTime = useApiClientSelector((s) => selectLiveRunResultStartTime(s, collectionId));
+  const runStatus = useApiClientSelector((s) => selectLiveRunResultRunStatus(s, collectionId));
+  const historySaveStatus = useApiClientSelector((s) => selectCollectionHistoryStatus(s, collectionId));
+  const error = useApiClientSelector((s) => selectLiveRunResultError(s, collectionId));
 
-  const { collectionId } = useCollectionView();
+  const totalIterationCount = useApiClientSelector((state) => bufferedEntity.getIterations(state));
+  const liveRunResultEntry = useApiClientSelector((s) => selectLiveRunResultByCollectionId(s, collectionId));
+
+  const testResults = useMemo(() => {
+    if (!liveRunResultEntry) {
+      return;
+    }
+
+    return {
+      startTime: liveRunResultEntry.startTime,
+      endTime: liveRunResultEntry.endTime,
+      runStatus: liveRunResultEntry.runStatus,
+      iterations: liveRunResultEntry.iterations,
+    };
+  }, [liveRunResultEntry]);
+
   const [isHistoryDrawerOpen, setIsHistoryDrawerOpen] = useState(false);
 
   return (
@@ -52,13 +66,15 @@ export const RunResultView: React.FC = () => {
         </RQButton>
       </div>
 
-      {historySaveStatus === HistorySaveStatus.FAILED ? <HistoryNotSavedBanner /> : null}
-      {runStatus === RunStatus.ERRORED ? (
+      {historySaveStatus === RunHistorySaveStatus.FAILED ? <HistoryNotSavedBanner /> : null}
+      {runStatus === RunStatus.ERRORED && error ? (
         error instanceof RenderableError ? (
           error.render()
         ) : (
           <DefaultErrorComponent error={error} />
         )
+      ) : !testResults ? (
+        <EmptyRunResultContainer />
       ) : (
         <RunResultContainer
           result={testResults}

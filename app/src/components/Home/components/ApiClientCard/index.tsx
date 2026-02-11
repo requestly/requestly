@@ -1,29 +1,28 @@
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { CgStack } from "@react-icons/all-files/cg/CgStack";
 import { MdHorizontalSplit } from "@react-icons/all-files/md/MdHorizontalSplit";
-import { MenuProps } from "antd";
-import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
-import { isEmpty } from "lodash";
-import { useCallback, useState } from "react";
-import { getOptions } from "./utils";
-import PATHS from "config/constants/sub/paths";
-import { PRODUCT_FEATURES } from "../EmptyCard/staticData";
-import { MdOutlineSyncAlt } from "@react-icons/all-files/md/MdOutlineSyncAlt";
-import DropdownButton from "antd/lib/dropdown/dropdown-button";
 import { MdOutlineKeyboardArrowDown } from "@react-icons/all-files/md/MdOutlineKeyboardArrowDown";
-import { Card } from "../Card";
-import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { CardListItem, CardType } from "../Card/types";
-import { ApiClientImporterType } from "features/apiClient/types";
-import Postman from "../../../../assets/img/brand/postman-icon.svg?react";
-import { CreateType } from "features/apiClient/types";
+import { MdOutlineSyncAlt } from "@react-icons/all-files/md/MdOutlineSyncAlt";
+import { SiOpenapiinitiative } from "@react-icons/all-files/si/SiOpenapiinitiative";
+import { MenuProps } from "antd";
+import DropdownButton from "antd/lib/dropdown/dropdown-button";
 import { trackHomeApisActionClicked } from "components/Home/analytics";
+import { useTabs } from "componentsV2/Tabs/slice";
+import PATHS from "config/constants/sub/paths";
+import { ApiClientImporterType, CreateType } from "features/apiClient/types";
 import { RoleBasedComponent, useRBAC } from "features/rbac";
 import { RQButton, RQTooltip } from "lib/design-system-v2/components";
-import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
-import { SiOpenapiinitiative } from "@react-icons/all-files/si/SiOpenapiinitiative";
-import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import { isEmpty } from "lodash";
+import { useCallback, useMemo } from "react";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
+import Postman from "../../../../assets/img/brand/postman-icon.svg?react";
+import { Card } from "../Card";
+import { CardListItem, CardType } from "../Card/types";
+import { PRODUCT_FEATURES } from "../EmptyCard/staticData";
 import "./apiClientCard.scss";
+import { getOptions } from "./utils";
 
 interface CardOptions {
   bodyTitle: string;
@@ -34,15 +33,18 @@ const ApiClientCard = () => {
   const navigate = useNavigate();
   const user = useSelector(getUserAuthDetails);
   const isLoggedIn = user?.details?.isLoggedIn;
-  const [tabs] = useTabServiceWithSelector((state) => [state.tabs]);
-  const [cardOptions] = useState<CardOptions>(!isEmpty(tabs) ? getOptions(tabs) : null);
+  const tabs = useTabs();
+  const cardOptions = useMemo<CardOptions | null>(
+    () => (!isEmpty(tabs) ? getOptions(tabs) : null),
+    [tabs]
+  );
   const { validatePermission } = useRBAC();
   const { isValidPermission } = validatePermission("api_client_request", "create");
   const isOpenApiSupportEnabled = useFeatureIsOn("openapi-import-support");
 
   const createNewHandler = useCallback(
     (type: CreateType) => {
-      navigate(PATHS.API_CLIENT.ABSOLUTE, { state: { action: "create", type } });
+      navigate(PATHS.API_CLIENT.ABSOLUTE as string, { state: { action: "create", type } });
       trackHomeApisActionClicked(`new_${type}_clicked`);
     },
     [navigate]
@@ -50,7 +52,7 @@ const ApiClientCard = () => {
 
   const importTriggerHandler = useCallback(
     (modal: ApiClientImporterType) => {
-      navigate(PATHS.API_CLIENT.ABSOLUTE, { state: { modal } });
+      navigate(PATHS.API_CLIENT.ABSOLUTE as string, { state: { modal } });
       trackHomeApisActionClicked(`${modal.toLowerCase()}_importer_clicked`);
     },
     [navigate]
@@ -150,15 +152,17 @@ const ApiClientCard = () => {
             }
           : null
       }
-      bodyTitle={cardOptions?.bodyTitle}
-      contentList={isLoggedIn ? cardOptions?.contentList : []}
+      bodyTitle={cardOptions?.bodyTitle ?? ""}
+      contentList={isLoggedIn ? cardOptions?.contentList ?? [] : []}
       listItemClickHandler={(item) => {
-        navigate(item.url);
-        trackHomeApisActionClicked("recent_tab_clicked");
+        if (item.url) {
+          navigate(item.url as string);
+          trackHomeApisActionClicked("recent_tab_clicked");
+        }
       }}
       actionButtons={actionButtons}
       viewAllCta={"View all APIs"}
-      viewAllCtaLink={PATHS.API_CLIENT.ABSOLUTE}
+      viewAllCtaLink={PATHS.API_CLIENT.ABSOLUTE as string}
       viewAllCtaOnClick={() => trackHomeApisActionClicked("view_all_apis")}
       emptyCardOptions={{
         ...PRODUCT_FEATURES.API_CLIENT,
@@ -171,7 +175,7 @@ const ApiClientCard = () => {
                 size="small"
                 type="primary"
                 onClick={() => {
-                  navigate(PATHS.API_CLIENT.ABSOLUTE);
+                  navigate(PATHS.API_CLIENT.ABSOLUTE as string);
                 }}
               >
                 View requests

@@ -136,7 +136,7 @@ export const graphQLResponseToHttpResponseAdapter = (response: RQAPI.GraphQLResp
   };
 };
 
-export const extractOperationNames = (operationString: string): string[] => {
+export const extractOperationNames = (operationString: string = ""): string[] => {
   if (!operationString || typeof operationString !== "string") {
     return [];
   }
