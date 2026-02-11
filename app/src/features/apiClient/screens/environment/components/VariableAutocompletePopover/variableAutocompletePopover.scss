@@ -23,7 +23,7 @@
     padding: var(--space-3, 6px) !important;
     flex-direction: row;
     width: 225px;
-    border: none !important;
+    border-bottom: none !important;
     justify-content: space-between;
     cursor: pointer;
     &:hover {
@@ -70,6 +70,11 @@
       font-style: normal;
       font-weight: 400;
       line-height: 18px; /* 150% */
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+      white-space: nowrap !important;
+      max-width: 160px;
+      flex-shrink: 1;
     }
   }
 }
