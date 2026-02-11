@@ -11,5 +11,4 @@ export class FakerVariableProvider extends DynamicVariableProvider {
     super();
     const fakerVariables = createFakerVariables(faker);
     this.variableNames = new Map(fakerVariables.map((v) => [v.name, v]));
-  }
 }
