@@ -27,7 +27,6 @@ export const getRankForDroppedRecord = ({
 }: GetRankForDroppedRecordParams): string => {
   const state = context.store.getState();
   const siblings = apiRecordsRankingManager.sort(selectChildRecords(state, targetRecord.collectionId ?? ""));
-  console.log("Siblings for target record:", siblings);
   let beforeRecord: RecordData | null = null;
   let afterRecord: RecordData | null = null;
   const recordIndex = siblings.findIndex((sibling) => sibling.id === targetRecord.id);

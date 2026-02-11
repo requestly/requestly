@@ -172,8 +172,13 @@ export const RequestRow: React.FC<Props> = ({
             dropPosition: currentDropPosition,
           });
           const targetCollectionId = record.collectionId;
-
+          if (item.record.type === RQAPI.RecordType.COLLECTION) {
+            return;
+          }
           const patch: Partial<RQAPI.ApiRecord> = {
+            data: {
+              ...item.record.data,
+            },
             id: item.record.id,
             rank,
             collectionId: targetCollectionId,
