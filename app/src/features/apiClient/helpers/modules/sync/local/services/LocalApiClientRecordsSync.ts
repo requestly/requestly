@@ -9,6 +9,7 @@ import { Authorization } from "features/apiClient/screens/apiClient/components/v
 import { ResponsePromise } from "backend/types";
 import { SavedRunConfig } from "features/apiClient/slices/runConfig/types";
 import { RunResult, SavedRunResult } from "features/apiClient/slices/common/runResults";
+import { apiRecordsRankingManager } from "features/apiClient/helpers/RankingManager";
 
 export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiClientLocalMeta> {
   meta: ApiClientLocalMeta;
@@ -81,6 +82,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
           updatedBy: "local",
           createdTs: Date.now(),
           updatedTs: Date.now(),
+          rank: e.data.rank,
 
           type: RQAPI.RecordType.API,
           data: {
@@ -106,6 +108,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
       case RQAPI.ApiEntryType.HTTP:
         return {
           name: record.name || "Untitled request",
+          rank: record.rank,
           request: {
             type: record.data.type,
             url: record.data.request.url,
@@ -123,6 +126,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
       case RQAPI.ApiEntryType.GRAPHQL:
         return {
           name: record.name || "Untitled request",
+          rank: record.rank,
           request: {
             type: record.data.type,
             url: record.data.request.url,
@@ -138,6 +142,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
         const httpRecord = record as RQAPI.HttpApiRecord;
         return {
           name: record.name || "Untitled Request",
+          rank: record.rank,
           request: {
             type: httpRecord.data.type,
             url: httpRecord.data.request.url,
@@ -282,7 +287,12 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
     nativeId: string
   ): RQAPI.ApiClientRecordPromise {
     const id = parseNativeId(nativeId);
-
+    if (!patch.rank) {
+      const existingRecord = await this.getRecord(id);
+      if (existingRecord?.success && existingRecord.data) {
+        patch.rank = apiRecordsRankingManager.getEffectiveRank(existingRecord.data);
+      }
+    }
     const isCollection = patch.type === RQAPI.RecordType.COLLECTION;
     if (isCollection) {
       return this.updateCollectionRecord(patch as Partial<Omit<RQAPI.CollectionRecord, "id">>, id);
