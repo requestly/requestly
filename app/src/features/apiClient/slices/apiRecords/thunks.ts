@@ -228,3 +228,22 @@ export const duplicateRecords = createAsyncThunk<
     return rejectWithValue(error instanceof Error ? error.message : "Failed to duplicate records");
   }
 });
+
+export const getExamplesForApiRecords = createAsyncThunk<
+  { examples: RQAPI.ExampleApiRecord[] },
+  { apiRecordIds: string[]; repository: Repository },
+  { rejectValue: string }
+>("apiRecords/getExamplesForApiRecords", async ({ apiRecordIds, repository }, { dispatch, rejectWithValue }) => {
+  try {
+    const result = await repository.getAllExamples(apiRecordIds);
+    if (!result.success) {
+      throw new Error("Failed to get examples");
+    }
+
+    dispatch(apiRecordsActions.upsertRecords(result.data.examples));
+
+    return { examples: result.data.examples };
+  } catch (error) {
+    return rejectWithValue(error instanceof Error ? error.message : "Failed to get examples");
+  }
+});
