@@ -204,7 +204,7 @@ export class HttpRecordEntity<M extends ApiClientEntityMeta = ApiClientEntityMet
     this.unsafePatch((state) => {
       state.data.request = {
         ...request,
-        body: request.body ?? undefined,
+        body: request.body ?? "",
       };
     });
   }

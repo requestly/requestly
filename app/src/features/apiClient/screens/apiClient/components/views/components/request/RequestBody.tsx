@@ -104,16 +104,7 @@ const RequestBody: React.FC<RequestBodyProps> = React.memo((props) => {
   });
 
   useEffect(() => {
-    if (!contentType || body === null) {
-      return;
-    }
-    if (body === undefined) {
-      // Reset bodyContainer when body is undefined
-      setBodyContainer({
-        text: "",
-        form: [],
-        multipartForm: [],
-      });
+    if (!contentType || body === undefined || body === null) {
       return;
     }
     // Initializing the component level states based on the props
