@@ -46,11 +46,15 @@
   .api-request-body-editor-container {
     height: inherit;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
 
     .react-resizable {
-      height: calc(100% - 35px) !important;
-      min-height: unset important;
+      flex: 1;
+      min-height: 0 !important;
+      height: auto !important;
     }
+
     .editor-popup-container {
       display: none;
     }
