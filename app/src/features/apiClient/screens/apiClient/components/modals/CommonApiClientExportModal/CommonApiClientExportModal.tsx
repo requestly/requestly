@@ -29,7 +29,7 @@ export const CommonApiClientExportModal: React.FC<Props> = ({ isOpen, onClose, t
     }
   }, [exporter]);
 
-  const handleExport = useCallback(async () => {
+  const handleExport = useCallback(() => {
     if (!exportResult || !exportResult.files || exportResult.files.length === 0) {
       toast.error("No data to export");
       return;
