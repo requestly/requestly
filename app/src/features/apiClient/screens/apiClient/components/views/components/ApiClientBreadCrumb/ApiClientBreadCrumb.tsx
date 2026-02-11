@@ -4,7 +4,6 @@ import PATHS from "config/constants/sub/paths";
 import { RQBreadcrumb } from "lib/design-system-v2/components";
 import { useLocation } from "react-router-dom";
 import { LuFolderCog } from "@react-icons/all-files/lu/LuFolderCog";
-import "./ApiClientBreadCrumb.scss";
 import { truncateString } from "features/apiClient/screens/apiClient/utils";
 import { Tooltip } from "antd";
 import {
@@ -15,6 +14,8 @@ import {
   useAncestorRecords,
 } from "features/apiClient/slices";
 import { WorkspaceType } from "features/workspaces/types";
+import { HiOutlineDocument } from "@react-icons/all-files/hi/HiOutlineDocument";
+import "./ApiClientBreadCrumb.scss";
 
 interface Props {
   id: string;
@@ -25,6 +26,7 @@ interface Props {
   onRecordNameUpdate?: (name: string) => void;
   onBlur: (name: string) => void;
   breadCrumbType: string;
+  isDraft?: boolean;
 }
 
 export const BreadcrumbType = {
@@ -111,25 +113,32 @@ export const ApiClientBreadCrumb: React.FC<Props> = ({ ...props }) => {
 
   return (
     <Conditional condition={!openInModal}>
-      {viewMode === ApiClientViewMode.SINGLE ? (
-        <RQBreadcrumb
-          placeholder={placeholder}
-          recordName={name}
-          onRecordNameUpdate={onRecordNameUpdate}
-          onBlur={onBlur}
-          autoFocus={autoFocus}
-          defaultBreadcrumbs={[
-            { label: "API Client", pathname: PATHS.API_CLIENT.INDEX },
-            {
-              isEditable: !isHistoryPath,
-              pathname: window.location.pathname,
-              label: isHistoryPath ? "History" : name || "Untitled request",
-            },
-          ]}
-        />
-      ) : (
-        <MultiViewBreadCrumb {...props} />
-      )}
+      <div className="api-client-breadcrumb-wrapper">
+        {props.isDraft && (
+          <div className="api-client-breadcrumb-draft-badge">
+            <HiOutlineDocument /> <span>Draft</span>
+          </div>
+        )}
+        {viewMode === ApiClientViewMode.SINGLE ? (
+          <RQBreadcrumb
+            placeholder={placeholder}
+            recordName={name}
+            onRecordNameUpdate={onRecordNameUpdate}
+            onBlur={onBlur}
+            autoFocus={autoFocus}
+            defaultBreadcrumbs={[
+              { label: "API Client", pathname: PATHS.API_CLIENT.INDEX },
+              {
+                isEditable: !isHistoryPath,
+                pathname: window.location.pathname,
+                label: isHistoryPath ? "History" : name || "Untitled request",
+              },
+            ]}
+          />
+        ) : (
+          <MultiViewBreadCrumb {...props} />
+        )}
+      </div>
     </Conditional>
   );
 };
