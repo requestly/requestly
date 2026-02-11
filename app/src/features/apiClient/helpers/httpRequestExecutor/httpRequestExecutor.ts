@@ -41,6 +41,7 @@ function buildExecutionErrorObject(error: any, source: string, type: RQAPI.ApiCl
     source,
     name: error.name || "Error",
     message: error.message,
+    stack: error?.stack,
   };
 
   if (error.context?.reason) {
@@ -291,7 +292,8 @@ export class HttpRequestExecutor {
     } catch (err) {
       const error = buildExecutionErrorObject(
         {
-          ...err,
+          name: err.name,
+          stack: err.stack,
           message:
             this.appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP
               ? err.message
