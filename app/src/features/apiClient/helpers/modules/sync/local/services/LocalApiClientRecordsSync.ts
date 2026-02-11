@@ -621,6 +621,8 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
         if (entity.type === RQAPI.RecordType.API) {
           return this.createRecordWithId(entity, entity.id);
         }
+
+        // TODO: handle example api records here
         return this.createCollectionFromImport(entity, entity.id);
       })();
       if (duplicationResult.success) {
@@ -739,6 +741,18 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
     return {
       success: true,
       data: {} as SavedRunResult,
+    };
+  }
+
+  async getAllExamples(
+    recordIds: string[]
+  ): Promise<{ success: boolean; data: { examples: RQAPI.ExampleApiRecord[] } }> {
+    // TODO: Implement this, will be a dummy implementation for local ws
+    return {
+      success: true,
+      data: {
+        examples: [],
+      },
     };
   }
 }

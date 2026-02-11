@@ -22,6 +22,12 @@ export function sanitizeRecord(record: Partial<RQAPI.ApiClientRecord>) {
     }
   }
 
+  if (sanitizedRecord.type === RQAPI.RecordType.EXAMPLE_API) {
+    if (sanitizedRecord.data) {
+      delete sanitizedRecord.data.testResults;
+    }
+  }
+
   return sanitizedRecord;
 }
 
