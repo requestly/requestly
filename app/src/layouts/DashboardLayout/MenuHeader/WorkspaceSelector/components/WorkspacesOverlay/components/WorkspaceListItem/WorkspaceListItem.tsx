@@ -17,13 +17,14 @@ import {
 } from "modules/analytics/events/common/teams";
 import "./workspaceListItem.scss";
 import {
-  ApiClientViewMode,
-  useApiClientMultiWorkspaceView,
-} from "features/apiClient/store/multiWorkspaceView/multiWorkspaceView.store";
-import { toast } from "utils/Toast";
-import { addWorkspaceToView, removeWorkspaceFromView } from "features/apiClient/commands/multiView";
+  useGetAllSelectedWorkspaces,
+  useViewMode,
+  useWorkspaceViewActions,
+} from "features/apiClient/slices/workspaceView/hooks";
+import { getWorkspaceInfo } from "features/apiClient/slices/workspaceView/utils";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getActiveWorkspace } from "store/slices/workspaces/selectors";
+import { ApiClientViewMode } from "features/apiClient/slices";
 
 type WorkspaceItemProps =
   | {
@@ -48,7 +49,7 @@ const ShareWorkspaceActions = ({
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const activeWorkspace = useSelector(getActiveWorkspace);
-  const [viewMode] = useApiClientMultiWorkspaceView((s) => [s.viewMode]);
+  const viewMode = useViewMode();
 
   const isPrivateWorkspace = activeWorkspace?.workspaceType === WorkspaceType.PERSONAL || workspaceId === null;
 
@@ -107,59 +108,35 @@ const LocalWorkspaceActions = ({
   const user = useSelector(getUserAuthDetails);
   const activeWorkspace = useSelector(getActiveWorkspace);
 
-  const [selectedWorkspaces, getViewMode, getAllSelectedWorkspaces] = useApiClientMultiWorkspaceView((s) => [
-    s.selectedWorkspaces,
-    s.getViewMode,
-    s.getAllSelectedWorkspaces,
-  ]);
+  const viewMode = useViewMode();
+  const selectedWorkspaces = useGetAllSelectedWorkspaces();
+  const { workspaceViewManager } = useWorkspaceViewActions();
+
+  const userId = user.details?.profile?.uid;
 
   const handleMultiWorkspaceCheckbox = useCallback(
     async (isChecked: boolean) => {
-      const handleWorkspaceSelection = async () => {
-        const isFirstSelectedWorkspace = getAllSelectedWorkspaces().length === 0 && workspace.id !== activeWorkspace.id;
-        if (isFirstSelectedWorkspace) {
-          switchWorkspace(() => addWorkspaceToView(workspace, user.details?.profile?.uid));
-        } else {
-          await addWorkspaceToView(workspace, user.details?.profile?.uid);
-        }
+      const workspaceInfo = getWorkspaceInfo(workspace);
+
+      if (isChecked) {
+        await workspaceViewManager({ workspaces: [workspaceInfo], action: "add", userId });
         trackMultiWorkspaceSelected("workspace_selector_dropdown");
-      };
-
-      const handleWorkspaceDeselection = () => {
-        const isLastSelectedWorkspace =
-          getViewMode() === ApiClientViewMode.MULTI && getAllSelectedWorkspaces().length === 1;
-
-        if (isLastSelectedWorkspace) {
-          switchWorkspace();
-        } else {
-          removeWorkspaceFromView(workspace.id);
-        }
-
+      } else {
+        await workspaceViewManager({ workspaces: [workspaceInfo], action: "remove", userId });
         trackMultiWorkspaceDeselected("workspace_selector_dropdown");
-      };
-
-      try {
-        if (isChecked) {
-          await handleWorkspaceSelection();
-        } else {
-          handleWorkspaceDeselection();
-        }
-      } catch (e) {
-        // fixme: error should be observed in some way
-        toast.error(e.message);
       }
     },
-    [getAllSelectedWorkspaces, workspace, activeWorkspace.id, switchWorkspace, user.details?.profile?.uid, getViewMode]
+    [workspace, workspaceViewManager, userId]
   );
 
-  const isSelected = useMemo(() => selectedWorkspaces.some((w) => w.getState().id === workspace.id), [
+  const isSelected = useMemo(() => selectedWorkspaces.some((w) => w && w.id === workspace.id), [
     selectedWorkspaces,
     workspace.id,
   ]);
 
   return (
     <>
-      {activeWorkspace.id === workspace.id && getViewMode() === ApiClientViewMode.SINGLE ? (
+      {activeWorkspace.id === workspace.id && viewMode === ApiClientViewMode.SINGLE ? (
         <Tag className="workspace-list-item-active-tag">CURRENT</Tag>
       ) : null}
       <div className="local-workspace-actions" onClick={(e) => e.stopPropagation()}>
@@ -179,7 +156,7 @@ const LocalWorkspaceActions = ({
         </Tooltip>
 
         <Checkbox
-          checked={isSelected}
+          checked={isSelected && viewMode !== ApiClientViewMode.SINGLE}
           className="local-workspace-actions__checkbox"
           onChange={(e) => {
             handleMultiWorkspaceCheckbox(e.target.checked);
@@ -193,7 +170,8 @@ const LocalWorkspaceActions = ({
 export const WorkspaceItem: React.FC<WorkspaceItemProps> = (props) => {
   const { onClick, toggleDropdown } = props;
 
-  const [viewMode, selectedWorkspaces] = useApiClientMultiWorkspaceView((s) => [s.viewMode, s.selectedWorkspaces]);
+  const viewMode = useViewMode();
+  const selectedWorkspaces = useGetAllSelectedWorkspaces();
 
   const getWorkspaceDetails = (workspace: Workspace) => {
     switch (workspace.workspaceType) {
@@ -235,7 +213,7 @@ export const WorkspaceItem: React.FC<WorkspaceItemProps> = (props) => {
 
   const { workspace } = props;
   const isMultiView = viewMode === ApiClientViewMode.MULTI;
-  const isSelected = selectedWorkspaces.some((w) => w.getState().id === workspace.id);
+  const isSelected = selectedWorkspaces.some((w) => w && w.id === workspace.id);
   const isWorkspaceSwitchDisabled = isMultiView && isSelected;
 
   return (

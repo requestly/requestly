@@ -58,10 +58,11 @@ export const MultiEditableCell: React.FC<React.PropsWithChildren<EditableCellPro
     return <td {...restProps}>{children}</td>;
   }
 
-  const save = async () => {
+  const save = async (manualOverrides: Partial<RQAPI.FormDataKeyValuePair> = {}) => {
     try {
       const values = await form.validateFields();
-      handleUpdatePair({ ...record, ...values });
+      // Order matters: record -> form values -> manual overrides
+      handleUpdatePair({ ...record, ...values, ...manualOverrides });
     } catch (error) {
       Sentry.captureMessage("Error saving key-value pair", error);
     }
@@ -159,11 +160,10 @@ export const MultiEditableCell: React.FC<React.PropsWithChildren<EditableCellPro
                 ]}
                 defaultValue={record?.type ?? FormDropDownOptions.TEXT}
                 onChange={(value) => {
-                  record.type = value;
                   //clear the value if type is changed to file, because earlier value remains there
-                  const newValue: string | [] = value === FormDropDownOptions.FILE ? [] : "";
-                  form.setFieldsValue({ value: newValue });
-                  save();
+                  const newValue: string | RQAPI.MultipartFileValue[] = value === FormDropDownOptions.FILE ? [] : "";
+                  form.setFieldsValue({ type: value, value: newValue });
+                  save({ type: value, value: newValue } as Partial<RQAPI.FormDataKeyValuePair>);
                 }}
               />
             )}

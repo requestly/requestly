@@ -3,6 +3,7 @@ import { useVirtualizer } from "@tanstack/react-virtual";
 import { ReorderableListItem } from "./ReorderableListItem";
 import { RQAPI } from "features/apiClient/types";
 import "./reorderableList.scss";
+import { NativeError } from "errors/NativeError";
 
 interface ReorderableListProps {
   requests: RQAPI.OrderedRequests;
@@ -20,6 +21,9 @@ export const ReorderableList: React.FC<ReorderableListProps> = ({ requests, onOr
 
       const result: RQAPI.RunOrder = requests.map((r) => ({ id: r.record.id, isSelected: r.isSelected }));
       const [item] = result.splice(currentIndex, 1);
+      if (!item) {
+        throw new NativeError("ReorderableList: Item to reorder not found");
+      }
       result.splice(newIndex, 0, item);
       onOrderUpdate(result);
     },
@@ -47,6 +51,11 @@ export const ReorderableList: React.FC<ReorderableListProps> = ({ requests, onOr
         >
           {items.map((virtualRow) => {
             const orderedRequest = requests[virtualRow.index];
+
+            if (!orderedRequest) {
+              return null;
+            }
+
             return (
               <div
                 key={orderedRequest.record.id}

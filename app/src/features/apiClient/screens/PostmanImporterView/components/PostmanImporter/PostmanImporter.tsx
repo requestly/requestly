@@ -4,9 +4,11 @@ import { getUploadedPostmanFileType, processPostmanCollectionData, processPostma
 import { toast } from "utils/Toast";
 import { RQButton } from "lib/design-system-v2/components";
 import { MdCheckCircleOutline } from "@react-icons/all-files/md/MdCheckCircleOutline";
+import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
 import { ApiClientImporterType, RQAPI } from "features/apiClient/types";
 import { IoMdCloseCircleOutline } from "@react-icons/all-files/io/IoMdCloseCircleOutline";
-import { notification, Row } from "antd";
+import { notification, Row, Tooltip } from "antd";
+import LINKS from "config/constants/sub/links";
 import {
   trackImportFailed,
   trackImportParsed,
@@ -16,12 +18,16 @@ import {
 import Logger from "lib/logger";
 import "./postmanImporter.scss";
 import * as Sentry from "@sentry/react";
-import { useCommand } from "features/apiClient/commands";
-import { useApiClientRepository } from "features/apiClient/contexts/meta";
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
-import { EnvironmentVariableData } from "features/apiClient/store/variables/types";
+import {
+  createEnvironment,
+  getApiClientFeatureContext,
+  updateEnvironmentVariables,
+  useApiClientRepository,
+} from "features/apiClient/slices";
 import { wrapWithCustomSpan } from "utils/sentry";
 import { SPAN_STATUS_ERROR, SPAN_STATUS_OK } from "@sentry/core";
+import { EnvironmentVariableData } from "@requestly/shared/types/entities/apiClient";
 import { LocalApiClientRecordsSync } from "features/apiClient/helpers/modules/sync/local/services/LocalApiClientRecordsSync";
 import { captureException } from "backend/apiClient/utils";
 
@@ -49,12 +55,9 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
     variables: {},
   });
 
-  const {
-    env: { createEnvironment, patchEnvironmentVariables },
-  } = useCommand();
-
   const { apiClientRecordsRepository, environmentVariablesRepository } = useApiClientRepository();
   const { onSaveRecord } = useNewApiClientContext();
+  const { dispatch } = getApiClientFeatureContext().store;
 
   const destinationRepository = apiClientRecordsRepository;
   const isLocalFileSystem = destinationRepository instanceof LocalApiClientRecordsSync;
@@ -179,23 +182,29 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
 
   const handleImportEnvironments = useCallback(async () => {
     try {
-      // For local workspace use sequential way
       if (isLocalFileSystem) {
         let successCount = 0;
         for (let index = 0; index < processedFileData.environments.length; index++) {
           const env = processedFileData.environments[index];
+
           try {
             if (env.isGlobal) {
-              await patchEnvironmentVariables({
-                environmentId: environmentVariablesRepository.getGlobalEnvironmentId(),
-                variables: env.variables,
-              });
+              await dispatch(
+                updateEnvironmentVariables({
+                  environmentId: environmentVariablesRepository.getGlobalEnvironmentId(),
+                  variables: env.variables,
+                  repository: environmentVariablesRepository,
+                }) as any
+              ).unwrap();
               successCount++;
             } else {
-              const result = await createEnvironment({
-                newEnvironmentName: env.name,
-                variables: env.variables,
-              });
+              const result = await dispatch(
+                createEnvironment({
+                  name: env.name,
+                  variables: env.variables,
+                  repository: environmentVariablesRepository,
+                }) as any
+              ).unwrap();
               if (result?.id) {
                 successCount++;
               }
@@ -204,21 +213,26 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
             Sentry.captureException(error);
           }
         }
-
         return successCount;
       } else {
         const importPromises = processedFileData.environments.map(async (env) => {
           if (env.isGlobal) {
-            await patchEnvironmentVariables({
-              environmentId: environmentVariablesRepository.getGlobalEnvironmentId(),
-              variables: env.variables,
-            });
+            await dispatch(
+              updateEnvironmentVariables({
+                environmentId: environmentVariablesRepository.getGlobalEnvironmentId(),
+                variables: env.variables,
+                repository: environmentVariablesRepository,
+              }) as any
+            ).unwrap();
             return true;
           } else {
-            const result = await createEnvironment({
-              newEnvironmentName: env.name,
-              variables: env.variables,
-            });
+            const result = await dispatch(
+              createEnvironment({
+                name: env.name,
+                variables: env.variables,
+                repository: environmentVariablesRepository,
+              }) as any
+            ).unwrap();
             return !!result?.id;
           }
         });
@@ -237,13 +251,7 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
       Logger.error("Postman data import failed:", error);
       throw error;
     }
-  }, [
-    processedFileData.environments,
-    patchEnvironmentVariables,
-    environmentVariablesRepository,
-    createEnvironment,
-    isLocalFileSystem,
-  ]);
+  }, [isLocalFileSystem, processedFileData.environments, dispatch, environmentVariablesRepository]);
 
   const handleImportCollectionsAndApis = useCallback(async () => {
     let importedCollectionsCount = 0;
@@ -435,6 +443,11 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
     <div className="postman-importer">
       <div className="postman-importer__header">
         <span>Import from Postman</span>
+        <Tooltip title="Learn more about importing from Postman">
+          <a href={LINKS.REQUESTLY_API_CLIENT_IMPORT_POSTMAN_DOCS} target="_blank" rel="noreferrer">
+            <MdInfoOutline className="postman-importer__header-info-icon" />
+          </a>
+        </Tooltip>
       </div>
       {importError ? (
         <div className="postman-importer__post-parse-view postman-importer__post-parse-view--error">
