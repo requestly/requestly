@@ -7,4 +7,4 @@ export interface DynamicVariable {
   generate: Handlebars.HelperDelegate;
 }
 
-export type VariableContext = Record<string, string | number | boolean | undefined>;
+export type VariableContext = Record<string, unknown>;
