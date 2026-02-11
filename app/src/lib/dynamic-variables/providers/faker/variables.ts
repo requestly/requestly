@@ -1,6 +1,7 @@
 import type { Faker } from "@faker-js/faker";
 import type { DynamicVariable } from "../../types";
 
+// TODO: Add more variables
 export function createFakerVariables(faker: Faker): DynamicVariable[] {
   return [
     {
