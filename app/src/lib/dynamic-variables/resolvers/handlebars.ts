@@ -1,5 +1,5 @@
 import Handlebars from "handlebars";
-import type { VariableContext } from "../types";
+import type { DynamicVariable, VariableContext } from "../types";
 import { DynamicVariableResolver } from "./DynamicVariableResolver";
 import { DynamicVariableProvider } from "../providers";
 
@@ -15,16 +15,17 @@ export class HandlebarsResolver extends DynamicVariableResolver {
 
   private createContextAwareHelper(
     variableName: string,
-    generate: Handlebars.HelperDelegate
+    generate: DynamicVariable["generate"]
   ): Handlebars.HelperDelegate {
-    return function (...args: unknown[]) {
-      // 'this' is the Handlebars context (user variables), which is evaluated at runtime
-      // If user has defined this variable, use their value eg collection or env variables
-      if (variableName in this) {
-        return this[variableName];
+    return function (ctx: VariableContext, ...args: unknown[]) {
+      // If user has defined this variable, use their value ie collection or env variables
+      if (variableName in ctx) {
+        return ctx[variableName];
       }
 
-      return generate.apply(this, args);
+      // Remove the Handlebars options object (last argument)
+      const helperArgs = args.slice(0, -1);
+      return generate(...helperArgs);
     };
   }
 
