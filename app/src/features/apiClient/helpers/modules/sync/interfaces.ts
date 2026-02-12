@@ -40,6 +40,7 @@ export interface ApiClientRecordsInterface<Meta extends Record<string, any>> {
   createRecord(record: Partial<RQAPI.ApiClientRecord>): RQAPI.ApiClientRecordPromise;
   createCollection(record: Partial<RQAPI.CollectionRecord>): RQAPI.ApiClientRecordPromise;
   createRecordWithId(record: Partial<RQAPI.ApiClientRecord>, id: string): RQAPI.ApiClientRecordPromise;
+  createExampleRequest(parentRequestId: string, example: RQAPI.ExampleApiRecord): RQAPI.ApiClientRecordPromise;
   updateRecord(record: Partial<Omit<RQAPI.ApiClientRecord, "id">>, id: string): RQAPI.ApiClientRecordPromise;
   deleteRecords(recordIds: string[]): Promise<{ success: boolean; message?: string }>;
   deleteCollections(ids: string[]): Promise<{ success: boolean; data: unknown; message?: string }>;

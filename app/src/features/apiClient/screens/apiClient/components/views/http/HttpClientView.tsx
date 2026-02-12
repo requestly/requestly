@@ -27,7 +27,7 @@ import {
 import { useSaveBuffer } from "features/apiClient/slices/buffer/hooks";
 import { BufferedHttpRecordEntity, useIsBufferDirty } from "features/apiClient/slices/entities";
 import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
-import { RBACButton, RevertViewModeChangesAlert, RoleBasedComponent } from "features/rbac";
+import { RevertViewModeChangesAlert, RoleBasedComponent } from "features/rbac";
 import { useDeepLinkState } from "hooks";
 import { useHostContext } from "hooks/useHostContext";
 import { RQButton } from "lib/design-system-v2/components";
@@ -70,7 +70,7 @@ import { ApiClientBottomSheet } from "../components/response/ApiClientBottomShee
 import HttpApiClientUrl from "./components/HttpClientUrl/HttpClientUrl";
 import HttpRequestTabs, { RequestTab } from "./components/HttpRequestTabs/HttpRequestTabs";
 import "./httpClientView.scss";
-import { apiRecordsRankingManager } from "features/apiClient/helpers/RankingManager";
+import { SaveRequestButton } from "../components/SaveRequestButton/SaveRequestButton";
 
 function getEntry(entity: BufferedHttpRecordEntity, store: ApiClientStore) {
   return entity.getEntityFromState(store.getState()).data;
@@ -598,7 +598,6 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
               />
             </Space.Compact>
             <RQButton
-              showHotKeyText
               onClick={onSendButtonClick}
               hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SEND_REQUEST!.hotKey}
               type="primary"
@@ -609,7 +608,7 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
               Send
             </RQButton>
 
-            <Conditional condition={!openInModal}>
+            {/* <Conditional condition={!openInModal}>
               <RBACButton
                 disabled={
                   !hasUnsavedChanges || (appMode === "EXTENSION" && contentType === RequestContentType.MULTIPART_FORM)
@@ -625,7 +624,16 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
               >
                 Save
               </RBACButton>
-            </Conditional>
+            </Conditional> */}
+            <SaveRequestButton
+              hidden={openInModal}
+              disabled={
+                !hasUnsavedChanges || (appMode === "EXTENSION" && contentType === RequestContentType.MULTIPART_FORM)
+              }
+              loading={isRequestSaving}
+              enableHotkey={enableHotkey}
+              onClick={onSaveButtonClick}
+            />
           </div>
         </div>
       </div>

@@ -10,6 +10,7 @@ import {
   upsertRunConfig as upsertRunConfigFromFirebase,
   getRunResults as getRunResultsFromFirebase,
   addRunResult as addRunResultToFirebase,
+  createExample,
 } from "backend/apiClient";
 import { ApiClientCloudMeta, ApiClientRecordsInterface } from "../../interfaces";
 import { batchWrite, firebaseBatchWrite, generateDocumentId, getOwnerId } from "backend/utils";
@@ -310,6 +311,21 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
         examples: result.data,
         failedRecordIds: result.failedRecordIds,
       },
+    };
+  }
+
+  async createExampleRequest(parentRequestId: string, example: RQAPI.ExampleApiRecord): RQAPI.ApiClientRecordPromise {
+    const result = await createExample(this.meta.uid, parentRequestId, example, this.meta.teamId);
+    if (result.success) {
+      return {
+        success: true,
+        data: result.data,
+      };
+    }
+    return {
+      success: false,
+      data: null,
+      message: "Failed to create example request",
     };
   }
 }

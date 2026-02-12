@@ -8,3 +8,4 @@ export { upsertRunConfig } from "./upsertRunConfig";
 export { getRunResults } from "./getRunResults";
 export { addRunResult } from "./addRunResult";
 export { getExamplesForApiRecords } from "./getAllExamples";
+export { createExample } from "./createExample";
