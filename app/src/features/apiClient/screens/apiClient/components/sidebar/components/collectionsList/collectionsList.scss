@@ -35,7 +35,7 @@
 
   .collections-list-content {
     overflow: auto;
-    padding: 0 8px;
+    padding: 0 var(--requestly-space-2, 4px);
 
     .collections-list {
       display: flex;
@@ -45,6 +45,7 @@
     .ant-collapse-expand-icon {
       display: flex;
       align-items: center;
+
       .ant-checkbox-wrapper {
         margin-right: 4px;
       }
@@ -92,14 +93,13 @@
       width: 100%;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: var(--requestly-space-3, 6px);
       cursor: pointer;
       padding: 2px 6px;
       border-radius: 4px;
       color: var(--requestly-color-text-subtle);
       font-size: var(--requestly-font-size-sm, 13px);
       min-height: 26px;
-      margin-top: 2px;
 
       &.api {
         height: 28px;
@@ -130,6 +130,7 @@
           font-size: var(--requestly-font-size-sm, 12px);
           color: var(--requestly-color-text-default);
         }
+
         .request-options {
           margin-left: auto;
           display: none;
@@ -190,7 +191,7 @@
           user-select: none;
           display: flex;
           align-items: center;
-          gap: 8px;
+          gap: var(--requestly-space-2, 4px);
           color: var(--requestly-color-text-subtle);
 
           &-text {
@@ -205,8 +206,8 @@
             cursor: pointer;
 
             svg {
-              width: 18px;
-              height: 18px;
+              width: 20px;
+              height: 20px;
               padding: 3px;
               color: inherit;
               margin: 0;
@@ -235,6 +236,7 @@
             white-space: nowrap;
             text-overflow: ellipsis;
             font-style: normal;
+            color: var(--requestly-color-text-default);
             font-size: var(--requestly-font-size-sm, 12px);
             font-weight: var(--requestly-font-weight-medium);
             font-weight: var(--requestly-font-weight-normal);
@@ -260,8 +262,8 @@
         }
 
         .ant-collapse-content-box {
-          margin-left: 6px;
-          padding: 2px 0px 0px 6px;
+          margin-left: 13px;
+          padding: 1px 0px 0px 6px;
           border-left: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.12));
 
           &:hover {

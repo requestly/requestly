@@ -1,13 +1,15 @@
 .status-light {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-2, 4px);
-
+  gap: var(--requestly-space-2, 4px);
+  border-radius: 4px;
   font-size: var(--requestly-font-size-2xs, 9px);
-  font-weight: 600;
-  line-height: 14px; /* 144.444% */
+  font-weight: var(--requestly-font-weight-medium);
+  line-height: 14px;
+  /* 144.444% */
   letter-spacing: 1.5px;
   text-transform: uppercase;
+  padding: var(--requestly-space-1, 2px) var(--requestly-space-2, 4px);
 
   &::before {
     content: "";
@@ -20,22 +22,27 @@
   }
 
   &.success {
-    color: var(--requestly-color-success);
+    color: var(--requestly-color-success-text);
+    background: var(--requestly-color-success-darker);
   }
 
   &.warning {
     color: var(--requestly-color-warning-soft);
+    background: var(--requestly-color-warning-darker);
   }
 
   &.error {
     color: var(--requestly-color-error-soft);
+    background: var(--requestly-color-error-darker);
   }
 
   &.info {
     color: var(--requestly-color-primary-soft);
+    background: var(--requestly-color-primary-darker);
   }
 
   &.neutral {
-    color: var(--requestly-color-neutral-600);
+    color: var(--requestly-color-neutral-200);
+    background: var(--requestly-color-neutral-800);
   }
 }
