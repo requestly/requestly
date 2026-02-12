@@ -292,7 +292,7 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
 
   async getAllExamples(
     recordIds: string[]
-  ): Promise<{ success: boolean; data: { examples: RQAPI.ExampleApiRecord[] } }> {
+  ): Promise<{ success: boolean; data: { examples: RQAPI.ExampleApiRecord[]; failedRecordIds?: string[] } }> {
     const result = await getExamplesForApiRecords(this.getPrimaryId(), recordIds);
 
     if (!result.success) {
@@ -308,6 +308,7 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
       success: true,
       data: {
         examples: result.data,
+        failedRecordIds: result.failedRecordIds,
       },
     };
   }

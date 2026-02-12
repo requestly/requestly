@@ -507,12 +507,13 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
 
   async getAllExamples(
     recordIds: string[]
-  ): Promise<{ success: boolean; data: { examples: RQAPI.ExampleApiRecord[] } }> {
+  ): Promise<{ success: boolean; data: { examples: RQAPI.ExampleApiRecord[]; failedRecordIds?: string[] } }> {
     // TODO: Implement this, will be a dummy implementation for local store
     return {
       success: true,
       data: {
         examples: [],
+        failedRecordIds: [],
       },
     };
   }
