@@ -208,6 +208,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
               saveOrUpdateRecord(context, result.data);
               openBufferedTab({
                 isNew: true,
+                preview: false,
                 source: new CollectionViewTabSource({
                   id: result.data.id,
                   title: result.data.name,
@@ -239,6 +240,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
             setIsRecordBeingCreated(null);
             openBufferedTab({
               isNew: true,
+              preview: false,
               source: new EnvironmentViewTabSource({
                 id: newEnvironment.id,
                 title: newEnvironment.name,
