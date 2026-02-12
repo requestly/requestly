@@ -7,9 +7,8 @@ import { RQButton } from "lib/design-system-v2/components";
 import { NewRecordNameInput } from "../newRecordNameInput/NewRecordNameInput";
 import { RequestRow } from "../requestRow/RequestRow";
 import { ApiRecordEmptyState } from "../apiRecordEmptyState/ApiRecordEmptyState";
-import { MdOutlineFolder } from "@react-icons/all-files/md/MdOutlineFolder";
-import { MdOutlineFolderSpecial } from "@react-icons/all-files/md/MdOutlineFolderSpecial";
-import { PiFolderOpen } from "@react-icons/all-files/pi/PiFolderOpen";
+import { MdKeyboardArrowDown } from "@react-icons/all-files/md/MdKeyboardArrowDown";
+import { MdKeyboardArrowRight } from "@react-icons/all-files/md/MdKeyboardArrowRight";
 import { IoChevronForward } from "@react-icons/all-files/io5/IoChevronForward";
 import { SidebarPlaceholderItem } from "../../SidebarPlaceholderItem/SidebarPlaceholderItem";
 import { isEmpty } from "lodash";
@@ -145,7 +144,7 @@ export const CollectionRow: React.FC<Props> = ({
           console.warn(`Unknown export type: ${exportType}`);
       }
     },
-    [record, workspaceId]
+    [record.id, workspaceId]
   );
 
   const getCollectionOptions = useCallback(
@@ -436,16 +435,11 @@ export const CollectionRow: React.FC<Props> = ({
                       />
                     </div>
                   )}
-                  {
-                    // @ts-ignore
-                    record.isExampleRoot ? (
-                      <MdOutlineFolderSpecial className="collection-expand-icon" />
-                    ) : isActive ? (
-                      <PiFolderOpen className="collection-expand-icon" />
-                    ) : (
-                      <MdOutlineFolder className="collection-expand-icon" />
-                    )
-                  }
+                  {isActive ? (
+                    <MdKeyboardArrowDown className="collection-expand-icon" />
+                  ) : (
+                    <MdKeyboardArrowRight className="collection-expand-icon" />
+                  )}
                 </>
               );
             }}

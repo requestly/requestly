@@ -178,23 +178,7 @@ export const PricingFeatures: PlanFeatures = {
           enabled: true,
         },
         {
-          title: "Scripting",
-          enabled: true,
-        },
-        {
-          title: "100 Collection Runs",
-          enabled: true,
-        },
-        {
           title: "Unlimited API Tests",
-          enabled: true,
-        },
-        {
-          title: "3 Custom Packages",
-          enabled: true,
-        },
-        {
-          title: "2 Workspaces",
           enabled: true,
         },
         {
@@ -202,7 +186,35 @@ export const PricingFeatures: PlanFeatures = {
           enabled: true,
         },
         {
-          title: "Import Collections from Git",
+          title: "Unlimited Local workspaces",
+          enabled: true,
+        },
+        {
+          title: "3 Team Workspaces",
+          enabled: true,
+        },
+        {
+          title: "10 Team Collaborators",
+          enabled: true,
+        },
+        {
+          title: "100 Collection Runs",
+          enabled: true,
+        },
+        {
+          title: "Scripting",
+          enabled: true,
+        },
+        {
+          title: "Unlimited NPM packages",
+          enabled: true,
+        },
+        {
+          title: "3 Custom Packages",
+          enabled: true,
+        },
+        {
+          title: "Import from Postman",
           enabled: true,
         },
         {
@@ -210,7 +222,7 @@ export const PricingFeatures: PlanFeatures = {
           enabled: true,
         },
         {
-          title: "Import from Postman",
+          title: "Import Collections from Git",
           enabled: true,
         },
       ],

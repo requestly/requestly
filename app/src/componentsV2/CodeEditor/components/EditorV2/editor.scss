@@ -8,7 +8,7 @@
     background: var(--requestly-color-background);
 
     .cm-line {
-      padding-top: 4px;
+      padding-top: 0;
     }
   }
 
@@ -22,18 +22,35 @@
     .cm-gutterElement {
       text-align: left;
       font-weight: 500;
-      padding-top: 2px;
+      padding-top: 0px;
+      padding-bottom: 0.3px;
+      display: flex;
+      align-items: center;
     }
   }
 
   .cm-gutter.cm-foldGutter {
-    padding-top: 2px;
+    padding-top: 0;
+  }
+
+  .cm-gutter-lint {
+    .cm-gutterElement {
+      padding-top: 0;
+      padding-bottom: 0;
+      display: flex;
+      align-items: center;
+    }
+
+    .cm-activeLineGutter {
+      position: static;
+    }
   }
 
   .highlight-defined-variable {
     color: var(--requestly-color-primary-text) !important;
     cursor: pointer;
   }
+
   .highlight-defined-variable * {
     color: var(--requestly-color-primary-text) !important;
   }
@@ -42,6 +59,7 @@
     color: var(--requestly-color-error-text) !important;
     cursor: pointer;
   }
+
   .highlight-undefined-variable * {
     color: var(--requestly-color-error-text) !important;
   }
