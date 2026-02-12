@@ -28,14 +28,13 @@ export const RequestBot: React.FC<RequestBotProps> = ({ isOpen, onClose, modelTy
       if (!isAIEnabledGlobally || !isOptedforAIFeatures) {
         setIsAIConsentModalOpen(true);
         setShouldShowBot(false);
-        onClose();
       } else {
         setShouldShowBot(true);
       }
     } else {
       setShouldShowBot(false);
     }
-  }, [isOpen, isAIEnabledGlobally, isOptedforAIFeatures, onClose]);
+  }, [isOpen, isAIEnabledGlobally, isOptedforAIFeatures]);
 
   const handleAIConsentEnable = () => {
     setShouldShowBot(true);
