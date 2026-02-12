@@ -40,7 +40,7 @@ const getApiRecordExamples = async (
 export const getExamplesForApiRecords = async (
   ownerId: string,
   apiRecordIds: string[]
-): Promise<{ success: boolean; data: RQAPI.ExampleApiRecord[] }> => {
+): Promise<{ success: boolean; data: RQAPI.ExampleApiRecord[]; failedRecordIds?: string[] }> => {
   if (!apiRecordIds.length) {
     return { success: true, data: [] };
   }
@@ -50,13 +50,22 @@ export const getExamplesForApiRecords = async (
     const results = await Promise.all(examplePromises);
 
     const allExamples: RQAPI.ExampleApiRecord[] = [];
-    results.forEach((result) => {
+    const failedRecordIds: string[] = [];
+    results.forEach((result, index) => {
       if (result.success) {
         allExamples.push(...result.data);
+      } else {
+        const recordId = apiRecordIds[index];
+        if (recordId) {
+          failedRecordIds.push(recordId);
+        }
       }
     });
-
-    return { success: true, data: allExamples };
+    return {
+      success: true,
+      data: allExamples,
+      failedRecordIds: failedRecordIds ?? undefined,
+    };
   } catch (error) {
     Logger.error("Error fetching examples for multiple API records:", error);
     return { success: false, data: [] };

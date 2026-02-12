@@ -33,7 +33,9 @@ export interface EnvironmentInterface<Meta extends Record<string, any>> {
 export interface ApiClientRecordsInterface<Meta extends Record<string, any>> {
   meta: Meta;
   getAllRecords(): RQAPI.RecordsPromise;
-  getAllExamples(recordIds: string[]): Promise<{ success: boolean; data: { examples: RQAPI.ExampleApiRecord[] } }>;
+  getAllExamples(
+    recordIds: string[]
+  ): Promise<{ success: boolean; data: { examples: RQAPI.ExampleApiRecord[]; failedRecordIds?: string[] } }>;
   getRecord(recordId: string): RQAPI.ApiClientRecordPromise;
   createRecord(record: Partial<RQAPI.ApiClientRecord>): RQAPI.ApiClientRecordPromise;
   createCollection(record: Partial<RQAPI.CollectionRecord>): RQAPI.ApiClientRecordPromise;
