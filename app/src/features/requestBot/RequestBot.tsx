@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { m } from "framer-motion";
@@ -17,27 +17,48 @@ interface RequestBotProps {
 }
 
 export const RequestBot: React.FC<RequestBotProps> = ({ isOpen, onClose, modelType = "app" }) => {
-  const isAIEnabledGlobally = useFeatureIsOn("global_ai_support");
   const isOptedforAIFeatures = useSelector(getIsOptedforAIFeatures);
   const [isAIConsentModalOpen, setIsAIConsentModalOpen] = useState(false);
   const [shouldShowBot, setShouldShowBot] = useState(false);
+  const [userHasConsented, setUserHasConsented] = useState(false);
+  const consentEnabledRef = useRef(false);
+
+  useEffect(() => {
+    if (isAIConsentModalOpen) {
+      consentEnabledRef.current = false;
+    }
+  }, [isAIConsentModalOpen]);
 
   useEffect(() => {
     if (isOpen) {
-      // Check if AI is enabled globally and user has consented
-      if (!isAIEnabledGlobally || !isOptedforAIFeatures) {
+      if (!isOptedforAIFeatures && !userHasConsented) {
         setIsAIConsentModalOpen(true);
         setShouldShowBot(false);
       } else {
         setShouldShowBot(true);
+        setIsAIConsentModalOpen(false);
       }
     } else {
       setShouldShowBot(false);
+      setIsAIConsentModalOpen(false);
+      setUserHasConsented(false);
     }
-  }, [isOpen, isAIEnabledGlobally, isOptedforAIFeatures]);
+  }, [isOpen, isOptedforAIFeatures, userHasConsented]);
 
   const handleAIConsentEnable = () => {
+    consentEnabledRef.current = true;
+    setUserHasConsented(true);
     setShouldShowBot(true);
+    setIsAIConsentModalOpen(false);
+  };
+
+  const handleAIConsentDismiss = () => {
+    setIsAIConsentModalOpen(false);
+    setTimeout(() => {
+      if (!consentEnabledRef.current) {
+        onClose();
+      }
+    }, 0);
   };
 
   return (
@@ -64,7 +85,7 @@ export const RequestBot: React.FC<RequestBotProps> = ({ isOpen, onClose, modelTy
       </m.div>
       <AIConsentModal
         isOpen={isAIConsentModalOpen}
-        toggle={setIsAIConsentModalOpen}
+        toggle={handleAIConsentDismiss}
         onEnableCallback={handleAIConsentEnable}
       />
     </>
