@@ -317,7 +317,13 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
                     queryParams: executedEntry.request.queryParams,
                   });
                   scope.setFingerprint(["api_request_error", executedEntry.request.method, error.source]);
-                  Sentry.captureException(new Error(`API Request Failed: ${error.message || "Unknown error"}`));
+                  const sentryError = new Error(
+                    `API Request Failed: ${error.message || error.name || "Unknown error"}`
+                  );
+                  if (error.stack) {
+                    sentryError.stack = error.stack;
+                  }
+                  Sentry.captureException(sentryError);
                 });
               }
               trackRequestFailed(
