@@ -6,10 +6,7 @@ import "./variableAutocompletePopover.scss";
 import { InfoCircleOutlined } from "@ant-design/icons";
 import { getScopeIcon } from "componentsV2/CodeEditor/components/EditorV2/components/VariablePopOver/hooks/useScopeOptions";
 import { flattenVariablesList } from "../../utils";
-import {
-  DynamicVariableInfoPopover,
-  DynamicVariableInfoTypes,
-} from "../DynamicVariableInfoPopover/DynamicVariableInfoPopover";
+import { DynamicVariableInfoPopover } from "../DynamicVariableInfoPopover/DynamicVariableInfoPopover";
 
 interface VariableAutocompleteProps {
   show: boolean;
@@ -21,14 +18,6 @@ interface VariableAutocompleteProps {
   editorRef: React.RefObject<HTMLDivElement | null>;
 }
 
-/**
- * Legacy wrapper for DynamicVariableInfoPopover component.
- * Kept for backward compatibility.
- * @deprecated Use DynamicVariableInfoPopover component directly instead.
- */
-export const dynamicVariableExample = (variable: DynamicVariableInfoTypes) => (
-  <DynamicVariableInfoPopover variable={variable} />
-);
 export const VariableAutocompletePopover: React.FC<VariableAutocompleteProps> = ({
   show,
   position,
@@ -100,7 +89,7 @@ export const VariableAutocompletePopover: React.FC<VariableAutocompleteProps> = 
           </div>
           {item.scope === "global" && (
             <Tooltip
-              title={dynamicVariableExample(item)}
+              title={<DynamicVariableInfoPopover variable={item} />}
               placement="rightTop"
               showArrow={false}
               overlayClassName="example-tooltip"
