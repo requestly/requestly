@@ -9,14 +9,20 @@ import { PersistGate } from "redux-persist/integration/react";
 import { HotkeysProvider } from "react-hotkeys-hook";
 
 import "./init";
-import "./assets/less/index.less";
-import "./styles/custom/custom.scss";
 
 import PageError from "components/misc/PageError";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { getAppFlavour } from "utils/AppUtils";
 import App from "./App";
 import SessionBearApp from "src-SessionBear/App";
+
+// Lazy load CSS to prevent render blocking
+const loadStyles = async () => {
+  await Promise.all([import("./assets/less/index.less"), import("./styles/custom/custom.scss")]);
+};
+
+// Start loading styles immediately but don't block render
+loadStyles();
 
 const persistor = persistStore(reduxStore);
 const container = document.getElementById("root");

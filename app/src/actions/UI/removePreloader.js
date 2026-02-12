@@ -22,7 +22,8 @@ const removePreloader = () => {
   }
 };
 
-// Auto Remove Preloader after some time in case some else function fails to invoke it!
+// Reduced timeout - preloader now removes earlier for better UX
+// Auth continues loading in background
 setTimeout(removePreloader, 8000);
 
 export default removePreloader;

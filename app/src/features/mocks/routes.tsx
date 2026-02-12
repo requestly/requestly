@@ -1,12 +1,15 @@
+import { lazy } from "react";
 import { Navigate, RouteObject } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
 import { joinPaths } from "utils/PathUtils";
-import FileMockEditorCreateView from "views/features/mocksV2/FileMockEditorCreateView";
-import ProtectedRoute from "components/authentication/ProtectedRoute";
 import { MockType } from "components/features/mocksV2/types";
-import MockEditorIndex from "components/features/mocksV2/MockEditorIndex";
-import MocksFeatureContainer from "./container";
-import { MocksListScreen } from "./screens/mocksList";
+
+// Lazy-loaded components for better code splitting
+const FileMockEditorCreateView = lazy(() => import("views/features/mocksV2/FileMockEditorCreateView"));
+const ProtectedRoute = lazy(() => import("components/authentication/ProtectedRoute"));
+const MockEditorIndex = lazy(() => import("components/features/mocksV2/MockEditorIndex"));
+const MocksFeatureContainer = lazy(() => import("./container"));
+const MocksListScreen = lazy(() => import("./screens/mocksList").then((m) => ({ default: m.MocksListScreen })));
 
 export const mockServerRoutes: RouteObject[] = [
   {

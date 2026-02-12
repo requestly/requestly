@@ -1,14 +1,17 @@
+import { lazy } from "react";
 import { Navigate, RouteObject } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
-import MyTeams from "features/settings/components/WorkspaceSettings/components/MyTeams";
-import CreateWorkspace from "components/user/Teams/CreateWorkspace";
-import PersonalSubscription from "features/settings/components/Profile/PersonalSubscription";
-import UpdateSubscriptionContactUs from "components/payments/UpdateSubscriptionContactUs";
-import UpdatePaymentMethod from "components/payments/UpdatePaymentMethod";
-import ManageAccount from "features/settings/components/Profile";
-import TeamViewer from "features/settings/components/Profile/ManageTeams/TeamViewer";
 import APP_CONSTANTS from "config/constants";
-import ProtectedRoute from "components/authentication/ProtectedRoute";
+
+// Lazy-loaded components for better code splitting
+const MyTeams = lazy(() => import("features/settings/components/WorkspaceSettings/components/MyTeams"));
+const CreateWorkspace = lazy(() => import("components/user/Teams/CreateWorkspace"));
+const PersonalSubscription = lazy(() => import("features/settings/components/Profile/PersonalSubscription"));
+const UpdateSubscriptionContactUs = lazy(() => import("components/payments/UpdateSubscriptionContactUs"));
+const UpdatePaymentMethod = lazy(() => import("components/payments/UpdatePaymentMethod"));
+const ManageAccount = lazy(() => import("features/settings/components/Profile"));
+const TeamViewer = lazy(() => import("features/settings/components/Profile/ManageTeams/TeamViewer"));
+const ProtectedRoute = lazy(() => import("components/authentication/ProtectedRoute"));
 
 export const accountRoutes: RouteObject[] = [
   {

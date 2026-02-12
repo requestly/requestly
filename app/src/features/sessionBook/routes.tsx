@@ -1,9 +1,23 @@
+import { lazy } from "react";
 import { Navigate, RouteObject } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
-import NetworkSessionViewer from "views/features/sessions/SessionsIndexPageContainer/NetworkSessions/NetworkSessionViewer";
-import { SessionsListScreenContainer } from "./screens/SessionsListScreen/SessionsListScreenContainer";
-import SessionsFeatureContainer from "./container";
-import { DraftSessionScreen, SavedSessionScreen } from "features/sessionBook";
+
+// Lazy-loaded components for better code splitting
+const NetworkSessionViewer = lazy(
+  () => import("views/features/sessions/SessionsIndexPageContainer/NetworkSessions/NetworkSessionViewer")
+);
+const SessionsListScreenContainer = lazy(() =>
+  import("./screens/SessionsListScreen/SessionsListScreenContainer").then((m) => ({
+    default: m.SessionsListScreenContainer,
+  }))
+);
+const SessionsFeatureContainer = lazy(() => import("./container"));
+const DraftSessionScreen = lazy(() =>
+  import("./screens/DraftSessionScreen/DraftSessionScreen").then((m) => ({ default: m.DraftSessionScreen }))
+);
+const SavedSessionScreen = lazy(() =>
+  import("./screens/SavedSessionScreen/SavedSessionScreen").then((m) => ({ default: m.SavedSessionScreen }))
+);
 
 export const sessionRoutes: RouteObject[] = [
   {

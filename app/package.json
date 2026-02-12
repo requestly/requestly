@@ -21,6 +21,14 @@
     "node": ">=18.18.0",
     "npm": ">=8.0.0"
   },
+  "sideEffects": [
+    "*.css",
+    "*.scss",
+    "*.less",
+    "src/init.js",
+    "src/pre-imports.js",
+    "src/firebase.js"
+  ],
   "scripts": {
     "postinstall": "patch-package",
     "install:clean": "rm -rf node_modules/ && rm -rf package-lock.json && npm install && npm start",
