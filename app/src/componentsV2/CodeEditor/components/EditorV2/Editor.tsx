@@ -63,6 +63,7 @@ interface EditorProps {
   disableDefaultAutoCompletions?: boolean;
   customTheme?: Extension;
   placeholder?: string;
+  disableLinting?: boolean;
 }
 const Editor: React.FC<EditorProps> = ({
   value,
@@ -87,6 +88,7 @@ const Editor: React.FC<EditorProps> = ({
   disableDefaultAutoCompletions = false,
   customTheme,
   placeholder,
+  disableLinting = false,
 }) => {
   const location = useLocation();
   const dispatch = useDispatch();
@@ -295,9 +297,11 @@ const Editor: React.FC<EditorProps> = ({
       result.push(editorLanguage);
     }
 
-    const linterExtension = getLinterExtension(language);
-    if (linterExtension.length) {
-      result.push(...linterExtension);
+    if (!disableLinting) {
+      const linterExtension = getLinterExtension(language);
+      if (linterExtension.length) {
+        result.push(...linterExtension);
+      }
     }
 
     if (customTheme) {
