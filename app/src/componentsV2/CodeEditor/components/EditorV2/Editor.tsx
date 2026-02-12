@@ -332,7 +332,16 @@ const Editor: React.FC<EditorProps> = ({
     }
 
     return result;
-  }, [editorLanguage, language, customTheme, placeholder, envVariables, handleSetVariable, setPopupPosition]);
+  }, [
+    editorLanguage,
+    language,
+    customTheme,
+    placeholder,
+    envVariables,
+    handleSetVariable,
+    setPopupPosition,
+    disableLinting,
+  ]);
 
   const editor = (
     <>
