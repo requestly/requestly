@@ -20,7 +20,7 @@ export class IterationData {
   toObject() {
     const result: Record<string, any> = {};
     for (const key in this.iterationData) {
-      result[key] = this.iterationData[key]?.localValue;
+      result[key] = this.iterationData[key];
     }
     return result;
   }
