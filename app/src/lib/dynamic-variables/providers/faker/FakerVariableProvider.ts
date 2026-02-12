@@ -5,12 +5,11 @@ import { createFakerVariables } from "./variables";
 
 export class FakerVariableProvider extends DynamicVariableProvider {
   readonly name = "faker";
-
-  readonly variables: Map<string, DynamicVariable>;
+  readonly variableNames: Map<string, DynamicVariable>;
 
   constructor() {
     super();
     const fakerVariables = createFakerVariables(faker);
-    this.variables = new Map(fakerVariables.map((v) => [v.name, v]));
+    this.variableNames = new Map(fakerVariables.map((v) => [v.name, v]));
   }
 }
