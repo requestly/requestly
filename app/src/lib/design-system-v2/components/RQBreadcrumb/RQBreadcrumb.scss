@@ -59,13 +59,15 @@ ol.rq-breadcrumb {
     max-width: 166px;
     font-size: var(--requestly-font-size-xs, 11px);
     font-weight: var(--requestly-font-weight-medium);
+    margin-top: 1px;
 
     .edit-icon {
       flex-shrink: 0;
-      width: 14px;
-      height: 14px;
+      width: 10px;
+      height: 10px;
       cursor: pointer;
-      margin-left: 2px;
+      margin-left: 6px;
+      color: var(--requestly-color-text-placeholder, #8f8f8f);
     }
   }
 }
