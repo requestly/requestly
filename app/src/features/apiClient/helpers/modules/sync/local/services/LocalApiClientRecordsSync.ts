@@ -647,6 +647,13 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
     for (const entity of entities) {
       const moveResult = await (async () => {
         if (entity.type === RQAPI.RecordType.API) {
+          await service.updateRecord(
+            {
+              ...this.parseApiRecordRequest(entity as RQAPI.ApiRecord),
+              name: entity.name,
+            },
+            parseNativeId(entity.id)
+          );
           return service.moveRecord(entity.id, newParentId);
         }
         return service.moveCollection(entity.id, newParentId);
