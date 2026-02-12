@@ -2,8 +2,8 @@
   background-color: var(--requestly-color-surface-0);
   color: var(--requestly-color-text-default);
   padding: 0;
-  font-size: var(--requestly-font-size-xs);
-  line-height: var(--requestly-font-line-height-xs);
+  font-size: var(--requestly-font-size-sm);
+  line-height: var(--requestly-font-line-height-sm);
   box-shadow: 0 16px 24px -4px rgba(0, 0, 0, 0.32);
   z-index: 10;
 }
@@ -17,7 +17,8 @@
   max-height: 256px !important;
   width: 280px !important;
   overflow-y: auto !important;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+  overflow-x: hidden !important;
+  font-family: var(--requestly-font-family-default) !important;
   z-index: 1050 !important;
   transform: translate(-8px, 6px) !important;
 
@@ -57,8 +58,9 @@
 
 .cm-autocomplete-option-custom {
   padding: 5px 12px !important;
-  font-size: 14px !important;
-  line-height: 22px !important;
+  font-size: var(--requestly-font-size-sm) !important;
+  line-height: var(--requestly-font-line-height-sm) !important;
+  font-family: var(--requestly-font-family-default) !important;
   color: var(--requestly-color-text-default) !important;
   cursor: pointer !important;
   border-radius: 4px !important;
@@ -87,6 +89,7 @@
   .cm-completionLabel {
     flex: 1;
     font-weight: 400;
+    font-family: var(--requestly-font-family-default) !important;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -94,6 +97,7 @@
 
   .cm-completionDetail {
     font-size: 12px;
+    font-family: var(--requestly-font-family-default) !important;
     color: var(--requestly-color-text-subtle);
     margin-left: 8px;
     flex-shrink: 0;
@@ -116,7 +120,8 @@
   padding: 12px !important;
   margin-left: 4px !important;
   box-shadow: 0 6px 16px 0 rgba(0, 0, 0, 0.32) !important;
-  max-width: 300px !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
 }
 
 .highlight-defined-variable {
