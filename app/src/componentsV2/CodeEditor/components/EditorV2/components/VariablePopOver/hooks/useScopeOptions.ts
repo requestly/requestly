@@ -55,6 +55,7 @@ export const getScopeIcon = (scope: VariableScope, showBackgroundColor: boolean 
         showBackgroundColor ? "var(--requestly-color-surface-2)" : "transparent"
       );
     case VariableScope.GLOBAL:
+    case VariableScope.DYNAMIC:
       return createIconWithWrapper(
         BsGlobeCentralSouthAsia,
         "var(--requestly-color-success-text)",

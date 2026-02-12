@@ -44,9 +44,8 @@
           font-size: var(--requestly-font-size-xs);
           font-weight: 400;
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+          max-width: 250px;
           word-wrap: break-word;
-          max-width: 280px;
-          max-height: 480px;
         }
       }
     }
@@ -79,90 +78,32 @@
   }
 }
 
+.scope-tooltip {
+  .ant-tooltip-inner {
+    background-color: var(--requestly-color-black) !important;
+    color: var(--requestly-color-text-default) !important;
+    border-radius: 4px;
+    padding: 6px 8px;
+    font-size: var(--requestly-font-size-xs);
+    font-weight: 400;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    max-width: 250px;
+    word-wrap: break-word;
+  }
+}
+
 .example-tooltip {
   .ant-tooltip-inner {
-    border-radius: 4px;
-    border: 1px solid var(--requestly-color-white-t-20, rgba(255, 255, 255, 0.12));
-    background: var(--requestly-color-surface-0, #212121);
-    box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.16);
+    border-radius: 4px !important;
+    border: 1px solid var(--requestly-color-white-t-20, rgba(255, 255, 255, 0.12)) !important;
+    background: var(--requestly-color-surface-0, #212121) !important;
+    box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.16) !important;
     margin-left: -10px;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     gap: var(--space-4, 8px);
     padding: 0;
-  }
-}
-// Legacy styles - kept for backward compatibility
-// These styles are now in DynamicVariableTooltip component
-// TODO: Remove after migration is complete
-.example-popover {
-  width: 100%;
-  padding: var(--space-4, 8px) var(--space-5, 12px);
-  max-width: 280px;
-  max-height: 400px;
-
-  .example-header {
-    color: var(--requestly-color-text-default, #fff);
-    font-family: var(--font-family-default, Inter);
-    font-size: var(--font-size-sm, 12px);
-    font-style: normal;
-    font-weight: 400;
-    padding: 0;
-
-    .header-with-icon {
-      display: flex;
-      align-items: center;
-      gap: var(--space-4, 8px);
-      align-self: stretch;
-
-      .variable-name {
-        overflow: hidden;
-        color: var(--requestly-color-text-subtle, #bbb);
-        text-overflow: ellipsis;
-        font-family: var(--font-family-default, Inter);
-        font-size: var(--font-size-xs, 11px);
-        font-style: normal;
-        font-weight: 400;
-        line-height: 17px; /* 154.545% */
-      }
-    }
-
-    .header-text {
-      margin-top: var(--space-2, 4px);
-    }
-  }
-
-  .example-body {
-    display: flex;
-    padding-top: var(--space-4, 8px);
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--space-2, 4px);
-    align-self: stretch;
-    border-top: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
-    font-style: normal;
-    font-weight: 400;
-    line-height: 17px; /* 154.545% */
-
-    .example-title {
-      color: var(--requestly-color-text-placeholder, #8f8f8f);
-      font-family: var(--font-family-default, Inter);
-      font-size: var(--font-size-xs, 11px);
-    }
-
-    .example-content {
-      color: var(--requestly-color-text-subtle, #bbb);
-      font-family: var(--font-family-default, Inter);
-      font-size: var(--font-size-xs, 11px);
-      overflow: auto;
-      max-height: 330px;
-      scrollbar-width: none; /* Firefox */
-      -ms-overflow-style: none; /* IE and Edge */
-
-      &::-webkit-scrollbar {
-        display: none; /* Chrome, Safari, Opera */
-      }
-    }
+    width: 280px;
   }
 }
