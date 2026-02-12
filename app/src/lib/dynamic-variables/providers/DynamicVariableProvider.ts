@@ -3,10 +3,10 @@ import type { DynamicVariable } from "../types";
 
 export abstract class DynamicVariableProvider {
   abstract readonly name: string;
-  abstract readonly variables: Map<string, DynamicVariable>;
+  abstract readonly variableNames: Map<string, DynamicVariable>;
 
   generate(name: string, ...args: unknown[]): ReturnType<DynamicVariable["generate"]> {
-    const variable = this.variables.get(name);
+    const variable = this.variableNames.get(name);
 
     if (!variable) {
       throw new DynamicVariableNotFoundError(name);
@@ -16,14 +16,14 @@ export abstract class DynamicVariableProvider {
   }
 
   getVariable(name: string): DynamicVariable | undefined {
-    return this.variables.get(name);
+    return this.variableNames.get(name);
   }
 
   has(name: string): boolean {
-    return this.variables.has(name);
+    return this.variableNames.has(name);
   }
 
   list(): DynamicVariable[] {
-    return Array.from(this.variables.values());
+    return Array.from(this.variableNames.values());
   }
 }

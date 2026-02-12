@@ -4,13 +4,13 @@ import { DynamicVariableResolver } from "./DynamicVariableResolver";
 import { DynamicVariableProvider } from "../providers";
 
 export class HandlebarsResolver extends DynamicVariableResolver {
-  private hbs: typeof Handlebars | null = null;
+  private hbs: typeof Handlebars;
   private helpersRegistered = false;
 
   constructor(provider: DynamicVariableProvider) {
     super(provider);
-    const hbs = this.getInstance();
-    this.registerHelpers(hbs);
+    this.hbs = Handlebars.create();
+    this.registerHelpers(this.hbs);
   }
 
   private createContextAwareHelper(
@@ -40,18 +40,8 @@ export class HandlebarsResolver extends DynamicVariableResolver {
     this.helpersRegistered = true;
   }
 
-  private getInstance(): typeof Handlebars {
-    if (this.hbs) {
-      return this.hbs;
-    }
-
-    return Handlebars.create();
-  }
-
   resolve(template: string, context: VariableContext = {}): string {
-    const hbs = this.getInstance();
-
-    const hbsTemplate = hbs.compile(template, {
+    const hbsTemplate = this.hbs.compile(template, {
       noEscape: true,
     });
 
