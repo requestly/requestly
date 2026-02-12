@@ -72,7 +72,7 @@ const TeamSettings = ({ teamId, isTeamAdmin, isTeamArchived, teamOwnerId }) => {
       trackWorkspaceDeleted();
       toast.info("Workspace deleted successfully");
       redirectToRules(navigate);
-      handleSwitchToPrivateWorkspace();
+      await handleSwitchToPrivateWorkspace();
       await switchContext({
         workspace: {
           id: dummyPersonalWorkspace.id,
