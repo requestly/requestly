@@ -53,11 +53,11 @@ export class HandlebarsResolver extends DynamicVariableResolver {
     variableName: string,
     generate: DynamicVariable["generate"]
   ): Handlebars.HelperDelegate {
-    return function (ctx: VariableContext, ...args: unknown[]) {
-      // 'ctx' is the Handlebars context (user variables passed to template)
+    return function (this: VariableContext, ...args: unknown[]) {
+      // 'this' is the Handlebars context (user variables passed to template)
       // If user has defined this variable use their value (e.g., collection or env variables)
-      if (variableName in ctx) {
-        return ctx[variableName];
+      if (variableName in this) {
+        return this[variableName];
       }
 
       // Remove the Handlebars options object (always the last argument)
