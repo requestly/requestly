@@ -1,24 +1,26 @@
-import React, { useEffect, useLayoutEffect, useState } from "react";
-import APIClientSidebar from "./screens/apiClient/components/sidebar/APIClientSidebar";
 import { TabsContainer } from "componentsV2/Tabs/components/TabsContainer";
-import "./container.scss";
-import { ApiClientLoadingView } from "./screens/apiClient/components/views/components/ApiClientLoadingView/ApiClientLoadingView";
-import { useSelector, useDispatch } from "react-redux";
-import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getWorkspaceViewSlice } from "./slices/workspaceView/slice";
-import Daemon from "./store/apiRecords/Daemon";
-import { ApiClientProvider } from "./contexts";
-import { setupWorkspaceView } from "./slices/workspaceView/thunks";
-import Split from "react-split";
+import React, { useEffect, useLayoutEffect, useState } from "react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
+import { useDispatch, useSelector } from "react-redux";
+import Split from "react-split";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { RootState } from "store/types";
+import "./container.scss";
+import { ApiClientProvider } from "./contexts";
+import APIClientSidebar from "./screens/apiClient/components/sidebar/APIClientSidebar";
+import { ApiClientLoadingView } from "./screens/apiClient/components/views/components/ApiClientLoadingView/ApiClientLoadingView";
+import { useWorkspaceLoadingError } from "./slices";
+import { getWorkspaceViewSlice } from "./slices/workspaceView/slice";
+import { setupWorkspaceView } from "./slices/workspaceView/thunks";
+import Daemon from "./store/apiRecords/Daemon";
 
 const ApiClientFeatureContainer: React.FC = () => {
   const dispatch = useDispatch();
   const user: Record<string, any> = useSelector(getUserAuthDetails);
   const isSetupDone = useSelector((s: RootState) => getWorkspaceViewSlice(s).isSetupDone);
   const [screenWidth, setScreenWidth] = useState(window.innerWidth);
+  const loadingError = useWorkspaceLoadingError();
 
   useLayoutEffect(() => {
     const handleResize = () => {
@@ -34,19 +36,19 @@ const ApiClientFeatureContainer: React.FC = () => {
   };
 
   useEffect(() => {
-    const promise = dispatch(
+    dispatch(
       setupWorkspaceView({
         userId: user.details?.profile?.uid,
       }) as any
     );
-
-    return () => {
-      promise.abort();
-    };
   }, [dispatch, user.details?.profile?.uid]);
 
   if (!isSetupDone) {
     return <ApiClientLoadingView />;
+  }
+
+  if (loadingError) {
+    throw loadingError;
   }
 
   return (

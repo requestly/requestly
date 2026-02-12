@@ -11,6 +11,7 @@ interface TabStateSerialized {
   sourceType: string;
   sourceMetadata: TabSourceMetadata;
   modeConfig: TabState["modeConfig"];
+  singleton?: boolean;
 }
 
 interface TabsEntityStateSerialized {
@@ -24,6 +25,7 @@ function serializeTab(tab: TabState): TabStateSerialized {
     sourceType: tab.source.type,
     sourceMetadata: tab.source.metadata,
     modeConfig: tab.modeConfig,
+    singleton: tab.singleton,
   };
 }
 
@@ -51,6 +53,7 @@ function deserializeTab(serialized: TabStateSerialized): TabState | null {
       activeWorkflows: new Set(),
       secondaryBufferIds: new Set(),
       modeConfig: serialized.modeConfig,
+      singleton: serialized.singleton,
     };
   } catch (error) {
     Sentry.captureException(error, {
