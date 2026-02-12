@@ -2,6 +2,7 @@ import Handlebars from "handlebars";
 import type { DynamicVariable, VariableContext } from "../types";
 import { DynamicVariableResolver } from "./DynamicVariableResolver";
 import { DynamicVariableProvider } from "../providers";
+import { DynamicVariableValueError } from "../errors";
 
 /**
  * Handlebars-based resolver for dynamic variables.
@@ -54,15 +55,20 @@ export class HandlebarsResolver extends DynamicVariableResolver {
     generate: DynamicVariable["generate"]
   ): Handlebars.HelperDelegate {
     return function (this: VariableContext, ...args: unknown[]) {
+      // Remove the Handlebars options object (always the last argument)
+      const helperArgs = args.slice(0, -1);
+
       // 'this' is the Handlebars context (user variables passed to template)
       // If user has defined this variable use their value (e.g., collection or env variables)
-      if (variableName in this) {
+      if (variableName in this && helperArgs.length === 0) {
         return this[variableName];
       }
 
-      // Remove the Handlebars options object (always the last argument)
-      const helperArgs = args.slice(0, -1);
-      return generate(...helperArgs);
+      try {
+        return generate(...helperArgs);
+      } catch (error) {
+        throw new DynamicVariableValueError(variableName, error);
+      }
     };
   }
 
