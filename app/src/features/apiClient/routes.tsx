@@ -1,9 +1,20 @@
+import { lazy } from "react";
 import { RouteObject } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
-import { ApiClientEmptyView } from "./screens/apiClient/components/views/components/ApiClientEmptyView/ApiClientEmptyView";
-import ProtectedRoute from "components/authentication/ProtectedRoute";
-import { PostmanImporterView } from "./screens/PostmanImporterView/PostmanImporterView";
-import { ApiClientRouteElement } from "./components/RouteElement";
+
+// Lazy-loaded components for better code splitting
+const ApiClientEmptyView = lazy(() =>
+  import("./screens/apiClient/components/views/components/ApiClientEmptyView/ApiClientEmptyView").then((m) => ({
+    default: m.ApiClientEmptyView,
+  }))
+);
+const ProtectedRoute = lazy(() => import("components/authentication/ProtectedRoute"));
+const PostmanImporterView = lazy(() =>
+  import("./screens/PostmanImporterView/PostmanImporterView").then((m) => ({ default: m.PostmanImporterView }))
+);
+const ApiClientRouteElement = lazy(() =>
+  import("./components/RouteElement").then((m) => ({ default: m.ApiClientRouteElement }))
+);
 
 export const apiClientRoutes: RouteObject[] = [
   {

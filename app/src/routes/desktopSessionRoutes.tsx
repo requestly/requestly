@@ -1,5 +1,5 @@
 import PATHS from "config/constants/sub/paths";
-import { DraftSessionScreen } from "features/sessionBook";
+import { DraftSessionScreen } from "features/sessionBook/screens/DraftSessionScreen/DraftSessionScreen";
 import { SessionsListScreenContainer } from "features/sessionBook/screens/SessionsListScreen/SessionsListScreenContainer";
 import { Navigate, RouteObject } from "react-router-dom";
 import { DesktopSessionsContainer } from "views/containers/DesktopSessionsContainer";

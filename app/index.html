@@ -1,299 +1,316 @@
 <!DOCTYPE html>
 <html lang="en" class="perfect-scrollbar-off nav-open" dir="ltr">
-  <head>
-    <script>
-      if (
-        window.location.hostname !== "app.requestly.io" &&
-        window.location.hostname !== "app.requestly.com" &&
-        window.location.hostname !== "beta.requestly.io" &&
-        window.location.hostname !== "app.beta.requestly.com" &&
-        window.location.hostname !== "app.sessionbear.com" &&
-        window.location.hostname !== "beta.sessionbear.com" &&
-        window.location.hostname !== "localhost" &&
-        !window.location.hostname.startsWith("requestly-dev") &&
-        isNaN(parseInt(window.location.hostname.replace(/\./g, ""))) // dumb check for an IP (or any number really)
-      ) {
-        window.location.href = "https://app.requestly.io";
+
+<head>
+  <script>
+    if (
+      window.location.hostname !== "app.requestly.io" &&
+      window.location.hostname !== "app.requestly.com" &&
+      window.location.hostname !== "beta.requestly.io" &&
+      window.location.hostname !== "app.beta.requestly.com" &&
+      window.location.hostname !== "app.sessionbear.com" &&
+      window.location.hostname !== "beta.sessionbear.com" &&
+      window.location.hostname !== "localhost" &&
+      !window.location.hostname.startsWith("requestly-dev") &&
+      isNaN(parseInt(window.location.hostname.replace(/\./g, ""))) // dumb check for an IP (or any number really)
+    ) {
+      window.location.href = "https://app.requestly.io";
+    }
+
+    const deviceId = localStorage.getItem("__amplitude_deviceId");
+    const uid = localStorage.getItem("__rq_uid");
+
+    const eventObject = { device_id: deviceId, event_type: "extension_uninstalled" };
+    const attributes = { extension_uninstall_date: new Date().toISOString().split("T")[0] };
+
+    if (uid) eventObject["user_id"] = uid;
+
+    const isHeadless =
+      window.navigator.webdriver === true || /HeadlessChrome/.test(window.navigator.userAgent) === true;
+
+    if (!isHeadless && "https://app.requestly.io/goodbye/" === window.location.href && deviceId) {
+      const a = { api_key: "6d37003f0cdb1921422bc474c634c135", events: [eventObject], user_properties: attributes };
+      const b = new Blob([JSON.stringify(a)]);
+      navigator.sendBeacon("https://api2.amplitude.com/2/httpapi", b);
+    }
+  </script>
+  <script>
+    // Set favicon
+    const hostname = window.location.hostname;
+    let faviconPath = "/favicon.png";
+
+    if (hostname.includes("sessionbear.com")) {
+      faviconPath = "/sessionBearFavicon.png";
+    }
+
+    const link = document.createElement("link");
+    link.rel = "icon";
+    link.href = faviconPath;
+    window.document.head.appendChild(link);
+
+    // Set the page title
+    let pageTitle = "Requestly - Best HTTP Interceptor & Mocking Tool for Web & Mobile Apps"; // default title
+    if (hostname.includes("sessionbear.com")) {
+      pageTitle = "SessionBear - Capture & Kill bugs in seconds!";
+    }
+
+    window.document.title = pageTitle;
+
+    if (window.location.pathname === "/pricing") {
+      const description =
+        "Free at $0, Lite for $8/month, Basic at $15/member/month, and the Professional plan—our best value—at $23/member/month.";
+      const metaTag = document.createElement("meta");
+      metaTag.name = "description";
+      metaTag.content = description;
+      document.querySelector("head").appendChild(metaTag);
+    }
+  </script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <meta name="theme-color" content="#000000" />
+  <link rel="manifest" href="/manifest.json" />
+  <!-- <link rel="shortcut icon" type="image/png" href="/favicon.png" /> -->
+
+  <!-- Preconnect to Google Fonts for faster loading -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+  <!-- Load fonts asynchronously to prevent render blocking -->
+  <link rel="preload" as="style"
+    href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,500;0,700;0,900;1,300;1,400;1,500;1,700;1,900&display=swap" />
+  <link rel="preload" as="style"
+    href="https://fonts.googleapis.com/css?family=Roboto%20Mono:ital,wght@0,300;0,400;0,500;0,700;0,900;1,300;1,400;1,500;1,700;1,900&display=swap" />
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" />
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,500;0,700;0,900;1,300;1,400;1,500;1,700;1,900&display=swap"
+    media="print" onload="this.media='all'" />
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css?family=Roboto%20Mono:ital,wght@0,300;0,400;0,500;0,700;0,900;1,300;1,400;1,500;1,700;1,900&display=swap"
+    media="print" onload="this.media='all'" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" media="print"
+    onload="this.media='all'" />
+  <noscript>
+    <link rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,500;0,700;0,900;1,300;1,400;1,500;1,700;1,900&display=swap" />
+    <link rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Roboto%20Mono:ital,wght@0,300;0,400;0,500;0,700;0,900;1,300;1,400;1,500;1,700;1,900&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" />
+  </noscript>
+
+  <script>
+    window.global = window;
+  </script>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-7FZEBFLWK0"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+    gtag("js", new Date());
+
+    gtag("config", "G-7FZEBFLWK0");
+  </script>
+
+  <style type="text/css">
+    body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      pointer-events: none;
+    }
+
+    body {
+      font-family: var(--requestly-font-family-default), Inter;
+      font-size: 13px;
+      -webkit-font-smoothing: antialiased;
+      background-color: var(--requestly-color-background-dark, #141414) !important;
+    }
+
+    .ipl-progress-indicator.available {
+      opacity: 0;
+    }
+
+    .ipl-progress-indicator {
+      background-color: var(--requestly-color-background-dark, #141414);
+      width: 100%;
+      height: 100%;
+      position: fixed;
+      opacity: 1;
+      pointer-events: none;
+      -webkit-transition: opacity cubic-bezier(0.4, 0, 0.2, 1) 436ms;
+      -moz-transition: opacity cubic-bezier(0.4, 0, 0.2, 1) 436ms;
+      transition: opacity cubic-bezier(0.4, 0, 0.2, 1) 436ms;
+      z-index: 9999;
+    }
+
+    .insp-logo-frame {
+      display: -webkit-flex;
+      display: -moz-flex;
+      display: flex;
+      -webkit-flex-direction: column;
+      -moz-flex-direction: column;
+      flex-direction: column;
+      -webkit-justify-content: center;
+      -moz-justify-content: center;
+      justify-content: center;
+      -webkit-animation: fadein 436ms;
+      -moz-animation: fadein 436ms;
+      animation: fadein 436ms;
+      height: 98%;
+    }
+
+    .insp-logo-frame-img {
+      max-width: 13%;
+      max-height: 13%;
+      -webkit-align-self: center;
+      -moz-align-self: center;
+      align-self: center;
+    }
+
+    .ipl-progress-indicator-head {
+      background-color: #d7e5fd;
+      height: 4px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .ipl-progress-indicator .first-indicator,
+    .ipl-progress-indicator .second-indicator {
+      background-color: #264ec8;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      top: 0;
+      position: absolute;
+      -webkit-transform-origin: left center;
+      -moz-transform-origin: left center;
+      transform-origin: left center;
+      -webkit-transform: scaleX(0);
+      -moz-transform: scaleX(0);
+      transform: scaleX(0);
+    }
+
+    .ipl-progress-indicator .first-indicator {
+      -webkit-animation: first-indicator 2s linear infinite;
+      -moz-animation: first-indicator 2s linear infinite;
+      animation: first-indicator 2s linear infinite;
+    }
+
+    .ipl-progress-indicator .second-indicator {
+      -webkit-animation: second-indicator 2s linear infinite;
+      -moz-animation: second-indicator 2s linear infinite;
+      animation: second-indicator 2s linear infinite;
+    }
+
+    .ipl-progress-indicator .insp-logo {
+      animation: App-logo-spin infinite 20s linear;
+      border-radius: 50%;
+      -webkit-align-self: center;
+      -moz-align-self: center;
+      align-self: center;
+    }
+
+    @keyframes App-logo-spin {
+      from {
+        transform: rotate(0);
       }
 
-      const deviceId = localStorage.getItem("__amplitude_deviceId");
-      const uid = localStorage.getItem("__rq_uid");
-
-      const eventObject = { device_id: deviceId, event_type: "extension_uninstalled" };
-      const attributes = { extension_uninstall_date: new Date().toISOString().split("T")[0] };
-
-      if (uid) eventObject["user_id"] = uid;
-
-      const isHeadless =
-        window.navigator.webdriver === true || /HeadlessChrome/.test(window.navigator.userAgent) === true;
-
-      if (!isHeadless && "https://app.requestly.io/goodbye/" === window.location.href && deviceId) {
-        const a = { api_key: "6d37003f0cdb1921422bc474c634c135", events: [eventObject], user_properties: attributes };
-        const b = new Blob([JSON.stringify(a)]);
-        navigator.sendBeacon("https://api2.amplitude.com/2/httpapi", b);
+      to {
+        transform: rotate(360deg);
       }
-    </script>
-    <script>
-      // Set favicon
-      const hostname = window.location.hostname;
-      let faviconPath = "/favicon.png";
+    }
 
-      if (hostname.includes("sessionbear.com")) {
-        faviconPath = "/sessionBearFavicon.png";
-      }
-
-      const link = document.createElement("link");
-      link.rel = "icon";
-      link.href = faviconPath;
-      window.document.head.appendChild(link);
-
-      // Set the page title
-      let pageTitle = "Requestly - Best HTTP Interceptor & Mocking Tool for Web & Mobile Apps"; // default title
-      if (hostname.includes("sessionbear.com")) {
-        pageTitle = "SessionBear - Capture & Kill bugs in seconds!";
-      }
-
-      window.document.title = pageTitle;
-
-      if (window.location.pathname === "/pricing") {
-        const description =
-          "Free at $0, Lite for $8/month, Basic at $15/member/month, and the Professional plan—our best value—at $23/member/month.";
-        const metaTag = document.createElement("meta");
-        metaTag.name = "description";
-        metaTag.content = description;
-        document.querySelector("head").appendChild(metaTag);
-      }
-    </script>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <meta name="theme-color" content="#000000" />
-    <link rel="manifest" href="/manifest.json" />
-    <!-- <link rel="shortcut icon" type="image/png" href="/favicon.png" /> -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,500;0,700;0,900;1,300;1,400;1,500;1,700;1,900&display=swap"
-    />
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css?family=Roboto%20Mono:ital,wght@0,300;0,400;0,500;0,700;0,900;1,300;1,400;1,500;1,700;1,900&display=swap"
-    />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet" />
-    <script>
-      window.global = window;
-    </script>
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-7FZEBFLWK0"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag() {
-        dataLayer.push(arguments);
-      }
-      gtag("js", new Date());
-
-      gtag("config", "G-7FZEBFLWK0");
-    </script>
-
-    <style type="text/css">
-      body {
-        height: 100%;
-        margin: 0;
-        padding: 0;
-        width: 100%;
-        pointer-events: none;
-      }
-
-      body {
-        font-family: var(--requestly-font-family-default), Inter;
-        font-size: 13px;
-        -webkit-font-smoothing: antialiased;
-        background-color: var(--requestly-color-background-dark,#141414) !important;
-      }
-
-      .ipl-progress-indicator.available {
+    @-webkit-keyframes fadein {
+      from {
         opacity: 0;
       }
 
-      .ipl-progress-indicator {
-        background-color: var(--requestly-color-background-dark, #141414);
-        width: 100%;
-        height: 100%;
-        position: fixed;
+      to {
         opacity: 1;
-        pointer-events: none;
-        -webkit-transition: opacity cubic-bezier(0.4, 0, 0.2, 1) 436ms;
-        -moz-transition: opacity cubic-bezier(0.4, 0, 0.2, 1) 436ms;
-        transition: opacity cubic-bezier(0.4, 0, 0.2, 1) 436ms;
-        z-index: 9999;
+      }
+    }
+
+    @-moz-keyframes fadein {
+      from {
+        opacity: 0;
       }
 
-      .insp-logo-frame {
-        display: -webkit-flex;
-        display: -moz-flex;
-        display: flex;
-        -webkit-flex-direction: column;
-        -moz-flex-direction: column;
-        flex-direction: column;
-        -webkit-justify-content: center;
-        -moz-justify-content: center;
-        justify-content: center;
-        -webkit-animation: fadein 436ms;
-        -moz-animation: fadein 436ms;
-        animation: fadein 436ms;
-        height: 98%;
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes fadein {
+      from {
+        opacity: 0;
       }
 
-      .insp-logo-frame-img {
-        max-width: 13%;
-        max-height: 13%;
-        -webkit-align-self: center;
-        -moz-align-self: center;
-        align-self: center;
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes first-indicator {
+      0% {
+        transform: translate(0) scaleX(0);
       }
 
-      .ipl-progress-indicator-head {
-        background-color: #d7e5fd;
-        height: 4px;
-        overflow: hidden;
-        position: relative;
+      25% {
+        transform: translate(0) scaleX(0.5);
       }
 
-      .ipl-progress-indicator .first-indicator,
-      .ipl-progress-indicator .second-indicator {
-        background-color: #264ec8;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        top: 0;
-        position: absolute;
-        -webkit-transform-origin: left center;
-        -moz-transform-origin: left center;
-        transform-origin: left center;
-        -webkit-transform: scaleX(0);
-        -moz-transform: scaleX(0);
-        transform: scaleX(0);
+      50% {
+        transform: translate(25%) scaleX(0.75);
       }
 
-      .ipl-progress-indicator .first-indicator {
-        -webkit-animation: first-indicator 2s linear infinite;
-        -moz-animation: first-indicator 2s linear infinite;
-        animation: first-indicator 2s linear infinite;
+      75% {
+        transform: translate(100%) scaleX(0);
       }
 
-      .ipl-progress-indicator .second-indicator {
-        -webkit-animation: second-indicator 2s linear infinite;
-        -moz-animation: second-indicator 2s linear infinite;
-        animation: second-indicator 2s linear infinite;
+      100% {
+        transform: translate(100%) scaleX(0);
+      }
+    }
+
+    @keyframes second-indicator {
+      0% {
+        transform: translate(0) scaleX(0);
       }
 
-      .ipl-progress-indicator .insp-logo {
-        animation: App-logo-spin infinite 20s linear;
-        border-radius: 50%;
-        -webkit-align-self: center;
-        -moz-align-self: center;
-        align-self: center;
+      60% {
+        transform: translate(0) scaleX(0);
       }
 
-      @keyframes App-logo-spin {
-        from {
-          transform: rotate(0);
-        }
-
-        to {
-          transform: rotate(360deg);
-        }
+      80% {
+        transform: translate(0) scaleX(0.6);
       }
 
-      @-webkit-keyframes fadein {
-        from {
-          opacity: 0;
-        }
-
-        to {
-          opacity: 1;
-        }
+      100% {
+        transform: translate(100%) scaleX(0.1);
       }
+    }
+  </style>
+</head>
 
-      @-moz-keyframes fadein {
-        from {
-          opacity: 0;
-        }
-
-        to {
-          opacity: 1;
-        }
-      }
-
-      @keyframes fadein {
-        from {
-          opacity: 0;
-        }
-
-        to {
-          opacity: 1;
-        }
-      }
-
-      @keyframes first-indicator {
-        0% {
-          transform: translate(0) scaleX(0);
-        }
-
-        25% {
-          transform: translate(0) scaleX(0.5);
-        }
-
-        50% {
-          transform: translate(25%) scaleX(0.75);
-        }
-
-        75% {
-          transform: translate(100%) scaleX(0);
-        }
-
-        100% {
-          transform: translate(100%) scaleX(0);
-        }
-      }
-
-      @keyframes second-indicator {
-        0% {
-          transform: translate(0) scaleX(0);
-        }
-
-        60% {
-          transform: translate(0) scaleX(0);
-        }
-
-        80% {
-          transform: translate(0) scaleX(0.6);
-        }
-
-        100% {
-          transform: translate(100%) scaleX(0.1);
-        }
-      }
-    </style>
-  </head>
-
-  <body class="dark">
-    <noscript> You need to enable JavaScript to run this app. </noscript>
-    <!-- Start - Preloading animation -->
-    <div class="ipl-progress-indicator" id="ipl-progress-indicator">
-      <div class="ipl-progress-indicator-head">
-        <div class="first-indicator"></div>
-        <div class="second-indicator"></div>
-      </div>
-      <div class="insp-logo-frame">
-        <img class="insp-logo-frame-img" src="" />
-      </div>
+<body class="dark">
+  <noscript> You need to enable JavaScript to run this app. </noscript>
+  <!-- Start - Preloading animation -->
+  <div class="ipl-progress-indicator" id="ipl-progress-indicator">
+    <div class="ipl-progress-indicator-head">
+      <div class="first-indicator"></div>
+      <div class="second-indicator"></div>
     </div>
-    <!-- End - Preloading animation -->
-    <div id="root"></div>
-    <script src="https://accounts.google.com/gsi/client" async></script>
-    <script type="module" src="/src/index.jsx"></script>
-    <!--
+    <div class="insp-logo-frame">
+      <img class="insp-logo-frame-img" src="" />
+    </div>
+  </div>
+  <!-- End - Preloading animation -->
+  <div id="root"></div>
+  <script src="https://accounts.google.com/gsi/client" async></script>
+  <script type="module" src="/src/index.jsx"></script>
+  <!--
       This HTML file is a template.
       If you open it directly in the browser, you will see an empty page.
 
@@ -303,17 +320,18 @@
       To begin the development, run `npm start` or `yarn start`.
       To create a production bundle, use `npm run build` or `yarn build`.
     -->
-  </body>
-  <script>
-    const rqLogo =
-      "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjUxIiBoZWlnaHQ9IjI1MSIgdmlld0JveD0iMCAwIDI1MSAyNTEiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxwYXRoIGQ9Ik0xMjQuNzU0IDI0Ni4wODZWMTg4LjQwNEMxMDQuODUxIDE4OC42OTYgODMuMTAwOCAxODcuMTA5IDYwLjUwNzUgMTgyLjVMNjAuNDAwOSAxODIuMzk3VjIxNi43NjdDNjAuNDAwOSAyMjMuNjM1IDYxLjE0MDYgMjI5LjE4MSA2Mi42MiAyMzMuNDA4QzY0LjA5OTQgMjM3LjYzNCA2Ni4xOTUyIDI0MC45MzUgNjguOTA3NCAyNDMuMzEyQzcxLjg2NjIgMjQ1LjY5IDc1LjQ0MTMgMjQ3LjI3NCA3OS42MzI5IDI0OC4wNjdDODQuMDcxMSAyNDkuMTIzIDg5LjEyNTYgMjQ5LjY1MiA5NC43OTY2IDI0OS42NTJDMTAwLjQ2OCAyNDkuNjUyIDEwNi4xMzggMjQ5LjI1NSAxMTEuODA5IDI0OC40NjNDMTE3LjcyNyAyNDcuNjcxIDEyMi4wNDIgMjQ2Ljg3OCAxMjQuNzU0IDI0Ni4wODZaIiBmaWxsPSJ1cmwoI3BhaW50MF9saW5lYXJfNF80MTgwKSIvPgo8cGF0aCBkPSJNMTI0Ljc1NCAxNzAuMDE2SDEyNy40OTVDMTUyLjc5OCAxNjkuNTA2IDE4MC4zOTYgMTY1Ljc0NiAyMDMuOTE4IDE1NC45ODVMMjAzLjkwMSAxNTQuOTYxQzIxNC43NSAxNDguNjIyIDIyNC4xMTkgMTM5LjY0MSAyMzIuMDA5IDEyOC4wMTlDMjM5Ljg5OSAxMTYuMzk4IDI0My44NDQgMTAyLjM5OSAyNDMuODQ0IDg2LjAyMjVDMjQzLjg0NCA1OS44NzM1IDIzNS4yMTQgMzkuMTM5MiAyMTcuOTU1IDIzLjgxOTZDMjAwLjY5NiA4LjUwMDAxIDE3NS4wNTMgMC44NDAyMSAxNDEuMDI3IDAuODQwMjFDMTI4LjQ1MiAwLjg0MDIxIDExNi42MTcgMS42MzI2MSAxMDUuNTIyIDMuMjE3MzlDOTQuNDI2NyA0LjUzODA0IDg0LjY4NzUgNi43ODMxNyA3Ni4zMDQzIDkuOTUyNzVDNzEuMzczIDExLjgwMTcgNjcuNDI4IDE0LjMxMDkgNjQuNDY5MiAxNy40ODA1QzYxLjc1NyAyMC4zODU5IDYwLjQwMDkgMjQuNjEyIDYwLjQwMDkgMzAuMTU4OFY5Ni41OTQ2QzcxLjcyODMgOTguMzI4NiAxMTQuNzI4IDEwMi4wNDQgMTI0LjM4NCAxMDEuNjMzVjU3Ljg5MjVDMTI3LjA5NiA1Ny4zNjQyIDEyOS41NjIgNTYuOTY4MSAxMzEuNzgxIDU2LjcwMzlDMTM0IDU2LjQzOTggMTM2Ljk1OSA1Ni4zMDc3IDE0MC42NTcgNTYuMzA3N0MxNTMuNzI1IDU2LjMwNzcgMTYzLjIxOCA1OC45NDkgMTY5LjEzNSA2NC4yMzE3QzE3NS4zIDY5LjI1MDIgMTc4LjM4MiA3Ni43Nzc5IDE3OC4zODIgODYuODE0OEMxNzguMzgyIDk2Ljg1MTggMTc1LjY2OSAxMDQuNTEyIDE3MC4yNDUgMTA5Ljc5NEMxNjQuODIxIDExNC44MTMgMTU3LjQyNCAxMTcuMzIyIDE0OC4wNTQgMTE3LjMyMkgxMjQuMzg0VjExNy4xMTFDMTI0LjMyIDExNy4yMTIgMTI0LjI2MSAxMTcuMzE0IDEyNC4yMDcgMTE3LjQxN0M4OC4zMjYxIDExNS42OSA2Ni41Mzg2IDExNC4xNjcgNjAuMzg2OCAxMTMuMzA0TDYwLjM4NjMgMTEzLjI5NEw0My4zNDAyIDExMS42QzQxLjc4NCAxMTEuNDQ2IDQwLjY0NjQgMTEwLjA1OSA0MC43OTkzIDEwOC41MDJMNDEuNzIyMiA5OS4xMDg3QzQxLjk4ODkgOTYuMzkzOCAzOC42NDAxIDk0LjkwNSAzNi44MDc0IDk2LjkyMzdMMS4yMzI4NSAxMzYuMTA5QzAuMjU5NDc1IDEzNy4xODEgMC4yNTMwNjMgMTM4LjgxNiAxLjIxNzk5IDEzOS44OThMMjkuNzk1MSAxNzEuOTM4QzMxLjQzNzggMTczLjc3OSAzNC40ODM2IDE3Mi43ODggMzQuNzI0NyAxNzAuMzM0TDM1LjM4NzYgMTYzLjU4N0MzNS41NDgyIDE2MS45NTEgMzcuMDYzIDE2MC43OTcgMzguNjgyOCAxNjEuMDc2TDYwLjQwMDkgMTY0LjgxNlYxNjQuOTQ4TDYwLjUwNzUgMTY0Ljg0MUM3My43OTUzIDE2Ny4wODEgOTcuODI0NiAxNzAuMzU4IDEyNC43NTQgMTcwLjA1OVYxNzAuMDE2WiIgZmlsbD0idXJsKCNwYWludDFfbGluZWFyXzRfNDE4MCkiLz4KPHBhdGggZD0iTTE3NS40MjMgMjIzLjUwM0wxNTMuOTkxIDE4Ni42MDRDMTgxLjgzMyAxODMuNTc1IDIwMy44NDEgMTc3LjM2NSAyMTYuMTMgMTcyLjM5OUMyMjAuODQyIDE3OC45NjUgMjI1LjUxOSAxODUuMzAzIDIzMC4xNiAxOTEuNDExQzIzOC43OSAyMDIuNzY4IDI0NS41NyAyMTMuMDY5IDI1MC41MDEgMjIyLjMxNEMyNDguMDM2IDIzMS41NTkgMjQzLjQ3NCAyMzguNjkgMjM2LjgxNyAyNDMuNzA5QzIzMC40MDYgMjQ4LjQ2MyAyMjMuMTMzIDI1MC44NCAyMTQuOTk2IDI1MC44NEMyMDkuNTcyIDI1MC44NCAyMDQuODg3IDI1MC4xOCAyMDAuOTQyIDI0OC44NTlDMTk2Ljk5NyAyNDcuNTM5IDE5My41NDUgMjQ1LjY5IDE5MC41ODYgMjQzLjMxMkMxODcuNjI4IDI0MC45MzUgMTg0LjkxNiAyMzguMDMgMTgyLjQ1IDIzNC41OTZDMTc5Ljk4NCAyMzEuMTYyIDE3Ny42NDIgMjI3LjQ2NSAxNzUuNDIzIDIyMy41MDNaIiBmaWxsPSJ1cmwoI3BhaW50Ml9saW5lYXJfNF80MTgwKSIvPgo8cGF0aCBkPSJNMC40OTkwMjMgMTM4LjA2N0MwLjUxMjEyMSAxMzguNzIzIDAuNzUxNTg2IDEzOS4zNzUgMS4yMTc5MSAxMzkuODk3TDI5Ljc5NSAxNzEuOTM4QzMxLjQzNzcgMTczLjc3OSAzNC40ODM1IDE3Mi43ODggMzQuNzI0NyAxNzAuMzM0TDM1LjM4NzUgMTYzLjU4N0MzNS41NDgyIDE2MS45NTEgMzcuMDYyOSAxNjAuNzk3IDM4LjY4MjcgMTYxLjA3Nkw2MC40MDA5IDE2NC44MTZWMTY0Ljk0OEw2MC41MDc0IDE2NC44NDFDNzMuNzk1MyAxNjcuMDggOTcuODI0NSAxNzAuMzU4IDEyNC43NTQgMTcwLjA1OVYxNzAuMDE2SDEyNS4yOTZWMTQ1LjA1OEwwLjQ5OTAyMyAxMzguMDY3WiIgZmlsbD0idXJsKCNwYWludDNfbGluZWFyXzRfNDE4MCkiLz4KPHBhdGggZD0iTTEyNS4yOTYgMTQ1LjA1OEwwLjQ5OTEwNCAxMzguMDY3QzAuNDg1MDk5IDEzNy4zNjcgMC43Mjk4ODIgMTM2LjY2MyAxLjIzMjg1IDEzNi4xMDlMMzYuODA3NCA5Ni45MjM3QzM4LjY0MDEgOTQuOTA1IDQxLjk4ODkgOTYuMzkzOSA0MS43MjIyIDk5LjEwODdMNDAuNzk5MyAxMDguNTAyQzQwLjY0NjQgMTEwLjA1OSA0MS43ODQgMTExLjQ0NiA0My4zNDAyIDExMS42TDYwLjM4NjMgMTEzLjI5NEw2MC4zODY4IDExMy4zMDRDNjYuNTM4NiAxMTQuMTY3IDg4LjMyNjEgMTE1LjY5IDEyNC4yMDcgMTE3LjQxN0MxMjQuMjYxIDExNy4zMTQgMTI0LjMyIDExNy4yMTIgMTI0LjM4NCAxMTcuMTExVjExNy4zMjJIMTI1LjI5NlYxNDUuMDU4WiIgZmlsbD0idXJsKCNwYWludDRfbGluZWFyXzRfNDE4MCkiLz4KPGRlZnM+CjxsaW5lYXJHcmFkaWVudCBpZD0icGFpbnQwX2xpbmVhcl80XzQxODAiIHgxPSI1OC42Mzk1IiB5MT0iLTIzLjE4OTEiIHgyPSIyMDYuNzYzIiB5Mj0iMzAyLjczNSIgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiPgo8c3RvcCBzdG9wLWNvbG9yPSIjMUVBMEZGIi8+CjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzAwNEVFQiIvPgo8L2xpbmVhckdyYWRpZW50Pgo8bGluZWFyR3JhZGllbnQgaWQ9InBhaW50MV9saW5lYXJfNF80MTgwIiB4MT0iNTguNjM5NSIgeTE9Ii0yMy4xODkxIiB4Mj0iMjA2Ljc2MyIgeTI9IjMwMi43MzUiIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIj4KPHN0b3Agc3RvcC1jb2xvcj0iIzFFQTBGRiIvPgo8c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMwMDRFRUIiLz4KPC9saW5lYXJHcmFkaWVudD4KPGxpbmVhckdyYWRpZW50IGlkPSJwYWludDJfbGluZWFyXzRfNDE4MCIgeDE9IjU4LjYzOTUiIHkxPSItMjMuMTg5MSIgeDI9IjIwNi43NjMiIHkyPSIzMDIuNzM1IiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+CjxzdG9wIHN0b3AtY29sb3I9IiMxRUEwRkYiLz4KPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMDA0RUVCIi8+CjwvbGluZWFyR3JhZGllbnQ+CjxsaW5lYXJHcmFkaWVudCBpZD0icGFpbnQzX2xpbmVhcl80XzQxODAiIHgxPSIxODYuMTM3IiB5MT0iMTU0LjY5OCIgeDI9IjgyLjE4NDgiIHkyPSIxMjcuNTU4IiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+CjxzdG9wIHN0b3AtY29sb3I9IiMxRUEwRkYiLz4KPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMDA0RUVCIi8+CjwvbGluZWFyR3JhZGllbnQ+CjxsaW5lYXJHcmFkaWVudCBpZD0icGFpbnQ0X2xpbmVhcl80XzQxODAiIHgxPSI0MC44MTExIiB5MT0iNzguNjYwMiIgeDI9IjIzMC4zNTQiIHkyPSIxMDIuOTA5IiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+CjxzdG9wIHN0b3AtY29sb3I9IiMxRUEwRkYiLz4KPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMDA0RUVCIi8+CjwvbGluZWFyR3JhZGllbnQ+CjwvZGVmcz4KPC9zdmc+Cg==";
-    const sessionBearLogoPath = "/sessionBear_lg.svg";
+</body>
+<script>
+  const rqLogo =
+    "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjUxIiBoZWlnaHQ9IjI1MSIgdmlld0JveD0iMCAwIDI1MSAyNTEiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxwYXRoIGQ9Ik0xMjQuNzU0IDI0Ni4wODZWMTg4LjQwNEMxMDQuODUxIDE4OC42OTYgODMuMTAwOCAxODcuMTA5IDYwLjUwNzUgMTgyLjVMNjAuNDAwOSAxODIuMzk3VjIxNi43NjdDNjAuNDAwOSAyMjMuNjM1IDYxLjE0MDYgMjI5LjE4MSA2Mi42MiAyMzMuNDA4QzY0LjA5OTQgMjM3LjYzNCA2Ni4xOTUyIDI0MC45MzUgNjguOTA3NCAyNDMuMzEyQzcxLjg2NjIgMjQ1LjY5IDc1LjQ0MTMgMjQ3LjI3NCA3OS42MzI5IDI0OC4wNjdDODQuMDcxMSAyNDkuMTIzIDg5LjEyNTYgMjQ5LjY1MiA5NC43OTY2IDI0OS42NTJDMTAwLjQ2OCAyNDkuNjUyIDEwNi4xMzggMjQ5LjI1NSAxMTEuODA5IDI0OC40NjNDMTE3LjcyNyAyNDcuNjcxIDEyMi4wNDIgMjQ2Ljg3OCAxMjQuNzU0IDI0Ni4wODZaIiBmaWxsPSJ1cmwoI3BhaW50MF9saW5lYXJfNF80MTgwKSIvPgo8cGF0aCBkPSJNMTI0Ljc1NCAxNzAuMDE2SDEyNy40OTVDMTUyLjc5OCAxNjkuNTA2IDE4MC4zOTYgMTY1Ljc0NiAyMDMuOTE4IDE1NC45ODVMMjAzLjkwMSAxNTQuOTYxQzIxNC43NSAxNDguNjIyIDIyNC4xMTkgMTM5LjY0MSAyMzIuMDA5IDEyOC4wMTlDMjM5Ljg5OSAxMTYuMzk4IDI0My44NDQgMTAyLjM5OSAyNDMuODQ0IDg2LjAyMjVDMjQzLjg0NCA1OS44NzM1IDIzNS4yMTQgMzkuMTM5MiAyMTcuOTU1IDIzLjgxOTZDMjAwLjY5NiA4LjUwMDAxIDE3NS4wNTMgMC44NDAyMSAxNDEuMDI3IDAuODQwMjFDMTI4LjQ1MiAwLjg0MDIxIDExNi42MTcgMS42MzI2MSAxMDUuNTIyIDMuMjE3MzlDOTQuNDI2NyA0LjUzODA0IDg0LjY4NzUgNi43ODMxNyA3Ni4zMDQzIDkuOTUyNzVDNzEuMzczIDExLjgwMTcgNjcuNDI4IDE0LjMxMDkgNjQuNDY5MiAxNy40ODA1QzYxLjc1NyAyMC4zODU5IDYwLjQwMDkgMjQuNjEyIDYwLjQwMDkgMzAuMTU4OFY5Ni41OTQ2QzcxLjcyODMgOTguMzI4NiAxMTQuNzI4IDEwMi4wNDQgMTI0LjM4NCAxMDEuNjMzVjU3Ljg5MjVDMTI3LjA5NiA1Ny4zNjQyIDEyOS41NjIgNTYuOTY4MSAxMzEuNzgxIDU2LjcwMzlDMTM0IDU2LjQzOTggMTM2Ljk1OSA1Ni4zMDc3IDE0MC42NTcgNTYuMzA3N0MxNTMuNzI1IDU2LjMwNzcgMTYzLjIxOCA1OC45NDkgMTY5LjEzNSA2NC4yMzE3QzE3NS4zIDY5LjI1MDIgMTc4LjM4MiA3Ni43Nzc5IDE3OC4zODIgODYuODE0OEMxNzguMzgyIDk2Ljg1MTggMTc1LjY2OSAxMDQuNTEyIDE3MC4yNDUgMTA5Ljc5NEMxNjQuODIxIDExNC44MTMgMTU3LjQyNCAxMTcuMzIyIDE0OC4wNTQgMTE3LjMyMkgxMjQuMzg0VjExNy4xMTFDMTI0LjMyIDExNy4yMTIgMTI0LjI2MSAxMTcuMzE0IDEyNC4yMDcgMTE3LjQxN0M4OC4zMjYxIDExNS42OSA2Ni41Mzg2IDExNC4xNjcgNjAuMzg2OCAxMTMuMzA0TDYwLjM4NjMgMTEzLjI5NEw0My4zNDAyIDExMS42QzQxLjc4NCAxMTEuNDQ2IDQwLjY0NjQgMTEwLjA1OSA0MC43OTkzIDEwOC41MDJMNDEuNzIyMiA5OS4xMDg3QzQxLjk4ODkgOTYuMzkzOCAzOC42NDAxIDk0LjkwNSAzNi44MDc0IDk2LjkyMzdMMS4yMzI4NSAxMzYuMTA5QzAuMjU5NDc1IDEzNy4xODEgMC4yNTMwNjMgMTM4LjgxNiAxLjIxNzk5IDEzOS44OThMMjkuNzk1MSAxNzEuOTM4QzMxLjQzNzggMTczLjc3OSAzNC40ODM2IDE3Mi43ODggMzQuNzI0NyAxNzAuMzM0TDM1LjM4NzYgMTYzLjU4N0MzNS41NDgyIDE2MS45NTEgMzcuMDYzIDE2MC43OTcgMzguNjgyOCAxNjEuMDc2TDYwLjQwMDkgMTY0LjgxNlYxNjQuOTQ4TDYwLjUwNzUgMTY0Ljg0MUM3My43OTUzIDE2Ny4wODEgOTcuODI0NiAxNzAuMzU4IDEyNC43NTQgMTcwLjA1OVYxNzAuMDE2WiIgZmlsbD0idXJsKCNwYWludDFfbGluZWFyXzRfNDE4MCkiLz4KPHBhdGggZD0iTTE3NS40MjMgMjIzLjUwM0wxNTMuOTkxIDE4Ni42MDRDMTgxLjgzMyAxODMuNTc1IDIwMy44NDEgMTc3LjM2NSAyMTYuMTMgMTcyLjM5OUMyMjAuODQyIDE3OC45NjUgMjI1LjUxOSAxODUuMzAzIDIzMC4xNiAxOTEuNDExQzIzOC43OSAyMDIuNzY4IDI0NS41NyAyMTMuMDY5IDI1MC41MDEgMjIyLjMxNEMyNDguMDM2IDIzMS41NTkgMjQzLjQ3NCAyMzguNjkgMjM2LjgxNyAyNDMuNzA5QzIzMC40MDYgMjQ4LjQ2MyAyMjMuMTMzIDI1MC44NCAyMTQuOTk2IDI1MC44NEMyMDkuNTcyIDI1MC44NCAyMDQuODg3IDI1MC4xOCAyMDAuOTQyIDI0OC44NTlDMTk2Ljk5NyAyNDcuNTM5IDE5My41NDUgMjQ1LjY5IDE5MC41ODYgMjQzLjMxMkMxODcuNjI4IDI0MC45MzUgMTg0LjkxNiAyMzguMDMgMTgyLjQ1IDIzNC41OTZDMTc5Ljk4NCAyMzEuMTYyIDE3Ny42NDIgMjI3LjQ2NSAxNzUuNDIzIDIyMy41MDNaIiBmaWxsPSJ1cmwoI3BhaW50Ml9saW5lYXJfNF80MTgwKSIvPgo8cGF0aCBkPSJNMC40OTkwMjMgMTM4LjA2N0MwLjUxMjEyMSAxMzguNzIzIDAuNzUxNTg2IDEzOS4zNzUgMS4yMTc5MSAxMzkuODk3TDI5Ljc5NSAxNzEuOTM4QzMxLjQzNzcgMTczLjc3OSAzNC40ODM1IDE3Mi43ODggMzQuNzI0NyAxNzAuMzM0TDM1LjM4NzUgMTYzLjU4N0MzNS41NDgyIDE2MS45NTEgMzcuMDYyOSAxNjAuNzk3IDM4LjY4MjcgMTYxLjA3Nkw2MC40MDA5IDE2NC44MTZWMTY0Ljk0OEw2MC41MDc0IDE2NC44NDFDNzMuNzk1MyAxNjcuMDggOTcuODI0NSAxNzAuMzU4IDEyNC43NTQgMTcwLjA1OVYxNzAuMDE2SDEyNS4yOTZWMTQ1LjA1OEwwLjQ5OTAyMyAxMzguMDY3WiIgZmlsbD0idXJsKCNwYWludDNfbGluZWFyXzRfNDE4MCkiLz4KPHBhdGggZD0iTTEyNS4yOTYgMTQ1LjA1OEwwLjQ5OTEwNCAxMzguMDY3QzAuNDg1MDk5IDEzNy4zNjcgMC43Mjk4ODIgMTM2LjY2MyAxLjIzMjg1IDEzNi4xMDlMMzYuODA3NCA5Ni45MjM3QzM4LjY0MDEgOTQuOTA1IDQxLjk4ODkgOTYuMzkzOSA0MS43MjIyIDk5LjEwODdMNDAuNzk5MyAxMDguNTAyQzQwLjY0NjQgMTEwLjA1OSA0MS43ODQgMTExLjQ0NiA0My4zNDAyIDExMS42TDYwLjM4NjMgMTEzLjI5NEw2MC4zODY4IDExMy4zMDRDNjYuNTM4NiAxMTQuMTY3IDg4LjMyNjEgMTE1LjY5IDEyNC4yMDcgMTE3LjQxN0MxMjQuMjYxIDExNy4zMTQgMTI0LjMyIDExNy4yMTIgMTI0LjM4NCAxMTcuMTExVjExNy4zMjJIMTI1LjI5NlYxNDUuMDU4WiIgZmlsbD0idXJsKCNwYWludDRfbGluZWFyXzRfNDE4MCkiLz4KPGRlZnM+CjxsaW5lYXJHcmFkaWVudCBpZD0icGFpbnQwX2xpbmVhcl80XzQxODAiIHgxPSI1OC42Mzk1IiB5MT0iLTIzLjE4OTEiIHgyPSIyMDYuNzYzIiB5Mj0iMzAyLjczNSIgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiPgo8c3RvcCBzdG9wLWNvbG9yPSIjMUVBMEZGIi8+CjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzAwNEVFQiIvPgo8L2xpbmVhckdyYWRpZW50Pgo8bGluZWFyR3JhZGllbnQgaWQ9InBhaW50MV9saW5lYXJfNF80MTgwIiB4MT0iNTguNjM5NSIgeTE9Ii0yMy4xODkxIiB4Mj0iMjA2Ljc2MyIgeTI9IjMwMi43MzUiIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIj4KPHN0b3Agc3RvcC1jb2xvcj0iIzFFQTBGRiIvPgo8c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMwMDRFRUIiLz4KPC9saW5lYXJHcmFkaWVudD4KPGxpbmVhckdyYWRpZW50IGlkPSJwYWludDJfbGluZWFyXzRfNDE4MCIgeDE9IjU4LjYzOTUiIHkxPSItMjMuMTg5MSIgeDI9IjIwNi43NjMiIHkyPSIzMDIuNzM1IiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+CjxzdG9wIHN0b3AtY29sb3I9IiMxRUEwRkYiLz4KPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMDA0RUVCIi8+CjwvbGluZWFyR3JhZGllbnQ+CjxsaW5lYXJHcmFkaWVudCBpZD0icGFpbnQzX2xpbmVhcl80XzQxODAiIHgxPSIxODYuMTM3IiB5MT0iMTU0LjY5OCIgeDI9IjgyLjE4NDgiIHkyPSIxMjcuNTU4IiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+CjxzdG9wIHN0b3AtY29sb3I9IiMxRUEwRkYiLz4KPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMDA0RUVCIi8+CjwvbGluZWFyR3JhZGllbnQ+CjxsaW5lYXJHcmFkaWVudCBpZD0icGFpbnQ0X2xpbmVhcl80XzQxODAiIHgxPSI0MC44MTExIiB5MT0iNzguNjYwMiIgeDI9IjIzMC4zNTQiIHkyPSIxMDIuOTA5IiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+CjxzdG9wIHN0b3AtY29sb3I9IiMxRUEwRkYiLz4KPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMDA0RUVCIi8+CjwvbGluZWFyR3JhZGllbnQ+CjwvZGVmcz4KPC9zdmc+Cg==";
+  const sessionBearLogoPath = "/sessionBear_lg.svg";
 
-    const logo = document.querySelector(".insp-logo-frame-img");
-    if (hostname.includes("sessionbear.com")) {
-      logo.src = sessionBearLogoPath;
-    } else {
-      logo.src = rqLogo;
-    }
-  </script>
+  const logo = document.querySelector(".insp-logo-frame-img");
+  if (hostname.includes("sessionbear.com")) {
+    logo.src = sessionBearLogoPath;
+  } else {
+    logo.src = rqLogo;
+  }
+</script>
+
 </html>

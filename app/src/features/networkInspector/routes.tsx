@@ -1,7 +1,12 @@
+import { lazy } from "react";
 import { RouteObject } from "react-router-dom";
-import NetworkInspectorContainer from "./container";
 import PATHS from "config/constants/sub/paths";
-import { NetworkInspectorHomeScreen } from "./screens";
+
+// Lazy-loaded components for better code splitting
+const NetworkInspectorContainer = lazy(() => import("./container"));
+const NetworkInspectorHomeScreen = lazy(() =>
+  import("./screens").then((m) => ({ default: m.NetworkInspectorHomeScreen }))
+);
 
 export const networkInspectorRoutes: RouteObject[] = [
   {
