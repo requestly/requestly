@@ -101,6 +101,7 @@ export namespace RQAPI {
     API = "api",
     COLLECTION = "collection",
     ENVIRONMENT = "environment",
+    EXAMPLE_API = "example_api",
   }
 
   export enum ScriptType {
@@ -291,7 +292,7 @@ export namespace RQAPI {
     description?: string;
     collectionId: string | null;
     rank?: string;
-    isExample?: boolean;
+    isExample?: boolean; // this is to denote sample entities not `example` api records
     ownerId: string;
     deleted: boolean;
     createdBy: string;
@@ -300,25 +301,27 @@ export namespace RQAPI {
     updatedTs: number;
   }
 
-  export interface BaseApiRecord extends RecordMetadata {
-    type: RecordType.API;
-  }
-
   export interface CollectionRecord extends RecordMetadata {
     type: RecordType.COLLECTION;
     data: Collection;
   }
 
-  export type ApiRecord = {
+  export interface ApiRecord extends RecordMetadata {
     type: RecordType.API;
     data: ApiEntry;
-  } & BaseApiRecord;
+  }
 
   export type HttpApiRecord = ApiRecord & { data: HttpApiEntry };
 
   export type GraphQLApiRecord = ApiRecord & { data: GraphQLApiEntry };
 
-  export type ApiClientRecord = ApiRecord | CollectionRecord;
+  export type ExampleApiRecord = RecordMetadata & {
+    type: RecordType.EXAMPLE_API;
+    parentRequestId: string;
+    data: ApiEntry;
+  };
+
+  export type ApiClientRecord = ApiRecord | CollectionRecord | ExampleApiRecord;
 
   export type ApiClientRecordPromise = Promise<
     | {
