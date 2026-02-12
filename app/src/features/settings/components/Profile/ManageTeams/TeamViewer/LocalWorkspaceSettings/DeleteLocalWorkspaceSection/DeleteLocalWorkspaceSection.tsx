@@ -1,20 +1,28 @@
-import React, { useCallback, useState } from "react";
-import DeleteWorkspaceModal from "../../TeamSettings/DeleteWorkspaceModal";
-import "./deleteLocalWorkspaceSection.scss";
+import * as Sentry from "@sentry/react";
 import { Alert, Button, Checkbox } from "antd";
+import { ErrorCode } from "errors/types";
+import { WorkspaceType } from "features/workspaces/types";
+import { trackWorkspaceDeleteClicked, trackWorkspaceDeleted } from "modules/analytics/events/common/teams";
+import React, { useCallback, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { toast } from "utils/Toast";
+import { getAllWorkspaces as getAllLocalWorkspaces, removeWorkspace } from "services/fsManagerServiceAdapter";
 import { getAppMode } from "store/selectors";
-import { getActiveWorkspaceId, getNonLocalWorkspaces, getWorkspaceById } from "store/slices/workspaces/selectors";
-import { clearCurrentlyActiveWorkspace } from "actions/TeamWorkspaceActions";
-import { removeWorkspace, getAllWorkspaces as getAllLocalWorkspaces } from "services/fsManagerServiceAdapter";
+import {
+  dummyPersonalWorkspace,
+  getActiveWorkspaceId,
+  getNonLocalWorkspaces,
+  getWorkspaceById,
+} from "store/slices/workspaces/selectors";
 import { workspaceActions } from "store/slices/workspaces/slice";
 import { redirectToRules } from "utils/RedirectionUtils";
-import * as Sentry from "@sentry/react";
-import { WorkspaceType } from "features/workspaces/types";
-import { ErrorCode } from "errors/types";
-import { trackWorkspaceDeleteClicked, trackWorkspaceDeleted } from "modules/analytics/events/common/teams";
+import { toast } from "utils/Toast";
+import DeleteWorkspaceModal from "../../TeamSettings/DeleteWorkspaceModal";
+import "./deleteLocalWorkspaceSection.scss";
+
+import { clearCurrentlyActiveWorkspace } from "actions/TeamWorkspaceActions";
+import { useWorkspaceViewActions } from "features/apiClient/slices";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 
 export const DeleteLocalWorkspaceSection: React.FC = () => {
   const dispatch = useDispatch();
@@ -25,6 +33,8 @@ export const DeleteLocalWorkspaceSection: React.FC = () => {
   const activeWorkspaceId = useSelector(getActiveWorkspaceId);
   const sharedWorkspaces = useSelector(getNonLocalWorkspaces);
   const currentWorkspace = useSelector(getWorkspaceById(workspaceId));
+  const user = useSelector(getUserAuthDetails);
+  const { switchContext } = useWorkspaceViewActions();
 
   const [deleteDirectory, setDeleteDirectory] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -87,6 +97,13 @@ export const DeleteLocalWorkspaceSection: React.FC = () => {
 
       if (activeWorkspaceId === workspaceId) {
         await clearCurrentlyActiveWorkspace(dispatch, appMode);
+        await switchContext({
+          workspace: {
+            id: dummyPersonalWorkspace.id,
+            meta: { type: WorkspaceType.PERSONAL },
+          },
+          userId: user?.details?.profile?.uid,
+        });
       }
       if (hadPermissionIssue) {
         toast.info("Workspace deleted, but failed to delete files. Please retry or delete manually.");
@@ -110,7 +127,18 @@ export const DeleteLocalWorkspaceSection: React.FC = () => {
     } finally {
       setIsDeleting(false);
     }
-  }, [workspaceId, deleteDirectory, isDeleting, location, activeWorkspaceId, dispatch, appMode, refreshAndNavigate]);
+  }, [
+    workspaceId,
+    isDeleting,
+    location?.state?.previousPath,
+    deleteDirectory,
+    activeWorkspaceId,
+    refreshAndNavigate,
+    dispatch,
+    appMode,
+    switchContext,
+    user?.details?.profile?.uid,
+  ]);
 
   return (
     <div className="local-workspace-delete-section">

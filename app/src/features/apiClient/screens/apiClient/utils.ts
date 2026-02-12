@@ -386,7 +386,8 @@ export const parseMultipartFormDataString = (
 };
 
 export const parseCurlRequest = (curl: string): RQAPI.Request => {
-  const requestJson = curlconverter.toJsonObject(curl);
+  const cleanCurl = curl.replace(/\u00A0/g, " ");
+  const requestJson = curlconverter.toJsonObject(cleanCurl);
   const queryParamsFromJson = generateKeyValuePairs(requestJson.queries);
   /*
       cURL converter is not able to parse query params from url for some cURL requests

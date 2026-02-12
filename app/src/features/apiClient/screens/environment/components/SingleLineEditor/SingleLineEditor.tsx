@@ -21,6 +21,7 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
   placeholder,
   onPressEnter,
   onBlur,
+  onPaste,
   variables,
 }) => {
   const editorRef = useRef<HTMLDivElement>(null);
@@ -33,6 +34,7 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
   */
   const onBlurRef = useRef(onBlur);
   const onChangeRef = useRef(onChange);
+  const onPasteRef = useRef(onPaste);
   const previousDefaultValueRef = useRef(defaultValue);
   const isPopoverPinnedRef = useRef(false);
 
@@ -41,7 +43,8 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
   useEffect(() => {
     onBlurRef.current = onBlur;
     onChangeRef.current = onChange;
-  }, [onBlur, onChange]);
+    onPasteRef.current = onPaste;
+  }, [onBlur, onChange, onPaste]);
 
   const [hoveredVariable, setHoveredVariable] = useState<string | null>(null); // Track hovered variable
   const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
@@ -74,14 +77,6 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
       editorViewRef.current = null;
     }
 
-    if (typeof defaultValue !== "string") {
-      Sentry.captureException(new Error("Editor defaultValue must be a string"), {
-        extra: {
-          defaultValue,
-        },
-      });
-    }
-
     if (!editorRef.current) return;
     /*
     CodeMirror uses extensions to configure DOM interactions.
@@ -111,6 +106,28 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
             keypress: (event, view) => {
               if (event.key === "Enter") {
                 onPressEnter?.(event, view.state.doc.toString());
+              }
+            },
+            paste: (event, view) => {
+              const pastedText = event.clipboardData?.getData("text/plain");
+              if (!pastedText) return;
+
+              // Call the onPaste handler first to let parent decide if it should handle the paste
+              // (e.g., for cURL import)
+              onPasteRef.current?.(event, pastedText);
+              // If parent didn't prevent default, handle multiline paste conversion
+              if (!event.defaultPrevented && pastedText.includes("\n")) {
+                event.preventDefault();
+                const singleLineText = pastedText.replace(/\\\s*\n\s*/g, " ").replace(/\n/g, " ");
+                view.dispatch(
+                  view.state.update({
+                    changes: {
+                      from: view.state.selection.main.from,
+                      to: view.state.selection.main.to,
+                      insert: singleLineText,
+                    },
+                  })
+                );
               }
             },
           }),
