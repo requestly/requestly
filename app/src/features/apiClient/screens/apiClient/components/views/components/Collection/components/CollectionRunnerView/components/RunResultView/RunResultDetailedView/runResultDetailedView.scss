@@ -11,9 +11,24 @@
       }
     }
 
+    .code-editor-toolbar,
+    .api-response-body-raw-content__header {
+      min-height: 29px;
+      box-sizing: border-box;
+    }
+
+    .api-response-body-mode-selector {
+      margin-bottom: 0;
+      margin-left: 0;
+    }
+
     .api-response-body-raw-content {
       max-height: 56vh;
       overflow-y: auto;
+
+      &__header {
+        padding: 2px 0;
+      }
     }
   }
 

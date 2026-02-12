@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Badge, Collapse, Spin, Tabs } from "antd";
+import { Badge, Collapse, Spin, Tabs, Typography } from "antd";
 import {
   CurrentlyExecutingRequest,
   LiveRunResult,
@@ -19,7 +19,6 @@ import { MdOutlineArrowForwardIos } from "@react-icons/all-files/md/MdOutlineArr
 import "./runResultContainer.scss";
 import { getFormattedStartTime, getFormattedTime } from "../utils";
 import { MdOutlineWarningAmber } from "@react-icons/all-files/md/MdOutlineWarningAmber";
-import { RQTooltip } from "lib/design-system-v2/components";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { useWorkspaceId } from "features/apiClient/common/WorkspaceProvider";
 import { useCollectionView } from "../../../../../collectionView.context";
@@ -129,12 +128,20 @@ const TestDetails: React.FC<{
       )}
 
       {requestExecutionResult.status?.value === RQAPI.ExecutionStatus["ERROR"] ? (
-        <RQTooltip title={requestExecutionResult.status.error.message || "Something went wrong!"}>
-          <div className="execution-error-message">
-            <MdOutlineWarningAmber />
-            <span className="message">{requestExecutionResult.status.error.message || "Something went wrong!"}</span>
-          </div>
-        </RQTooltip>
+        <div className="execution-error-message">
+          <MdOutlineWarningAmber />
+          <Typography.Paragraph
+            className="message"
+            ellipsis={{
+              tooltip: {
+                title: requestExecutionResult.status.error.message || "Something went wrong!",
+                overlayClassName: "rq-tooltip",
+              },
+            }}
+          >
+            {requestExecutionResult.status.error.message || "Something went wrong!"}
+          </Typography.Paragraph>
+        </div>
       ) : requestExecutionResult?.testResults?.length === 0 ? (
         <div className="no-test-found-message">
           <i>No test found</i>
