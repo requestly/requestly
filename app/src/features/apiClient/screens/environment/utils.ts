@@ -61,7 +61,7 @@ export const convertEnvironmentToMap = (variables: VariableRow[]) => {
   }, {} as EnvironmentVariables);
 };
 
-export const flattenVariablesList = (variables: ScopedVariables) => {
+export const parseVariables = (variables: ScopedVariables) => {
   if (!variables) return [];
   const flattened = Object.entries(variables).map(([label, arr]) => ({
     label,
