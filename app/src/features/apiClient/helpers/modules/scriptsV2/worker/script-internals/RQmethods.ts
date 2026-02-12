@@ -18,7 +18,7 @@ import { status } from "http-status";
 import { IterationData } from "./IterationData";
 import { ExecutionContext } from "features/apiClient/helpers/httpRequestExecutor/scriptExecutionContext";
 import { ScriptLogger } from "./scriptExecutionWorker/ScriptLogger";
-import { dynamicVariables } from "lib/dynamic-variables";
+import { dynamicVariableResolver } from "lib/dynamic-variables";
 
 // unsupported methods
 const createInfiniteChainable = (methodName: string) => {
@@ -104,7 +104,7 @@ export class RQ implements SandboxAPI {
    * Enables usage like rq.$randomEmail(), rq.$randomFirstName('male'), etc.
    */
   private registerDynamicVariables(): void {
-    for (const variable of dynamicVariables.listAll()) {
+    for (const variable of dynamicVariableResolver.listAll()) {
       (this as any)[variable.name] = (...args: unknown[]) => variable.generate(...args);
     }
   }
