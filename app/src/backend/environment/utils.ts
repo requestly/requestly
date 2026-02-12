@@ -1,4 +1,3 @@
-import { compile } from "handlebars";
 import { EnvironmentVariables } from "./types";
 import Logger from "lib/logger";
 import { isEmpty } from "lodash";
@@ -7,6 +6,7 @@ import { EnvironmentVariableData, VariableData } from "features/apiClient/store/
 import { ApiClientFeatureContext } from "features/apiClient/slices";
 import { reduxStore } from "store";
 import { DepGraph } from "dependency-graph";
+import { dynamicVariableResolver } from "lib/dynamic-variables";
 
 type Variables = Record<string, string | number | boolean>;
 interface RenderResult<T> {
@@ -43,13 +43,6 @@ export const renderTemplate = <T extends string | Record<string, T>>(
   renderedVariables?: Record<string, unknown>;
   renderedTemplate: T;
 } => {
-  if (!variables || Object.keys(variables).length === 0) {
-    return {
-      renderedTemplate: template,
-      renderedVariables: {},
-    };
-  }
-
   const parsedVariables = Object.entries(variables).reduce((envVars, [key, value]) => {
     if (typeof value.localValue === "number") {
       envVars[key] = value.localValue ?? value.syncValue;
@@ -113,8 +106,7 @@ const processObject = <T extends Record<string, any>>(input: T, variables: Varia
 const processTemplateString = <T extends string>(input: T, variables: Variables): RenderResult<T> => {
   try {
     const { wrappedTemplate, usedVariables } = collectAndEscapeVariablesFromTemplate(input, variables);
-    const hbsTemplate = compile(wrappedTemplate, { noEscape: true });
-    const renderedTemplate = hbsTemplate(variables) as T; // since handlebars generic types resolve to any; not string
+    const renderedTemplate = dynamicVariableResolver.resolve(wrappedTemplate, variables) as T; // since handlebars generic types resolve to any; not string
 
     return {
       renderedTemplate,
@@ -134,6 +126,16 @@ const escapeMatchFromHandlebars = (match: string) => {
   return match.replace(/({{)/g, "\\$1");
 };
 
+/**
+ * Checks if a variable name is a dynamic variable (e.g., $randomEmail, $randomInt 1 100).
+ * Extracts the variable name (first word) to handle arguments.
+ */
+const isDynamicVariable = (varName: string): boolean => {
+  if (!varName) return false;
+  const [variableNameOnly = ""] = varName.split(" ");
+  return dynamicVariableResolver.has(variableNameOnly);
+};
+
 const collectAndEscapeVariablesFromTemplate = (
   template: string,
   variables: Variables
@@ -143,20 +145,22 @@ const collectAndEscapeVariablesFromTemplate = (
   const wrappedTemplate = template.replace(/{{\s*([\s\S]*?)\s*}}/g, (completeMatch, firstMatchedGroup) => {
     const varName = firstMatchedGroup.trim();
     const isMatchEmpty = varName === ""; // {{}}
-    const matchStartsWithKnownHelper = varName in variables;
+    const isUserVariable = varName in variables;
+    const isDynamic = isDynamicVariable(varName);
 
-    if (matchStartsWithKnownHelper) {
+    if (isUserVariable) {
       usedVariables[varName] = variables[varName];
     }
 
-    if (isMatchEmpty || !matchStartsWithKnownHelper) {
+    // Escape if: empty match, or not a user variable AND not a dynamic variable
+    if (isMatchEmpty || (!isUserVariable && !isDynamic)) {
       return escapeMatchFromHandlebars(completeMatch);
     }
 
-    // If variable name contains dots, wrap it in square brackets for Handlebars
+    // If variable name contains dots and is a user variable, wrap in square brackets for Handlebars
     // otherwise a.b gets parsed as nested object path
     // https://handlebarsjs.com/guide/expressions.html#literal-segments
-    if (varName.includes(".")) {
+    if (varName.includes(".") && isUserVariable) {
       return `{{[${varName}]}}`;
     }
 
@@ -224,8 +228,7 @@ const resolveCompositeVariables = (variables: Variables): Variables => {
       delete resolutionContext[varName];
 
       const { wrappedTemplate } = collectAndEscapeVariablesFromTemplate(value, resolutionContext);
-      const hbsTemplate = compile(wrappedTemplate, { noEscape: true });
-      const renderedValue = hbsTemplate(resolutionContext);
+      const renderedValue = dynamicVariableResolver.resolve(wrappedTemplate, resolutionContext);
       resolved[varName] = renderedValue;
     } catch (e) {
       // Keep the original value if rendering fails
@@ -269,8 +272,24 @@ export const mergeLocalAndSyncVariables = (
   };
 };
 
+/**
+ * Extract variable names from a template string.
+ * Handles both regular variables and dynamic variables with arguments.
+ *
+ * Examples:
+ * - "{{baseUrl}}" → ["baseUrl"]
+ * - "{{$randomEmail}}" → ["$randomEmail"]
+ * - "{{$randomInt 1 100}}" → ["$randomInt"] (extracts just the variable name, not args)
+ */
 export const extractVariableNameFromStringIfExists = (string: string) => {
   const regex = /{{([^}]+)}}/g;
   const matches = Array.from(string.matchAll(regex));
-  return matches.length > 0 ? matches.map((match) => match[1]) : null;
+  if (matches.length === 0) return null;
+
+  return matches.map((match) => {
+    const fullMatch = match[1]?.trim() ?? "";
+    // Extract just the variable name (first word) in case of arguments like "$randomInt 1 100"
+    const [variableName = ""] = fullMatch.split(" ");
+    return variableName;
+  });
 };
