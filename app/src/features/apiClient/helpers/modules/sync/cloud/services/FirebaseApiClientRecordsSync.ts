@@ -5,6 +5,7 @@ import {
   upsertApiRecord,
   batchCreateApiRecordsWithExistingId,
   batchUpsertApiRecords,
+  getExamplesForApiRecords,
   getRunConfig as getRunConfigFromFirebase,
   upsertRunConfig as upsertRunConfigFromFirebase,
   getRunResults as getRunResultsFromFirebase,
@@ -287,5 +288,27 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
   ): ResponsePromise<SavedRunResult> {
     const result = await addRunResultToFirebase(collectionId, runResult);
     return result;
+  }
+
+  async getAllExamples(
+    recordIds: string[]
+  ): Promise<{ success: boolean; data: { examples: RQAPI.ExampleApiRecord[] } }> {
+    const result = await getExamplesForApiRecords(this.getPrimaryId(), recordIds);
+
+    if (!result.success) {
+      return {
+        success: false,
+        data: {
+          examples: [],
+        },
+      };
+    }
+
+    return {
+      success: true,
+      data: {
+        examples: result.data,
+      },
+    };
   }
 }

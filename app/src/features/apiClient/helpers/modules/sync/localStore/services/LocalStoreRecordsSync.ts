@@ -20,10 +20,7 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
 
   constructor(meta: ApiClientLocalStoreMeta) {
     this.meta = meta;
-    this.queryService = new ApiClientLocalDbQueryService<RQAPI.ApiRecord | LocalStore.CollectionRecord>(
-      meta,
-      ApiClientLocalDbTable.APIS
-    );
+    this.queryService = new ApiClientLocalDbQueryService<RQAPI.ApiClientRecord>(meta, ApiClientLocalDbTable.APIS);
   }
 
   private getNewId() {
@@ -506,5 +503,17 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
         },
       };
     }
+  }
+
+  async getAllExamples(
+    recordIds: string[]
+  ): Promise<{ success: boolean; data: { examples: RQAPI.ExampleApiRecord[] } }> {
+    // TODO: Implement this, will be a dummy implementation for local store
+    return {
+      success: true,
+      data: {
+        examples: [],
+      },
+    };
   }
 }
