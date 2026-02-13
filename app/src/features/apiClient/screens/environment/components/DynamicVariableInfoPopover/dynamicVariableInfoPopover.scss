@@ -66,6 +66,8 @@
       max-height: 330px;
       scrollbar-width: none; /* Firefox */
       -ms-overflow-style: none; /* IE and Edge */
+      white-space: pre-wrap; /* Preserves newlines and wraps text */
+      word-wrap: break-word; /* Prevents long words from overflowing */
 
       &::-webkit-scrollbar {
         display: none; /* Chrome, Safari, Opera */
