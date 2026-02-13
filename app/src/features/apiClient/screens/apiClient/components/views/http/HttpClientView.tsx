@@ -70,6 +70,7 @@ import { ApiClientBottomSheet } from "../components/response/ApiClientBottomShee
 import HttpApiClientUrl from "./components/HttpClientUrl/HttpClientUrl";
 import HttpRequestTabs, { RequestTab } from "./components/HttpRequestTabs/HttpRequestTabs";
 import "./httpClientView.scss";
+import { apiRecordsRankingManager } from "features/apiClient/helpers/RankingManager";
 
 function getEntry(entity: BufferedHttpRecordEntity, store: ApiClientStore) {
   return entity.getEntityFromState(store.getState()).data;

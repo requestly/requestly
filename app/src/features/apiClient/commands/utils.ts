@@ -12,6 +12,7 @@ import { isEmpty } from "lodash";
 import { selectAllRecords as selectAllRecordsFromSlice, selectChildToParent } from "../slices/apiRecords/selectors";
 import { Workspace } from "features/workspaces/types";
 import { getApiClientFeatureContext, WorkspaceInfo } from "../slices";
+import { apiRecordsRankingManager } from "../helpers/RankingManager";
 
 export const NoopContextId = "__stub_context_id";
 
@@ -62,14 +63,9 @@ export function prepareRecordsToRender(records: RQAPI.ApiClientRecord[]) {
     if (recordA.type !== recordB.type) {
       return recordA.type === RQAPI.RecordType.COLLECTION ? -1 : 1;
     }
-
-    // If types are the same, sort lexicographically by name
-    if (recordA.name.toLowerCase() !== recordB.name.toLowerCase()) {
-      return recordA.name.toLowerCase() < recordB.name.toLowerCase() ? -1 : 1;
-    }
-
-    // If names are the same, sort by creation date
-    return recordA.createdTs - recordB.createdTs;
+    const rankA = apiRecordsRankingManager.getEffectiveRank(recordA);
+    const rankB = apiRecordsRankingManager.getEffectiveRank(recordB);
+    return apiRecordsRankingManager.compareFn(rankA, rankB);
   });
 
   return {

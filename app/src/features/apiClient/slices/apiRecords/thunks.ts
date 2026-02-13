@@ -18,6 +18,7 @@ import { getApiClientFeatureContext } from "../workspaceView/helpers/ApiClientCo
 import { Workspace } from "features/workspaces/types";
 import { erroredRecordsActions } from "../erroredRecords";
 import { closeTabByEntityId } from "componentsV2/Tabs/slice";
+import { apiRecordsRankingManager } from "features/apiClient/helpers/RankingManager";
 
 type Repository = ApiClientRecordsInterface<Record<string, unknown>>;
 
@@ -168,7 +169,7 @@ export const moveRecords = createAsyncThunk<
     { recordsToMove, collectionId, repository, sourceWorkspaceId, destinationWorkspaceId },
     { dispatch, rejectWithValue }
   ) => {
-    const updatedRecords = recordsToMove.map((record) => {
+    const updatedRecords = recordsToMove.map((record, index) => {
       return isApiCollection(record)
         ? { ...record, collectionId, data: omit(record.data, "children") }
         : { ...record, collectionId };
@@ -208,11 +209,12 @@ export const duplicateRecords = createAsyncThunk<
   { rejectValue: string; state: ApiClientStoreState }
 >("apiRecords/duplicate", async ({ recordIds, repository }, { dispatch, rejectWithValue, getState }) => {
   try {
+    const context = getApiClientFeatureContext();
     const apiClientRecords = selectAllRecords(getState());
     const recordsToRender = getRecordsToRender({ apiClientRecords });
     const childParentMap = selectChildToParent(getState());
     const processedRecords = filterOutChildrenRecords(recordIds, childParentMap, recordsToRender.recordsMap);
-    const recordsToDuplicate = processRecordsForDuplication(processedRecords, repository);
+    const recordsToDuplicate = processRecordsForDuplication(processedRecords, repository, context);
 
     const duplicatedRecords = await repository.duplicateApiEntities(recordsToDuplicate);
 
