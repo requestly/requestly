@@ -161,8 +161,6 @@ export class HttpRequestPreparationService {
     const workingEntry = cloneDeep(sanitizeEntry(entry));
 
     workingEntry.testResults = [];
-    workingEntry.request.url = queryParamsToURLString(workingEntry.request.queryParams, workingEntry.request.url);
-    workingEntry.request.queryParams = [];
 
     const { scopedVariables } = this.getVariables(recordId, {
       storeOverrideConfig: executionContext
