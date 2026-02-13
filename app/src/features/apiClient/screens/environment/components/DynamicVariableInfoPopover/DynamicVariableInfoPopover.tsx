@@ -21,7 +21,7 @@ export const DynamicVariableInfoPopover: React.FC<DynamicVariableInfoPopoverProp
 
   const displayName = variable.name;
   const exampleText = typeof variable.example === "string" ? variable.example : "undefined";
-  const contentText = typeof variable.description === "string" ? variable.description : "undefined";
+  const descriptionText = typeof variable.description === "string" ? variable.description : "undefined";
 
   return (
     <div className="dynamic-variable-popover">
@@ -32,12 +32,12 @@ export const DynamicVariableInfoPopover: React.FC<DynamicVariableInfoPopoverProp
             <span className="variable-name">{displayName}</span>
           </div>
         )}
-        {exampleText && <div className="header-text">{exampleText}</div>}
+        {descriptionText && <div className="header-text">{descriptionText}</div>}
       </div>
-      {contentText && (
+      {exampleText && (
         <div className="popover-body">
           <span className="example-title">Example:</span>
-          <div className="example-content">{contentText}</div>
+          <div className="example-content">{exampleText}</div>
         </div>
       )}
     </div>

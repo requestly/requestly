@@ -21,8 +21,14 @@ export function isDynamicVariable(variable: UnifiedVariable): variable is Dynami
 export function getAllVariables(scopedVariables?: ScopedVariables): UnifiedVariables {
   const unified: UnifiedVariables = {};
 
-  dynamicVariableResolver.listAll().forEach((v) => (unified[v.name] = v));
+  // Add scoped variables first so they appear before dynamic variables
   if (scopedVariables) Object.assign(unified, scopedVariables);
+  // Add dynamic variables that don't conflict with scoped ones
+  dynamicVariableResolver.listAll().forEach((v) => {
+    if (!unified[v.name]) {
+      unified[v.name] = v;
+    }
+  });
 
   return unified;
 }
