@@ -3,10 +3,10 @@ import { DynamicVariable } from "lib/dynamic-variables/types";
 import { VariableScope } from "backend/environment/types";
 import { ScopedVariable, ScopedVariables } from "./variable-resolver";
 
-export type UnifiedVariable = ScopedVariable | DynamicVariable;
-export type UnifiedVariables = Record<string, UnifiedVariable>;
+export type CompositeVariable = ScopedVariable | DynamicVariable;
+export type CompositeVariables = Record<string, CompositeVariable>;
 
-export function getVariable(key: string, scopedVariables?: ScopedVariables): UnifiedVariable | undefined {
+export function getVariable(key: string, scopedVariables?: ScopedVariables): CompositeVariable | undefined {
   return scopedVariables?.[key] || dynamicVariableResolver.getVariable(key);
 }
 
@@ -14,12 +14,12 @@ export function hasVariable(key: string, scopedVariables?: ScopedVariables): boo
   return !!scopedVariables?.[key] || dynamicVariableResolver.has(key);
 }
 
-export function isDynamicVariable(variable: UnifiedVariable): variable is DynamicVariable {
+export function checkIsDynamicVariable(variable: CompositeVariable): variable is DynamicVariable {
   return (variable as DynamicVariable).scope === VariableScope.DYNAMIC;
 }
 
-export function getAllVariables(scopedVariables?: ScopedVariables): UnifiedVariables {
-  const unified: UnifiedVariables = {};
+export function getAllVariables(scopedVariables?: ScopedVariables): CompositeVariables {
+  const unified: CompositeVariables = {};
 
   // Add scoped variables first so they appear before dynamic variables
   if (scopedVariables) Object.assign(unified, scopedVariables);
@@ -31,10 +31,4 @@ export function getAllVariables(scopedVariables?: ScopedVariables): UnifiedVaria
   });
 
   return unified;
-}
-
-export function getVariableDisplayValue(variable: UnifiedVariable): string {
-  if (isDynamicVariable(variable)) return variable.example;
-  const [varData] = variable;
-  return String(varData.localValue ?? varData.syncValue ?? "");
 }

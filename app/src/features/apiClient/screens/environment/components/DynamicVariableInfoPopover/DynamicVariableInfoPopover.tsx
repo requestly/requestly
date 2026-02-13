@@ -20,8 +20,8 @@ export const DynamicVariableInfoPopover: React.FC<DynamicVariableInfoPopoverProp
   if (!variable) return null;
 
   const displayName = variable.name;
-  const exampleText = typeof variable.example === "string" ? variable.example : "undefined";
-  const descriptionText = typeof variable.description === "string" ? variable.description : "undefined";
+  const exampleText = variable.example;
+  const descriptionText = variable.description;
 
   return (
     <div className="dynamic-variable-popover">

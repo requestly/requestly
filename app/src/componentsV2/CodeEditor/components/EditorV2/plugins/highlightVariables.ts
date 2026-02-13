@@ -1,6 +1,6 @@
 import { Decoration, DecorationSet, EditorView, ViewPlugin, ViewUpdate } from "@codemirror/view";
 import { ScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
-import { hasVariable } from "features/apiClient/helpers/variableResolver/unified-variable-resolver";
+import { hasVariable } from "features/apiClient/helpers/variableResolver/variableHelper";
 
 interface VariableSetters {
   handleSetVariable: (token: string | null) => void;

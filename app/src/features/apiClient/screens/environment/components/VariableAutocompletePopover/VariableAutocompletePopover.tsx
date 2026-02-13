@@ -3,10 +3,7 @@ import { List, Popover, Tooltip } from "antd";
 import { createPortal } from "react-dom";
 import { InfoCircleOutlined } from "@ant-design/icons";
 import { ScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
-import {
-  getAllVariables,
-  isDynamicVariable,
-} from "features/apiClient/helpers/variableResolver/unified-variable-resolver";
+import { getAllVariables, checkIsDynamicVariable } from "features/apiClient/helpers/variableResolver/variableHelper";
 import { getScopeIcon } from "componentsV2/CodeEditor/components/EditorV2/components/VariablePopOver/hooks/useScopeOptions";
 import { DynamicVariableInfoPopover } from "../DynamicVariableInfoPopover/DynamicVariableInfoPopover";
 import "./variableAutocompletePopover.scss";
@@ -20,7 +17,7 @@ interface VariableAutocompleteProps {
   variables: ScopedVariables | undefined;
   onSelect: (variableKey: string, isDynamic: boolean) => void;
   onClose: () => void;
-  editorRef: React.RefObject<HTMLDivElement | null>;
+  editorRef: React.RefObject<HTMLDivElement>;
 }
 
 export const VariableAutocompletePopover: React.FC<VariableAutocompleteProps> = ({
@@ -53,6 +50,7 @@ export const VariableAutocompletePopover: React.FC<VariableAutocompleteProps> = 
     (e: React.MouseEvent, variableName: string, isDynamic: boolean) => {
       e.preventDefault();
       e.stopPropagation();
+      console.log("Selected variable:", variableName, "Is dynamic:", isDynamic);
       onSelect(variableName, isDynamic);
     },
     [onSelect]
@@ -80,7 +78,7 @@ export const VariableAutocompletePopover: React.FC<VariableAutocompleteProps> = 
   }
 
   const renderListItem = (item: { name: string; variable: any }) => {
-    const isDynamic = isDynamicVariable(item.variable);
+    const isDynamic = checkIsDynamicVariable(item.variable);
     const variableName = item.name;
     const variableScope = isDynamic ? item.variable.scope : item.variable[1].scope; // For scoped variables, get scope from source
 

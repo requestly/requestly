@@ -29,7 +29,6 @@
         overflow: hidden;
         color: var(--requestly-color-text-subtle, #bbb);
         text-overflow: ellipsis;
-        font-family: var(--font-family-default, Inter);
         font-size: var(--font-size-xs, 11px);
         font-style: normal;
         font-weight: 400;
@@ -57,13 +56,11 @@
 
     .example-title {
       color: var(--requestly-color-text-placeholder, #8f8f8f);
-      font-family: var(--font-family-default, Inter);
       font-size: var(--font-size-xs, 11px);
     }
 
     .example-content {
       color: var(--requestly-color-text-subtle, #bbb);
-      font-family: var(--font-family-default, Inter);
       font-size: var(--font-size-xs, 11px);
       overflow: auto;
       max-height: 330px;
