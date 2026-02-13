@@ -12,6 +12,8 @@
     border: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
     background: var(--requestly-color-surface-1, #282828);
     box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.16);
+    overflow-y: auto;
+    overflow-x: hidden;
   }
 
   .ant-popover-arrow {

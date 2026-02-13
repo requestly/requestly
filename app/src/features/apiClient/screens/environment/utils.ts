@@ -1,7 +1,6 @@
 import { EnvironmentVariables } from "backend/environment/types";
 import { VariableRow } from "./components/VariablesList/VariablesList";
 import { GLOBAL_ENVIRONMENT_ID } from "features/apiClient/slices/common/constants";
-import { ScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
 
 export const isGlobalEnvironment = (environmentId: string) => {
   if (!environmentId) {
@@ -59,13 +58,4 @@ export const convertEnvironmentToMap = (variables: VariableRow[]) => {
     }
     return acc;
   }, {} as EnvironmentVariables);
-};
-
-export const parseVariables = (variables: ScopedVariables) => {
-  if (!variables) return [];
-  const flattened = Object.entries(variables).map(([label, arr]) => ({
-    label,
-    ...Object.assign({}, ...arr),
-  }));
-  return flattened;
 };

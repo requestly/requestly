@@ -36,7 +36,7 @@ export const VariableAutocompletePopover: React.FC<VariableAutocompleteProps> = 
     if (!variables) return [];
 
     // Use unified variable resolution to get all variables (scoped + dynamic)
-    // This automatically handles priority: scoped variables override dynamic ones with same name
+    // getAllVariables returns scoped variables first, then dynamic variables
     const allVariables = getAllVariables(variables);
     const lowerSearch = search.toLowerCase();
 
