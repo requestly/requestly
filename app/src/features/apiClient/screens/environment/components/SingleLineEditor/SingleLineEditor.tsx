@@ -8,11 +8,9 @@ import * as Sentry from "@sentry/react";
 import "./singleLineEditor.scss";
 import { SingleLineEditorProps } from "./types";
 import { Conditional } from "components/common/Conditional";
-import {
-  customKeyBinding,
-  highlightVariablesPlugin,
-  generateCompletionsForVariables,
-} from "componentsV2/CodeEditor/components/EditorV2/plugins";
+import { customKeyBinding, highlightVariablesPlugin } from "componentsV2/CodeEditor/components/EditorV2/plugins";
+import { VariableAutocompletePopover } from "../VariableAutocompletePopover/VariableAutocompletePopover";
+import { useVariableAutocomplete } from "../hooks/useVariableAutocomplete";
 
 export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
   className,
@@ -25,6 +23,14 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
 }) => {
   const editorRef = useRef<HTMLDivElement>(null);
   const editorViewRef = useRef<EditorView | null>(null);
+
+  const {
+    autocompleteState,
+    autocompleteExtension,
+    handleSelectVariable,
+    handleCloseAutocomplete,
+  } = useVariableAutocomplete(variables, { editorViewRef });
+
   /*
   onKeyDown, onBlur and onChange is in the useEffect dependencies (implicitly through the editor setup),
   which causes the editor to be recreated when onKeyDown changes
@@ -43,7 +49,7 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
     onChangeRef.current = onChange;
   }, [onBlur, onChange]);
 
-  const [hoveredVariable, setHoveredVariable] = useState<string | null>(null); // Track hovered variable
+  const [hoveredVariable, setHoveredVariable] = useState<string | null>(null);
   const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
   const [isPopoverPinned, setIsPopoverPinned] = useState(false);
 
@@ -96,9 +102,11 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
               onChangeRef.current?.(update.state.doc.toString());
             }
           }),
+          autocompleteExtension,
           EditorView.domEventHandlers({
             blur: (_, view) => {
               onBlurRef.current?.(view.state.doc.toString());
+              handleCloseAutocomplete();
             },
             keypress: (event, view) => {
               if (event.key === "Enter") {
@@ -113,7 +121,6 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
             },
             variables || emptyVariables
           ),
-          generateCompletionsForVariables(variables),
           cmPlaceHolder(placeholder ?? "Input here"),
         ].filter((ext): ext is NonNullable<typeof ext> => ext !== null),
       }),
@@ -158,21 +165,33 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
   }, []);
 
   return (
-    <div
-      ref={editorRef}
-      className={`${className ?? ""} editor-popup-container ant-input`}
-      onMouseLeave={handleMouseLeave}
-    >
-      <Conditional condition={!!hoveredVariable}>
-        <VariablePopover
-          editorRef={editorRef as React.RefObject<HTMLDivElement>}
-          hoveredVariable={hoveredVariable || ""}
-          popupPosition={popupPosition}
-          variables={variables || emptyVariables}
-          onClose={handleClosePopover}
-          onPinChange={setIsPopoverPinned}
-        />
-      </Conditional>
-    </div>
+    <>
+      <div
+        ref={editorRef}
+        className={`${className ?? ""} editor-popup-container ant-input`}
+        onMouseLeave={handleMouseLeave}
+      >
+        <Conditional condition={!!hoveredVariable}>
+          <VariablePopover
+            editorRef={editorRef as React.RefObject<HTMLDivElement>}
+            hoveredVariable={hoveredVariable || ""}
+            popupPosition={popupPosition}
+            variables={variables || emptyVariables}
+            onClose={handleClosePopover}
+            onPinChange={setIsPopoverPinned}
+          />
+        </Conditional>
+      </div>
+
+      <VariableAutocompletePopover
+        show={autocompleteState.show}
+        position={autocompleteState.position}
+        search={autocompleteState.filter}
+        variables={variables}
+        onSelect={handleSelectVariable}
+        onClose={handleCloseAutocomplete}
+        editorRef={editorRef}
+      />
+    </>
   );
 };
