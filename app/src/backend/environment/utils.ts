@@ -2,11 +2,11 @@ import { EnvironmentVariables } from "./types";
 import Logger from "lib/logger";
 import { isEmpty } from "lodash";
 import { getScopedVariables, Scope } from "features/apiClient/helpers/variableResolver/variable-resolver";
-import { EnvironmentVariableData, VariableData } from "features/apiClient/store/variables/types";
+import { EnvironmentVariableData, VariableData } from "@requestly/shared/types/entities/apiClient";
 import { ApiClientFeatureContext } from "features/apiClient/slices";
 import { reduxStore } from "store";
 import { DepGraph } from "dependency-graph";
-import { dynamicVariableResolver } from "lib/dynamic-variables";
+import { variableResolver } from "lib/dynamic-variables";
 
 type Variables = Record<string, string | number | boolean>;
 interface RenderResult<T> {
@@ -106,7 +106,7 @@ const processObject = <T extends Record<string, any>>(input: T, variables: Varia
 const processTemplateString = <T extends string>(input: T, variables: Variables): RenderResult<T> => {
   try {
     const { wrappedTemplate, usedVariables } = collectAndEscapeVariablesFromTemplate(input, variables);
-    const renderedTemplate = dynamicVariableResolver.resolve(wrappedTemplate, variables) as T; // since handlebars generic types resolve to any; not string
+    const renderedTemplate = variableResolver.resolve(wrappedTemplate, variables) as T; // since handlebars generic types resolve to any; not string
 
     return {
       renderedTemplate,
@@ -133,7 +133,7 @@ const escapeMatchFromHandlebars = (match: string) => {
 const isDynamicVariable = (varName: string): boolean => {
   if (!varName) return false;
   const [variableNameOnly = ""] = varName.split(" ");
-  return dynamicVariableResolver.has(variableNameOnly);
+  return variableResolver.has(variableNameOnly);
 };
 
 const collectAndEscapeVariablesFromTemplate = (
@@ -152,8 +152,14 @@ const collectAndEscapeVariablesFromTemplate = (
       usedVariables[varName] = variables[varName];
     }
 
-    // Escape if: empty match, or not a user variable AND not a dynamic variable
-    if (isMatchEmpty || (!isUserVariable && !isDynamic)) {
+    // Escape if: empty match
+    if (isMatchEmpty) {
+      return escapeMatchFromHandlebars(completeMatch);
+    }
+
+    // Or escape if not a user variable AND not a dynamic variable
+    const shouldEscape = !isUserVariable && !isDynamic;
+    if (shouldEscape) {
       return escapeMatchFromHandlebars(completeMatch);
     }
 
@@ -228,7 +234,7 @@ const resolveCompositeVariables = (variables: Variables): Variables => {
       delete resolutionContext[varName];
 
       const { wrappedTemplate } = collectAndEscapeVariablesFromTemplate(value, resolutionContext);
-      const renderedValue = dynamicVariableResolver.resolve(wrappedTemplate, resolutionContext);
+      const renderedValue = variableResolver.resolve(wrappedTemplate, resolutionContext);
       resolved[varName] = renderedValue;
     } catch (e) {
       // Keep the original value if rendering fails
