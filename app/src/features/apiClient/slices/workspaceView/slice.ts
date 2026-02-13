@@ -141,10 +141,9 @@ export const workspaceViewSlice = createSlice({
           return;
         }
 
-        throw new NativeError(action.error.message as string)
-          .setShowBoundary(true)
-          .setSeverity(ErrorSeverity.FATAL)
-          .set("stack", action.error.stack);
+        const switchErr = new Error(action.error.message as string);
+        switchErr.stack = action.error.stack;
+        throw NativeError.fromError(switchErr).setShowBoundary(true).setSeverity(ErrorSeverity.FATAL);
       })
       .addCase(setupWorkspaceView.pending, (state) => {
         state.isSetupDone = false;
@@ -154,10 +153,9 @@ export const workspaceViewSlice = createSlice({
           return;
         }
 
-        throw new NativeError(action.error.message as string)
-          .setShowBoundary(true)
-          .setSeverity(ErrorSeverity.FATAL)
-          .set("stack", action.error.stack);
+        const setupErr = new Error(action.error.message as string);
+        setupErr.stack = action.error.stack;
+        throw NativeError.fromError(setupErr).setShowBoundary(true).setSeverity(ErrorSeverity.FATAL);
       })
       .addCase(setupWorkspaceView.fulfilled, (state) => {
         state.isSetupDone = true;
