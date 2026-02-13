@@ -186,7 +186,7 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
       <VariableAutocompletePopover
         show={autocompleteState.show}
         position={autocompleteState.position}
-        filter={autocompleteState.filter}
+        search={autocompleteState.filter}
         variables={variables}
         onSelect={handleSelectVariable}
         onClose={handleCloseAutocomplete}

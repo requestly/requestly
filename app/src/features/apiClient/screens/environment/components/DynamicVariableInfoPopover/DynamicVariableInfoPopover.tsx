@@ -2,18 +2,10 @@ import React from "react";
 import { getScopeIcon } from "componentsV2/CodeEditor/components/EditorV2/components/VariablePopOver/hooks/useScopeOptions";
 import { VariableScope } from "backend/environment/types";
 import "./dynamicVariableInfoPopover.scss";
-
-export interface DynamicVariableInfoTypes {
-  key?: string;
-  label?: string;
-  scope?: VariableScope | string;
-  header?: string | unknown;
-  content?: string | unknown;
-  [key: string]: any; // Allow additional properties for flexibility
-}
+import { DynamicVariable } from "lib/dynamic-variables/types";
 
 interface DynamicVariableInfoPopoverProps {
-  variable: DynamicVariableInfoTypes;
+  variable: DynamicVariable;
   showIconHeader?: boolean; // Optional prop to control header display with icon
 }
 
@@ -27,27 +19,25 @@ export const DynamicVariableInfoPopover: React.FC<DynamicVariableInfoPopoverProp
 }) => {
   if (!variable) return null;
 
-  const displayName = variable.key || variable.label;
-  const headerText = typeof variable.header === "string" ? variable.header : "undefined";
-  const contentText = typeof variable.content === "string" ? variable.content : "undefined";
+  const displayName = variable.name;
+  const exampleText = typeof variable.example === "string" ? variable.example : "undefined";
+  const descriptionText = typeof variable.description === "string" ? variable.description : "undefined";
 
   return (
     <div className="dynamic-variable-popover">
       <div className="popover-header">
-        {variable.scope && displayName && showIconHeader && (
+        {displayName && showIconHeader && (
           <div className="header-with-icon">
-            <span className="main-header">
-              {getScopeIcon(variable.scope as VariableScope, true, variable.scope as VariableScope)}
-            </span>
+            <span className="main-header">{getScopeIcon(VariableScope.DYNAMIC, true, "DYNAMIC")}</span>
             <span className="variable-name">{displayName}</span>
           </div>
         )}
-        {headerText && <div className="header-text">{headerText}</div>}
+        {descriptionText && <div className="header-text">{descriptionText}</div>}
       </div>
-      {contentText && (
+      {exampleText && (
         <div className="popover-body">
           <span className="example-title">Example:</span>
-          <div className="example-content">{contentText}</div>
+          <div className="example-content">{exampleText}</div>
         </div>
       )}
     </div>
