@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo } from "react";
+import React, { useCallback, useMemo } from "react";
 import { List, Popover, Tooltip } from "antd";
 import { createPortal } from "react-dom";
 import { InfoCircleOutlined } from "@ant-design/icons";
@@ -16,8 +16,6 @@ interface VariableAutocompleteProps {
   search: string;
   variables: ScopedVariables | undefined;
   onSelect: (variableKey: string, isDynamic: boolean) => void;
-  onClose: () => void;
-  editorRef: React.RefObject<HTMLDivElement>;
 }
 
 export const VariableAutocompletePopover: React.FC<VariableAutocompleteProps> = ({
@@ -26,8 +24,6 @@ export const VariableAutocompletePopover: React.FC<VariableAutocompleteProps> = 
   search,
   variables,
   onSelect,
-  onClose,
-  editorRef,
 }) => {
   const filteredVariables = useMemo(() => {
     if (!variables) return [];
@@ -54,23 +50,6 @@ export const VariableAutocompletePopover: React.FC<VariableAutocompleteProps> = 
     },
     [onSelect]
   );
-
-  useEffect(() => {
-    if (!show) return;
-
-    const handleClickOutside = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      const isInsidePopup = target.closest(".variable-autocomplete-popup");
-      const isInsideEditor = editorRef?.current?.contains(target);
-
-      if (!isInsidePopup && !isInsideEditor) {
-        onClose();
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [show, onClose, editorRef]);
 
   if (!show || filteredVariables.length === 0) {
     return null;
