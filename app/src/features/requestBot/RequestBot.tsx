@@ -1,6 +1,5 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
-import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { m } from "framer-motion";
 import { IoMdClose } from "@react-icons/all-files/io/IoMdClose";
 import { trackGetHumanSupportClicked } from "./analytics";
@@ -8,6 +7,7 @@ import { RequestBotModel } from "./types";
 import { MODELS } from "./constants";
 import { AIConsentModal } from "features/ai";
 import { getIsOptedforAIFeatures } from "store/slices/global/user/selectors";
+import { reduxStore } from "store";
 import "./requestBot.css";
 
 interface RequestBotProps {
@@ -18,47 +18,28 @@ interface RequestBotProps {
 
 export const RequestBot: React.FC<RequestBotProps> = ({ isOpen, onClose, modelType = "app" }) => {
   const isOptedforAIFeatures = useSelector(getIsOptedforAIFeatures);
-  const [isAIConsentModalOpen, setIsAIConsentModalOpen] = useState(false);
-  const [shouldShowBot, setShouldShowBot] = useState(false);
   const [userHasConsented, setUserHasConsented] = useState(false);
-  const consentEnabledRef = useRef(false);
 
   useEffect(() => {
-    if (isAIConsentModalOpen) {
-      consentEnabledRef.current = false;
-    }
-  }, [isAIConsentModalOpen]);
-
-  useEffect(() => {
-    if (isOpen) {
-      if (!isOptedforAIFeatures && !userHasConsented) {
-        setIsAIConsentModalOpen(true);
-        setShouldShowBot(false);
-      } else {
-        setShouldShowBot(true);
-        setIsAIConsentModalOpen(false);
-      }
-    } else {
-      setShouldShowBot(false);
-      setIsAIConsentModalOpen(false);
+    if (!isOpen) {
       setUserHasConsented(false);
     }
-  }, [isOpen, isOptedforAIFeatures, userHasConsented]);
+  }, [isOpen]);
+
+  const showConsentModal = isOpen && !isOptedforAIFeatures && !userHasConsented;
+  const shouldShowBot = isOpen && (isOptedforAIFeatures || userHasConsented);
 
   const handleAIConsentEnable = () => {
-    consentEnabledRef.current = true;
     setUserHasConsented(true);
-    setShouldShowBot(true);
-    setIsAIConsentModalOpen(false);
   };
 
   const handleAIConsentDismiss = () => {
-    setIsAIConsentModalOpen(false);
-    setTimeout(() => {
-      if (!consentEnabledRef.current) {
-        onClose();
-      }
-    }, 0);
+    const state = reduxStore.getState();
+    const isOpted = getIsOptedforAIFeatures(state);
+
+    if (!isOpted) {
+      onClose();
+    }
   };
 
   return (
@@ -84,7 +65,7 @@ export const RequestBot: React.FC<RequestBotProps> = ({ isOpen, onClose, modelTy
         </div>
       </m.div>
       <AIConsentModal
-        isOpen={isAIConsentModalOpen}
+        isOpen={showConsentModal}
         toggle={handleAIConsentDismiss}
         onEnableCallback={handleAIConsentEnable}
       />
