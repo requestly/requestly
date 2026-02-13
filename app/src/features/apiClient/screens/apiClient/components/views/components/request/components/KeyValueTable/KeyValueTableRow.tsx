@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import { Checkbox, Form, FormInstance } from "antd";
-import { KeyValueDataType, KeyValuePair } from "features/apiClient/types";
+import { KeyValueDataType, KeyValueFormType, KeyValuePair } from "features/apiClient/types";
 import SingleLineEditor from "features/apiClient/screens/environment/components/SingleLineEditor";
 import InfoIcon from "components/misc/InfoIcon";
 import { Conditional } from "components/common/Conditional";
@@ -9,6 +9,7 @@ import { ScopedVariables } from "features/apiClient/helpers/variableResolver/var
 import KeyValueDescriptionCell from "./KeyValueTableDescriptionCell";
 import { KeyValueTypeCell, ValidationWarning } from "./KeyValueTableTypeCell";
 import { captureException } from "@sentry/react";
+import HEADER_SUGGESTIONS from "config/constants/sub/header-suggestions";
 
 const EditableContext = React.createContext<FormInstance<any> | null>(null);
 
@@ -36,6 +37,7 @@ interface EditableCellProps {
   handleUpdatePair: (record: KeyValuePair) => void;
   checkInvalidCharacter: boolean;
   error?: string | null;
+  tableType?: string;
 }
 
 export const KeyValueTableEditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> = ({
@@ -48,6 +50,7 @@ export const KeyValueTableEditableCell: React.FC<React.PropsWithChildren<Editabl
   handleUpdatePair,
   checkInvalidCharacter,
   error,
+  tableType,
   ...restProps
 }) => {
   const form = useContext(EditableContext);
@@ -125,6 +128,9 @@ export const KeyValueTableEditableCell: React.FC<React.PropsWithChildren<Editabl
                 save();
               }}
               variables={variables}
+              suggestions={
+                tableType === KeyValueFormType.HEADERS && dataIndex === "key" ? HEADER_SUGGESTIONS.Request : undefined
+              }
             />
 
             <Conditional

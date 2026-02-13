@@ -170,6 +170,7 @@ export const KeyValueTable: React.FC<React.PropsWithChildren<KeyValueTableProps>
           variables,
           checkInvalidCharacter,
           handleUpdatePair,
+          tableType,
         }),
       },
       {

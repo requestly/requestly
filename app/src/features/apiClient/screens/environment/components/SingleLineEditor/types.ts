@@ -9,4 +9,5 @@ export interface SingleLineEditorProps {
   onBlur?: (text: string) => void;
   onPaste?: (event: ClipboardEvent, text: string) => void;
   variables?: ScopedVariables;
+  suggestions?: Array<{ value: string }>;
 }

@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useState, useCallback, useMemo } from "react"
 import { EditorView, placeholder as cmPlaceHolder, keymap } from "@codemirror/view";
 import { EditorState } from "@codemirror/state";
 import { history, historyKeymap } from "@codemirror/commands";
+import { startCompletion } from "@codemirror/autocomplete";
 import { VariablePopover } from "componentsV2/CodeEditor/components/EditorV2/components/VariablePopOver";
 import "componentsV2/CodeEditor/components/EditorV2/components/VariablePopOver/variable-popover.scss";
 import * as Sentry from "@sentry/react";
@@ -23,6 +24,7 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
   onBlur,
   onPaste,
   variables,
+  suggestions,
 }) => {
   const editorRef = useRef<HTMLDivElement>(null);
   const editorViewRef = useRef<EditorView | null>(null);
@@ -46,7 +48,7 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
     onPasteRef.current = onPaste;
   }, [onBlur, onChange, onPaste]);
 
-  const [hoveredVariable, setHoveredVariable] = useState<string | null>(null); // Track hovered variable
+  const [hoveredVariable, setHoveredVariable] = useState<string | null>(null);
   const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
   const [isPopoverPinned, setIsPopoverPinned] = useState(false);
 
@@ -103,6 +105,11 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
             blur: (_, view) => {
               onBlurRef.current?.(view.state.doc.toString());
             },
+            focus: (_, view) => {
+              if (suggestions?.length) {
+                setTimeout(() => startCompletion(view), 0);
+              }
+            },
             keypress: (event, view) => {
               if (event.key === "Enter") {
                 onPressEnter?.(event, view.state.doc.toString());
@@ -138,7 +145,7 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
             },
             variables || emptyVariables
           ),
-          generateCompletionsForVariables(variables),
+          generateCompletionsForVariables(variables, suggestions),
           cmPlaceHolder(placeholder ?? "Input here"),
         ].filter((ext): ext is NonNullable<typeof ext> => ext !== null),
       }),
@@ -151,7 +158,7 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
     //Need to disable to implement the onChange handler
     // Shouldn't be recreated every render
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [placeholder, variables, handleSetVariable]);
+  }, [placeholder, variables, handleSetVariable, suggestions]);
 
   useEffect(() => {
     if (defaultValue !== previousDefaultValueRef.current) {
