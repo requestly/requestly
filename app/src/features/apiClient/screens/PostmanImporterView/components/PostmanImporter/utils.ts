@@ -86,11 +86,58 @@ const processScripts = (item: any) => {
     postResponse: "",
   };
 
+  /**
+   * Converts a dynamic variable placeholder to rq method call.
+   * {{$uuid}} → ${rq.$uuid()}
+   * {{$randomInt 1 100}} → ${rq.$randomInt(1, 100)}
+   */
+  const convertDynamicVariable = (varName: string, args?: string): string => {
+    if (args && args.trim()) {
+      const formattedArgs = args
+        .trim()
+        .split(/\s+/)
+        .map((arg: string) => (isNaN(Number(arg)) ? `"${arg}"` : arg))
+        .join(", ");
+      return `\${rq.${varName}(${formattedArgs})}`;
+    }
+    return `\${rq.${varName}()}`;
+  };
+
+  /**
+   * Migrates Postman scripts to Requestly format.
+   * - Converts pm.variables.replaceIn('...{{$var}}...') to template literals with rq.$var()
+   * - Replaces pm. with rq. for other methods
+   *
+   * Examples:
+   * - pm.variables.replaceIn('{{$uuid}}') → `${rq.$uuid()}`
+   * - pm.variables.replaceIn('{"id": "{{$uuid}}", "time": {{$timestamp}}}')
+   *   → `{"id": "${rq.$uuid()}", "time": ${rq.$timestamp()}}`
+   */
   const migratePostmanScripts = (postmanScript: string) => {
     if (!postmanScript) {
       return "";
     }
-    return postmanScript.replace(/pm\./g, "rq."); // Replace all occurrences of 'pm.' with 'rq.'
+
+    let script = postmanScript;
+
+    // Replace pm.variables.replaceIn('template with {{$vars}}')
+    // Convert to template literal with rq.$var() calls
+    script = script.replace(
+      /pm\.variables\.replaceIn\s*\(\s*(['"`])([\s\S]*?)\1\s*\)/g,
+      (_, quote, templateContent) => {
+        // Replace all {{$varName}} or {{$varName args}} in the template
+        const converted = templateContent.replace(
+          /{{(\$\w+)(?:\s+([^}]*))?}}/g,
+          (_: string, varName: string, args?: string) => convertDynamicVariable(varName, args)
+        );
+        return "`" + converted + "`";
+      }
+    );
+
+    // General pm. → rq. replacement (for other methods)
+    script = script.replace(/pm\./g, "rq.");
+
+    return script;
   };
 
   if (!item.event?.length) {
