@@ -2,7 +2,7 @@ import { EnvironmentVariables } from "./types";
 import Logger from "lib/logger";
 import { isEmpty } from "lodash";
 import { getScopedVariables, Scope } from "features/apiClient/helpers/variableResolver/variable-resolver";
-import { EnvironmentVariableData, VariableData } from "features/apiClient/store/variables/types";
+import { EnvironmentVariableData, VariableData } from "@requestly/shared/types/entities/apiClient";
 import { ApiClientFeatureContext } from "features/apiClient/slices";
 import { reduxStore } from "store";
 import { DepGraph } from "dependency-graph";
