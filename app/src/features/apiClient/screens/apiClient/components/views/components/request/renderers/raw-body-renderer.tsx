@@ -60,6 +60,7 @@ export function RawBody(props: {
           disableDefaultAutoCompletions={true}
           customTheme={autocompleteExtension}
           onEditorReady={handleEditorReady}
+          onBlur={handleCloseAutocomplete}
         />
       </div>
 
@@ -69,8 +70,6 @@ export function RawBody(props: {
         search={autocompleteState.filter}
         variables={scopedVariables}
         onSelect={handleSelectVariable}
-        onClose={handleCloseAutocomplete}
-        editorRef={editorContainerRef}
       />
     </>
   );

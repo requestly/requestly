@@ -189,8 +189,6 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
         search={autocompleteState.filter}
         variables={variables}
         onSelect={handleSelectVariable}
-        onClose={handleCloseAutocomplete}
-        editorRef={editorRef}
       />
     </>
   );
