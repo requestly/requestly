@@ -120,15 +120,15 @@ export const useCreateWorkspace = ({
       }
     },
     [
-      WorkspaceType,
-      dispatch,
+      activeWorkspace.id,
+      navigate,
+      switchContext,
       user?.details?.isSyncEnabled,
       isSharedWorkspaceMode,
       appMode,
-      analyticEventSource,
-      switchContext,
       userId,
-      navigate,
+      dispatch,
+      analyticEventSource,
     ]
   );
 
