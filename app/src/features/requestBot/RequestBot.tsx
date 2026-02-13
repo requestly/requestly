@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { m } from "framer-motion";
 import { IoMdClose } from "@react-icons/all-files/io/IoMdClose";
@@ -18,12 +18,10 @@ interface RequestBotProps {
 export const RequestBot: React.FC<RequestBotProps> = ({ isOpen, onClose, modelType = "app" }) => {
   const isOptedforAIFeatures = useSelector(getIsOptedforAIFeatures);
   const [userHasConsented, setUserHasConsented] = useState(false);
-  const userHasConsentedRef = useRef(false);
 
   useEffect(() => {
     if (!isOpen) {
       setUserHasConsented(false);
-      userHasConsentedRef.current = false;
     }
   }, [isOpen]);
 
@@ -32,7 +30,6 @@ export const RequestBot: React.FC<RequestBotProps> = ({ isOpen, onClose, modelTy
 
   const handleAIConsentEnable = () => {
     setUserHasConsented(true);
-    userHasConsentedRef.current = true;
   };
 
   const handleAIConsentDismiss = () => {
