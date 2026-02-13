@@ -1,9 +1,9 @@
 import { ErrorCode, ErrorSeverity } from "./types";
 
-export class NativeError<T extends Record<string, any> = Record<string, any>> extends Error {
+export class NativeError extends Error {
   public errorCode: ErrorCode = ErrorCode.UNKNOWN;
   public severity: ErrorSeverity = ErrorSeverity.ERROR;
-  private _context: Partial<T> = {};
+  private _context: Record<string, any> = {};
   public showBoundary: boolean = false;
 
   constructor(message: string) {
@@ -12,7 +12,7 @@ export class NativeError<T extends Record<string, any> = Record<string, any>> ex
     this.name = this.constructor.name;
   }
 
-  addContext(ctx: Partial<T>) {
+  addContext(ctx: Record<string, any>) {
     this._context = Object.assign(this._context, ctx);
     return this;
   }
