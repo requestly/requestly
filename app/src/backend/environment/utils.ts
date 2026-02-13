@@ -152,8 +152,14 @@ const collectAndEscapeVariablesFromTemplate = (
       usedVariables[varName] = variables[varName];
     }
 
-    // Escape if: empty match, or not a user variable AND not a dynamic variable
-    if (isMatchEmpty || (!isUserVariable && !isDynamic)) {
+    // Escape if: empty match
+    if (isMatchEmpty) {
+      return escapeMatchFromHandlebars(completeMatch);
+    }
+
+    // Or escape if not a user variable AND not a dynamic variable
+    const shouldEscape = !isUserVariable && !isDynamic;
+    if (shouldEscape) {
       return escapeMatchFromHandlebars(completeMatch);
     }
 
