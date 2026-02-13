@@ -50,7 +50,6 @@ export const VariableAutocompletePopover: React.FC<VariableAutocompleteProps> = 
     (e: React.MouseEvent, variableName: string, isDynamic: boolean) => {
       e.preventDefault();
       e.stopPropagation();
-      console.log("Selected variable:", variableName, "Is dynamic:", isDynamic);
       onSelect(variableName, isDynamic);
     },
     [onSelect]
