@@ -18,7 +18,7 @@ interface VariableAutocompleteProps {
   position: { x: number; y: number };
   search: string;
   variables: ScopedVariables | undefined;
-  onSelect: (variableKey: string) => void;
+  onSelect: (variableKey: string, isDynamic: boolean) => void;
   onClose: () => void;
   editorRef: React.RefObject<HTMLDivElement | null>;
 }
@@ -50,10 +50,10 @@ export const VariableAutocompletePopover: React.FC<VariableAutocompleteProps> = 
   }, [variables, search]);
 
   const handleSelect = useCallback(
-    (e: React.MouseEvent, variableName: string) => {
+    (e: React.MouseEvent, variableName: string, isDynamic: boolean) => {
       e.preventDefault();
       e.stopPropagation();
-      onSelect(variableName);
+      onSelect(variableName, isDynamic);
     },
     [onSelect]
   );
@@ -87,7 +87,7 @@ export const VariableAutocompletePopover: React.FC<VariableAutocompleteProps> = 
     return (
       <List.Item
         className="variable-autocomplete-item"
-        onMouseDown={(e) => handleSelect(e, variableName)}
+        onMouseDown={(e) => handleSelect(e, variableName, isDynamic)}
         style={{ cursor: "pointer" }}
       >
         <div className="item-left-section">

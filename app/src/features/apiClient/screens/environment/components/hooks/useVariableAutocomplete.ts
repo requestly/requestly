@@ -71,13 +71,15 @@ export const useVariableAutocomplete = (variables?: ScopedVariables, options?: U
   );
 
   const handleSelectVariable = useCallback(
-    (variableKey: string) => {
+    (variableKey: string, isDynamic: boolean = false) => {
       if (!editorViewRef.current) return;
       const view = editorViewRef.current;
       const closingChars = getClosingBraces(view, autocompleteState.to);
+      // Add $ prefix for dynamic variables if not already present
+      const variableToInsert = isDynamic && !variableKey.startsWith("$") ? `$${variableKey}` : variableKey;
       view.dispatch({
-        changes: { from: autocompleteState.from, to: autocompleteState.to, insert: variableKey + closingChars },
-        selection: { anchor: autocompleteState.from + variableKey.length + closingChars.length },
+        changes: { from: autocompleteState.from, to: autocompleteState.to, insert: variableToInsert + closingChars },
+        selection: { anchor: autocompleteState.from + variableToInsert.length + closingChars.length },
       });
       setAutocompleteState((prev) => ({ ...prev, show: false }));
       view.focus();
