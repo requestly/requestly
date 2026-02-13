@@ -66,7 +66,7 @@ export function RawBody(props: {
       <VariableAutocompletePopover
         show={autocompleteState.show}
         position={autocompleteState.position}
-        filter={autocompleteState.filter}
+        search={autocompleteState.filter}
         variables={scopedVariables}
         onSelect={handleSelectVariable}
         onClose={handleCloseAutocomplete}

@@ -71,6 +71,7 @@ export const getScopeIcon = (
         text
       );
     case VariableScope.GLOBAL:
+    case VariableScope.DYNAMIC:
       return createIconWithWrapper(
         BsGlobeCentralSouthAsia,
         "var(--requestly-color-success-text)",

@@ -1,8 +1,7 @@
 .dynamic-variable-popover {
   width: 100%;
   padding: var(--space-4, 8px) var(--space-5, 12px);
-  max-width: 280px;
-  max-height: 400px;
+  width: 280px;
 
   .popover-header {
     color: var(--requestly-color-text-default, #fff);
