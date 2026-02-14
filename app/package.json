@@ -55,6 +55,7 @@
     "@ant-design/icons": "^4.7.0",
     "@ant-design/pro-card": "^1.20.6",
     "@ant-design/pro-table": "^2.75.1",
+    "@babel/parser": "^7.26.0",
     "@codemirror/autocomplete": "^6.18.1",
     "@codemirror/lang-css": "^6.2.1",
     "@codemirror/lang-html": "^6.4.9",
@@ -68,6 +69,7 @@
     "@devtools-ds/object-inspector": "^1.2.1",
     "@devtools-ds/table": "^1.1.2",
     "@devtools-ds/themes": "^1.2.1",
+    "@faker-js/faker": "^10.3.0",
     "@graphiql/plugin-explorer": "^5.1.1",
     "@growthbook/growthbook-react": "^1.3.1",
     "@react-icons/all-files": "https://github.com/react-icons/react-icons/releases/download/v5.4.0/react-icons-all-files-5.4.0.tgz",
@@ -170,8 +172,7 @@
     "vscode-languageserver-types": "^3.17.5",
     "xml2js": "^0.6.2",
     "zod": "^4.1.13",
-    "zustand": "^5.0.3",
-    "@babel/parser": "^7.26.0"
+    "zustand": "^5.0.3"
   },
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
