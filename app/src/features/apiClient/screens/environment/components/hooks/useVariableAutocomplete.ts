@@ -98,6 +98,18 @@ export const useVariableAutocomplete = (variables?: ScopedVariables, options?: U
         const match = beforeCursor.match(/\{\{([^}]*)$/);
 
         if (match) {
+          // If the cursor is inside an already-closed variable (e.g., {{var}}),
+          // do not show autocomplete to avoid overlapping popovers.
+          const afterCursor = doc.slice(cursorPos);
+          const nextClose = afterCursor.indexOf("}}");
+          const nextOpen = afterCursor.indexOf("{{");
+          const isInsideCompletedVariable = nextClose !== -1 && (nextOpen === -1 || nextClose < nextOpen);
+
+          if (isInsideCompletedVariable) {
+            if (autocompleteState.show) setAutocompleteState((prev) => ({ ...prev, show: false }));
+            return;
+          }
+
           // Pattern found - show autocomplete popup
 
           // Get screen coordinates at cursor position for popup placement
