@@ -18,17 +18,18 @@ export function checkIsDynamicVariable(variable: CompositeVariable): variable is
   return (variable as DynamicVariable).scope === VariableScope.DYNAMIC;
 }
 
-export function getAllVariables(scopedVariables?: ScopedVariables): CompositeVariables {
+export function getAllVariables(scopedVariables?: ScopedVariables, includeDynamicVariables = true): CompositeVariables {
   const unified: CompositeVariables = {};
 
   // Add scoped variables first so they appear before dynamic variables
   if (scopedVariables) Object.assign(unified, scopedVariables);
   // Add dynamic variables that don't conflict with scoped ones
-  dynamicVariableResolver.listAll().forEach((v) => {
-    if (!unified[v.name]) {
-      unified[v.name] = v;
-    }
-  });
-
+  if (includeDynamicVariables) {
+    dynamicVariableResolver.listAll().forEach((v) => {
+      if (!unified[v.name]) {
+        unified[v.name] = v;
+      }
+    });
+  }
   return unified;
 }

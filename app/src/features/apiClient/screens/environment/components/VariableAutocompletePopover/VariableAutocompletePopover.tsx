@@ -30,8 +30,10 @@ export const VariableAutocompletePopover: React.FC<VariableAutocompleteProps> = 
 
     // Use unified variable resolution to get all variables (scoped + dynamic)
     // getAllVariables returns scoped variables first, then dynamic variables
-    const allVariables = getAllVariables(variables);
+
     const lowerSearch = search.toLowerCase();
+    const hasDynamicPrefix = lowerSearch.startsWith("$");
+    const allVariables = getAllVariables(variables, hasDynamicPrefix);
 
     // Convert to array and filter by search
     return Object.entries(allVariables)
