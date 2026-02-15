@@ -607,24 +607,6 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
             >
               Send
             </RQButton>
-
-            {/* <Conditional condition={!openInModal}>
-              <RBACButton
-                disabled={
-                  !hasUnsavedChanges || (appMode === "EXTENSION" && contentType === RequestContentType.MULTIPART_FORM)
-                }
-                permission="create"
-                resource="api_client_request"
-                showHotKeyText
-                hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SAVE_REQUEST!.hotKey}
-                onClick={onSaveButtonClick}
-                loading={isRequestSaving}
-                tooltipTitle="Saving is not allowed in view-only mode. You can update and view changes but cannot save them."
-                enableHotKey={enableHotkey}
-              >
-                Save
-              </RBACButton>
-            </Conditional> */}
             <SaveRequestButton
               hidden={openInModal}
               disabled={
@@ -633,6 +615,7 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
               loading={isRequestSaving}
               enableHotkey={enableHotkey}
               onClick={onSaveButtonClick}
+              entity={entity}
             />
           </div>
         </div>

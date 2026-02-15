@@ -7,12 +7,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { useGraphQLIntrospection } from "features/apiClient/hooks/useGraphQLIntrospection";
 import { useGraphQLRecordStore } from "features/apiClient/hooks/useGraphQLRecordStore";
 import { useDebounce } from "hooks/useDebounce";
-import { RBACButton, RevertViewModeChangesAlert, RoleBasedComponent } from "features/rbac";
+import { RevertViewModeChangesAlert, RoleBasedComponent } from "features/rbac";
 import { Conditional } from "components/common/Conditional";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { notification, Space } from "antd";
 import { ApiClientBreadCrumb, BreadcrumbType } from "../components/ApiClientBreadCrumb/ApiClientBreadCrumb";
-import { KEYBOARD_SHORTCUTS } from "../../../../../../../constants/keyboardShortcuts";
 import { BottomSheetLayout, useBottomSheetContext } from "componentsV2/BottomSheet";
 import { BottomSheetPlacement, SheetLayout } from "componentsV2/BottomSheet/types";
 import { GraphQLRequestTabs } from "./components/GraphQLRequestTabs/GraphQLRequestTabs";
@@ -64,6 +63,7 @@ import { useHostContext } from "hooks/useHostContext";
 import { sanitizeKeyValuePairs } from "../../../utils";
 import { GraphQLRecordProvider } from "features/apiClient/store/apiRecord/graphqlRecord/GraphQLRecordContextProvider";
 import { GenericApiClientOverride } from "../../../clientView/GenericApiClient";
+import { SaveRequestButton } from "../components/SaveRequestButton/SaveRequestButton";
 
 function getEntry(entity: BufferedGraphQLRecordEntity, store: ApiClientStore) {
   return entity.getEntityFromState(store.getState()).data;
@@ -477,21 +477,14 @@ const GraphQLClientView: React.FC<GraphQLClientViewProps> = ({
             </Space.Compact>
             <SendQueryButton entity={entity} disabled={!url} loading={isSending} onSendClick={handleSend} />
 
-            <Conditional condition={!openInModal}>
-              <RBACButton
-                disabled={!hasUnsavedChanges}
-                permission="create"
-                resource="api_client_request"
-                showHotKeyText
-                hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SAVE_REQUEST!.hotKey}
-                onClick={onSaveButtonClick}
-                loading={isRequestSaving}
-                tooltipTitle="Saving is not allowed in view-only mode. You can update and view changes but cannot save them."
-                enableHotKey={enableHotkey}
-              >
-                Save
-              </RBACButton>
-            </Conditional>
+            <SaveRequestButton
+              disabled={!hasUnsavedChanges}
+              loading={isRequestSaving}
+              hidden={openInModal}
+              enableHotkey={enableHotkey}
+              onClick={onSaveButtonClick}
+              entity={entity}
+            />
           </div>
         </div>
       </div>

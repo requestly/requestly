@@ -1,13 +1,14 @@
 import { RQAPI } from "features/apiClient/types";
-import { addDoc, collection, getFirestore, Timestamp } from "firebase/firestore";
+import { collection, doc, getFirestore, setDoc, Timestamp } from "firebase/firestore";
 import firebaseApp from "../../firebase";
 import { APIS_NODE, EXAMPLES_REQUESTS_NODE } from "./constants";
 import { getOwnerId } from "backend/utils";
 import lodash from "lodash";
 
-const sanitizeExample = (example: RQAPI.ExampleApiRecord) => {
+const sanitizeExample = (example: Partial<RQAPI.ExampleApiRecord>) => {
   const sanitizedExample = lodash.cloneDeep(example);
-  delete sanitizedExample.data.testResults;
+  delete sanitizedExample?.data?.testResults;
+  delete sanitizedExample?.id;
   return sanitizedExample;
 };
 
@@ -23,7 +24,7 @@ export const createExample = async (
 
   const sanitizedExample = sanitizeExample(example);
 
-  const newExampleRecord: RQAPI.ExampleApiRecord = {
+  const newExampleRecord: Partial<RQAPI.ExampleApiRecord> = {
     ...sanitizedExample,
     ownerId,
     deleted: false,
@@ -32,6 +33,9 @@ export const createExample = async (
     createdTs: Timestamp.now().toMillis(),
     updatedTs: Timestamp.now().toMillis(),
   };
-  const result = await addDoc(examplesRef, newExampleRecord);
-  return { success: true, data: { ...newExampleRecord, id: result.id } };
+  const docRef = doc(examplesRef);
+  const createdRecord = { ...newExampleRecord, id: docRef.id } as RQAPI.ExampleApiRecord;
+  await setDoc(docRef, createdRecord);
+
+  return { success: true, data: createdRecord };
 };
