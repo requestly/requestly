@@ -21,6 +21,28 @@ const v = (
 function generateImageLink(category: string) {
   return `https://loremflickr.com/640/480/${category}`;
 }
+const companySuffixes = [
+  "LLC",
+  "Inc.",
+  "Corp.",
+  "Ltd.",
+  "LLP",
+  "LP",
+  "PLC",
+  "GmbH",
+  "S.A.",
+  "SARL",
+  "BV",
+  "NV",
+  "Pty Ltd",
+  "Pte Ltd",
+  "SDN BHD",
+  "KK",
+  "AG",
+  "SRL",
+  "ULC",
+  "OPC",
+];
 
 const toInt = (val: unknown): number => (typeof val === "string" ? parseInt(val, 10) : Number(val));
 
@@ -81,15 +103,6 @@ export function createFakerVariables(faker: Faker): DynamicVariable[] {
       const prefix = args[2] ? String(args[2]) : undefined;
       const casing = args[3] as "upper" | "lower" | "mixed" | undefined;
       return faker.color.rgb({ format: format || "hex", includeAlpha, prefix, casing });
-    }),
-    v("$randomFloat", "A random float number", "472.83", (...args: unknown[]) => {
-      if (!args[0]) return faker.number.float();
-      if (!args[1]) return faker.number.float({ max: Number(args[0]) });
-      const min = Number(args[0]);
-      const max = Number(args[1]);
-      const fractionDigits = args[2] ? toInt(args[2]) : undefined;
-      const multipleOf = args[3] ? Number(args[3]) : undefined;
-      return faker.number.float({ min, max, fractionDigits, multipleOf });
     }),
     v("$randomAbbreviation", "A random abbreviation", "HTTP", () => faker.hacker.abbreviation()),
 
@@ -188,7 +201,7 @@ export function createFakerVariables(faker: Faker): DynamicVariable[] {
       return faker.location.longitude({ min, max, precision });
     }),
 
-    // Images - 16
+    // Images - 15
     v("$randomAvatarImage", "A random avatar image", "https://example.com/avatar/512x512", () => faker.image.avatar()),
     v("$randomImageUrl", "A URL of a random image", "https://example.com/images/640/480", (...args: unknown[]) => {
       const width = args[0] ? toInt(args[0]) : undefined;
@@ -286,8 +299,9 @@ export function createFakerVariables(faker: Faker): DynamicVariable[] {
       return type || network ? faker.finance.bitcoinAddress({ type, network }) : faker.finance.bitcoinAddress();
     }),
 
-    // Business - 5
+    // Business - 6
     v("$randomCompanyName", "A random company name", "TechStart Solutions", () => faker.company.name()),
+    v("$randomCompanySuffix", "A random company suffix", "LLC", () => faker.helpers.arrayElement(companySuffixes)),
     v("$randomBs", "A random phrase of business-speak", "streamline innovative platforms", () =>
       faker.company.buzzPhrase()
     ),
