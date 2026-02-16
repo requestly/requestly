@@ -641,6 +641,7 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
               enableHotkey={enableHotkey}
               onClick={onSaveButtonClick}
               entity={entity}
+              isExample={isExample}
             />
           </div>
         </div>
