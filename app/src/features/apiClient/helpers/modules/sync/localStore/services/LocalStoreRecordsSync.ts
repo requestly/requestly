@@ -1,11 +1,10 @@
 import { RQAPI } from "features/apiClient/types";
 import { ApiClientLocalStoreMeta, ApiClientRecordsInterface } from "../../interfaces";
 import { ErroredRecord } from "../../local/services/types";
-import { sanitizeRecord } from "backend/apiClient/upsertApiRecord";
 import { Timestamp } from "firebase/firestore";
 import { EnvironmentVariables } from "backend/environment/types";
 import { isApiCollection } from "features/apiClient/screens/apiClient/utils";
-import { omit } from "lodash";
+import lodash, { omit } from "lodash";
 import { ApiClientLocalDbQueryService } from "../helpers";
 import { ApiClientLocalDbTable } from "../helpers/types";
 import { v4 as uuidv4 } from "uuid";
@@ -28,6 +27,25 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
 
   private getNewId() {
     return uuidv4();
+  }
+
+  private sanitizeRecordForLocalStore(record: Partial<RQAPI.ApiClientRecord>) {
+    const sanitizedRecord = lodash.cloneDeep(record);
+
+    if (sanitizedRecord.type === RQAPI.RecordType.API) {
+      if (sanitizedRecord.data) {
+        sanitizedRecord.data.response = null;
+        delete sanitizedRecord.data.testResults;
+      }
+    }
+
+    if (sanitizedRecord.type === RQAPI.RecordType.COLLECTION) {
+      if (sanitizedRecord.data) {
+        delete sanitizedRecord.data.children;
+      }
+    }
+
+    return sanitizedRecord;
   }
 
   async getAllRecords(): RQAPI.RecordsPromise {
@@ -60,7 +78,7 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
   }
 
   async createRecord(record: Partial<RQAPI.ApiClientRecord>): RQAPI.ApiClientRecordPromise {
-    const sanitizedRecord = sanitizeRecord(record as RQAPI.ApiClientRecord);
+    const sanitizedRecord = this.sanitizeRecordForLocalStore(record as RQAPI.ApiClientRecord);
     const newRecord = {
       ...sanitizedRecord,
       id: this.getNewId(),
@@ -87,7 +105,7 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
 
   // TODO: refactor this to avoid code duplication
   async createRecordWithId(record: Partial<RQAPI.ApiClientRecord>, id: string): RQAPI.ApiClientRecordPromise {
-    const sanitizedRecord = sanitizeRecord(record as RQAPI.ApiClientRecord);
+    const sanitizedRecord = this.sanitizeRecordForLocalStore(record as RQAPI.ApiClientRecord);
 
     const newRecord = {
       ...sanitizedRecord,
@@ -110,7 +128,7 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
   }
 
   async updateRecord(record: Partial<RQAPI.ApiClientRecord>, id: string): RQAPI.ApiClientRecordPromise {
-    const sanitizedRecord = sanitizeRecord(record as RQAPI.ApiClientRecord);
+    const sanitizedRecord = this.sanitizeRecordForLocalStore(record as RQAPI.ApiClientRecord);
     const existingRecord = await this.getApiRecord(id);
 
     const updatedRecord = {
