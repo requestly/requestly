@@ -243,6 +243,7 @@ export namespace RQAPI {
     name: Error["name"];
     reason?: string;
     message: Error["message"];
+    stack?: Error["stack"];
   };
 
   export type ExecutionWarning = {
