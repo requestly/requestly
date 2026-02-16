@@ -60,7 +60,11 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
 }) => {
   const workspaceId = useWorkspaceId();
   const isNoopContext = workspaceId === NoopContextId;
-  const variableData = getVariable(hoveredVariable, variables);
+
+  // Extract base variable name for dynamic variables with arguments (e.g., "$randomInt 0 100" -> "$randomInt")
+  const baseVariableName = hoveredVariable.split(" ")[0] || hoveredVariable;
+  const variableData = getVariable(baseVariableName, variables);
+
   const [currentView, setCurrentView] = useState<PopoverView>(() => {
     return variableData ? PopoverView.VARIABLE_INFO : PopoverView.NOT_FOUND;
   });
