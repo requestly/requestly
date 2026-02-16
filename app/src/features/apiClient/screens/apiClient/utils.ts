@@ -384,7 +384,8 @@ export const parseMultipartFormDataString = (
 };
 
 export const parseCurlRequest = (curl: string): RQAPI.Request => {
-  const requestJson = curlconverter.toJsonObject(curl);
+  const cleanCurl = curl.replace(/\u00A0/g, " ");
+  const requestJson = curlconverter.toJsonObject(cleanCurl);
   const queryParamsFromJson = generateKeyValuePairs(requestJson.queries);
   /*
       cURL converter is not able to parse query params from url for some cURL requests
@@ -754,6 +755,11 @@ export const apiRequestToHarRequestAdapter = (apiRequest: RQAPI.HttpRequest): Ha
     } else if (apiRequest?.contentType === RequestContentType.JSON) {
       harRequest.postData = {
         mimeType: RequestContentType.JSON,
+        text: (apiRequest.body as string) ?? "",
+      };
+    } else if (apiRequest?.contentType === RequestContentType.XML) {
+      harRequest.postData = {
+        mimeType: RequestContentType.XML,
         text: (apiRequest.body as string) ?? "",
       };
     } else if (apiRequest?.contentType === RequestContentType.FORM) {
