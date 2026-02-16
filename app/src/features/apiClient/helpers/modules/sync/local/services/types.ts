@@ -28,6 +28,7 @@ export type Collection = {
 export type BaseApiRequestDetails = {
   url: string;
   auth: RQAPI.Auth;
+  rank?: string;
   scripts: {
     preRequest: string;
     postResponse: string;
@@ -44,6 +45,7 @@ export type API = {
   id: string;
   data: {
     name: string;
+    rank?: string;
     request: ApiRequestDetails;
   };
 };
