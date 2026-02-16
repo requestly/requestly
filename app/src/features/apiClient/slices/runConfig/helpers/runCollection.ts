@@ -142,11 +142,11 @@ class Runner {
       const parsedData = await parseCollectionRunnerDataFile(dataFile.path, ITERATIONS_MAX_LIMIT);
       return parsedData.data;
     } catch (e) {
-      throw new DataFileParseError(
-        `The data file used for this collection appears to be damaged or unreadable. Please re-upload a valid file to continue.`
-      ).addContext({
+      const message = `The data file used for this collection appears to be damaged or unreadable. Please re-upload a valid file to continue.`;
+      const parseError =
+        e instanceof Error ? DataFileParseError.fromError(e, message) : new DataFileParseError(message);
+      throw parseError.addContext({
         collectionId,
-        error: e,
         filePath: dataFile.path,
       });
     }

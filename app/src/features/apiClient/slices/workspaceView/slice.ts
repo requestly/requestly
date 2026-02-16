@@ -1,11 +1,15 @@
 import { createEntityAdapter, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { ApiClientViewMode, WorkspaceState, WorkspaceViewState } from "./types";
+import { ApiClientViewMode, WorkspaceInfo, WorkspaceState, WorkspaceViewState } from "./types";
 import { ReducerKeys } from "store/constants";
 import { addWorkspaceIntoView, setupWorkspaceView, switchContext } from "./thunks";
 import { RootState } from "store/types";
-import getReducerWithLocalStorageSync from "store/getReducerWithLocalStorageSync";
 import { NativeError } from "errors/NativeError";
 import { ErrorSeverity } from "errors/types";
+import { InvalidContextVersionError } from "./helpers/ApiClientContextRegistry/ApiClientContextRegistry";
+import { persistReducer, createTransform } from "redux-persist";
+import { getPersistConfig } from "redux-deep-persist";
+import storage from "redux-persist/lib/storage";
+import { EntityState } from "@reduxjs/toolkit";
 
 export const workspaceViewAdapter = createEntityAdapter<WorkspaceState>({
   selectId: (workspace) => workspace.id as string,
@@ -101,12 +105,19 @@ export const workspaceViewSlice = createSlice({
         const { workspace } = action.meta.arg;
         const id = workspace.id as string;
 
+        if (action.error.name === InvalidContextVersionError.name) {
+          return;
+        }
+
+        const error = new Error(action.error.message);
+        error.stack = action.error.stack;
+
         workspaceViewAdapter.updateOne(state.selectedWorkspaces, {
           id,
           changes: {
             status: {
               loading: false,
-              state: { success: false, error: new Error(action.error.message) },
+              state: { success: false, error },
             },
           },
         });
@@ -126,19 +137,25 @@ export const workspaceViewSlice = createSlice({
         });
       })
       .addCase(switchContext.rejected, (state, action) => {
-        throw new NativeError(action.error.message as string)
-          .setShowBoundary(true)
-          .setSeverity(ErrorSeverity.FATAL)
-          .set("stack", action.error.stack);
+        if (action.error.name === InvalidContextVersionError.name) {
+          return;
+        }
+
+        const switchErr = new Error(action.error.message as string);
+        switchErr.stack = action.error.stack;
+        throw NativeError.fromError(switchErr).setShowBoundary(true).setSeverity(ErrorSeverity.FATAL);
       })
       .addCase(setupWorkspaceView.pending, (state) => {
         state.isSetupDone = false;
       })
       .addCase(setupWorkspaceView.rejected, (state, action) => {
-        throw new NativeError(action.error.message as string)
-          .setShowBoundary(true)
-          .setSeverity(ErrorSeverity.FATAL)
-          .set("stack", action.error.stack);
+        if (action.error.name === InvalidContextVersionError.name) {
+          return;
+        }
+
+        const setupErr = new Error(action.error.message as string);
+        setupErr.stack = action.error.stack;
+        throw NativeError.fromError(setupErr).setShowBoundary(true).setSeverity(ErrorSeverity.FATAL);
       })
       .addCase(setupWorkspaceView.fulfilled, (state) => {
         state.isSetupDone = true;
@@ -148,8 +165,58 @@ export const workspaceViewSlice = createSlice({
 
 export const workspaceViewActions = workspaceViewSlice.actions;
 
-export const workspaceViewReducerWithLocal = getReducerWithLocalStorageSync(
-  ReducerKeys.WORKSPACE_VIEW,
-  workspaceViewSlice.reducer,
-  ["viewMode", "selectedWorkspaces"]
+const selectedWorkspacesTransform = createTransform(
+  (inboundState: EntityState<WorkspaceState>) => {
+    if (!inboundState?.entities) return inboundState;
+
+    const sanitizedEntities: Record<string, WorkspaceInfo> = {};
+    const sanitizedIds: string[] = [];
+
+    Object.entries(inboundState.entities).forEach(([key, workspace]) => {
+      if (workspace && "id" in workspace && workspace.id !== undefined) {
+        sanitizedEntities[key] = {
+          id: workspace.id,
+          meta: workspace.meta,
+        };
+        sanitizedIds.push(key);
+      }
+    });
+
+    return {
+      ids: sanitizedIds,
+      entities: sanitizedEntities,
+    };
+  },
+  (outboundState: EntityState<WorkspaceInfo>) => {
+    if (!outboundState?.entities) return outboundState;
+
+    const rehydratedEntities: Record<string, WorkspaceState> = {};
+    const rehydratedIds: string[] = [];
+
+    Object.entries(outboundState.entities).forEach(([key, workspaceInfo]) => {
+      if (workspaceInfo && "id" in workspaceInfo && workspaceInfo.id !== undefined) {
+        rehydratedEntities[key] = {
+          ...workspaceInfo,
+          status: { loading: true },
+        } as WorkspaceState;
+        rehydratedIds.push(key);
+      }
+    });
+
+    return {
+      ids: rehydratedIds,
+      entities: rehydratedEntities,
+    };
+  },
+  { whitelist: ["selectedWorkspaces"] }
 );
+
+const workspaceViewPersistConfig = getPersistConfig({
+  storage,
+  key: ReducerKeys.WORKSPACE_VIEW,
+  rootReducer: workspaceViewSlice.reducer,
+  whitelist: ["viewMode", "selectedWorkspaces"],
+  transforms: [selectedWorkspacesTransform],
+});
+
+export const workspaceViewReducerWithLocal = persistReducer(workspaceViewPersistConfig, workspaceViewSlice.reducer);
