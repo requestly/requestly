@@ -317,7 +317,13 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
                     queryParams: executedEntry.request.queryParams,
                   });
                   scope.setFingerprint(["api_request_error", executedEntry.request.method, error.source]);
-                  Sentry.captureException(new Error(`API Request Failed: ${error.message || "Unknown error"}`));
+                  const sentryError = new Error(
+                    `API Request Failed: ${error.message || error.name || "Unknown error"}`
+                  );
+                  if (error.stack) {
+                    sentryError.stack = error.stack;
+                  }
+                  Sentry.captureException(sentryError);
                 });
               }
               trackRequestFailed(
@@ -521,6 +527,20 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
     );
   }, [entity, store]);
 
+  const handleCurlImport = useCallback(
+    (request: RQAPI.Request) => {
+      try {
+        // Use setRequest to set the request with imported cURL
+        entity.setRequest(request as RQAPI.HttpRequest);
+        toast.success("cURL command imported successfully");
+      } catch (error) {
+        toast.error("Failed to import cURL command");
+        Sentry.captureException(error);
+      }
+    },
+    [entity]
+  );
+
   const enableHotkey = getIsActive();
 
   return isExtensionEnabled ? (
@@ -579,6 +599,7 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
                 entity={entity}
                 onUrlChange={entity.setUrl.bind(entity)}
                 onEnterPress={onUrlInputEnterPressed}
+                onCurlImport={handleCurlImport}
               />
             </Space.Compact>
             <RQButton
