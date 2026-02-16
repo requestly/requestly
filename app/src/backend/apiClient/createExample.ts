@@ -3,15 +3,8 @@ import { collection, doc, getFirestore, setDoc, Timestamp } from "firebase/fires
 import firebaseApp from "../../firebase";
 import { APIS_NODE, EXAMPLES_REQUESTS_NODE } from "./constants";
 import { getOwnerId } from "backend/utils";
-import lodash from "lodash";
 import * as Sentry from "@sentry/react";
-
-const sanitizeExample = (example: Partial<RQAPI.ExampleApiRecord>) => {
-  const sanitizedExample = lodash.cloneDeep(example);
-  delete sanitizedExample?.data?.testResults;
-  delete sanitizedExample?.id;
-  return sanitizedExample;
-};
+import { sanitizeExample } from "./utils";
 
 export const createExample = async (
   uid: string,
@@ -25,6 +18,7 @@ export const createExample = async (
     const ownerId = getOwnerId(uid, teamId);
 
     const sanitizedExample = sanitizeExample(example);
+    delete sanitizedExample?.id;
 
     const newExampleRecord: Partial<RQAPI.ExampleApiRecord> = {
       ...sanitizedExample,

@@ -2,6 +2,7 @@ import * as Sentry from "@sentry/react";
 import { EnvironmentVariables } from "backend/environment/types";
 import { RQAPI } from "features/apiClient/types";
 import { Timestamp } from "firebase/firestore";
+import lodash from "lodash";
 
 export function patchMissingIdInVariables(variables: EnvironmentVariables): EnvironmentVariables {
   return Object.fromEntries(
@@ -32,3 +33,9 @@ export function captureException(e: any) {
     },
   });
 }
+
+export const sanitizeExample = (example: Partial<RQAPI.ExampleApiRecord>) => {
+  const sanitizedExample = lodash.cloneDeep(example);
+  delete sanitizedExample?.data?.testResults;
+  return sanitizedExample;
+};

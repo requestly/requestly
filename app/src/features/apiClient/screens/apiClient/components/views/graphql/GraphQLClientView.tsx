@@ -35,7 +35,11 @@ import {
 } from "modules/analytics/events/features/apiClient";
 import { extractOperationNames } from "./utils";
 import ErrorBoundary from "features/apiClient/components/ErrorBoundary/ErrorBoundary";
-import { getContentTypeFromResponseHeaders, getEmptyDraftApiRecord, getRequestTypeForAnalyticEvent } from "../../../utils";
+import {
+  getContentTypeFromResponseHeaders,
+  getEmptyDraftApiRecord,
+  getRequestTypeForAnalyticEvent,
+} from "../../../utils";
 import { useGraphQLRequestExecutor } from "features/apiClient/hooks/requestExecutors/useGraphQLRequestExecutor";
 import { isExtensionInstalled } from "actions/ExtensionActions";
 import { isDesktopMode } from "utils/AppUtils";
@@ -511,6 +515,7 @@ const GraphQLClientView: React.FC<GraphQLClientViewProps> = ({
               enableHotkey={enableHotkey}
               onClick={onSaveButtonClick}
               entity={entity}
+              isExample={isExample}
             />
           </div>
         </div>
