@@ -37,16 +37,16 @@ export const createLocationVariables: CategoryCreator = (faker) => [
     }
   ),
   createDynamicVariable("$randomLatitude", "A random latitude coordinate", "-23.5475", (...args: unknown[]) => {
-    if (!args[0]) return faker.location.latitude();
-    if (!args[1]) return faker.location.latitude({ max: toInt(args[0]) });
+    if (args[0] === undefined || args[0] === null) return faker.location.latitude();
+    if (args[1] === undefined || args[1] === null) return faker.location.latitude({ max: toInt(args[0]) });
     const min = toInt(args[0]);
     const max = toInt(args[1]);
     const precision = args[2] ? toInt(args[2]) : undefined;
     return faker.location.latitude({ min, max, precision });
   }),
   createDynamicVariable("$randomLongitude", "A random longitude coordinate", "151.2095", (...args: unknown[]) => {
-    if (!args[0]) return faker.location.longitude();
-    if (!args[1]) return faker.location.longitude({ max: toInt(args[0]) });
+    if (args[0] === undefined || args[0] === null) return faker.location.longitude();
+    if (args[1] === undefined || args[1] === null) return faker.location.longitude({ max: toInt(args[0]) });
     const min = toInt(args[0]);
     const max = toInt(args[1]);
     const precision = args[2] ? toInt(args[2]) : undefined;
