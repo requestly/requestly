@@ -2,11 +2,13 @@ import { useFeatureValue } from "@growthbook/growthbook-react";
 import { Checkbox } from "antd";
 import { Conditional } from "components/common/Conditional";
 import FEATURES from "config/constants/sub/features";
-import { sanitizeKeyValuePairs, supportsRequestBody } from "features/apiClient/screens/apiClient/utils";
+import { sanitizeKeyValuePairs, supportsGetRequestBody } from "features/apiClient/screens/apiClient/utils";
 import { BufferedHttpRecordEntity } from "features/apiClient/slices/entities";
 import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
-import { RQAPI } from "features/apiClient/types";
+import { RequestMethod, RQAPI } from "features/apiClient/types";
 import React, { useMemo } from "react";
+import { useSelector } from "react-redux";
+import { getAppMode } from "store/selectors";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import { ApiClientRequestTabs } from "../../../components/request/components/ApiClientRequestTabs/ApiClientRequestTabs";
 import { RequestTabLabel } from "../../../components/request/components/ApiClientRequestTabs/components/RequestTabLabel/RequestTabLabel";
@@ -41,6 +43,7 @@ const HttpRequestTabs: React.FC<Props> = ({
   scriptEditorVersion,
 }) => {
   const showCredentialsCheckbox = useFeatureValue("api-client-include-credentials", false);
+  const appMode = useSelector(getAppMode);
 
   const queryParams = useApiClientSelector((s) => entity.getQueryParams(s));
   const pathVariables = useApiClientSelector((s) => entity.getPathVariables(s));
@@ -52,7 +55,8 @@ const HttpRequestTabs: React.FC<Props> = ({
 
   const requestEntry = useApiClientSelector((s) => entity.getEntityFromState(s).data);
 
-  const isRequestBodySupported = supportsRequestBody(method);
+  const isRequestBodySupported =
+    method !== RequestMethod.HEAD && (method !== RequestMethod.GET || supportsGetRequestBody(appMode));
   const hasScriptError = error?.type === RQAPI.ApiClientErrorType.SCRIPT;
 
   const items = useMemo(() => {
