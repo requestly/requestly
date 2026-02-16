@@ -12,13 +12,15 @@ import { SiBruno } from "@react-icons/all-files/si/SiBruno";
 import { PostmanImporterModal } from "../../../modals/postmanImporterModal/PostmanImporterModal";
 import { MdOutlineTerminal } from "@react-icons/all-files/md/MdOutlineTerminal";
 import { BrunoImporterModal } from "features/apiClient/screens/BrunoImporter";
+import { SoapImporterModal } from "../../../modals/SoapImporterModal/SoapImporterModal";
 import { useLocation } from "react-router-dom";
 import { RoleBasedComponent } from "features/rbac";
 import { NewApiRecordDropdown } from "../NewApiRecordDropdown/NewApiRecordDropdown";
 import { ApiClientSidebarTabKey } from "../../SingleWorkspaceSidebar/SingleWorkspaceSidebar";
 import { SiOpenapiinitiative } from "@react-icons/all-files/si/SiOpenapiinitiative";
+import { LuCodeXml } from "@react-icons/all-files/lu/LuCodeXml";
 import { CommonApiClientImportModal } from "../../../modals/CommonApiClientImportModal/CommonApiClientImportModal";
-import { ApiClientImporterMethod, openApiImporter } from "@requestly/alternative-importers";
+import { ApiClientImporterMethod, openApiImporter, soapImporter } from "@requestly/alternative-importers";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { ApiClientViewMode, useViewMode } from "features/apiClient/slices";
 import { EnvironmentSwitcher } from "./components/environmentSwitcher/EnvironmentSwitcher";
@@ -53,6 +55,7 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isPostmanImporterModalOpen, setIsPostmanImporterModalOpen] = useState(false);
   const [isBrunoImporterModalOpen, setIsBrunoImporterModalOpen] = useState(false);
+  const [isSoapImporterModalOpen, setIsSoapImporterModalOpen] = useState(false);
   const [commonImportModalConfig, setCommonImportModalConfig] = useState<ImportModalConfig | null>(null);
   const isOpenApiSupportEnabled = useFeatureIsOn("openapi-import-support");
 
@@ -126,6 +129,18 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
           setIsBrunoImporterModalOpen(true);
         },
       },
+      {
+        key: "6",
+        label: (
+          <div className="new-btn-option">
+            <LuCodeXml /> SOAP
+          </div>
+        ),
+        onClick: () => {
+          trackImportStarted(ApiClientImporterType.SOAP);
+          setIsSoapImporterModalOpen(true);
+        },
+      },
     ],
     [onImportClick, isOpenApiSupportEnabled]
   );
@@ -150,6 +165,9 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
             importerType: ApiClientImporterType.OPENAPI,
             docsLink: LINKS.REQUESTLY_API_CLIENT_IMPORT_OPENAPI_DOCS,
           });
+          break;
+        case ApiClientImporterType.SOAP:
+          setIsSoapImporterModalOpen(true);
           break;
         default:
           break;
@@ -212,6 +230,13 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
       )}
       {isBrunoImporterModalOpen && (
         <BrunoImporterModal isOpen={isBrunoImporterModalOpen} onClose={() => setIsBrunoImporterModalOpen(false)} />
+      )}
+      {isSoapImporterModalOpen && (
+        <SoapImporterModal
+          isOpen={isSoapImporterModalOpen}
+          onClose={() => setIsSoapImporterModalOpen(false)}
+          importer={soapImporter}
+        />
       )}
 
       {commonImportModalConfig && (
