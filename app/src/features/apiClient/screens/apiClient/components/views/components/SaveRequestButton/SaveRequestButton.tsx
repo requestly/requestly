@@ -139,6 +139,7 @@ export const SaveRequestButton: React.FC<Props> = ({
             loading={isSavingAsExample}
             className="api-client-save-request-button"
             enableHotKey={enableHotkey}
+            hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SAVE_REQUEST!.hotKey}
           >
             Save
           </RQButton>
