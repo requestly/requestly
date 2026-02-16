@@ -114,7 +114,7 @@ export const AuthScreen = () => {
     (metadata: AuthSyncMetadata["syncData"]) => {
       setAuthErrorCode(AuthErrorCode.NONE);
       setAuthProviders(metadata.providers);
-      if (metadata.isSyncedUser) {
+      if (metadata.forceBstackAuth || metadata.isSyncedUser) {
         trackBstackLoginInitiated();
         setRedirectMetadata({ source: eventSource, redirectURL });
         redirectToOAuthUrl(navigate);
