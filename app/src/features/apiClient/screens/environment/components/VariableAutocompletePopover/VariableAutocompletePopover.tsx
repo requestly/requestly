@@ -41,9 +41,14 @@ export const VariableAutocompletePopover: React.FC<VariableAutocompleteProps> = 
         name: key,
         variable,
       }))
-      .filter(({ name }) => name.toLowerCase().includes(lowerSearch));
+      .filter(({ name }) => {
+        const lowerName = name.toLowerCase();
+        const searchWithoutPrefix = hasDynamicPrefix ? lowerSearch.substring(1) : lowerSearch;
+        const nameWithoutPrefix = lowerName.startsWith("$") ? lowerName.substring(1) : lowerName;
+        return nameWithoutPrefix.includes(searchWithoutPrefix);
+      });
 
-    // Show only scoped variables by default, only dynamic variables when user types $
+    // Show only dynamic variables when user explicitly types "$" prefix
     if (hasDynamicPrefix) {
       // Show only dynamic variables (check scope attribute)
       results = results.filter(({ variable }) => checkIsDynamicVariable(variable));
