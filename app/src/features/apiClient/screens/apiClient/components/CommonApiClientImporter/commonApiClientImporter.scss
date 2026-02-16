@@ -41,6 +41,9 @@
 
   .common-api-client-importer-body {
     margin-top: 16px;
+    display: flex;
+    flex-direction: column;
+    min-height: 200px;
 
     .imported-entities-container {
       display: flex;
@@ -143,4 +146,84 @@
   margin-left: 4px;
   position: relative;
   top: 1px;
+}
+
+.link-import-section {
+  margin-bottom: 12px;
+  transition: all 0.2s ease;
+
+  .link-import-description {
+    font-size: var(--requestly-font-size-sm);
+    color: var(--requestly-color-text-subtle);
+    margin: 0 0 12px 0;
+  }
+
+  .link-import-input-group {
+    display: flex;
+    gap: 8px;
+    width: 100%;
+
+    .link-input {
+      flex: 1;
+      min-width: 0;
+      font-size: var(--requestly-font-size-sm);
+      textarea {
+        padding: 8px 12px;
+        resize: none;
+      }
+    }
+  }
+
+  &.expanded {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 0;
+
+    .link-import-input-group {
+      flex: 1;
+      height: 100%;
+      padding-bottom: 12px;
+      resize: none;
+    }
+  }
+}
+
+.link-expanded-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: auto;
+
+  .link-import-status {
+    display: flex;
+    justify-content: center;
+
+    .error {
+      color: var(--requestly-color-error);
+      font-size: var(--requestly-font-size-xs);
+    }
+  }
+
+  .link-expanded-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+  }
+}
+
+.link-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 16px 0;
+  color: var(--requestly-color-text-subtle);
+  font-size: var(--requestly-font-size-xs);
+
+  &::before,
+  &::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+  }
 }
