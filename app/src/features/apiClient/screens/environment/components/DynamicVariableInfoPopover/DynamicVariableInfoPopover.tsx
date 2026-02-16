@@ -28,7 +28,12 @@ export const DynamicVariableInfoPopover: React.FC<DynamicVariableInfoPopoverProp
       <div className="popover-header">
         {displayName && showIconHeader && (
           <div className="header-with-icon">
-            <span className="main-header">{getScopeIcon(VariableScope.DYNAMIC, true, "DYNAMIC")}</span>
+            <span className="main-header">
+              {getScopeIcon(VariableScope.DYNAMIC, {
+                showBackgroundColor: true,
+                showText: true,
+              })}
+            </span>
             <span className="variable-name">{displayName}</span>
           </div>
         )}
