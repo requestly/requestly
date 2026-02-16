@@ -15,6 +15,10 @@ import { toast } from "utils/Toast";
 import { trackWorkspaceDeleted, trackWorkspaceDeleteClicked } from "modules/analytics/events/common/teams";
 import "./TeamSettings.css";
 import { renameWorkspace } from "backend/workspace";
+import { useWorkspaceViewActions } from "features/apiClient/slices";
+import { dummyPersonalWorkspace } from "store/slices/workspaces/selectors";
+import { WorkspaceType } from "features/workspaces/types";
+import { FAKE_LOGGED_OUT_WORKSPACE_ID } from "features/apiClient/slices/common/constants";
 
 const TeamSettings = ({ teamId, isTeamAdmin, isTeamArchived, teamOwnerId }) => {
   const navigate = useNavigate();
@@ -24,6 +28,7 @@ const TeamSettings = ({ teamId, isTeamAdmin, isTeamArchived, teamOwnerId }) => {
   const user = useSelector(getUserAuthDetails);
   const userId = user?.details?.profile?.uid;
   const isLoggedInUserOwner = userId === teamOwnerId;
+  const { switchContext } = useWorkspaceViewActions();
 
   if (!teamId) redirectToWorkspaceSettings(navigate, window.location.pathname, "my_profile");
 
@@ -68,7 +73,19 @@ const TeamSettings = ({ teamId, isTeamAdmin, isTeamArchived, teamOwnerId }) => {
       trackWorkspaceDeleted();
       toast.info("Workspace deleted successfully");
       redirectToRules(navigate);
-      handleSwitchToPrivateWorkspace();
+      await handleSwitchToPrivateWorkspace();
+      await switchContext({
+        workspace: userId
+          ? {
+              id: dummyPersonalWorkspace.id,
+              meta: { type: WorkspaceType.PERSONAL },
+            }
+          : {
+              id: FAKE_LOGGED_OUT_WORKSPACE_ID,
+              meta: { type: WorkspaceType.LOCAL_STORAGE },
+            },
+        userId,
+      });
     } catch (err) {
       toast.error("Only owner can delete the workspace!");
     } finally {
