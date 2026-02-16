@@ -52,9 +52,13 @@ const createIconWithWrapper = (
 
 export const getScopeIcon = (
   scope: VariableScope,
-  showBackgroundColor: boolean = true,
-  showText: boolean = false
+  config?: {
+    showBackgroundColor?: boolean;
+    showText?: boolean;
+  }
 ): React.ReactNode => {
+  const { showBackgroundColor = true, showText = false } = config ?? {};
+
   switch (scope) {
     case VariableScope.ENVIRONMENT:
       return createIconWithWrapper(

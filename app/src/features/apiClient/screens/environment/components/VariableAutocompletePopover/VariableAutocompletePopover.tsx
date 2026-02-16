@@ -86,7 +86,7 @@ export const VariableAutocompletePopover: React.FC<VariableAutocompleteProps> = 
             showArrow={false}
             overlayClassName="scope-tooltip"
           >
-            <span>{getScopeIcon(variableScope, false)}</span>
+            <span>{getScopeIcon(variableScope, { showBackgroundColor: false })}</span>
           </Tooltip>
           <span className="variable-label">{variableName}</span>
         </div>
