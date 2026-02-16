@@ -22,8 +22,8 @@ export const createTextVariables: CategoryCreator = (faker) => [
     return probability !== undefined ? faker.datatype.boolean(probability) : faker.datatype.boolean();
   }),
   createDynamicVariable("$randomInt", "A random integer between 0 and 10000", "472", (...args: unknown[]) => {
-    if (!args[0]) return faker.number.int({ min: 0, max: 10000 });
-    if (!args[1]) return faker.number.int({ min: 0, max: toInt(args[0]) });
+    if (args[0] === undefined || args[0] === null) return faker.number.int({ min: 0, max: 10000 });
+    if (args[1] === undefined || args[1] === null) return faker.number.int({ min: 0, max: toInt(args[0]) });
     const min = toInt(args[0]);
     const max = toInt(args[1]);
     const multipleOf = args[2] ? toInt(args[2]) : undefined;
