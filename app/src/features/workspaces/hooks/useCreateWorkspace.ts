@@ -103,11 +103,10 @@ export const useCreateWorkspace = ({
         if (result.payload.error.name === InvalidContextVersionError.name) {
           return;
         } else {
-          const error = result.payload?.error;
-          throw new NativeError(error.message as string)
-            .setShowBoundary(true)
-            .setSeverity(ErrorSeverity.FATAL)
-            .set("stack", error.stack);
+          const rawError = result.payload?.error;
+          const wrappedError = new Error(rawError.message as string);
+          wrappedError.stack = rawError.stack;
+          throw NativeError.fromError(wrappedError).setShowBoundary(true).setSeverity(ErrorSeverity.FATAL);
         }
       }
 
@@ -120,15 +119,15 @@ export const useCreateWorkspace = ({
       }
     },
     [
-      WorkspaceType,
-      dispatch,
+      activeWorkspace.id,
+      navigate,
+      switchContext,
       user?.details?.isSyncEnabled,
       isSharedWorkspaceMode,
       appMode,
-      analyticEventSource,
-      switchContext,
       userId,
-      navigate,
+      dispatch,
+      analyticEventSource,
     ]
   );
 

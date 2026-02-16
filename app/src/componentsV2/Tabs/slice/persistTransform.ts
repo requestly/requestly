@@ -61,7 +61,7 @@ function deserializeTab(serialized: TabStateSerialized): TabState | null {
       extra: { serializedTab: serialized },
     });
 
-    throw new NativeError(error instanceof Error ? error.message : String(error));
+    throw error instanceof Error ? NativeError.fromError(error) : new NativeError(String(error));
   }
 }
 
