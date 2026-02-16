@@ -3,7 +3,10 @@ import { List, Popover, Tooltip } from "antd";
 import { createPortal } from "react-dom";
 import { InfoCircleOutlined } from "@ant-design/icons";
 import { ScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
-import { getAllVariables, checkIsDynamicVariable } from "features/apiClient/helpers/variableResolver/variableHelper";
+import {
+  checkIsDynamicVariable,
+  mergeAndParseAllVariables,
+} from "features/apiClient/helpers/variableResolver/variableHelper";
 import { getScopeIcon } from "componentsV2/CodeEditor/components/EditorV2/components/VariablePopOver/hooks/useScopeOptions";
 import { DynamicVariableInfoPopover } from "../DynamicVariableInfoPopover/DynamicVariableInfoPopover";
 import "./variableAutocompletePopover.scss";
@@ -28,20 +31,28 @@ export const VariableAutocompletePopover: React.FC<VariableAutocompleteProps> = 
   const filteredVariables = useMemo(() => {
     if (!variables) return [];
 
-    // Use unified variable resolution to get all variables (scoped + dynamic)
-    // getAllVariables returns scoped variables first, then dynamic variables
-
     const lowerSearch = search.toLowerCase();
     const hasDynamicPrefix = lowerSearch.startsWith("$");
-    const allVariables = getAllVariables(variables, hasDynamicPrefix);
+    const allVariables = mergeAndParseAllVariables(variables);
 
     // Convert to array and filter by search
-    return Object.entries(allVariables)
+    let results = Object.entries(allVariables)
       .map(([key, variable]) => ({
         name: key,
         variable,
       }))
       .filter(({ name }) => name.toLowerCase().includes(lowerSearch));
+
+    // Show only scoped variables by default, only dynamic variables when user types $
+    if (hasDynamicPrefix) {
+      // Show only dynamic variables (check scope attribute)
+      results = results.filter(({ variable }) => checkIsDynamicVariable(variable));
+    } else {
+      // Show only scoped variables (filter out dynamic ones)
+      results = results.filter(({ variable }) => !checkIsDynamicVariable(variable));
+    }
+
+    return results;
   }, [variables, search]);
 
   const handleSelect = useCallback(
