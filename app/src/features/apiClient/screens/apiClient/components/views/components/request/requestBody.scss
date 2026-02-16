@@ -58,6 +58,11 @@
     .editor-popup-container {
       display: none;
     }
+
+    // Hide default CodeMirror autocomplete tooltip
+    .cm-tooltip-autocomplete {
+      display: none !important;
+    }
   }
 
   .api-request-body-raw {
