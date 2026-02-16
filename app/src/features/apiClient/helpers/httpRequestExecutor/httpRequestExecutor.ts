@@ -43,6 +43,7 @@ function buildExecutionErrorObject(error: any, source: string, type: RQAPI.ApiCl
     source,
     name: error.name || "Error",
     message: error.message,
+    stack: error?.stack,
   };
 
   if (error.context?.reason) {
@@ -81,6 +82,12 @@ class ExecutionError extends NativeError {
     );
 
     this.result = buildErroredExecutionResult(entry, executionError, executionId);
+  }
+
+  static fromEntry(entry: RQAPI.HttpApiEntry, error: Error): ExecutionError {
+    const execErr = new ExecutionError(entry, error);
+    execErr.stack = error.stack;
+    return execErr;
   }
 }
 
@@ -180,7 +187,7 @@ export class HttpRequestExecutor {
 
     return result.mapError((err) => {
       trackRequestFailed(RQAPI.ApiClientErrorType.PRE_VALIDATION);
-      return new NativeError(err.message).addContext({ type: RQAPI.ApiClientErrorType.PRE_VALIDATION });
+      return NativeError.fromError(err).addContext({ type: RQAPI.ApiClientErrorType.PRE_VALIDATION });
     });
   }
 
@@ -312,7 +319,8 @@ export class HttpRequestExecutor {
     } catch (err) {
       const error = buildExecutionErrorObject(
         {
-          ...err,
+          name: err.name,
+          stack: err.stack,
           message:
             this.appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP
               ? err.message

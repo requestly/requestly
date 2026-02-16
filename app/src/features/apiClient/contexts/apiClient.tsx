@@ -163,7 +163,13 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
           setIsRecordBeingCreated(recordType);
 
           try {
-            const result = await createBlankApiRecord(recordType, collectionId, apiClientRecordsRepository, entryType);
+            const result = await createBlankApiRecord(
+              recordType,
+              collectionId,
+              apiClientRecordsRepository,
+              context,
+              entryType
+            );
             setIsRecordBeingCreated(null);
             if (!result.success) {
               toast.error(result.message || "Failed to create record!");
@@ -195,13 +201,14 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
           trackNewCollectionClicked(analyticEventSource);
 
           try {
-            const result = await createBlankApiRecord(recordType, collectionId, apiClientRecordsRepository);
+            const result = await createBlankApiRecord(recordType, collectionId, apiClientRecordsRepository, context);
 
             setIsRecordBeingCreated(null);
             if (result.success) {
               saveOrUpdateRecord(context, result.data);
               openBufferedTab({
                 isNew: true,
+                preview: false,
                 source: new CollectionViewTabSource({
                   id: result.data.id,
                   title: result.data.name,
@@ -233,6 +240,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
             setIsRecordBeingCreated(null);
             openBufferedTab({
               isNew: true,
+              preview: false,
               source: new EnvironmentViewTabSource({
                 id: newEnvironment.id,
                 title: newEnvironment.name,

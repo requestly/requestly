@@ -447,6 +447,7 @@ const GraphQLClientView: React.FC<GraphQLClientViewProps> = ({
               openInModal={openInModal}
               name={name}
               autoFocus={isNew}
+              isDraft={!!isNew}
               onBlur={(newName) => {
                 if (override?.handleNameChange) {
                   override.handleNameChange(newName);

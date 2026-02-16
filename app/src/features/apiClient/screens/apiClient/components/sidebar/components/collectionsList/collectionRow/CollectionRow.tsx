@@ -6,9 +6,8 @@ import { RQButton } from "lib/design-system-v2/components";
 import { NewRecordNameInput } from "../newRecordNameInput/NewRecordNameInput";
 import { RequestRow } from "../requestRow/RequestRow";
 import { ApiRecordEmptyState } from "../apiRecordEmptyState/ApiRecordEmptyState";
-import { MdOutlineFolder } from "@react-icons/all-files/md/MdOutlineFolder";
-import { MdOutlineFolderSpecial } from "@react-icons/all-files/md/MdOutlineFolderSpecial";
-import { PiFolderOpen } from "@react-icons/all-files/pi/PiFolderOpen";
+import { MdKeyboardArrowDown } from "@react-icons/all-files/md/MdKeyboardArrowDown";
+import { MdKeyboardArrowRight } from "@react-icons/all-files/md/MdKeyboardArrowRight";
 import { IoChevronForward } from "@react-icons/all-files/io5/IoChevronForward";
 import { SidebarPlaceholderItem } from "../../SidebarPlaceholderItem/SidebarPlaceholderItem";
 import { isEmpty } from "lodash";
@@ -19,7 +18,7 @@ import { MdOutlineDelete } from "@react-icons/all-files/md/MdOutlineDelete";
 import { MdOutlineIosShare } from "@react-icons/all-files/md/MdOutlineIosShare";
 import { Conditional } from "components/common/Conditional";
 import { CollectionViewTabSource } from "../../../../views/components/Collection/collectionViewTabSource";
-import { useDrag, useDrop } from "react-dnd";
+import { DropTargetMonitor, useDrag, useDrop } from "react-dnd";
 import { MdAdd } from "@react-icons/all-files/md/MdAdd";
 import RequestlyIcon from "assets/img/brand/rq_logo.svg";
 import PostmanIcon from "assets/img/brand/postman-icon.svg";
@@ -90,6 +89,7 @@ export const CollectionRow: React.FC<Props> = ({
   const [activeKey, setActiveKey] = useState<string | undefined>(
     expandedRecordIds?.includes(record.id) ? record.id : undefined
   );
+  const hoverExpandTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
   const [createNewField, setCreateNewField] = useState<RQAPI.RecordType | null>(null);
   const [hoveredId, setHoveredId] = useState("");
   const [isCollectionRowLoading, setIsCollectionRowLoading] = useState(false);
@@ -101,36 +101,39 @@ export const CollectionRow: React.FC<Props> = ({
 
   const { onNewClickV2 } = useApiClientContext();
 
-  const workspaceId = useWorkspaceId();
+  const workspaceId = useWorkspaceId() || null;
   const { openBufferedTab } = useTabActions();
   const activeTabSourceId = useActiveTab()?.source.getSourceId();
 
-  const handleCollectionExport = useCallback((collection: RQAPI.CollectionRecord, exportType: ExportType) => {
-    const collectionRecordState = getRecord(record.id, workspaceId) as RQAPI.CollectionRecord | undefined;
-    if (!collectionRecordState) {
-      throw new EntityNotFound(record.id, "Collection record not found for export");
-    }
-    const collectionVariables = collectionRecordState.data.variables;
-    const removeLocalValue = (variables: EnvironmentVariables): Record<string, any> => {
-      // set localValue to empty before exporting
-      return Object.fromEntries(Object.entries(variables).map(([k, v]) => [k, { ...v, localValue: "" }]));
-    };
-    const exportData: RQAPI.CollectionRecord = {
-      ...collection,
-      data: { ...collection.data, variables: removeLocalValue(collectionVariables) },
-    };
-    setCollectionsToExport((prev) => [...prev, exportData]);
-    switch (exportType) {
-      case ExportType.REQUESTLY:
-        setIsExportModalOpen(true);
-        break;
-      case ExportType.POSTMAN:
-        setIsPostmanExportModalOpen(true);
-        break;
-      default:
-        console.warn(`Unknown export type: ${exportType}`);
-    }
-  }, [record.id, workspaceId]);
+  const handleCollectionExport = useCallback(
+    (collection: RQAPI.CollectionRecord, exportType: ExportType) => {
+      const collectionRecordState = getRecord(record.id, workspaceId) as RQAPI.CollectionRecord | undefined;
+      if (!collectionRecordState) {
+        throw new EntityNotFound(record.id, "Collection record not found for export");
+      }
+      const collectionVariables = collectionRecordState.data.variables;
+      const removeLocalValue = (variables: EnvironmentVariables): Record<string, any> => {
+        // set localValue to empty before exporting
+        return Object.fromEntries(Object.entries(variables).map(([k, v]) => [k, { ...v, localValue: "" }]));
+      };
+      const exportData: RQAPI.CollectionRecord = {
+        ...collection,
+        data: { ...collection.data, variables: removeLocalValue(collectionVariables) },
+      };
+      setCollectionsToExport((prev) => [...prev, exportData]);
+      switch (exportType) {
+        case ExportType.REQUESTLY:
+          setIsExportModalOpen(true);
+          break;
+        case ExportType.POSTMAN:
+          setIsPostmanExportModalOpen(true);
+          break;
+        default:
+          console.warn(`Unknown export type: ${exportType}`);
+      }
+    },
+    [record.id, workspaceId]
+  );
 
   const getCollectionOptions = useCallback(
     (record: RQAPI.CollectionRecord) => {
@@ -220,6 +223,16 @@ export const CollectionRow: React.FC<Props> = ({
     [handleCollectionExport, openBufferedTab, workspaceId, handleRecordsToBeDeleted]
   );
 
+  const updateExpandedRecordIds = useCallback(
+    (newExpandedIds: RQAPI.ApiClientRecord["id"][]) => {
+      setExpandedRecordIds(newExpandedIds);
+      isEmpty(newExpandedIds)
+        ? sessionStorage.removeItem(SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY)
+        : sessionStorage.setItem(SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY, newExpandedIds);
+    },
+    [setExpandedRecordIds]
+  );
+
   const collapseChangeHandler = useCallback(
     (keys: RQAPI.ApiClientRecord["id"][]) => {
       let activeKeysCopy = [...expandedRecordIds];
@@ -228,12 +241,9 @@ export const CollectionRow: React.FC<Props> = ({
       } else if (!activeKeysCopy.includes(record.id)) {
         activeKeysCopy.push(record.id);
       }
-      setExpandedRecordIds(activeKeysCopy);
-      isEmpty(activeKeysCopy)
-        ? sessionStorage.removeItem(SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY)
-        : sessionStorage.setItem(SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY, activeKeysCopy);
+      updateExpandedRecordIds(activeKeysCopy);
     },
-    [record, expandedRecordIds, setExpandedRecordIds]
+    [record, expandedRecordIds, updateExpandedRecordIds]
   );
 
   useEffect(() => {
@@ -244,6 +254,14 @@ export const CollectionRow: React.FC<Props> = ({
     /* Temporary Change-> To remove previous key from session storage
        which was added due to the previous logic can be removed after some time */
     sessionStorage.removeItem("collapsed_collection_keys");
+
+    // clean up hover timeout on unmount
+    return () => {
+      if (hoverExpandTimeoutRef.current) {
+        clearTimeout(hoverExpandTimeoutRef.current);
+        hoverExpandTimeoutRef.current = null;
+      }
+    };
   }, []);
 
   const handleRecordDrop = useCallback(
@@ -273,8 +291,7 @@ export const CollectionRow: React.FC<Props> = ({
 
         if (!expandedRecordIds.includes(record.id)) {
           const newExpandedRecordIds = [...expandedRecordIds, destination.collectionId];
-          setExpandedRecordIds(newExpandedRecordIds);
-          sessionStorage.setItem(SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY, newExpandedRecordIds);
+          updateExpandedRecordIds(newExpandedRecordIds);
         }
       } catch (error) {
         notification.error({
@@ -286,7 +303,7 @@ export const CollectionRow: React.FC<Props> = ({
         setIsCollectionRowLoading(false);
       }
     },
-    [record.id, expandedRecordIds, setExpandedRecordIds]
+    [record.id, expandedRecordIds, updateExpandedRecordIds]
   );
 
   const checkCanDropItem = useCallback(
@@ -324,7 +341,27 @@ export const CollectionRow: React.FC<Props> = ({
     }),
     [record, workspaceId]
   );
-
+  const handleHoverExpand = useCallback(
+    (item: DraggableApiRecord, monitor: DropTargetMonitor) => {
+      const isOverAny = monitor.isOver();
+      if (!isOverAny) {
+        if (hoverExpandTimeoutRef.current) {
+          clearTimeout(hoverExpandTimeoutRef.current);
+          hoverExpandTimeoutRef.current = null;
+        }
+        return;
+      }
+      const IsTargetCollectionCollapsed = !expandedRecordIds.includes(record.id);
+      if (IsTargetCollectionCollapsed && !hoverExpandTimeoutRef.current) {
+        hoverExpandTimeoutRef.current = setTimeout(() => {
+          const newExpandedRecordIds = [...expandedRecordIds, record.id];
+          updateExpandedRecordIds(newExpandedRecordIds);
+          hoverExpandTimeoutRef.current = null;
+        }, 600);
+      }
+    },
+    [expandedRecordIds, record.id, updateExpandedRecordIds]
+  );
   const [{ isOver }, drop] = useDrop(
     () => ({
       accept: [RQAPI.RecordType.API, RQAPI.RecordType.COLLECTION],
@@ -336,6 +373,7 @@ export const CollectionRow: React.FC<Props> = ({
         setIsCollectionRowLoading(true);
         handleRecordDrop(item, workspaceId);
       },
+      hover: handleHoverExpand,
       canDrop: checkCanDropItem,
       collect: (monitor) => ({
         isOver: monitor.isOver({ shallow: true }),
@@ -398,16 +436,11 @@ export const CollectionRow: React.FC<Props> = ({
                       />
                     </div>
                   )}
-                  {
-                    // @ts-ignore
-                    record.isExampleRoot ? (
-                      <MdOutlineFolderSpecial className="collection-expand-icon" />
-                    ) : isActive ? (
-                      <PiFolderOpen className="collection-expand-icon" />
-                    ) : (
-                      <MdOutlineFolder className="collection-expand-icon" />
-                    )
-                  }
+                  {isActive ? (
+                    <MdKeyboardArrowDown className="collection-expand-icon" />
+                  ) : (
+                    <MdKeyboardArrowRight className="collection-expand-icon" />
+                  )}
                 </>
               );
             }}
