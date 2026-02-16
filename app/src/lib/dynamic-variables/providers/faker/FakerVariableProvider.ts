@@ -1,4 +1,4 @@
-import { faker } from "@faker-js/faker";
+import { faker } from "@faker-js/faker/locale/en";
 import type { DynamicVariable } from "../../types";
 import { DynamicVariableProvider } from "../DynamicVariableProvider";
 import { createFakerVariables } from "./variables";
