@@ -177,9 +177,9 @@ export const getEmptyApiEntry = (apiEntryType: RQAPI.ApiEntryType, request?: RQA
   }
 };
 
-export const getEmptyDraftApiRecord = (apiEntryType: RQAPI.ApiEntryType, request?: RQAPI.Request): RQAPI.ApiRecord => {
+export const getEmptyDraftApiRecord = (apiEntryType: RQAPI.ApiEntryType, entry?: RQAPI.ApiEntry): RQAPI.ApiRecord => {
   return {
-    data: getEmptyApiEntry(apiEntryType),
+    data: entry ?? getEmptyApiEntry(apiEntryType),
     type: RQAPI.RecordType.API,
     id: "",
     name: DEFAULT_REQUEST_NAME,
