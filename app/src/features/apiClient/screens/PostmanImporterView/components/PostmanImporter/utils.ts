@@ -279,39 +279,33 @@ const createExampleApiRecord = (
   apiClientRecordsRepository: ApiClientRecordsInterface<Record<string, any>>
 ): Partial<RQAPI.ExampleApiRecord> => {
   const responseHeaders =
-    exampleResponse.header?.map(
-      (
-        header: { key: string; value: string; disabled?: boolean; type?: string; description?: string },
-        index: number
-      ) => ({
-        id: index,
-        key: header.key,
-        value: header.value,
-        isEnabled: !header?.disabled,
-        description: header?.description || "",
-        dataType: getInferredKeyValueDataType(header.value),
-      })
-    ) ?? [];
+    exampleResponse?.header?.map((header: any, i: number) => ({
+      id: i,
+      key: header.key,
+      value: header.value,
+      isEnabled: !header?.disabled,
+      description: header?.description || "",
+      dataType: getInferredKeyValueDataType(header.value),
+    })) ?? [];
 
   const response: RQAPI.HttpResponse = {
-    body: exampleResponse.body || "",
+    body: exampleResponse?.body ?? "",
     headers: responseHeaders,
-    status: parseInt(exampleResponse.code) || 200,
-    statusText: exampleResponse.status || "",
+    status: parseInt(exampleResponse?.code) || 200,
+    statusText: exampleResponse?.status ?? "",
     time: 0,
     redirectedUrl: "",
   };
 
-  // Create a minimal request structure from the original request if available
-  const request = exampleResponse.originalRequest;
+  const request = exampleResponse?.originalRequest;
   const queryParams =
-    request?.url?.query?.map((query: any, index: number) => ({
-      id: index,
-      key: query.key,
-      value: query.value,
-      isEnabled: query?.disabled !== true,
-      description: query?.description || "",
-      dataType: getInferredKeyValueDataType(query.value),
+    request?.url?.query?.map((q: any, i: number) => ({
+      id: i,
+      key: q.key,
+      value: q.value,
+      isEnabled: q?.disabled !== true,
+      description: q?.description || "",
+      dataType: getInferredKeyValueDataType(q.value),
     })) ?? [];
 
   const { requestBody, contentType } = request
