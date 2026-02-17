@@ -407,7 +407,7 @@ export const RequestRow: React.FC<Props> = ({
         ellipsis={{
           tooltip: {
             title: record.name || record.data.request?.url,
-            placement: "right",
+            placement: "top",
             color: "#000",
             mouseEnterDelay: 0.5,
           },
@@ -546,6 +546,9 @@ export const RequestRow: React.FC<Props> = ({
             onCollapseToggle={collapseChangeHandler}
             collapsible="icon"
             className="request-with-examples-row"
+            panelClassName={`${record.id === activeTabSourceId ? "active" : ""} ${
+              selectedRecords.has(record.id) && showSelection ? "selected" : ""
+            }`}
             expandIconPrefix={
               showSelection ? (
                 <div className="collection-checkbox-container" onClick={(event) => event.stopPropagation()}>
