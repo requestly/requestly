@@ -37,9 +37,20 @@
     overflow: auto;
     padding: 0 var(--requestly-space-2, 4px);
 
+    &.drop-target-active {
+      background: #004eeb33;
+      border: 1px solid var(--requestly-color-primary-600);
+      border-radius: 4px;
+    }
+
     .collections-list {
       display: flex;
       flex-direction: column;
+
+      .top-level-drop-zone {
+        min-height: 20px;
+        transition: all 0.2s ease;
+      }
     }
 
     .ant-collapse-expand-icon {

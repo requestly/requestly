@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { BulkActions, RQAPI } from "features/apiClient/types";
 import { notification } from "antd";
+import { useDrop } from "react-dnd";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { CollectionRow, ExportType } from "./collectionRow/CollectionRow";
 import { RequestRow } from "./requestRow/RequestRow";
@@ -31,9 +32,19 @@ import { ExampleCollectionsNudge } from "../ExampleCollectionsNudge/ExampleColle
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import APP_CONSTANTS from "config/constants";
-import { duplicateRecords, useAllRecords, useApiClientRepository, useChildToParent } from "features/apiClient/slices";
+import {
+  duplicateRecords,
+  useAllRecords,
+  useApiClientRepository,
+  useChildToParent,
+  moveRecords,
+  getApiClientFeatureContext,
+} from "features/apiClient/slices";
 import { useApiClientDispatch } from "features/apiClient/slices/hooks/base.hooks";
 import { EXPANDED_RECORD_IDS_UPDATED } from "features/apiClient/slices/exampleCollections";
+import { useWorkspaceId } from "features/apiClient/common/WorkspaceProvider";
+import { Workspace } from "features/workspaces/types";
+import { DraggableApiRecord } from "./collectionRow/CollectionRow";
 
 interface Props {
   onNewClick: (src: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType) => Promise<void>;
@@ -54,6 +65,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
   const { isValidPermission } = validatePermission("api_client_request", "create");
   const apiClientRecords = useAllRecords();
   const childParentMap = useChildToParent();
+  const workspaceId = useWorkspaceId();
 
   const { isRecordBeingCreated } = useApiClientContext();
   const { onSaveRecord } = useNewApiClientContext();
@@ -373,6 +385,64 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
     [showSelection, selectedRecords, handleRecordToggle]
   );
 
+  const handleRecordDrop = useCallback(async (item: DraggableApiRecord, dropWorkspaceId: Workspace["id"] | null) => {
+    try {
+      const sourceContext = getApiClientFeatureContext(item.workspaceId ?? undefined);
+      if (!sourceContext) {
+        throw new Error(`Source context not found for id: ${item.workspaceId}`);
+      }
+
+      // Empty string for collectionId means move to top-level (no parent collection)
+      const destination = {
+        workspaceId: dropWorkspaceId ?? undefined,
+        collectionId: "",
+      };
+
+      await sourceContext.store
+        .dispatch(
+          moveRecords({
+            recordsToMove: [item.record],
+            collectionId: destination.collectionId,
+            repository: sourceContext.repositories.apiClientRecordsRepository,
+            sourceWorkspaceId: item.workspaceId ?? undefined,
+            destinationWorkspaceId: destination.workspaceId,
+          }) as any
+        )
+        .unwrap();
+    } catch (error) {
+      console.error("Error moving item:", error);
+      notification.error({
+        message: "Error moving item",
+        description: error?.message || "Failed to move item. Please try again.",
+        placement: "bottomRight",
+      });
+    }
+  }, []);
+
+  const [{ isOver, canDrop }, drop] = useDrop(
+    () => ({
+      accept: [RQAPI.RecordType.API, RQAPI.RecordType.COLLECTION],
+      drop: (item: DraggableApiRecord, monitor) => {
+        const isOverCurrent = monitor.isOver({ shallow: true });
+        if (!isOverCurrent) return;
+
+        // Only handle drop if item is from a collection (collectionId is not empty)
+        if (item.record.collectionId) {
+          handleRecordDrop(item, workspaceId || null);
+        }
+      },
+      canDrop: (item: DraggableApiRecord) => {
+        // Can drop if the item is currently in a collection (moving it to top-level)
+        return !!item.record.collectionId;
+      },
+      collect: (monitor) => ({
+        isOver: monitor.isOver({ shallow: true }),
+        canDrop: monitor.canDrop(),
+      }),
+    }),
+    [handleRecordDrop, workspaceId]
+  );
+
   useEffect(() => {
     const id = requestId || collectionId;
     if (id) {
@@ -402,7 +472,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
         )}
       </div>
       <div className={`collections-list-container ${showSelection ? "selection-enabled" : ""}`}>
-        <div className="collections-list-content">
+        <div className={`collections-list-content ${isOver && canDrop ? "drop-target-active" : ""}`} ref={drop}>
           <ExampleCollectionsNudge />
           {updatedRecords.count > 0 ? (
             <div className="collections-list">
@@ -448,6 +518,9 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
                   <SidebarPlaceholderItem name="New Request" />
                 </div>
               )}
+
+              {/* Dedicated drop zone for easier dropping at top-level */}
+              <div className={`top-level-drop-zone ${isOver && canDrop ? "active" : ""}`}></div>
             </div>
           ) : (
             <ApiRecordEmptyState
