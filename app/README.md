@@ -1,4 +1,4 @@
-# UI Application
+# UI Application [Web app]
 
 Front-end application which provides UI to manage rules, mocks, SessionBooks, user profile and workspaces.
 
@@ -7,28 +7,39 @@ It currently supports three modes:
 2. Desktop Mode - when Requestly desktop application is launched
 3. Remote - when account is connected to a mobile application
 
+### Prerequisites
+
+Please make sure that Node version >= 18.18.0 is installed on your system.
+Make sure you have completed the Mono Repo setup [here](../getting-started.md).
+
+
 ## Install
 
-Please make sure that Node version >= 18.18.0 is installed on your system. 
+First, navigate to the app directory of the repo:
+
+```sh
+cd requestly/app
+```
+
+Then run:
 
 ```sh
 npm install
 ```
 
-## Build & Run Locally
-
-### Prerequisite - Build and Install Local Extension
-Some features require the Requestly Extension to be installed. Follow the steps below to build and install the extension
-https://github.com/requestly/requestly/blob/master/browser-extension/mv3/README.md
-
 ### Build WebApp
-```
+
+```sh
 npm run start
 ```
 
-The application will start running at http://localhost:3000. 
+The application will start running at http://localhost:3000.
 
-By default, the local application communicates to our dev Firebase server. 
+By default, the local application communicates with our dev/beta Firebase server. 
 
-The browser extension to be used should be built using local environment configuration. Follow [guide](/browser-extension/mv3/README.md).
+#### Some Features Require Local Extension to be Built
+
+##### Build and Install Local Extension
+
+Some features require the Requestly Extension to be installed. The browser extension should be built using local environment configuration. Follow the [extension setup guide](/browser-extension/mv3/README.md).
 

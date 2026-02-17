@@ -7,6 +7,6 @@
     "https://beta.sessionbear.com",
     "https://requestly.com"
   ],
-  "LANDING_PAGE_BASE_URL": "https://beta.requestly.com",
+  "LANDING_PAGE_BASE_URL": "http://localhost:3000",
   "logLevel": "debug"
 }
