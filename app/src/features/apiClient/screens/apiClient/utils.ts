@@ -399,6 +399,47 @@ export const parseCurlRequest = (curl: string): RQAPI.Request => {
   const headers = filterHeadersToImport(generateKeyValuePairs(headersObj));
 
   let contentType = getContentTypeFromRequestHeaders(headers);
+  // Handle -u/--user for Basic Auth when username is empty
+  try {
+    const hasAuthorizationHeader = headers.some((h) => h.key.toLowerCase() === "authorization");
+    if (!hasAuthorizationHeader && typeof curl === "string") {
+      // match -u '...'/"..."/... or --user '...'
+      const userRegex = /(?:^|\s)(?:-u|--user)\s*(?:'([^']*)'|"([^"]*)"|([^\s]+))/i;
+      const match = curl.match(userRegex);
+      const cred = match ? (match[1] ?? match[2] ?? match[3]) : null;
+      if (cred && cred.startsWith(":")) {
+        const toEncode = cred; // username is empty, cred is like ':TOKEN'
+        let encoded: string;
+        // base64 encode in browser or Node without referencing Buffer type in TS
+        const base64Encode = (inputStr: string) => {
+          if (typeof btoa !== "undefined") {
+            return btoa(inputStr);
+          }
+          try {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const globalObj: any = typeof globalThis !== "undefined" ? globalThis : window || {};
+            if (globalObj.Buffer) {
+              return globalObj.Buffer.from(inputStr).toString("base64");
+            }
+          } catch (e) {
+            // ignore
+          }
+          return "";
+        };
+
+        encoded = base64Encode(toEncode);
+
+        if (encoded) {
+          headers.push({ id: Math.random(), key: "Authorization", value: `Basic ${encoded}`, isEnabled: true });
+          // If content type wasn't set, leave it as-is; Authorization isn't a content header.
+        }
+      }
+    }
+  } catch (err) {
+    // don't break curl import on any unexpected errors here
+    // eslint-disable-next-line no-console
+    console.error("parseCurlRequest: failed to parse -u/--user", err);
+  }
 
   // For multipart-form data we need to check the json structure
   const hasFiles = requestJson.files && Object.keys(requestJson.files).length > 0;
@@ -601,7 +642,7 @@ export const extractQueryParams = (inputString: string) => {
 
   if (inputString) {
     const queryParamsList = split(inputString, "&");
-    forEach(queryParamsList, (queryParam) => {
+    forEach(queryParamsList, (queryParam: string) => {
       const queryParamValues = split(queryParam, "=");
       queryParams.push({
         id: Math.random(),
