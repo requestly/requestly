@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import { Typography, Dropdown, MenuProps, Checkbox, notification } from "antd";
 import { REQUEST_METHOD_BACKGROUND_COLORS, REQUEST_METHOD_COLORS } from "../../../../../../../../../constants";
 import { RequestMethod, RQAPI } from "features/apiClient/types";
@@ -31,9 +31,7 @@ import { useWorkspaceId } from "features/apiClient/common/WorkspaceProvider";
 import { apiRecordsRankingManager } from "features/apiClient/helpers/RankingManager";
 import { ApiClientSidebarCollapse } from "../apiClientSidebarCollapse/ApiClientSidebarCollapse";
 import { ExampleRow } from "../exampleRow/ExampleRow";
-import { isEmpty } from "lodash";
-import { sessionStorage } from "utils/sessionStorage";
-import { SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY } from "features/apiClient/constants";
+import { useCollapsibleRow } from "../../../../../../../hooks/useCollapsibleRow";
 
 import clsx from "clsx";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
@@ -330,36 +328,11 @@ export const RequestRow: React.FC<Props> = ({
 
   const examples = record.data.examples || [];
 
-  const [activeKey, setActiveKey] = useState<string | undefined>(
-    expandedRecordIds?.includes(record.id) ? record.id : undefined
-  );
-
-  useEffect(() => {
-    setActiveKey(expandedRecordIds?.includes(record.id) ? record.id : undefined);
-  }, [expandedRecordIds, record.id]);
-
-  const updateExpandedRecordIds = useCallback(
-    (newExpandedIds: RQAPI.ApiClientRecord["id"][]) => {
-      setExpandedRecordIds?.(newExpandedIds);
-      isEmpty(newExpandedIds)
-        ? sessionStorage.removeItem(SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY)
-        : sessionStorage.setItem(SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY, newExpandedIds);
-    },
-    [setExpandedRecordIds]
-  );
-
-  const collapseChangeHandler = useCallback(
-    (keys: RQAPI.ApiClientRecord["id"][]) => {
-      let activeKeysCopy = [...expandedRecordIds];
-      if (isEmpty(keys)) {
-        activeKeysCopy = activeKeysCopy.filter((key) => key !== record.id);
-      } else if (!activeKeysCopy.includes(record.id)) {
-        activeKeysCopy.push(record.id);
-      }
-      updateExpandedRecordIds(activeKeysCopy);
-    },
-    [record, expandedRecordIds, updateExpandedRecordIds]
-  );
+  const { activeKey, collapseChangeHandler } = useCollapsibleRow({
+    recordId: record.id,
+    expandedRecordIds,
+    setExpandedRecordIds,
+  });
 
   const requestRowHeader = (
     <div
@@ -408,71 +381,6 @@ export const RequestRow: React.FC<Props> = ({
           tooltip: {
             title: record.name || record.data.request?.url,
             placement: "top",
-            color: "#000",
-            mouseEnterDelay: 0.5,
-          },
-        }}
-        className="request-url"
-      >
-        {record.name || record.data.request?.url}
-      </Typography.Text>
-
-      <Conditional condition={!isReadOnly}>
-        <div className={`request-options ${isDropdownVisible ? "active" : ""}`}>
-          <Dropdown
-            trigger={["click"]}
-            menu={{ items: requestOptions }}
-            placement="bottomRight"
-            open={isDropdownVisible}
-            onOpenChange={handleDropdownVisibleChange}
-          >
-            <RQButton
-              onClick={(e) => {
-                e.stopPropagation();
-                setShowSelection(false);
-              }}
-              size="small"
-              type="transparent"
-              icon={<MdOutlineMoreHoriz />}
-            />
-          </Dropdown>
-        </div>
-      </Conditional>
-    </div>
-  );
-
-  const simpleRequestContent = (
-    <div
-      className={`collections-list-item api ${record.id === activeTabSourceId ? "active" : ""} ${
-        selectedRecords.has(record.id) && showSelection ? "selected" : ""
-      }`}
-      onClick={(e) => {
-        if (onItemClick && (e.metaKey || e.ctrlKey)) {
-          onItemClick(record, e);
-          return;
-        }
-
-        openBufferedTab({
-          source: new RequestViewTabSource({
-            id: record.id,
-            apiEntryDetails: record,
-            title: record.name || record.data.request?.url,
-            context: {
-              id: workspaceId,
-            },
-          }),
-        });
-      }}
-    >
-      {showSelection && (
-        <Checkbox onChange={recordsSelectionHandler.bind(this, record)} checked={selectedRecords.has(record.id)} />
-      )}
-      <RequestIcon record={record} />
-      <Typography.Text
-        ellipsis={{
-          tooltip: {
-            title: record.name || record.data.request?.url,
-            placement: "right",
             color: "#000",
             mouseEnterDelay: 0.5,
           },
@@ -584,7 +492,71 @@ export const RequestRow: React.FC<Props> = ({
           }}
           style={{ opacity: isDragging || isDropProcessing ? 0.5 : 1 }}
         >
-          {simpleRequestContent}
+          <div
+            className={`collections-list-item api ${record.id === activeTabSourceId ? "active" : ""} ${
+              selectedRecords.has(record.id) && showSelection ? "selected" : ""
+            }`}
+            onClick={(e) => {
+              if (onItemClick && (e.metaKey || e.ctrlKey)) {
+                onItemClick(record, e);
+                return;
+              }
+
+              openBufferedTab({
+                source: new RequestViewTabSource({
+                  id: record.id,
+                  apiEntryDetails: record,
+                  title: record.name || record.data.request?.url,
+                  context: {
+                    id: workspaceId,
+                  },
+                }),
+              });
+            }}
+          >
+            {showSelection && (
+              <Checkbox
+                onChange={recordsSelectionHandler.bind(this, record)}
+                checked={selectedRecords.has(record.id)}
+              />
+            )}
+            <RequestIcon record={record} />
+            <Typography.Text
+              ellipsis={{
+                tooltip: {
+                  title: record.name || record.data.request?.url,
+                  placement: "right",
+                  color: "#000",
+                  mouseEnterDelay: 0.5,
+                },
+              }}
+              className="request-url"
+            >
+              {record.name || record.data.request?.url}
+            </Typography.Text>
+
+            <Conditional condition={!isReadOnly}>
+              <div className={`request-options ${isDropdownVisible ? "active" : ""}`}>
+                <Dropdown
+                  trigger={["click"]}
+                  menu={{ items: requestOptions }}
+                  placement="bottomRight"
+                  open={isDropdownVisible}
+                  onOpenChange={handleDropdownVisibleChange}
+                >
+                  <RQButton
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowSelection(false);
+                    }}
+                    size="small"
+                    type="transparent"
+                    icon={<MdOutlineMoreHoriz />}
+                  />
+                </Dropdown>
+              </div>
+            </Conditional>
+          </div>
         </div>
       )}
     </>
