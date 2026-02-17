@@ -420,6 +420,12 @@ export const parseCurlRequest = (curl: string): RQAPI.Request => {
           contentType = RequestContentType.FORM;
         } else if (httpContentType.includes("application/json")) {
           contentType = RequestContentType.JSON;
+        } else if (
+          httpContentType.includes("application/xml") ||
+          httpContentType.includes("text/xml") ||
+          httpContentType.includes("application/soap")
+        ) {
+          contentType = RequestContentType.XML;
         } else {
           contentType = RequestContentType.RAW;
         }

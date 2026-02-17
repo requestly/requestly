@@ -43,7 +43,6 @@
     margin-top: 16px;
     display: flex;
     flex-direction: column;
-    min-height: 200px;
 
     .imported-entities-container {
       display: flex;
@@ -175,16 +174,24 @@
   }
 
   &.expanded {
-    flex: 1;
     display: flex;
     flex-direction: column;
     margin-bottom: 0;
 
     .link-import-input-group {
-      flex: 1;
-      height: 100%;
       padding-bottom: 12px;
-      resize: none;
+
+      .link-input {
+        height: 200px;
+        min-height: unset;
+        resize: none;
+
+        textarea {
+          height: 100%;
+          resize: none;
+          min-height: unset;
+        }
+      }
     }
   }
 }
