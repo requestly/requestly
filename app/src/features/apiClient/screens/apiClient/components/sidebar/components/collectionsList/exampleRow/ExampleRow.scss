@@ -1,0 +1,12 @@
+.collections-list-item.example-row {
+  .example-row-icon {
+    flex-shrink: 0;
+    width: 14px;
+    height: 14px;
+    color: var(--requestly-color-text-subtle);
+  }
+
+  .example-row-name {
+    color: var(--requestly-color-text-subtle) !important;
+  }
+}
