@@ -22,6 +22,8 @@ export const DesktopSettings = () => {
   const appMode = useSelector(getAppMode);
   const [portInput, setPortInput] = useState("");
   const [portSubmitLoading, setPortSubmitLoading] = useState(false);
+  const [urlInput, setUrlInput] = useState("");
+  const [urlSubmitLoading, setUrlSubmitLoading] = useState(false);
 
   const closeInterceptingApps = () => {
     if (window.RQ && window.RQ && window.RQ.DESKTOP) {
@@ -63,6 +65,45 @@ export const DesktopSettings = () => {
   const regenerateRootCa = useCallback(() => {
     window.RQ.DESKTOP.SERVICES.IPC.invokeEventInMain("renew-ssl-certificates");
   }, []);
+
+  const handleUrlChange = async () => {
+    const isValidUrl = (urlString) => {
+      try {
+        const url = new URL(urlString);
+        return url.protocol === "http:" || url.protocol === "https:";
+      } catch {
+        return false;
+      }
+    };
+
+    if (!urlInput || !urlInput.trim()) {
+      toast.error("Please enter a URL");
+      return;
+    }
+
+    if (!isValidUrl(urlInput.trim())) {
+      toast.error("Please enter a valid HTTP or HTTPS URL");
+      return;
+    }
+
+    setUrlSubmitLoading(true);
+    try {
+      const response = await window.RQ.DESKTOP.SERVICES.IPC.invokeEventInMain("change-webapp-url", {
+        url: urlInput.trim(),
+      });
+
+      if (response.success) {
+        toast.success("Web app URL changed successfully. Window will recreate.");
+        setUrlInput("");
+      } else {
+        toast.error(response.error || "Failed to change URL");
+      }
+    } catch (error) {
+      toast.error("Failed to change URL: " + error.message);
+    } finally {
+      setUrlSubmitLoading(false);
+    }
+  };
 
   // add loader
   return appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? (
@@ -122,6 +163,44 @@ export const DesktopSettings = () => {
               />
             </Row>
           )}
+        </div>
+
+        {/* Custom Web App URL Section */}
+        <div className="mt-16">
+          <Row className="w-full" align="middle" gutter={8}>
+            <Col
+              span={13}
+              xs={{ span: 17 }}
+              sm={{ span: 16 }}
+              md={{ span: 15 }}
+              lg={{ span: 14 }}
+              xl={{ span: 13 }}
+              flex="0 1 420px"
+              align="left"
+            >
+              <label className="caption text-bold desktop-setting-port-input-label">Change Web App URL</label>
+              <Input
+                value={urlInput}
+                disabled={urlSubmitLoading}
+                placeholder="e.g., http://localhost:5000"
+                className="desktop-setting-port-input"
+                onChange={(e) => setUrlInput(e.target.value)}
+              />
+
+              <Popconfirm
+                okText="Continue"
+                cancelText="No"
+                placement="topLeft"
+                title="The app window will recreate with the new URL. Changes will not persist after app restart. Continue?"
+                onConfirm={handleUrlChange}
+              >
+                <Button className="desktop-port-update-btn" loading={urlSubmitLoading} disabled={!urlInput.trim()}>
+                  Update URL
+                </Button>
+              </Popconfirm>
+              <p className="text-gray text-xs mt-8">Note: URL will revert to default on app restart</p>
+            </Col>
+          </Row>
         </div>
 
         {isFeatureCompatible(FEATURES.REGENERATE_SSL_CERTS) ? (
