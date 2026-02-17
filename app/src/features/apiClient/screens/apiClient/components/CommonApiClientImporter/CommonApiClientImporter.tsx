@@ -21,7 +21,7 @@ import {
 } from "modules/analytics/events/features/apiClient";
 import "./commonApiClientImporter.scss";
 import { ImportErrorView } from "./components/ImporterErrorView";
-import { SuccessfulParseView } from "./components/SuccessfulParseView";
+import { SuccessfulParseView, SuccessfulParseViewProps } from "./components/SuccessfulParseView";
 import { wrapWithCustomSpan } from "utils/sentry";
 import { SPAN_STATUS_ERROR, SPAN_STATUS_OK } from "@sentry/core";
 
@@ -48,6 +48,7 @@ export interface CommonApiClientImporterProps {
   onImportSuccess: () => void;
   docsLink?: string;
   linkView?: LinkViewConfig;
+  renderSuccessView?: (props: SuccessfulParseViewProps) => React.ReactNode;
 }
 
 export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = ({
@@ -58,6 +59,7 @@ export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = (
   onImportSuccess,
   docsLink,
   linkView,
+  renderSuccessView,
 }) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isDataProcessing, setIsDataProcessing] = useState<boolean>(false);
@@ -471,100 +473,108 @@ export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = (
     [importRootCollection]
   );
 
-  const handleImportData = useCallback(async () => {
-    return wrapWithCustomSpan(
-      {
-        name: `[Transaction] api_client.${importerType.toLowerCase()}_import.import_data`,
-        op: `api_client.${importerType.toLowerCase()}_import.import_data`,
-        forceTransaction: true,
-        attributes: {},
-      },
-      async () => {
-        setIsLoading(true);
-        try {
-          const importPromises = [];
-          importPromises.push(handleImportEnvironments(environmentsData));
-          importPromises.push(handleImportCollections(collectionsData));
-          const importResults = await Promise.allSettled(importPromises);
+  const handleImportData = useCallback(
+    async (collectionsOverride?: RQAPI.CollectionRecord[], environmentsOverride?: EnvironmentData[]) => {
+      return wrapWithCustomSpan(
+        {
+          name: `[Transaction] api_client.${importerType.toLowerCase()}_import.import_data`,
+          op: `api_client.${importerType.toLowerCase()}_import.import_data`,
+          forceTransaction: true,
+          attributes: {},
+        },
+        async () => {
+          setIsLoading(true);
+          try {
+            const collectionsToImport = collectionsOverride || collectionsData;
+            const environmentsToImport = environmentsOverride || environmentsData;
 
-          const environmentResults = importResults[0];
-          const collectionResults = importResults[1];
+            const importPromises = [];
+            importPromises.push(handleImportEnvironments(environmentsToImport));
+            importPromises.push(handleImportCollections(collectionsToImport));
+            const importResults = await Promise.allSettled(importPromises);
 
-          let totalImported = 0;
-          let totalFailed = 0;
+            const environmentResults = importResults[0];
+            const collectionResults = importResults[1];
 
-          if (environmentResults && environmentResults.status === "fulfilled") {
-            const envResults = environmentResults.value as PromiseSettledResult<{ id: string; name: string }>[];
-            const successfulEnvironments = envResults.filter((result) => result.status === "fulfilled").length;
-            totalImported += successfulEnvironments;
-            totalFailed += envResults.length - successfulEnvironments;
-          } else {
-            totalFailed += environmentsData.length;
-          }
+            let totalImported = 0;
+            let totalFailed = 0;
 
-          if (collectionResults && collectionResults.status === "fulfilled") {
-            const collectionResult = collectionResults.value as {
-              success: boolean;
-              importedCount: number;
-              failedCount: number;
-            };
-            totalImported += collectionResult.importedCount;
-            totalFailed += collectionResult.failedCount;
-          } else {
-            totalFailed += collectionsData.length;
-          }
+            if (environmentResults && environmentResults.status === "fulfilled") {
+              const envResults = environmentResults.value as PromiseSettledResult<{ id: string; name: string }>[];
+              const successfulEnvironments = envResults.filter((result) => result.status === "fulfilled").length;
+              totalImported += successfulEnvironments;
+              totalFailed += envResults.length - successfulEnvironments;
+            } else {
+              totalFailed += environmentsToImport.length;
+            }
 
-          if (totalImported === 0) {
+            if (collectionResults && collectionResults.status === "fulfilled") {
+              const collectionResult = collectionResults.value as {
+                success: boolean;
+                importedCount: number;
+                failedCount: number;
+              };
+              totalImported += collectionResult.importedCount;
+              totalFailed += collectionResult.failedCount;
+            } else {
+              totalFailed += collectionsToImport.length;
+            }
+
+            if (totalImported === 0) {
+              setImportError("Failed to import collections and environments");
+              Sentry.captureException(new Error("Failed to import collections and environments"));
+              Sentry.getActiveSpan()?.setStatus({
+                code: SPAN_STATUS_ERROR,
+              });
+              return;
+            }
+
+            if (totalFailed === 0) {
+              toast.success(
+                `Successfully imported ${collectionsToImport.length} ${
+                  collectionsToImport.length !== 1 ? "collections" : "collection"
+                } and ${environmentsToImport.length} ${
+                  environmentsToImport.length !== 1 ? "environments" : "environment"
+                }`
+              );
+              trackImportSuccess(importerType, totalImported, null);
+              onImportSuccess();
+              Sentry.getActiveSpan()?.setStatus({
+                code: SPAN_STATUS_OK,
+              });
+            } else {
+              toast.warn(
+                `Partially imported: ${totalImported} succeeded, ${totalFailed} failed. Please review your files.`
+              );
+              trackImportSuccess(importerType, totalImported, null);
+              onImportSuccess();
+              Sentry.captureException(new Error("Partially imported collections and environments"));
+              Sentry.getActiveSpan()?.setStatus({
+                code: SPAN_STATUS_ERROR,
+              });
+            }
+          } catch (e) {
             setImportError("Failed to import collections and environments");
-            Sentry.captureException(new Error("Failed to import collections and environments"));
+            trackImportFailed(importerType, e.message);
+            Sentry.captureException(e);
             Sentry.getActiveSpan()?.setStatus({
               code: SPAN_STATUS_ERROR,
             });
-            return;
+          } finally {
+            setIsLoading(false);
           }
-
-          if (totalFailed === 0) {
-            toast.success(
-              `Successfully imported ${collectionsData.length} ${
-                collectionsData.length !== 1 ? "collections" : "collection"
-              } and ${environmentsData.length} ${environmentsData.length !== 1 ? "environments" : "environment"}`
-            );
-            trackImportSuccess(importerType, collectionsData.length, null);
-            onImportSuccess();
-            Sentry.getActiveSpan()?.setStatus({
-              code: SPAN_STATUS_OK,
-            });
-          } else {
-            toast.warn(
-              `Partially imported: ${totalImported} succeeded, ${totalFailed} failed. Please review your files.`
-            );
-            trackImportSuccess(importerType, totalImported, null);
-            onImportSuccess();
-            Sentry.captureException(new Error("Partially imported collections and environments"));
-            Sentry.getActiveSpan()?.setStatus({
-              code: SPAN_STATUS_ERROR,
-            });
-          }
-        } catch (e) {
-          setImportError("Failed to import collections and environments");
-          trackImportFailed(importerType, e.message);
-          Sentry.captureException(e);
-          Sentry.getActiveSpan()?.setStatus({
-            code: SPAN_STATUS_ERROR,
-          });
-        } finally {
-          setIsLoading(false);
         }
-      }
-    )();
-  }, [
-    collectionsData,
-    environmentsData,
-    handleImportEnvironments,
-    handleImportCollections,
-    onImportSuccess,
-    importerType,
-  ]);
+      )();
+    },
+    [
+      collectionsData,
+      environmentsData,
+      handleImportEnvironments,
+      handleImportCollections,
+      onImportSuccess,
+      importerType,
+    ]
+  );
 
   const HeaderComponent: React.FC<{}> = () => {
     return (
@@ -605,17 +615,27 @@ export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = (
       <HeaderComponent />
       <div className="common-api-client-importer-body">
         {isParseComplete ? (
-          <SuccessfulParseView
-            collectionsData={collectionsData}
-            environmentsData={environmentsData}
-            isLoading={isLoading}
-            handleImportData={handleImportData}
-          />
+          renderSuccessView ? (
+            renderSuccessView({
+              collectionsData,
+              environmentsData,
+              isLoading,
+              handleImportData,
+              onBack: handleResetImport,
+            })
+          ) : (
+            <SuccessfulParseView
+              collectionsData={collectionsData}
+              environmentsData={environmentsData}
+              isLoading={isLoading}
+              handleImportData={handleImportData}
+              onBack={handleResetImport}
+            />
+          )
         ) : (
           <>
             {linkView?.enabled && (
               <div className={`link-import-section ${isLinkViewExpanded ? "expanded" : ""}`}>
-                <p className="link-import-description">{linkView.placeholder}</p>
                 <div className="link-import-input-group">
                   <Input.TextArea
                     placeholder={linkView.placeholder}

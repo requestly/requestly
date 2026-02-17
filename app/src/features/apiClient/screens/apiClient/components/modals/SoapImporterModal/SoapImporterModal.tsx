@@ -5,6 +5,7 @@ import { ApiClientImporterMethod } from "@requestly/alternative-importers";
 import { ApiClientImporterType } from "@requestly/shared/types/entities/apiClient";
 import { useWsdlFetcher } from "../../../../../hooks/useWsdlFetcher";
 import { SoapImportError } from "../../../../../errors/SoapImportError/SoapImportError";
+import { SoapSuccessfulParseView } from "./SoapSuccessfulParseView";
 
 interface SoapImporterModalProps {
   isOpen: boolean;
@@ -31,6 +32,7 @@ export const SoapImporterModal: React.FC<SoapImporterModalProps> = ({ isOpen, on
         importerType={ApiClientImporterType.SOAP}
         onImportSuccess={onClose}
         docsLink="" // TBD: Add documentation link when available
+        renderSuccessView={(props) => <SoapSuccessfulParseView {...props} />}
         linkView={{
           enabled: true,
           placeholder: "Paste or type URL to import",
