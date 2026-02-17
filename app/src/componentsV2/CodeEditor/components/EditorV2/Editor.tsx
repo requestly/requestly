@@ -5,6 +5,7 @@ import { html } from "@codemirror/lang-html";
 import { json5 } from "codemirror-json5";
 import { json } from "@codemirror/lang-json";
 import { css } from "@codemirror/lang-css";
+import { xml } from "@codemirror/lang-xml";
 import { vscodeDark } from "@uiw/codemirror-theme-vscode";
 import { EditorLanguage, EditorCustomToolbar, AnalyticEventProperties } from "componentsV2/CodeEditor/types";
 import { ResizableBox } from "react-resizable";
@@ -142,6 +143,8 @@ const Editor: React.FC<EditorProps> = ({
         return json5();
       case EditorLanguage.HTML:
         return html();
+      case EditorLanguage.XML:
+        return xml();
       case EditorLanguage.CSS:
         return css();
       default:
