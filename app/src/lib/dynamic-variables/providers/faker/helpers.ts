@@ -1,6 +1,6 @@
 import type { Faker } from "@faker-js/faker";
 import type { DynamicVariable } from "../../types";
-import { VariableScope } from "backend/environment/types";
+import { VariableScope } from "../../../../backend/environment/types";
 
 export const createDynamicVariable = (
   name: string,
