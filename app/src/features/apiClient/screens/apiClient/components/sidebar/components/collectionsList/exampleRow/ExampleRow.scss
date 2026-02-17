@@ -1,4 +1,10 @@
 .collections-list-item.example-row {
+  &.active {
+    .example-row-name {
+      color: var(--requestly-color-text-default) !important;
+    }
+  }
+
   .example-row-icon {
     flex-shrink: 0;
     width: 14px;
