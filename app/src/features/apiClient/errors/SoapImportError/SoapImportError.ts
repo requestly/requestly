@@ -9,7 +9,7 @@ export enum SoapImportErrorType {
 }
 
 export const SOAP_IMPORT_ERROR_MESSAGES: Record<SoapImportErrorType, string> = {
-  [SoapImportErrorType.INVALID_URL]: "Please enter a valid URL starting with http:// or https://",
+  [SoapImportErrorType.INVALID_URL]: "Please enter a valid WSDL URL",
   [SoapImportErrorType.FETCH_FAILED]: "Failed to fetch WSDL from the provided URL",
   [SoapImportErrorType.INVALID_RESPONSE]: "The response does not appear to be valid WSDL/XML",
   [SoapImportErrorType.NETWORK_ERROR]: "Network error while fetching WSDL",

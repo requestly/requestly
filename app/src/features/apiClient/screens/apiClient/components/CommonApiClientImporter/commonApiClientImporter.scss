@@ -87,6 +87,7 @@
       font-size: var(--requestly-font-size-sm);
       padding: 8px;
       margin-bottom: 8px;
+      margin-top: 8px;
       background: var(--requestly-color-surface-2);
       border-radius: 8px;
       border: 1px solid var(--requestly-color-error-300);
@@ -118,6 +119,27 @@
     .importer-actions-row {
       margin-top: 16px;
     }
+
+    .soap-parsing-loading-view {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 250px;
+      gap: 16px;
+
+      .loading-text {
+        color: var(--requestly-color-text-default);
+        font-size: var(--requestly-font-size-md);
+        font-weight: 500;
+        margin-top: 8px;
+      }
+
+      .loading-subtext {
+        color: var(--requestly-color-text-subtle);
+        font-size: var(--requestly-font-size-sm);
+      }
+    }
   }
 
   &.importer-success {
@@ -148,7 +170,6 @@
 }
 
 .link-import-section {
-  margin-bottom: 12px;
   transition: all 0.2s ease;
 
   .link-import-description {
@@ -171,6 +192,12 @@
         resize: none;
       }
     }
+  }
+
+  .link-import-error {
+    color: var(--requestly-color-error);
+    font-size: var(--requestly-font-size-xs);
+    margin-top: 4px;
   }
 
   &.expanded {

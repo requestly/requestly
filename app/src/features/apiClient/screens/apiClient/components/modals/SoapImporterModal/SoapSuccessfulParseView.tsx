@@ -26,7 +26,7 @@ export const SoapSuccessfulParseView: React.FC<SuccessfulParseViewProps> = ({
   const firstRootCollection = collectionsData[0];
   const childrenCount = firstRootCollection?.data?.children?.length || 0;
   const hasMultipleVersions = childrenCount >= 2;
-  const [selectedVersion, setSelectedVersion] = useState<SoapVersion>(SoapVersion.V1_1);
+  const [selectedVersion, setSelectedVersion] = useState<SoapVersion>(SoapVersion.V1_2);
   const [organisation, setOrganisation] = useState<CollectionOrganisation>(CollectionOrganisation.PORT_ENDPOINT);
 
   const rawTargetCollections = useMemo(() => {
@@ -102,7 +102,7 @@ export const SoapSuccessfulParseView: React.FC<SuccessfulParseViewProps> = ({
               onChange={setSelectedVersion}
               options={[
                 { label: "SOAP 1.1", value: SoapVersion.V1_1 },
-                { label: "SOAP 1.2", value: SoapVersion.V1_2 },
+                { label: "SOAP 1.2 (Recommended)", value: SoapVersion.V1_2 },
               ]}
             />
           </div>
