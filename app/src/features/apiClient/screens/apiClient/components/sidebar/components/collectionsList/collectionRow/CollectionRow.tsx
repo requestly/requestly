@@ -29,12 +29,8 @@ import { useApiClientContext } from "features/apiClient/contexts";
 import { PostmanExportModal } from "../../../../modals/postmanCollectionExportModal/PostmanCollectionExportModal";
 import { MdOutlineVideoLibrary } from "@react-icons/all-files/md/MdOutlineVideoLibrary";
 import { CollectionRowOptionsCustomEvent, dispatchCustomEvent } from "./utils";
-import {
-  ApiClientFeatureContext,
-  EntityNotFound,
-  getApiClientFeatureContext,
-  moveRecords,
-} from "features/apiClient/slices";
+import { ApiClientFeatureContext, EntityNotFound } from "features/apiClient/slices";
+import { handleRecordDrop } from "../utils/handleRecordDrop";
 import { useWorkspaceId } from "features/apiClient/common/WorkspaceProvider";
 import { useActiveTab, useTabActions } from "componentsV2/Tabs/slice";
 import { getAncestorIds, getRecord } from "features/apiClient/slices/apiRecords/utils";
@@ -248,45 +244,21 @@ export const CollectionRow: React.FC<Props> = ({
     sessionStorage.removeItem("collapsed_collection_keys");
   }, []);
 
-  const handleRecordDrop = useCallback(
+  const handleRecordDropToCollection = useCallback(
     async (item: DraggableApiRecord, dropWorkspaceId: Workspace["id"]) => {
-      try {
-        const sourceContext = getApiClientFeatureContext(item.workspaceId);
-        if (!sourceContext) {
-          throw new Error(`Source context not found for id: ${item.workspaceId}`);
-        }
-
-        const destination = {
-          workspaceId: dropWorkspaceId,
-          collectionId: record.id,
-        };
-
-        await sourceContext.store
-          .dispatch(
-            moveRecords({
-              recordsToMove: [item.record],
-              collectionId: destination.collectionId,
-              repository: sourceContext.repositories.apiClientRecordsRepository,
-              sourceWorkspaceId: item.workspaceId,
-              destinationWorkspaceId: destination.workspaceId,
-            }) as any
-          )
-          .unwrap();
-
-        if (!expandedRecordIds.includes(record.id)) {
-          const newExpandedRecordIds = [...expandedRecordIds, destination.collectionId];
-          setExpandedRecordIds(newExpandedRecordIds);
-          sessionStorage.setItem(SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY, newExpandedRecordIds);
-        }
-      } catch (error) {
-        notification.error({
-          message: "Error moving item",
-          description: error?.message || "Failed to move item. Please try again.",
-          placement: "bottomRight",
-        });
-      } finally {
-        setIsCollectionRowLoading(false);
-      }
+      await handleRecordDrop(item, dropWorkspaceId, {
+        targetCollectionId: record.id,
+        onSuccess: () => {
+          if (!expandedRecordIds.includes(record.id)) {
+            const newExpandedRecordIds = [...expandedRecordIds, record.id];
+            setExpandedRecordIds(newExpandedRecordIds);
+            sessionStorage.setItem(SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY, newExpandedRecordIds);
+          }
+        },
+        onFinally: () => {
+          setIsCollectionRowLoading(false);
+        },
+      });
     },
     [record.id, expandedRecordIds, setExpandedRecordIds]
   );
@@ -336,14 +308,14 @@ export const CollectionRow: React.FC<Props> = ({
 
         if (item.record.id === record.id) return;
         setIsCollectionRowLoading(true);
-        handleRecordDrop(item, workspaceId);
+        handleRecordDropToCollection(item, workspaceId);
       },
       canDrop: checkCanDropItem,
       collect: (monitor) => ({
         isOver: monitor.isOver({ shallow: true }),
       }),
     }),
-    [handleRecordDrop, checkCanDropItem, workspaceId]
+    [handleRecordDropToCollection, checkCanDropItem, workspaceId]
   );
 
   return (
