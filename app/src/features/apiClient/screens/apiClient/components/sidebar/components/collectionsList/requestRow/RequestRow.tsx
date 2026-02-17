@@ -111,19 +111,17 @@ export const RequestRow: React.FC<Props> = ({
   const [{ isDragging }, drag] = useDrag(
     () => ({
       type: RQAPI.RecordType.API,
-      item: {
-        record,
-        workspaceId,
-        onDropComplete: () => setIsDropProcessing(false),
+      item: () => {
+        setIsDropProcessing(true);
+        return {
+          record,
+          workspaceId,
+          onDropComplete: () => setIsDropProcessing(false),
+        };
       },
       collect: (monitor) => ({
         isDragging: monitor.isDragging(),
       }),
-      end: (item, monitor) => {
-        if (monitor.didDrop()) {
-          setIsDropProcessing(true);
-        }
-      },
     }),
     [record, workspaceId]
   );
@@ -131,10 +129,12 @@ export const RequestRow: React.FC<Props> = ({
     () => ({
       accept: [RQAPI.RecordType.API],
       canDrop: (item: { record: RQAPI.ApiClientRecord; workspaceId: string; onDropComplete?: () => void }) => {
-        if (isReadOnly) return false;
-
-        if (item.record.id === record.id) return false;
-        if (!isFeatureCompatible(FEATURES.API_CLIENT_RECORDS_REORDERING)) {
+        if (
+          isReadOnly ||
+          item.record.id === record.id ||
+          !isFeatureCompatible(FEATURES.API_CLIENT_RECORDS_REORDERING)
+        ) {
+          item.onDropComplete?.();
           return false;
         }
         return true;
