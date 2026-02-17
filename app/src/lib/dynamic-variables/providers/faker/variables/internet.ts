@@ -35,7 +35,7 @@ export const createInternetVariables: CategoryCreator = (faker) => [
       return faker.internet.password({ length, memorable, pattern, prefix });
     }
   ),
-  createDynamicVariable("$randomLocale", "A random two-letter language code (ISO 639-1)", "fr", () =>
+  createDynamicVariable("$randomLocale", "A random two-letter language code (ISO 3166-1)", "fr", () =>
     faker.location.countryCode("alpha-2").toLowerCase()
   ),
   createDynamicVariable(
