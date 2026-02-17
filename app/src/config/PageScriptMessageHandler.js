@@ -1,8 +1,13 @@
 import Logger from "lib/logger";
 
+const MESSAGE_BUFFER_TIMEOUT_MS = 10000;
+const MESSAGE_BUFFER_MAX_SIZE = 50;
+
 const PageScriptMessageHandler = {
   eventCallbackMap: {},
   messageListeners: {},
+  messageBuffer: [],
+  isBufferingEnabled: true,
   requestId: 1,
   isInitialized: false,
 
@@ -13,6 +18,18 @@ const PageScriptMessageHandler = {
 
   addMessageListener: function (messageAction, listener) {
     this.messageListeners[messageAction] = listener;
+
+    this.messageBuffer = this.messageBuffer.filter((message) => {
+      if (message.action !== messageAction) {
+        return true;
+      }
+
+      const response = listener(message);
+      if (response) {
+        this.sendResponse(message, response);
+      }
+      return false;
+    });
   },
 
   removeMessageListener: function (messageName) {
@@ -88,6 +105,11 @@ const PageScriptMessageHandler = {
       if (response) {
         this.sendResponse(message, response);
       }
+    } else if (this.isBufferingEnabled) {
+      if (this.messageBuffer.length >= MESSAGE_BUFFER_MAX_SIZE) {
+        this.messageBuffer.shift();
+      }
+      this.messageBuffer.push(message);
     }
   },
 
@@ -108,6 +130,11 @@ const PageScriptMessageHandler = {
     if (!this.isInitialized) {
       window.addEventListener("message", this.handleMessageReceived.bind(this));
       this.isInitialized = true;
+
+      setTimeout(() => {
+        this.isBufferingEnabled = false;
+        this.messageBuffer = [];
+      }, MESSAGE_BUFFER_TIMEOUT_MS);
     }
   },
 };
