@@ -11,8 +11,33 @@ import {
   trackEmailVerificationSendSuccess,
 } from "modules/analytics/events/common/auth/emailVerification";
 import Logger from "lib/logger";
+import { globalActions } from "store/slices/global/slice";
 
 const TRACKING = APP_CONSTANTS.GA_EVENTS;
+
+/**
+ * @typedef {Object} refer the props of components/authentication/AuthModal/index.js
+ *
+ * @argument {string} redirectBackTo - if passed, will redirect back to the source when auth is successfully completed
+ */
+export const showAuthModal = (dispatch, modalProps, redirectBackTo) => {
+  if (!dispatch || !modalProps) {
+    throw new Error("dispatch and modalProps are required");
+  }
+  if (redirectBackTo) {
+    localStorage.setItem("authTriggerSource", redirectBackTo);
+  }
+  dispatch(
+    globalActions.toggleActiveModal({
+      modalName: "authModal",
+      newValue: true,
+      newProps: {
+        redirectURL: redirectBackTo,
+        ...modalProps,
+      },
+    })
+  );
+};
 
 /**
  * Email verified bool is taken from firebase database instead of data provided by firebase auth api
