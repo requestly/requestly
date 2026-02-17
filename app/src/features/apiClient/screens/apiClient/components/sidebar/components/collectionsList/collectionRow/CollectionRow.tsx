@@ -489,7 +489,7 @@ export const CollectionRow: React.FC<Props> = ({
                   ellipsis={{
                     tooltip: {
                       title: record.name,
-                      placement: "right",
+                      placement: "top",
                       color: "#000",
                       mouseEnterDelay: 0.5,
                     },

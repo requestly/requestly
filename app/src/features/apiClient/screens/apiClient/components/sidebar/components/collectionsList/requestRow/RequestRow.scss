@@ -45,12 +45,14 @@ svg.graphql-request-icon {
   display: flex;
   align-items: center;
   gap: var(--requestly-space-2, 4px);
-  padding: var(--space-2, 4px);
+  // padding: var(--space-2, 4px);
   border-radius: 4px;
   cursor: pointer;
   transition: background-color 0.2s ease;
+}
 
-  &:hover .request-options {
-    display: block;
+.request-with-examples-row {
+  .ant-collapse-header:hover .request-options {
+    display: block !important;
   }
 }
