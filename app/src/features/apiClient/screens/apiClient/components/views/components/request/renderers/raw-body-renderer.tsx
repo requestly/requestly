@@ -39,7 +39,15 @@ export function RawBody(props: {
     { leading: true, trailing: true }
   );
 
-  const editorLanguage = contentType === RequestContentType.JSON ? EditorLanguage.JSON5 : null;
+  let editorLanguage;
+  switch (contentType) {
+    case RequestContentType.JSON:
+      editorLanguage = EditorLanguage.JSON5;
+      break;
+    case RequestContentType.XML:
+      editorLanguage = EditorLanguage.XML;
+      break;
+  }
 
   return (
     <>
@@ -55,7 +63,7 @@ export function RawBody(props: {
           toolbarOptions={{ title: "", options: [editorOptions] }}
           analyticEventProperties={{ source: "api_client" }}
           showOptions={{
-            enablePrettify: contentType === RequestContentType.JSON,
+            enablePrettify: contentType === RequestContentType.JSON || contentType === RequestContentType.XML,
           }}
           disableDefaultAutoCompletions={true}
           customTheme={autocompleteExtension}
