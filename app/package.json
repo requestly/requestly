@@ -108,7 +108,7 @@
     "dexie": "^4.2.1",
     "fflate": "^0.7.3",
     "file-saver": "^2.0.5",
-    "firebase": "^10.8.1",
+    "firebase": "^11.0.0",
     "framer-motion": "^10.16.16",
     "fuzzysort": "^2.0.4",
     "graphiql-explorer": "^0.9.0",
