@@ -18,7 +18,7 @@ import { getApiClientFeatureContext } from "../workspaceView/helpers/ApiClientCo
 import { Workspace } from "features/workspaces/types";
 import { erroredRecordsActions } from "../erroredRecords";
 import { closeTabByEntityId } from "componentsV2/Tabs/slice";
-import { apiRecordsRankingManager } from "features/apiClient/helpers/RankingManager";
+import * as Sentry from "@sentry/react";
 
 type Repository = ApiClientRecordsInterface<Record<string, unknown>>;
 
@@ -148,6 +148,7 @@ export const forceRefreshRecords = createAsyncThunk<boolean, { repository: Repos
 
       return true;
     } catch (error) {
+      Sentry.captureException(error);
       return rejectWithValue(error instanceof Error ? error.message : "Failed to refresh records");
     }
   }
@@ -198,7 +199,14 @@ export const moveRecords = createAsyncThunk<
 
       return { movedRecords };
     } catch (error) {
-      return rejectWithValue("Failed to move records");
+      Sentry.captureException(error, {
+        extra: {
+          collectionId,
+          sourceWorkspaceId,
+          destinationWorkspaceId,
+        },
+      });
+      return rejectWithValue(error instanceof Error ? error.message : "Failed to move records");
     }
   }
 );
@@ -227,6 +235,11 @@ export const duplicateRecords = createAsyncThunk<
 
     return { duplicatedRecords };
   } catch (error) {
+    Sentry.captureException(error, {
+      extra: {
+        recordIds,
+      },
+    });
     return rejectWithValue(error instanceof Error ? error.message : "Failed to duplicate records");
   }
 });

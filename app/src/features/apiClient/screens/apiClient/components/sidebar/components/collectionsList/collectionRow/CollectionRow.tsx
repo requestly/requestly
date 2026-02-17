@@ -296,7 +296,7 @@ export const CollectionRow: React.FC<Props> = ({
       } catch (error) {
         notification.error({
           message: "Error moving item",
-          description: error?.message || "Failed to move item. Please try again.",
+          description: error?.message || (typeof error === "string" ? error : "Failed to move item. Please try again."),
           placement: "bottomRight",
         });
       } finally {

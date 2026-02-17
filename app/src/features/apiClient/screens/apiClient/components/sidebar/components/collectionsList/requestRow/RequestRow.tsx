@@ -201,7 +201,8 @@ export const RequestRow: React.FC<Props> = ({
         } catch (error) {
           notification.error({
             message: "Error moving record",
-            description: error?.message || "Unexpected error. Please contact support.",
+            description:
+              error?.message || (typeof error === "string" ? error : "Unexpected error. Please contact support."),
             placement: "bottomRight",
           });
         } finally {
