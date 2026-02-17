@@ -1,6 +1,6 @@
-import { variableResolver } from "lib/dynamic-variables";
-import { DynamicVariable } from "lib/dynamic-variables/types";
-import { VariableScope } from "backend/environment/types";
+import { variableResolver } from "../../../../lib/dynamic-variables";
+import { DynamicVariable } from "../../../../lib/dynamic-variables/types";
+import { VariableScope } from "../../../../backend/environment/types";
 import { ScopedVariable, ScopedVariables } from "./variable-resolver";
 
 export type Variable = ScopedVariable | DynamicVariable;
