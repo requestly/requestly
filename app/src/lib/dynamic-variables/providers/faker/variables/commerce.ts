@@ -8,8 +8,8 @@ import { createDynamicVariable, toInt } from "../helpers";
  */
 export const createCommerceVariables: CategoryCreator = (faker) => [
   createDynamicVariable("$randomPrice", "A random price between 0.00 and 1000.00", "247.99", (...args: unknown[]) => {
-    if (!args[0]) return faker.commerce.price();
-    if (!args[1]) return faker.commerce.price({ min: 0, max: toInt(args[0]) });
+    if (args[0] === undefined || args[0] === null) return faker.commerce.price();
+    if (args[1] === undefined || args[1] === null) return faker.commerce.price({ min: 0, max: toInt(args[0]) });
     const min = toInt(args[0]);
     const max = toInt(args[1]);
     const dec = args[2] ? toInt(args[2]) : undefined;
