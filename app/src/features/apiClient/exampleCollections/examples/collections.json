@@ -11,10 +11,97 @@
           "authConfigStore": {}
         }
       },
-      "deleted": false,
       "collectionId": "",
-      "id": "6fbefe49-e016-42a2-a254-90568a1f5032",
-      "description": "Sample Collections"
+      "deleted": false,
+      "description": "Sample Collections",
+      "id": "tY8UZ0VhAIxIblpFq4I9"
+    },
+    {
+      "name": "GraphQL",
+      "type": "collection",
+      "data": {
+        "auth": {
+          "authConfigStore": {},
+          "currentAuthType": "INHERIT"
+        },
+        "variables": {}
+      },
+      "collectionId": "tY8UZ0VhAIxIblpFq4I9",
+      "deleted": false,
+      "description": "This collection demonstrates how to work with **GraphQL APIs** using different types of operations against the [GraphQLZero public API](https://graphqlzero.almansi.me/). It covers common patterns for querying, mutating, and combining multiple queries within a single request.\n\nThe collection includes:\n\n1. **Get User Details (Query)** \nFetches information about a user by ID, including basic profile data, posts, and address details.\n    \n2. **Create New User (Mutation)** \nDemonstrates how to send variables into a GraphQL mutation to create a new user with nested address and company fields.\n    \n3. **Get User Posts / Albums (Multiple Queries)** \nShows how to execute multiple queries in one request, retrieving both posts and albums of a user simultaneously.\n    \n\nUse this collection as a starting point to learn and test how GraphQL queries, mutations, and combined queries work in real-world APIs.",
+      "id": "3kutqEiDgCy2lXnlYLTh"
+    },
+    {
+      "name": "Create new User",
+      "type": "api",
+      "data": {
+        "request": {
+          "operation": "mutation CreateUser($name: String!, $username: String!, $email: String!, $street: String!, $suite: String!, $city: String!, $zipcode: String!, $lat: Float!, $lng: Float!, $phone: String!, $website: String!, $companyName: String!, $companyCatchPhrase: String!) {\n  createUser(\n    input: {name: $name, username: $username, email: $email, address: {street: $street, suite: $suite, city: $city, zipcode: $zipcode, geo: {lat: $lat, lng: $lng}}, phone: $phone, website: $website, company: {name: $companyName, catchPhrase: $companyCatchPhrase}}\n  ) {\n    id\n    name\n    username\n    email\n    phone\n    website\n    company {\n      name\n    }\n  }\n}",
+          "headers": [],
+          "variables": "{\n  \"name\": \"John Doe\",\n  \"username\": \"john_doe\",\n  \"email\": \"john@example.com\",\n  \"street\": \"street 1\",\n  \"suite\": \"suite 2\",\n  \"city\": \"london\",\n  \"zipcode\": \"SW1A 0AA\",\n  \"lat\": 51.5085,\n  \"lng\": 0.12574,\n  \"phone\": \"123456789\",\n  \"website\": \"johndoe.com\",\n  \"companyName\": \"Enterprise\",\n  \"companyCatchPhrase\": \"Enter Surprise\"\n}",
+          "url": "https://graphqlzero.almansi.me/api"
+        },
+        "scripts": {
+          "preRequest": "",
+          "postResponse": ""
+        },
+        "type": "graphql",
+        "auth": {
+          "authConfigStore": {},
+          "currentAuthType": "INHERIT"
+        }
+      },
+      "collectionId": "3kutqEiDgCy2lXnlYLTh",
+      "deleted": false,
+      "id": "PXEhMM7906F3gNmY3kE7"
+    },
+    {
+      "name": "Get User Details",
+      "type": "api",
+      "data": {
+        "request": {
+          "variables": "{\n  \"userid\" : \"1\"\n}",
+          "url": "https://graphqlzero.almansi.me/api",
+          "headers": [],
+          "operation": "query GetUser($userid: ID!) {\n  user(id: $userid) {\n    id\n    name\n    email\n    posts {\n      data {\n        id\n        title\n      }\n    }\n    address {\n      city\n      street\n      zipcode\n    }\n  }\n}"
+        },
+        "type": "graphql",
+        "auth": {
+          "authConfigStore": {},
+          "currentAuthType": "INHERIT"
+        },
+        "scripts": {
+          "postResponse": "",
+          "preRequest": ""
+        }
+      },
+      "collectionId": "3kutqEiDgCy2lXnlYLTh",
+      "deleted": false,
+      "id": "OtQlmSo83tuQGQpnj0tS"
+    },
+    {
+      "name": "Get User Posts / Albums",
+      "type": "api",
+      "data": {
+        "auth": {
+          "authConfigStore": {},
+          "currentAuthType": "INHERIT"
+        },
+        "scripts": {
+          "preRequest": "",
+          "postResponse": ""
+        },
+        "request": {
+          "headers": [],
+          "variables": "{\n  \"userid\": 3\n}",
+          "url": "https://graphqlzero.almansi.me/api",
+          "operation": "query GetUserPosts($userid: ID!) {\n    user(id: $userid) {\n        name\n        username\n        email\n        phone\n        website\n        id\n        posts {\n            data {\n                id\n                title\n                body\n            }\n        }\n    }\n}\n\n\nquery GetUserAlbums($userid: ID!) {\n    user(id: $userid) {\n        id\n        name\n        username\n        email\n        phone\n        website\n        albums {\n            data {\n                id\n                title\n            }\n        }\n    }\n}\n"
+        },
+        "type": "graphql"
+      },
+      "collectionId": "3kutqEiDgCy2lXnlYLTh",
+      "deleted": false,
+      "id": "yryhFJYGN87b2y3YWLea"
     },
     {
       "name": "HackerNews API",
@@ -37,10 +124,10 @@
           "authConfigStore": {}
         }
       },
-      "collectionId": "6fbefe49-e016-42a2-a254-90568a1f5032",
+      "collectionId": "tY8UZ0VhAIxIblpFq4I9",
       "deleted": false,
       "description": "Documentation is here: [https://github.com/HackerNews/API](https://github.com/HackerNews/API)\n\n## Overview\n\nIn partnership with [Firebase](https://firebase.google.com/), we're making the public Hacker News data available in near real time. Firebase enables easy access from [Android](https://firebase.google.com/docs/android/setup), [iOS](https://firebase.google.com/docs/ios/setup) and the [web](https://firebase.google.com/docs/web/setup). [Servers](https://firebase.google.com/docs/server/setup) aren't left out.\n\nIf you can use one of the many [Firebase client libraries](https://firebase.google.com/docs/libraries/), you really should. The libraries handle networking efficiently and can raise events when things change. Be sure to check them out.\n\nPlease email api@ycombinator.com if you find any bugs.\n\n## URI and Versioning\n\nWe hope to improve the API over time. The changes won't always be backward compatible, so we're going to use versioning. This first iteration will have URIs prefixed with `https://hacker-news.firebaseio.com/v0/` and is structured as described below. There is currently no rate limit.\n\nFor versioning purposes, only removal of a non-optional field or alteration of an existing field will be considered incompatible changes. *Clients should gracefully handle additional fields they don't expect, and simply ignore them.*\n\n## Design\n\nThe v0 API is essentially a dump of our in-memory data structures. We know, what works great locally in memory isn't so hot over the network. Many of the awkward things are just the way HN works internally. Want to know the total number of comments on an article? Traverse the tree and count. Want to know the children of an item? Load the item and get their IDs, then load them. The newest page? Starts at item maxid and walks backward, keeping only the top level stories. Same for Ask, Show, etc.\n\nI'm not saying this to defend it - It's not the ideal public API, but it's the one we could release in the time we had. While awkward, it's possible to implement most of HN using it.\n\n## Items\n\nStories, comments, jobs, Ask HNs and even polls are just items. They're identified by their ids, which are unique integers, and live under `/v0/item/<id>`.\n\nAll items have some of the following properties, with required properties in bold:\n\nField | Description\n------|------------\n**id** | The item's unique id.\ndeleted | `true` if the item is deleted.\ntype | The type of item. One of \"job\", \"story\", \"comment\", \"poll\", or \"pollopt\".\nby | The username of the item's author.\ntime | Creation date of the item, in [Unix Time](http://en.wikipedia.org/wiki/Unix_time).\ntext | The comment, story or poll text. HTML.\ndead | `true` if the item is dead.\nparent | The comment's parent: either another comment or the relevant story.\npoll | The pollopt's associated poll.\nkids | The ids of the item's comments, in ranked display order.\nurl | The URL of the story.\nscore | The story's score, or the votes for a pollopt.\ntitle | The title of the story, poll or job. HTML.\nparts | A list of related pollopts, in display order.\ndescendants | In the case of stories or polls, the total comment count.\n\nFor example, a story: https://hacker-news.firebaseio.com/v0/item/8863.json?print=pretty\n\n```javascript\n{\n  \"by\" : \"dhouston\",\n  \"descendants\" : 71,\n  \"id\" : 8863,\n  \"kids\" : [ 8952, 9224, 8917, 8884, 8887, 8943, 8869, 8958, 9005, 9671, 8940, 9067, 8908, 9055, 8865, 8881, 8872, 8873, 8955, 10403, 8903, 8928, 9125, 8998, 8901, 8902, 8907, 8894, 8878, 8870, 8980, 8934, 8876 ],\n  \"score\" : 111,\n  \"time\" : 1175714200,\n  \"title\" : \"My YC app: Dropbox - Throw away your USB drive\",\n  \"type\" : \"story\",\n  \"url\" : \"http://www.getdropbox.com/u/2/screencast.html\"\n}\n```\n\ncomment: https://hacker-news.firebaseio.com/v0/item/2921983.json?print=pretty\n\n```javascript\n{\n  \"by\" : \"norvig\",\n  \"id\" : 2921983,\n  \"kids\" : [ 2922097, 2922429, 2924562, 2922709, 2922573, 2922140, 2922141 ],\n  \"parent\" : 2921506,\n  \"text\" : \"Aw shucks, guys ... you make me blush with your compliments.<p>Tell you what, Ill make a deal: I'll keep writing if you keep reading. K?\",\n  \"time\" : 1314211127,\n  \"type\" : \"comment\"\n}\n```\n\nask: https://hacker-news.firebaseio.com/v0/item/121003.json?print=pretty\n\n```javascript\n{\n  \"by\" : \"tel\",\n  \"descendants\" : 16,\n  \"id\" : 121003,\n  \"kids\" : [ 121016, 121109, 121168 ],\n  \"score\" : 25,\n  \"text\" : \"<i>or</i> HN: the Next Iteration<p>I get the impression that with Arc being released a lot of people who never had time for HN before are suddenly dropping in more often. (PG: what are the numbers on this? I'm envisioning a spike.)<p>Not to say that isn't great, but I'm wary of Diggification. Between links comparing programming to sex and a flurry of gratuitous, ostentatious  adjectives in the headlines it's a bit concerning.<p>80% of the stuff that makes the front page is still pretty awesome, but what's in place to keep the signal/noise ratio high? Does the HN model still work as the community scales? What's in store for (++ HN)?\",\n  \"time\" : 1203647620,\n  \"title\" : \"Ask HN: The Arc Effect\",\n  \"type\" : \"story\"\n}\n```\n\njob: https://hacker-news.firebaseio.com/v0/item/192327.json?print=pretty\n\n```javascript\n{\n  \"by\" : \"justin\",\n  \"id\" : 192327,\n  \"score\" : 6,\n  \"text\" : \"Justin.tv is the biggest live video site online. We serve hundreds of thousands of video streams a day, and have supported up to 50k live concurrent viewers. Our site is growing every week, and we just added a 10 gbps line to our colo. Our unique visitors are up 900% since January.<p>There are a lot of pieces that fit together to make Justin.tv work: our video cluster, IRC server, our web app, and our monitoring and search services, to name a few. A lot of our website is dependent on Flash, and we're looking for talented Flash Engineers who know AS2 and AS3 very well who want to be leaders in the development of our Flash.<p>Responsibilities<p><pre><code>    * Contribute to product design and implementation discussions\\n    * Implement projects from the idea phase to production\\n    * Test and iterate code before and after production release \\n</code></pre>\\nQualifications<p><pre><code>    * You should know AS2, AS3, and maybe a little be of Flex.\\n    * Experience building web applications.\\n    * A strong desire to work on website with passionate users and ideas for how to improve it.\\n    * Experience hacking video streams, python, Twisted or rails all a plus.\\n</code></pre>\\nWhile we're growing rapidly, Justin.tv is still a small, technology focused company, built by hackers for hackers. Seven of our ten person team are engineers or designers. We believe in rapid development, and push out new code releases every week. We're based in a beautiful office in the SOMA district of SF, one block from the caltrain station. If you want a fun job hacking on code that will touch a lot of people, JTV is for you.<p>Note: You must be physically present in SF to work for JTV. Completing the technical problem at <a href=\\\"http://www.justin.tv/problems/bml\\\" rel=\\\"nofollow\\\">http://www.justin.tv/problems/bml</a> will go a long way with us. Cheers!\",\n  \"time\" : 1210981217,\n  \"title\" : \"Justin.tv is looking for a Lead Flash Engineer!\",\n  \"type\" : \"job\",\n  \"url\" : \"\"\n}\n```\n\npoll: https://hacker-news.firebaseio.com/v0/item/126809.json?print=pretty\n\n```javascript\n{\n  \"by\" : \"pg\",\n  \"descendants\" : 54,\n  \"id\" : 126809,\n  \"kids\" : [ 126822, 126823, 126993, 126824, 126934, 127411, 126888, 127681, 126818, 126816, 126854, 127095, 126861, 127313, 127299, 126859, 126852, 126882, 126832, 127072, 127217, 126889, 127535, 126917, 126875 ],\n  \"parts\" : [ 126810, 126811, 126812 ],\n  \"score\" : 46,\n  \"text\" : \"\",\n  \"time\" : 1204403652,\n  \"title\" : \"Poll: What would happen if News.YC had explicit support for polls?\",\n  \"type\" : \"poll\"\n}\n```\n\nand one of its parts: https://hacker-news.firebaseio.com/v0/item/160705.json?print=pretty\n\n```javascript\n{\n  \"by\" : \"pg\",\n  \"id\" : 160705,\n  \"poll\" : 160704,\n  \"score\" : 335,\n  \"text\" : \"Yes, ban them; I'm tired of seeing Valleywag stories on News.YC.\",\n  \"time\" : 1207886576,\n  \"type\" : \"pollopt\"\n}\n```\n\n## Users\n\nUsers are identified by case-sensitive ids, and live under `/v0/user/`. Only users that have public activity (comments or story submissions) on the site are available through the API.\n\nField | Description\n------|------------\n**id** | The user's unique username. Case-sensitive. Required.\n**created** | Creation date of the user, in [Unix Time](http://en.wikipedia.org/wiki/Unix_time).\n**karma** | The user's karma.\nabout | The user's optional self-description. HTML.\nsubmitted | List of the user's stories, polls and comments.\n\nFor example: https://hacker-news.firebaseio.com/v0/user/jl.json?print=pretty\n\n```javascript\n{\n  \"about\" : \"This is a test\",\n  \"created\" : 1173923446,\n  \"delay\" : 0,\n  \"id\" : \"jl\",\n  \"karma\" : 2937,\n  \"submitted\" : [ 8265435, 8168423, 8090946, 8090326, 7699907, 7637962, 7596179, 7596163, 7594569, 7562135, 7562111, 7494708, 7494171, 7488093, 7444860, 7327817, 7280290, 7278694, 7097557, 7097546, 7097254, 7052857, 7039484, 6987273, 6649999, 6649706, 6629560, 6609127, 6327951, 6225810, 6111999, 5580079, 5112008, 4907948, 4901821, 4700469, 4678919, 3779193, 3711380, 3701405, 3627981, 3473004, 3473000, 3457006, 3422158, 3136701, 2943046, 2794646, 2482737, 2425640, 2411925, 2408077, 2407992, 2407940, 2278689, 2220295, 2144918, 2144852, 1875323, 1875295, 1857397, 1839737, 1809010, 1788048, 1780681, 1721745, 1676227, 1654023, 1651449, 1641019, 1631985, 1618759, 1522978, 1499641, 1441290, 1440993, 1436440, 1430510, 1430208, 1385525, 1384917, 1370453, 1346118, 1309968, 1305415, 1305037, 1276771, 1270981, 1233287, 1211456, 1210688, 1210682, 1194189, 1193914, 1191653, 1190766, 1190319, 1189925, 1188455, 1188177, 1185884, 1165649, 1164314, 1160048, 1159156, 1158865, 1150900, 1115326, 933897, 924482, 923918, 922804, 922280, 922168, 920332, 919803, 917871, 912867, 910426, 902506, 891171, 807902, 806254, 796618, 786286, 764412, 764325, 642566, 642564, 587821, 575744, 547504, 532055, 521067, 492164, 491979, 383935, 383933, 383930, 383927, 375462, 263479, 258389, 250751, 245140, 243472, 237445, 229393, 226797, 225536, 225483, 225426, 221084, 213940, 213342, 211238, 210099, 210007, 209913, 209908, 209904, 209903, 170904, 165850, 161566, 158388, 158305, 158294, 156235, 151097, 148566, 146948, 136968, 134656, 133455, 129765, 126740, 122101, 122100, 120867, 120492, 115999, 114492, 114304, 111730, 110980, 110451, 108420, 107165, 105150, 104735, 103188, 103187, 99902, 99282, 99122, 98972, 98417, 98416, 98231, 96007, 96005, 95623, 95487, 95475, 95471, 95467, 95326, 95322, 94952, 94681, 94679, 94678, 94420, 94419, 94393, 94149, 94008, 93490, 93489, 92944, 92247, 91713, 90162, 90091, 89844, 89678, 89498, 86953, 86109, 85244, 85195, 85194, 85193, 85192, 84955, 84629, 83902, 82918, 76393, 68677, 61565, 60542, 47745, 47744, 41098, 39153, 38678, 37741, 33469, 12897, 6746, 5252, 4752, 4586, 4289 ]\n}\n```\n\n## Live Data\n\nThe coolest part of Firebase is its support for change notifications. While you can subscribe to individual items and profiles, you'll need to use the following to observe front page ranking, new items, and new profiles.\n\n### Max Item ID\n\nThe current largest item id is at `/v0/maxitem`. You can walk backward from here to discover all items.\n\nExample: https://hacker-news.firebaseio.com/v0/maxitem.json?print=pretty\n\n```javascript\n9130260\n```\n\n### New, Top and Best Stories\n\nUp to 500 top and new stories are at `/v0/topstories` (also contains jobs) and `/v0/newstories`. Best stories are at `/v0/beststories`.\n\nExample: https://hacker-news.firebaseio.com/v0/topstories.json?print=pretty\n\n```javascript\n[ 9129911, 9129199, 9127761, 9128141, 9128264, 9127792, 9129248, 9127092, 9128367, ..., 9038733 ]\n```\n\n### Ask, Show and Job Stories\n\nUp to 200 of the latest Ask HN, Show HN, and Job stories are at `/v0/askstories`, `/v0/showstories`, and `/v0/jobstories`.\n\nExample: https://hacker-news.firebaseio.com/v0/askstories.json?print=pretty\n\n```javascript\n[ 9127232, 9128437, 9130049, 9130144, 9130064, 9130028, 9129409, 9127243, 9128571, ..., 9120990 ]\n```\n\n### Changed Items and Profiles\n\nThe item and profile changes are at `/v0/updates`.\n\nExample: https://hacker-news.firebaseio.com/v0/updates.json?print=pretty\n\n```javascript\n{\n  \"items\" : [ 8423305, 8420805, 8423379, 8422504, 8423178, 8423336, 8422717, 8417484, 8423378, 8423238, 8423353, 8422395, 8423072, 8423044, 8423344, 8423374, 8423015, 8422428, 8423377, 8420444, 8423300, 8422633, 8422599, 8422408, 8422928, 8394339, 8421900, 8420902, 8422087 ],\n  \"profiles\" : [ \"thefox\", \"mdda\", \"plinkplonk\", \"GBond\", \"rqebmm\", \"neom\", \"arram\", \"mcmancini\", \"metachris\", \"DubiousPusher\", \"dochtman\", \"kstrauser\", \"biren34\", \"foobarqux\", \"mkehrt\", \"nathanm412\", \"wmblaettler\", \"JoeAnzalone\", \"rcconf\", \"johndbritton\", \"msie\", \"cktsai\", \"27182818284\", \"kevinskii\", \"wildwood\", \"mcherm\", \"naiyt\", \"matthewmcg\", \"joelhaus\", \"tshtf\", \"MrZongle2\", \"Bogdanp\" ]\n}\n```",
-      "id": "e09db82a-8401-485f-80da-c855efa0cbea"
+      "id": "Cul8IqVMcGcEr8DUlha1"
     },
     {
       "name": "Best Stories",
@@ -68,12 +155,12 @@
         "scripts": {
           "preRequest": "",
           "postResponse": ""
-        }
+        },
+        "type": "http"
       },
-      "collectionId": "e09db82a-8401-485f-80da-c855efa0cbea",
+      "collectionId": "Cul8IqVMcGcEr8DUlha1",
       "deleted": false,
-      "id": "3352db5c-d338-4bc4-9df1-5a1a73effe4d",
-      "description": ""
+      "id": "4HukCbMfmA0zdHAfA3A7"
     },
     {
       "name": "New Stories",
@@ -101,12 +188,12 @@
         "scripts": {
           "preRequest": "",
           "postResponse": ""
-        }
+        },
+        "type": "http"
       },
-      "collectionId": "e09db82a-8401-485f-80da-c855efa0cbea",
+      "collectionId": "Cul8IqVMcGcEr8DUlha1",
       "deleted": false,
-      "id": "57e4ac92-8d54-4270-86c7-daa825d4be6c",
-      "description": ""
+      "id": "6w3HI6sWGTZlP8SLkYY7"
     },
     {
       "name": "Story",
@@ -134,12 +221,12 @@
         "scripts": {
           "preRequest": "",
           "postResponse": ""
-        }
+        },
+        "type": "http"
       },
-      "collectionId": "e09db82a-8401-485f-80da-c855efa0cbea",
+      "collectionId": "Cul8IqVMcGcEr8DUlha1",
       "deleted": false,
-      "id": "06df54e2-4666-48ad-996b-d0dc8a138041",
-      "description": ""
+      "id": "QZFK6teK18tFxwYMvr7Y"
     },
     {
       "name": "Top Stories",
@@ -167,16 +254,16 @@
         "scripts": {
           "preRequest": "",
           "postResponse": "\nrq.test(\"Response status code is 200\", function () {\n  rq.response.to.have.status(200);\n});\n\n\nrq.test(\"Response is an array\", function () {\n  const responseData = rq.response.json();\n\n  rq.expect(responseData).to.be.an('array');\n});\n\n\nrq.test(\"Response array should contain at least one element\", function () {\n  const responseData = rq.response.json();\n\n  rq.expect(responseData).to.be.an('array').and.to.have.lengthOf.at.least(1);\n});\n\n\nrq.test(\"Response array elements are integers\", function () {\n  const responseData = rq.response.json();\n\n  rq.expect(responseData).to.be.an('array');\n  responseData.forEach(function (element) {\n    rq.expect(element).to.be.a('number');\n  });\n});\n\n\nrq.test(\"Response time is less than 500ms\", function () {\n  rq.expect(rq.response.responseTime).to.be.below(500);\n});\n\n"
-        }
+        },
+        "type": "http"
       },
-      "collectionId": "e09db82a-8401-485f-80da-c855efa0cbea",
+      "collectionId": "Cul8IqVMcGcEr8DUlha1",
       "deleted": false,
-      "id": "9de389a5-d0d0-494a-bac6-93820817be46",
-      "description": ""
+      "id": "4TGy5SLTO6h9fkVVeNBC"
     },
     {
       "name": "Hello World",
-      "description": "Let's explore how the API client works and what it has to offer!\nWe will be going through the following things:\n\n## Requests and Sub-Collections\nWe will see how to create a request and how to leverage a collection inside another collection!\n\n## Environment & Collection Variables\nHow to use variables to reduce repeated effort across the team!\n\n## Scripts and Tests\nAutomate to further make it easier dealing with APIs! \n",
+      "type": "collection",
       "data": {
         "variables": {},
         "auth": {
@@ -188,14 +275,14 @@
           "currentAuthType": "BEARER_TOKEN"
         }
       },
-      "type": "collection",
-      "collectionId": "6fbefe49-e016-42a2-a254-90568a1f5032",
+      "collectionId": "tY8UZ0VhAIxIblpFq4I9",
       "deleted": false,
-      "id": "e78a4d92-2bfa-470e-b5e6-9db957327f5b"
+      "description": "Let's explore how the API client works and what it has to offer!\nWe will be going through the following things:\n\n## Requests and Sub-Collections\nWe will see how to create a request and how to leverage a collection inside another collection!\n\n## Environment & Collection Variables\nHow to use variables to reduce repeated effort across the team!\n\n## Scripts and Tests\nAutomate to further make it easier dealing with APIs! \n",
+      "id": "BNsJKguj7RfmwGKCZDLE"
     },
     {
-      "description": "Here we will see that a folder is just another collection with the same bells and whistles. We will also make a request which uses the parent collection's \"Authorization\" config.\n\nOpen the \"Send token\" request and click the \"Send\" button. You should see the response as well as a passing test that says \"Successfuly sent bearer token!\"\n\nDon't worry about the test and the script for now, we will cover it in details later.",
-      "deleted": false,
+      "name": "1. Hello from the other side",
+      "type": "collection",
       "data": {
         "variables": {},
         "auth": {
@@ -203,13 +290,12 @@
           "authConfigStore": {}
         }
       },
-      "type": "collection",
-      "name": "1. Hello from the other side",
-      "id": "28a0b674-9eaf-46d0-8be9-3314c99a0637",
-      "collectionId": "e78a4d92-2bfa-470e-b5e6-9db957327f5b"
+      "collectionId": "BNsJKguj7RfmwGKCZDLE",
+      "deleted": false,
+      "description": "Here we will see that a folder is just another collection with the same bells and whistles. We will also make a request which uses the parent collection's \"Authorization\" config.\n\nOpen the \"Send token\" request and click the \"Send\" button. You should see the response as well as a passing test that says \"Successfuly sent bearer token!\"\n\nDon't worry about the test and the script for now, we will cover it in details later.",
+      "id": "eMhYQsgoreBxNBLjxWKy"
     },
     {
-      "deleted": false,
       "name": "Send token",
       "type": "api",
       "data": {
@@ -235,11 +321,12 @@
         "auth": {
           "currentAuthType": "INHERIT",
           "authConfigStore": {}
-        }
+        },
+        "type": "http"
       },
-      "collectionId": "28a0b674-9eaf-46d0-8be9-3314c99a0637",
-      "id": "dd8958b6-ffa7-4789-8863-202abbef9998",
-      "description": ""
+      "collectionId": "eMhYQsgoreBxNBLjxWKy",
+      "deleted": false,
+      "id": "bik1wfGWFx8xYafZ9i0O"
     },
     {
       "name": "2. Variables save the day",
@@ -262,10 +349,10 @@
           "authConfigStore": {}
         }
       },
+      "collectionId": "BNsJKguj7RfmwGKCZDLE",
       "deleted": false,
       "description": "In this collection we have set a variabled called `endpoint` and in the \"Requesly Testing\" environment you will find a variable called `base_url`. We will be using them together to send a request.\n\nYou can create variables to centralize common data, and this can be done in two ways, Environments & Collection Variables.\n\n## Environment Variables\nAn Environment closely mimics the idea of `\"staging`, `\"dev\"` or `\"production\"`. It's an isolated space where you can keep common stuff in a common bucket.This gets useful when you want to swap out the bucket whenever you want. \n\n## Collection Variables\nHere you can keep the base data that doesn't rely on environment and will stay the same but is used in multiple places. The variables are essentially a property of a collection and hence can't be swapped out.",
-      "id": "d6bebb5b-6c3b-466d-8550-3bfcf142941c",
-      "collectionId": "e78a4d92-2bfa-470e-b5e6-9db957327f5b"
+      "id": "ku9H9loe91WwZEm30VLp"
     },
     {
       "name": "Templatized Request",
@@ -293,12 +380,12 @@
         "scripts": {
           "preRequest": "",
           "postResponse": ""
-        }
+        },
+        "type": "http"
       },
-      "collectionId": "d6bebb5b-6c3b-466d-8550-3bfcf142941c",
+      "collectionId": "ku9H9loe91WwZEm30VLp",
       "deleted": false,
-      "id": "a298baf6-c6de-41a3-9bdd-c41f0d36d670",
-      "description": ""
+      "id": "sGkrik9CsP6nmyaVJEHB"
     },
     {
       "name": "3. JavaScript FTW!",
@@ -310,10 +397,10 @@
           "authConfigStore": {}
         }
       },
+      "collectionId": "BNsJKguj7RfmwGKCZDLE",
       "deleted": false,
       "description": "Here have a workflow where you test something and if it's true set an environment variable(like auth token) that can be used by other APIs.\n\nWe can use scripts to further customize our workflow. These scripts get executed before sending a request and after receiving a response. \n\nNot just that, we can write tests in this script that can make sure `1==1` is indeed true of if the shape of the data is correct or not.\n\nThese scripts also have access to variables and can set or get anything including collection variables.",
-      "id": "8ba620f9-dd30-4b9e-8219-8664fbb16cd4",
-      "collectionId": "e78a4d92-2bfa-470e-b5e6-9db957327f5b"
+      "id": "uCzyk1LPb6Zucmx0Qksr"
     },
     {
       "name": "Get and Set token",
@@ -342,157 +429,11 @@
           "preRequest": "",
           "postResponse": "// **********************************************\n// 🛠️ Use JavaScript to visualize responses: https://docs.requestly.com/general/api-client/scripts\n// **********************************************\nrq.test(\"Received token and set it in environment!\", function () {\n  const { queryParameters } = rq.response.toJSON().body;\n  rq.expect(queryParameters).to.not.be.undefined;\n  const { token } = queryParameters;\n  rq.expect(token.length).to.be.gte(1);\n\n  rq.environment.set(\"token\", token);\n});"
         },
-        "response": {
-          "body": "{\n  \"method\": \"GET\",\n  \"queryParameters\": {\n    \"token\": \"er\"\n  },\n  \"headers\": {\n    \"host\": \"us-central1-project-7820168409702389920.cloudfunctions.net\",\n    \"accept\": \"*/*\",\n    \"accept-language\": \"en,en,zh,zh\",\n    \"authorization\": \"Bearer your_token\",\n    \"cache-control\": \"private,no-store\",\n    \"cdn-loop\": \"cloudflare; loops=1; subreqs=1, Fastly, Fastly\",\n    \"cf-connecting-ip\": \"157.119.177.170\",\n    \"cf-ew-via\": \"15\",\n    \"cf-ipcountry\": \"IN\",\n    \"cf-ray\": \"9596b462b7813d2a-BOM\",\n    \"cf-visitor\": \"{\\\"scheme\\\":\\\"https\\\"}\",\n    \"content-type\": \"text/plain\",\n    \"fastly-client\": \"1\",\n    \"fastly-client-ip\": \"172.69.178.84\",\n    \"fastly-ff\": \"s48hDkrIORDrAz3sjuyh5gIWcInqIjSROZ47KAY+w/I=!BOM!cache-bom4721-BOM, s48hDkrIORDrAz3sjuyh5gIWcInqIjSROZ47KAY+w/I=!BOM!cache-bom4743-BOM\",\n    \"fastly-orig-accept-encoding\": \"gzip\",\n    \"fastly-ssl\": \"1\",\n    \"fastly-temp-xff\": \"157.119.177.170,157.119.177.170, 172.69.178.84, 172.69.178.84\",\n    \"pragma\": \"no-cache\",\n    \"priority\": \"u=1, i\",\n    \"sec-fetch-dest\": \"empty\",\n    \"sec-fetch-mode\": \"cors\",\n    \"sec-fetch-site\": \"none\",\n    \"via\": \"1.1 Firebase Hosting\",\n    \"x-country-code\": \"IN\",\n    \"x-firebase-channel\": \"live\",\n    \"x-firebase-hosting-channel\": \"live\",\n    \"x-forwarded-for\": \"172.69.178.84,66.249.82.128\",\n    \"x-forwarded-host\": \"app.requestly.io\",\n    \"x-forwarded-server\": \"cache-bom4721-BOM\",\n    \"x-forwarded-url\": \"/echo?token=er\",\n    \"x-orig-accept-language\": \"en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7\",\n    \"x-timer\": \"S1751549082.069631,VS0\",\n    \"x-varnish\": \"340656599, 3689460660\",\n    \"user-agent\": \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36\",\n    \"x-cloud-trace-context\": \"dca3da8916794c1c3767808c28edd26c/4955902027483189520;o=1\",\n    \"x-appengine-country\": \"ZZ\",\n    \"x-forwarded-proto\": \"https\",\n    \"traceparent\": \"00-dca3da8916794c1c3767808c28edd26c-44c6e6a2f1c61110-01\",\n    \"x-appengine-appversionid\": \"s~n5d89573008f37147-tp/9ee3b49c0366ebc4d8cf55613c63501d:5.469317723287507132\",\n    \"x-appengine-timeout-ms\": \"599999\",\n    \"x-appengine-https\": \"on\",\n    \"x-appengine-user-ip\": \"66.249.82.128\",\n    \"forwarded\": \"for=\\\"66.249.82.128\\\";proto=https\",\n    \"accept-encoding\": \"gzip\",\n    \"x-appengine-request-log-id\": \"6866847600ff098e4208a8df1f0001737e6e356438393537333030386633373134372d7470000139656533623439633033363665626334643863663535363133633633353031643a3500010125\",\n    \"x-appengine-default-version-hostname\": \"n5d89573008f37147-tp.appspot.com\",\n    \"function-execution-id\": \"6ghgpxbjg2vt\"\n  },\n  \"body\": {}\n}",
-          "time": 426.5,
-          "headers": [
-            {
-              "key": "accept-ranges",
-              "value": "bytes"
-            },
-            {
-              "key": "access-control-allow-credentials",
-              "value": "true"
-            },
-            {
-              "key": "access-control-expose-headers",
-              "value": "*"
-            },
-            {
-              "key": "alt-svc",
-              "value": "h3=\":443\"; ma=86400"
-            },
-            {
-              "key": "cache-control",
-              "value": "no-store"
-            },
-            {
-              "key": "cf-apo-via",
-              "value": "origin,host"
-            },
-            {
-              "key": "cf-cache-status",
-              "value": "DYNAMIC"
-            },
-            {
-              "key": "cf-ray",
-              "value": "9596b4627fe53d2a-BOM"
-            },
-            {
-              "key": "content-encoding",
-              "value": "gzip"
-            },
-            {
-              "key": "content-security-policy",
-              "value": "default-src http: https: wss: 'unsafe-inline' 'unsafe-eval' data: blob: chrome-extension:;, default-src http: https: wss: 'unsafe-inline' 'unsafe-eval' data: blob: chrome-extension:;"
-            },
-            {
-              "key": "content-type",
-              "value": "application/json; charset=utf-8"
-            },
-            {
-              "key": "cross-origin-opener-policy",
-              "value": "same-origin-allow-popups, same-origin-allow-popups"
-            },
-            {
-              "key": "date",
-              "value": "Thu, 03 Jul 2025 13:24:42 GMT"
-            },
-            {
-              "key": "etag",
-              "value": "W/\"a1c-D7suFb4SkcNys/jjc80JvaQYQ4o\""
-            },
-            {
-              "key": "function-execution-id",
-              "value": "6ghgpxbjg2vt"
-            },
-            {
-              "key": "nel",
-              "value": "{\"success_fraction\":0,\"report_to\":\"cf-nel\",\"max_age\":604800}"
-            },
-            {
-              "key": "permission-policy",
-              "value": "geolocation=*, microphone=*, camera=*, geolocation=*, microphone=*, camera=*"
-            },
-            {
-              "key": "priority",
-              "value": "u=1,i"
-            },
-            {
-              "key": "report-to",
-              "value": "{\"endpoints\":[{\"url\":\"https:\\/\\/a.nel.cloudflare.com\\/report\\/v4?s=0aVjMSACsgpozrANMLUlid%2Bupn3lWiV19YEs%2B0ubHHm%2B1XKlpJvGkGfTYs%2F1xvX8ulSaRV2fwH4CiTC3Kto5k9VeS8mYIqmLPOdOtCBrYHq7b3LzTrDKf%2FMiS44U%2B3m%2FDz0%3D\"}],\"group\":\"cf-nel\",\"max_age\":604800}"
-            },
-            {
-              "key": "server",
-              "value": "cloudflare"
-            },
-            {
-              "key": "server-timing",
-              "value": "cfL4;desc=\"?proto=QUIC&rtt=9748&min_rtt=3739&rtt_var=5377&sent=12&recv=11&lost=0&retrans=0&sent_bytes=2701&recv_bytes=4358&delivery_rate=714&cwnd=12000&unsent_bytes=0&cid=cc1aa221c50f7790&ts=389&x=1\", cfExtPri, cfHdrFlush;dur=0"
-            },
-            {
-              "key": "strict-transport-security",
-              "value": "max-age=2592000; includeSubDomains; preload"
-            },
-            {
-              "key": "vary",
-              "value": "Origin,cookie,need-authorization, x-fh-requested-host, accept-encoding"
-            },
-            {
-              "key": "x-cache",
-              "value": "MISS"
-            },
-            {
-              "key": "x-cache-hits",
-              "value": "0"
-            },
-            {
-              "key": "x-cloud-trace-context",
-              "value": "dca3da8916794c1c3767808c28edd26c;o=1"
-            },
-            {
-              "key": "x-content-type-options",
-              "value": "nosniff"
-            },
-            {
-              "key": "x-country-code",
-              "value": "IN"
-            },
-            {
-              "key": "x-frame-options",
-              "value": "SAMEORIGIN, SAMEORIGIN, SAMEORIGIN"
-            },
-            {
-              "key": "x-orig-accept-language",
-              "value": "en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7"
-            },
-            {
-              "key": "x-powered-by",
-              "value": "Express"
-            },
-            {
-              "key": "x-robots-tag",
-              "value": "noindex"
-            },
-            {
-              "key": "x-served-by",
-              "value": "cache-bom4721-BOM"
-            },
-            {
-              "key": "x-timer",
-              "value": "S1751549082.069631,VS0,VE318"
-            }
-          ],
-          "status": 200,
-          "statusText": "",
-          "redirectedUrl": ""
-        },
-        "testResults": []
+        "type": "http"
       },
-      "collectionId": "8ba620f9-dd30-4b9e-8219-8664fbb16cd4",
+      "collectionId": "uCzyk1LPb6Zucmx0Qksr",
       "deleted": false,
-      "id": "5a1ec0b0-fded-44c8-874a-86ac6a366228",
-      "description": ""
+      "id": "V3sE3ExaJj8Kzfhk3ahu"
     },
     {
       "name": "Make Authenticated Request",
@@ -524,12 +465,12 @@
         "scripts": {
           "preRequest": "// **********************************************\n// 🛠️ Learn more about scripts and snippets: https://docs.requestly.com/general/api-client/scripts\n// **********************************************\nrq.test(\"Token is set it in environment!\", function () {\n  const token = rq.environment.get(\"token\");\n  rq.expect(token).to.not.be.undefined;\n});",
           "postResponse": "// **********************************************\n// 🛠️ Use JavaScript to visualize responses: https://docs.requestly.com/general/api-client/scripts\n// **********************************************\nrq.test(\"Successfuly sent token!\", function () {\n  const keyHeader = rq.response.toJSON().body.headers[\"authorization\"];\n  rq.expect(keyHeader).to.not.be.undefined;\n  const token = rq.environment.get(\"token\")  \n  rq.expect(keyHeader).to.be.equal(`Bearer ${token}`);\n});"
-        }
+        },
+        "type": "http"
       },
-      "collectionId": "8ba620f9-dd30-4b9e-8219-8664fbb16cd4",
+      "collectionId": "uCzyk1LPb6Zucmx0Qksr",
       "deleted": false,
-      "id": "6874e4a5-c0a9-4264-a79f-ff9fb90ea848",
-      "description": ""
+      "id": "HeXsLyDctQMFPD2NLmEW"
     }
   ]
 }
