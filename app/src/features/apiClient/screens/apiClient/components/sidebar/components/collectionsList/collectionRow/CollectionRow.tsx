@@ -84,6 +84,7 @@ export const CollectionRow: React.FC<Props> = ({
   handleRecordsToBeDeleted,
   onItemClick,
 }) => {
+  console.log(record, "reordd");
   const { selectedRecords, showSelection, recordsSelectionHandler, setShowSelection } = bulkActionOptions || {};
   const [isEditMode, setIsEditMode] = useState(false);
   const [activeKey, setActiveKey] = useState<string | undefined>(
