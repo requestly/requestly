@@ -78,7 +78,6 @@ export function RawBody(props: {
         search={autocompleteState.filter}
         variables={scopedVariables}
         onSelect={handleSelectVariable}
-        onClose={handleCloseAutocomplete}
       />
     </>
   );
