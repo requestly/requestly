@@ -1,31 +1,44 @@
 import React from "react";
-import { BottomSheetPlacement, BottomSheetProvider } from "componentsV2/BottomSheet";
 import { RQAPI } from "features/apiClient/types";
 import { AutogenerateProvider } from "features/apiClient/store/autogenerateContextProvider";
 import { ClientViewFactory } from "./ClientViewFactory";
+import { BottomSheetProvider } from "componentsV2/BottomSheet";
 import "../apiClient.scss";
+import { BottomSheetFeatureContext } from "componentsV2/BottomSheet/types";
+import { AISessionProvider } from "features/ai/contexts/AISession";
+import { BufferedGraphQLRecordEntity, BufferedHttpRecordEntity } from "features/apiClient/slices/entities";
+import { ApiClientRepositoryInterface } from "features/apiClient/helpers/modules/sync/interfaces";
+
+export type GenericApiClientOverride = {
+  handleNameChange?: (name: string) => Promise<void>;
+  onSaveClick?: {
+    save: (record: RQAPI.ApiRecord, repositories: ApiClientRepositoryInterface) => Promise<RQAPI.ApiRecord>;
+    onSuccess: (record: RQAPI.ApiRecord) => void;
+    skipMarkSaved?: boolean;
+  };
+};
 
 type Props = {
-  apiEntryDetails: RQAPI.ApiRecord;
-  onSaveCallback: (apiEntryDetails: RQAPI.ApiRecord) => void;
+  entity: BufferedHttpRecordEntity | BufferedGraphQLRecordEntity;
+  override?: GenericApiClientOverride;
   handleAppRequestFinished: (entry: RQAPI.ApiEntry) => void;
-  isCreateMode: boolean;
   isOpenInModal?: boolean;
 };
 
 export const GenericApiClient: React.FC<Props> = React.memo(
-  ({ apiEntryDetails, onSaveCallback, handleAppRequestFinished, isCreateMode, isOpenInModal = false }) => {
+  ({ entity, override, handleAppRequestFinished, isOpenInModal = false }) => {
     return (
-      <BottomSheetProvider defaultPlacement={BottomSheetPlacement.BOTTOM} isSheetOpenByDefault={true}>
+      <BottomSheetProvider context={BottomSheetFeatureContext.API_CLIENT}>
         <div className="api-client-container-content">
           <AutogenerateProvider>
-            <ClientViewFactory
-              apiRecord={apiEntryDetails}
-              handleRequestFinished={handleAppRequestFinished}
-              onSaveCallback={onSaveCallback}
-              isCreateMode={isCreateMode}
-              isOpenInModal={isOpenInModal}
-            />
+            <AISessionProvider>
+              <ClientViewFactory
+                entity={entity}
+                handleRequestFinished={handleAppRequestFinished}
+                override={override}
+                isOpenInModal={isOpenInModal}
+              />
+            </AISessionProvider>
           </AutogenerateProvider>
         </div>
       </BottomSheetProvider>

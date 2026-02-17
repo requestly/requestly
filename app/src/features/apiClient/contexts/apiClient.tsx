@@ -1,4 +1,4 @@
-import React, { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import React, { createContext, ReactNode, useCallback, useContext, useMemo, useState } from "react";
 import { RQAPI } from "../types";
 import { addToHistoryInStore, clearHistoryFromStore, getHistoryFromStore } from "../screens/apiClient/historyStore";
 import {
@@ -8,22 +8,18 @@ import {
   trackNewCollectionClicked,
   trackNewRequestClicked,
 } from "modules/analytics/events/features/apiClient";
-import { createBlankApiRecord, isApiCollection } from "../screens/apiClient/utils";
+import { createBlankApiRecord, getEmptyDraftApiRecord } from "../screens/apiClient/utils";
 import { APIClientWorkloadManager } from "../helpers/modules/scriptsV2/workloadManager/APIClientWorkloadManager";
-import { notification } from "antd";
 import { toast } from "utils/Toast";
-import APP_CONSTANTS from "config/constants";
-import { submitAttrUtil } from "utils/AnalyticsUtils";
-import { debounce } from "lodash";
 import { RBAC, useRBAC } from "features/rbac";
-import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
 import { DraftRequestContainerTabSource } from "../screens/apiClient/components/views/components/DraftRequestContainer/draftRequestContainerTabSource";
 import { EnvironmentViewTabSource } from "../screens/environment/components/environmentView/EnvironmentViewTabSource";
-import { useAPIRecords } from "../store/apiRecords/ApiRecordsContextProvider";
-import { getApiClientFeatureContext, saveOrUpdateRecord } from "../commands/store.utils";
 import { RequestViewTabSource } from "../screens/apiClient/components/views/components/RequestView/requestViewTabSource";
 import { CollectionViewTabSource } from "../screens/apiClient/components/views/components/Collection/collectionViewTabSource";
-import { createEnvironment as _createEnvironment } from "../commands/environments";
+import { createEnvironment, getApiClientFeatureContext } from "../slices";
+import { Workspace } from "features/workspaces/types";
+import { useTabActions } from "componentsV2/Tabs/slice";
+import { saveOrUpdateRecord } from "../hooks/useNewApiClientContext";
 
 interface ApiClientContextInterface {
   history: RQAPI.ApiEntry[];
@@ -46,7 +42,7 @@ interface ApiClientContextInterface {
     entryType?: RQAPI.ApiEntryType
   ) => Promise<void>;
   onNewClickV2: (params: {
-    contextId: string;
+    contextId: Workspace["id"];
     analyticEventSource: RQAPI.AnalyticsEventSource;
     recordType: RQAPI.RecordType;
     collectionId?: string;
@@ -84,24 +80,11 @@ interface ApiClientProviderProps {
   children: ReactNode;
 }
 
-const trackUserProperties = (records: RQAPI.ApiClientRecord[]) => {
-  const totalCollections = records.filter((record) => isApiCollection(record)).length;
-  const totalRequests = records.length - totalCollections;
-  submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_COLLECTIONS, totalCollections);
-  submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_REQUESTS, totalRequests);
-};
-
 // suggestion: could be renamed to ApiClientStoreEnabler
 export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }) => {
   const { validatePermission, getRBACValidationFailureErrorMessage } = useRBAC();
   const { isValidPermission } = validatePermission("api_client_request", "create");
-  const [apiClientRecords] = useAPIRecords((state) => [
-    state.apiClientRecords,
-    state.addNewRecord,
-    state.updateRecord,
-    state.updateRecords,
-    state.getData,
-  ]);
+
   const [onNewClickContextId, setOnNewClickContextId] = useState<string | null>(null); // FIXME: temp fix, to be removed
 
   const [history, setHistory] = useState<RQAPI.ApiEntry[]>(getHistoryFromStore());
@@ -110,13 +93,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isRecordBeingCreated, setIsRecordBeingCreated] = useState<RQAPI.RecordType | null>(null);
 
-  const debouncedTrackUserProperties = debounce(() => trackUserProperties(apiClientRecords), 1000);
-
-  const [openTab] = useTabServiceWithSelector((state) => [state.openTab]);
-
-  useEffect(() => {
-    debouncedTrackUserProperties();
-  }, [apiClientRecords, debouncedTrackUserProperties]);
+  const { openBufferedTab } = useTabActions();
 
   const addToHistory = useCallback((apiEntry: RQAPI.ApiEntry) => {
     setHistory((history) => [...history, apiEntry]);
@@ -143,13 +120,19 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
 
   const onNewClickV2 = useCallback(
     async (params: {
-      contextId: string;
+      contextId: Workspace["id"];
       analyticEventSource: RQAPI.AnalyticsEventSource;
       recordType: RQAPI.RecordType;
       collectionId?: string;
       entryType?: RQAPI.ApiEntryType;
     }) => {
-      const { contextId, analyticEventSource, recordType, collectionId = "", entryType } = params;
+      const {
+        contextId,
+        analyticEventSource,
+        recordType,
+        collectionId = "",
+        entryType = RQAPI.ApiEntryType.HTTP,
+      } = params;
 
       if (!isValidPermission) {
         toast.warn(getRBACValidationFailureErrorMessage(RBAC.Permission.create, recordType), 5);
@@ -158,101 +141,114 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
 
       setOnNewClickContextId(contextId);
       const context = getApiClientFeatureContext(contextId);
-      const recordsRepository = context?.repositories?.apiClientRecordsRepository;
+      const { apiClientRecordsRepository, environmentVariablesRepository } = context.repositories;
 
       switch (recordType) {
         case RQAPI.RecordType.API: {
           trackNewRequestClicked(analyticEventSource);
 
           if (["api_client_sidebar_header", "home_screen"].includes(analyticEventSource)) {
-            openTab(new DraftRequestContainerTabSource({ apiEntryType: entryType, context: { id: context?.id } }));
+            openBufferedTab({
+              source: new DraftRequestContainerTabSource({
+                apiEntryType: entryType,
+                context: { id: context.workspaceId },
+                emptyRecord: getEmptyDraftApiRecord(entryType),
+              }),
+              isNew: true,
+              preview: false,
+            });
             return;
           }
 
           setIsRecordBeingCreated(recordType);
-          return createBlankApiRecord(recordType, collectionId, recordsRepository, entryType).then((result) => {
+
+          try {
+            const result = await createBlankApiRecord(recordType, collectionId, apiClientRecordsRepository, entryType);
             setIsRecordBeingCreated(null);
             if (!result.success) {
               toast.error(result.message || "Failed to create record!");
               return;
             }
+
             saveOrUpdateRecord(context, result.data);
 
-            openTab(
-              new RequestViewTabSource({
+            openBufferedTab({
+              isNew: true,
+              source: new RequestViewTabSource({
                 id: result.data.id,
                 apiEntryDetails: result.data as RQAPI.ApiRecord,
                 title: result.data.name,
-                isNewTab: true,
                 context: {
-                  id: context.id,
+                  id: context.workspaceId,
                 },
-              })
-            );
-            return;
-          });
+              }),
+            });
+          } catch (error) {
+            toast.error("Failed to create record!");
+          }
+
+          return;
         }
 
         case RQAPI.RecordType.COLLECTION: {
           setIsRecordBeingCreated(recordType);
           trackNewCollectionClicked(analyticEventSource);
-          return createBlankApiRecord(recordType, collectionId, recordsRepository)
-            .then((result) => {
-              setIsRecordBeingCreated(null);
-              if (result.success) {
-                saveOrUpdateRecord(context, result.data);
-                openTab(
-                  new CollectionViewTabSource({
-                    id: result.data.id,
-                    title: result.data.name,
-                    isNewTab: true,
-                    context: {
-                      id: context.id,
-                    },
-                  })
-                );
-              } else {
-                toast.error(result.message || "Could not create collection.", 5);
 
-                notification.error({
-                  message: "Could not create collection!",
-                  description: result?.message,
-                  placement: "bottomRight",
-                });
-              }
-            })
-            .catch((error) => {
-              notification.error({
-                message: "Could not create collection!",
-                description: error.message,
-                placement: "bottomRight",
+          try {
+            const result = await createBlankApiRecord(recordType, collectionId, apiClientRecordsRepository);
+
+            setIsRecordBeingCreated(null);
+            if (result.success) {
+              saveOrUpdateRecord(context, result.data);
+              openBufferedTab({
+                isNew: true,
+                preview: false,
+                source: new CollectionViewTabSource({
+                  id: result.data.id,
+                  title: result.data.name,
+                  context: {
+                    id: context.workspaceId,
+                  },
+                }),
               });
-              console.error("Error adding new collection", error);
-            });
+            } else {
+              toast.error(result.message || "Could not create collection.", 5);
+            }
+          } catch (error) {
+            toast.error("Could not create collection!", 5);
+          }
+          return;
         }
 
         case RQAPI.RecordType.ENVIRONMENT: {
           setIsRecordBeingCreated(recordType);
           trackNewEnvironmentClicked("api_client_sidebar_header");
-          return _createEnvironment(context, { newEnvironmentName: "New Environment" })
-            .then((newEnvironment: { id: string; name: string }) => {
-              setIsRecordBeingCreated(null);
-              openTab(
-                new EnvironmentViewTabSource({
-                  id: newEnvironment.id,
-                  title: newEnvironment.name,
-                  isNewTab: true,
-                  context: {
-                    id: context?.id,
-                  },
-                })
-              );
-            })
-            .catch((error) => {
-              setIsRecordBeingCreated(null);
-              toast.error(error.message);
-              console.error("Error adding new environment", error);
+
+          try {
+            const newEnvironment = await context.store
+              .dispatch(
+                createEnvironment({ name: "New Environment", repository: environmentVariablesRepository }) as any
+              )
+              .unwrap();
+
+            setIsRecordBeingCreated(null);
+            openBufferedTab({
+              isNew: true,
+              preview: false,
+              source: new EnvironmentViewTabSource({
+                id: newEnvironment.id,
+                title: newEnvironment.name,
+                context: {
+                  id: context.workspaceId,
+                },
+                isGlobal: false,
+              }),
             });
+          } catch (error) {
+            setIsRecordBeingCreated(null);
+            toast.error(error.message);
+          }
+          return;
         }
 
         default: {
@@ -260,7 +256,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
         }
       }
     },
-    [isValidPermission, getRBACValidationFailureErrorMessage, openTab]
+    [isValidPermission, getRBACValidationFailureErrorMessage, openBufferedTab]
   );
 
   const onNewClick = useCallback(
@@ -277,7 +273,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
 
       const context = getApiClientFeatureContext();
       return onNewClickV2({
-        contextId: context?.id,
+        contextId: context.workspaceId,
         analyticEventSource,
         recordType,
         collectionId,

@@ -5,6 +5,7 @@ import { ReactNode } from "react";
 export enum EditorLanguage {
   JAVASCRIPT = "javascript",
   JSON = "json",
+  JSON5 = "json5",
   HTML = "html",
   CSS = "css",
 }
@@ -28,6 +29,8 @@ const contentTypeToLanguageMap: { regex: RegExp; language: EditorLanguage }[] = 
   { regex: /^application\/manifest\+json$/, language: EditorLanguage.JSON },
   { regex: /^application\/ld\+json$/, language: EditorLanguage.JSON },
   { regex: /^text\/json$/, language: EditorLanguage.JSON },
+  // Vendor-specific JSON types (e.g., application/vnd.api+json)
+  { regex: /^application\/[\w.-]+\+json$/, language: EditorLanguage.JSON },
 ];
 
 export type EditorCustomToolbar = {

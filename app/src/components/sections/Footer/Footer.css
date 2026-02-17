@@ -6,7 +6,6 @@
 .app-footer-links {
   display: flex;
   align-items: center;
-  margin-right: 48px;
 }
 
 .app-footer-links .ant-typography {

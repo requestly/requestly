@@ -1,4 +1,4 @@
-import { Input, Modal } from "antd";
+import { Input, Modal, Tooltip } from "antd";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { parseCurlRequest } from "../../../utils";
 import { RQAPI } from "../../../../../types";
@@ -11,6 +11,8 @@ import {
 import { trackRQDesktopLastActivity, trackRQLastActivity } from "utils/AnalyticsUtils";
 import { API_CLIENT } from "modules/analytics/events/features/constants";
 import { getDomainFromURL } from "utils/URLUtils";
+import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
+import LINKS from "config/constants/sub/links";
 import "./importFromCurlModal.scss";
 
 interface Props {
@@ -94,9 +96,18 @@ export const ImportFromCurlModal: React.FC<Props> = ({
 
   return (
     <Modal
-      className="import-modal"
+      className="import-modal import-curl-modal"
       centered
-      title="Import from cURL"
+      title={
+        <span className="import-curl-modal-title">
+          Import from cURL
+          <Tooltip title="Learn more about importing from cURL">
+            <a href={LINKS.REQUESTLY_API_CLIENT_IMPORT_CURL_DOCS} target="_blank" rel="noreferrer">
+              <MdInfoOutline className="import-curl-modal-info-icon" />
+            </a>
+          </Tooltip>
+        </span>
+      }
       open={isOpen}
       okText="Import"
       onOk={onImportClicked}

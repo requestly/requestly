@@ -1,10 +1,9 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import { Popover } from "antd";
-import { EnvironmentVariableType, VariableScope, VariableValueType } from "backend/environment/types";
+import { EnvironmentVariableType, VariableScope } from "backend/environment/types";
+import type { VariableValueType } from "backend/environment/types";
 import { capitalize } from "lodash";
-import { pipe } from "lodash/fp";
-import { ScopedVariable, ScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
-import { VariableData } from "features/apiClient/store/variables/types";
+import type { ScopedVariable, ScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
 import { PopoverView } from "./types";
 import { VariableNotFound } from "./components/VariableNotFound";
 import { CreateVariableView } from "./components/CreateVariableView";
@@ -12,9 +11,14 @@ import { EditVariableView } from "./components/EditVariableView";
 import { RQButton } from "lib/design-system-v2/components";
 import { MdEdit } from "@react-icons/all-files/md/MdEdit";
 import { getScopeIcon } from "./hooks/useScopeOptions";
-import { useContextId } from "features/apiClient/contexts/contextId.context";
-import { NoopContextId } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
+import { RevealableSecretField } from "../../../../../RevealableSecretField/RevealableSecretField";
 import { captureMessage } from "@sentry/react";
+import { useRBAC } from "features/rbac";
+import { useWorkspaceId } from "features/apiClient/common/WorkspaceProvider";
+import { NoopContextId } from "features/apiClient/commands/utils";
+import { createPortal } from "react-dom";
+
+type VariableData = ScopedVariable[0];
 
 const PopoverViewTransitions: Record<PopoverView, PopoverView[]> = {
   [PopoverView.IDLE]: [PopoverView.VARIABLE_INFO, PopoverView.NOT_FOUND],
@@ -27,24 +31,33 @@ const PopoverViewTransitions: Record<PopoverView, PopoverView[]> = {
 interface VariablePopoverProps {
   hoveredVariable: string;
   popupPosition: { x: number; y: number };
-  editorRef: React.RefObject<HTMLDivElement>;
   variables: ScopedVariables;
   onClose?: () => void;
   onPinChange?: (pinned: boolean) => void;
 }
+enum InfoFieldLabel {
+  NAME = "Name",
+  TYPE = "Type",
+  INITIAL_VALUE = "Initial Value",
+  CURRENT_VALUE = "Current Value",
+  IS_PERSISTENT = "Is persistent",
+}
+interface InfoFieldConfig {
+  label: InfoFieldLabel;
+  value: string;
+  isSecret?: boolean;
+}
 
 export const VariablePopover: React.FC<VariablePopoverProps> = ({
   hoveredVariable,
-  editorRef,
   popupPosition,
   variables,
   onClose,
   onPinChange,
 }) => {
-  const variableData = variables.get(hoveredVariable);
-  const contextId = useContextId();
-  const isNoopContext = contextId === NoopContextId;
-
+  const workspaceId = useWorkspaceId();
+  const isNoopContext = workspaceId === NoopContextId;
+  const variableData = variables[hoveredVariable];
   const [currentView, setCurrentView] = useState<PopoverView>(() => {
     return variableData ? PopoverView.VARIABLE_INFO : PopoverView.NOT_FOUND;
   });
@@ -75,9 +88,9 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
   }, [transitionToView, onPinChange]);
 
   const handleSwitchEnvironment = useCallback(() => {
-    window.dispatchEvent(new CustomEvent("trigger-env-switcher", { detail: { contextId } }));
+    window.dispatchEvent(new CustomEvent("trigger-env-switcher", { detail: { contextId: workspaceId } }));
     onClose?.();
-  }, [onClose, contextId]);
+  }, [onClose, workspaceId]);
 
   const handleCancel = useCallback(() => {
     if (currentView === PopoverView.CREATE_FORM) {
@@ -119,8 +132,8 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
         return (
           <VariableNotFound
             isNoopContext={isNoopContext}
-            onCreateClick={handleCreateClick}
             onSwitchEnvironment={handleSwitchEnvironment}
+            onCreateClick={handleCreateClick}
           />
         );
       }
@@ -140,6 +153,7 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
               syncValue: variable.syncValue ?? "",
               localValue: variable.localValue ?? "",
               scope: source.scope,
+              scopeId: source.scopeId,
               scopeName: source.name,
             }}
             onCancel={handleCancel}
@@ -160,14 +174,18 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
 
   const popupStyle: React.CSSProperties = {
     position: "absolute",
-    top: (popupPosition?.y ?? 0) - (editorRef.current?.getBoundingClientRect().top ?? 0) + 10,
-    left: (popupPosition?.x ?? 0) - (editorRef.current?.getBoundingClientRect().left ?? 0) + 100,
+    top: (popupPosition?.y ?? 0) + 10,
+    left: (popupPosition?.x ?? 0) + 100,
     zIndex: 1000,
   };
 
   const isFormMode = currentView === PopoverView.CREATE_FORM || currentView === PopoverView.EDIT_FORM;
 
-  return (
+  // createPortal is being used to bypass the styling override behavior
+  // by antd, and ensure that the desired styling and positioning
+  // applies to the popover
+  // A full refactor will be carried out for the editor in the future
+  return createPortal(
     <Popover
       content={<div className="variable-info-body">{popoverContent}</div>}
       open
@@ -186,23 +204,17 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
       }`}
     >
       <div style={popupStyle} className="variable-info-div"></div>
-    </Popover>
+    </Popover>,
+    document.body
   );
 };
 
-function getSanitizedVariableValue(variable: VariableData) {
-  const isSecret = variable.type === EnvironmentVariableType.Secret;
-  const makeSecret = (value: VariableValueType) => "•".repeat(String(value || "").length);
+function getValueStrings(variable: VariableData) {
   const makeRenderable = (value: VariableValueType) => `${value}`;
 
-  const sanitize = pipe(
-    (value: VariableValueType) => (value === undefined || value === null ? "" : value),
-    isSecret ? makeSecret : makeRenderable
-  );
-
   return {
-    syncValue: sanitize(variable.syncValue ?? ""),
-    localValue: sanitize(variable.localValue ?? ""),
+    syncValue: makeRenderable(variable.syncValue ?? ""),
+    localValue: makeRenderable(variable.localValue ?? ""),
     isPersisted: makeRenderable(variable.isPersisted ?? true),
   };
 }
@@ -222,35 +234,55 @@ const VariableInfo: React.FC<{
   onEditClick,
   isNoopContext,
 }) => {
-  const { syncValue, localValue, isPersisted } = getSanitizedVariableValue(variable);
-  const infoFields =
-    source.scope === VariableScope.RUNTIME
-      ? [
-          { label: "Name", value: name },
-          { label: "Type", value: capitalize(variable.type) },
-          { label: "Current Value", value: localValue },
-          { label: "Is persistent", value: isPersisted },
-        ]
-      : [
-          { label: "Name", value: name },
-          { label: "Type", value: capitalize(variable.type) },
-          { label: "Initial Value", value: syncValue },
-          { label: "Current Value", value: localValue },
-        ];
+  const { syncValue, localValue, isPersisted } = getValueStrings(variable);
+  const { validatePermission } = useRBAC();
+  const { isValidPermission } = validatePermission("api_client_environment", "update");
+  const isSecretType = variable.type === EnvironmentVariableType.Secret;
+  const infoFields: InfoFieldConfig[] = useMemo(() => {
+    const commonFields = [
+      { label: InfoFieldLabel.NAME, value: name },
+      { label: InfoFieldLabel.TYPE, value: capitalize(variable.type) },
+    ];
 
+    if (source.scope === VariableScope.RUNTIME) {
+      return [
+        ...commonFields,
+        {
+          label: InfoFieldLabel.CURRENT_VALUE,
+          value: localValue,
+          isSecret: isSecretType,
+        },
+        { label: InfoFieldLabel.IS_PERSISTENT, value: isPersisted },
+      ];
+    }
+
+    return [
+      ...commonFields,
+      {
+        label: InfoFieldLabel.INITIAL_VALUE,
+        value: syncValue,
+        isSecret: isSecretType,
+      },
+      {
+        label: InfoFieldLabel.CURRENT_VALUE,
+        value: localValue,
+        isSecret: isSecretType,
+      },
+    ];
+  }, [source.scope, name, variable.type, localValue, isPersisted, syncValue, isSecretType]);
   return (
     <>
       <div className="variable-info-property-container">
-        <span>{getScopeIcon(source.scope)} </span>
-        <span className="variable-header-info-seperator"> </span>
-        <div className="variable-info-header-name"> {source.name}</div>
-
+        <span>{getScopeIcon(source.scope)}</span>
+        <span className="variable-header-info-separator" />
+        <div className="variable-info-header-name">{source.name}</div>
         <RQButton
           type="transparent"
           size="small"
-          icon={<MdEdit style={{ fontSize: "14px", color: "var(--requestly-color-text-subtle)" }} />}
+          icon={<MdEdit className="edit-icon" />}
           onClick={onEditClick}
           className="edit-variable-btn"
+          hidden={!isValidPermission}
         >
           Edit
         </RQButton>
@@ -258,10 +290,18 @@ const VariableInfo: React.FC<{
 
       <div className="variable-info-content-container">
         <div className="variable-info-content">
-          {infoFields.map(({ label, value }) => (
-            <React.Fragment key={label}>
-              <div className="variable-info-title">{label}</div>
-              <div className="variable-info-value">{value}</div>
+          {infoFields.map((field) => (
+            <React.Fragment key={field.label}>
+              <div className="variable-info-title">{field.label}</div>
+              {field.isSecret ? (
+                <RevealableSecretField value={field.value} isRevealable={isValidPermission} />
+              ) : (
+                <div className="variable-info-value">
+                  <span className="value-content">
+                    <span>{String(field.value)}</span>
+                  </span>
+                </div>
+              )}
             </React.Fragment>
           ))}
         </div>

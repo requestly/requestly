@@ -21,6 +21,7 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
   placeholder,
   onPressEnter,
   onBlur,
+  onPaste,
   variables,
 }) => {
   const editorRef = useRef<HTMLDivElement>(null);
@@ -33,31 +34,47 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
   */
   const onBlurRef = useRef(onBlur);
   const onChangeRef = useRef(onChange);
+  const onPasteRef = useRef(onPaste);
   const previousDefaultValueRef = useRef(defaultValue);
+  const isPopoverPinnedRef = useRef(false);
 
   const emptyVariables = useMemo(() => new Map(), []);
 
   useEffect(() => {
     onBlurRef.current = onBlur;
     onChangeRef.current = onChange;
-  }, [onBlur, onChange]);
+    onPasteRef.current = onPaste;
+  }, [onBlur, onChange, onPaste]);
 
   const [hoveredVariable, setHoveredVariable] = useState<string | null>(null); // Track hovered variable
   const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
   const [isPopoverPinned, setIsPopoverPinned] = useState(false);
 
   useEffect(() => {
+    isPopoverPinnedRef.current = isPopoverPinned;
+  }, [isPopoverPinned]);
+
+  const handleMouseLeave = useCallback(() => {
+    if (!isPopoverPinnedRef.current) {
+      setHoveredVariable(null);
+    }
+  }, []);
+
+  const handleSetVariable = useCallback(
+    (variable: string | null) => {
+      if (!variable) {
+        handleMouseLeave();
+      } else {
+        setHoveredVariable(variable);
+      }
+    },
+    [handleMouseLeave]
+  );
+
+  useEffect(() => {
     if (editorViewRef.current) {
       editorViewRef.current.destroy();
       editorViewRef.current = null;
-    }
-
-    if (typeof defaultValue !== "string") {
-      Sentry.captureException(new Error("Editor defaultValue must be a string"), {
-        extra: {
-          defaultValue,
-        },
-      });
     }
 
     if (!editorRef.current) return;
@@ -91,10 +108,32 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
                 onPressEnter?.(event, view.state.doc.toString());
               }
             },
+            paste: (event, view) => {
+              const pastedText = event.clipboardData?.getData("text/plain");
+              if (!pastedText) return;
+
+              // Call the onPaste handler first to let parent decide if it should handle the paste
+              // (e.g., for cURL import)
+              onPasteRef.current?.(event, pastedText);
+              // If parent didn't prevent default, handle multiline paste conversion
+              if (!event.defaultPrevented && pastedText.includes("\n")) {
+                event.preventDefault();
+                const singleLineText = pastedText.replace(/\\\s*\n\s*/g, " ").replace(/\n/g, " ");
+                view.dispatch(
+                  view.state.update({
+                    changes: {
+                      from: view.state.selection.main.from,
+                      to: view.state.selection.main.to,
+                      insert: singleLineText,
+                    },
+                  })
+                );
+              }
+            },
           }),
           highlightVariablesPlugin(
             {
-              setHoveredVariable,
+              handleSetVariable,
               setPopupPosition,
             },
             variables || emptyVariables
@@ -112,7 +151,7 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
     //Need to disable to implement the onChange handler
     // Shouldn't be recreated every render
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [placeholder, variables]);
+  }, [placeholder, variables, handleSetVariable]);
 
   useEffect(() => {
     if (defaultValue !== previousDefaultValueRef.current) {
@@ -137,12 +176,6 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
       }
     }
   }, [defaultValue]);
-
-  const handleMouseLeave = useCallback(() => {
-    if (!isPopoverPinned) {
-      setHoveredVariable(null);
-    }
-  }, [isPopoverPinned]);
 
   const handleClosePopover = useCallback(() => {
     setHoveredVariable(null);

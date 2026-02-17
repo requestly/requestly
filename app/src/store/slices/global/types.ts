@@ -3,6 +3,7 @@ import { EditorToastState } from "./editorToast/types";
 import { GlobalModals } from "./modals/types";
 import { RulesState } from "./rules/types";
 import { UserAuth } from "./user/types";
+import { BottomSheetOrientation } from "componentsV2/BottomSheet/types";
 
 export interface GlobalSliceState {
   activeModals: GlobalModals;
@@ -10,6 +11,7 @@ export interface GlobalSliceState {
   rules: RulesState;
   user: UserAuth;
   syncingV2: boolean;
+  bottomSheetOrientation: BottomSheetOrientation;
   isExtensionEnabled: boolean;
   pendingRefresh: {
     rules: boolean;

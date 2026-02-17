@@ -35,6 +35,7 @@ import { getFileContents } from "components/mode-specific/desktop/DesktopFilePic
 import { NativeError } from "errors/NativeError";
 import { trackCollectionRunnerRecordLimitExceeded } from "modules/analytics/events/features/apiClient";
 import { getBoundary, parse as multipartParser } from "parse-multipart-data";
+import { TreeIndices } from "features/apiClient/slices";
 
 const createAbortError = (signal: AbortSignal) => {
   if (signal && signal.reason === AbortReason.USER_CANCELLED) {
@@ -113,6 +114,11 @@ export const addUrlSchemeIfMissing = (url: string): string => {
   return url;
 };
 
+/**
+ * Creates an empty HTTP API entry with default values.
+ * Note: Default values are hard-coded here. If the schema changes,
+ * these defaults should be updated accordingly.
+ */
 export const getEmptyHttpEntry = (request?: RQAPI.Request): RQAPI.HttpApiEntry => {
   const httpRequest = (request || {}) as RQAPI.HttpRequest;
 
@@ -378,7 +384,8 @@ export const parseMultipartFormDataString = (
 };
 
 export const parseCurlRequest = (curl: string): RQAPI.Request => {
-  const requestJson = curlconverter.toJsonObject(curl);
+  const cleanCurl = curl.replace(/\u00A0/g, " ");
+  const requestJson = curlconverter.toJsonObject(cleanCurl);
   const queryParamsFromJson = generateKeyValuePairs(requestJson.queries);
   /*
       cURL converter is not able to parse query params from url for some cURL requests
@@ -743,17 +750,17 @@ export const apiRequestToHarRequestAdapter = (apiRequest: RQAPI.HttpRequest): Ha
     if (apiRequest?.contentType === RequestContentType.RAW) {
       harRequest.postData = {
         mimeType: RequestContentType.RAW,
-        text: apiRequest.body as string,
+        text: (apiRequest.body as string) ?? "",
       };
     } else if (apiRequest?.contentType === RequestContentType.JSON) {
       harRequest.postData = {
         mimeType: RequestContentType.JSON,
-        text: apiRequest.body as string,
+        text: (apiRequest.body as string) ?? "",
       };
     } else if (apiRequest?.contentType === RequestContentType.FORM) {
       harRequest.postData = {
         mimeType: RequestContentType.FORM,
-        params: (apiRequest.body as KeyValuePair[]).map(({ key, value }) => ({ name: key, value })),
+        params: ((apiRequest.body as KeyValuePair[]) ?? []).map(({ key, value }) => ({ name: key, value })),
       };
     }
   }
@@ -763,12 +770,13 @@ export const apiRequestToHarRequestAdapter = (apiRequest: RQAPI.HttpRequest): Ha
 
 export const filterOutChildrenRecords = (
   selectedRecords: Set<RQAPI.ApiClientRecord["id"]>,
-  childParentMap: Map<RQAPI.ApiClientRecord["id"], RQAPI.ApiClientRecord["id"]>,
+  childParentMap: TreeIndices["childToParent"],
   recordsMap: Record<RQAPI.ApiClientRecord["id"], RQAPI.ApiClientRecord>
 ) =>
   [...selectedRecords]
-    .filter((id) => !childParentMap.get(id) || !selectedRecords.has(childParentMap.get(id) ?? ""))
-    .map((id) => recordsMap[id]);
+    .filter((id) => !childParentMap[id] || !selectedRecords.has(childParentMap[id] ?? ""))
+    .map((id) => recordsMap[id])
+    .filter((r) => !!r);
 
 export const processRecordsForDuplication = (
   recordsToProcess: RQAPI.ApiClientRecord[],
@@ -815,9 +823,9 @@ export const processRecordsForDuplication = (
 
 export const resolveAuth = (
   auth: RQAPI.Auth,
-  childDetails: { id: string; parentId: string | null },
+  childDetails: { id: string; parentId: string | undefined },
   getParentChain: (id: string) => string[],
-  getData: (id: string | null) => RQAPI.ApiClientRecord | undefined
+  getData: (id: string | undefined) => RQAPI.ApiClientRecord | undefined
 ): RQAPI.Auth => {
   //create a record array
   const apiRecords: RQAPI.ApiClientRecord[] = [];
@@ -950,6 +958,23 @@ export const checkForLargeFiles = (body: RQAPI.RequestBody): boolean => {
   return false;
 };
 
+/**
+ * Generates a regular expression for identifying path variables
+ *
+ * The pattern matches a colon followed by a variable name, excluding URL reserved
+ * characters (: / ? # [ ] @ ! $ & ' ( ) * + , ; =) and whitespace and control characters
+ *
+ * @param includeLookBehind - Whether to include a negative look behind assertion to avoid matching colons preceded by word characters (e.g. to avoid matching "urn:uuid")
+ * @returns A RegExp object for matching path variables.
+ */
+export function getPathVariableRegex(includeLookBehind: boolean) {
+  const variableRegex = /([^:/?#[\]@!$&'()*+,;=\s]+)/;
+  if (includeLookBehind) {
+    return new RegExp(`(?<!\\w):${variableRegex.source}`, "g");
+  }
+  return new RegExp(`:${variableRegex.source}`, "g");
+}
+
 export const extractPathVariablesFromUrl = (url: string) => {
   if (!url) {
     return [];
@@ -964,13 +989,11 @@ export const extractPathVariablesFromUrl = (url: string) => {
     return [];
   }
 
-  // Allow all characters except URL reserved characters: : / ? # [ ] @ ! $ & ' ( ) * + , ; =
-  // Also exclude whitespace and control characters for practical reasons
-  const variablePattern = /(?<!:):([^:/?#[\]@!$&'()*+,;=\s]+)/g;
+  const variableRegex = getPathVariableRegex(true);
   const variables: string[] = [];
   let match;
 
-  while ((match = variablePattern.exec(pathname)) !== null) {
+  while ((match = variableRegex.exec(pathname)) !== null) {
     const variableName = match[1];
     if (!variables.includes(variableName)) {
       variables.push(variableName);

@@ -1,12 +1,14 @@
 import React from "react";
-import { Modal } from "antd";
+import { Modal, Tooltip } from "antd";
 import { FilePicker } from "components/common/FilePicker";
 import { MdCheckCircleOutline } from "@react-icons/all-files/md/MdCheckCircleOutline";
+import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
 import { RQButton } from "lib/design-system-v2/components";
 import { MdErrorOutline } from "@react-icons/all-files/md/MdErrorOutline";
 import {} from "modules/analytics/events/features/apiClient";
 import "./apiClientImportModal.scss";
 import useApiClientFileImporter, { ImporterType } from "features/apiClient/hooks/useApiClientFileImporter";
+import LINKS from "config/constants/sub/links";
 
 interface Props {
   isOpen: boolean;
@@ -35,7 +37,16 @@ export const ApiClientImportModal: React.FC<Props> = ({ isOpen, onClose }) => {
         onClose();
         resetImportData();
       }}
-      title="Import collections & environments"
+      title={
+        <span className="import-collections-modal-title">
+          Import collections & environments
+          <Tooltip title="Learn more about importing Requestly collections">
+            <a href={LINKS.REQUESTLY_API_CLIENT_IMPORT_COLLECTIONS_DOCS} target="_blank" rel="noreferrer">
+              <MdInfoOutline className="import-collections-modal-info-icon" />
+            </a>
+          </Tooltip>
+        </span>
+      }
       footer={null}
       width={600}
     >

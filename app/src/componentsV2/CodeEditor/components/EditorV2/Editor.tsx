@@ -1,8 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import CodeMirror, { EditorView, ReactCodeMirrorRef } from "@uiw/react-codemirror";
+import CodeMirror, { EditorView, Extension, ReactCodeMirrorRef } from "@uiw/react-codemirror";
 import { javascript } from "@codemirror/lang-javascript";
-import { json } from "@codemirror/lang-json";
 import { html } from "@codemirror/lang-html";
+import { json5 } from "codemirror-json5";
+import { json } from "@codemirror/lang-json";
 import { css } from "@codemirror/lang-css";
 import { vscodeDark } from "@uiw/codemirror-theme-vscode";
 import { EditorLanguage, EditorCustomToolbar, AnalyticEventProperties } from "componentsV2/CodeEditor/types";
@@ -30,6 +31,9 @@ import {
   highlightVariablesPlugin,
   generateCompletionsForVariables,
 } from "componentsV2/CodeEditor/components/EditorV2/plugins";
+import { placeholder as placeholderExtension } from "@codemirror/view";
+import { getLinterExtension } from "./lints/linterRegistry";
+
 interface EditorProps {
   value: string;
   language: EditorLanguage | null;
@@ -56,6 +60,9 @@ interface EditorProps {
     source: "ai" | "user";
     onPartialMerge: (mergedValue: string, newIncomingValue: string, type: "accept" | "reject") => void;
   };
+  disableDefaultAutoCompletions?: boolean;
+  customTheme?: Extension;
+  placeholder?: string;
 }
 const Editor: React.FC<EditorProps> = ({
   value,
@@ -77,12 +84,15 @@ const Editor: React.FC<EditorProps> = ({
   onFocus,
   onEditorReady,
   mergeView,
+  disableDefaultAutoCompletions = false,
+  customTheme,
+  placeholder,
 }) => {
   const location = useLocation();
   const dispatch = useDispatch();
   const editorRef = useRef<ReactCodeMirrorRef | null>(null);
   const [editorHeight, setEditorHeight] = useState(height);
-  const [hoveredVariable, setHoveredVariable] = useState(null);
+  const [hoveredVariable, setHoveredVariable] = useState<string | null>(null);
   const isFullScreenModeOnboardingCompleted = useSelector(getIsCodeEditorFullScreenModeOnboardingCompleted);
   const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
   const [isEditorInitialized, setIsEditorInitialized] = useState(false);
@@ -92,6 +102,7 @@ const Editor: React.FC<EditorProps> = ({
   const isDefaultPrettificationDone = useRef(false);
   const isUnsaveChange = useRef(false);
   const [isFullScreen, setFullScreen] = useState(false);
+  const [isPopoverPinned, setIsPopoverPinned] = useState(false);
 
   const handleFullScreenChange = () => {
     setFullScreen((prev) => !prev);
@@ -127,6 +138,8 @@ const Editor: React.FC<EditorProps> = ({
         return javascript({ jsx: false });
       case EditorLanguage.JSON:
         return json();
+      case EditorLanguage.JSON5:
+        return json5();
       case EditorLanguage.HTML:
         return html();
       case EditorLanguage.CSS:
@@ -157,7 +170,7 @@ const Editor: React.FC<EditorProps> = ({
     const doc = view?.state?.doc;
 
     if (!view || !doc) {
-      return null;
+      return;
     }
     // Not mark prettify as unsaved change, that is just a effect
     isUnsaveChange.current = false;
@@ -253,58 +266,107 @@ const Editor: React.FC<EditorProps> = ({
     ]
   );
 
+  const handleMouseLeave = useCallback(() => {
+    if (!isPopoverPinned) {
+      setHoveredVariable(null);
+    }
+  }, [isPopoverPinned]);
+
+  const handleClosePopover = useCallback(() => {
+    setHoveredVariable(null);
+    setIsPopoverPinned(false);
+  }, []);
+
+  const handleSetVariable = useCallback(
+    (variable: string | null) => {
+      if (!variable) {
+        handleMouseLeave();
+      } else {
+        setHoveredVariable(variable);
+      }
+    },
+    [handleMouseLeave]
+  );
+
+  const extensions: Extension[] = useMemo(() => {
+    const result: Extension[] = [];
+
+    if (editorLanguage) {
+      result.push(editorLanguage);
+    }
+
+    const linterExtension = getLinterExtension(language);
+    if (linterExtension.length) {
+      result.push(...linterExtension);
+    }
+
+    if (customTheme) {
+      result.push(customTheme);
+    }
+
+    if (placeholder) {
+      result.push(placeholderExtension(placeholder));
+    }
+
+    result.push(customKeyBinding, EditorView.lineWrapping);
+
+    if (envVariables) {
+      result.push(
+        highlightVariablesPlugin(
+          {
+            handleSetVariable,
+            setPopupPosition,
+          },
+          envVariables
+        )
+      );
+    }
+
+    const completionExtension = generateCompletionsForVariables(envVariables);
+    if (completionExtension) {
+      result.push(completionExtension);
+    }
+
+    return result;
+  }, [editorLanguage, language, customTheme, placeholder, envVariables, handleSetVariable, setPopupPosition]);
+
   const editor = (
-    <CodeMirror
-      ref={editorRefCallback}
-      className={`code-editor ${envVariables ? "code-editor-with-env-variables" : ""} ${
-        !isEditorInitialized ? "not-visible" : ""
-      }`}
-      width="100%"
-      readOnly={isReadOnly}
-      value={value ?? ""}
-      onKeyDown={() => (isUnsaveChange.current = true)}
-      onChange={debouncedhandleEditorBodyChange}
-      theme={vscodeDark}
-      extensions={[
-        editorLanguage,
-        customKeyBinding,
-        EditorView.lineWrapping,
-        envVariables
-          ? highlightVariablesPlugin(
-              {
-                setHoveredVariable,
-                setPopupPosition,
-              },
-              envVariables
-            )
-          : null,
-        generateCompletionsForVariables(envVariables),
-      ].filter(Boolean)}
-      basicSetup={{
-        highlightActiveLine: false,
-        bracketMatching: true,
-        closeBrackets: true,
-        allowMultipleSelections: true,
-      }}
-      data-enable-grammarly="false"
-      data-gramm_editor="false"
-      data-gramm="false"
-    >
-      {envVariables && (
-        <div className="editor-popup-container ant-input" onMouseLeave={() => setHoveredVariable(null)}>
-          {hoveredVariable && (
-            <VariablePopover
-              editorRef={{
-                current: editorRef.current?.editor ?? null,
-              }}
-              hoveredVariable={hoveredVariable}
-              popupPosition={popupPosition}
-              variables={envVariables}
-            />
-          )}
-        </div>
-      )}
-    </CodeMirror>
+    <>
+      <CodeMirror
+        ref={editorRefCallback}
+        className={`code-editor ${envVariables ? "code-editor-with-env-variables" : ""} ${
+          !isEditorInitialized ? "not-visible" : ""
+        }`}
+        width="100%"
+        readOnly={isReadOnly}
+        value={value ?? ""}
+        onKeyDown={() => (isUnsaveChange.current = true)}
+        onChange={debouncedhandleEditorBodyChange}
+        theme={vscodeDark}
+        extensions={extensions}
+        basicSetup={{
+          highlightActiveLine: false,
+          bracketMatching: true,
+          closeBrackets: true,
+          allowMultipleSelections: true,
+          autocompletion: !disableDefaultAutoCompletions,
+        }}
+        data-enable-grammarly="false"
+        data-gramm_editor="false"
+        data-gramm="false"
+      />
+      <div className="editor-popup-container" onMouseLeave={handleMouseLeave}>
+        {hoveredVariable && envVariables && (
+          <VariablePopover
+            hoveredVariable={hoveredVariable}
+            popupPosition={popupPosition}
+            variables={envVariables}
+            onPinChange={setIsPopoverPinned}
+            onClose={handleClosePopover}
+          />
+        )}
+      </div>
+    </>
   );
 
   const toastContainer = toastOverlay && (
@@ -361,7 +423,12 @@ const Editor: React.FC<EditorProps> = ({
       >
         {toastContainer}
         {mergeView ? (
-          <MergeViewEditor originalValue={value} newValue={mergeView.incomingValue} onMergeChunk={handleMergeChunk} />
+          <MergeViewEditor
+            originalValue={value}
+            newValue={mergeView.incomingValue}
+            onMergeChunk={handleMergeChunk}
+            onEditorReady={editorRefCallback}
+          />
         ) : (
           editor
         )}

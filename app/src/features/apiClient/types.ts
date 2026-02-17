@@ -94,7 +94,8 @@ export namespace RQAPI {
     | "collection_row"
     | "collection_list_empty_state"
     | "api_client_sidebar_header"
-    | "api_client_sidebar";
+    | "api_client_sidebar"
+    | "api_client_home";
 
   export enum RecordType {
     API = "api",
@@ -108,7 +109,7 @@ export namespace RQAPI {
   }
 
   export type PathVariable = {
-    id: number;
+    id: number | string;
     key: string;
     value: string;
     description?: string;
@@ -242,6 +243,7 @@ export namespace RQAPI {
     name: Error["name"];
     reason?: string;
     message: Error["message"];
+    stack?: Error["stack"];
   };
 
   export type ExecutionWarning = {
@@ -280,6 +282,7 @@ export namespace RQAPI {
       postResponse: string;
     };
     variables: Omit<EnvironmentVariables, "localValue">;
+    variablesOrder?: string[]; // Array of variable keys in display order
     auth: Auth;
   }
 
