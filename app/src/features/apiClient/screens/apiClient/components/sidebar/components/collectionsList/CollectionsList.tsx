@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { BulkActions, RQAPI } from "features/apiClient/types";
-import { notification } from "antd";
 import { useDrop } from "react-dnd";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { CollectionRow, ExportType } from "./collectionRow/CollectionRow";
@@ -45,6 +44,7 @@ import { EXPANDED_RECORD_IDS_UPDATED } from "features/apiClient/slices/exampleCo
 import { useWorkspaceId } from "features/apiClient/common/WorkspaceProvider";
 import { Workspace } from "features/workspaces/types";
 import { DraggableApiRecord } from "./collectionRow/CollectionRow";
+import { handleRecordDrop } from "./utils/handleRecordDrop";
 
 interface Props {
   onNewClick: (src: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType) => Promise<void>;
@@ -385,39 +385,15 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
     [showSelection, selectedRecords, handleRecordToggle]
   );
 
-  const handleRecordDrop = useCallback(async (item: DraggableApiRecord, dropWorkspaceId: Workspace["id"] | null) => {
-    try {
-      const sourceContext = getApiClientFeatureContext(item.workspaceId ?? undefined);
-      if (!sourceContext) {
-        throw new Error(`Source context not found for id: ${item.workspaceId}`);
-      }
-
+  const handleRecordDropToTopLevel = useCallback(
+    async (item: DraggableApiRecord, dropWorkspaceId: Workspace["id"] | null) => {
       // Empty string for collectionId means move to top-level (no parent collection)
-      const destination = {
-        workspaceId: dropWorkspaceId ?? undefined,
-        collectionId: "",
-      };
-
-      await sourceContext.store
-        .dispatch(
-          moveRecords({
-            recordsToMove: [item.record],
-            collectionId: destination.collectionId,
-            repository: sourceContext.repositories.apiClientRecordsRepository,
-            sourceWorkspaceId: item.workspaceId ?? undefined,
-            destinationWorkspaceId: destination.workspaceId,
-          }) as any
-        )
-        .unwrap();
-    } catch (error) {
-      console.error("Error moving item:", error);
-      notification.error({
-        message: "Error moving item",
-        description: error?.message || "Failed to move item. Please try again.",
-        placement: "bottomRight",
+      await handleRecordDrop(item, dropWorkspaceId, {
+        targetCollectionId: "",
       });
-    }
-  }, []);
+    },
+    []
+  );
 
   const [{ isOver, canDrop }, drop] = useDrop(
     () => ({
@@ -428,7 +404,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
 
         // Only handle drop if item is from a collection (collectionId is not empty)
         if (item.record.collectionId) {
-          handleRecordDrop(item, workspaceId || null);
+          handleRecordDropToTopLevel(item, workspaceId || null);
         }
       },
       canDrop: (item: DraggableApiRecord) => {
@@ -440,7 +416,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
         canDrop: monitor.canDrop(),
       }),
     }),
-    [handleRecordDrop, workspaceId]
+    [handleRecordDropToTopLevel, workspaceId]
   );
 
   useEffect(() => {
