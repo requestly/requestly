@@ -32,10 +32,14 @@
       background-color: var(--requestly-color-white-t-10);
     }
 
+    &.selected {
+      background-color: var(--requestly-color-white-t-10);
+    }
+
     .item-left-section {
       display: flex;
       flex-direction: row;
-      gap: var(--space-4, 8px);
+      gap: var(--space-3, 6px) !important;
 
       .scope-tooltip {
         .ant-tooltip-inner {
@@ -58,7 +62,7 @@
       height: 12px;
       color: var(--requestly-color-text-placeholder);
       font-family: "Material Symbols Outlined";
-      font-size: 14px;
+      font-size: 12px;
       font-style: normal;
       font-weight: 400;
       opacity: 0.5;

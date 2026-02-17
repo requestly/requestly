@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useMemo, useState, useEffect, useRef } from "react";
 import { List, Popover, Tooltip } from "antd";
 import { createPortal } from "react-dom";
 import { InfoCircleOutlined } from "@ant-design/icons";
@@ -19,6 +19,7 @@ interface VariableAutocompleteProps {
   search: string;
   variables: ScopedVariables | undefined;
   onSelect: (variableKey: string, isDynamic: boolean) => void;
+  onClose?: () => void;
 }
 
 export const VariableAutocompletePopover: React.FC<VariableAutocompleteProps> = ({
@@ -27,7 +28,17 @@ export const VariableAutocompletePopover: React.FC<VariableAutocompleteProps> = 
   search,
   variables,
   onSelect,
+  onClose,
 }) => {
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const listRef = useRef<HTMLDivElement>(null);
+  const selectedIndexRef = useRef(0);
+
+  // Keep ref in sync
+  useEffect(() => {
+    selectedIndexRef.current = selectedIndex;
+  }, [selectedIndex]);
+
   const filteredVariables = useMemo(() => {
     if (!variables) return [];
 
@@ -60,6 +71,45 @@ export const VariableAutocompletePopover: React.FC<VariableAutocompleteProps> = 
     return results;
   }, [variables, search]);
 
+  // Keyboard navigation and auto-scroll
+  useEffect(() => {
+    if (!show) return;
+    setSelectedIndex(0);
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const len = filteredVariables.length;
+      if (!len) return;
+
+      switch (e.key) {
+        case "ArrowDown":
+          e.preventDefault();
+          setSelectedIndex((prev) => (prev + 1) % len);
+          break;
+        case "ArrowUp":
+          e.preventDefault();
+          setSelectedIndex((prev) => (prev - 1 + len) % len);
+          break;
+        case "Enter": {
+          e.preventDefault();
+          const item = filteredVariables[selectedIndexRef.current];
+          if (item) onSelect(item.name, checkIsDynamicVariable(item.variable));
+          break;
+        }
+        case "Escape":
+          e.preventDefault();
+          onClose?.();
+          break;
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [show, filteredVariables, onSelect, onClose]);
+
+  useEffect(() => {
+    listRef.current?.querySelector(`[data-index="${selectedIndex}"]`)?.scrollIntoView({ block: "nearest" });
+  }, [selectedIndex]);
+
   const handleSelect = useCallback(
     (e: React.MouseEvent, variableName: string, isDynamic: boolean) => {
       e.preventDefault();
@@ -69,46 +119,52 @@ export const VariableAutocompletePopover: React.FC<VariableAutocompleteProps> = 
     [onSelect]
   );
 
+  const renderListItem = useCallback(
+    (item: { name: string; variable: any }, index: number) => {
+      const isDynamic = checkIsDynamicVariable(item.variable);
+      const variableName = item.name;
+      const variableScope = isDynamic ? item.variable.scope : item.variable[1].scope;
+      const isSelected = index === selectedIndex;
+
+      return (
+        <List.Item
+          className={`variable-autocomplete-item ${isSelected ? "selected" : ""}`}
+          onMouseDown={(e) => handleSelect(e, variableName, isDynamic)}
+          onMouseEnter={() => setSelectedIndex(index)}
+          style={{ cursor: "pointer" }}
+          data-index={index}
+        >
+          <div className="item-left-section">
+            <Tooltip
+              title={`Scope: ${capitalize(String(variableScope))} environment`}
+              placement="top"
+              showArrow={false}
+              overlayClassName="scope-tooltip"
+            >
+              <span>{getScopeIcon(variableScope, { showBackgroundColor: false })}</span>
+            </Tooltip>
+            <span className="variable-label">{variableName}</span>
+          </div>
+
+          {isDynamic && (
+            <Tooltip
+              title={<DynamicVariableInfoPopover variable={item.variable as DynamicVariable} />}
+              placement="rightTop"
+              showArrow={false}
+              overlayClassName="example-tooltip"
+            >
+              <InfoCircleOutlined className="info-icon" />
+            </Tooltip>
+          )}
+        </List.Item>
+      );
+    },
+    [selectedIndex, handleSelect]
+  );
+
   if (!show || filteredVariables.length === 0) {
     return null;
   }
-
-  const renderListItem = (item: { name: string; variable: any }) => {
-    const isDynamic = checkIsDynamicVariable(item.variable);
-    const variableName = item.name;
-    const variableScope = isDynamic ? item.variable.scope : item.variable[1].scope; // For scoped variables, get scope from source
-
-    return (
-      <List.Item
-        className="variable-autocomplete-item"
-        onMouseDown={(e) => handleSelect(e, variableName, isDynamic)}
-        style={{ cursor: "pointer" }}
-      >
-        <div className="item-left-section">
-          <Tooltip
-            title={`Scope: ${capitalize(String(variableScope))} environment`}
-            placement="top"
-            showArrow={false}
-            overlayClassName="scope-tooltip"
-          >
-            <span>{getScopeIcon(variableScope, { showBackgroundColor: false })}</span>
-          </Tooltip>
-          <span className="variable-label">{variableName}</span>
-        </div>
-
-        {isDynamic && (
-          <Tooltip
-            title={<DynamicVariableInfoPopover variable={item.variable as DynamicVariable} />}
-            placement="rightTop"
-            showArrow={false}
-            overlayClassName="example-tooltip"
-          >
-            <InfoCircleOutlined className="info-icon" />
-          </Tooltip>
-        )}
-      </List.Item>
-    );
-  };
 
   const popupStyle: React.CSSProperties = {
     position: "absolute",
@@ -119,8 +175,12 @@ export const VariableAutocompletePopover: React.FC<VariableAutocompleteProps> = 
 
   return createPortal(
     <Popover
-      content={<List size="small" dataSource={filteredVariables} renderItem={renderListItem} />}
-      open={show}
+      content={
+        <div ref={listRef}>
+          <List size="small" dataSource={filteredVariables} renderItem={renderListItem} />
+        </div>
+      }
+      open={true}
       destroyTooltipOnHide
       trigger={[]}
       placement="bottomLeft"
