@@ -70,6 +70,7 @@ import { ApiClientBottomSheet } from "../components/response/ApiClientBottomShee
 import HttpApiClientUrl from "./components/HttpClientUrl/HttpClientUrl";
 import HttpRequestTabs, { RequestTab } from "./components/HttpRequestTabs/HttpRequestTabs";
 import "./httpClientView.scss";
+import { apiRecordsRankingManager } from "features/apiClient/helpers/RankingManager";
 
 function getEntry(entity: BufferedHttpRecordEntity, store: ApiClientStore) {
   return entity.getEntityFromState(store.getState()).data;
@@ -317,7 +318,13 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
                     queryParams: executedEntry.request.queryParams,
                   });
                   scope.setFingerprint(["api_request_error", executedEntry.request.method, error.source]);
-                  Sentry.captureException(new Error(`API Request Failed: ${error.message || "Unknown error"}`));
+                  const sentryError = new Error(
+                    `API Request Failed: ${error.message || error.name || "Unknown error"}`
+                  );
+                  if (error.stack) {
+                    sentryError.stack = error.stack;
+                  }
+                  Sentry.captureException(sentryError);
                 });
               }
               trackRequestFailed(

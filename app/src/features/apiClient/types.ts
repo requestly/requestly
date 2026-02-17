@@ -244,6 +244,7 @@ export namespace RQAPI {
     name: Error["name"];
     reason?: string;
     message: Error["message"];
+    stack?: Error["stack"];
   };
 
   export type ExecutionWarning = {
@@ -291,6 +292,7 @@ export namespace RQAPI {
     name: string;
     description?: string;
     collectionId: string | null;
+    rank?: string;
     isExample?: boolean;
     ownerId: string;
     deleted: boolean;

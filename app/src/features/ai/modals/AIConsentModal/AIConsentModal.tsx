@@ -20,6 +20,7 @@ interface AIConsentModalProps {
   isOpen: boolean;
   toggle: (isOpen: boolean) => void;
   onEnableCallback?: () => void;
+  autoCloseOnEnable?: boolean;
 }
 
 const AI_DETAILS = [
@@ -37,7 +38,12 @@ const AI_DETAILS = [
   },
 ];
 
-export const AIConsentModal: React.FC<AIConsentModalProps> = ({ isOpen, toggle, onEnableCallback }) => {
+export const AIConsentModal: React.FC<AIConsentModalProps> = ({
+  isOpen,
+  toggle,
+  onEnableCallback,
+  autoCloseOnEnable = true,
+}) => {
   const user = useSelector(getUserAuthDetails);
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
@@ -47,7 +53,9 @@ export const AIConsentModal: React.FC<AIConsentModalProps> = ({ isOpen, toggle, 
     const result = await toggleAIFeatures(user.details?.profile?.uid, true);
     if (result.success) {
       dispatch(globalActions.updateIsOptedforAIFeatures(true));
-      toggle(false);
+      if (autoCloseOnEnable) {
+        toggle(false);
+      }
       onEnableCallback?.();
     } else {
       toast.error("Something went wrong while enabling AI features. Please try again later or contact support.");
