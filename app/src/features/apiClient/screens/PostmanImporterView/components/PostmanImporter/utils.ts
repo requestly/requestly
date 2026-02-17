@@ -272,6 +272,80 @@ export const processRequestHeaders = (request: any): RequestHeadersProcessingRes
   return { headers };
 };
 
+const createExampleApiRecord = (
+  exampleResponse: any,
+  parentRequestId: string,
+  parentCollectionId: string,
+  apiClientRecordsRepository: ApiClientRecordsInterface<Record<string, any>>
+): Partial<RQAPI.ExampleApiRecord> => {
+  const responseHeaders =
+    exampleResponse.header?.map(
+      (
+        header: { key: string; value: string; disabled?: boolean; type?: string; description?: string },
+        index: number
+      ) => ({
+        id: index,
+        key: header.key,
+        value: header.value,
+        isEnabled: !header?.disabled,
+        description: header?.description || "",
+        dataType: getInferredKeyValueDataType(header.value),
+      })
+    ) ?? [];
+
+  const response: RQAPI.HttpResponse = {
+    body: exampleResponse.body || "",
+    headers: responseHeaders,
+    status: parseInt(exampleResponse.code) || 200,
+    statusText: exampleResponse.status || "",
+    time: 0,
+    redirectedUrl: "",
+  };
+
+  // Create a minimal request structure from the original request if available
+  const request = exampleResponse.originalRequest;
+  const queryParams =
+    request?.url?.query?.map((query: any, index: number) => ({
+      id: index,
+      key: query.key,
+      value: query.value,
+      isEnabled: query?.disabled !== true,
+      description: query?.description || "",
+      dataType: getInferredKeyValueDataType(query.value),
+    })) ?? [];
+
+  const { requestBody, contentType } = request
+    ? processRequestBody(request)
+    : { requestBody: "", contentType: RequestContentType.RAW };
+  const { headers } = request ? processRequestHeaders(request) : { headers: [] };
+
+  return {
+    id: apiClientRecordsRepository.generateApiRecordId(parentCollectionId),
+    parentRequestId,
+    collectionId: parentCollectionId,
+    name: exampleResponse.name || "Example Response",
+    type: RQAPI.RecordType.EXAMPLE_API,
+    deleted: false,
+    data: {
+      type: RQAPI.ApiEntryType.HTTP,
+      request: {
+        url: typeof request?.url === "string" ? request.url : request?.url?.raw ?? "",
+        method: request?.method || RequestMethod.GET,
+        queryParams,
+        headers,
+        body: requestBody,
+        bodyContainer: createBodyContainer({ contentType, body: requestBody }),
+        contentType,
+      },
+      response,
+      auth: request
+        ? processAuthorizationOptions(request.auth, parentCollectionId)
+        : { currentAuthType: "INHERIT", authConfigStore: {} },
+      scripts: { preRequest: "", postResponse: "" },
+    },
+  } as RQAPI.ExampleApiRecord;
+};
+
 const createApiRecord = (
   item: any,
   parentCollectionId: string,
@@ -356,7 +430,11 @@ const createCollectionRecord = (
 export const processPostmanCollectionData = (
   fileContent: any,
   apiClientRecordsRepository: ApiClientRecordsInterface<Record<string, any>>
-): { collections: Partial<RQAPI.CollectionRecord>[]; apis: Partial<RQAPI.ApiRecord>[] } => {
+): {
+  collections: Partial<RQAPI.CollectionRecord>[];
+  apis: Partial<RQAPI.ApiRecord>[];
+  examples: Partial<RQAPI.ExampleApiRecord>[];
+} => {
   if (!fileContent.info?.name) {
     throw new Error("Invalid collection file: missing name");
   }
@@ -365,6 +443,7 @@ export const processPostmanCollectionData = (
     const result = {
       collections: [] as Partial<RQAPI.CollectionRecord>[],
       apis: [] as Partial<RQAPI.ApiRecord>[],
+      examples: [] as Partial<RQAPI.ExampleApiRecord>[],
     };
 
     items.forEach((item) => {
@@ -389,10 +468,24 @@ export const processPostmanCollectionData = (
         const subItems = processItems(item.item, subCollection.id);
         result.collections.push(...subItems.collections);
         result.apis.push(...subItems.apis);
+        result.examples.push(...subItems.examples);
       } else if (item.request) {
         // This is an API endpoint
-        const data = createApiRecord(item, parentCollectionId, apiClientRecordsRepository);
-        result.apis.push(data);
+        const apiRecord = createApiRecord(item, parentCollectionId, apiClientRecordsRepository);
+        result.apis.push(apiRecord);
+
+        // Process examples/responses if they exist
+        if (item.response && Array.isArray(item.response) && item.response.length > 0 && apiRecord.id) {
+          item.response.forEach((exampleResponse: any) => {
+            const exampleRecord = createExampleApiRecord(
+              exampleResponse,
+              apiRecord.id as string,
+              parentCollectionId,
+              apiClientRecordsRepository
+            );
+            result.examples.push(exampleRecord);
+          });
+        }
       }
     });
 
@@ -420,6 +513,7 @@ export const processPostmanCollectionData = (
       api.rank = ranks[index];
       return api;
     }),
+    examples: processedItems.examples,
   };
 };
 

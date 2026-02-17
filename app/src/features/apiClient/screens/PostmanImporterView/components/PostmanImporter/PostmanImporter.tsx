@@ -34,6 +34,7 @@ import { captureException } from "backend/apiClient/utils";
 type ProcessedData = {
   environments: { name: string; variables: Record<string, EnvironmentVariableData>; isGlobal: boolean }[];
   apiRecords: (RQAPI.CollectionRecord | RQAPI.ApiRecord)[];
+  exampleRecords: RQAPI.ExampleApiRecord[];
   variables: Record<string, EnvironmentVariableData>;
 };
 
@@ -52,6 +53,7 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
   const [processedFileData, setProcessedFileData] = useState<ProcessedData>({
     environments: [],
     apiRecords: [],
+    exampleRecords: [],
     variables: {},
   });
 
@@ -133,6 +135,7 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
               const processedRecords: ProcessedData = {
                 environments: [],
                 apiRecords: [],
+                exampleRecords: [],
                 variables: {},
               };
 
@@ -141,9 +144,10 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
                   if (result.value.type === "environment") {
                     processedRecords.environments.push(result.value.data);
                   } else {
-                    const { collections, apis } = result.value.data.apiRecords;
+                    const { collections, apis, examples } = result.value.data.apiRecords;
                     processedRecords.variables = { ...processedRecords.variables, ...result.value.data.variables };
                     processedRecords.apiRecords.push(...collections, ...apis);
+                    processedRecords.exampleRecords.push(...(examples || []));
                     collectionsCount.current += collections.length;
                     trackImportParsed(ApiClientImporterType.POSTMAN, collections.length, apis.length);
                   }
@@ -257,9 +261,11 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
     let importedCollectionsCount = 0;
     let failedCollectionsCount = 0;
     let importedApisCount = 0;
+    let importedExamplesCount = 0;
 
     const collections = processedFileData.apiRecords.filter((record) => record.type === RQAPI.RecordType.COLLECTION);
     const apis = processedFileData.apiRecords.filter((record) => record.type === RQAPI.RecordType.API);
+    const examples = processedFileData.exampleRecords;
 
     const handleCollectionWrites = async (collection: RQAPI.CollectionRecord) => {
       try {
@@ -321,6 +327,48 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
       throw new Error(`Failed to import APIs: ${apiWriteResult.message}`);
     }
 
+    // Import examples after APIs are imported
+    const handleExampleWrites = async (example: RQAPI.ExampleApiRecord) => {
+      const newCollectionId = collections.find((collection) => collection.id === example.collectionId)?.id;
+      if (!newCollectionId) {
+        throw new Error(`Failed to find new collection ID for Example: ${example.name || example.id}`);
+      }
+
+      // Find the parent request ID - it should already be imported
+      const parentRequest = apis.find((api) => api.id === example.parentRequestId);
+      if (!parentRequest || !parentRequest.id) {
+        throw new Error(`Failed to find parent request for Example: ${example.name || example.id}`);
+      }
+
+      const updatedExample = { ...example, collectionId: newCollectionId };
+      try {
+        const newExample = await apiClientRecordsRepository.createExampleRequest(parentRequest.id, updatedExample);
+        if (newExample.success) {
+          onSaveRecord(newExample.data);
+          importedExamplesCount++;
+          return newExample.data.id;
+        } else {
+          failedCollectionsCount++;
+          return null;
+        }
+      } catch (error) {
+        failedCollectionsCount++;
+        Logger.error("Error importing Example:", error);
+        return null;
+      }
+    };
+
+    if (examples.length > 0) {
+      const exampleWriteResult = await apiClientRecordsRepository.batchWriteApiEntities(
+        BATCH_SIZE,
+        examples,
+        handleExampleWrites
+      );
+      if (!exampleWriteResult.success) {
+        throw new Error(`Failed to import Examples: ${exampleWriteResult.message}`);
+      }
+    }
+
     if (failedCollectionsCount > 0) {
       const failureMessage =
         failedCollectionsCount > 0
@@ -331,8 +379,8 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
       }
     }
 
-    return { importedCollectionsCount, importedApisCount };
-  }, [processedFileData.apiRecords, onSaveRecord, apiClientRecordsRepository]);
+    return { importedCollectionsCount, importedApisCount, importedExamplesCount };
+  }, [processedFileData.apiRecords, processedFileData.exampleRecords, onSaveRecord, apiClientRecordsRepository]);
 
   const handleImportPostmanData = useCallback(async () => {
     return wrapWithCustomSpan(
@@ -352,6 +400,8 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
               collectionsResult.status === "fulfilled" ? collectionsResult.value.importedCollectionsCount : 0;
             const importedApisCount =
               collectionsResult.status === "fulfilled" ? collectionsResult.value.importedApisCount : 0;
+            const importedExamplesCount =
+              collectionsResult.status === "fulfilled" ? collectionsResult.value.importedExamplesCount : 0;
 
             const failedEnvironments = processedFileData.environments.length - importedEnvironments;
             const failedCollections = collectionsCount.current - importedCollectionsCount;
@@ -397,9 +447,12 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
                 importedEnvironments > 0
                   ? `${importedEnvironments} environment${importedEnvironments !== 1 ? "s" : ""}`
                   : "",
+                importedExamplesCount > 0
+                  ? `${importedExamplesCount} example${importedExamplesCount !== 1 ? "s" : ""}`
+                  : "",
               ]
                 .filter(Boolean)
-                .join(" and ")}`
+                .join(", ")}`
             );
 
             onSuccess?.();
@@ -434,6 +487,7 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
     setProcessedFileData({
       environments: [],
       apiRecords: [],
+      exampleRecords: [],
       variables: {},
     });
     collectionsCount.current = 0;
