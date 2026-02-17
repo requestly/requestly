@@ -554,7 +554,7 @@ export const convertFlatRecordsToNestedRecords = (records: RQAPI.ApiClientRecord
 
 export const getEmptyPair = (): KeyValuePair => ({ id: Math.random(), key: "", value: "", isEnabled: true });
 
-export const createBlankApiRecord = (
+export const createBlankApiRecord = async (
   recordType: RQAPI.RecordType,
   collectionId: string,
   apiClientRecordsRepository: ApiClientRecordsInterface<any>,
@@ -586,11 +586,10 @@ export const createBlankApiRecord = (
     newRecord.collectionId = collectionId;
   }
 
-  const result =
-    recordType === RQAPI.RecordType.COLLECTION
-      ? apiClientRecordsRepository.createCollection(newRecord as RQAPI.CollectionRecord)
-      : apiClientRecordsRepository.createRecord(newRecord as RQAPI.ApiRecord);
-
+  //without await race condition
+  const result = await (recordType === RQAPI.RecordType.COLLECTION
+    ? apiClientRecordsRepository.createCollection(newRecord as RQAPI.CollectionRecord)
+    : apiClientRecordsRepository.createRecord(newRecord as RQAPI.ApiRecord));
   return result;
 };
 
