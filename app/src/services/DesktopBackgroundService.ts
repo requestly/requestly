@@ -17,20 +17,37 @@ export function rpc(
   ...args: any[]
 ) {
   const { namespace, method, timeout } = params;
+  const rpcId = `${namespace}-${method}-${Date.now()}`;
+  const startTime = performance.now();
+
+  console.log(`[RPC] Starting ${rpcId} with timeout ${timeout || IPC_TIMEOUT}ms`);
+
   return new Promise((resolve, reject) => {
-    setTimeout(() => {
+    const timeoutId = setTimeout(() => {
+      const elapsed = performance.now() - startTime;
+      console.error(`[RPC] ❌ TIMEOUT ${rpcId} after ${elapsed.toFixed(2)}ms`);
       reject(new TimoutError(method));
     }, timeout || IPC_TIMEOUT);
 
     window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG(`${namespace}-${method}`, args)
       .then((res: any) => {
+        clearTimeout(timeoutId);
+        const elapsed = performance.now() - startTime;
+        console.log(`[RPC] ✅ Success ${rpcId} in ${elapsed.toFixed(2)}ms`);
+
         if (res.success) {
           resolve(res.data);
         } else {
+          console.error(`[RPC] ❌ Response error ${rpcId}:`, res.data);
           reject(res.data);
         }
       })
-      .catch(reject);
+      .catch((err) => {
+        clearTimeout(timeoutId);
+        const elapsed = performance.now() - startTime;
+        console.error(`[RPC] ❌ IPC error ${rpcId} after ${elapsed.toFixed(2)}ms:`, err);
+        reject(err);
+      });
   });
 }
 
@@ -43,11 +60,25 @@ export async function rpcWithRetry(
   },
   ...args: any[]
 ) {
-  let retries = params.retryCount;
+  const maxRetries = params.retryCount;
+  let retries = maxRetries;
+  const startTime = performance.now();
+
+  console.log(
+    `[RPC-RETRY] Starting ${params.namespace}-${params.method} with ${maxRetries} retries, ${params.timeout}ms timeout per attempt`
+  );
+
   while (retries >= 0) {
-    // console.log(`attempt`, { ...params, retries, args, timestamp: Date.now() });
+    const attemptNum = maxRetries - retries + 1;
+    console.log(`[RPC-RETRY] Attempt ${attemptNum}/${maxRetries + 1}`, {
+      namespace: params.namespace,
+      method: params.method,
+      retries,
+      args,
+    });
+
     try {
-      return await rpc(
+      const result = await rpc(
         {
           namespace: params.namespace,
           method: params.method,
@@ -55,18 +86,38 @@ export async function rpcWithRetry(
         },
         ...args
       );
-    } catch (err) {
-      // console.log(`attempt error`, { ...params, retries, err, args, timestamp: Date.now() });
-      if (err instanceof TimoutError) {
+
+      const totalTime = performance.now() - startTime;
+      console.log(`[RPC-RETRY] ✅ Success after ${attemptNum} attempt(s), total time: ${totalTime.toFixed(2)}ms`);
+
+      return result;
+    } catch (err: any) {
+      const totalTime = performance.now() - startTime;
+      console.log(`[RPC-RETRY] Attempt ${attemptNum} failed after ${totalTime.toFixed(2)}ms`, { error: err, retries });
+
+      // Check if error is "No handler registered" - background process not ready yet
+      const isHandlerNotReady = err?.message?.includes("No handler registered");
+
+      if (err instanceof TimoutError || isHandlerNotReady) {
         retries--;
 
         if (retries < 0) {
+          console.error(`[RPC-RETRY] ❌ All retries exhausted after ${totalTime.toFixed(2)}ms`);
           throw err;
         }
 
+        if (isHandlerNotReady) {
+          console.warn(
+            `[RPC-RETRY] Background process not ready yet, waiting 1s before retry... (${retries} retries remaining)`
+          );
+          await new Promise((resolve) => setTimeout(resolve, 1000)); // Wait 1s before retry
+        } else {
+          console.warn(`[RPC-RETRY] Timeout, retrying immediately... (${retries} retries remaining)`);
+        }
         continue;
       }
-      console.log("weird error", retries, err);
+
+      console.error(`[RPC-RETRY] ❌ Non-retryable error, aborting:`, err);
       throw err;
     }
   }

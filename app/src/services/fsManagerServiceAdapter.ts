@@ -1,5 +1,5 @@
 // import { isFeatureCompatible } from "utils/CompatibilityUtils";
-import {
+import type {
   API,
   APIEntity,
   Collection,
@@ -9,18 +9,19 @@ import {
   FileSystemResult,
 } from "features/apiClient/helpers/modules/sync/local/services/types";
 import BackgroundServiceAdapter, { rpc, rpcWithRetry } from "./DesktopBackgroundService";
-import { EnvironmentData, EnvironmentVariables } from "backend/environment/types";
-import { RQAPI } from "features/apiClient/types";
+import type { EnvironmentData, EnvironmentVariables } from "backend/environment/types";
+import type { RQAPI } from "features/apiClient/types";
 import { FsAccessError } from "features/apiClient/errors/FsError/FsAccessError/FsAccessError";
 import { ErrorCode } from "errors/types";
-import { Mutex, MutexInterface, withTimeout } from "async-mutex";
+import { Mutex, withTimeout } from "async-mutex";
+import type { MutexInterface } from "async-mutex";
 
 const LOCAL_SYNC_BUILDER_NAMESPACE = "local_sync_builder";
 
-function FsErrorHandler(_target: any, _key: string, descriptor: PropertyDescriptor) {
+function FsErrorHandler(_target: unknown, _key: string, descriptor: PropertyDescriptor) {
   const originalMethod = descriptor.value;
 
-  descriptor.value = async function (...args: any[]) {
+  descriptor.value = async function (...args: unknown[]) {
     try {
       const result = await originalMethod.apply(this, args);
       if (result.type === "error") {
@@ -148,7 +149,7 @@ export class FsManagerServiceAdapter extends BackgroundServiceAdapter {
   }
 
   @FsErrorHandler
-  async writeRawRecord(id: string, record: any, fileType: FileType) {
+  async writeRawRecord(id: string, record: unknown, fileType: FileType) {
     return this.invokeProcedureInBG("writeRawRecord", id, record, fileType) as Promise<FileSystemResult<unknown>>;
   }
 
@@ -187,34 +188,64 @@ class FsManagerServiceAdapterProvider {
   async get(rootPath: string): Promise<FsManagerServiceAdapter> {
     let lock = this.lockMap.get(rootPath);
     if (!lock) {
-      lock = withTimeout(new Mutex(), 10 * 1000);
+      lock = withTimeout(new Mutex(), 40 * 1000); // Must exceed RPC timeout (30s) + retry overhead;
       this.lockMap.set(rootPath, lock);
     }
+
+    // [PERF] Start timing for lock acquisition
+    const lockAcquireStart = performance.now();
+    console.log(`[PERF] FsManagerServiceAdapter.get() starting for rootPath: ${rootPath}`);
+
     await lock.acquire();
+
+    const lockAcquireTime = performance.now() - lockAcquireStart;
+    console.log(`[PERF] Lock acquired in ${lockAcquireTime.toFixed(2)}ms`);
 
     const fsManagerServiceAdapter = this.cache.get(rootPath);
 
     if (fsManagerServiceAdapter) {
-      console.log("got provider from cache");
+      console.log("[PERF] Got provider from cache");
       lock.release();
       return fsManagerServiceAdapter;
     }
     try {
-      // console.log(`calling build for rootPath=${rootPath}`, Date.now());
+      // [PERF] Start timing for buildFsManager RPC call
+      const buildFsStart = performance.now();
+      console.log("[PERF] buildFsManager() RPC call starting...");
+
       await buildFsManager(rootPath);
-      // console.log(`received build for rootPath=${rootPath}`, Date.now());
+
+      const buildFsTime = performance.now() - buildFsStart;
+      console.log(`[PERF] buildFsManager() RPC call completed in ${buildFsTime.toFixed(2)}ms`);
+
+      if (buildFsTime > 10000) {
+        console.warn(
+          `[PERF] ⚠️ WARNING: buildFsManager took ${buildFsTime.toFixed(
+            2
+          )}ms (>10s). This may indicate a large workspace.`
+        );
+      }
+      if (buildFsTime > 30000) {
+        console.error(`[PERF] ❌ ERROR: buildFsManager took ${buildFsTime.toFixed(2)}ms (>30s). MUTEX TIMEOUT LIKELY!`);
+      }
+
       const service = new FsManagerServiceAdapter(rootPath);
       this.cache.set(rootPath, service);
       return service;
     } catch (e) {
-      const isAccessIssue = (arg: any) => typeof arg === "string" && arg.includes("EACCES:");
-      // console.error(`build error for rootPath=${rootPath}`, e);
-      if (isAccessIssue(e) || isAccessIssue(e.message)) {
-        throw new FsAccessError(e.message || e, rootPath);
+      console.error("[PERF] ❌ ERROR in FsManagerServiceAdapter.get():", e);
+      const isAccessIssue = (arg: unknown) => typeof arg === "string" && arg.includes("EACCES:");
+      if (isAccessIssue(e) || (e && typeof e === "object" && "message" in e && isAccessIssue(e.message))) {
+        const errorMessage = e && typeof e === "object" && "message" in e ? String(e.message) : String(e);
+        throw new FsAccessError(errorMessage, rootPath);
       }
       throw e;
     } finally {
       lock.release();
+      const totalTime = performance.now() - lockAcquireStart;
+      console.log(
+        `[PERF] FsManagerServiceAdapter.get() completed in ${totalTime.toFixed(2)}ms (including lock release)`
+      );
     }
   }
 }
@@ -225,8 +256,8 @@ export function buildFsManager(rootPath: string) {
     {
       namespace: LOCAL_SYNC_BUILDER_NAMESPACE,
       method: "build",
-      retryCount: 10,
-      timeout: 1000 * 30,
+      retryCount: 3, // Reduced from 10 - each retry adds significant time
+      timeout: 1000 * 20, // 20s timeout: accounts for ~5s IPC buffering during cold start + ~5s work + 10s safety margin
     },
     rootPath
   ) as Promise<void>;
@@ -266,7 +297,7 @@ export function getAllWorkspaces() {
   return rpcWithRetry({
     namespace: LOCAL_SYNC_BUILDER_NAMESPACE,
     method: "getAllWorkspaces",
-    retryCount: 10,
+    retryCount: 3, // Reduced from 10 - each retry adds 30s
     timeout: 1000,
   }) as Promise<FileSystemResult<{ id: string; name: string; path: string }[]>>;
 }
