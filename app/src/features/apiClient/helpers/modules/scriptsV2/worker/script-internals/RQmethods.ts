@@ -18,7 +18,7 @@ import { status } from "http-status";
 import { IterationData } from "./IterationData";
 import { ExecutionContext } from "features/apiClient/helpers/httpRequestExecutor/scriptExecutionContext";
 import { ScriptLogger } from "./scriptExecutionWorker/ScriptLogger";
-import { variableResolver } from "lib/dynamic-variables";
+import { variableResolver } from "../../../../../../../lib/dynamic-variables";
 
 // unsupported methods
 const createInfiniteChainable = (methodName: string) => {
