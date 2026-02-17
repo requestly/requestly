@@ -181,7 +181,7 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
                 overlayClassName="api-client-new-btn-dropdown-overlay"
               >
                 <RQButton type="transparent" size="small" icon={<CodeOutlined />}>
-                  Import
+                  My Import
                 </RQButton>
               </Dropdown>
             </div>
