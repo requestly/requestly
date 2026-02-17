@@ -5,6 +5,7 @@ import { html } from "@codemirror/lang-html";
 import { json5 } from "codemirror-json5";
 import { json } from "@codemirror/lang-json";
 import { css } from "@codemirror/lang-css";
+import { xml } from "@codemirror/lang-xml";
 import { vscodeDark } from "@uiw/codemirror-theme-vscode";
 import { EditorLanguage, EditorCustomToolbar, AnalyticEventProperties } from "componentsV2/CodeEditor/types";
 import { ResizableBox } from "react-resizable";
@@ -63,6 +64,7 @@ interface EditorProps {
   disableDefaultAutoCompletions?: boolean;
   customTheme?: Extension;
   placeholder?: string;
+  disableLinting?: boolean;
 }
 const Editor: React.FC<EditorProps> = ({
   value,
@@ -87,6 +89,7 @@ const Editor: React.FC<EditorProps> = ({
   disableDefaultAutoCompletions = false,
   customTheme,
   placeholder,
+  disableLinting = false,
 }) => {
   const location = useLocation();
   const dispatch = useDispatch();
@@ -142,6 +145,8 @@ const Editor: React.FC<EditorProps> = ({
         return json5();
       case EditorLanguage.HTML:
         return html();
+      case EditorLanguage.XML:
+        return xml();
       case EditorLanguage.CSS:
         return css();
       default:
@@ -295,9 +300,11 @@ const Editor: React.FC<EditorProps> = ({
       result.push(editorLanguage);
     }
 
-    const linterExtension = getLinterExtension(language);
-    if (linterExtension.length) {
-      result.push(...linterExtension);
+    if (!disableLinting) {
+      const linterExtension = getLinterExtension(language);
+      if (linterExtension.length) {
+        result.push(...linterExtension);
+      }
     }
 
     if (customTheme) {
@@ -328,7 +335,16 @@ const Editor: React.FC<EditorProps> = ({
     }
 
     return result;
-  }, [editorLanguage, language, customTheme, placeholder, envVariables, handleSetVariable, setPopupPosition]);
+  }, [
+    editorLanguage,
+    language,
+    customTheme,
+    placeholder,
+    envVariables,
+    handleSetVariable,
+    setPopupPosition,
+    disableLinting,
+  ]);
 
   const editor = (
     <>
