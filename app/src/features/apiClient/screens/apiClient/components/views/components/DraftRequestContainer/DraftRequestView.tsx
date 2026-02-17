@@ -1,7 +1,13 @@
 import React, { useCallback } from "react";
 import { RQAPI } from "features/apiClient/types";
 import { useHostContext } from "hooks/useHostContext";
-import { bufferActions, EntityNotFound, useApiClientRepository, useApiClientStore } from "features/apiClient/slices";
+import {
+  bufferActions,
+  EntityNotFound,
+  useApiClientRepository,
+  useApiClientStore,
+  useApiClientFeatureContext,
+} from "features/apiClient/slices";
 import { useOriginUndefinedBufferedEntity } from "features/apiClient/slices/entities/hooks";
 import { ApiClientEntityType } from "features/apiClient/slices/entities/types";
 import { notification } from "antd";
@@ -13,6 +19,7 @@ import {
 } from "features/apiClient/screens/apiClient/clientView/GenericApiClient";
 import { useApiClientDispatch } from "features/apiClient/slices/hooks/base.hooks";
 import { ApiClientEntity } from "features/apiClient/slices/entities";
+import { apiRecordsRankingManager } from "features/apiClient/helpers/RankingManager";
 
 export const DraftRequestView: React.FC<{
   onSaveCallback: (apiEntryDetails: RQAPI.ApiRecord) => void;
@@ -31,13 +38,20 @@ export const DraftRequestView: React.FC<{
   const repositories = useApiClientRepository();
   const store = useApiClientStore();
   const dispatch = useApiClientDispatch();
+  const context = useApiClientFeatureContext();
 
   const handleRecordNameUpdate = useCallback(
     async (name: string) => {
       const scratchRecord = scratchBuffer.getEntityFromState(store.getState());
+
+      // Generate rank for the new record
+      const collectionId = scratchRecord.collectionId || "";
+      const rank = apiRecordsRankingManager.getRanksForNewApis(context, collectionId, [scratchRecord])[0];
+
       const dataToSave: Partial<RQAPI.ApiRecord> = {
         ...scratchRecord,
         name,
+        rank,
       };
       const result = await repositories.apiClientRecordsRepository.createRecord(dataToSave);
       if (!result.success) {
