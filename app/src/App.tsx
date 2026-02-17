@@ -8,6 +8,8 @@ declare global {
   }
 }
 
+console.log("Non Forked App");
+
 /** Common things which do not depend on routes for App **/
 const App = () => {
   const router = Sentry.wrapCreateBrowserRouterV6(createBrowserRouter)(routesV2);
