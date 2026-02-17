@@ -1,6 +1,11 @@
 import React, { useCallback, useRef, useState } from "react";
 import { FilePicker } from "components/common/FilePicker";
-import { getUploadedPostmanFileType, processPostmanCollectionData, processPostmanEnvironmentData } from "./utils";
+import {
+  getUploadedPostmanFileType,
+  processPostmanCollectionData,
+  processPostmanEnvironmentData,
+  detectUnsupportedFeatures,
+} from "./utils";
 import { toast } from "utils/Toast";
 import { RQButton } from "lib/design-system-v2/components";
 import { MdCheckCircleOutline } from "@react-icons/all-files/md/MdCheckCircleOutline";
@@ -26,7 +31,7 @@ import {
   useApiClientRepository,
 } from "features/apiClient/slices";
 import { wrapWithCustomSpan } from "utils/sentry";
-import { SPAN_STATUS_ERROR, SPAN_STATUS_OK } from "@sentry/core";
+import { debug, SPAN_STATUS_ERROR, SPAN_STATUS_OK } from "@sentry/core";
 import { EnvironmentVariableData } from "@requestly/shared/types/entities/apiClient";
 import { LocalApiClientRecordsSync } from "features/apiClient/helpers/modules/sync/local/services/LocalApiClientRecordsSync";
 import { captureException } from "backend/apiClient/utils";
@@ -64,6 +69,7 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
 
   const collectionsCount = useRef(0);
 
+  // #process part -> account changes here
   const handleFileDrop = useCallback(
     async (files: File[]) => {
       return wrapWithCustomSpan(
@@ -99,6 +105,17 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
                     const processedData = processPostmanEnvironmentData(fileContent);
                     resolve({ type: postmanFileType, data: processedData });
                   } else {
+                    const unsupportedFeatures = detectUnsupportedFeatures(fileContent);
+                    const hasUnsupportedAuth = unsupportedFeatures.auth.types.size > 0;
+
+                    const hasCollectionLevelScripts =
+                      unsupportedFeatures.collectionLevelScripts.hasPreRequest ||
+                      unsupportedFeatures.collectionLevelScripts.hasTest;
+
+                    if (hasUnsupportedAuth || hasCollectionLevelScripts) {
+                      console.log("Unsupported Features", unsupportedFeatures);
+                      // trackUnsupportedFeatures(unsupportedFeatures);
+                    }
                     const processedApiRecords = processPostmanCollectionData(fileContent, apiClientRecordsRepository);
                     resolve({
                       type: postmanFileType,
@@ -180,6 +197,7 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
     [importError, apiClientRecordsRepository]
   );
 
+  // #import part -> do not touch
   const handleImportEnvironments = useCallback(async () => {
     try {
       if (isLocalFileSystem) {
@@ -253,6 +271,7 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
     }
   }, [isLocalFileSystem, processedFileData.environments, dispatch, environmentVariablesRepository]);
 
+  // #import part -> do not touch
   const handleImportCollectionsAndApis = useCallback(async () => {
     let importedCollectionsCount = 0;
     let failedCollectionsCount = 0;
@@ -334,6 +353,7 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
     return { importedCollectionsCount, importedApisCount };
   }, [processedFileData.apiRecords, onSaveRecord, apiClientRecordsRepository]);
 
+  // #import part -> do not touch
   const handleImportPostmanData = useCallback(async () => {
     return wrapWithCustomSpan(
       {
@@ -427,6 +447,7 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
     )();
   }, [handleImportEnvironments, handleImportCollectionsAndApis, onSuccess, processedFileData.environments.length]);
 
+  // #import part -> do not touch
   const handleResetImport = () => {
     setProcessingStatus("idle");
     setIsImporting(false);

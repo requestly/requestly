@@ -352,6 +352,118 @@ const createCollectionRecord = (
   };
 };
 
+export interface UnsupportedFeatures {
+  auth: {
+    types: Set<string>;
+  };
+  collectionLevelScripts: {
+    hasPreRequest: boolean;
+    hasTest: boolean;
+  };
+}
+
+const detectUnsupportedAuthModes = (fileContent: any): Pick<UnsupportedFeatures, "auth"> => {
+  const supportedAuthTypes = new Set([
+    PostmanAuth.AuthType.NO_AUTH,
+    PostmanAuth.AuthType.INHERIT,
+    PostmanAuth.AuthType.BEARER_TOKEN,
+    PostmanAuth.AuthType.BASIC_AUTH,
+    PostmanAuth.AuthType.API_KEY,
+  ]);
+
+  const unsupportedAuthModes = {
+    auth: {
+      types: new Set<string>(),
+    },
+  };
+
+  // check for unsupporedAuth at all levels
+  const checkAuth = (auth: any) => {
+    // add the auth type to unsupported features array
+    if (auth && auth.type && !supportedAuthTypes.has(auth.type)) {
+      unsupportedAuthModes.auth.types.add(auth.type);
+    }
+  };
+
+  //check at collection level
+  if (fileContent.auth) {
+    checkAuth(fileContent.auth);
+  }
+
+  // check at inside folder & request level
+
+  const processItems = (items: any[]) => {
+    items?.forEach((item: any) => {
+      if (item.item) {
+        // Folder-level auth also exists
+        if (item.auth) {
+          checkAuth(item.auth);
+        }
+        // Recurse into folder
+        processItems(item.item);
+      } else if (item.request) {
+        // Request-level auth (inside request object)
+        if (item.request.auth) {
+          checkAuth(item.request.auth);
+        }
+      }
+    });
+  };
+
+  if (fileContent.item) {
+    processItems(fileContent.item);
+  }
+  return unsupportedAuthModes;
+};
+
+const hasNonEmptyScript = (event: any): boolean => {
+  const exec = event?.script?.exec;
+  if (!Array.isArray(exec)) return false;
+  return exec.some((line: string) => typeof line === "string" && line.trim() !== "");
+};
+
+const detectCollectionLevelScripts = (fileContent: any): UnsupportedFeatures["collectionLevelScripts"] => {
+  const result = { hasPreRequest: false, hasTest: false };
+
+  const checkEvents = (events: any[]) => {
+    events?.forEach((event: any) => {
+      if (event.listen === "prerequest" && hasNonEmptyScript(event)) {
+        result.hasPreRequest = true;
+      }
+      if (event.listen === "test" && hasNonEmptyScript(event)) {
+        result.hasTest = true;
+      }
+    });
+  };
+
+  // Collection-level scripts
+  if (fileContent.event) {
+    checkEvents(fileContent.event);
+  }
+
+  // Folder-level scripts (recurse into items)
+  const processItems = (items: any[]) => {
+    items?.forEach((item: any) => {
+      if (item.item) {
+        if (item.event) checkEvents(item.event);
+        processItems(item.item);
+      }
+    });
+  };
+  if (fileContent.item) {
+    processItems(fileContent.item);
+  }
+
+  return result;
+};
+
+export const detectUnsupportedFeatures = (fileContent: any): UnsupportedFeatures => {
+  return {
+    ...detectUnsupportedAuthModes(fileContent),
+    collectionLevelScripts: detectCollectionLevelScripts(fileContent),
+  };
+};
+
 export const processPostmanCollectionData = (
   fileContent: any,
   apiClientRecordsRepository: ApiClientRecordsInterface<Record<string, any>>
