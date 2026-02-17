@@ -1,4 +1,4 @@
-import { VariableScope } from "backend/environment/types";
+import { VariableScope } from "../../backend/environment/types";
 
 export interface DynamicVariable {
   name: string;

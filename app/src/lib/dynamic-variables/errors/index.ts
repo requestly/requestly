@@ -1,4 +1,4 @@
-import { NativeError } from "errors/NativeError";
+import { NativeError } from "../../../errors/NativeError";
 
 export class DynamicVariableNotFoundError extends NativeError {
   constructor(name: string) {

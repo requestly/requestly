@@ -6,7 +6,7 @@ import { EnvironmentVariableData, VariableData } from "@requestly/shared/types/e
 import { ApiClientFeatureContext } from "features/apiClient/slices";
 import { reduxStore } from "store";
 import { DepGraph } from "dependency-graph";
-import { variableResolver } from "lib/dynamic-variables";
+import { variableResolver } from "../../lib/dynamic-variables";
 
 type Variables = Record<string, string | number | boolean>;
 interface RenderResult<T> {
