@@ -36,7 +36,7 @@
     .item-left-section {
       display: flex;
       flex-direction: row;
-      gap: var(--space-3, 8px);
+      gap: var(--space-3, 6px);
 
       .scope-tooltip {
         .ant-tooltip-inner {
