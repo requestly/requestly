@@ -9,9 +9,7 @@ import { ApiRecordEmptyState } from "../apiRecordEmptyState/ApiRecordEmptyState"
 import { IoChevronForward } from "@react-icons/all-files/io5/IoChevronForward";
 import { ApiClientSidebarCollapse } from "../apiClientSidebarCollapse/ApiClientSidebarCollapse";
 import { SidebarPlaceholderItem } from "../../SidebarPlaceholderItem/SidebarPlaceholderItem";
-import { isEmpty } from "lodash";
-import { sessionStorage } from "utils/sessionStorage";
-import { SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY } from "features/apiClient/constants";
+import { useCollapsibleRow } from "../../../../../../../hooks/useCollapsibleRow";
 import { MdOutlineBorderColor } from "@react-icons/all-files/md/MdOutlineBorderColor";
 import { MdOutlineDelete } from "@react-icons/all-files/md/MdOutlineDelete";
 import { MdOutlineIosShare } from "@react-icons/all-files/md/MdOutlineIosShare";
@@ -85,9 +83,11 @@ export const CollectionRow: React.FC<Props> = ({
 }) => {
   const { selectedRecords, showSelection, recordsSelectionHandler, setShowSelection } = bulkActionOptions || {};
   const [isEditMode, setIsEditMode] = useState(false);
-  const [activeKey, setActiveKey] = useState<string | undefined>(
-    expandedRecordIds?.includes(record.id) ? record.id : undefined
-  );
+  const { activeKey, setActiveKey, updateExpandedRecordIds, collapseChangeHandler } = useCollapsibleRow({
+    recordId: record.id,
+    expandedRecordIds,
+    setExpandedRecordIds,
+  });
   const hoverExpandTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
   const [createNewField, setCreateNewField] = useState<RQAPI.RecordType | null>(null);
   const [hoveredId, setHoveredId] = useState("");
@@ -221,33 +221,6 @@ export const CollectionRow: React.FC<Props> = ({
     },
     [handleCollectionExport, openBufferedTab, workspaceId, handleRecordsToBeDeleted]
   );
-
-  const updateExpandedRecordIds = useCallback(
-    (newExpandedIds: RQAPI.ApiClientRecord["id"][]) => {
-      setExpandedRecordIds(newExpandedIds);
-      isEmpty(newExpandedIds)
-        ? sessionStorage.removeItem(SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY)
-        : sessionStorage.setItem(SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY, newExpandedIds);
-    },
-    [setExpandedRecordIds]
-  );
-
-  const collapseChangeHandler = useCallback(
-    (keys: RQAPI.ApiClientRecord["id"][]) => {
-      let activeKeysCopy = [...expandedRecordIds];
-      if (isEmpty(keys)) {
-        activeKeysCopy = activeKeysCopy.filter((key) => key !== record.id);
-      } else if (!activeKeysCopy.includes(record.id)) {
-        activeKeysCopy.push(record.id);
-      }
-      updateExpandedRecordIds(activeKeysCopy);
-    },
-    [record, expandedRecordIds, updateExpandedRecordIds]
-  );
-
-  useEffect(() => {
-    setActiveKey(expandedRecordIds?.includes(record.id) ? record.id : undefined);
-  }, [expandedRecordIds, record.id]);
 
   useEffect(() => {
     /* Temporary Change-> To remove previous key from session storage
