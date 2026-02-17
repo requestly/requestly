@@ -28,8 +28,8 @@ export const createWordVariables: CategoryCreator = (faker) => [
     withLengthStrategy((opts) => faker.word.sample(opts), args)
   ),
   createDynamicVariable("$randomWords", "Some random words", "quick brown fox jumps high", (...args: unknown[]) => {
-    if (!args[0]) return faker.word.words(5);
-    if (!args[1]) return faker.word.words(toInt(args[0]));
+    if (args[0] == null) return faker.word.words(5);
+    if (args[1] == null) return faker.word.words(toInt(args[0]));
     const count = { min: toInt(args[0]), max: toInt(args[1]) };
     return faker.word.words({ count });
   }),

@@ -28,7 +28,7 @@ export const createInternetVariables: CategoryCreator = (faker) => [
     "A random 16-character alpha-numeric password",
     "8kP2mX9qL4nB5wV3",
     (...args: unknown[]) => {
-      const length = args[0] ? toInt(args[0]) : 15;
+      const length = args[0] ? toInt(args[0]) : 16;
       const memorable = toBool(args[1]);
       const pattern = args[2] ? new RegExp(String(args[2])) : undefined;
       const prefix = args[3] ? String(args[3]) : undefined;
