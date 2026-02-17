@@ -36,12 +36,12 @@ export const createOpenApiExporter = (collectionRecord: RQAPI.CollectionRecord):
               {
                 fileName: `${sanitizedName}.json`,
                 content: jsonExport,
-                type: "application/json",
+                type: "JSON",
               },
               {
                 fileName: `${sanitizedName}.yaml`,
                 content: yamlExport,
-                type: "application/x-yaml",
+                type: "YAML",
               },
             ],
             metadata: [
