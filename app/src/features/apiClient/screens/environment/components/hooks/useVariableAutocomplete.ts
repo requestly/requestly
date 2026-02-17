@@ -162,7 +162,7 @@ export const useVariableAutocomplete = (variables?: ScopedVariables, options?: U
    * @param isDynamic - Whether this is a dynamic variable requiring '$' prefix
    */
   const handleSelectVariable = useCallback(
-    (variableKey: string, isDynamic: boolean = false) => {
+    (variableKey: string) => {
       if (!editorViewRef.current) return;
 
       const view = editorViewRef.current;
