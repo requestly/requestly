@@ -129,18 +129,18 @@ export const RequestRow: React.FC<Props> = ({
     () => ({
       accept: [RQAPI.RecordType.API],
       canDrop: (item: { record: RQAPI.ApiClientRecord; workspaceId: string; onDropComplete?: () => void }) => {
-        if (
-          isReadOnly ||
-          item.record.id === record.id ||
-          !isFeatureCompatible(FEATURES.API_CLIENT_RECORDS_REORDERING)
-        ) {
+        if (isReadOnly || !isFeatureCompatible(FEATURES.API_CLIENT_RECORDS_REORDERING)) {
           item.onDropComplete?.();
           return false;
         }
         return true;
       },
       hover: (item: { record: RQAPI.ApiClientRecord; workspaceId: string; onDropComplete?: () => void }, monitor) => {
-        if (!monitor.isOver({ shallow: true }) || !isFeatureCompatible(FEATURES.API_CLIENT_RECORDS_REORDERING)) {
+        if (
+          !monitor.isOver({ shallow: true }) ||
+          !isFeatureCompatible(FEATURES.API_CLIENT_RECORDS_REORDERING) ||
+          item.record.id === record.id
+        ) {
           return;
         }
 
@@ -160,8 +160,9 @@ export const RequestRow: React.FC<Props> = ({
         item: { record: RQAPI.ApiClientRecord; workspaceId: string; onDropComplete?: () => void },
         monitor
       ) => {
-        if (!monitor.isOver({ shallow: true })) {
+        if (!monitor.isOver({ shallow: true }) || item.record.id === record.id) {
           setDropPosition(null);
+          item.onDropComplete?.();
           dropPositionRef.current = null;
           return;
         }
