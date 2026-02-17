@@ -36,12 +36,18 @@ const useRootPathRedirector = () => {
 
   useEffect(() => {
     if (location.pathname === PATHS.ROOT) {
+      console.log("!!!debug", "navigation called", Date.now());
+      // TODO@nafees: Should it also redirect from someFeature -> home or not?
       if (storedFeaturePath && storedFeaturePath !== PATHS.ROOT) {
-        navigate(`${storedFeaturePath}?${params}`, { replace: true });
+        if (location.pathname !== storedFeaturePath) {
+          navigate(`${storedFeaturePath}?${params}`, { replace: true });
+        }
       } else {
-        isOpenedInDesktopMode
-          ? navigate(PATHS.DESKTOP.INTERCEPT_TRAFFIC.ABSOLUTE, { replace: true })
-          : navigate(`${PATHS.HOME.ABSOLUTE}?${params}`, { replace: true });
+        const targetPath = isOpenedInDesktopMode ? PATHS.DESKTOP.INTERCEPT_TRAFFIC.ABSOLUTE : PATHS.HOME.ABSOLUTE;
+
+        if (location.pathname !== targetPath) {
+          navigate(`${targetPath}?${params}`, { replace: true });
+        }
       }
     }
   }, [isOpenedInDesktopMode, location.pathname, navigate, storedFeaturePath, params]);

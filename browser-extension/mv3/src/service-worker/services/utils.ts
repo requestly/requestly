@@ -194,6 +194,7 @@ export const triggerOpenCurlModalMessage = async (
 
     // Wait for the tab to load completely
     await tabService.ensureTabLoadingComplete(newTab.id);
+    console.log("!!!debug", "tab loading complete", Date.now());
 
     // Send message to the new tab to open cURL import modal with pre-filled text
     const message = {
@@ -205,6 +206,7 @@ export const triggerOpenCurlModalMessage = async (
       },
     };
 
+    console.log("!!!debug", "sent message", Date.now());
     // Send message without expecting a response (one-way notification)
     chrome.tabs.sendMessage(newTab.id, message);
   } catch (error) {
