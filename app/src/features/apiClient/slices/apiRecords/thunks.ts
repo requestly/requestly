@@ -170,7 +170,7 @@ export const moveRecords = createAsyncThunk<
     { dispatch, rejectWithValue }
   ) => {
     const context = getApiClientFeatureContext(destinationWorkspaceId);
-    const ranks = apiRecordsRankingManager.getRanksForNewApis(context, collectionId, recordsToMove);
+    const ranks = apiRecordsRankingManager.getRanksForNewApiRecords(context, collectionId, recordsToMove);
     const updatedRecords = recordsToMove.map((record, index) => {
       return isApiCollection(record)
         ? { ...record, collectionId, data: omit(record.data, "children") }

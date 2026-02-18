@@ -514,10 +514,13 @@ export const sortRecords = (records: RQAPI.ApiClientRecord[]) => {
 };
 
 const sortNestedRecords = (records: RQAPI.ApiClientRecord[]) => {
+  // TODO: Fix this
   records.forEach((record) => {
     if (isApiCollection(record)) {
       record.data.children = sortRecords(record.data.children ?? []);
       sortNestedRecords(record.data.children);
+    } else if (isApiRequest(record) && record.data.examples?.length) {
+      record.data.examples = apiRecordsRankingManager.sort(record.data.examples) as RQAPI.ExampleApiRecord[];
     }
   });
 };
@@ -590,7 +593,7 @@ export const createBlankApiRecord = (
     newRecord.data = getEmptyApiEntry(entryType ?? RQAPI.ApiEntryType.HTTP);
     newRecord.deleted = false;
     newRecord.collectionId = collectionId;
-    const rank = apiRecordsRankingManager.getRanksForNewApis(context, collectionId, [newRecord])[0];
+    const rank = apiRecordsRankingManager.getRanksForNewApiRecords(context, collectionId, [newRecord])[0];
     if (rank) {
       newRecord.rank = rank;
     }
@@ -859,7 +862,7 @@ export const processRecordsForDuplication = (
         name: `(Copy) ${record.name}`,
       });
       // Set rank for the duplicated request
-      requestToDuplicate.rank = apiRecordsRankingManager.getRankForDuplicatedApi(
+      requestToDuplicate.rank = apiRecordsRankingManager.getRankForDuplicatedRecord(
         context,
         record,
         record.collectionId ?? ""

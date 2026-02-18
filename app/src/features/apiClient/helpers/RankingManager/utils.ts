@@ -11,6 +11,13 @@ interface GetRankForDroppedRecordParams {
   dropPosition: "before" | "after" | null;
 }
 
+interface GetRankForDroppedExampleParams {
+  context: ApiClientFeatureContext;
+  targetExample: RQAPI.ExampleApiRecord;
+  droppedExample: RQAPI.ExampleApiRecord;
+  dropPosition: "before" | "after" | null;
+}
+
 /**
  * Calculates the rank for a dropped record based on the drop position
  * @param context - API client feature context
@@ -42,5 +49,31 @@ export const getRankForDroppedRecord = ({
   const rank =
     apiRecordsRankingManager.getRanksBetweenRecords(beforeRecord, afterRecord, [droppedRecord])[0] ||
     apiRecordsRankingManager.getEffectiveRank(droppedRecord);
+  return rank;
+};
+
+export const getRankForDroppedExample = ({
+  context,
+  targetExample,
+  droppedExample,
+  dropPosition,
+}: GetRankForDroppedExampleParams): string => {
+  const state = context.store.getState();
+  const siblings = apiRecordsRankingManager.sort(selectChildRecords(state, targetExample.parentRequestId));
+  let beforeRecord: RecordData | null = null;
+  let afterRecord: RecordData | null = null;
+  const recordIndex = siblings.findIndex((sibling) => sibling.id === targetExample.id);
+
+  if (dropPosition === "before") {
+    beforeRecord = siblings[recordIndex - 1] || null;
+    afterRecord = targetExample;
+  } else if (dropPosition === "after") {
+    afterRecord = siblings[recordIndex + 1] || null;
+    beforeRecord = targetExample;
+  }
+
+  const rank =
+    apiRecordsRankingManager.getRanksBetweenRecords(beforeRecord, afterRecord, [droppedExample])[0] ||
+    apiRecordsRankingManager.getEffectiveRank(droppedExample);
   return rank;
 };

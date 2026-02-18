@@ -46,7 +46,7 @@ export const DraftRequestView: React.FC<{
 
       // Generate rank for the new record
       const collectionId = scratchRecord.collectionId || "";
-      const rank = apiRecordsRankingManager.getRanksForNewApis(context, collectionId, [scratchRecord])[0];
+      const rank = apiRecordsRankingManager.getRanksForNewApiRecords(context, collectionId, [scratchRecord])[0];
 
       const dataToSave: Partial<RQAPI.ApiRecord> = {
         ...scratchRecord,
