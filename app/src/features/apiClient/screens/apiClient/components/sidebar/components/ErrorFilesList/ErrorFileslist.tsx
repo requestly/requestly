@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { MdEdit } from "@react-icons/all-files/md/MdEdit";
 import { MdWarningAmber } from "@react-icons/all-files/md/MdWarningAmber";
 import { RiDeleteBin6Line } from "@react-icons/all-files/ri/RiDeleteBin6Line";
+import { MdVisibilityOff } from "@react-icons/all-files/md/MdVisibilityOff";
 import { ErroredRecord, FileType } from "features/apiClient/helpers/modules/sync/local/services/types";
 import { ErrorFileViewerModal } from "../../../modals/ErrorFileViewerModal/ErrorFileViewerModal";
 import { toast } from "utils/Toast";
@@ -106,7 +107,8 @@ const ErrorFileItem: React.FC<{
   file: ErroredRecord;
   openErrorFile: (file: ErroredRecord) => void;
   deleteErrorFile(file: ErroredRecord): void;
-}> = ({ file, openErrorFile, deleteErrorFile }) => {
+  excludeErrorFile(file: ErroredRecord): void;
+}> = ({ file, openErrorFile, deleteErrorFile, excludeErrorFile }) => {
   return (
     <div key={file.path} className="error-file-item">
       <ErrorFileItemTitle file={file} />
@@ -114,6 +116,9 @@ const ErrorFileItem: React.FC<{
       <div className="error-file-item-actions">
         <Tooltip title="Edit file" color="var(--requestly-color-black)" placement="top">
           <MdEdit className="error-file-item-action-icon" onClick={() => openErrorFile(file)} />
+        </Tooltip>
+        <Tooltip title="Exclude file from workspace" color="var(--requestly-color-black)" placement="top">
+          <MdVisibilityOff className="error-file-item-action-icon" onClick={() => excludeErrorFile(file)} />
         </Tooltip>
         <DeleteErrorFileButton
           onDelete={() => {
@@ -184,6 +189,28 @@ export const ErrorFilesList: React.FC<{ updateErrorRecordsCount?: (value: number
     [apiClientRecordsRepository, environmentVariablesRepository, context]
   );
 
+  const handleExcludeErrorFile = useCallback(
+    async (errorFile: ErroredRecord) => {
+      const result = await apiClientRecordsRepository.excludeErrorFile(errorFile.path);
+
+      if (result.success) {
+        if (errorFile.type === FileType.ENVIRONMENT) {
+          forceRefreshEnvironments();
+        } else {
+          forceRefreshRecords();
+        }
+
+        toast.success(`"${errorFile.name}" has been excluded from workspace`);
+      } else {
+        notification.error({
+          message: result.message || "Failed to exclude error file",
+          placement: "bottomRight",
+        });
+      }
+    },
+    [apiClientRecordsRepository, forceRefreshEnvironments, forceRefreshRecords]
+  );
+
   const handleOpenErrorFile = (file: ErroredRecord) => {
     setErrorFileToView(file);
     setIsErrorFileViewerModalOpen(true);
@@ -218,6 +245,7 @@ export const ErrorFilesList: React.FC<{ updateErrorRecordsCount?: (value: number
                 key={file.path}
                 openErrorFile={handleOpenErrorFile}
                 deleteErrorFile={handleDeleteErrorFile}
+                excludeErrorFile={handleExcludeErrorFile}
               />
             );
           })}
