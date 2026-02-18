@@ -677,11 +677,18 @@ export const filterRecordsBySearch = (
       }
       childrenMap.get(record.collectionId)?.add(record.id);
     }
+    if (isExampleApiRecord(record)) {
+      parentMap.set(record.id, record.parentRequestId);
+      if (!childrenMap.has(record.parentRequestId)) {
+        childrenMap.set(record.parentRequestId, new Set());
+      }
+      childrenMap.get(record.parentRequestId)?.add(record.id);
+    }
   });
 
-  // Add all children records of a collection
-  const addChildrenRecords = (collectionId: string) => {
-    const children = childrenMap.get(collectionId) || new Set();
+  // Add all children records of a collection or request
+  const addChildrenRecords = (recordId: string) => {
+    const children = childrenMap.get(recordId) || new Set();
     children.forEach((childId) => {
       matchingRecords.add(childId);
       if (childrenMap.has(childId)) {
@@ -690,12 +697,12 @@ export const filterRecordsBySearch = (
     });
   };
 
-  // Add all parent collections of a record
-  const addParentCollections = (recordId: string) => {
+  // Add all parent collections/requests of a record
+  const addParents = (recordId: string) => {
     const parentId = parentMap.get(recordId);
     if (parentId) {
       matchingRecords.add(parentId);
-      addParentCollections(parentId);
+      addParents(parentId);
     }
   };
 
@@ -704,16 +711,16 @@ export const filterRecordsBySearch = (
     if (record.name.toLowerCase().includes(search)) {
       matchingRecords.add(record.id);
 
-      // If collection matches, add all children records
-      if (isApiCollection(record)) {
+      // If collection or request matches, add all children records
+      if (isApiCollection(record) || isApiRequest(record)) {
         addChildrenRecords(record.id);
       }
     }
   });
 
-  // Second pass: add parent collections
+  // Second pass: add parents
   matchingRecords.forEach((id) => {
-    addParentCollections(id);
+    addParents(id);
   });
 
   return records.filter((record) => matchingRecords.has(record.id));
