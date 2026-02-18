@@ -6,6 +6,7 @@ import { SoapImportError } from "../errors/SoapImportError/SoapImportError";
 import { ImportFile } from "../screens/apiClient/components/CommonApiClientImporter/CommonApiClientImporter";
 import { RequestMethod } from "../types";
 import { getDefaultAuth } from "../screens/apiClient/components/views/components/request/components/AuthorizationView/defaults";
+import { extractQueryParams } from "../screens/apiClient/utils";
 
 interface UseWsdlFetcherResult {
   isFetching: boolean;
@@ -18,12 +19,12 @@ export const useWsdlFetcher = (): UseWsdlFetcherResult => {
   const [error, setError] = useState<string | null>(null);
 
   // Create a temporary record ID for the executor
-  const tempRecordId = uuidv4();
+  const [tempRecordId] = useState(() => uuidv4());
   const httpRequestExecutor = useHttpRequestExecutor(tempRecordId);
 
   const fetchWsdlFromUrl = useCallback(
     async (url: string): Promise<ImportFile | null> => {
-      const urlValidationRegex = /^https?:\/\/.+(?:\?WSDL)$/i;
+      const urlValidationRegex = /^https?:\/\//i;
       if (!urlValidationRegex.test(url)) {
         setError(SoapImportError.invalidUrl().message);
         return null;
@@ -31,22 +32,15 @@ export const useWsdlFetcher = (): UseWsdlFetcherResult => {
 
       setIsFetching(true);
       setError(null);
-      console.log("Fetching WSDL from URL:", url, url.trim());
 
       try {
         // Create a GET request to fetch the WSDL
+        const queryParams = extractQueryParams(url);
         const httpRequest: RQAPI.HttpRequest = {
           url: url.trim(),
           method: RequestMethod.GET,
           headers: [],
-          queryParams: [
-            {
-              isEnabled: true,
-              id: 1,
-              key: "WSDL",
-              value: "",
-            },
-          ],
+          queryParams: queryParams,
           body: "",
           contentType: undefined,
         };
@@ -90,8 +84,6 @@ export const useWsdlFetcher = (): UseWsdlFetcherResult => {
           name: "Url Response",
           type: "application/soap+xml",
         };
-
-        console.log("Fetched WSDL ImportFile:", importFile);
 
         return importFile;
       } catch (err) {

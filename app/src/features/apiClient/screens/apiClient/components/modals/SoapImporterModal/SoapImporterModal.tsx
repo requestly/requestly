@@ -37,7 +37,7 @@ export const SoapImporterModal: React.FC<SoapImporterModalProps> = ({ isOpen, on
           enabled: true,
           placeholder: "Paste or type URL to import",
           onFetchFromUrl: handleFetchWsdl,
-          urlValidationRegex: /^https?:\/\/.+(?:\?WSDL)$/i,
+          urlValidationRegex: /^https?:\/\//i,
           urlValidationErrorMessage: SoapImportError.invalidUrl().message,
         }}
       />
