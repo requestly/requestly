@@ -73,6 +73,7 @@ export const RunConfigSettings: React.FC = () => {
             name="run-iterations"
             onChange={handleDelayChange}
           />
+          <span className="ms-text">ms</span>
         </div>
 
         {appMode === "DESKTOP" && (
