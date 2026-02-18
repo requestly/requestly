@@ -109,13 +109,13 @@ function getScopes(
   runtimeVariables: EnvironmentVariables,
   id: string,
   config?: {
-    initialScopes?: Scope[];
+    scopes?: Scope[];
     storeOverrideConfig?: StoreOverrideConfig;
   }
 ): Scope[] {
   const parents = selectAncestorIds(state, id);
   const override = config?.storeOverrideConfig;
-  const initialScopes = config?.initialScopes || [];
+  const initialScopes = config?.scopes || [];
   let currentScopeLevel = initialScopes.length;
   const scopes: Scope[] = [...initialScopes];
   const activeEnvironment = selectActiveEnvironment(state);
