@@ -88,11 +88,10 @@
     }
 
     .cm-completionLabel {
-      flex: 1;
+      flex: 0 0 auto;
       font-weight: 400;
       font-family: var(--requestly-font-family-default);
-      overflow: hidden;
-      text-overflow: ellipsis;
+      margin-right: 8px;
       white-space: nowrap;
     }
 
@@ -100,8 +99,13 @@
       font-size: 12px;
       font-family: var(--requestly-font-family-default);
       color: var(--requestly-color-text-subtle);
-      margin-left: 8px;
-      flex-shrink: 0;
+      margin-left: auto;
+      padding-right: 8px;
+      max-width: 60%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      text-align: right;
     }
 
     &:active {
