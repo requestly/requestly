@@ -182,6 +182,15 @@
     display: flex;
     gap: 8px;
     width: 100%;
+    position: relative;
+
+    .link-input-wrapper {
+      width: 100%;
+    }
+
+    .link-input-tooltip {
+      width: 100%;
+    }
 
     .link-input {
       flex: 1;
@@ -191,6 +200,16 @@
         padding: 8px 12px;
         resize: none;
       }
+    }
+
+    .input-error-icon {
+      position: absolute;
+      right: 12px;
+      top: 12px;
+      font-size: 16px;
+      color: var(--requestly-color-error);
+      z-index: 10;
+      pointer-events: none;
     }
   }
 
