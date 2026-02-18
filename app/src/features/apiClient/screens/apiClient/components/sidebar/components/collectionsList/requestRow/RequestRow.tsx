@@ -300,7 +300,7 @@ export const RequestRow: React.FC<Props> = ({
         toast.error("Something went wrong while creating the example.");
       }
     },
-    [context.store, context.repositories.apiClientRecordsRepository, openBufferedTab, workspaceId]
+    [context, openBufferedTab, workspaceId]
   );
 
   const requestOptions = useMemo((): MenuProps["items"] => {
