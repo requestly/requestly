@@ -253,7 +253,7 @@ export const getExamplesForApiRecords = createAsyncThunk<
 });
 
 export const createExampleRequest = createAsyncThunk<
-  RQAPI.ExampleApiRecord,
+  { exampleRecord: RQAPI.ExampleApiRecord },
   { parentRequestId: string; example: RQAPI.ExampleApiRecord; repository: Repository },
   { rejectValue: string }
 >("apiRecords/createExample", async ({ parentRequestId, example, repository }, { dispatch, rejectWithValue }) => {
@@ -267,14 +267,14 @@ export const createExampleRequest = createAsyncThunk<
 
     dispatch(apiRecordsActions.upsertRecord(record));
 
-    return record;
+    return { exampleRecord: record };
   } catch (error) {
     return rejectWithValue(error instanceof Error ? error.message : "Failed to create example request");
   }
 });
 
 export const updateExampleRequest = createAsyncThunk<
-  RQAPI.ExampleApiRecord,
+  { exampleRecord: RQAPI.ExampleApiRecord },
   { example: RQAPI.ExampleApiRecord; repository: Repository },
   { rejectValue: string }
 >("apiRecords/updateExample", async ({ example, repository }, { dispatch, rejectWithValue }) => {
@@ -288,7 +288,7 @@ export const updateExampleRequest = createAsyncThunk<
 
     dispatch(apiRecordsActions.upsertRecord(record));
 
-    return record;
+    return { exampleRecord: record };
   } catch (error) {
     return rejectWithValue(error instanceof Error ? error.message : "Failed to update example request");
   }
