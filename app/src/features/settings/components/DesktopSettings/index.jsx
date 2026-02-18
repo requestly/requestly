@@ -69,6 +69,8 @@ export const DesktopSettings = () => {
   }, []);
 
   const handleUrlChange = async () => {
+    const trimmedUrl = urlInput.trim();
+
     const isValidUrl = (urlString) => {
       try {
         const url = new URL(urlString);
@@ -84,17 +86,17 @@ export const DesktopSettings = () => {
       return allowedKeywords.some((keyword) => lowerUrl.includes(keyword));
     };
 
-    if (!urlInput || !urlInput.trim()) {
+    if (!trimmedUrl) {
       toast.error("Please enter a URL");
       return;
     }
 
-    if (!isValidUrl(urlInput.trim())) {
+    if (!isValidUrl(trimmedUrl)) {
       toast.error("Please enter a valid HTTP or HTTPS URL");
       return;
     }
 
-    if (!containsRequiredKeywords(urlInput.trim())) {
+    if (!containsRequiredKeywords(trimmedUrl)) {
       toast.error("URL must contain one of the allowed keywords");
       return;
     }
@@ -102,7 +104,7 @@ export const DesktopSettings = () => {
     setUrlSubmitLoading(true);
     try {
       const response = await window.RQ.DESKTOP.SERVICES.IPC.invokeEventInMain("change-webapp-url", {
-        url: urlInput.trim(),
+        url: trimmedUrl,
       });
 
       if (response?.success) {
@@ -195,7 +197,7 @@ export const DesktopSettings = () => {
                 <Input
                   value={urlInput}
                   disabled={urlSubmitLoading}
-                  placeholder="e.g., http://localhost:5000"
+                  placeholder="Enter New URL"
                   className="desktop-setting-port-input"
                   onChange={(e) => setUrlInput(e.target.value)}
                 />
@@ -216,7 +218,9 @@ export const DesktopSettings = () => {
                     Update URL
                   </Button>
                 </Popconfirm>
-                <p className="text-gray text-xs mt-8">Note: URL will revert to default on app restart</p>
+                <p className="text-gray text-xs mt-8 desktop-setting-note">
+                  Note: URL will revert to default on app restart
+                </p>
               </Col>
             </Row>
           </div>
