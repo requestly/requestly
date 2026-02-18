@@ -352,6 +352,8 @@ const createCollectionRecord = (
   };
 };
 
+// regex for vault variables -> {{vault:testVar}}
+const VAULT_VARIABLE_PATTERN = /\{\{vault:([^}]+)\}\}/g;
 export interface UnsupportedFeatures {
   auth: {
     types: Set<string>;
@@ -359,6 +361,9 @@ export interface UnsupportedFeatures {
   collectionLevelScripts: {
     hasPreRequest: boolean;
     hasTest: boolean;
+  };
+  vaultVariables: {
+    variableNames: Set<string>;
   };
 }
 
@@ -457,10 +462,36 @@ const detectCollectionLevelScripts = (fileContent: any): UnsupportedFeatures["co
   return result;
 };
 
+const detectVaultVariables = (fileContent: any): UnsupportedFeatures["vaultVariables"] => {
+  const variableNames = new Set<string>();
+
+  const scanValue = (value: any) => {
+    if (typeof value === "string") {
+      const matches = value.matchAll(VAULT_VARIABLE_PATTERN);
+      for (const item of matches) {
+        const name = item[1];
+        if (name) variableNames.add(name);
+      }
+    } else if (Array.isArray(value)) {
+      for (const item of value) {
+        scanValue(item);
+      }
+    } else if (value !== null && typeof value === "object") {
+      for (const item of Object.values(value)) {
+        scanValue(item);
+      }
+    }
+  };
+
+  scanValue(fileContent);
+  return { variableNames };
+};
+
 export const detectUnsupportedFeatures = (fileContent: any): UnsupportedFeatures => {
   return {
-    ...detectUnsupportedAuthModes(fileContent),
+    auth: detectUnsupportedAuthModes(fileContent).auth,
     collectionLevelScripts: detectCollectionLevelScripts(fileContent),
+    vaultVariables: detectVaultVariables(fileContent),
   };
 };
 
