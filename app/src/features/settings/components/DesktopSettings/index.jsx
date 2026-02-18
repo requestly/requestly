@@ -25,7 +25,7 @@ export const DesktopSettings = () => {
   const [portSubmitLoading, setPortSubmitLoading] = useState(false);
   const [urlInput, setUrlInput] = useState("");
   const [urlSubmitLoading, setUrlSubmitLoading] = useState(false);
-  const isCustomUrlEnabled = useFeatureIsOn("desktop_custom_url_setting");
+  const isCustomUrlEnabled = useFeatureIsOn("desktop_beta_preview_url");
 
   const closeInterceptingApps = () => {
     if (window.RQ && window.RQ && window.RQ.DESKTOP) {
@@ -203,8 +203,9 @@ export const DesktopSettings = () => {
                 <Popconfirm
                   okText="Continue"
                   cancelText="No"
-                  placement="topLeft"
-                  title="The app window will recreate with the new URL. Changes will not persist after app restart. Continue?"
+                  placement="right"
+                  overlayStyle={{ maxHeight: 40 }}
+                  title="Window will recreate with new URL. Changes won't persist after restart. Continue?"
                   onConfirm={handleUrlChange}
                 >
                   <Button
