@@ -129,26 +129,25 @@ export const DesktopSettings = () => {
 
         <div>
           {isFeatureCompatible(FEATURES.DESKTOP_USER_PREFERENCES) ? (
-            <Row className="w-full" align="middle" gutter={8}>
-              <Col
-                span={13}
-                xs={{ span: 17 }}
-                sm={{ span: 16 }}
-                md={{ span: 15 }}
-                lg={{ span: 14 }}
-                xl={{ span: 13 }}
-                flex="0 1 420px"
-                align="left"
-              >
-                <label className="caption text-bold desktop-setting-port-input-label">Set default proxy port</label>
-                <Input
-                  value={portInput}
-                  disabled={portSubmitLoading}
-                  placeholder="Enter New Port"
-                  className="desktop-setting-port-input"
-                  onChange={(e) => setPortInput(e.target.value)}
-                />
-
+            <Row align="middle" className="w-full setting-item-container">
+              <Col span={22}>
+                <div className="title">Set default proxy port</div>
+                <p className="setting-item-caption">
+                  Change the default port for the proxy server. Browsers launched from Requestly will be closed.
+                </p>
+                <Row style={{ marginTop: "16px" }}>
+                  <Col span={18}>
+                    <Input
+                      value={portInput}
+                      disabled={portSubmitLoading}
+                      placeholder="Enter New Port"
+                      className="desktop-setting-port-input"
+                      onChange={(e) => setPortInput(e.target.value)}
+                    />
+                  </Col>
+                </Row>
+              </Col>
+              <Col span={2} style={{ alignSelf: "flex-end" }}>
                 <Popconfirm
                   okText="Continue"
                   cancelText="No"
@@ -157,9 +156,9 @@ export const DesktopSettings = () => {
                   onConfirm={handlePortChange}
                   onCancel={trackUserDeniedClosingLaunchedApps}
                 >
-                  <Button className="desktop-port-update-btn" onClick={trackProxyPortChangeRequested}>
+                  <RQButton onClick={trackProxyPortChangeRequested} type="default">
                     Update
-                  </Button>
+                  </RQButton>
                 </Popconfirm>
               </Col>
             </Row>
@@ -181,49 +180,38 @@ export const DesktopSettings = () => {
         </div>
 
         {isCustomUrlEnabled && (
-          <div className="mt-16">
-            <Row className="w-full" align="middle" gutter={8}>
-              <Col
-                span={13}
-                xs={{ span: 17 }}
-                sm={{ span: 16 }}
-                md={{ span: 15 }}
-                lg={{ span: 14 }}
-                xl={{ span: 13 }}
-                flex="0 1 420px"
-                align="left"
+          <Row align="middle" className="w-full mt-16 setting-item-container">
+            <Col span={22}>
+              <div className="title">Change Web App URL</div>
+              <p className="setting-item-caption">
+                Temporarily change the web app URL for testing. Changes won't persist after app restart.
+              </p>
+              <Row style={{ marginTop: "16px" }}>
+                <Col span={18}>
+                  <Input
+                    value={urlInput}
+                    disabled={urlSubmitLoading}
+                    placeholder="Enter New URL"
+                    className="desktop-setting-port-input"
+                    onChange={(e) => setUrlInput(e.target.value)}
+                  />
+                </Col>
+              </Row>
+            </Col>
+            <Col span={2} style={{ alignSelf: "flex-end" }}>
+              <Popconfirm
+                okText="Continue"
+                cancelText="No"
+                placement="topLeft"
+                title="Window will recreate with new URL. Changes won't persist after restart. Continue?"
+                onConfirm={handleUrlChange}
               >
-                <label className="caption text-bold desktop-setting-port-input-label">Change Web App URL</label>
-                <Input
-                  value={urlInput}
-                  disabled={urlSubmitLoading}
-                  placeholder="Enter New URL"
-                  className="desktop-setting-port-input"
-                  onChange={(e) => setUrlInput(e.target.value)}
-                />
-
-                <Popconfirm
-                  okText="Continue"
-                  cancelText="No"
-                  placement="right"
-                  overlayStyle={{ maxHeight: 40 }}
-                  title="Window will recreate with new URL. Changes won't persist after restart. Continue?"
-                  onConfirm={handleUrlChange}
-                >
-                  <Button
-                    className="desktop-port-update-btn"
-                    loading={urlSubmitLoading}
-                    disabled={!urlInput.trim() || urlSubmitLoading}
-                  >
-                    Update URL
-                  </Button>
-                </Popconfirm>
-                <p className="text-gray text-xs mt-8 desktop-setting-note">
-                  Note: URL will revert to default on app restart
-                </p>
-              </Col>
-            </Row>
-          </div>
+                <RQButton loading={urlSubmitLoading} disabled={!urlInput.trim() || urlSubmitLoading} type="default">
+                  Update
+                </RQButton>
+              </Popconfirm>
+            </Col>
+          </Row>
         )}
 
         {isFeatureCompatible(FEATURES.REGENERATE_SSL_CERTS) ? (
