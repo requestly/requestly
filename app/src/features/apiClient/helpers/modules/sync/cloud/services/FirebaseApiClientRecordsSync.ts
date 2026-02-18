@@ -28,6 +28,7 @@ import { SentryCustomSpan } from "utils/sentry";
 import { captureException } from "backend/apiClient/utils";
 import { apiRecordsRankingManager } from "features/apiClient/helpers/RankingManager";
 import { updateExample } from "backend/apiClient/updateExample";
+import { deleteExamples } from "backend/apiClient/deleteExamples";
 
 export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<ApiClientCloudMeta> {
   meta: ApiClientCloudMeta;
@@ -322,6 +323,11 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
 
   async updateExampleRequest(example: RQAPI.ExampleApiRecord): RQAPI.ApiClientRecordPromise {
     const result = await updateExample(this.meta.uid, example, this.meta.teamId);
+    return result;
+  }
+
+  async deleteExamples(exampleRecords: RQAPI.ExampleApiRecord[]): Promise<{ success: boolean; message?: string }> {
+    const result = await deleteExamples(this.meta.uid, exampleRecords, this.meta.teamId);
     return result;
   }
 }
