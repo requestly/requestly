@@ -14,4 +14,5 @@ export enum ReducerKeys {
   TABS = "tabs",
   RUNTIME_VARIABLES = "runtimeVariables",
   EXAMPLE_COLLECTIONS = "exampleCollections",
+  EVENTS = "events",
 }
