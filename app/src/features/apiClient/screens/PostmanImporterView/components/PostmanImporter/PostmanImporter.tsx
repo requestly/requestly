@@ -19,6 +19,7 @@ import {
   trackImportParsed,
   trackImportParseFailed,
   trackImportSuccess,
+  trackPostmanUnsupportedFeatures,
 } from "modules/analytics/events/features/apiClient";
 import Logger from "lib/logger";
 import "./postmanImporter.scss";
@@ -31,10 +32,11 @@ import {
   useApiClientRepository,
 } from "features/apiClient/slices";
 import { wrapWithCustomSpan } from "utils/sentry";
-import { debug, SPAN_STATUS_ERROR, SPAN_STATUS_OK } from "@sentry/core";
+import { SPAN_STATUS_ERROR, SPAN_STATUS_OK } from "@sentry/core";
 import { EnvironmentVariableData } from "@requestly/shared/types/entities/apiClient";
 import { LocalApiClientRecordsSync } from "features/apiClient/helpers/modules/sync/local/services/LocalApiClientRecordsSync";
 import { captureException } from "backend/apiClient/utils";
+import { trackEvent } from "modules/analytics";
 
 type ProcessedData = {
   environments: { name: string; variables: Record<string, EnvironmentVariableData>; isGlobal: boolean }[];
@@ -106,16 +108,32 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
                     resolve({ type: postmanFileType, data: processedData });
                   } else {
                     const unsupportedFeatures = detectUnsupportedFeatures(fileContent);
+
                     const hasUnsupportedAuth = unsupportedFeatures.auth.types.size > 0;
 
                     const hasCollectionLevelScripts =
                       unsupportedFeatures.collectionLevelScripts.hasPreRequest ||
                       unsupportedFeatures.collectionLevelScripts.hasTest;
 
-                    if (hasUnsupportedAuth || hasCollectionLevelScripts) {
-                      console.log("Unsupported Features", unsupportedFeatures);
-                      // trackUnsupportedFeatures(unsupportedFeatures);
+                    const hasVaultVariables = unsupportedFeatures.vaultVariables.variableNames.size > 0;
+
+                    if (hasUnsupportedAuth) {
+                      trackPostmanUnsupportedFeatures({
+                        Feature: "Unsupported Auth",
+                        AuthType: unsupportedFeatures.auth.types,
+                      });
                     }
+                    if (hasCollectionLevelScripts) {
+                      trackPostmanUnsupportedFeatures({
+                        Feature: "Collection Level Scripts",
+                        HasPreRequestScript: unsupportedFeatures.collectionLevelScripts.hasPreRequest,
+                        HasPosResponseScript: unsupportedFeatures.collectionLevelScripts.hasTest,
+                      });
+                    }
+                    if (hasVaultVariables) {
+                      trackPostmanUnsupportedFeatures({ Feature: "Vault Variables" });
+                    }
+
                     const processedApiRecords = processPostmanCollectionData(fileContent, apiClientRecordsRepository);
                     resolve({
                       type: postmanFileType,
