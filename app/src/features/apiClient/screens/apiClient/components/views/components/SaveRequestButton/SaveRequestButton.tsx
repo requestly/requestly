@@ -37,18 +37,18 @@ export const SaveRequestButton: React.FC<Props> = ({ hidden, disabled, loading, 
   const handleSaveAsExample = useCallback(async () => {
     try {
       setIsSavingAsExample(true);
-      const exampleRecord: RQAPI.ExampleApiRecord = {
+      const exampleRecordToCreate: RQAPI.ExampleApiRecord = {
         ...requestRecord,
         parentRequestId: entity.meta.referenceId,
         type: RQAPI.RecordType.EXAMPLE_API,
       };
-      exampleRecord.collectionId = null;
+      exampleRecordToCreate.collectionId = null;
 
-      const result = await context.store
+      const { exampleRecord } = await context.store
         .dispatch(
           createExampleRequest({
             parentRequestId: entity.meta.referenceId,
-            example: exampleRecord,
+            example: exampleRecordToCreate,
             repository: context.repositories.apiClientRecordsRepository,
           }) as any
         )
@@ -57,9 +57,9 @@ export const SaveRequestButton: React.FC<Props> = ({ hidden, disabled, loading, 
       openBufferedTab({
         preview: false,
         source: new ExampleViewTabSource({
-          id: result.id,
-          title: result.name || "Example",
-          apiEntryDetails: result,
+          id: exampleRecord.id,
+          title: exampleRecord.name || "Example",
+          apiEntryDetails: exampleRecord,
           context: { id: context.workspaceId },
         }),
       });
