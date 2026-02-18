@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState, useEffect, useRef, memo } from "react";
-import { List, Popover, Tooltip, Empty } from "antd";
+import { List, Popover, Tooltip } from "antd";
 import { InfoCircleOutlined } from "@ant-design/icons";
 import { ScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
 import {
@@ -192,22 +192,21 @@ export const VariableAutocompletePopover: React.FC<VariableAutocompleteProps> = 
         overlayInnerStyle={{ padding: 0 }}
         content={
           <div ref={listRef} className="autocomplete-scroll-container" style={{ maxHeight: 300, overflowY: "auto" }}>
-            <List
-              size="small"
-              locale={{
-                emptyText: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No variables" />,
-              }}
-              dataSource={filteredVariables}
-              renderItem={(item, index) => (
-                <VariableItem
-                  item={item}
-                  index={index}
-                  isSelected={index === selectedIndex}
-                  onSelect={stableOnSelect}
-                  onHover={setSelectedIndex}
-                />
-              )}
-            />
+            {filteredVariables?.length > 0 && (
+              <List
+                size="small"
+                dataSource={filteredVariables}
+                renderItem={(item, index) => (
+                  <VariableItem
+                    item={item}
+                    index={index}
+                    isSelected={index === selectedIndex}
+                    onSelect={stableOnSelect}
+                    onHover={setSelectedIndex}
+                  />
+                )}
+              />
+            )}
           </div>
         }
       >
