@@ -362,9 +362,7 @@ export interface UnsupportedFeatures {
     hasPreRequest: boolean;
     hasTest: boolean;
   };
-  vaultVariables: {
-    variableNames: Set<string>;
-  };
+  vaultVariables: boolean;
 }
 
 const detectUnsupportedAuthModes = (fileContent: any): Pick<UnsupportedFeatures, "auth"> => {
@@ -462,29 +460,31 @@ const detectCollectionLevelScripts = (fileContent: any): UnsupportedFeatures["co
   return result;
 };
 
-const detectVaultVariables = (fileContent: any): UnsupportedFeatures["vaultVariables"] => {
-  const variableNames = new Set<string>();
+export const detectVaultVariables = (fileContent: any): UnsupportedFeatures["vaultVariables"] => {
+  let vaultVariableDetected = false;
 
   const scanValue = (value: any) => {
+    if (vaultVariableDetected) return;
     if (typeof value === "string") {
-      const matches = value.matchAll(VAULT_VARIABLE_PATTERN);
-      for (const item of matches) {
-        const name = item[1];
-        if (name) variableNames.add(name);
+      VAULT_VARIABLE_PATTERN.lastIndex = 0;
+      if (VAULT_VARIABLE_PATTERN.test(value)) {
+        vaultVariableDetected = true;
       }
     } else if (Array.isArray(value)) {
       for (const item of value) {
         scanValue(item);
+        if (vaultVariableDetected) return;
       }
     } else if (value !== null && typeof value === "object") {
       for (const item of Object.values(value)) {
         scanValue(item);
+        if (vaultVariableDetected) return;
       }
     }
   };
 
   scanValue(fileContent);
-  return { variableNames };
+  return vaultVariableDetected;
 };
 
 export const detectUnsupportedFeatures = (fileContent: any): UnsupportedFeatures => {

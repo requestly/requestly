@@ -5,6 +5,7 @@ import {
   processPostmanCollectionData,
   processPostmanEnvironmentData,
   detectUnsupportedFeatures,
+  detectVaultVariables,
 } from "./utils";
 import { toast } from "utils/Toast";
 import { RQButton } from "lib/design-system-v2/components";
@@ -102,34 +103,26 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
                   }
 
                   if (postmanFileType === "environment") {
+                    const hasVaultVariables = detectVaultVariables(fileContent);
+                    if (hasVaultVariables) {
+                      trackPostmanUnsupportedFeatures({ vaultVariables: true });
+                    }
                     const processedData = processPostmanEnvironmentData(fileContent);
                     resolve({ type: postmanFileType, data: processedData });
                   } else {
                     const unsupportedFeatures = detectUnsupportedFeatures(fileContent);
 
                     const hasUnsupportedAuth = unsupportedFeatures.auth.types.size > 0;
-
                     const hasCollectionLevelScripts =
                       unsupportedFeatures.collectionLevelScripts.hasPreRequest ||
                       unsupportedFeatures.collectionLevelScripts.hasTest;
-
-                    const hasVaultVariables = unsupportedFeatures.vaultVariables.variableNames.size > 0;
-
-                    if (hasUnsupportedAuth) {
+                    const hasVaultVariables = unsupportedFeatures.vaultVariables;
+                    if (hasUnsupportedAuth || hasCollectionLevelScripts || hasVaultVariables) {
                       trackPostmanUnsupportedFeatures({
-                        Feature: "Unsupported Auth",
-                        AuthType: Array.from(unsupportedFeatures.auth.types),
+                        ...(hasCollectionLevelScripts && { collectionLevelScripts: true }),
+                        ...(hasVaultVariables && { vaultVariables: true }),
+                        ...(hasUnsupportedAuth && { auth: Array.from(unsupportedFeatures.auth.types) }),
                       });
-                    }
-                    if (hasCollectionLevelScripts) {
-                      trackPostmanUnsupportedFeatures({
-                        Feature: "Collection Level Scripts",
-                        HasPreRequestScript: unsupportedFeatures.collectionLevelScripts.hasPreRequest,
-                        HasPostResponseScript: unsupportedFeatures.collectionLevelScripts.hasTest,
-                      });
-                    }
-                    if (hasVaultVariables) {
-                      trackPostmanUnsupportedFeatures({ Feature: "Vault Variables" });
                     }
 
                     const processedApiRecords = processPostmanCollectionData(fileContent, apiClientRecordsRepository);
