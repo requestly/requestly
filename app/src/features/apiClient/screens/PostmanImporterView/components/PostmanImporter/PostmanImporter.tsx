@@ -105,7 +105,7 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
                   if (postmanFileType === "environment") {
                     const hasVaultVariables = detectVaultVariables(fileContent);
                     if (hasVaultVariables) {
-                      trackPostmanUnsupportedFeatures({ vaultVariables: true });
+                      trackPostmanUnsupportedFeatures(["vault variables"]);
                     }
                     const processedData = processPostmanEnvironmentData(fileContent);
                     resolve({ type: postmanFileType, data: processedData });
@@ -119,11 +119,12 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
                         unsupportedFeatures.collectionLevelScripts?.hasTest;
                       const hasVaultVariables = unsupportedFeatures.vaultVariables;
                       if (hasUnsupportedAuth || hasCollectionLevelScripts || hasVaultVariables) {
-                        trackPostmanUnsupportedFeatures({
-                          ...(hasCollectionLevelScripts && { collectionLevelScripts: true }),
-                          ...(hasVaultVariables && { vaultVariables: true }),
-                          ...(hasUnsupportedAuth && { auth: Array.from(unsupportedFeatures.auth.types) }),
-                        });
+                        const unsupportedFeaturesList: string[] = [
+                          ...(hasCollectionLevelScripts ? ["collection level scripts"] : []),
+                          ...(hasVaultVariables ? ["vault variables"] : []),
+                          ...(hasUnsupportedAuth ? Array.from(unsupportedFeatures.auth.types) : []),
+                        ];
+                        trackPostmanUnsupportedFeatures(unsupportedFeaturesList);
                       }
                     } catch (error) {
                       // not logging on sentry, since this is for analytics purpose only
