@@ -18,6 +18,7 @@ import { SuccessfulParseView, SuccessfulParseViewProps } from "./components/Succ
 import { wrapWithCustomSpan } from "utils/sentry";
 import { SPAN_STATUS_ERROR, SPAN_STATUS_OK } from "@sentry/core";
 import { ImportInputView, ImportFile, LinkViewConfig } from "./components/ImportInputView";
+import { apiRecordsRankingManager } from "features/apiClient/helpers/RankingManager";
 
 export type { ImportFile, LinkViewConfig };
 
@@ -167,6 +168,11 @@ export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = (
       if (allRequests.length === 0) {
         return { successfulRequests: [], failedCount: 0 };
       }
+
+      const ranks = apiRecordsRankingManager.getNextRanks(allRequests, allRequests);
+      allRequests.forEach((request, index) => {
+        request.rank = ranks[index];
+      });
 
       try {
         const createdRequests = await apiClientRecordsRepository.batchWriteApiRecords(allRequests);
