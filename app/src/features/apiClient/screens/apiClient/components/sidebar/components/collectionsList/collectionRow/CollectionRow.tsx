@@ -40,6 +40,8 @@ import { useActiveTab, useTabActions } from "componentsV2/Tabs/slice";
 import { getAncestorIds, getRecord } from "features/apiClient/slices/apiRecords/utils";
 import { Workspace } from "features/workspaces/types";
 import { EnvironmentVariables } from "backend/environment/types";
+import { NativeError } from "errors/NativeError";
+import { ErrorSeverity } from "errors/types";
 
 export enum ExportType {
   REQUESTLY = "requestly",
@@ -277,7 +279,7 @@ export const CollectionRow: React.FC<Props> = ({
           collectionId: record.id,
         };
 
-        await sourceContext.store
+        const res = await sourceContext.store
           .dispatch(
             moveRecords({
               recordsToMove: [item.record],
@@ -289,6 +291,8 @@ export const CollectionRow: React.FC<Props> = ({
           )
           .unwrap();
 
+        console.log("!!!debug", "ress", res);
+
         if (!expandedRecordIds.includes(record.id)) {
           const newExpandedRecordIds = [...expandedRecordIds, destination.collectionId];
           updateExpandedRecordIds(newExpandedRecordIds);
@@ -299,6 +303,7 @@ export const CollectionRow: React.FC<Props> = ({
           description: error?.message || (typeof error === "string" ? error : "Failed to move item. Please try again."),
           placement: "bottomRight",
         });
+        throw NativeError.fromError(error).setShowBoundary(true).setSeverity(ErrorSeverity.ERROR);
       } finally {
         setIsCollectionRowLoading(false);
       }

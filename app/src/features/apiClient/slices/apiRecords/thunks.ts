@@ -18,7 +18,6 @@ import { getApiClientFeatureContext } from "../workspaceView/helpers/ApiClientCo
 import { Workspace } from "features/workspaces/types";
 import { erroredRecordsActions } from "../erroredRecords";
 import { closeTabByEntityId } from "componentsV2/Tabs/slice";
-import * as Sentry from "@sentry/react";
 
 type Repository = ApiClientRecordsInterface<Record<string, unknown>>;
 
@@ -130,27 +129,22 @@ export const deleteRecords = createAsyncThunk<
 export const forceRefreshRecords = createAsyncThunk<boolean, { repository: Repository }, { rejectValue: string }>(
   "apiRecords/forceRefresh",
   async ({ repository }, { dispatch, rejectWithValue }) => {
-    try {
-      const recordsToRefresh = await repository.getRecordsForForceRefresh();
-      if (!recordsToRefresh || !recordsToRefresh.success) {
-        return false;
-      }
-
-      dispatch(
-        apiRecordsActions.hydrate({
-          records: recordsToRefresh.data.records,
-          erroredRecords: recordsToRefresh.data.erroredRecords, // TODO: cleanup
-        })
-      );
-
-      dispatch(erroredRecordsActions.setApiErroredRecords(recordsToRefresh.data.erroredRecords));
-      // closeCorruptedTabs();
-
-      return true;
-    } catch (error) {
-      Sentry.captureException(error);
-      return rejectWithValue(error instanceof Error ? error.message : "Failed to refresh records");
+    const recordsToRefresh = await repository.getRecordsForForceRefresh();
+    if (!recordsToRefresh || !recordsToRefresh.success) {
+      return false;
     }
+
+    dispatch(
+      apiRecordsActions.hydrate({
+        records: recordsToRefresh.data.records,
+        erroredRecords: recordsToRefresh.data.erroredRecords, // TODO: cleanup
+      })
+    );
+
+    dispatch(erroredRecordsActions.setApiErroredRecords(recordsToRefresh.data.erroredRecords));
+    // closeCorruptedTabs();
+
+    return true;
   }
 );
 
@@ -176,38 +170,27 @@ export const moveRecords = createAsyncThunk<
         : { ...record, collectionId };
     });
 
-    try {
-      const movedRecords = await repository.moveAPIEntities(updatedRecords, collectionId);
+    const movedRecords = await repository.moveAPIEntities(updatedRecords, collectionId);
 
-      dispatch(apiRecordsActions.upsertRecords(movedRecords));
+    dispatch(apiRecordsActions.upsertRecords(movedRecords));
 
-      // TODO: check why we need to refresh for local workspace, when move is in same workspace
-      const sourceContext = getApiClientFeatureContext(sourceWorkspaceId);
-      await sourceContext.store
-        .dispatch(forceRefreshRecords({ repository: sourceContext.repositories.apiClientRecordsRepository }) as any)
+    // TODO: check why we need to refresh for local workspace, when move is in same workspace
+    const sourceContext = getApiClientFeatureContext(sourceWorkspaceId);
+    await sourceContext.store
+      .dispatch(forceRefreshRecords({ repository: sourceContext.repositories.apiClientRecordsRepository }) as any)
+      .unwrap();
+
+    if (destinationWorkspaceId && destinationWorkspaceId !== sourceWorkspaceId) {
+      const destinationContext = getApiClientFeatureContext(destinationWorkspaceId);
+
+      await destinationContext.store
+        .dispatch(
+          forceRefreshRecords({ repository: destinationContext.repositories.apiClientRecordsRepository }) as any
+        )
         .unwrap();
-
-      if (destinationWorkspaceId && destinationWorkspaceId !== sourceWorkspaceId) {
-        const destinationContext = getApiClientFeatureContext(destinationWorkspaceId);
-
-        await destinationContext.store
-          .dispatch(
-            forceRefreshRecords({ repository: destinationContext.repositories.apiClientRecordsRepository }) as any
-          )
-          .unwrap();
-      }
-
-      return { movedRecords };
-    } catch (error) {
-      Sentry.captureException(error, {
-        extra: {
-          collectionId,
-          sourceWorkspaceId,
-          destinationWorkspaceId,
-        },
-      });
-      return rejectWithValue(error instanceof Error ? error.message : "Failed to move records");
     }
+
+    return { movedRecords };
   }
 );
 
@@ -216,30 +199,21 @@ export const duplicateRecords = createAsyncThunk<
   { recordIds: Set<string>; repository: Repository },
   { rejectValue: string; state: ApiClientStoreState }
 >("apiRecords/duplicate", async ({ recordIds, repository }, { dispatch, rejectWithValue, getState }) => {
-  try {
-    const context = getApiClientFeatureContext();
-    const apiClientRecords = selectAllRecords(getState());
-    const recordsToRender = getRecordsToRender({ apiClientRecords });
-    const childParentMap = selectChildToParent(getState());
-    const processedRecords = filterOutChildrenRecords(recordIds, childParentMap, recordsToRender.recordsMap);
-    const recordsToDuplicate = processRecordsForDuplication(processedRecords, repository, context);
+  const context = getApiClientFeatureContext();
+  const apiClientRecords = selectAllRecords(getState());
+  const recordsToRender = getRecordsToRender({ apiClientRecords });
+  const childParentMap = selectChildToParent(getState());
+  const processedRecords = filterOutChildrenRecords(recordIds, childParentMap, recordsToRender.recordsMap);
+  const recordsToDuplicate = processRecordsForDuplication(processedRecords, repository, context);
 
-    const duplicatedRecords = await repository.duplicateApiEntities(recordsToDuplicate);
+  const duplicatedRecords = await repository.duplicateApiEntities(recordsToDuplicate);
 
-    dispatch(apiRecordsActions.upsertRecords(duplicatedRecords));
+  dispatch(apiRecordsActions.upsertRecords(duplicatedRecords));
 
-    const isMultiView = reduxStore.getState().workspaceView.viewMode === ApiClientViewMode.MULTI;
-    if (isMultiView) {
-      await dispatch(forceRefreshRecords({ repository })).unwrap();
-    }
-
-    return { duplicatedRecords };
-  } catch (error) {
-    Sentry.captureException(error, {
-      extra: {
-        recordIds,
-      },
-    });
-    return rejectWithValue(error instanceof Error ? error.message : "Failed to duplicate records");
+  const isMultiView = reduxStore.getState().workspaceView.viewMode === ApiClientViewMode.MULTI;
+  if (isMultiView) {
+    await dispatch(forceRefreshRecords({ repository })).unwrap();
   }
+
+  return { duplicatedRecords };
 });
