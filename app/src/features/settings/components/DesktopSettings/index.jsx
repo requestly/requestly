@@ -111,7 +111,7 @@ export const DesktopSettings = () => {
         toast.success("Web app URL changed successfully. Window will recreate.");
         setUrlInput("");
       } else {
-        toast.error(response.error || "Failed to change URL");
+        toast.error(response?.error || "Failed to change URL");
       }
     } catch (error) {
       toast.error("Failed to change URL: " + error.message);
