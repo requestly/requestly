@@ -13,6 +13,7 @@ import {
 } from "modules/analytics/events/features/apiClient";
 import { MdOutlineIosShare } from "@react-icons/all-files/md/MdOutlineIosShare";
 import { postmanCollectionExporter } from "@requestly/alternative-importers";
+import { apiRecordsRankingManager } from "features/apiClient/helpers/RankingManager";
 
 interface PostmanExportModalProps {
   recordsToBeExported: RQAPI.ApiClientRecord[];
@@ -106,7 +107,7 @@ export const PostmanExportModal: React.FC<PostmanExportModalProps> = ({ recordsT
   useEffect(() => {
     const recordsToExport: ExportRecord[] = [];
 
-    recordsToBeExported.forEach((record) => {
+    apiRecordsRankingManager.sort(recordsToBeExported).forEach((record) => {
       if (isApiCollection(record)) {
         recordsToExport.push(...sanitizeRecords(record));
       } else {
