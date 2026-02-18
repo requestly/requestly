@@ -91,19 +91,43 @@ export const useVariableAutocomplete = (variables?: ScopedVariables, options?: U
 
         // Get all text before the cursor to search for the '{{' pattern
         const beforeCursor = doc.slice(0, cursorPos);
+        const afterCursor = doc.slice(cursorPos);
+        // Cursor inside existing {{}} only
+        const lastOpen = beforeCursor.lastIndexOf("{{");
+        const nextClose = afterCursor.indexOf("}}");
 
-        // Match pattern: {{ followed by zero or more non-closing-brace characters
-        // Example matches: "{{", "{{api", "{{user.name"
-        // Does not match: "}} {{" (would only match the second {{)
+        if (lastOpen !== -1 && nextClose !== -1) {
+          const start = lastOpen + 2; // Position immediately after '{{'
+
+          // Only show autocomplete if cursor is strictly inside the braces
+          if (cursorPos >= start && cursorPos <= start + nextClose) {
+            // Extract variable content for filtering suggestions
+            const variableContent = doc.slice(start, cursorPos);
+
+            // Get screen coordinates at cursor position for popup placement
+            const coords = update.view.coordsAtPos(cursorPos);
+            if (coords) {
+              setAutocompleteState({
+                show: true,
+                position: { x: coords.left, y: coords.bottom }, // Position below cursor
+                filter: variableContent, // Empty string allowed for '{{}}'
+                from: start, // Start position right after '{{'
+                to: cursorPos, // End position (current cursor)
+              });
+            }
+            return; // Skip further processing, new case handled
+          }
+        }
+        // Match '{{' followed by any number of non-'}}' characters
         const match = beforeCursor.match(/\{\{([^}]*)$/);
 
         if (match) {
-          // If the cursor is inside an already-closed variable (e.g., {{var}}),
-          // do not show autocomplete to avoid overlapping popovers.
-          const afterCursor = doc.slice(cursorPos);
-          const nextClose = afterCursor.indexOf("}}");
-          const nextOpen = afterCursor.indexOf("{{");
-          const isInsideCompletedVariable = nextClose !== -1 && (nextOpen === -1 || nextClose < nextOpen);
+          // Prevent autocomplete inside completed variables
+          const afterText = doc.slice(cursorPos);
+          const nextCloseIndex = afterText.indexOf("}}");
+          const nextOpenIndex = afterText.indexOf("{{");
+          const isInsideCompletedVariable =
+            nextCloseIndex !== -1 && (nextOpenIndex === -1 || nextCloseIndex < nextOpenIndex);
 
           if (isInsideCompletedVariable) {
             if (autocompleteState.show) setAutocompleteState((prev) => ({ ...prev, show: false }));
@@ -159,7 +183,6 @@ export const useVariableAutocomplete = (variables?: ScopedVariables, options?: U
    * - Positions cursor after the inserted text for continued editing
    *
    * @param variableKey - The variable name to insert (e.g., "apiKey" or "$dynamic")
-   * @param isDynamic - Whether this is a dynamic variable requiring '$' prefix
    */
   const handleSelectVariable = useCallback(
     (variableKey: string) => {
@@ -173,8 +196,14 @@ export const useVariableAutocomplete = (variables?: ScopedVariables, options?: U
 
       // Replace the text between 'from' and 'to' with the selected variable
       view.dispatch({
-        changes: { from: autocompleteState.from, to: autocompleteState.to, insert: variableKey + closingChars },
-        selection: { anchor: autocompleteState.from + variableKey.length + closingChars.length },
+        changes: {
+          from: autocompleteState.from,
+          to: autocompleteState.to,
+          insert: variableKey + closingChars,
+        },
+        selection: {
+          anchor: autocompleteState.from + variableKey.length + closingChars.length,
+        },
       });
 
       // Hide the autocomplete popup
