@@ -87,11 +87,13 @@ const DBListeners = () => {
 
   /* Force refresh custom claims in auth token */
   useEffect(() => {
-    getAuth(firebaseApp)
-      .currentUser?.getIdTokenResult(true)
-      ?.then((status) => {
-        Logger.log("force updated auth token");
-      });
+    setTimeout(() => {
+      getAuth(firebaseApp)
+        .currentUser?.getIdTokenResult(true)
+        ?.then((status) => {
+          Logger.log("force updated auth token");
+        });
+    }, 10000);
   }, [user?.details?.profile?.uid, user?.loggedIn, activeWorkspaceId, currentTeamMembers, dispatch]);
 
   return null;
