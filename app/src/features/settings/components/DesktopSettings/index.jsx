@@ -7,6 +7,7 @@ import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
 import { LinkOutlined } from "@ant-design/icons";
+import { RQInput } from "lib/design-system/components";
 import {
   trackProxyPortChanged,
   trackInvalidProxyPortInput,
@@ -179,39 +180,44 @@ export const DesktopSettings = () => {
           )}
         </div>
 
-        {isCustomUrlEnabled && (
-          <Row align="middle" className="w-full mt-16 setting-item-container">
-            <Col span={22}>
-              <div className="title">Change Web App URL</div>
-              <p className="setting-item-caption">
-                Temporarily change the web app URL for testing. Changes won't persist after app restart.
-              </p>
-              <Row style={{ marginTop: "16px" }}>
-                <Col span={18}>
-                  <Input
-                    value={urlInput}
-                    disabled={urlSubmitLoading}
-                    placeholder="Enter New URL"
-                    className="desktop-setting-port-input"
-                    onChange={(e) => setUrlInput(e.target.value)}
-                  />
-                </Col>
-              </Row>
-            </Col>
-            <Col span={2} style={{ alignSelf: "flex-end" }}>
-              <Popconfirm
-                okText="Continue"
-                cancelText="No"
-                placement="topLeft"
-                title="Window will recreate with new URL. Changes won't persist after restart. Continue?"
-                onConfirm={handleUrlChange}
-              >
-                <RQButton loading={urlSubmitLoading} disabled={!urlInput.trim() || urlSubmitLoading} type="default">
-                  Update
-                </RQButton>
-              </Popconfirm>
-            </Col>
-          </Row>
+        {true && (
+          <div className="preview-url-container">
+            <Row align="middle" className="w-full mt-16 setting-item">
+              <Col span={24}>
+                <div className="title">Change Web App URL</div>
+                <p className="setting-item-caption">
+                  Temporarily change the web app URL for testing. Changes won't persist after app restart.
+                </p>
+                <Row className="header-row">
+                  <Col span={21}>
+                    <RQInput
+                      placeholder="Enter new URL"
+                      onChange={(e) => setUrlInput(e.target.value)}
+                      value={urlInput}
+                    />
+                  </Col>
+                  <Col span={2}>
+                    <Popconfirm
+                      okText="Continue"
+                      cancelText="No"
+                      placement="topLeft"
+                      title="Window will recreate with new URL. Changes won't persist after restart. Continue?"
+                      onConfirm={handleUrlChange}
+                    >
+                      <RQButton
+                        className="update-url-btn"
+                        loading={urlSubmitLoading}
+                        disabled={!urlInput.trim() || urlSubmitLoading}
+                        type="default"
+                      >
+                        Update
+                      </RQButton>
+                    </Popconfirm>
+                  </Col>
+                </Row>
+              </Col>
+            </Row>
+          </div>
         )}
 
         {isFeatureCompatible(FEATURES.REGENERATE_SSL_CERTS) ? (
