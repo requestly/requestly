@@ -110,19 +110,24 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
                     const processedData = processPostmanEnvironmentData(fileContent);
                     resolve({ type: postmanFileType, data: processedData });
                   } else {
-                    const unsupportedFeatures = detectUnsupportedFeatures(fileContent);
+                    try {
+                      const unsupportedFeatures = detectUnsupportedFeatures(fileContent);
 
-                    const hasUnsupportedAuth = unsupportedFeatures.auth.types.size > 0;
-                    const hasCollectionLevelScripts =
-                      unsupportedFeatures.collectionLevelScripts.hasPreRequest ||
-                      unsupportedFeatures.collectionLevelScripts.hasTest;
-                    const hasVaultVariables = unsupportedFeatures.vaultVariables;
-                    if (hasUnsupportedAuth || hasCollectionLevelScripts || hasVaultVariables) {
-                      trackPostmanUnsupportedFeatures({
-                        ...(hasCollectionLevelScripts && { collectionLevelScripts: true }),
-                        ...(hasVaultVariables && { vaultVariables: true }),
-                        ...(hasUnsupportedAuth && { auth: Array.from(unsupportedFeatures.auth.types) }),
-                      });
+                      const hasUnsupportedAuth = unsupportedFeatures.auth.types.size > 0;
+                      const hasCollectionLevelScripts =
+                        unsupportedFeatures.collectionLevelScripts?.hasPreRequest ||
+                        unsupportedFeatures.collectionLevelScripts?.hasTest;
+                      const hasVaultVariables = unsupportedFeatures.vaultVariables;
+                      if (hasUnsupportedAuth || hasCollectionLevelScripts || hasVaultVariables) {
+                        trackPostmanUnsupportedFeatures({
+                          ...(hasCollectionLevelScripts && { collectionLevelScripts: true }),
+                          ...(hasVaultVariables && { vaultVariables: true }),
+                          ...(hasUnsupportedAuth && { auth: Array.from(unsupportedFeatures.auth.types) }),
+                        });
+                      }
+                    } catch (error) {
+                      // not logging on sentry, since this is for analytics purpose only
+                      Logger.error("Error detecting unsupported features:", error);
                     }
 
                     const processedApiRecords = processPostmanCollectionData(fileContent, apiClientRecordsRepository);
