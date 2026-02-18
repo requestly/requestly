@@ -181,59 +181,29 @@ export class FsManagerServiceAdapter extends BackgroundServiceAdapter {
 class FsManagerServiceAdapterProvider {
   private cache = new Map<string, FsManagerServiceAdapter>();
   private lockMap = new Map<string, MutexInterface>();
-  constructor() {
-    console.log("provider created");
-  }
 
   async get(rootPath: string): Promise<FsManagerServiceAdapter> {
     let lock = this.lockMap.get(rootPath);
     if (!lock) {
-      lock = withTimeout(new Mutex(), 40 * 1000); // Must exceed RPC timeout (30s) + retry overhead;
+      lock = withTimeout(new Mutex(), 50 * 1000); // Must exceed buildFsManager budget: 2 attempts × 20s + 1s delay + safety
       this.lockMap.set(rootPath, lock);
     }
 
-    // [PERF] Start timing for lock acquisition
-    const lockAcquireStart = performance.now();
-    console.log(`[PERF] FsManagerServiceAdapter.get() starting for rootPath: ${rootPath}`);
-
     await lock.acquire();
-
-    const lockAcquireTime = performance.now() - lockAcquireStart;
-    console.log(`[PERF] Lock acquired in ${lockAcquireTime.toFixed(2)}ms`);
 
     const fsManagerServiceAdapter = this.cache.get(rootPath);
 
     if (fsManagerServiceAdapter) {
-      console.log("[PERF] Got provider from cache");
       lock.release();
       return fsManagerServiceAdapter;
     }
     try {
-      // [PERF] Start timing for buildFsManager RPC call
-      const buildFsStart = performance.now();
-      console.log("[PERF] buildFsManager() RPC call starting...");
-
       await buildFsManager(rootPath);
-
-      const buildFsTime = performance.now() - buildFsStart;
-      console.log(`[PERF] buildFsManager() RPC call completed in ${buildFsTime.toFixed(2)}ms`);
-
-      if (buildFsTime > 10000) {
-        console.warn(
-          `[PERF] ⚠️ WARNING: buildFsManager took ${buildFsTime.toFixed(
-            2
-          )}ms (>10s). This may indicate a large workspace.`
-        );
-      }
-      if (buildFsTime > 30000) {
-        console.error(`[PERF] ❌ ERROR: buildFsManager took ${buildFsTime.toFixed(2)}ms (>30s). MUTEX TIMEOUT LIKELY!`);
-      }
 
       const service = new FsManagerServiceAdapter(rootPath);
       this.cache.set(rootPath, service);
       return service;
     } catch (e) {
-      console.error("[PERF] ❌ ERROR in FsManagerServiceAdapter.get():", e);
       const isAccessIssue = (arg: unknown) => typeof arg === "string" && arg.includes("EACCES:");
       if (isAccessIssue(e) || (e && typeof e === "object" && "message" in e && isAccessIssue(e.message))) {
         const errorMessage = e && typeof e === "object" && "message" in e ? String(e.message) : String(e);
@@ -242,10 +212,6 @@ class FsManagerServiceAdapterProvider {
       throw e;
     } finally {
       lock.release();
-      const totalTime = performance.now() - lockAcquireStart;
-      console.log(
-        `[PERF] FsManagerServiceAdapter.get() completed in ${totalTime.toFixed(2)}ms (including lock release)`
-      );
     }
   }
 }
