@@ -25,6 +25,8 @@ import { selectLiveRunResultSummary } from "../../liveRunResults/selectors";
 import { RunStatus } from "../../common/runResults/types";
 import { DELAY_MIN_LIMIT, ITERATIONS_MAX_LIMIT } from "../constants";
 import { RunHistorySaveStatus } from "../../runHistory/types";
+import { Scope } from "features/apiClient/helpers/variableResolver/variable-resolver";
+import { EnvironmentVariableType, EnvironmentVariables, VariableScope } from "backend/environment/types";
 
 function parseExecutingRequestEntry(entry: RQAPI.ApiEntry): RequestExecutionResult["entry"] {
   return isHTTPApiEntry(entry)
@@ -53,6 +55,7 @@ function prepareExecutionResult(params: {
 
   if (result.status === RQAPI.ExecutionStatus.ERROR) {
     return {
+      executionId: result.executionId,
       iteration,
       recordId,
       recordName,
@@ -65,6 +68,7 @@ function prepareExecutionResult(params: {
   }
 
   return {
+    executionId: result.executionId,
     iteration,
     recordId,
     recordName,
@@ -185,6 +189,39 @@ class Runner {
     }
   }
 
+  private parseDataFileVariables(primitives: Record<string, any>): EnvironmentVariables {
+    const result: EnvironmentVariables = {};
+    let id = 0;
+
+    for (const key in primitives) {
+      const value = primitives[key];
+      if (value == null) {
+        continue;
+      }
+
+      let type: EnvironmentVariableType = EnvironmentVariableType.String;
+      let convertedValue: string | number | boolean = String(value);
+
+      if (typeof value === "number") {
+        type = EnvironmentVariableType.Number;
+        convertedValue = value;
+      } else if (typeof value === "boolean") {
+        type = EnvironmentVariableType.Boolean;
+        convertedValue = value;
+      }
+
+      result[key] = {
+        id: id++,
+        syncValue: convertedValue,
+        localValue: convertedValue,
+        type,
+        isPersisted: true,
+      };
+    }
+
+    return result;
+  }
+
   private beforeRequestExecutionStart(iteration: number, request: RQAPI.ApiRecord, startTime: number) {
     this.throwIfRunCancelled();
     const collection = selectRecordById(this.ctx.store.getState(), request.collectionId!);
@@ -205,7 +242,24 @@ class Runner {
       })
     );
 
-    return { currentExecutingRequest };
+    // Create scopes with data file variables for this iteration
+    const scopes: Scope[] = [];
+    const dataFileVariables = this.variables[iteration - 1]; // iteration is 1-based
+
+    if (dataFileVariables) {
+      const parsedVariables = this.parseDataFileVariables(dataFileVariables);
+      scopes.push([
+        {
+          scope: VariableScope.DATA_FILE,
+          scopeId: "data_file",
+          name: "Data File",
+          level: 0,
+        },
+        parsedVariables,
+      ]);
+    }
+
+    return { currentExecutingRequest, scopes };
   }
 
   private afterRequestExecutionComplete(
@@ -393,14 +447,14 @@ class Runner {
       const executionContext: ExecutionContext = {} as ExecutionContext; // Empty object that will be filled and shared across iterations
 
       for await (const { request, iteration, startTime } of this.iterate()) {
-        const { currentExecutingRequest } = this.beforeRequestExecutionStart(iteration, request, startTime);
+        const { currentExecutingRequest, scopes } = this.beforeRequestExecutionStart(iteration, request, startTime);
         const result = await this.executor.executeSingleRequest(
           { entry: request.data as RQAPI.ApiEntry, recordId: request.id },
           {
             iteration: iteration - 1, // We want 0-based index for usage in scripts
             iterationCount,
           },
-          { abortController: this.abortController, executionContext }
+          { abortController: this.abortController, scopes, executionContext }
         );
 
         this.afterRequestExecutionComplete(currentExecutingRequest, result);

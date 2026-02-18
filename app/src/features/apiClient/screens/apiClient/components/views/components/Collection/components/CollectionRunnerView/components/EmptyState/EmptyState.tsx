@@ -8,7 +8,7 @@ export const EmptyState: React.FC<{ imageSrc?: string; title: string; descriptio
 }) => {
   return (
     <div className="runResultEmptyState">
-      <img width={80} height={80} src={imageSrc ?? "/assets/media/home/empty-card.svg"} alt="empty view" />
+      <img width={64} height={64} src={imageSrc ?? "/assets/media/home/empty-card.svg"} alt="empty view" />
       <div className="title">{title}</div>
       <div className="description">{description}</div>
     </div>
