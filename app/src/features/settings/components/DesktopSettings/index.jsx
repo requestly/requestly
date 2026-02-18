@@ -180,7 +180,7 @@ export const DesktopSettings = () => {
           )}
         </div>
 
-        {true && (
+        {isCustomUrlEnabled && (
           <div className="preview-url-container">
             <Row align="middle" className="w-full mt-16 setting-item">
               <Col span={24}>
