@@ -193,7 +193,7 @@ class Runner {
 
     for (const key in primitives) {
       const value = primitives[key];
-      if (!value) {
+      if (value == null) {
         continue;
       }
 
