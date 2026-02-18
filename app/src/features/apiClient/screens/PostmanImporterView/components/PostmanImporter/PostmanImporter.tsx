@@ -36,7 +36,6 @@ import { SPAN_STATUS_ERROR, SPAN_STATUS_OK } from "@sentry/core";
 import { EnvironmentVariableData } from "@requestly/shared/types/entities/apiClient";
 import { LocalApiClientRecordsSync } from "features/apiClient/helpers/modules/sync/local/services/LocalApiClientRecordsSync";
 import { captureException } from "backend/apiClient/utils";
-import { trackEvent } from "modules/analytics";
 
 type ProcessedData = {
   environments: { name: string; variables: Record<string, EnvironmentVariableData>; isGlobal: boolean }[];
@@ -71,7 +70,6 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
 
   const collectionsCount = useRef(0);
 
-  // #process part -> account changes here
   const handleFileDrop = useCallback(
     async (files: File[]) => {
       return wrapWithCustomSpan(
