@@ -25,7 +25,12 @@ import { useDrag, useDrop } from "react-dnd";
 import { GrGraphQl } from "@react-icons/all-files/gr/GrGraphQl";
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
 import { isGraphQLApiRecord, isHttpApiRecord } from "features/apiClient/screens/apiClient/utils";
-import { ApiClientFeatureContext, useApiClientRepository, useApiClientFeatureContext } from "features/apiClient/slices";
+import {
+  ApiClientFeatureContext,
+  useApiClientRepository,
+  useApiClientFeatureContext,
+  createExampleRequest,
+} from "features/apiClient/slices";
 import { useActiveTab, useTabActions } from "componentsV2/Tabs/slice";
 import { useWorkspaceId } from "features/apiClient/common/WorkspaceProvider";
 import { apiRecordsRankingManager } from "features/apiClient/helpers/RankingManager";
@@ -37,6 +42,8 @@ import clsx from "clsx";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
 import { getRankForDroppedRecord } from "features/apiClient/helpers/RankingManager/utils";
+import { MdOutlineDashboardCustomize } from "@react-icons/all-files/md/MdOutlineDashboardCustomize";
+import { ExampleViewTabSource } from "../../../../views/components/ExampleRequestView/exampleViewTabSource";
 
 interface Props {
   record: RQAPI.ApiRecord;
@@ -260,6 +267,41 @@ export const RequestRow: React.FC<Props> = ({
     [context, apiClientRecordsRepository, onSaveRecord]
   );
 
+  const handleAddExample = useCallback(
+    async (record: RQAPI.ApiRecord) => {
+      try {
+        handleDropdownVisibleChange(false);
+        const exampleRecordToCreate: RQAPI.ExampleApiRecord = {
+          ...record,
+          type: RQAPI.RecordType.EXAMPLE_API,
+          collectionId: null,
+          parentRequestId: record.id,
+        };
+        const { exampleRecord } = await context.store
+          .dispatch(
+            createExampleRequest({
+              parentRequestId: record.id,
+              example: exampleRecordToCreate,
+              repository: context.repositories.apiClientRecordsRepository,
+            }) as any
+          )
+          .unwrap();
+        openBufferedTab({
+          preview: false,
+          source: new ExampleViewTabSource({
+            id: exampleRecord.id,
+            title: exampleRecord.name || "Example",
+            apiEntryDetails: exampleRecord,
+            context: { id: workspaceId },
+          }),
+        });
+      } catch {
+        toast.error("Something went wrong while creating the example.");
+      }
+    },
+    [context.store, context.repositories.apiClientRecordsRepository, openBufferedTab, workspaceId]
+  );
+
   const requestOptions = useMemo((): MenuProps["items"] => {
     return [
       {
@@ -312,6 +354,19 @@ export const RequestRow: React.FC<Props> = ({
         key: "3",
         label: (
           <div>
+            <MdOutlineDashboardCustomize style={{ marginRight: 8 }} />
+            Add example
+          </div>
+        ),
+        onClick: (itemInfo) => {
+          itemInfo.domEvent?.stopPropagation?.();
+          handleAddExample(record);
+        },
+      },
+      {
+        key: "4",
+        label: (
+          <div>
             <MdOutlineDelete style={{ marginRight: 8 }} />
             Delete
           </div>
@@ -324,7 +379,7 @@ export const RequestRow: React.FC<Props> = ({
         },
       },
     ];
-  }, [record, handleRecordsToBeDeleted, handleDuplicateRequest]);
+  }, [record, handleRecordsToBeDeleted, handleDuplicateRequest, handleAddExample]);
 
   const examples = record.data.examples || [];
 
