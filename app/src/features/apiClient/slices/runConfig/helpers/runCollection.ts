@@ -193,6 +193,10 @@ class Runner {
 
     for (const key in primitives) {
       const value = primitives[key];
+      if (!value) {
+        continue;
+      }
+
       let type: EnvironmentVariableType = EnvironmentVariableType.String;
       let convertedValue: string | number | boolean = String(value);
 
