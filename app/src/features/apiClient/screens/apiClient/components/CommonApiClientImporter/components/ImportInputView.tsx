@@ -2,14 +2,14 @@ import React, { useCallback, useState } from "react";
 import { useSelector } from "react-redux";
 import * as Sentry from "@sentry/react";
 import { SPAN_STATUS_ERROR, SPAN_STATUS_OK } from "@sentry/core";
-import { Input, Button, Spin } from "antd";
-import { LoadingOutlined } from "@ant-design/icons";
+import { Input, Button, Spin, Tooltip } from "antd";
+import { LoadingOutlined, ExclamationCircleFilled } from "@ant-design/icons";
 import { toast } from "utils/Toast";
 import { wrapWithCustomSpan } from "utils/sentry";
 import { FilePicker } from "components/common/FilePicker";
 import { ImportErrorView } from "./ImporterErrorView";
-import { getAppMode } from "store/selectors";
-import { isExtensionInstalled, isExtensionEnabled } from "actions/ExtensionActions";
+import { getAppMode, getIsExtensionEnabled } from "store/selectors";
+import { isExtensionInstalled } from "actions/ExtensionActions";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { trackImportParsed, trackImportParseFailed } from "modules/analytics/events/features/apiClient";
 import { RQAPI, EnvironmentData, ApiClientImporterType } from "@requestly/shared/types/entities/apiClient";
@@ -55,6 +55,10 @@ export const ImportInputView: React.FC<ImportInputViewProps> = ({
   const [linkError, setLinkError] = useState<string | null>(null);
 
   const appMode = useSelector(getAppMode);
+  const isExtensionEnabled = useSelector(getIsExtensionEnabled);
+  const isDesktop = appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP;
+  const isInstalled = isExtensionInstalled();
+  const isLinkFeatureReady = isDesktop || (isInstalled && isExtensionEnabled);
 
   const handleResetInput = () => {
     setImportError(null);
@@ -179,21 +183,9 @@ export const ImportInputView: React.FC<ImportInputViewProps> = ({
   );
 
   const handleFetchAndImport = useCallback(async () => {
-    if (!linkView?.onFetchFromUrl) {
-      return;
-    }
+    if (!linkView?.onFetchFromUrl) return;
 
-    // Extension Checks
-    if (appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
-      if (!isExtensionInstalled()) {
-        setLinkError("Extension is not installed. Please install the extension to use this feature.");
-        return;
-      }
-      if (!isExtensionEnabled()) {
-        setLinkError("Extension is not enabled. Please enable the extension to use this feature.");
-        return;
-      }
-    }
+    if (!isLinkFeatureReady) return;
 
     if (!linkUrl.trim()) {
       setLinkError("Please enter a URL");
@@ -221,7 +213,7 @@ export const ImportInputView: React.FC<ImportInputViewProps> = ({
     } finally {
       setIsFetchingFromUrl(false);
     }
-  }, [linkUrl, linkView, processImportFiles, appMode]);
+  }, [linkUrl, linkView, processImportFiles, isLinkFeatureReady]);
 
   if ((isDataProcessing || isFetchingFromUrl) && importerType === ApiClientImporterType.SOAP) {
     return (
@@ -233,24 +225,41 @@ export const ImportInputView: React.FC<ImportInputViewProps> = ({
     );
   }
 
+  let tooltipTitle = "";
+  if (!isLinkFeatureReady) {
+    if (!isInstalled) {
+      tooltipTitle = "Please install extension to import via URL.";
+    } else {
+      tooltipTitle = "Please enable extension to import via URL.";
+    }
+  }
+
   return (
     <>
       {linkView?.enabled && (
         <div className={`link-import-section ${isLinkViewExpanded ? "expanded" : ""}`}>
           <div className="link-import-input-group">
-            <Input.TextArea
-              placeholder={linkView.placeholder}
-              value={linkUrl}
-              onChange={handleLinkInputChange}
-              disabled={isFetchingFromUrl}
-              className="link-input"
-              status={linkError ? "error" : ""}
-              onPressEnter={(e) => {
-                e.preventDefault();
-                handleFetchAndImport();
-              }}
-              autoSize={!isLinkViewExpanded ? { minRows: 1 } : false}
-            />
+            <Tooltip title={tooltipTitle} placement="top" mouseEnterDelay={0.2} color="#000000">
+              <div className="link-input-wrapper">
+                <Input.TextArea
+                  placeholder={linkView.placeholder}
+                  value={linkUrl}
+                  onChange={handleLinkInputChange}
+                  disabled={isFetchingFromUrl || !isLinkFeatureReady}
+                  className="link-input"
+                  status={linkError ? "error" : ""}
+                  onPressEnter={(e) => {
+                    e.preventDefault();
+                    if (isLinkFeatureReady) {
+                      handleFetchAndImport();
+                    }
+                  }}
+                  autoSize={!isLinkViewExpanded ? { minRows: 1 } : false}
+                />
+              </div>
+            </Tooltip>
+
+            {linkError && <ExclamationCircleFilled className="input-error-icon" />}
           </div>
           {linkError && <div className="link-import-error">{linkError}</div>}
         </div>
@@ -265,9 +274,18 @@ export const ImportInputView: React.FC<ImportInputViewProps> = ({
           )}
           <div className="link-expanded-buttons">
             <Button onClick={handleBackFromLinkView}>Back</Button>
-            <Button type="primary" loading={isFetchingFromUrl} onClick={handleFetchAndImport}>
-              Continue
-            </Button>
+            <Tooltip title={tooltipTitle} placement="top">
+              <span>
+                <Button
+                  type="primary"
+                  loading={isFetchingFromUrl}
+                  onClick={handleFetchAndImport}
+                  disabled={!isLinkFeatureReady}
+                >
+                  Continue
+                </Button>
+              </span>
+            </Tooltip>
           </div>
         </div>
       ) : (
