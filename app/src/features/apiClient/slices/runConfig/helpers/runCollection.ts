@@ -124,11 +124,11 @@ class Runner {
 
   private async parseDataFile() {
     const dataFile = this.runContext.runConfigEntity.getDataFile(this.ctx.store.getState());
-    if (!dataFile) {
+    const apiClientFilesStore = apiClientFileStore.getState();
+
+    if (!dataFile || !apiClientFilesStore.files[dataFile.id]) {
       return;
     }
-
-    const apiClientFilesStore = apiClientFileStore.getState();
 
     const { collectionId } = this.runContext.runConfigEntity.getEntityFromState(this.ctx.store.getState());
     if (!(await apiClientFilesStore.isFilePresentLocally(dataFile.id))) {
@@ -443,7 +443,9 @@ class Runner {
   async run() {
     try {
       await this.beforeStart();
+
       const iterationCount = this.runContext.runConfigEntity.getIterations(this.ctx.store.getState());
+
       const executionContext: ExecutionContext = {} as ExecutionContext; // Empty object that will be filled and shared across iterations
 
       for await (const { request, iteration, startTime } of this.iterate()) {
@@ -481,6 +483,7 @@ export async function runCollection(params: {
   executor: BatchRequestExecutor;
   runContext: RunContext;
 }) {
+  console.log("DBG:: RunContext", params.runContext);
   const runner = new Runner(params.ctx, params.executor, params.runContext);
   return runner.run();
 }
