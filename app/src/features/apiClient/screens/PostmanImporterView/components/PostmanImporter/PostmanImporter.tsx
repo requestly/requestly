@@ -215,7 +215,6 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
     [importError, apiClientRecordsRepository]
   );
 
-  // #import part -> do not touch
   const handleImportEnvironments = useCallback(async () => {
     try {
       if (isLocalFileSystem) {
@@ -289,7 +288,6 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
     }
   }, [isLocalFileSystem, processedFileData.environments, dispatch, environmentVariablesRepository]);
 
-  // #import part -> do not touch
   const handleImportCollectionsAndApis = useCallback(async () => {
     let importedCollectionsCount = 0;
     let failedCollectionsCount = 0;
@@ -371,7 +369,6 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
     return { importedCollectionsCount, importedApisCount };
   }, [processedFileData.apiRecords, onSaveRecord, apiClientRecordsRepository]);
 
-  // #import part -> do not touch
   const handleImportPostmanData = useCallback(async () => {
     return wrapWithCustomSpan(
       {
@@ -465,7 +462,6 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
     )();
   }, [handleImportEnvironments, handleImportCollectionsAndApis, onSuccess, processedFileData.environments.length]);
 
-  // #import part -> do not touch
   const handleResetImport = () => {
     setProcessingStatus("idle");
     setIsImporting(false);
