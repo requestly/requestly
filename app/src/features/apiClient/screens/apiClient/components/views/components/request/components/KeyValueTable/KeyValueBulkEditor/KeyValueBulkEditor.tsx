@@ -163,6 +163,7 @@ export const KeyValueBulkEditor: React.FC<KeyValueBulkEditorProps> = ({ data, on
         <Editor
           value={editorValue}
           language={EditorLanguage.JAVASCRIPT}
+          disableLinting={true}
           handleChange={handleEditorChange}
           onEditorReady={handleEditorReady}
           customTheme={whiteTextTheme}
