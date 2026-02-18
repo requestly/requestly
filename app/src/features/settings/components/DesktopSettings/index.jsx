@@ -25,7 +25,7 @@ export const DesktopSettings = () => {
   const [portSubmitLoading, setPortSubmitLoading] = useState(false);
   const [urlInput, setUrlInput] = useState("");
   const [urlSubmitLoading, setUrlSubmitLoading] = useState(false);
-  const isCustomUrlEnabled = useFeatureIsOn("desktop_beta_preview_url");
+  const isCustomUrlEnabled = useFeatureIsOn("allow_desktop_beta_preview_url_configuration");
 
   const closeInterceptingApps = () => {
     if (window.RQ && window.RQ && window.RQ.DESKTOP) {
