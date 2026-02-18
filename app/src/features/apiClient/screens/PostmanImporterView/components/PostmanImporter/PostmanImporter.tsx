@@ -120,14 +120,14 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
                     if (hasUnsupportedAuth) {
                       trackPostmanUnsupportedFeatures({
                         Feature: "Unsupported Auth",
-                        AuthType: unsupportedFeatures.auth.types,
+                        AuthType: Array.from(unsupportedFeatures.auth.types),
                       });
                     }
                     if (hasCollectionLevelScripts) {
                       trackPostmanUnsupportedFeatures({
                         Feature: "Collection Level Scripts",
                         HasPreRequestScript: unsupportedFeatures.collectionLevelScripts.hasPreRequest,
-                        HasPosResponseScript: unsupportedFeatures.collectionLevelScripts.hasTest,
+                        HasPostResponseScript: unsupportedFeatures.collectionLevelScripts.hasTest,
                       });
                     }
                     if (hasVaultVariables) {

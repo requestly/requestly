@@ -382,7 +382,7 @@ const detectUnsupportedAuthModes = (fileContent: any): Pick<UnsupportedFeatures,
     },
   };
 
-  // check for unsupporedAuth at all levels
+  // check for unsupportedAuth at all levels
   const checkAuth = (auth: any) => {
     // add the auth type to unsupported features array
     if (auth && auth.type && !supportedAuthTypes.has(auth.type)) {
