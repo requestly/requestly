@@ -239,7 +239,7 @@ export const RequestRow: React.FC<Props> = ({
       const { id, ...rest } = record;
 
       // Generate rank for the duplicated request to place it immediately after the original
-      const rank = apiRecordsRankingManager.getRankForDuplicatedApi(context, record, record.collectionId ?? "");
+      const rank = apiRecordsRankingManager.getRankForDuplicatedRecord(context, record, record.collectionId ?? "");
 
       const newRecord: Omit<RQAPI.ApiRecord, "id"> = {
         ...rest,
@@ -276,6 +276,7 @@ export const RequestRow: React.FC<Props> = ({
           type: RQAPI.RecordType.EXAMPLE_API,
           collectionId: null,
           parentRequestId: record.id,
+          rank: apiRecordsRankingManager.getRanksForNewApiRecords(context, record.id, [record])[0],
         };
         const { exampleRecord } = await context.store
           .dispatch(
