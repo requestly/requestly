@@ -4,14 +4,11 @@ import { getAppMode, getAuthInitialization } from "../../store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import syncingNodeListener from "./syncingNodeListener";
 import userNodeListener from "./userNodeListener";
-import { getAuth } from "firebase/auth";
-import firebaseApp from "../../firebase";
-import Logger from "lib/logger";
 import { globalActions } from "store/slices/global/slice";
 import { isArray } from "lodash";
 import { useHasChanged } from "hooks/useHasChanged";
 import { userSubscriptionDocListener } from "./userSubscriptionDocListener";
-import { getActiveWorkspaceId, getActiveWorkspacesMembers } from "store/slices/workspaces/selectors";
+import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 
 window.isFirstSyncComplete = false;
 
@@ -21,7 +18,6 @@ const DBListeners = () => {
   const appMode = useSelector(getAppMode);
   const activeWorkspaceId = useSelector(getActiveWorkspaceId);
 
-  const currentTeamMembers = useSelector(getActiveWorkspacesMembers);
   const hasAuthInitialized = useSelector(getAuthInitialization);
 
   let unsubscribeUserNodeRef = useRef(null);
@@ -84,17 +80,6 @@ const DBListeners = () => {
     user?.details?.isSyncEnabled,
     hasAuthStateChanged,
   ]);
-
-  /* Force refresh custom claims in auth token */
-  useEffect(() => {
-    setTimeout(() => {
-      getAuth(firebaseApp)
-        .currentUser?.getIdTokenResult(true)
-        ?.then((status) => {
-          Logger.log("force updated auth token");
-        });
-    }, 10000);
-  }, [user?.details?.profile?.uid, user?.loggedIn, activeWorkspaceId, currentTeamMembers, dispatch]);
 
   return null;
 };

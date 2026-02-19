@@ -18,6 +18,8 @@ import { isArray } from "lodash";
 import { workspaceActions } from "store/slices/workspaces/slice";
 import { WorkspaceType } from "features/workspaces/types";
 import { clientStorageService } from "services/clientStorageService";
+import { getAuth } from "firebase/auth";
+import firebaseApp from "../firebase";
 
 export const showSwitchWorkspaceSuccessToast = (teamName) => {
   // Show toast
@@ -113,6 +115,11 @@ export const switchWorkspace = async (
   if (!skipBroadcast) {
     window.activeWorkspaceBroadcastChannel &&
       window.activeWorkspaceBroadcastChannel.postMessage("active_workspace_changed");
+  }
+
+  if (teamId != null && newWorkspaceDetails.workspaceType === WorkspaceType.SHARED) {
+    await getAuth(firebaseApp).currentUser?.getIdTokenResult(true);
+    Logger.log("Refreshed auth token on workspace switch");
   }
 };
 
