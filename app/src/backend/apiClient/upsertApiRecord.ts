@@ -6,7 +6,6 @@ import lodash from "lodash";
 import { RQAPI } from "features/apiClient/types";
 import { captureException } from "./utils";
 import { wrapWithCustomSpan } from "utils/sentry";
-import { apiRecordsRankingManager } from "features/apiClient/helpers/RankingManager/APIRecordsListRankingManager";
 
 export function sanitizeRecord(record: Partial<RQAPI.ApiClientRecord>) {
   const sanitizedRecord = lodash.cloneDeep(record);
@@ -20,6 +19,16 @@ export function sanitizeRecord(record: Partial<RQAPI.ApiClientRecord>) {
   if (sanitizedRecord.type === RQAPI.RecordType.COLLECTION) {
     if (sanitizedRecord.data) {
       delete sanitizedRecord.data.children;
+
+      // Remove localValue from collection variables
+      if (sanitizedRecord.data.variables) {
+        sanitizedRecord.data.variables = Object.fromEntries(
+          Object.entries(sanitizedRecord.data.variables).map(([key, variable]) => {
+            const { localValue, ...rest } = variable;
+            return [key, rest];
+          })
+        );
+      }
     }
   }
 
@@ -74,7 +83,6 @@ const _createApiRecord = async (
     createdTs: Timestamp.now().toMillis(),
     updatedTs: Timestamp.now().toMillis(),
   } as RQAPI.ApiClientRecord;
-  newRecord.rank = apiRecordsRankingManager.getEffectiveRank(record);
 
   if (record.type === RQAPI.RecordType.COLLECTION) {
     newRecord.description = record.description || "";
