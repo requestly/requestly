@@ -140,6 +140,11 @@ export const workspaceViewSlice = createSlice({
         if (action.error.name === InvalidContextVersionError.name) {
           return;
         }
+        // When a switchContext is superseded by a newer setupWorkspaceView via .abort(),
+        // the old one rejects. This is expected — the newer call will complete setup.
+        if (action.meta.aborted) {
+          return;
+        }
 
         const switchErr = new Error(action.error.message as string);
         switchErr.stack = action.error.stack;
@@ -150,6 +155,11 @@ export const workspaceViewSlice = createSlice({
       })
       .addCase(setupWorkspaceView.rejected, (state, action) => {
         if (action.error.name === InvalidContextVersionError.name) {
+          return;
+        }
+        // When a setupWorkspaceView is superseded by a newer one via .abort(),
+        // the old one rejects. This is expected — the newer call will set isSetupDone.
+        if (action.meta.aborted) {
           return;
         }
 

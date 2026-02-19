@@ -16,7 +16,8 @@ import { DraftRequestContainerTabSource } from "features/apiClient/screens/apiCl
 import { CollectionViewTabSource } from "features/apiClient/screens/apiClient/components/views/components/Collection/collectionViewTabSource";
 import { EnvironmentViewTabSource } from "features/apiClient/screens/environment/components/environmentView/EnvironmentViewTabSource";
 import { RuntimeVariablesViewTabSource } from "features/apiClient/screens/environment/components/RuntimeVariables/runtimevariablesTabSource";
-import { EntityNotFound, EnvironmentEntity, getApiClientFeatureContext } from "features/apiClient/slices";
+import { EntityNotFound, EnvironmentEntity } from "features/apiClient/slices";
+import { apiClientContextRegistry } from "features/apiClient/slices/workspaceView/helpers/ApiClientContextRegistry/ApiClientContextRegistry";
 import { selectRuntimeVariablesEntity } from "features/apiClient/slices/runtimeVariables/selectors";
 import { TabState } from "./types";
 import { reduxStore } from "store";
@@ -139,13 +140,27 @@ export function getEntityDataFromTabSource(
 
 function getApiClientStoreByTabSource(source: TabState["source"]) {
   const workspaceId = source.metadata.context?.id;
-  const context = getApiClientFeatureContext(workspaceId);
-  return context.store;
+  if (workspaceId === undefined) {
+    return null;
+  }
+
+  // Use registry.getContext() directly instead of getApiClientFeatureContext() which throws.
+  // When context is null, the workspace has been torn down (clearAll or removeContext).
+  // The workspace store and all its buffers are GC'd with the context — no cleanup needed.
+  const context = apiClientContextRegistry.getContext(workspaceId);
+  return context?.store ?? null;
 }
 
 function handleOpenBufferedTab(action: ReturnType<typeof openBufferedTab>) {
   const { source, isNew = false, preview, singleton } = action.payload;
   const apiClientStore = getApiClientStoreByTabSource(source);
+
+  if (!apiClientStore) {
+    // Context doesn't exist yet or was destroyed. This can happen during workspace transitions.
+    // The tab will be re-opened once the new context is ready (via buffer hydration in createContext).
+    return;
+  }
+
   const state = apiClientStore.getState() as ApiClientStoreState;
   const entityData = getEntityDataFromTabSource(source, {
     records: state.records,
@@ -199,6 +214,12 @@ function handleOpenBufferedTab(action: ReturnType<typeof openBufferedTab>) {
 
 function closeBufferByTab(tab: TabState) {
   const apiClientStore = getApiClientStoreByTabSource(tab.source);
+
+  // Context was already destroyed — buffers are GC'd with the workspace store.
+  if (!apiClientStore) {
+    return;
+  }
+
   apiClientStore.dispatch(bufferActions.close(tab.modeConfig.entityId));
 
   tab.secondaryBufferIds.forEach((id) => {
