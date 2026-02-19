@@ -72,33 +72,28 @@ export const DesktopSettings = () => {
   const handleUrlChange = async () => {
     const trimmedUrl = urlInput.trim();
 
-    const isValidUrl = (urlString) => {
+    const isValidAndAllowedUrl = (urlString) => {
       try {
         const url = new URL(urlString);
-        return url.protocol === "http:" || url.protocol === "https:";
+        if (url.protocol !== "http:" && url.protocol !== "https:") {
+          return { valid: false, error: "Please enter a valid HTTP or HTTPS URL" };
+        }
+
+        const lowerUrl = urlString.toLowerCase();
+        const allowedKeywords = ["beta", "web.app"];
+        if (!allowedKeywords.some((keyword) => lowerUrl.includes(keyword))) {
+          return { valid: false, error: "URL must contain one of the allowed keywords" };
+        }
+
+        return { valid: true };
       } catch {
-        return false;
+        return { valid: false, error: "Please enter a valid HTTP or HTTPS URL" };
       }
     };
 
-    const containsRequiredKeywords = (urlString) => {
-      const lowerUrl = urlString.toLowerCase();
-      const allowedKeywords = ["beta", "web.app"];
-      return allowedKeywords.some((keyword) => lowerUrl.includes(keyword));
-    };
-
-    if (!trimmedUrl) {
-      toast.error("Please enter a URL");
-      return;
-    }
-
-    if (!isValidUrl(trimmedUrl)) {
-      toast.error("Please enter a valid HTTP or HTTPS URL");
-      return;
-    }
-
-    if (!containsRequiredKeywords(trimmedUrl)) {
-      toast.error("URL must contain one of the allowed keywords");
+    const validation = isValidAndAllowedUrl(trimmedUrl);
+    if (!validation.valid) {
+      toast.error(validation.error);
       return;
     }
 
