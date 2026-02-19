@@ -12,6 +12,7 @@ import {
   filterRecordsBySearch,
   getRecordIdsToBeExpanded,
   filterOutChildrenRecords,
+  sortRecords,
 } from "../../../../utils";
 import { ApiRecordEmptyState } from "./apiRecordEmptyState/ApiRecordEmptyState";
 import { SidebarPlaceholderItem } from "../SidebarPlaceholderItem/SidebarPlaceholderItem";
@@ -26,7 +27,6 @@ import { toast } from "utils/Toast";
 import { MoveToCollectionModal } from "../../../modals/MoveToCollectionModal/MoveToCollectionModal";
 import ActionMenu from "./BulkActionsMenu";
 import { useRBAC } from "features/rbac";
-import * as Sentry from "@sentry/react";
 import { ExampleCollectionsNudge } from "../ExampleCollectionsNudge/ExampleCollectionsNudge";
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
@@ -34,6 +34,8 @@ import APP_CONSTANTS from "config/constants";
 import { duplicateRecords, useAllRecords, useApiClientRepository, useChildToParent } from "features/apiClient/slices";
 import { useApiClientDispatch } from "features/apiClient/slices/hooks/base.hooks";
 import { EXPANDED_RECORD_IDS_UPDATED } from "features/apiClient/slices/exampleCollections";
+import { ErrorSeverity } from "errors/types";
+import { NativeError } from "errors/NativeError";
 
 interface Props {
   onNewClick: (src: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType) => Promise<void>;
@@ -100,33 +102,12 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
     const { updatedRecords, recordsMap } = convertFlatRecordsToNestedRecords(records);
     setShowSelection(false);
 
-    updatedRecords.sort((recordA, recordB) => {
-      // If different type, then keep collection first
-      if (recordA.type === RQAPI.RecordType.COLLECTION && recordA.isExample && !recordB.isExample) {
-        return -1;
-      }
-
-      if (recordB.type === RQAPI.RecordType.COLLECTION && recordB.isExample && !recordA.isExample) {
-        return 1;
-      }
-
-      if (recordA.type !== recordB.type) {
-        return recordA.type === RQAPI.RecordType.COLLECTION ? -1 : 1;
-      }
-
-      // If types are the same, sort lexicographically by name
-      if (recordA.name.toLowerCase() !== recordB.name.toLowerCase()) {
-        return recordA.name.toLowerCase() < recordB.name.toLowerCase() ? -1 : 1;
-      }
-
-      // If names are the same, sort by creation date
-      return recordA.createdTs - recordB.createdTs;
-    });
+    const sortedRecords = sortRecords(updatedRecords);
 
     return {
-      count: updatedRecords.length,
-      collections: updatedRecords.filter((record) => isApiCollection(record)) as RQAPI.CollectionRecord[],
-      requests: updatedRecords.filter((record) => isApiRequest(record)) as RQAPI.ApiRecord[],
+      count: sortedRecords.length,
+      collections: sortedRecords.filter((record) => isApiCollection(record)) as RQAPI.CollectionRecord[],
+      requests: sortedRecords.filter((record) => isApiRequest(record)) as RQAPI.ApiRecord[],
       recordsMap: recordsMap,
     };
   }, []);
@@ -226,10 +207,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
               description: error?.message,
               placement: "bottomRight",
             });
-            Sentry.withScope((scope) => {
-              scope.setTag("error_type", "api_client_record_duplication");
-              Sentry.captureException(error);
-            });
+            throw NativeError.fromError(error).setShowBoundary(true).setSeverity(ErrorSeverity.ERROR);
           }
 
           break;

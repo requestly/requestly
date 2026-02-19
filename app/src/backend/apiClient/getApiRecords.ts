@@ -60,6 +60,6 @@ const getApiRecordsFromFirebase = async (
     return { success: true, data: result };
   } catch (error) {
     Logger.error("Error fetching api records!", error);
-    throw error;
+    throw new Error(error.message);
   }
 };
