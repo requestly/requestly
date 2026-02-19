@@ -357,7 +357,7 @@ const createApiRecord = (
     data: {
       type: RQAPI.ApiEntryType.HTTP,
       request: {
-        url: typeof request.url === "string" ? request.url : "",
+        url: typeof request.url === "string" ? request.url : request.url?.raw ?? "",
         method: request.method || RequestMethod.GET,
         queryParams,
         headers,
