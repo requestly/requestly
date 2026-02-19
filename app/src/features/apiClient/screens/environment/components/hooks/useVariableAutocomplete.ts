@@ -1,55 +1,28 @@
 import { useState, useCallback, useMemo, useRef, RefObject } from "react";
 import { EditorView } from "@codemirror/view";
 import { Extension } from "@codemirror/state";
-import { ScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
 import { getClosingBraces } from "componentsV2/CodeEditor/components/EditorV2/plugins/generateAutoCompletions";
 
-/**
- * Represents the current state of the autocomplete popup
- */
 interface AutocompleteState {
-  show: boolean; // Whether the autocomplete dropdown is visible
-  position: { x: number; y: number }; // Screen coordinates where the popup should appear
-  filter: string; // The text typed after '{{' used to filter variable suggestions
-  from: number; // Starting position in the document where replacement should begin
-  to: number; // Ending position in the document where replacement should end
+  show: boolean;
+  position: { x: number; y: number };
+  filter: string;
+  from: number;
+  to: number;
 }
 
 /**
- * Options for configuring the variable autocomplete hook
+ * Hook to manage variable autocompletion within a CodeMirror 6 editor.
+ *
+ * Behavior Summary:
+ * - TRIGGERS: When user types '{{' or clicks into braces '{{...}}'.
+ * - FILTERS: As the user types characters after '{{'.
+ * - HIDES: When the cursor leaves the braces or when the editor loses focus.
  */
-interface UseVariableAutocompleteOptions {
-  editorViewRef?: RefObject<EditorView | null>; // Optional external editor view reference for cases where the editor is managed externally
-}
-
-/**
- * Custom React hook that provides intelligent variable autocomplete functionality for CodeMirror editors.
- *
- * Purpose:
- * - Enables IntelliSense-style suggestions when users type '{{' to reference environment variables
- * - Improves user experience by reducing errors and speeding up variable insertion
- * - Supports dynamic variables with '$' prefix
- *
- * How it works:
- * - Monitors editor input in real-time for the '{{' pattern
- * - Shows a popup with filtered variable suggestions
- * - Auto-completes selected variables with proper closing braces
- *
- * @param variables - The scoped variables available for autocomplete suggestions
- * @param options - Configuration options including optional external editor reference
- * @returns Object containing autocomplete state, handlers, and CodeMirror extension
- */
-export const useVariableAutocomplete = (variables?: ScopedVariables, options?: UseVariableAutocompleteOptions) => {
-  // Create internal ref to hold the editor view instance
-  // This is used when no external ref is provided
+export const useVariableAutocomplete = (options?: { editorViewRef?: RefObject<EditorView | null> }) => {
   const internalEditorViewRef = useRef<EditorView | null>(null);
-
-  // Use external ref if provided, otherwise use internal ref
-  // This allows flexibility for both self-managed and externally-managed editors
   const editorViewRef = options?.editorViewRef || internalEditorViewRef;
 
-  // Track the current state of the autocomplete popup
-  // Initialized with default values when the popup is hidden
   const [autocompleteState, setAutocompleteState] = useState<AutocompleteState>({
     show: false,
     position: { x: 0, y: 0 },
@@ -58,152 +31,136 @@ export const useVariableAutocomplete = (variables?: ScopedVariables, options?: U
     to: 0,
   });
 
+  // Ref to always have latest state without recreating callbacks
+  const autocompleteStateRef = useRef(autocompleteState);
+  autocompleteStateRef.current = autocompleteState;
+
   /**
-   * CodeMirror extension that monitors document changes and cursor movement.
+   * CodeMirror Extension: UpdateListener
    *
-   * Purpose:
-   * - Detects when user types the '{{' pattern to trigger autocomplete
-   * - Calculates the popup position based on cursor location
-   * - Extracts the filter text to narrow down suggestions
-   * - Automatically hides popup when pattern no longer matches
-   *
-   * Why useMemo?
-   * - Extension creation is expensive and should only happen when dependencies change
-   * - Prevents unnecessary re-renders and maintains stable reference
+   * Listens to every editor change (typing, clicking, scrolling).
+   * Wrapped in useMemo so the extension reference is stable, preventing
+   * CodeMirror from re-configuring the editor unnecessarily on every render.
    */
   const autocompleteExtension = useMemo((): Extension => {
     return EditorView.updateListener.of((update) => {
-      // Early exit if editor view is not available
-      if (!editorViewRef.current) return;
-
-      // Only process changes when document content changes or selection (cursor) moves
+      // Only re-calculate if the text changed OR the cursor (selection) moved
       if (update.docChanged || update.selectionSet) {
-        // Hide autocomplete if editor loses focus
-        // Why? User is likely interacting with something else and doesn't need suggestions
+        // If editor loses focus, hide the popup to avoid "ghost" menus
         if (!update.view.hasFocus) {
-          if (autocompleteState.show) setAutocompleteState((prev) => ({ ...prev, show: false }));
+          setAutocompleteState((prev) => (prev.show ? { ...prev, show: false } : prev));
           return;
         }
 
-        // Get the full document text and current cursor position
-        const doc = update.state.doc.toString();
-        const cursorPos = update.state.selection.main.head;
+        const state = update.state;
+        const cursorPos = state.selection.main.head;
+        const docText = state.doc.toString();
 
-        // Get all text before the cursor to search for the '{{' pattern
-        const beforeCursor = doc.slice(0, cursorPos);
+        const textBefore = docText.slice(0, cursorPos);
+        const textAfter = docText.slice(cursorPos);
 
-        // Match pattern: {{ followed by zero or more non-closing-brace characters
-        // Example matches: "{{", "{{api", "{{user.name"
-        // Does not match: "}} {{" (would only match the second {{)
-        const match = beforeCursor.match(/\{\{([^}]*)$/);
+        // Find the most recent '{{' before the cursor
+        const lastOpen = textBefore.lastIndexOf("{{");
 
-        if (match) {
-          // If the cursor is inside an already-closed variable (e.g., {{var}}),
-          // do not show autocomplete to avoid overlapping popovers.
-          const afterCursor = doc.slice(cursorPos);
-          const nextClose = afterCursor.indexOf("}}");
-          const nextOpen = afterCursor.indexOf("{{");
-          const isInsideCompletedVariable = nextClose !== -1 && (nextOpen === -1 || nextClose < nextOpen);
+        if (lastOpen !== -1) {
+          // Text between '{{' and the cursor (potential variable name)
+          const filterText = textBefore.slice(lastOpen + 2);
 
-          if (isInsideCompletedVariable) {
-            if (autocompleteState.show) setAutocompleteState((prev) => ({ ...prev, show: false }));
-            return;
+          // 1. Is it closed behind us? (e.g., {{abc}} |) -> HIDE
+          const isClosedBefore = filterText.includes("}}");
+
+          // 2. Are we touching a brace boundary? (e.g., {{abc}}| or {{abc}|} ) -> HIDE
+          const isAtTrailingBoundary = textBefore.endsWith("}");
+
+          // 3. Look ahead for a closing '}}' belonging to this expression.
+          const nextClose = textAfter.indexOf("}}");
+          const nextOpen = textAfter.indexOf("{{");
+
+          // isInsideBraces: There is a '}}' ahead, and no new '{{' starts before it.
+          const isInsideBraces = nextClose !== -1 && (nextOpen === -1 || nextClose < nextOpen);
+
+          let shouldShow = false;
+
+          if (!isClosedBefore && !isAtTrailingBoundary) {
+            if (isInsideBraces) {
+              // Braces are closed: only show autocomplete if content is empty (e.g., {{|}}).
+              // When populated (e.g., {{$random|}}), the "Variable Not Found" popover
+              // handles that case instead.
+              const wholeContent = (filterText + textAfter.slice(0, nextClose)).trim();
+              shouldShow = wholeContent === "";
+            } else {
+              // No closing braces yet — user is typing a new variable (e.g., {{api|)
+              shouldShow = true;
+            }
           }
 
-          // Pattern found - show autocomplete popup
-
-          // Get screen coordinates at cursor position for popup placement
-          const coords = update.view.coordsAtPos(cursorPos);
-          if (coords) {
-            setAutocompleteState({
-              show: true,
-              position: { x: coords.left, y: coords.bottom }, // Position below cursor
-              filter: match[1] || "", // Text after '{{' used to filter suggestions
-              from: cursorPos - (match[1]?.length || 0), // Start position (right after '{{')
-              to: cursorPos, // End position (current cursor)
-            });
+          if (shouldShow) {
+            const coords = update.view.coordsAtPos(cursorPos);
+            if (coords) {
+              setAutocompleteState({
+                show: true,
+                position: { x: coords.left, y: coords.bottom },
+                filter: filterText,
+                from: lastOpen + 2,
+                to: cursorPos,
+              });
+              return;
+            }
           }
-        } else {
-          // Pattern not found - hide autocomplete
-          setAutocompleteState((prev) => ({ ...prev, show: false }));
         }
+
+        // Default: ensure popup is hidden if none of the 'show' conditions are met.
+        setAutocompleteState((prev) => (prev.show ? { ...prev, show: false } : prev));
       }
     });
-  }, [autocompleteState.show, editorViewRef]);
+  }, []);
 
-  /**
-   * Callback invoked when the CodeMirror editor is fully initialized.
-   *
-   * Purpose:
-   * - Stores the editor view reference for later use in variable insertion
-   * - Only sets internal ref if no external ref was provided
-   *
-   * @param view - The initialized CodeMirror EditorView instance
-   */
   const handleEditorReady = useCallback(
     (view: EditorView) => {
-      if (!options?.editorViewRef) {
-        internalEditorViewRef.current = view;
-      }
+      if (!options?.editorViewRef) internalEditorViewRef.current = view;
     },
     [options?.editorViewRef]
   );
 
   /**
-   * Handles variable selection from the autocomplete popup.
-   *
-   * Purpose:
-   * - Inserts the selected variable into the editor at the correct position
-   * - Automatically adds closing '}}' braces if they're missing
-   * - Adds '$' prefix for dynamic variables
-   * - Positions cursor after the inserted text for continued editing
-   *
-   * @param variableKey - The variable name to insert (e.g., "apiKey" or "$dynamic")
-   * @param isDynamic - Whether this is a dynamic variable requiring '$' prefix
+   * Inserts a selected variable into the document.
+   * Uses a ref for state to avoid recreating the callback on every state change.
    */
   const handleSelectVariable = useCallback(
     (variableKey: string) => {
-      if (!editorViewRef.current) return;
-
       const view = editorViewRef.current;
+      if (!view) return;
 
-      // Check if closing '}}' braces are needed
-      // Why? Prevents duplicate braces if user already typed them
-      const closingChars = getClosingBraces(view, autocompleteState.to);
+      const { from, to } = autocompleteStateRef.current;
+      const closingChars = getClosingBraces(view, to);
 
-      // Replace the text between 'from' and 'to' with the selected variable
       view.dispatch({
-        changes: { from: autocompleteState.from, to: autocompleteState.to, insert: variableKey + closingChars },
-        selection: { anchor: autocompleteState.from + variableKey.length + closingChars.length },
+        changes: {
+          from,
+          to,
+          insert: variableKey + closingChars,
+        },
+        selection: {
+          anchor: from + variableKey.length + closingChars.length,
+        },
       });
 
-      // Hide the autocomplete popup
       setAutocompleteState((prev) => ({ ...prev, show: false }));
-
-      // Return focus to the editor for continued typing
       view.focus();
     },
-    [autocompleteState.from, autocompleteState.to, editorViewRef]
+    [editorViewRef]
   );
 
-  /**
-   * Manually closes the autocomplete popup.
-   *
-   * Purpose:
-   * - Allows external components to hide the popup (e.g., on Escape key, click outside)
-   * - Provides explicit control over popup visibility
-   */
   const handleCloseAutocomplete = useCallback(() => {
     setAutocompleteState((prev) => ({ ...prev, show: false }));
   }, []);
 
-  // Return all necessary values and handlers for the consuming component
   return {
-    autocompleteState, // Current state of the autocomplete popup
-    autocompleteExtension, // CodeMirror extension to monitor editor changes
-    handleEditorReady, // Callback to initialize editor reference
-    handleSelectVariable, // Handler for variable selection
-    handleCloseAutocomplete, // Handler to close popup
-    editorViewRef: internalEditorViewRef, // Editor view reference (for external access if needed)
+    autocompleteState,
+    autocompleteExtension,
+    handleEditorReady,
+    handleSelectVariable,
+    handleCloseAutocomplete,
+    editorViewRef: internalEditorViewRef,
   };
 };
