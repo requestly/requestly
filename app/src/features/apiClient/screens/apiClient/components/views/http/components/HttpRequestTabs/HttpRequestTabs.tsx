@@ -49,6 +49,7 @@ const HttpRequestTabs: React.FC<Props> = ({
   const headersLength = useApiClientSelector((s) => sanitizeKeyValuePairs(entity.getHeaders(s)).length);
   const auth = useApiClientSelector((s) => entity.getAuth(s));
   const isRootLevelRecord = useApiClientSelector((s) => !!entity.getCollectionId(s));
+  const entityType = useApiClientSelector((s) => entity.getType(s));
 
   const requestEntry = useApiClientSelector((s) => entity.getEntityFromState(s).data);
 
@@ -79,46 +80,51 @@ const HttpRequestTabs: React.FC<Props> = ({
         label: <RequestTabLabel label="Headers" count={headersLength} />,
         children: <HeadersTable entity={entity} />,
       },
-      {
-        key: RequestTab.AUTHORIZATION,
-        label: <RequestTabLabel label="Authorization" />,
-        children: (
-          <AuthorizationView
-            recordId={entity.meta.referenceId}
-            defaults={auth}
-            onAuthUpdate={handleAuthChange}
-            isRootLevelRecord={isRootLevelRecord}
-          />
-        ),
-      },
-      {
-        key: RequestTab.SCRIPTS,
-        label: (
-          <RequestTabLabel
-            label="Scripts"
-            dotIndicator={hasScriptError ? "error" : "success"}
-            showDot={true}
-            count={requestEntry.scripts?.postResponse?.length || requestEntry.scripts?.preRequest?.length}
-          />
-        ),
-        children: (
-          <ScriptEditor
-            key={`${scriptEditorVersion}`}
-            requestId={entity.meta.referenceId}
-            entry={requestEntry}
-            onScriptsChange={(scripts) => {
-              if (!scripts) {
-                return;
-              }
-              entity.setScripts(scripts);
-            }}
-            aiTestsExcutionCallback={(testResults) => entity.setTestResults(testResults)}
-            focusPostResponse={focusPostResponseScriptEditor ?? false}
-          />
-        ),
-      },
+      ...(entityType === RQAPI.RecordType.API
+        ? [
+            {
+              key: RequestTab.AUTHORIZATION,
+              label: <RequestTabLabel label="Authorization" />,
+              children: (
+                <AuthorizationView
+                  recordId={entity.meta.referenceId}
+                  defaults={auth}
+                  onAuthUpdate={handleAuthChange}
+                  isRootLevelRecord={isRootLevelRecord}
+                />
+              ),
+            },
+            {
+              key: RequestTab.SCRIPTS,
+              label: (
+                <RequestTabLabel
+                  label="Scripts"
+                  dotIndicator={hasScriptError ? "error" : "success"}
+                  showDot={true}
+                  count={requestEntry.scripts?.postResponse?.length || requestEntry.scripts?.preRequest?.length}
+                />
+              ),
+              children: (
+                <ScriptEditor
+                  key={`${scriptEditorVersion}`}
+                  requestId={entity.meta.referenceId}
+                  entry={requestEntry}
+                  onScriptsChange={(scripts) => {
+                    if (!scripts) {
+                      return;
+                    }
+                    entity.setScripts(scripts);
+                  }}
+                  aiTestsExcutionCallback={(testResults) => entity.setTestResults(testResults)}
+                  focusPostResponse={focusPostResponseScriptEditor ?? false}
+                />
+              ),
+            },
+          ]
+        : []),
     ];
   }, [
+    entityType,
     queryParams.length,
     pathVariables?.length,
     entity,
