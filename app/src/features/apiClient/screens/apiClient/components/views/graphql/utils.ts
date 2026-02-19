@@ -81,6 +81,9 @@ export const graphQLRequestToHttpRequestAdapter = (request: RQAPI.GraphQLRequest
 };
 
 export const httpRequestToGraphQLRequestAdapter = (request: RQAPI.HttpRequest): RQAPI.GraphQLRequest => {
+  // default setting to Post
+  // adapter to convert graphQL to http request
+
   if (isEmpty(request)) {
     throw new Error("HTTP request cannot be empty");
   }
