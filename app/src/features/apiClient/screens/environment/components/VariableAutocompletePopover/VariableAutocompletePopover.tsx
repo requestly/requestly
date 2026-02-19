@@ -184,7 +184,7 @@ export const VariableAutocompletePopover: React.FC<VariableAutocompleteProps> = 
 
     return (
       <Popover
-        open={show}
+        open={show && filteredVariables.length > 0}
         destroyTooltipOnHide
         trigger={[]}
         placement="bottomLeft"

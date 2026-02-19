@@ -29,7 +29,7 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
     autocompleteExtension,
     handleSelectVariable,
     handleCloseAutocomplete,
-  } = useVariableAutocomplete(variables, { editorViewRef });
+  } = useVariableAutocomplete({ editorViewRef });
 
   /*
   onKeyDown, onBlur and onChange is in the useEffect dependencies (implicitly through the editor setup),

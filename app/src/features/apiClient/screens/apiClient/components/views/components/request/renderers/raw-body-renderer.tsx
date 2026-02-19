@@ -26,7 +26,7 @@ export function RawBody(props: {
     handleEditorReady,
     handleSelectVariable,
     handleCloseAutocomplete,
-  } = useVariableAutocomplete(scopedVariables);
+  } = useVariableAutocomplete();
 
   const handleTextChange = useDebounce(
     useCallback(
