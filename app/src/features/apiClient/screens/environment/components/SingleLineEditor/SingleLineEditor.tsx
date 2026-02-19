@@ -4,7 +4,6 @@ import { EditorState } from "@codemirror/state";
 import { history, historyKeymap } from "@codemirror/commands";
 import { VariablePopover } from "componentsV2/CodeEditor/components/EditorV2/components/VariablePopOver";
 import "componentsV2/CodeEditor/components/EditorV2/components/VariablePopOver/variable-popover.scss";
-import * as Sentry from "@sentry/react";
 import "./singleLineEditor.scss";
 import { SingleLineEditorProps } from "./types";
 import { Conditional } from "components/common/Conditional";
@@ -30,7 +29,7 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
     autocompleteExtension,
     handleSelectVariable,
     handleCloseAutocomplete,
-  } = useVariableAutocomplete(variables, { editorViewRef });
+  } = useVariableAutocomplete({ editorViewRef });
 
   /*
   onKeyDown, onBlur and onChange is in the useEffect dependencies (implicitly through the editor setup),
@@ -214,6 +213,7 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
         search={autocompleteState.filter}
         variables={variables}
         onSelect={handleSelectVariable}
+        onClose={handleCloseAutocomplete}
       />
     </>
   );
