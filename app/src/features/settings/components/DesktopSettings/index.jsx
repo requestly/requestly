@@ -19,6 +19,7 @@ import { trackSettingsToggled } from "modules/analytics/events/misc/settings";
 import { RQButton } from "lib/design-system/components";
 import "./DesktopSettings.css";
 import LocalLogFile from "./LocalLogFile";
+import { Conditional } from "components/common/Conditional";
 
 export const DesktopSettings = () => {
   const appMode = useSelector(getAppMode);
@@ -175,7 +176,7 @@ export const DesktopSettings = () => {
           )}
         </div>
 
-        {isCustomUrlEnabled && (
+        {isFeatureCompatible(FEATURES.DESKTOP_BETA_PREVIEW_URL_CONFIGURATION) && Conditional(isCustomUrlEnabled) && (
           <div className="preview-url-container">
             <Row align="middle" className="w-full mt-16 setting-item">
               <Col span={24}>
