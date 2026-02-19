@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo, useState } from "react";
 import { RQAPI } from "../../../../../../types";
-import { Popover, Space } from "antd";
+import { Popover, Space, Tooltip } from "antd";
 import PropertyRow from "./PropertyRow/PropertyRow";
 import { statusCodes } from "config/constants/sub/statusCode";
 import NetworkStatusField from "components/misc/NetworkStatusField";
@@ -108,15 +108,17 @@ const StatusLine: React.FC<Props> = ({ response, entity }) => {
       <PropertyRow className="api-response-status-row__time" name="Time" value={formattedTime} />
       {entityType === RQAPI.RecordType.API && !isLocalSyncEnabled && (
         <div className="api-response-status-row__save-button-wapper">
-          <RQButton
-            size="small"
-            type="transparent"
-            icon={<MdOutlineDashboardCustomize />}
-            onClick={handleSaveResponseClick}
-            loading={isSavingAsExample}
-          >
-            Save
-          </RQButton>
+          <Tooltip title="Save the current request and response as an example." placement="bottom" color="#000">
+            <RQButton
+              size="small"
+              type="transparent"
+              icon={<MdOutlineDashboardCustomize />}
+              onClick={handleSaveResponseClick}
+              loading={isSavingAsExample}
+            >
+              Save
+            </RQButton>
+          </Tooltip>
         </div>
       )}
     </Space>

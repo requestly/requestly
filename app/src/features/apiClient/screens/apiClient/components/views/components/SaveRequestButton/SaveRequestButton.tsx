@@ -20,6 +20,7 @@ import { ExampleViewTabSource } from "../ExampleRequestView/exampleViewTabSource
 import { toast } from "utils/Toast";
 import "./saveRequestButton.scss";
 import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
+import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
 
 interface Props {
   hidden?: boolean;
@@ -118,7 +119,19 @@ export const SaveRequestButton: React.FC<Props> = ({
       {
         key: "save_as_example",
         icon: <MdOutlineDashboardCustomize />,
-        label: "Save as example",
+        label: (
+          <div className="save-as-example-label">
+            Save as example{" "}
+            <Tooltip
+              showArrow={false}
+              title="Save the current request as an example."
+              color="#000"
+              placement="bottomLeft"
+            >
+              <MdInfoOutline />
+            </Tooltip>
+          </div>
+        ),
         disabled: !isValidPermission,
         onClick: handleSaveAsExample,
       },

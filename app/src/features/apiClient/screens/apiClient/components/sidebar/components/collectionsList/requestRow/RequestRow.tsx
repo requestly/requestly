@@ -599,6 +599,7 @@ export const RequestRow: React.FC<Props> = ({
                 checked={selectedRecords.has(record.id)}
               />
             )}
+            <div style={{ width: 8 }} />
             <RequestIcon record={record} />
             <Typography.Text
               ellipsis={{
