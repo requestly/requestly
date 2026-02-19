@@ -46,6 +46,8 @@ import { Workspace } from "features/workspaces/types";
 import { EnvironmentVariables } from "backend/environment/types";
 import { SiOpenapiinitiative } from "@react-icons/all-files/si/SiOpenapiinitiative";
 import { ExportType } from "features/apiClient/helpers/exporters/types";
+import { NativeError } from "errors/NativeError";
+import { ErrorSeverity } from "errors/types";
 
 interface Props {
   record: RQAPI.CollectionRecord;
@@ -318,9 +320,10 @@ export const CollectionRow: React.FC<Props> = ({
       } catch (error) {
         notification.error({
           message: "Error moving item",
-          description: error?.message || "Failed to move item. Please try again.",
+          description: error?.message || (typeof error === "string" ? error : "Failed to move item. Please try again."),
           placement: "bottomRight",
         });
+        throw NativeError.fromError(error).setShowBoundary(true).setSeverity(ErrorSeverity.ERROR);
       } finally {
         setIsCollectionRowLoading(false);
       }
