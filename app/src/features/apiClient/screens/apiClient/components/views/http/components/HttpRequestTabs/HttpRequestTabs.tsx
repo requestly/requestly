@@ -18,6 +18,7 @@ import { QueryParamsTable } from "../../../components/request/components/QueryPa
 import RequestBody from "../../../components/request/RequestBody";
 import { ScriptEditor } from "../../../components/Scripts/components/ScriptEditor/ScriptEditor";
 import { PathVariableTable } from "../PathVariableTable";
+import GetRequestBodyRedirectScreen from "../../../../clientView/components/GetRequestBodyRedirectScreen";
 
 export enum RequestTab {
   QUERY_PARAMS = "query_params",
@@ -57,6 +58,7 @@ const HttpRequestTabs: React.FC<Props> = ({
 
   const isRequestBodySupported =
     method !== RequestMethod.HEAD && (method !== RequestMethod.GET || supportsGetRequestBody(appMode));
+  const isGetRequestInNonDesktopMode = method === RequestMethod.GET && !supportsGetRequestBody(appMode);
   const hasScriptError = error?.type === RQAPI.ApiClientErrorType.SCRIPT;
 
   const items = useMemo(() => {
@@ -75,8 +77,8 @@ const HttpRequestTabs: React.FC<Props> = ({
       {
         key: RequestTab.BODY,
         label: <RequestTabLabel label="Body" count={bodyLength ? 1 : 0} showDot={isRequestBodySupported} />,
-        children: <RequestBody entity={entity} />,
-        disabled: !isRequestBodySupported,
+        children: isGetRequestInNonDesktopMode ? <GetRequestBodyRedirectScreen /> : <RequestBody entity={entity} />,
+        disabled: method === RequestMethod.HEAD,
       },
       {
         key: RequestTab.HEADERS,
@@ -128,6 +130,7 @@ const HttpRequestTabs: React.FC<Props> = ({
     entity,
     bodyLength,
     isRequestBodySupported,
+    isGetRequestInNonDesktopMode,
     headersLength,
     auth,
     handleAuthChange,
