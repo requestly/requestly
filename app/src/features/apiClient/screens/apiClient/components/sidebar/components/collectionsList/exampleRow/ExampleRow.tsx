@@ -268,6 +268,7 @@ export const ExampleRow: React.FC<Props> = ({ record, isReadOnly, handleRecordsT
           });
         }}
       >
+        <div style={{ width: 8 }} />
         <MdOutlineDashboardCustomize className="example-row-icon" />
         <Typography.Text
           ellipsis={{
