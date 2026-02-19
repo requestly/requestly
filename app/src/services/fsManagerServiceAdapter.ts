@@ -187,7 +187,7 @@ class FsManagerServiceAdapterProvider {
   async get(rootPath: string): Promise<FsManagerServiceAdapter> {
     let lock = this.lockMap.get(rootPath);
     if (!lock) {
-      lock = withTimeout(new Mutex(), 10 * 1000);
+      lock = withTimeout(new Mutex(), 30 * 1000);
       this.lockMap.set(rootPath, lock);
     }
     await lock.acquire();
@@ -220,13 +220,39 @@ class FsManagerServiceAdapterProvider {
 }
 
 export const fsManagerServiceAdapterProvider = new FsManagerServiceAdapterProvider();
+
+/**
+ * Builds the file system manager for a workspace.
+ *
+ * DEBUG RESOLUTION: RPC timeout and retry caused duplicate build() calls
+ *
+ * THE ISSUE:
+ * When adding workspaces in multiview, build() RPC had 1s timeout with retries enabled.
+ * For some workspaces, build takes > 1s on desktop side, causing:
+ * 1. Web app: build() RPC sent to desktop
+ * 2. Desktop: first build arrives, exposes channels over rpc (takes some time, response not yet sent)
+ * 3. Web app: 1s timeout hits, considers build failed, triggers RETRY
+ * 4. Desktop: retry arrives, again exposes channels over rpc
+ * 5. Subsequent operations (updateRecord, createRecord) talks to file system.
+ * 6. File conflicts: one succeeds, other fails with ENOENT
+ * 7. User sees "File not found" errors when saving/updating API records
+ *
+ * DEBUG PROCESS:
+ * Console logs showed duplicate RPC calls for same workspace:
+ *   RPC {method: 'build', args: ['/Users/srbh/Documents/uio']}
+ *   RPC {method: 'build', args: ['/Users/srbh/Documents/uio']} // DUPLICATE!
+ * Traced through IPC layer to find timeout was too aggressive for build operation.
+ *
+ * FIX:
+ * - timeout: 20s → Some workspaces need time to build ie to expose channels over rpc (previous 1s was too aggressive)
+ */
 export function buildFsManager(rootPath: string) {
   return rpcWithRetry(
     {
       namespace: LOCAL_SYNC_BUILDER_NAMESPACE,
       method: "build",
       retryCount: 10,
-      timeout: 1000 * 30,
+      timeout: 1000 * 20,
     },
     rootPath
   ) as Promise<void>;
