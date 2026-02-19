@@ -13,6 +13,7 @@ import { createExampleRequest, useApiClientFeatureContext } from "features/apiCl
 import { useTabActions } from "componentsV2/Tabs/slice";
 import { ExampleViewTabSource } from "../ExampleRequestView/exampleViewTabSource";
 import { toast } from "utils/Toast";
+import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
 
 interface Props {
   response: RQAPI.Response;
@@ -22,6 +23,8 @@ interface Props {
 const StatusLine: React.FC<Props> = ({ response, entity }) => {
   const context = useApiClientFeatureContext();
   const { openBufferedTab } = useTabActions();
+
+  const isLocalSyncEnabled = useCheckLocalSyncSupport();
 
   const [isSavingAsExample, setIsSavingAsExample] = useState(false);
 
@@ -103,7 +106,7 @@ const StatusLine: React.FC<Props> = ({ response, entity }) => {
         value={<NetworkStatusField status={response.status} />}
       />
       <PropertyRow className="api-response-status-row__time" name="Time" value={formattedTime} />
-      {entityType === RQAPI.RecordType.API && (
+      {entityType === RQAPI.RecordType.API && !isLocalSyncEnabled && (
         <div className="api-response-status-row__save-button-wapper">
           <RQButton
             size="small"

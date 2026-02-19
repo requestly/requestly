@@ -19,6 +19,7 @@ import { useTabActions } from "componentsV2/Tabs/slice";
 import { ExampleViewTabSource } from "../ExampleRequestView/exampleViewTabSource";
 import { toast } from "utils/Toast";
 import "./saveRequestButton.scss";
+import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
 
 interface Props {
   hidden?: boolean;
@@ -47,6 +48,8 @@ export const SaveRequestButton: React.FC<Props> = ({
   const { isValidPermission } = validatePermission("api_client_request", "create");
   const context = useApiClientFeatureContext();
   const { openBufferedTab } = useTabActions();
+
+  const isLocalSyncEnabled = useCheckLocalSyncSupport();
 
   const [isSavingAsExample, setIsSavingAsExample] = useState(false);
 
@@ -120,6 +123,21 @@ export const SaveRequestButton: React.FC<Props> = ({
     ],
     [handleSaveAsExample, isValidPermission]
   );
+
+  if (isLocalSyncEnabled) {
+    return (
+      <RQButton
+        onClick={onClick}
+        disabled={disabled || !isValidPermission}
+        hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SAVE_REQUEST!.hotKey}
+        loading={loading}
+        className="api-client-save-request-button"
+        enableHotKey={enableHotkey}
+      >
+        Save
+      </RQButton>
+    );
+  }
 
   return (
     <Conditional condition={!hidden}>
