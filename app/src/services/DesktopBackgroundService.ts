@@ -1,6 +1,6 @@
 const IPC_TIMEOUT = 15000;
 
-class TimoutError extends Error {
+class TimeoutError extends Error {
   constructor(method: string) {
     super(
       `IPC Timeout: no response for [${method}] RPC call. Please make sure method is implemented correctly in Background process`
@@ -17,20 +17,26 @@ export function rpc(
   ...args: any[]
 ) {
   const { namespace, method, timeout } = params;
+
   return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      reject(new TimoutError(method));
+    const timeoutId = setTimeout(() => {
+      reject(new TimeoutError(method));
     }, timeout || IPC_TIMEOUT);
 
     window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG(`${namespace}-${method}`, args)
       .then((res: any) => {
+        clearTimeout(timeoutId);
+
         if (res.success) {
           resolve(res.data);
         } else {
           reject(res.data);
         }
       })
-      .catch(reject);
+      .catch((err) => {
+        clearTimeout(timeoutId);
+        reject(err);
+      });
   });
 }
 
@@ -43,11 +49,12 @@ export async function rpcWithRetry(
   },
   ...args: any[]
 ) {
-  let retries = params.retryCount;
+  const maxRetries = params.retryCount;
+  let retries = maxRetries;
+
   while (retries >= 0) {
-    // console.log(`attempt`, { ...params, retries, args, timestamp: Date.now() });
     try {
-      return await rpc(
+      const result = await rpc(
         {
           namespace: params.namespace,
           method: params.method,
@@ -55,21 +62,30 @@ export async function rpcWithRetry(
         },
         ...args
       );
-    } catch (err) {
-      // console.log(`attempt error`, { ...params, retries, err, args, timestamp: Date.now() });
-      if (err instanceof TimoutError) {
+
+      return result;
+    } catch (err: any) {
+      const isHandlerNotReady = err?.message?.includes("No handler registered");
+
+      if (err instanceof TimeoutError || isHandlerNotReady) {
         retries--;
 
         if (retries < 0) {
           throw err;
         }
 
+        if (isHandlerNotReady) {
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+        }
         continue;
       }
-      console.log("weird error", retries, err);
+
       throw err;
     }
   }
+
+  // Unreachable in practice, but satisfies TypeScript return type analysis
+  throw new Error(`rpcWithRetry: exhausted all attempts for ${params.namespace}-${params.method}`);
 }
 
 /* Expects the service to be present in Desktop background process */
