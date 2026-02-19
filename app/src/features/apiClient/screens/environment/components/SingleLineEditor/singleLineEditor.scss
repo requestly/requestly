@@ -1,21 +1,141 @@
-.popup-option {
-  background-color: var(--requestly-color-surface-0);
-  color: var(--requestly-color-text-default);
-  padding: 0;
-  font-size: var(--requestly-font-size-xs);
-  line-height: var(--requestly-font-line-height-xs);
-  box-shadow: 0px 16px 24px -4px rgba(0, 0, 0, 0.32);
-  z-index: 10;
-}
+.editor-popup-container {
+  .popup-option {
+    background-color: var(--requestly-color-surface-0);
+    color: var(--requestly-color-text-default);
+    padding: 0;
+    font-size: var(--requestly-font-size-sm);
+    line-height: var(--requestly-font-line-height-sm);
+    box-shadow: 0 16px 24px -4px rgba(0, 0, 0, 0.32);
+    z-index: 10;
+  }
 
-// Adding redundant higlighting class here since base CSS file does not exist for editors
-// TODO: move such styles to a common base stylesheet
-.highlight-defined-variable {
-  color: var(--requestly-color-primary-text);
-  cursor: pointer;
-}
+  .cm-autocomplete-custom {
+    background: var(--requestly-color-surface-0);
+    border: 1px solid var(--requestly-color-white-t-10);
+    border-radius: 8px;
+    box-shadow: 0 6px 16px 0 rgb(0 0 0 / 0.32), 0 3px 6px -4px rgb(0 0 0 / 0.48);
+    padding: 8px;
+    max-height: 256px;
+    width: 280px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    font-family: var(--requestly-font-family-default);
+    z-index: 1050;
+    transform: translate(-8px, 6px);
 
-.highlight-undefined-variable {
-  color: var(--requestly-color-error-text);
-  cursor: pointer;
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+      margin: 8px 0;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: var(--requestly-color-black);
+      border-radius: 4px;
+      border: 2px solid transparent;
+      background-clip: padding-box;
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+      background: var(--requestly-color-background);
+      border: 2px solid transparent;
+      background-clip: padding-box;
+    }
+
+    ul {
+      margin: 0;
+      padding: 0 8px 0 0 !important;
+      list-style: none;
+    }
+
+    li {
+      padding: 0 0 0 8px !important;
+      margin: 2px 0 0;
+    }
+  }
+
+  .cm-autocomplete-option-custom {
+    padding: 5px 12px;
+    font-size: var(--requestly-font-size-sm);
+    line-height: var(--requestly-font-line-height-sm);
+    font-family: var(--requestly-font-family-default);
+    color: var(--requestly-color-text-default);
+    cursor: pointer;
+    border-radius: 4px;
+    margin: 0;
+    transition: all 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
+    display: flex;
+    align-items: center;
+    min-height: 32px;
+    position: relative;
+    font-weight: 400;
+
+    &[aria-selected="true"] {
+      background: var(--requestly-color-white-t-10) !important;
+      color: var(--requestly-color-text-default) !important;
+    }
+
+    &:hover {
+      background: var(--requestly-color-white-t-10);
+      color: var(--requestly-color-text-default);
+    }
+
+    .cm-completionIcon {
+      display: none;
+    }
+
+    .cm-completionLabel {
+      flex: 0 0 auto;
+      font-weight: 400;
+      font-family: var(--requestly-font-family-default);
+      margin-right: 8px;
+      white-space: nowrap;
+    }
+
+    .cm-completionDetail {
+      font-size: 12px;
+      font-family: var(--requestly-font-family-default);
+      color: var(--requestly-color-text-subtle);
+      margin-left: auto;
+      padding-right: 8px;
+      max-width: 60%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      text-align: right;
+    }
+
+    &:active {
+      background: var(--requestly-color-white-t-20);
+    }
+  }
+
+  .cm-completionMatchedText {
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .cm-completionInfo {
+    background: var(--requestly-color-surface-0);
+    border: 1px solid var(--requestly-color-white-t-10);
+    border-radius: 8px;
+    padding: 12px;
+    margin-left: 4px;
+    box-shadow: 0 6px 16px 0 rgba(0, 0, 0, 0.32);
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  .highlight-defined-variable {
+    color: var(--requestly-color-primary-text);
+    cursor: pointer;
+  }
+
+  .highlight-undefined-variable {
+    color: var(--requestly-color-error-text);
+    cursor: pointer;
+  }
 }
