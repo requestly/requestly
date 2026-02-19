@@ -33,6 +33,7 @@ const getApiRecordExamples = async (
     });
     return { success: true, data: result };
   } catch (error) {
+    Logger.error("Error fetching examples for API record:", error);
     return { success: false, data: [] };
   }
 };
