@@ -30,13 +30,6 @@
       flex-direction: column;
     }
 
-    .ant-collapse-content-box {
-      & > .request-row,
-      & > .example-row {
-        padding-left: 13px !important;
-      }
-    }
-
     .ant-collapse-expand-icon {
       display: flex;
       align-items: center;
