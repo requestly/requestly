@@ -2,12 +2,17 @@ import React, { useRef, useEffect, useState, useCallback, useMemo } from "react"
 import { EditorView, placeholder as cmPlaceHolder, keymap } from "@codemirror/view";
 import { EditorState } from "@codemirror/state";
 import { history, historyKeymap } from "@codemirror/commands";
+import { startCompletion } from "@codemirror/autocomplete"; // New Import
 import { VariablePopover } from "componentsV2/CodeEditor/components/EditorV2/components/VariablePopOver";
 import "componentsV2/CodeEditor/components/EditorV2/components/VariablePopOver/variable-popover.scss";
 import "./singleLineEditor.scss";
 import { SingleLineEditorProps } from "./types";
 import { Conditional } from "components/common/Conditional";
-import { customKeyBinding, highlightVariablesPlugin } from "componentsV2/CodeEditor/components/EditorV2/plugins";
+import {
+  customKeyBinding,
+  generateCompletionsForVariables,
+  highlightVariablesPlugin,
+} from "componentsV2/CodeEditor/components/EditorV2/plugins";
 import { VariableAutocompletePopover } from "../VariableAutocompletePopover/VariableAutocompletePopover";
 import { useVariableAutocomplete } from "../hooks/useVariableAutocomplete";
 
@@ -20,6 +25,7 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
   onBlur,
   onPaste,
   variables,
+  suggestions,
 }) => {
   const editorRef = useRef<HTMLDivElement>(null);
   const editorViewRef = useRef<EditorView | null>(null);
@@ -91,7 +97,7 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
     editorViewRef.current = new EditorView({
       parent: editorRef.current,
       state: EditorState.create({
-        doc: typeof defaultValue === "string" ? defaultValue : "", // hack to scope down the crash
+        doc: typeof defaultValue === "string" ? defaultValue : "",
         extensions: [
           history(),
           keymap.of(historyKeymap),
@@ -109,6 +115,13 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
             blur: (_, view) => {
               onBlurRef.current?.(view.state.doc.toString());
               handleCloseAutocomplete();
+            },
+            // Added Focus logic from New Code
+            focus: (_, view) => {
+              if (suggestions?.length) {
+                // Timeout ensures the editor is fully focused before opening menu
+                setTimeout(() => startCompletion(view), 0);
+              }
             },
             keypress: (event, view) => {
               if (event.key === "Enter") {
@@ -145,6 +158,7 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
             },
             variables || emptyVariables
           ),
+          generateCompletionsForVariables(emptyVariables, suggestions),
           cmPlaceHolder(placeholder ?? "Input here"),
         ].filter((ext): ext is NonNullable<typeof ext> => ext !== null),
       }),
@@ -157,7 +171,7 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
     //Need to disable to implement the onChange handler
     // Shouldn't be recreated every render
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [placeholder, variables, handleSetVariable]);
+  }, [placeholder, variables, handleSetVariable, suggestions]);
 
   useEffect(() => {
     if (defaultValue !== previousDefaultValueRef.current) {

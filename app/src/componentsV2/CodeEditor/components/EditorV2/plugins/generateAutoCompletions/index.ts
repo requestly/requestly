@@ -8,34 +8,6 @@ import {
 import { EditorView } from "@codemirror/view";
 import { ScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
 
-/**
- * Creates a custom completion source that returns a set of suggestions
- * when the typed text matches a specified pattern.
- *
- * @param matchPattern A regular expression to identify when completions should appear.
- * @param completions An array of Completion items to display as suggestions.
- * @param lengthOfStartingChars Number of initial characters that remain untouched by the completion.
- * @returns A CompletionSource that provides suggestions whenever the text matches matchPattern.
- */
-export function generateCompletionSource(
-  matchPattern: RegExp,
-  completions: Completion[],
-  lengthOfStartingChars: number
-): CompletionSource {
-  return (context) => {
-    const match = context.matchBefore(matchPattern);
-    if (match) {
-      return {
-        from: match.from + lengthOfStartingChars,
-        to: match.to,
-        options: completions,
-        filter: true,
-      } as CompletionResult;
-    }
-  };
-}
-
-// Helper to calculate closing braces - exported for reuse
 export function getClosingBraces(view: EditorView, to: number): string {
   const LOOK_AHEAD_BUFFER = 10;
   const lookahead = view.state.doc.sliceString(to, to + LOOK_AHEAD_BUFFER);
@@ -43,50 +15,100 @@ export function getClosingBraces(view: EditorView, to: number): string {
   return nextChars.startsWith("}}") ? "" : nextChars.startsWith("}") ? "}" : "}}";
 }
 
-// Helper to apply variable completion - exported for reuse
 export function applyVariableCompletion(view: EditorView, variableLabel: string, from: number, to: number): void {
   const closingChars = getClosingBraces(view, to);
   const finalCompletion = variableLabel + closingChars;
   view.dispatch(insertCompletionText(view.state, finalCompletion, from, to));
 }
 
-// Variable pattern constant - exported for reuse
-export const VARIABLE_COMPLETION_PATTERN = /\{\{.*?/g;
-export const VARIABLE_PATTERN_OFFSET = 2; // Number of chars to skip from start ({{)
-
-// VARIABLE COMPLETIONS
 function varCompletionSource(envVariables: ScopedVariables): CompletionSource {
   const varCompletions = Object.keys(envVariables).map((key) => {
-    const envId = key;
     const value = envVariables[key]!;
     const [variable] = value;
+
+    const displayValue =
+      variable.type === "secret"
+        ? "\u0000a5".repeat(String(variable.localValue ?? variable.syncValue).length)
+        : ((variable.localValue ?? variable.syncValue) as string);
+
     return {
-      label: envId.toString(),
-      detail:
-        variable.type === "secret"
-          ? "•".repeat(String(variable.localValue ?? variable.syncValue).length)
-          : ((variable.localValue ?? variable.syncValue) as string),
+      label: key,
+      detail: displayValue,
       type: variable.localValue ? "local variable" : "sync variable",
+      info: `${key}: ${displayValue}`,
       apply: (view: EditorView, completion: Completion, from: number, to: number): void => {
         applyVariableCompletion(view, completion.label, from, to);
       },
     };
   });
-  return generateCompletionSource(VARIABLE_COMPLETION_PATTERN, varCompletions, VARIABLE_PATTERN_OFFSET);
+
+  return (context) => {
+    const match = context.matchBefore(/\{\{.*?/);
+    if (!match) return null;
+
+    return {
+      from: match.from + 2, // Offset for '{{'
+      to: match.to,
+      options: varCompletions,
+      filter: true,
+    } as CompletionResult;
+  };
 }
 
-/* CORE PLUGIN */
-export default function generateCompletionsForVariables(envVariables?: ScopedVariables) {
-  const customCompletions = [];
+/**
+ * CORE PLUGIN EXPORT
+ */
+export default function generateCompletionsForVariables(
+  envVariables?: ScopedVariables,
+  suggestions?: Array<{ value: string }>
+) {
+  const customCompletions: CompletionSource[] = [];
+
+  // 1. Static Suggestions (e.g. Header keys)
+  if (suggestions && suggestions.length > 0) {
+    const suggestionsCompletions = suggestions.map((s) => ({
+      label: s.value,
+      info: s.value,
+    }));
+
+    const suggestionsSource: CompletionSource = (context) => {
+      const before = context.matchBefore(/.*/);
+      const text = before ? before.text : "";
+
+      // If user starts typing a variable, hide the static suggestions
+      if (text.includes("{{")) return null;
+
+      return {
+        from: before ? before.from : context.pos,
+        options: suggestionsCompletions,
+      };
+    };
+    customCompletions.push(suggestionsSource);
+  }
+
+  // 2. Variable Suggestions
   if (envVariables) {
     customCompletions.push(varCompletionSource(envVariables));
   }
 
   if (!customCompletions.length) return null;
   return autocompletion({
-    activateOnTyping: true,
     override: customCompletions,
-    tooltipClass: () => "popup-tooltip",
-    optionClass: () => "popup-option",
+    tooltipClass: () => "cm-autocomplete-custom",
+    optionClass: () => "cm-autocomplete-option-custom",
+    addToOptions: [
+      {
+        render: (completion) => {
+          const span = document.createElement("span");
+          span.title = completion.label;
+          span.style.position = "absolute";
+          span.style.inset = "0";
+          span.style.display = "block";
+          span.setAttribute("aria-hidden", "true");
+          return span;
+        },
+        position: 0,
+      },
+    ],
   });
 }
