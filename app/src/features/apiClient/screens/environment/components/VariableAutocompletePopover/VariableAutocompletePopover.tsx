@@ -191,8 +191,8 @@ export const VariableAutocompletePopover: React.FC<VariableAutocompleteProps> = 
         overlayClassName="variable-autocomplete-popup"
         overlayInnerStyle={{ padding: 0 }}
         content={
-          <div ref={listRef} className="autocomplete-scroll-container" style={{ maxHeight: 300, overflowY: "auto" }}>
-            {filteredVariables?.length > 0 && (
+          filteredVariables?.length > 0 ? (
+            <div ref={listRef} className="autocomplete-scroll-container" style={{ maxHeight: 300, overflowY: "auto" }}>
               <List
                 size="small"
                 dataSource={filteredVariables}
@@ -206,8 +206,8 @@ export const VariableAutocompletePopover: React.FC<VariableAutocompleteProps> = 
                   />
                 )}
               />
-            )}
-          </div>
+            </div>
+          ) : null
         }
       >
         <span
