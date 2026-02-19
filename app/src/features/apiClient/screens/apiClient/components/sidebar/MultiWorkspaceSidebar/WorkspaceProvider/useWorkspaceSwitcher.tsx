@@ -99,7 +99,7 @@ export const useWorkspaceSwitcher = () => {
           if (result.payload.error.name === InvalidContextVersionError.name) {
             return;
           } else {
-            throw new Error(result.payload?.error);
+            throw result.payload?.error;
           }
         }
 
@@ -186,7 +186,7 @@ export const useWorkspaceSwitcher = () => {
         if (result.payload.error.name === InvalidContextVersionError.name) {
           return;
         } else {
-          throw new Error(result.payload?.error);
+          throw result.payload?.error;
         }
       }
 
