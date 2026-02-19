@@ -313,7 +313,7 @@ const createGraphQLApiRecord = (
     data: {
       type: RQAPI.ApiEntryType.GRAPHQL,
       request: {
-        url: typeof request.url === "string" ? request.url : "",
+        url: typeof request.url === "string" ? request.url : request.url?.raw ?? "",
         headers,
         operation: operation,
         variables: variables,
