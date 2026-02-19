@@ -254,6 +254,22 @@ export const RequestRow: React.FC<Props> = ({
         const result = await apiClientRecordsRepository.createRecord(newRecord);
         if (!result.success) throw new Error("Failed to duplicate request");
 
+        const newRequestId = result.data.id;
+        const examples = record.data.examples ?? [];
+        if (examples.length > 0) {
+          await Promise.all(
+            examples.map((example) =>
+              context.store.dispatch(
+                createExampleRequest({
+                  parentRequestId: newRequestId,
+                  example: { ...example, parentRequestId: newRequestId },
+                  repository: context.repositories.apiClientRecordsRepository,
+                }) as any
+              )
+            )
+          );
+        }
+
         onSaveRecord(result.data, "open");
         toast.success("Request duplicated successfully");
         trackRequestDuplicated();

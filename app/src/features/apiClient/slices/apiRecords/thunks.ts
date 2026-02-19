@@ -216,11 +216,29 @@ export const duplicateRecords = createAsyncThunk<
     const recordsToRender = getRecordsToRender({ apiClientRecords });
     const childParentMap = selectChildToParent(getState());
     const processedRecords = filterOutChildrenRecords(recordIds, childParentMap, recordsToRender.recordsMap);
-    const recordsToDuplicate = processRecordsForDuplication(processedRecords, repository, context);
+    const { recordsToDuplicate, examplesToDuplicate } = processRecordsForDuplication(
+      processedRecords,
+      repository,
+      context
+    );
 
     const duplicatedRecords = await repository.duplicateApiEntities(recordsToDuplicate);
 
     dispatch(apiRecordsActions.upsertRecords(duplicatedRecords));
+
+    if (examplesToDuplicate.length > 0) {
+      await Promise.all(
+        examplesToDuplicate.map(({ parentRequestId, example }) =>
+          dispatch(
+            createExampleRequest({
+              parentRequestId,
+              example: { ...example, parentRequestId },
+              repository,
+            }) as any
+          )
+        )
+      );
+    }
 
     const isMultiView = reduxStore.getState().workspaceView.viewMode === ApiClientViewMode.MULTI;
     if (isMultiView) {
