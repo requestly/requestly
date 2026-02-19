@@ -7,6 +7,7 @@ export interface SingleLineEditorProps {
   placeholder?: string;
   onPressEnter?: (event: KeyboardEvent, text: string) => void;
   onBlur?: (text: string) => void;
+  onPaste?: (event: ClipboardEvent, text: string) => void;
   variables?: ScopedVariables;
   suggestions?: Array<{ value: string }>;
 }

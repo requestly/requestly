@@ -18,6 +18,7 @@ import { Modal } from "antd";
 import { ApiClientViewMode, useViewMode, useWorkspaceViewActions } from "features/apiClient/slices";
 import { getWorkspaceInfo } from "features/apiClient/slices/workspaceView/utils";
 import { InvalidContextVersionError } from "features/apiClient/slices/workspaceView/helpers/ApiClientContextRegistry/ApiClientContextRegistry";
+import * as Sentry from "@sentry/react";
 
 //TODO: move it into top level hooks
 export const useWorkspaceSwitcher = () => {
@@ -98,7 +99,7 @@ export const useWorkspaceSwitcher = () => {
           if (result.payload.error.name === InvalidContextVersionError.name) {
             return;
           } else {
-            throw new Error(result.payload?.error);
+            throw result.payload?.error;
           }
         }
 
@@ -108,6 +109,12 @@ export const useWorkspaceSwitcher = () => {
 
         callback?.();
       } catch (error) {
+        Sentry.captureException(error, {
+          tags: {
+            feature: "workspace-switching",
+            action: "switch-workspace",
+          },
+        });
         toast.error(
           "Failed to switch workspace. Please reload and try again. If the issue persists, please contact support."
         );
@@ -179,12 +186,18 @@ export const useWorkspaceSwitcher = () => {
         if (result.payload.error.name === InvalidContextVersionError.name) {
           return;
         } else {
-          throw new Error(result.payload?.error);
+          throw result.payload?.error;
         }
       }
 
       showSwitchWorkspaceSuccessToast();
     } catch (error) {
+      Sentry.captureException(error, {
+        tags: {
+          feature: "workspace-switching",
+          action: "switch-to-private-workspace",
+        },
+      });
       toast.error(
         "Failed to switch workspace. Please reload and try again. If the issue persists, please contact support."
       );
