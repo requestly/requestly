@@ -29,6 +29,7 @@ interface Props {
   onClick: () => void;
   entity: BufferedHttpRecordEntity | BufferedGraphQLRecordEntity;
   isExample: boolean;
+  isDraft: boolean;
 }
 
 const getRecord = (entity: BufferedHttpRecordEntity | BufferedGraphQLRecordEntity, store: ApiClientStore) => {
@@ -43,6 +44,7 @@ export const SaveRequestButton: React.FC<Props> = ({
   onClick,
   entity,
   isExample,
+  isDraft,
 }) => {
   const { validatePermission } = useRBAC();
   const { isValidPermission } = validatePermission("api_client_request", "create");
@@ -124,7 +126,7 @@ export const SaveRequestButton: React.FC<Props> = ({
     [handleSaveAsExample, isValidPermission]
   );
 
-  if (isLocalSyncEnabled) {
+  if (isLocalSyncEnabled || isDraft) {
     return (
       <RQButton
         onClick={onClick}
