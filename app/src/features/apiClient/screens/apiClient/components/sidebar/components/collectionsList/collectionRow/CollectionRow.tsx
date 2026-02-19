@@ -279,7 +279,7 @@ export const CollectionRow: React.FC<Props> = ({
           collectionId: record.id,
         };
 
-        const res = await sourceContext.store
+        await sourceContext.store
           .dispatch(
             moveRecords({
               recordsToMove: [item.record],
@@ -290,8 +290,6 @@ export const CollectionRow: React.FC<Props> = ({
             }) as any
           )
           .unwrap();
-
-        console.log("!!!debug", "ress", res);
 
         if (!expandedRecordIds.includes(record.id)) {
           const newExpandedRecordIds = [...expandedRecordIds, destination.collectionId];
