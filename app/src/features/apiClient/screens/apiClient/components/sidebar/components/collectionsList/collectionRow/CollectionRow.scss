@@ -11,13 +11,13 @@
 
   // TEMP FIX: Added left padding to colllection name because drag preview of collection looks broken;
   // TODO: Rever this when drap preview is implemented
-  .ant-collapse-header.ant-collapse-icon-collapsible-only {
-    gap: unset !important;
+  // .ant-collapse-header.ant-collapse-icon-collapsible-only {
+  //   gap: unset !important;
 
-    // .collection-name-container {
-    //   padding-left: 8px;
-    // }
-  }
+  //   // .collection-name-container {
+  //   //   padding-left: 8px;
+  //   // }
+  // }
 
   .loading-collection-row {
     li {
