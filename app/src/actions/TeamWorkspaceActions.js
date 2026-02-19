@@ -104,6 +104,11 @@ export const switchWorkspace = async (
     dispatch(workspaceActions.setActiveWorkspacesMembers({}));
   }
 
+  if (teamId != null && newWorkspaceDetails.workspaceType === WorkspaceType.SHARED) {
+    await getAuth(firebaseApp).currentUser?.getIdTokenResult(true);
+    Logger.log("Refreshed auth token on workspace switch");
+  }
+
   dispatch(workspaceActions.setActiveWorkspaceIds(teamId ? [teamId] : []));
 
   //Refresh Rules List
@@ -115,11 +120,6 @@ export const switchWorkspace = async (
   if (!skipBroadcast) {
     window.activeWorkspaceBroadcastChannel &&
       window.activeWorkspaceBroadcastChannel.postMessage("active_workspace_changed");
-  }
-
-  if (teamId != null && newWorkspaceDetails.workspaceType === WorkspaceType.SHARED) {
-    await getAuth(firebaseApp).currentUser?.getIdTokenResult(true);
-    Logger.log("Refreshed auth token on workspace switch");
   }
 };
 
