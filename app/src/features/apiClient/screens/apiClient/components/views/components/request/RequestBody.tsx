@@ -104,7 +104,15 @@ const RequestBody: React.FC<RequestBodyProps> = React.memo((props) => {
   });
 
   useEffect(() => {
-    if (!contentType || body === undefined || body === null) {
+    if (!contentType) {
+      return;
+    }
+    if (body === undefined || body === null) {
+      setBodyContainer({
+        text: "",
+        form: [],
+        multipartForm: [],
+      });
       return;
     }
     // Initializing the component level states based on the props
@@ -129,7 +137,9 @@ const RequestBody: React.FC<RequestBodyProps> = React.memo((props) => {
   const requestBodyOptions = useMemo(() => {
     return (
       <div className="api-request-body-options">
-        {contentType === RequestContentType.RAW || contentType === RequestContentType.JSON ? (
+        {contentType === RequestContentType.RAW ||
+        contentType === RequestContentType.JSON ||
+        contentType === RequestContentType.XML ? (
           <Select
             popupClassName="api-request-body-options-list"
             className="api-request-body-options-select"
@@ -137,6 +147,7 @@ const RequestBody: React.FC<RequestBodyProps> = React.memo((props) => {
             options={[
               { value: RequestContentType.RAW, label: "Text" },
               { value: RequestContentType.JSON, label: "JSON" },
+              { value: RequestContentType.XML, label: "XML" },
             ]}
             onChange={(value) => handleContentTypeChange(value)}
             size="small"
@@ -201,7 +212,11 @@ const RequestBody: React.FC<RequestBodyProps> = React.memo((props) => {
           onChange={(e) => handleContentTypeChange(e.target.value === "text" ? RequestContentType.RAW : e.target.value)}
           defaultValue={RequestContentType.RAW}
           value={
-            contentType === RequestContentType.RAW || contentType === RequestContentType.JSON ? "text" : contentType
+            contentType === RequestContentType.RAW ||
+            contentType === RequestContentType.JSON ||
+            contentType === RequestContentType.XML
+              ? "text"
+              : contentType
           }
         >
           <Radio value="text">Raw</Radio>
