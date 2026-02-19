@@ -483,7 +483,6 @@ export async function runCollection(params: {
   executor: BatchRequestExecutor;
   runContext: RunContext;
 }) {
-  console.log("DBG:: RunContext", params.runContext);
   const runner = new Runner(params.ctx, params.executor, params.runContext);
   return runner.run();
 }
