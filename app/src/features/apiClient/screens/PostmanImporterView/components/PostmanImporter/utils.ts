@@ -225,20 +225,22 @@ const processUrlEncodedBody = (urlencoded: any[]): RequestBodyProcessingResult =
   };
 };
 
-/** Parsed GraphQL body from Postman (query, variables, operationName) for creating GraphQL API records */
+/** Parsing GraphQL body from Postman (query, variables, operationName) for creating GraphQL API records */
 export interface PostmanGraphQLBody {
   operation: string;
   variables: string;
   operationName?: string;
 }
 
-export const parsePostmanGraphQLBody = (graphql: any): PostmanGraphQLBody => {
+export const parseGraphQLBody = (graphql: any): PostmanGraphQLBody => {
   if (!graphql || typeof graphql !== "object") {
     return { operation: "", variables: "" };
   }
   const operation = typeof graphql.query === "string" ? graphql.query : "";
+
   const variables =
     typeof graphql.variables === "string" ? graphql.variables : JSON.stringify(graphql.variables ?? {}, null, 2);
+
   const operationName = typeof graphql.operationName === "string" ? graphql.operationName : undefined;
   return { operation, variables, operationName };
 };
@@ -261,7 +263,7 @@ const processRequestBody = (request: any): RequestBodyProcessingResult => {
     case PostmanBodyMode.URL_ENCODED:
       return processUrlEncodedBody(urlencoded);
     case PostmanBodyMode.GRAPHQL:
-      return parsePostmanGraphQLBody(graphql);
+      return parseGraphQLBody(graphql);
     default:
       return {
         requestBody: "",
@@ -292,11 +294,13 @@ export const processRequestHeaders = (request: any): RequestHeadersProcessingRes
 const createGraphQLApiRecord = (
   item: any,
   parentCollectionId: string,
-  apiClientRecordsRepository: ApiClientRecordsInterface<Record<string, any>>,
-  graphqlBody: GraphQLBody
+  apiClientRecordsRepository: ApiClientRecordsInterface<Record<string, any>>
 ): Partial<RQAPI.GraphQLApiRecord> => {
   const { request } = item;
   if (!request) throw new Error(`Invalid API item: ${item.name}`);
+
+  const bodyResult = processRequestBody(request) as GraphQLBody;
+  const { operation, variables, operationName } = bodyResult;
 
   const { headers } = processRequestHeaders(request);
 
@@ -311,9 +315,9 @@ const createGraphQLApiRecord = (
       request: {
         url: typeof request.url === "string" ? request.url : "",
         headers,
-        operation: graphqlBody.operation,
-        variables: graphqlBody.variables,
-        ...(graphqlBody.operationName && { operationName: graphqlBody.operationName }),
+        operation: operation,
+        variables: variables,
+        operationName: operationName,
       },
       response: null,
       auth: processAuthorizationOptions(request.auth, parentCollectionId),
@@ -443,12 +447,7 @@ export const processPostmanCollectionData = (
       } else if (item.request) {
         const data =
           item.request.body?.mode === PostmanBodyMode.GRAPHQL && item.request.body?.graphql
-            ? createGraphQLApiRecord(
-                item,
-                parentCollectionId,
-                apiClientRecordsRepository,
-                parsePostmanGraphQLBody(item.request.body.graphql)
-              )
+            ? createGraphQLApiRecord(item, parentCollectionId, apiClientRecordsRepository)
             : createApiRecord(item, parentCollectionId, apiClientRecordsRepository);
         result.apis.push(data);
       }
