@@ -7,6 +7,14 @@ import { getAppMode, getLastUsedFeaturePath } from "store/selectors";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { useIsAuthSkipped } from "./useIsAuthSkipped";
 
+const LAST_KNOWN_PATHS = new Set([
+  PATHS.API_CLIENT.INDEX,
+  PATHS.RULES.INDEX,
+  PATHS.MOCK_SERVER.INDEX,
+  PATHS.NETWORK_INSPECTOR.INDEX,
+  `/${PATHS.SESSIONS.INDEX}`,
+]);
+
 const useRootPathRedirector = () => {
   const dispatch = useDispatch();
   const location = useLocation();
@@ -24,20 +32,10 @@ const useRootPathRedirector = () => {
     return searchParamsCopy;
   }, [searchParams, isAuthSkipped]);
 
-  const LAST_KNOWN_PATHS = new Set([
-    PATHS.API_CLIENT.INDEX,
-    PATHS.RULES.INDEX,
-    PATHS.MOCK_SERVER.INDEX,
-    PATHS.NETWORK_INSPECTOR.INDEX,
-    `/${PATHS.SESSIONS.INDEX}`,
-  ]);
-
   const isOpenedInDesktopMode = PATHS.ROOT === location.pathname && appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP;
 
   useEffect(() => {
     if (location.pathname === PATHS.ROOT) {
-      console.log("!!!debug", "navigation called", Date.now());
-      // TODO@nafees: Should it also redirect from someFeature -> home or not?
       if (storedFeaturePath && storedFeaturePath !== PATHS.ROOT) {
         if (location.pathname !== storedFeaturePath) {
           navigate(`${storedFeaturePath}?${params}`, { replace: true });
