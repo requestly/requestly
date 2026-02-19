@@ -30,8 +30,6 @@ export enum ApiClientSidebarTabKey {
 export const SingleWorkspaceSidebar: React.FC<Props> = () => {
   const { state } = useLocation();
 
-  console.log("!!!debug", "single workspace sidebar", state);
-
   const { requestId, collectionId } = useParams();
   const [activeKey, setActiveKey] = useState<ApiClientSidebarTabKey>(ApiClientSidebarTabKey.COLLECTIONS);
   const [recordTypeToBeCreated, setRecordTypeToBeCreated] = useState<RQAPI.RecordType | null>(null);

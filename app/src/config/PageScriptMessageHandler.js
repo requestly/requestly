@@ -19,7 +19,6 @@ const PageScriptMessageHandler = {
   addMessageListener: function (messageAction, listener) {
     this.messageListeners[messageAction] = listener;
 
-    console.log("!!!debug", "messageAction", messageAction, this.messageBuffer);
     this.messageBuffer = this.messageBuffer.filter((message) => {
       if (message.action !== messageAction) {
         return true;
@@ -130,13 +129,11 @@ const PageScriptMessageHandler = {
 
     if (!this.isInitialized) {
       window.addEventListener("message", this.handleMessageReceived.bind(this));
-      console.log("!!!debug", "psmh initialized", Date.now());
       this.isInitialized = true;
 
       setTimeout(() => {
         this.isBufferingEnabled = false;
         this.messageBuffer = [];
-        console.log("!!!debug", "buffer cleared", Date.now());
       }, MESSAGE_BUFFER_TIMEOUT_MS);
     }
   },
