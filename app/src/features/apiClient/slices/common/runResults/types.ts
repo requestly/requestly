@@ -1,10 +1,11 @@
-import type { RQAPI } from "features/apiClient/types";
+import type { ExecutionId, RQAPI } from "features/apiClient/types";
 
 export type Iteration = number;
 export type Timestamp = number;
 
 export type BaseRequestExecutionResult = {
   iteration: Iteration;
+  executionId: ExecutionId;
   recordId: RQAPI.ApiRecord["id"];
   recordName: RQAPI.ApiRecord["name"];
   collectionName: RQAPI.CollectionRecord["name"];
@@ -52,7 +53,7 @@ export enum RunStatus {
 
 export type CurrentlyExecutingRequest =
   | null
-  | (BaseRequestExecutionResult & {
+  | (Omit<BaseRequestExecutionResult, "executionId"> & {
       startTime: Timestamp;
     });
 
