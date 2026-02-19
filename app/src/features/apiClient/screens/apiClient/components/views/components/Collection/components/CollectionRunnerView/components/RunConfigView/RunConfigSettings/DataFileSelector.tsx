@@ -3,6 +3,7 @@ import { MdOutlineFileUpload } from "@react-icons/all-files/md/MdOutlineFileUplo
 import { MdOutlineInfo } from "@react-icons/all-files/md/MdOutlineInfo";
 import { MdOutlineRemoveRedEye } from "@react-icons/all-files/md/MdOutlineRemoveRedEye";
 import { RxCross2 } from "@react-icons/all-files/rx/RxCross2";
+import { API_CLIENT_DOCS } from "features/apiClient/constants";
 import { getFileExtension, truncateString } from "features/apiClient/screens/apiClient/utils";
 import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
 import { useApiClientFileStore } from "features/apiClient/store/apiClientFilesStore";
@@ -12,6 +13,7 @@ import {
   trackCollectionRunnerSelectFileClicked,
 } from "modules/analytics/events/features/apiClient";
 import React, { useCallback, useMemo } from "react";
+import { isDesktopMode } from "utils/AppUtils";
 import { useCollectionView } from "../../../../../collectionView.context";
 import { useCollectionRunnerFileSelection } from "../hooks/useCollectionRunnerFileSelection.hook";
 import { DataFileModalViewMode, useDataFileModalContext } from "../ParseFileModal/Modals/DataFileModalContext";
@@ -30,6 +32,8 @@ export const DataFileSelector: React.FC = () => {
   const { bufferedEntity } = useCollectionView();
 
   const dataFile = useApiClientSelector((state) => bufferedEntity.getDataFile(state));
+
+  const isDesktop = useMemo(isDesktopMode, []);
 
   const [getFilesByIds, isFilePresentLocally, storeFiles] = useApiClientFileStore((s) => [
     s.getFilesByIds,
@@ -89,19 +93,45 @@ export const DataFileSelector: React.FC = () => {
     }
   }, [dataFile, isFilePresentLocally, setDataFileMetadata, setShowModal, parseFile, setViewMode]);
 
+  const selectFileButton = (
+    <RQButton
+      size="small"
+      icon={<MdOutlineFileUpload />}
+      disabled={!isDesktop}
+      onClick={() => {
+        handleFileSelection();
+      }}
+    >
+      Select file
+    </RQButton>
+  );
+
   return (
     <>
       {!dataFile ? (
         <>
-          <RQButton
-            size="small"
-            icon={<MdOutlineFileUpload />}
-            onClick={() => {
-              handleFileSelection();
-            }}
-          >
-            Select file
-          </RQButton>
+          {isDesktop ? (
+            selectFileButton
+          ) : (
+            <RQTooltip
+              title={
+                <>
+                  This feature is only available in Desktop App.{" "}
+                  <a
+                    href={API_CLIENT_DOCS.COLLECTION_RUNNER_DATA_FILE}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="tooltip-link"
+                  >
+                    Learn more
+                  </a>
+                </>
+              }
+              placement="top"
+            >
+              <span>{selectFileButton}</span>
+            </RQTooltip>
+          )}
 
           <div className="file-upload-info">
             <MdOutlineInfo className="file-info-icon" />
