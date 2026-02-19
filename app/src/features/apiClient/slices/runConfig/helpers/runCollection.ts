@@ -124,11 +124,11 @@ class Runner {
 
   private async parseDataFile() {
     const dataFile = this.runContext.runConfigEntity.getDataFile(this.ctx.store.getState());
-    const apiClientFilesStore = apiClientFileStore.getState();
 
-    if (!dataFile || !apiClientFilesStore.files[dataFile.id]) {
+    if (!dataFile) {
       return;
     }
+    const apiClientFilesStore = apiClientFileStore.getState();
 
     const { collectionId } = this.runContext.runConfigEntity.getEntityFromState(this.ctx.store.getState());
     if (!(await apiClientFilesStore.isFilePresentLocally(dataFile.id))) {
