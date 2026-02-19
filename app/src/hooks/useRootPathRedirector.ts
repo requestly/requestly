@@ -7,14 +7,6 @@ import { getAppMode, getLastUsedFeaturePath } from "store/selectors";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { useIsAuthSkipped } from "./useIsAuthSkipped";
 
-const LAST_KNOWN_PATHS = new Set([
-  PATHS.API_CLIENT.INDEX,
-  PATHS.RULES.INDEX,
-  PATHS.MOCK_SERVER.INDEX,
-  PATHS.NETWORK_INSPECTOR.INDEX,
-  `/${PATHS.SESSIONS.INDEX}`,
-]);
-
 const useRootPathRedirector = () => {
   const dispatch = useDispatch();
   const location = useLocation();
@@ -32,20 +24,24 @@ const useRootPathRedirector = () => {
     return searchParamsCopy;
   }, [searchParams, isAuthSkipped]);
 
+  const LAST_KNOWN_PATHS = new Set([
+    PATHS.API_CLIENT.INDEX,
+    PATHS.RULES.INDEX,
+    PATHS.MOCK_SERVER.INDEX,
+    PATHS.NETWORK_INSPECTOR.INDEX,
+    `/${PATHS.SESSIONS.INDEX}`,
+  ]);
+
   const isOpenedInDesktopMode = PATHS.ROOT === location.pathname && appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP;
 
   useEffect(() => {
     if (location.pathname === PATHS.ROOT) {
       if (storedFeaturePath && storedFeaturePath !== PATHS.ROOT) {
-        if (location.pathname !== storedFeaturePath) {
-          navigate(`${storedFeaturePath}?${params}`, { replace: true });
-        }
+        navigate(`${storedFeaturePath}?${params}`, { replace: true });
       } else {
-        const targetPath = isOpenedInDesktopMode ? PATHS.DESKTOP.INTERCEPT_TRAFFIC.ABSOLUTE : PATHS.HOME.ABSOLUTE;
-
-        if (location.pathname !== targetPath) {
-          navigate(`${targetPath}?${params}`, { replace: true });
-        }
+        isOpenedInDesktopMode
+          ? navigate(PATHS.DESKTOP.INTERCEPT_TRAFFIC.ABSOLUTE, { replace: true })
+          : navigate(`${PATHS.HOME.ABSOLUTE}?${params}`, { replace: true });
       }
     }
   }, [isOpenedInDesktopMode, location.pathname, navigate, storedFeaturePath, params]);
