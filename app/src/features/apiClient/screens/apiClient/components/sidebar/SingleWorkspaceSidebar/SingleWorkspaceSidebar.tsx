@@ -29,7 +29,6 @@ export enum ApiClientSidebarTabKey {
 
 export const SingleWorkspaceSidebar: React.FC<Props> = () => {
   const { state } = useLocation();
-
   const { requestId, collectionId } = useParams();
   const [activeKey, setActiveKey] = useState<ApiClientSidebarTabKey>(ApiClientSidebarTabKey.COLLECTIONS);
   const [recordTypeToBeCreated, setRecordTypeToBeCreated] = useState<RQAPI.RecordType | null>(null);
@@ -256,6 +255,7 @@ export const SingleWorkspaceSidebar: React.FC<Props> = () => {
         </div>
         {/* <ErrorFilesList /> */}
       </div>
+
       {isDeleteModalOpen ? (
         <DeleteApiRecordModal
           open={isDeleteModalOpen}
