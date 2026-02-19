@@ -124,10 +124,10 @@ class Runner {
 
   private async parseDataFile() {
     const dataFile = this.runContext.runConfigEntity.getDataFile(this.ctx.store.getState());
+
     if (!dataFile) {
       return;
     }
-
     const apiClientFilesStore = apiClientFileStore.getState();
 
     const { collectionId } = this.runContext.runConfigEntity.getEntityFromState(this.ctx.store.getState());
@@ -443,7 +443,9 @@ class Runner {
   async run() {
     try {
       await this.beforeStart();
+
       const iterationCount = this.runContext.runConfigEntity.getIterations(this.ctx.store.getState());
+
       const executionContext: ExecutionContext = {} as ExecutionContext; // Empty object that will be filled and shared across iterations
 
       for await (const { request, iteration, startTime } of this.iterate()) {

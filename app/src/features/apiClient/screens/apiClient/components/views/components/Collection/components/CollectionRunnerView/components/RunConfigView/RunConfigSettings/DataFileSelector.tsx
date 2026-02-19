@@ -71,8 +71,8 @@ export const DataFileSelector: React.FC = () => {
   }, [bufferedEntity, setDataFileMetadata]);
 
   const handleViewExistingFile = useCallback(async () => {
-    if (dataFile) {
-      const isFilePresent = await isFilePresentLocally(dataFile.id);
+    if (file) {
+      const isFilePresent = await isFilePresentLocally(file.id);
       if (!isFilePresent) {
         // setting view mode to rerender and show error state through isValud
         setViewMode(DataFileModalViewMode.ERROR);
@@ -80,18 +80,18 @@ export const DataFileSelector: React.FC = () => {
       }
 
       setDataFileMetadata({
-        name: dataFile.name,
-        path: dataFile.path,
-        size: dataFile.size,
+        name: file.name,
+        path: file.path,
+        size: file.size,
       });
       setShowModal(true);
-      parseFile(dataFile.path, false);
+      parseFile(file.path, false);
     }
-  }, [dataFile, isFilePresentLocally, setDataFileMetadata, setShowModal, parseFile, setViewMode]);
+  }, [file, isFilePresentLocally, setDataFileMetadata, setShowModal, parseFile, setViewMode]);
 
   return (
     <>
-      {!dataFile ? (
+      {!file ? (
         <>
           <RQButton
             size="small"
@@ -140,7 +140,7 @@ export const DataFileSelector: React.FC = () => {
               }}
               type="transparent"
             >
-              {dataFile && <RxCross2 />}
+              {file && <RxCross2 />}
             </RQButton>
           </RQTooltip>
         </div>
