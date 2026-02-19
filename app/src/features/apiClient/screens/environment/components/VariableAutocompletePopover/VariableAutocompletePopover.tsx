@@ -169,10 +169,10 @@ export const VariableAutocompletePopover: React.FC<VariableAutocompleteProps> = 
             break;
         }
       };
-      document.addEventListener("keydown", handleKeyDown, true);
+      document.addEventListener("keydown", handleKeyDown);
 
       return () => {
-        document.removeEventListener("keydown", handleKeyDown, true);
+        document.removeEventListener("keydown", handleKeyDown);
       };
     }, [show, onClose, stableOnSelect]);
 
