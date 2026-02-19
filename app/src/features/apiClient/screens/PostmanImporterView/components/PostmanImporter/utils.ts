@@ -44,10 +44,6 @@ interface GraphQLBody {
 }
 type RequestBodyProcessingResult = HttpRequestBody | GraphQLBody;
 
-function isGraphQLBodyResult(result: RequestBodyProcessingResult): result is GraphQLBody {
-  return "operation" in result;
-}
-
 interface RequestHeadersProcessingResult {
   headers: KeyValuePair[];
 }
@@ -325,24 +321,16 @@ const createGraphQLApiRecord = (
     },
   } as RQAPI.GraphQLApiRecord;
 };
+
 const createApiRecord = (
   item: any,
   parentCollectionId: string,
   apiClientRecordsRepository: ApiClientRecordsInterface<Record<string, any>>
-): Partial<RQAPI.ApiRecord> => {
+): Partial<RQAPI.HttpApiRecord> => {
   const { request } = item;
   if (!request) throw new Error(`Invalid API item: ${item.name}`);
 
-  console.log("test3", request);
-
-  const bodyResult = processRequestBody(request);
-
-  console.log("test2", bodyResult);
-
-  if (isGraphQLBodyResult(bodyResult)) {
-    return createGraphQLApiRecord(item, parentCollectionId, apiClientRecordsRepository, bodyResult);
-  }
-
+  const bodyResult = processRequestBody(request) as HttpRequestBody;
   const { requestBody, contentType } = bodyResult;
   const queryParams =
     request.url?.query?.map((query: any, index: number) => ({
@@ -355,8 +343,6 @@ const createApiRecord = (
     })) ?? [];
 
   const { headers } = processRequestHeaders(request);
-
-  console.log("test", request.url);
 
   return {
     id: apiClientRecordsRepository.generateApiRecordId(parentCollectionId),
@@ -455,9 +441,15 @@ export const processPostmanCollectionData = (
         result.collections.push(...subItems.collections);
         result.apis.push(...subItems.apis);
       } else if (item.request) {
-        console.log("test4", item);
-        // This is an API endpoint
-        const data = createApiRecord(item, parentCollectionId, apiClientRecordsRepository);
+        const data =
+          item.request.body?.mode === PostmanBodyMode.GRAPHQL && item.request.body?.graphql
+            ? createGraphQLApiRecord(
+                item,
+                parentCollectionId,
+                apiClientRecordsRepository,
+                parsePostmanGraphQLBody(item.request.body.graphql)
+              )
+            : createApiRecord(item, parentCollectionId, apiClientRecordsRepository);
         result.apis.push(data);
       }
     });
