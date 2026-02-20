@@ -63,6 +63,13 @@ export const useVariableAutocomplete = (options?: { editorViewRef?: RefObject<Ed
         const lastOpen = textBefore.lastIndexOf("{{");
 
         if (lastOpen !== -1) {
+          // Ensure this is exactly '{{' and not part of a longer '{{{...' sequence
+          const precededByBrace = lastOpen > 0 && textBefore[lastOpen - 1] === "{";
+          if (precededByBrace) {
+            setAutocompleteState((prev) => (prev.show ? { ...prev, show: false } : prev));
+            return;
+          }
+
           // Text between '{{' and the cursor (potential variable name)
           const filterText = textBefore.slice(lastOpen + 2);
 
