@@ -8,8 +8,9 @@ import { isEmpty } from "lodash";
 import { deleteRecords } from "features/apiClient/slices/apiRecords/thunks";
 import { toast } from "utils/Toast";
 import { isApiCollection } from "../../../utils";
-import * as Sentry from "@sentry/react";
 import { ApiClientFeatureContext } from "features/apiClient/slices";
+import { NativeError } from "errors/NativeError";
+import { ErrorSeverity } from "errors/types";
 
 interface DeleteApiRecordModalProps {
   open: boolean;
@@ -76,10 +77,7 @@ export const DeleteApiRecordModal: React.FC<DeleteApiRecordModalProps> = ({
     } catch (error) {
       toast.error("Error while deleting!");
 
-      Sentry.withScope((scope) => {
-        scope.setTag("error_type", "api_client_record_deletion");
-        Sentry.captureException(`Error deleting ${records.length === 1 ? "record" : "records"}`);
-      });
+      throw NativeError.fromError(error).setShowBoundary(true).setSeverity(ErrorSeverity.ERROR);
     } finally {
       setIsDeleting(false);
     }

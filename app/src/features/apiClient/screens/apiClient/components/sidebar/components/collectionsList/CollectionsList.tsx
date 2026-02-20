@@ -27,7 +27,6 @@ import { toast } from "utils/Toast";
 import { MoveToCollectionModal } from "../../../modals/MoveToCollectionModal/MoveToCollectionModal";
 import ActionMenu from "./BulkActionsMenu";
 import { useRBAC } from "features/rbac";
-import * as Sentry from "@sentry/react";
 import { ExampleCollectionsNudge } from "../ExampleCollectionsNudge/ExampleCollectionsNudge";
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
@@ -35,6 +34,8 @@ import APP_CONSTANTS from "config/constants";
 import { duplicateRecords, useAllRecords, useApiClientRepository, useChildToParent } from "features/apiClient/slices";
 import { useApiClientDispatch } from "features/apiClient/slices/hooks/base.hooks";
 import { EXPANDED_RECORD_IDS_UPDATED } from "features/apiClient/slices/exampleCollections";
+import { ErrorSeverity } from "errors/types";
+import { NativeError } from "errors/NativeError";
 
 interface Props {
   onNewClick: (src: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType) => Promise<void>;
@@ -206,10 +207,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
               description: error?.message,
               placement: "bottomRight",
             });
-            Sentry.withScope((scope) => {
-              scope.setTag("error_type", "api_client_record_duplication");
-              Sentry.captureException(error);
-            });
+            throw NativeError.fromError(error).setShowBoundary(true).setSeverity(ErrorSeverity.ERROR);
           }
 
           break;
