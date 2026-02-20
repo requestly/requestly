@@ -3,9 +3,11 @@ import { useSelector } from "react-redux";
 import { getAppMode } from "store/selectors";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { Alert, Button, Col, Input, Popconfirm, Row, Tooltip } from "antd";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
 import { LinkOutlined } from "@ant-design/icons";
+import { RQInput } from "lib/design-system/components";
 import {
   trackProxyPortChanged,
   trackInvalidProxyPortInput,
@@ -22,6 +24,9 @@ export const DesktopSettings = () => {
   const appMode = useSelector(getAppMode);
   const [portInput, setPortInput] = useState("");
   const [portSubmitLoading, setPortSubmitLoading] = useState(false);
+  const [urlInput, setUrlInput] = useState("");
+  const [urlSubmitLoading, setUrlSubmitLoading] = useState(false);
+  const isCustomUrlEnabled = useFeatureIsOn("allow_desktop_beta_preview_url_configuration");
 
   const closeInterceptingApps = () => {
     if (window.RQ && window.RQ && window.RQ.DESKTOP) {
@@ -64,6 +69,53 @@ export const DesktopSettings = () => {
     window.RQ.DESKTOP.SERVICES.IPC.invokeEventInMain("renew-ssl-certificates");
   }, []);
 
+  const handleUrlChange = async () => {
+    const trimmedUrl = urlInput.trim();
+
+    const isValidAndAllowedUrl = (urlString) => {
+      try {
+        const url = new URL(urlString);
+        if (url.protocol !== "http:" && url.protocol !== "https:") {
+          return { valid: false, error: "Please enter a valid HTTP or HTTPS URL" };
+        }
+
+        const lowerUrl = urlString.toLowerCase();
+        const allowedKeywords = ["beta", "web.app"];
+        if (!allowedKeywords.some((keyword) => lowerUrl.includes(keyword))) {
+          return { valid: false, error: "URL must contain one of the allowed keywords" };
+        }
+
+        return { valid: true };
+      } catch {
+        return { valid: false, error: "Please enter a valid HTTP or HTTPS URL" };
+      }
+    };
+
+    const validation = isValidAndAllowedUrl(trimmedUrl);
+    if (!validation.valid) {
+      toast.error(validation.error);
+      return;
+    }
+
+    setUrlSubmitLoading(true);
+    try {
+      const response = await window.RQ.DESKTOP.SERVICES.IPC.invokeEventInMain("change-webapp-url", {
+        url: trimmedUrl,
+      });
+
+      if (response?.success) {
+        toast.success("Web app URL changed successfully. Window will recreate.");
+        setUrlInput("");
+      } else {
+        toast.error(response?.error || "Failed to change URL");
+      }
+    } catch (error) {
+      toast.error("Failed to change URL: " + error.message);
+    } finally {
+      setUrlSubmitLoading(false);
+    }
+  };
+
   // add loader
   return appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? (
     <div className="desktop-settings-container">
@@ -73,26 +125,25 @@ export const DesktopSettings = () => {
 
         <div>
           {isFeatureCompatible(FEATURES.DESKTOP_USER_PREFERENCES) ? (
-            <Row className="w-full" align="middle" gutter={8}>
-              <Col
-                span={13}
-                xs={{ span: 17 }}
-                sm={{ span: 16 }}
-                md={{ span: 15 }}
-                lg={{ span: 14 }}
-                xl={{ span: 13 }}
-                flex="0 1 420px"
-                align="left"
-              >
-                <label className="caption text-bold desktop-setting-port-input-label">Set default proxy port</label>
-                <Input
-                  value={portInput}
-                  disabled={portSubmitLoading}
-                  placeholder="Enter New Port"
-                  className="desktop-setting-port-input"
-                  onChange={(e) => setPortInput(e.target.value)}
-                />
-
+            <Row align="middle" className="w-full setting-item-container">
+              <Col span={22}>
+                <div className="title">Set default proxy port</div>
+                <p className="setting-item-caption">
+                  Change the default port for the proxy server. Browsers launched from Requestly will be closed.
+                </p>
+                <Row style={{ marginTop: "16px" }}>
+                  <Col span={18}>
+                    <Input
+                      value={portInput}
+                      disabled={portSubmitLoading}
+                      placeholder="Enter New Port"
+                      className="desktop-setting-port-input"
+                      onChange={(e) => setPortInput(e.target.value)}
+                    />
+                  </Col>
+                </Row>
+              </Col>
+              <Col span={2} style={{ alignSelf: "flex-end" }}>
                 <Popconfirm
                   okText="Continue"
                   cancelText="No"
@@ -101,9 +152,9 @@ export const DesktopSettings = () => {
                   onConfirm={handlePortChange}
                   onCancel={trackUserDeniedClosingLaunchedApps}
                 >
-                  <Button className="desktop-port-update-btn" onClick={trackProxyPortChangeRequested}>
+                  <RQButton onClick={trackProxyPortChangeRequested} type="default">
                     Update
-                  </Button>
+                  </RQButton>
                 </Popconfirm>
               </Col>
             </Row>
@@ -123,6 +174,46 @@ export const DesktopSettings = () => {
             </Row>
           )}
         </div>
+
+        {isFeatureCompatible(FEATURES.DESKTOP_BETA_PREVIEW_URL_CONFIGURATION) && isCustomUrlEnabled && (
+          <div className="preview-url-container">
+            <Row align="middle" className="w-full mt-16 setting-item">
+              <Col span={24}>
+                <div className="title">Change Web App URL</div>
+                <p className="setting-item-caption">
+                  Temporarily change the web app URL for testing. Changes won't persist after app restart.
+                </p>
+                <Row className="header-row">
+                  <Col span={21}>
+                    <RQInput
+                      placeholder="Enter new URL"
+                      onChange={(e) => setUrlInput(e.target.value)}
+                      value={urlInput}
+                    />
+                  </Col>
+                  <Col span={2}>
+                    <Popconfirm
+                      okText="Continue"
+                      cancelText="No"
+                      placement="topLeft"
+                      title="Window will recreate with new URL. Changes won't persist after restart. Continue?"
+                      onConfirm={handleUrlChange}
+                    >
+                      <RQButton
+                        className="update-url-btn"
+                        loading={urlSubmitLoading}
+                        disabled={!urlInput.trim() || urlSubmitLoading}
+                        type="default"
+                      >
+                        Update
+                      </RQButton>
+                    </Popconfirm>
+                  </Col>
+                </Row>
+              </Col>
+            </Row>
+          </div>
+        )}
 
         {isFeatureCompatible(FEATURES.REGENERATE_SSL_CERTS) ? (
           <>

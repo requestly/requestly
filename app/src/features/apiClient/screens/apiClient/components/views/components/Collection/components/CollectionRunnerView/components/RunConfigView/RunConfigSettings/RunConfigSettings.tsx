@@ -7,12 +7,9 @@ import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks
 import { toast } from "utils/Toast";
 import "./runConfigSettings.scss";
 import { DataFileSelector } from "./DataFileSelector";
-import { getAppMode } from "store/selectors";
-import { useSelector } from "react-redux";
 import { DELAY_MAX_LIMIT, ITERATIONS_MAX_LIMIT } from "features/apiClient/slices/runConfig/constants";
 
 export const RunConfigSettings: React.FC = () => {
-  const appMode = useSelector(getAppMode);
   const { bufferedEntity } = useCollectionView();
 
   const iterations = useApiClientSelector((state) => bufferedEntity.getIterations(state));
@@ -76,12 +73,10 @@ export const RunConfigSettings: React.FC = () => {
           <span className="ms-text">ms</span>
         </div>
 
-        {appMode === "DESKTOP" && (
-          <div className="setting-container">
-            <label htmlFor="file-upload">Select data file</label>
-            <DataFileSelector />
-          </div>
-        )}
+        <div className="setting-container">
+          <label htmlFor="file-upload">Select data file</label>
+          <DataFileSelector />
+        </div>
       </div>
 
       {/* TODO: for later */}
