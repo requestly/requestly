@@ -310,7 +310,7 @@ const createGraphQLApiRecord = (
         headers,
         operation: operation,
         variables: variables,
-        operationName: operationName,
+        ...(operationName != null && operationName !== "" && { operationName: operationName }),
       },
       response: null,
       auth: processAuthorizationOptions(request.auth, parentCollectionId),
