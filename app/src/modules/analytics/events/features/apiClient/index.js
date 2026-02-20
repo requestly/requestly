@@ -176,7 +176,8 @@ export const trackImportSuccess = (type, collectionsCount, requestsCount) => {
   });
 };
 
-export const trackPostmanUnsupportedFeatures = (params) => {
+export const trackPostmanUnsupportedFeatures = (unsupportedFeaturesList) => {
+  const params = { unsupported_features_list: unsupportedFeaturesList };
   trackEvent(API_CLIENT.POSTMAN_UNSUPPORTED_FEATURES, params);
 };
 
