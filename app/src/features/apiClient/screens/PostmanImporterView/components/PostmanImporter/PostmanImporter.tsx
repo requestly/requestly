@@ -111,19 +111,8 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
                     resolve({ type: postmanFileType, data: processedData });
                   } else {
                     try {
-                      const unsupportedFeatures = detectUnsupportedFeatures(fileContent);
-
-                      const hasUnsupportedAuth = unsupportedFeatures.auth.types.size > 0;
-                      const hasCollectionLevelScripts =
-                        unsupportedFeatures.collectionLevelScripts?.hasPreRequest ||
-                        unsupportedFeatures.collectionLevelScripts?.hasTest;
-                      const hasVaultVariables = unsupportedFeatures.vaultVariables;
-                      if (hasUnsupportedAuth || hasCollectionLevelScripts || hasVaultVariables) {
-                        const unsupportedFeaturesList: string[] = [
-                          ...(hasCollectionLevelScripts ? ["collection level scripts"] : []),
-                          ...(hasVaultVariables ? ["vault variables"] : []),
-                          ...(hasUnsupportedAuth ? Array.from(unsupportedFeatures.auth.types) : []),
-                        ];
+                      const unsupportedFeaturesList = detectUnsupportedFeatures(fileContent);
+                      if (unsupportedFeaturesList.length > 0) {
                         trackPostmanUnsupportedFeatures(unsupportedFeaturesList);
                       }
                     } catch (error) {

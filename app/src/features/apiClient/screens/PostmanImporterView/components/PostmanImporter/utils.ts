@@ -487,12 +487,19 @@ export const detectVaultVariables = (fileContent: any): UnsupportedFeatures["vau
   return vaultVariableDetected;
 };
 
-export const detectUnsupportedFeatures = (fileContent: any): UnsupportedFeatures => {
-  return {
-    auth: detectUnsupportedAuthModes(fileContent).auth,
-    collectionLevelScripts: detectCollectionLevelScripts(fileContent),
-    vaultVariables: detectVaultVariables(fileContent),
-  };
+export const detectUnsupportedFeatures = (fileContent: any): string[] => {
+  const auth = detectUnsupportedAuthModes(fileContent).auth;
+  const collectionLevelScripts = detectCollectionLevelScripts(fileContent);
+  const vaultVariables = detectVaultVariables(fileContent);
+
+  const hasUnsupportedAuth = auth.types.size > 0;
+  const hasCollectionLevelScripts = collectionLevelScripts?.hasPreRequest || collectionLevelScripts?.hasTest;
+
+  return [
+    ...(hasCollectionLevelScripts ? ["collection level scripts"] : []),
+    ...(vaultVariables ? ["vault variables"] : []),
+    ...(hasUnsupportedAuth ? Array.from(auth.types) : []),
+  ];
 };
 
 export const processPostmanCollectionData = (
