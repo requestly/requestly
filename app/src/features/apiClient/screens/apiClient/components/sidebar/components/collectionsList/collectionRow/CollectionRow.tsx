@@ -40,6 +40,8 @@ import { useActiveTab, useTabActions } from "componentsV2/Tabs/slice";
 import { getAncestorIds, getRecord } from "features/apiClient/slices/apiRecords/utils";
 import { Workspace } from "features/workspaces/types";
 import { EnvironmentVariables } from "backend/environment/types";
+import { NativeError } from "errors/NativeError";
+import { ErrorSeverity } from "errors/types";
 
 export enum ExportType {
   REQUESTLY = "requestly",
@@ -296,9 +298,10 @@ export const CollectionRow: React.FC<Props> = ({
       } catch (error) {
         notification.error({
           message: "Error moving item",
-          description: error?.message || "Failed to move item. Please try again.",
+          description: error?.message || (typeof error === "string" ? error : "Failed to move item. Please try again."),
           placement: "bottomRight",
         });
+        throw NativeError.fromError(error).setShowBoundary(true).setSeverity(ErrorSeverity.ERROR);
       } finally {
         setIsCollectionRowLoading(false);
       }
