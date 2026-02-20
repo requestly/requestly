@@ -104,7 +104,7 @@ export const switchWorkspace = async (
     dispatch(workspaceActions.setActiveWorkspacesMembers({}));
   }
 
-  if (teamId != null && newWorkspaceDetails.workspaceType === WorkspaceType.SHARED) {
+  if (teamId != null) {
     await getAuth(firebaseApp).currentUser?.getIdTokenResult(true);
     Logger.log("Refreshed auth token on workspace switch");
   }
