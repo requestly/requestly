@@ -225,14 +225,7 @@ const processUrlEncodedBody = (urlencoded: any[]): RequestBodyProcessingResult =
   };
 };
 
-/** Parsing GraphQL body from Postman (query, variables, operationName) for creating GraphQL API records */
-export interface PostmanGraphQLBody {
-  operation: string;
-  variables: string;
-  operationName?: string;
-}
-
-export const parseGraphQLBody = (graphql: any): PostmanGraphQLBody => {
+export const parseGraphQLBody = (graphql: any): GraphQLBody => {
   if (!graphql || typeof graphql !== "object") {
     return { operation: "", variables: "" };
   }
@@ -323,7 +316,7 @@ const createGraphQLApiRecord = (
       auth: processAuthorizationOptions(request.auth, parentCollectionId),
       scripts: processScripts(item),
     },
-  } as RQAPI.GraphQLApiRecord;
+  };
 };
 
 const createApiRecord = (
