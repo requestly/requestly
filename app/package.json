@@ -77,7 +77,7 @@
     "@react-icons/all-files": "https://github.com/react-icons/react-icons/releases/download/v5.4.0/react-icons-all-files-5.4.0.tgz",
     "@readme/httpsnippet": "^11.0.0",
     "@reduxjs/toolkit": "^1.9.0",
-    "@requestly/alternative-importers": "https://github.com/requestly/alternative-importers#ENGG-5278-preview",
+    "@requestly/alternative-importers": "https://pkg.pr.new/@requestly/alternative-importers@21",
     "@requestly/mock-server": "0.1.6",
     "@requestly/requestly-core": "file:..",
     "@requestly/shared": "file:../shared",
