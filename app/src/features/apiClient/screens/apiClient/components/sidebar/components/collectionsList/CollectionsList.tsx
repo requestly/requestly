@@ -223,8 +223,6 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
 
       const processedRecords = filterOutChildrenRecords(selectedRecords, childParentMap, updatedRecords.recordsMap);
 
-      const dummyCollection = wrapRecordsInCollection(processedRecords);
-
       switch (action) {
         case BulkActions.DUPLICATE: {
           try {
@@ -271,6 +269,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
           break;
 
         case BulkActions.EXPORT_OPENAPI: {
+          const dummyCollection = wrapRecordsInCollection(processedRecords);
           const exporter = createOpenApiExporter(dummyCollection as SharedRQAPI.CollectionRecord);
           setCommonExporterConfig({
             exporter,
