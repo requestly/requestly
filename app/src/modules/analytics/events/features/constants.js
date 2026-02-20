@@ -265,6 +265,8 @@ export const API_CLIENT = {
   ENVIRONMENT_EXPORTED: "api_client_environment_exported",
   ENVIRONMENT_DELETED: "api_client_environment_deleted",
 
+  // Process File
+  POSTMAN_UNSUPPORTED_FEATURES: "api_client_postman_unsupported_features_detected",
   // Import Data
   IMPORT_STARTED: "api_client_import_started",
   IMPORT_DATA_PARSED: "api_client_import_requests_parsed",
