@@ -5,6 +5,7 @@ import { fromSavedRunConfig, isValidDelay, isValidIterations, patchRunOrder } fr
 import { entitySynced } from "../common";
 import { ApiClientEntityType } from "../entities/types";
 import { RQAPI } from "features/apiClient/types";
+import { ApiClientFile, apiClientFileStore, FileFeature } from "features/apiClient/store/apiClientFilesStore";
 
 export const runConfigAdapter = createEntityAdapter<RunConfigEntity>({
   selectId: (config) => config.collectionId + "::" + config.configId,
@@ -141,6 +142,18 @@ export const runnerConfigSlice = createSlice({
         timestamps?: { createdTs?: number; updatedTs?: number }
       ) {
         const entity = fromSavedRunConfig(collectionId, savedConfig, timestamps);
+        // Re-hydrate dataFile into apiClientFilesStore
+        if (savedConfig.dataFile) {
+          const apiClientFile: Omit<ApiClientFile, "isFileValid"> = {
+            name: savedConfig.dataFile.name,
+            path: savedConfig.dataFile.path,
+            source: savedConfig.dataFile.source,
+            size: savedConfig.dataFile.size,
+            fileFeature: FileFeature.COLLECTION_RUNNER,
+          };
+          apiClientFileStore.getState().addFile(savedConfig.dataFile.id, apiClientFile);
+        }
+
         return {
           payload: { entity },
         };
