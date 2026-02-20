@@ -401,6 +401,156 @@ const createCollectionRecord = (
   };
 };
 
+// regex for vault variables -> {{vault:testVar}}
+const VAULT_VARIABLE_PATTERN = /\{\{vault:([^}]+)\}\}/g;
+export interface UnsupportedFeatures {
+  auth: {
+    types: Set<string>;
+  };
+  collectionLevelScripts: {
+    hasPreRequest: boolean;
+    hasTest: boolean;
+  };
+  vaultVariables: boolean;
+}
+
+const detectUnsupportedAuthModes = (fileContent: any): Pick<UnsupportedFeatures, "auth"> => {
+  const supportedAuthTypes = new Set([
+    PostmanAuth.AuthType.NO_AUTH,
+    PostmanAuth.AuthType.INHERIT,
+    PostmanAuth.AuthType.BEARER_TOKEN,
+    PostmanAuth.AuthType.BASIC_AUTH,
+    PostmanAuth.AuthType.API_KEY,
+  ]);
+
+  const unsupportedAuthModes = {
+    auth: {
+      types: new Set<string>(),
+    },
+  };
+
+  // check for unsupportedAuth at all levels
+  const checkAuth = (auth: any) => {
+    // add the auth type to unsupported features array
+    if (auth && auth.type && !supportedAuthTypes.has(auth.type)) {
+      unsupportedAuthModes.auth.types.add(auth.type);
+    }
+  };
+
+  //check at collection level
+  if (fileContent.auth) {
+    checkAuth(fileContent.auth);
+  }
+
+  // check at inside folder & request level
+
+  const processItems = (items: any[]) => {
+    items?.forEach((item: any) => {
+      if (item.item) {
+        // Folder-level auth also exists
+        if (item.auth) {
+          checkAuth(item.auth);
+        }
+        // Recurse into folder
+        processItems(item.item);
+      } else if (item.request) {
+        // Request-level auth (inside request object)
+        if (item.request.auth) {
+          checkAuth(item.request.auth);
+        }
+      }
+    });
+  };
+
+  if (fileContent.item) {
+    processItems(fileContent.item);
+  }
+  return unsupportedAuthModes;
+};
+
+const hasNonEmptyScript = (event: any): boolean => {
+  const exec = event?.script?.exec;
+  if (!Array.isArray(exec)) return false;
+  return exec.some((line: string) => typeof line === "string" && line.trim() !== "");
+};
+
+const detectCollectionLevelScripts = (fileContent: any): UnsupportedFeatures["collectionLevelScripts"] => {
+  const result = { hasPreRequest: false, hasTest: false };
+
+  const checkEvents = (events: any[]) => {
+    events?.forEach((event: any) => {
+      if (event.listen === "prerequest" && hasNonEmptyScript(event)) {
+        result.hasPreRequest = true;
+      }
+      if (event.listen === "test" && hasNonEmptyScript(event)) {
+        result.hasTest = true;
+      }
+    });
+  };
+
+  // Collection-level scripts
+  if (fileContent.event) {
+    checkEvents(fileContent.event);
+  }
+
+  // Folder-level scripts (recurse into items)
+  const processItems = (items: any[]) => {
+    items?.forEach((item: any) => {
+      if (item.item) {
+        if (item.event) checkEvents(item.event);
+        processItems(item.item);
+      }
+    });
+  };
+  if (fileContent.item) {
+    processItems(fileContent.item);
+  }
+
+  return result;
+};
+
+export const detectVaultVariables = (fileContent: any): UnsupportedFeatures["vaultVariables"] => {
+  let vaultVariableDetected = false;
+
+  const scanValue = (value: any) => {
+    if (vaultVariableDetected) return;
+    if (typeof value === "string") {
+      VAULT_VARIABLE_PATTERN.lastIndex = 0;
+      if (VAULT_VARIABLE_PATTERN.test(value)) {
+        vaultVariableDetected = true;
+      }
+    } else if (Array.isArray(value)) {
+      for (const item of value) {
+        scanValue(item);
+        if (vaultVariableDetected) return;
+      }
+    } else if (value !== null && typeof value === "object") {
+      for (const item of Object.values(value)) {
+        scanValue(item);
+        if (vaultVariableDetected) return;
+      }
+    }
+  };
+
+  scanValue(fileContent);
+  return vaultVariableDetected;
+};
+
+export const detectUnsupportedFeatures = (fileContent: any): string[] => {
+  const auth = detectUnsupportedAuthModes(fileContent).auth;
+  const collectionLevelScripts = detectCollectionLevelScripts(fileContent);
+  const vaultVariables = detectVaultVariables(fileContent);
+
+  const hasUnsupportedAuth = auth.types.size > 0;
+  const hasCollectionLevelScripts = collectionLevelScripts?.hasPreRequest || collectionLevelScripts?.hasTest;
+
+  return [
+    ...(hasCollectionLevelScripts ? ["collection level scripts"] : []),
+    ...(vaultVariables ? ["vault variables"] : []),
+    ...(hasUnsupportedAuth ? Array.from(auth.types) : []),
+  ];
+};
+
 export const processPostmanCollectionData = (
   fileContent: any,
   apiClientRecordsRepository: ApiClientRecordsInterface<Record<string, any>>
