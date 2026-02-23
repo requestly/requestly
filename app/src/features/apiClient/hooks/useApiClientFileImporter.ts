@@ -26,6 +26,7 @@ type ProcessedData = {
   collections: RQAPI.CollectionRecord[];
   apis: RQAPI.ApiRecord[];
   recordsCount: number;
+  examples: RQAPI.ExampleApiRecord[];
 };
 
 type ProcessingStatus = "idle" | "processing" | "processed";
@@ -48,6 +49,7 @@ const useApiClientFileImporter = (importer: ImporterType) => {
     environments: [],
     collections: [],
     recordsCount: 0,
+    examples: [],
   });
 
   const [isImporting, setIsImporting] = useState(false);
@@ -60,7 +62,7 @@ const useApiClientFileImporter = (importer: ImporterType) => {
   const uid = user?.details?.profile?.uid;
   const dispatch = useApiClientDispatch();
 
-  const { environments = [], collections = [], apis = [] } = processedFileData;
+  const { environments = [], collections = [], apis = [], examples = [] } = processedFileData;
 
   const processFiles = useCallback(
     (files: File[]) => {
@@ -106,14 +108,20 @@ const useApiClientFileImporter = (importer: ImporterType) => {
 
           results.forEach((result: any) => {
             if (result.status === "fulfilled") {
-              setProcessedFileData((prev) => {
-                prev.collections.push(...result.value.collections);
-                prev.apis.push(...result.value.apis);
-                prev.environments.push(...result.value.environments);
-                prev.recordsCount = prev.recordsCount + result.value.count;
-                trackImportParsed(ApiClientImporterType.REQUESTLY, prev.collections.length, prev.apis.length);
-                return prev;
-              });
+              // CHANGE: Replaced mutation (.push) with spread to fix duplication
+              setProcessedFileData((prev) => ({
+                ...prev,
+                collections: [...prev.collections, ...result.value.collections],
+                apis: [...prev.apis, ...result.value.apis],
+                environments: [...prev.environments, ...result.value.environments],
+                examples: [...prev.examples, ...result.value.examples],
+                recordsCount: prev.recordsCount + result.value.count,
+              }));
+              trackImportParsed(
+                ApiClientImporterType.REQUESTLY,
+                result.value.collections.length,
+                result.value.apis.length
+              );
             } else {
               trackImportParseFailed(ApiClientImporterType.REQUESTLY, result.reason);
               console.error("Error processing file:", result.reason);
@@ -210,14 +218,8 @@ const useApiClientFileImporter = (importer: ImporterType) => {
     }
 
     const handleApiWrites = async (api: RQAPI.ApiRecord) => {
-      const newCollectionId = collections.find((collection) => collection.id === api.collectionId)?.id;
-      const updatedApi = {
-        ...api,
-        collectionId: newCollectionId,
-        id: apiClientRecordsRepository.generateApiRecordId(newCollectionId),
-      };
       try {
-        const newApi = await apiClientRecordsRepository.createRecordWithId(updatedApi, updatedApi.id);
+        const newApi = await apiClientRecordsRepository.createRecordWithId(api, api.id);
         if (!newApi.data) {
           throw new Error("Failed to create API");
         }
@@ -233,6 +235,20 @@ const useApiClientFileImporter = (importer: ImporterType) => {
     if (!apiWriteResult.success) {
       throw new Error(`Failed to import APIs: ${apiWriteResult.message}`);
     }
+    const handleExampleWrites = async (example: RQAPI.ExampleApiRecord) => {
+      try {
+        const newExample = await apiClientRecordsRepository.createExampleRequest(example.parentRequestId, example);
+        if (newExample?.success) {
+          onSaveRecord(newExample.data);
+        }
+      } catch (error) {
+        Logger.error("Error importing Example:", error);
+      }
+    };
+
+    if (examples.length > 0) {
+      await apiClientRecordsRepository.batchWriteApiEntities(BATCH_SIZE, examples, handleExampleWrites);
+    }
 
     if (failedCollectionsCount > 0 || failedApisCount > 0) {
       toast.warn(
@@ -243,7 +259,7 @@ const useApiClientFileImporter = (importer: ImporterType) => {
     }
 
     return { importedCollectionsCount, importedApisCount };
-  }, [onSaveRecord, collections, apis, apiClientRecordsRepository]);
+  }, [onSaveRecord, collections, apis, examples, apiClientRecordsRepository]);
 
   const handleImportData = useCallback(
     async (onSuccess: () => void) => {
@@ -321,7 +337,7 @@ const useApiClientFileImporter = (importer: ImporterType) => {
     setError(null);
     setIsImporting(false);
     setProcessingStatus("idle");
-    setProcessedFileData({ apis: [], environments: [], collections: [], recordsCount: 0 });
+    setProcessedFileData({ apis: [], environments: [], collections: [], recordsCount: 0, examples: [] });
   };
 
   return { isImporting, error, processFiles, handleImportData, resetImportData, processingStatus };
