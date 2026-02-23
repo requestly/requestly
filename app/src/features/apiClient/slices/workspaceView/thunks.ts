@@ -191,11 +191,7 @@ const removeWorkspacesFromView = createAsyncThunk<
 
 const singleToMultiView = createAsyncThunk(
   `${SLICE_NAME}/singleToMultiView`,
-  async (params: { workspaces: WorkspaceInfo[]; userId?: string }, { dispatch, signal }) => {
-    // If this thunk was aborted (e.g., by a newer setupWorkspaceView call),
-    // do NOT clear the registry — the newer call owns it now.
-    if (signal.aborted) return;
-
+  async (params: { workspaces: WorkspaceInfo[]; userId?: string }, { dispatch }) => {
     apiClientContextRegistry.clearAll();
     dispatch(workspaceViewActions.resetToMultiView());
     return dispatch(addWorkspacesIntoMultiView(params)).unwrap();
@@ -210,12 +206,8 @@ const singleToMultiView = createAsyncThunk(
 
 export const switchContext = createAsyncThunk(
   `${SLICE_NAME}/switchContext`,
-  async (params: { workspace: WorkspaceInfo; userId?: string }, { dispatch, signal }) => {
+  async (params: { workspace: WorkspaceInfo; userId?: string }, { dispatch }) => {
     const { workspace, userId } = params;
-
-    // If this thunk was aborted (e.g., by a newer setupWorkspaceView call),
-    // do NOT clear the registry — the newer call owns it now.
-    if (signal.aborted) return;
 
     apiClientContextRegistry.clearAll();
     dispatch(workspaceViewActions.resetToSingleView());
