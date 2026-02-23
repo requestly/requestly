@@ -132,7 +132,7 @@ export function useTabBuffer<T>(
   }) => T
 ): T | null {
   const workspaceId = tab.source.metadata.context?.id;
-  const context = workspaceId != null ? apiClientContextRegistry.getContext(workspaceId) : undefined;
+  const context = workspaceId !== undefined ? apiClientContextRegistry.getContext(workspaceId) : undefined;
   const store = context?.store ?? null;
 
   const subscribe = useCallback(

@@ -28,7 +28,7 @@ export function getIsTabDirty(tab: TabState) {
   }
 
   const workspaceId = tab.source.metadata.context?.id;
-  if (!workspaceId || !apiClientContextRegistry.hasContext(workspaceId)) {
+  if (workspaceId === undefined || !apiClientContextRegistry.hasContext(workspaceId)) {
     return false;
   }
 
