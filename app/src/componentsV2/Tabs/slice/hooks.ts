@@ -131,7 +131,7 @@ export function useTabBuffer<T>(
     state: ReturnType<ReturnType<typeof getApiClientFeatureContext>["store"]["getState"]>;
   }) => T
 ): T | null {
-  const workspaceId = tab.source.metadata.context.id;
+  const workspaceId = tab.source.metadata.context?.id;
   const context = workspaceId != null ? apiClientContextRegistry.getContext(workspaceId) : undefined;
   const store = context?.store ?? null;
 
