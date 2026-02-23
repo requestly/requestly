@@ -90,13 +90,12 @@ export const useVariableAutocomplete = (options?: { editorViewRef?: RefObject<Ed
 
           if (!isClosedBefore && !isAtTrailingBoundary) {
             if (isInsideBraces) {
-              // Braces are closed: only show autocomplete if content is empty (e.g., {{|}}).
-              // When populated (e.g., {{$random|}}), the "Variable Not Found" popover
-              // handles that case instead.
-              const wholeContent = (filterText + textAfter.slice(0, nextClose)).trim();
-              shouldShow = wholeContent === "";
+              // If closed ahead (e.g. {{filter|content}}), only show if there is
+              // NO content AFTER the cursor. We allow content BEFORE (the filter).
+              const contentAfterCursor = textAfter.slice(0, nextClose).trim();
+              shouldShow = contentAfterCursor === "";
             } else {
-              // No closing braces yet — user is typing a new variable (e.g., {{api|)
+              // Braces are not closed yet, show it so user can filter/type
               shouldShow = true;
             }
           }

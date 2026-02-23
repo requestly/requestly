@@ -49,6 +49,24 @@ export function RawBody(props: {
       break;
   }
 
+  const handleEditorKeyDown = (e: React.KeyboardEvent) => {
+    if (autocompleteState.show) {
+      if (["ArrowDown", "ArrowUp", "Enter", "Escape"].includes(e.key)) {
+        // Stop the editor from processing these keys (prevents unwanted newlines)
+        e.preventDefault();
+        e.stopPropagation();
+
+        // Relay the event to the document for the Popover to handle
+        const keyboardEvent = new KeyboardEvent("keydown", {
+          key: e.key,
+          bubbles: true,
+          cancelable: true,
+        });
+        document.dispatchEvent(keyboardEvent);
+      }
+    }
+  };
+
   return (
     <>
       <div ref={editorContainerRef} className="api-client-code-editor-container api-request-body-editor-container">
@@ -69,6 +87,7 @@ export function RawBody(props: {
           customTheme={autocompleteExtension}
           onEditorReady={handleEditorReady}
           onBlur={handleCloseAutocomplete}
+          onKeyDown={handleEditorKeyDown}
         />
       </div>
 
