@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Modal } from "antd";
 import { RQAPI } from "features/apiClient/types";
-// import { MdOutlineFileDownload } from "@react-icons/all-files/md/MdOutlineFileDownload";
 import { getFormattedDate } from "utils/DateTimeUtils";
 import "./apiClientExportModal.scss";
 import fileDownload from "js-file-download";
@@ -51,6 +50,15 @@ export const ApiClientExportModal: React.FC<ExportModalProps> = ({ isOpen, onClo
     exportType === "collection" ? { records: [] } : exportType === "environment" ? { environments: [] } : {}
   );
   const [fileInfo, setFileInfo] = useState<{ label: string; type: string }>({ label: "", type: "" });
+  /**
+   * Ensure examples array exists (backward compatibility)
+   */
+  const normalizeExamples = (record: RQAPI.ApiClientRecord) => {
+    if (record.type === RQAPI.RecordType.API && !(record.data as any).examples) {
+      (record.data as any).examples = [];
+    }
+    return record;
+  };
 
   const handleExport = useCallback(() => {
     const dataToExport = { schema_version: COLLECTIONS_SCHEMA_VERSION, ...exportData };
@@ -68,7 +76,7 @@ export const ApiClientExportModal: React.FC<ExportModalProps> = ({ isOpen, onClo
   }, [exportData, onClose, fileInfo.label, exportType]);
 
   const sanitizeRecord = (record: RQAPI.ApiClientRecord): ExportRecord =>
-    omit(record, ["createdBy", "updatedBy", "ownerId", "createdTs", "updatedTs"]);
+    omit(normalizeExamples(record), ["createdBy", "updatedBy", "ownerId", "createdTs", "updatedTs"]);
 
   const sanitizeRecords = useCallback((collection: RQAPI.CollectionRecord): ExportRecord[] => {
     const records: ExportRecord[] = [];
@@ -93,8 +101,11 @@ export const ApiClientExportModal: React.FC<ExportModalProps> = ({ isOpen, onClo
   const processEnvironments = useCallback((environments: EnvironmentData[]): EnvironmentData[] => {
     return environments.map((env) => {
       const updatedVariables = Object.keys(env.variables).reduce((acc, key) => {
-        const { localValue, ...rest } = env.variables[key];
-        acc[key] = rest;
+        const variable = env.variables[key];
+        if (variable) {
+          const { localValue, ...rest } = variable;
+          acc[key] = rest;
+        }
         return acc;
       }, {} as typeof env.variables);
 
@@ -145,7 +156,7 @@ export const ApiClientExportModal: React.FC<ExportModalProps> = ({ isOpen, onClo
     } else if (exportType === "environment") {
       setFileInfo({ label: environments.length > 1 ? "Environments" : "Environment", type: "ENV" });
     }
-  }, [exportType, setFileInfo, recordsToBeExported.length, environments.length]);
+  }, [exportType, recordsToBeExported.length, environments.length]);
 
   return (
     <Modal
