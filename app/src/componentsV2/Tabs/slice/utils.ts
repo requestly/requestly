@@ -2,6 +2,7 @@ import { reduxStore } from "store";
 import { BufferModeTab, getTabBufferedEntity } from "./hooks";
 import { tabsSelectors } from "./selectors";
 import { BufferEntry } from "features/apiClient/slices";
+import { apiClientContextRegistry } from "features/apiClient/slices/workspaceView/helpers/ApiClientContextRegistry/ApiClientContextRegistry";
 import { TabState } from "./types";
 
 function isBufferModeTab(tab: TabState): tab is BufferModeTab {
@@ -23,6 +24,11 @@ export function getIsBuffersDirty(params: { primaryBuffer: BufferEntry; secondar
 
 export function getIsTabDirty(tab: TabState) {
   if (!isBufferModeTab(tab)) {
+    return false;
+  }
+
+  const workspaceId = tab.source.metadata.context?.id;
+  if (!workspaceId || !apiClientContextRegistry.hasContext(workspaceId)) {
     return false;
   }
 

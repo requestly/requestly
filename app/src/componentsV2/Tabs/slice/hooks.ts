@@ -11,6 +11,7 @@ import {
   closeTabByEntityId as _closeTabByEntityId,
 } from "./thunks";
 import { BufferEntry, EntityNotFound, getApiClientFeatureContext } from "features/apiClient/slices";
+import { apiClientContextRegistry } from "features/apiClient/slices/workspaceView/helpers/ApiClientContextRegistry/ApiClientContextRegistry";
 import { BufferedEntityFactory } from "features/apiClient/slices/entities";
 import { selectActiveTab, selectActiveTabId } from "./selectors";
 import { getIsBuffersDirty } from "./utils";
@@ -129,11 +130,21 @@ export function useTabBuffer<T>(
     secondaryBuffers: BufferEntry[];
     state: ReturnType<ReturnType<typeof getApiClientFeatureContext>["store"]["getState"]>;
   }) => T
-): T {
+): T | null {
   const workspaceId = tab.source.metadata.context.id;
-  const { store } = getApiClientFeatureContext(workspaceId);
+  const context = workspaceId != null ? apiClientContextRegistry.getContext(workspaceId) : undefined;
+  const store = context?.store ?? null;
+
+  const subscribe = useCallback(
+    (onStoreChange: () => void) => {
+      if (!store) return () => {};
+      return store.subscribe(onStoreChange);
+    },
+    [store]
+  );
 
   const getSnapshot = useCallback(() => {
+    if (!store) return null;
     const { entity, primaryBuffer, secondaryBuffers } = getTabBufferedEntity(tab);
 
     return selector({
@@ -144,13 +155,15 @@ export function useTabBuffer<T>(
     });
   }, [selector, store, tab]);
 
-  return useSyncExternalStore(store.subscribe, getSnapshot);
+  return useSyncExternalStore(subscribe, getSnapshot);
 }
 
 export function useIsTabDirty(tab: BufferModeTab) {
-  return useTabBuffer(tab, ({ primaryBuffer, secondaryBuffers }) => {
-    return getIsBuffersDirty({ primaryBuffer, secondaryBuffers });
-  });
+  return (
+    useTabBuffer(tab, ({ primaryBuffer, secondaryBuffers }) => {
+      return getIsBuffersDirty({ primaryBuffer, secondaryBuffers });
+    }) ?? false
+  );
 }
 
 export function useTabTitle(tab: BufferModeTab) {
@@ -161,5 +174,5 @@ export function useTabTitle(tab: BufferModeTab) {
     return entity.getName(state);
   });
 
-  return title;
+  return title ?? tab.source.getDefaultTitle();
 }
