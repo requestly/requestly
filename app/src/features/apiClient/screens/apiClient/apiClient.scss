@@ -30,6 +30,7 @@
 
   .api-client-header-container {
     position: sticky;
+    z-index: 100;
     border-bottom: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
 
     &__header {

@@ -811,6 +811,11 @@ export const apiRequestToHarRequestAdapter = (apiRequest: RQAPI.HttpRequest): Ha
         mimeType: RequestContentType.JSON,
         text: (apiRequest.body as string) ?? "",
       };
+    } else if (apiRequest?.contentType === RequestContentType.XML) {
+      harRequest.postData = {
+        mimeType: RequestContentType.XML,
+        text: (apiRequest.body as string) ?? "",
+      };
     } else if (apiRequest?.contentType === RequestContentType.FORM) {
       harRequest.postData = {
         mimeType: RequestContentType.FORM,

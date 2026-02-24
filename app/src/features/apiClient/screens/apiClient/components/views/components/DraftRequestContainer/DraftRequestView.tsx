@@ -73,7 +73,7 @@ export const DraftRequestView: React.FC<{
       );
       onSaveCallback(result.data as RQAPI.ApiRecord);
     },
-    [scratchBuffer, repositories, store, onSaveCallback, dispatch]
+    [scratchBuffer, store, context, repositories.apiClientRecordsRepository, dispatch, onSaveCallback]
   );
 
   const save = useCallback(

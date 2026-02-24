@@ -46,6 +46,8 @@ import { getRankForDroppedRecord } from "features/apiClient/helpers/RankingManag
 import { MdOutlineDashboardCustomize } from "@react-icons/all-files/md/MdOutlineDashboardCustomize";
 import { ExampleViewTabSource } from "../../../../views/components/ExampleRequestView/exampleViewTabSource";
 import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
+import { NativeError } from "errors/NativeError";
+import { ErrorSeverity } from "errors/types";
 
 interface Props {
   record: RQAPI.ApiRecord;
@@ -123,19 +125,17 @@ export const RequestRow: React.FC<Props> = ({
   const [{ isDragging }, drag] = useDrag(
     () => ({
       type: RQAPI.RecordType.API,
-      item: {
-        record,
-        workspaceId,
-        onDropComplete: () => setIsDropProcessing(false),
+      item: () => {
+        setIsDropProcessing(true);
+        return {
+          record,
+          workspaceId,
+          onDropComplete: () => setIsDropProcessing(false),
+        };
       },
       collect: (monitor) => ({
         isDragging: monitor.isDragging(),
       }),
-      end: (item, monitor) => {
-        if (monitor.didDrop()) {
-          setIsDropProcessing(true);
-        }
-      },
     }),
     [record, workspaceId]
   );
@@ -143,16 +143,18 @@ export const RequestRow: React.FC<Props> = ({
     () => ({
       accept: [RQAPI.RecordType.API],
       canDrop: (item: { record: RQAPI.ApiClientRecord; workspaceId: string; onDropComplete?: () => void }) => {
-        if (isReadOnly) return false;
-
-        if (item.record.id === record.id) return false;
-        if (!isFeatureCompatible(FEATURES.API_CLIENT_RECORDS_REORDERING)) {
+        if (isReadOnly || !isFeatureCompatible(FEATURES.API_CLIENT_RECORDS_REORDERING)) {
+          item.onDropComplete?.();
           return false;
         }
         return true;
       },
       hover: (item: { record: RQAPI.ApiClientRecord; workspaceId: string; onDropComplete?: () => void }, monitor) => {
-        if (!monitor.isOver({ shallow: true }) || !isFeatureCompatible(FEATURES.API_CLIENT_RECORDS_REORDERING)) {
+        if (
+          !monitor.isOver({ shallow: true }) ||
+          !isFeatureCompatible(FEATURES.API_CLIENT_RECORDS_REORDERING) ||
+          item.record.id === record.id
+        ) {
           return;
         }
 
@@ -172,8 +174,9 @@ export const RequestRow: React.FC<Props> = ({
         item: { record: RQAPI.ApiClientRecord; workspaceId: string; onDropComplete?: () => void },
         monitor
       ) => {
-        if (!monitor.isOver({ shallow: true })) {
+        if (!monitor.isOver({ shallow: true }) || item.record.id === record.id) {
           setDropPosition(null);
+          item.onDropComplete?.();
           dropPositionRef.current = null;
           return;
         }
@@ -212,9 +215,11 @@ export const RequestRow: React.FC<Props> = ({
         } catch (error) {
           notification.error({
             message: "Error moving record",
-            description: error?.message || "Unexpected error. Please contact support.",
+            description:
+              error?.message || (typeof error === "string" ? error : "Unexpected error. Please contact support."),
             placement: "bottomRight",
           });
+          throw NativeError.fromError(error).setShowBoundary(true).setSeverity(ErrorSeverity.ERROR);
         } finally {
           item.onDropComplete?.();
         }
