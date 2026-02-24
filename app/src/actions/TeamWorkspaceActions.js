@@ -18,6 +18,8 @@ import { isArray } from "lodash";
 import { workspaceActions } from "store/slices/workspaces/slice";
 import { WorkspaceType } from "features/workspaces/types";
 import { clientStorageService } from "services/clientStorageService";
+import { getAuth } from "firebase/auth";
+import firebaseApp from "../firebase";
 
 export const showSwitchWorkspaceSuccessToast = (teamName) => {
   // Show toast
@@ -100,6 +102,11 @@ export const switchWorkspace = async (
     // We are switching to pvt workspace
     // Clear team members info
     dispatch(workspaceActions.setActiveWorkspacesMembers({}));
+  }
+
+  if (teamId != null) {
+    await getAuth(firebaseApp).currentUser?.getIdTokenResult(true);
+    Logger.log("Refreshed auth token on workspace switch");
   }
 
   dispatch(workspaceActions.setActiveWorkspaceIds(teamId ? [teamId] : []));
