@@ -10,6 +10,7 @@ import {
   upsertRunConfig as upsertRunConfigFromFirebase,
   getRunResults as getRunResultsFromFirebase,
   addRunResult as addRunResultToFirebase,
+  createExample,
 } from "backend/apiClient";
 import { ApiClientCloudMeta, ApiClientRecordsInterface } from "../../interfaces";
 import { batchWrite, firebaseBatchWrite, generateDocumentId, getOwnerId } from "backend/utils";
@@ -26,6 +27,7 @@ import { SavedRunConfig } from "features/apiClient/slices/runConfig/types";
 import { SentryCustomSpan } from "utils/sentry";
 import { captureException } from "backend/apiClient/utils";
 import { apiRecordsRankingManager } from "features/apiClient/helpers/RankingManager";
+import { updateExample } from "backend/apiClient/updateExample";
 
 export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<ApiClientCloudMeta> {
   meta: ApiClientCloudMeta;
@@ -311,5 +313,15 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
         failedRecordIds: result.failedRecordIds,
       },
     };
+  }
+
+  async createExampleRequest(parentRequestId: string, example: RQAPI.ExampleApiRecord): RQAPI.ApiClientRecordPromise {
+    const result = await createExample(this.meta.uid, parentRequestId, example, this.meta.teamId);
+    return result;
+  }
+
+  async updateExampleRequest(example: RQAPI.ExampleApiRecord): RQAPI.ApiClientRecordPromise {
+    const result = await updateExample(this.meta.uid, example, this.meta.teamId);
+    return result;
   }
 }

@@ -27,7 +27,7 @@ import {
 import { useSaveBuffer } from "features/apiClient/slices/buffer/hooks";
 import { BufferedHttpRecordEntity, useIsBufferDirty } from "features/apiClient/slices/entities";
 import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
-import { RBACButton, RevertViewModeChangesAlert, RoleBasedComponent } from "features/rbac";
+import { RevertViewModeChangesAlert, RoleBasedComponent } from "features/rbac";
 import { useDeepLinkState } from "hooks";
 import { useHostContext } from "hooks/useHostContext";
 import { RQButton } from "lib/design-system-v2/components";
@@ -60,6 +60,7 @@ import { RequestContentType, RequestMethod, RQAPI } from "../../../../../types";
 import {
   checkForLargeFiles,
   getContentTypeFromResponseHeaders,
+  getEmptyDraftApiRecord,
   getRequestTypeForAnalyticEvent,
   sanitizeEntry,
 } from "../../../utils";
@@ -70,7 +71,10 @@ import { ApiClientBottomSheet } from "../components/response/ApiClientBottomShee
 import HttpApiClientUrl from "./components/HttpClientUrl/HttpClientUrl";
 import HttpRequestTabs, { RequestTab } from "./components/HttpRequestTabs/HttpRequestTabs";
 import "./httpClientView.scss";
-import { apiRecordsRankingManager } from "features/apiClient/helpers/RankingManager";
+import { SaveRequestButton } from "../components/SaveRequestButton/SaveRequestButton";
+import { MdArrowOutward } from "@react-icons/all-files/md/MdArrowOutward";
+import { DraftRequestContainerTabSource } from "../components/DraftRequestContainer/draftRequestContainerTabSource";
+import { useTabActions } from "componentsV2/Tabs/slice";
 
 function getEntry(entity: BufferedHttpRecordEntity, store: ApiClientStore) {
   return entity.getEntityFromState(store.getState()).data;
@@ -110,6 +114,7 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
   const { toggleBottomSheet, sheetPlacement } = useBottomSheetContext();
 
   const { getIsActive } = useHostContext();
+  const { openBufferedTab } = useTabActions();
 
   const { apiClientRecordsRepository, repoType } = useApiClientRepository();
 
@@ -139,6 +144,7 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
   const method = useApiClientSelector((s) => entity.getMethod(s));
   const name = useApiClientSelector((s) => entity.getName(s));
   const isNew = useApiClientSelector((s) => bufferAdapterSelectors.selectById(s.buffer, entity.id)?.isNew);
+  const isExample = useApiClientSelector((s) => entity.getType(s) === RQAPI.RecordType.EXAMPLE_API);
 
   const saveBuffer = useSaveBuffer();
 
@@ -536,6 +542,18 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
     [entity]
   );
 
+  const handleUseAsTemplate = useCallback(() => {
+    openBufferedTab({
+      isNew: true,
+      preview: false,
+      source: new DraftRequestContainerTabSource({
+        apiEntryType: RQAPI.ApiEntryType.HTTP,
+        context: {},
+        emptyRecord: getEmptyDraftApiRecord(RQAPI.ApiEntryType.HTTP, entity.getEntityFromState(store.getState()).data),
+      }),
+    });
+  }, [entity, store, openBufferedTab]);
+
   const enableHotkey = getIsActive();
 
   return isExtensionEnabled ? (
@@ -597,35 +615,34 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
                 onCurlImport={handleCurlImport}
               />
             </Space.Compact>
-            <RQButton
-              showHotKeyText
-              onClick={onSendButtonClick}
-              hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SEND_REQUEST!.hotKey}
-              type="primary"
-              className="text-bold"
-              enableHotKey={enableHotkey}
-              disabled={!url || (appMode === "EXTENSION" && contentType === RequestContentType.MULTIPART_FORM)}
-            >
-              Send
-            </RQButton>
-
-            <Conditional condition={!openInModal}>
-              <RBACButton
-                disabled={
-                  !hasUnsavedChanges || (appMode === "EXTENSION" && contentType === RequestContentType.MULTIPART_FORM)
-                }
-                permission="create"
-                resource="api_client_request"
-                showHotKeyText
-                hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SAVE_REQUEST!.hotKey}
-                onClick={onSaveButtonClick}
-                loading={isRequestSaving}
-                tooltipTitle="Saving is not allowed in view-only mode. You can update and view changes but cannot save them."
+            {isExample ? (
+              <RQButton type="primary" className="api-client-use-as-template-button" onClick={handleUseAsTemplate}>
+                Use as template <MdArrowOutward />
+              </RQButton>
+            ) : (
+              <RQButton
+                onClick={onSendButtonClick}
+                hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SEND_REQUEST!.hotKey}
+                type="primary"
+                className="text-bold"
                 enableHotKey={enableHotkey}
+                disabled={!url || (appMode === "EXTENSION" && contentType === RequestContentType.MULTIPART_FORM)}
               >
-                Save
-              </RBACButton>
-            </Conditional>
+                Send
+              </RQButton>
+            )}
+
+            <SaveRequestButton
+              hidden={openInModal}
+              disabled={
+                !hasUnsavedChanges || (appMode === "EXTENSION" && contentType === RequestContentType.MULTIPART_FORM)
+              }
+              loading={isRequestSaving}
+              enableHotkey={enableHotkey}
+              onClick={onSaveButtonClick}
+              entity={entity}
+              isExample={isExample}
+            />
           </div>
         </div>
       </div>

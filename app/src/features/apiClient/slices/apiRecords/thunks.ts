@@ -249,3 +249,45 @@ export const getExamplesForApiRecords = createAsyncThunk<
     return rejectWithValue(error instanceof Error ? error.message : "Failed to get examples");
   }
 });
+
+export const createExampleRequest = createAsyncThunk<
+  { exampleRecord: RQAPI.ExampleApiRecord },
+  { parentRequestId: string; example: RQAPI.ExampleApiRecord; repository: Repository },
+  { rejectValue: string }
+>("apiRecords/createExample", async ({ parentRequestId, example, repository }, { dispatch, rejectWithValue }) => {
+  try {
+    const result = await repository.createExampleRequest(parentRequestId, example);
+    if (!result.success || !result.data) {
+      throw new Error(result.message ?? "Failed to create example request");
+    }
+
+    const record = result.data as RQAPI.ExampleApiRecord;
+
+    dispatch(apiRecordsActions.upsertRecord(record));
+
+    return { exampleRecord: record };
+  } catch (error) {
+    return rejectWithValue(error instanceof Error ? error.message : "Failed to create example request");
+  }
+});
+
+export const updateExampleRequest = createAsyncThunk<
+  { exampleRecord: RQAPI.ExampleApiRecord },
+  { example: RQAPI.ExampleApiRecord; repository: Repository },
+  { rejectValue: string }
+>("apiRecords/updateExample", async ({ example, repository }, { dispatch, rejectWithValue }) => {
+  try {
+    const result = await repository.updateExampleRequest(example);
+    if (!result.success || !result.data) {
+      throw new Error(result.message ?? "Failed to update example request");
+    }
+
+    const record = result.data as RQAPI.ExampleApiRecord;
+
+    dispatch(apiRecordsActions.upsertRecord(record));
+
+    return { exampleRecord: record };
+  } catch (error) {
+    return rejectWithValue(error instanceof Error ? error.message : "Failed to update example request");
+  }
+});
