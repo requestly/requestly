@@ -1,4 +1,4 @@
-import { RouteObject } from "react-router-dom";
+import { Navigate, RouteObject } from "react-router-dom";
 import DashboardLayout from "../layouts/DashboardLayout";
 import FullScreenLayout from "layouts/FullScreenLayout";
 import PATHS from "config/constants/sub/paths";
@@ -22,14 +22,13 @@ import { paymentRoutes } from "./paymentRoutes";
 import { networkInspectorRoutes } from "features/networkInspector";
 import RouterError from "components/misc/PageError/RouterError";
 import { BStackAuthStart } from "features/onboarding/screens/BStackAuthStart/BStackAuthStart";
-import ExtensionInstalledScreen from "views/misc/ExtensionInstalledScreen/";
 import AutomationTemplate from "views/misc/Automation/layout";
 
 export const routesV2: RouteObject[] = [
   /** Misc **/
   {
     path: PATHS._INSTALLED_EXTENSION.RELATIVE,
-    element: <ExtensionInstalledScreen />,
+    element: <Navigate to={PATHS.HOME.ABSOLUTE} replace />,
   },
   {
     path: PATHS.SELENIUM_IMPORTER.RELATIVE,
