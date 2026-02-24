@@ -18,6 +18,8 @@ import { Modal } from "antd";
 import { ApiClientViewMode, useViewMode, useWorkspaceViewActions } from "features/apiClient/slices";
 import { getWorkspaceInfo } from "features/apiClient/slices/workspaceView/utils";
 import { InvalidContextVersionError } from "features/apiClient/slices/workspaceView/helpers/ApiClientContextRegistry/ApiClientContextRegistry";
+import { NativeError } from "errors/NativeError";
+import { ErrorSeverity } from "errors/types";
 
 //TODO: move it into top level hooks
 export const useWorkspaceSwitcher = () => {
@@ -98,7 +100,7 @@ export const useWorkspaceSwitcher = () => {
           if (result.payload.error.name === InvalidContextVersionError.name) {
             return;
           } else {
-            throw new Error(result.payload?.error);
+            throw result.payload?.error;
           }
         }
 
@@ -111,6 +113,7 @@ export const useWorkspaceSwitcher = () => {
         toast.error(
           "Failed to switch workspace. Please reload and try again. If the issue persists, please contact support."
         );
+        throw NativeError.fromError(error).setShowBoundary(true).setSeverity(ErrorSeverity.ERROR);
       } finally {
         setIsWorkspaceLoading(false);
       }
@@ -179,7 +182,7 @@ export const useWorkspaceSwitcher = () => {
         if (result.payload.error.name === InvalidContextVersionError.name) {
           return;
         } else {
-          throw new Error(result.payload?.error);
+          throw result.payload?.error;
         }
       }
 
@@ -188,6 +191,7 @@ export const useWorkspaceSwitcher = () => {
       toast.error(
         "Failed to switch workspace. Please reload and try again. If the issue persists, please contact support."
       );
+      throw NativeError.fromError(error).setShowBoundary(true).setSeverity(ErrorSeverity.ERROR);
     } finally {
       setIsWorkspaceLoading(false);
     }
