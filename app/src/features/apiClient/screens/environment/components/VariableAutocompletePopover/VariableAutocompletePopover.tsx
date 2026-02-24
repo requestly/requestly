@@ -96,11 +96,8 @@ export const VariableAutocompletePopover: React.FC<VariableAutocompleteProps> = 
 
     useEffect(() => {
       onSelectRef.current = onSelect;
-    }, [onSelect]);
-
-    useEffect(() => {
       indexRef.current = selectedIndex;
-    }, [selectedIndex]);
+    });
 
     const allVariables = useMemo(() => {
       return variables ? mergeAndParseAllVariables(variables) : {};
@@ -108,29 +105,19 @@ export const VariableAutocompletePopover: React.FC<VariableAutocompleteProps> = 
 
     const filteredVariables = useMemo(() => {
       const entries = Object.entries(allVariables);
-      if (!entries.length) return [];
 
-      const lowerSearch = search.toLowerCase();
+      const lowerSearch = (search || "").toLowerCase();
 
       return entries
         .map(([key, variable]) => ({ name: key, variable }))
-        .filter(({ name }) => {
-          const lower = name.toLowerCase();
-          return lower.includes(lowerSearch);
-        });
+        .filter(({ name }) => name.toLowerCase().includes(lowerSearch));
     }, [allVariables, search]);
 
     useEffect(() => {
       filteredRef.current = filteredVariables;
 
-      if (show) {
-        setSelectedIndex(0);
-      }
-    }, [filteredVariables, show]);
-
-    const stableOnSelect = useCallback((name: string, isDynamic: boolean) => {
-      onSelectRef.current(name, isDynamic);
-    }, []);
+      setSelectedIndex(0);
+    }, [filteredVariables]);
 
     useEffect(() => {
       if (!show) return;
@@ -157,7 +144,7 @@ export const VariableAutocompletePopover: React.FC<VariableAutocompleteProps> = 
             e.stopPropagation();
             const item = items[indexRef.current];
             if (item) {
-              stableOnSelect(item.name, checkIsDynamicVariable(item.variable));
+              onSelectRef.current(item.name, checkIsDynamicVariable(item.variable));
             }
             break;
           }
@@ -169,17 +156,19 @@ export const VariableAutocompletePopover: React.FC<VariableAutocompleteProps> = 
             break;
         }
       };
-      document.addEventListener("keydown", handleKeyDown);
+      document.addEventListener("keydown", handleKeyDown, true);
 
       return () => {
-        document.removeEventListener("keydown", handleKeyDown);
+        document.removeEventListener("keydown", handleKeyDown, true);
       };
-    }, [show, onClose, stableOnSelect]);
+    }, [show, onClose]);
 
     useEffect(() => {
       if (!show) return;
-      const node = listRef.current?.querySelector(`[data-index="${selectedIndex}"]`) as HTMLElement | null;
-      node?.scrollIntoView({ block: "nearest" });
+      const node = listRef.current?.querySelector(`[data-index="${selectedIndex}"]`) as HTMLElement;
+      if (node) {
+        node.scrollIntoView({ block: "nearest" });
+      }
     }, [selectedIndex, show]);
 
     return (
@@ -201,7 +190,7 @@ export const VariableAutocompletePopover: React.FC<VariableAutocompleteProps> = 
                     item={item}
                     index={index}
                     isSelected={index === selectedIndex}
-                    onSelect={stableOnSelect}
+                    onSelect={(name, isDyn) => onSelectRef.current(name, isDyn)}
                     onHover={setSelectedIndex}
                   />
                 )}
@@ -217,6 +206,7 @@ export const VariableAutocompletePopover: React.FC<VariableAutocompleteProps> = 
             left: position.x,
             width: 1,
             height: 1,
+            pointerEvents: "none",
           }}
         />
       </Popover>
