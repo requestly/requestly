@@ -13,7 +13,6 @@ import { useActiveTab, useTabActions } from "componentsV2/Tabs/slice";
 import {
   ApiClientFeatureContext,
   createExampleRequest,
-  deleteExampleRequests,
   updateExampleRequest,
   useApiClientFeatureContext,
 } from "features/apiClient/slices";
@@ -128,22 +127,6 @@ export const ExampleRow: React.FC<Props> = ({ record, isReadOnly, handleRecordsT
     }
   }, [isOverCurrent, dropPosition]);
 
-  const handleDeleteExample = useCallback(async () => {
-    try {
-      await context.store
-        .dispatch(
-          deleteExampleRequests({
-            exampleRecords: [record],
-            repository: context.repositories.apiClientRecordsRepository,
-          }) as any
-        )
-        .unwrap();
-      toast.success("Example deleted successfully");
-    } catch (error) {
-      toast.error("Something went wrong while deleting the example.");
-    }
-  }, [context.store, context.repositories.apiClientRecordsRepository, record]);
-
   const handleDuplicateExample = useCallback(async () => {
     try {
       const rank = apiRecordsRankingManager.getRankForDuplicatedRecord(context, record, record.parentRequestId);
@@ -220,11 +203,11 @@ export const ExampleRow: React.FC<Props> = ({ record, isReadOnly, handleRecordsT
         onClick: (itemInfo) => {
           itemInfo.domEvent?.stopPropagation?.();
           setIsDropdownVisible(false);
-          handleDeleteExample();
+          handleRecordsToBeDeleted([record], context);
         },
       },
     ];
-  }, [handleDeleteExample, handleDuplicateExample]);
+  }, [handleDuplicateExample, handleRecordsToBeDeleted, record, context]);
 
   if (isEditMode) {
     return (

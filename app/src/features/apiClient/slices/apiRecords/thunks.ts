@@ -70,6 +70,7 @@ type DeleteRecordsResult = {
   collectionsDeletionResult: { success: boolean; data: unknown; message?: string };
   deletedApiRecords: RQAPI.ApiRecord[];
   deletedCollectionRecords: RQAPI.CollectionRecord[];
+  deletedExampleRecords: RQAPI.ExampleApiRecord[];
 };
 
 export const deleteRecords = createAsyncThunk<
@@ -84,26 +85,33 @@ export const deleteRecords = createAsyncThunk<
   async ({ records, repository }, { dispatch, rejectWithValue, getState, signal }) => {
     const recordsToBeDeleted = getAllRecords(records);
 
-    const [apiRecords, collectionRecords] = partition(recordsToBeDeleted, isApiRequest);
+    const [apiRecords, nonApiRecords] = partition(recordsToBeDeleted, isApiRequest);
+    const [collectionRecords, exampleRecords] = partition(nonApiRecords, isApiCollection);
     const apiRecordIds = apiRecords.map((record) => record.id);
     const collectionRecordIds = collectionRecords.map((record) => record.id);
 
     const recordsDeletionResult = await repository.deleteRecords(apiRecordIds);
     const collectionsDeletionResult = await repository.deleteCollections(collectionRecordIds);
+    const exampleRecordsDeletionResult = await repository.deleteExamples(exampleRecords as RQAPI.ExampleApiRecord[]);
 
-    if (!recordsDeletionResult.success || !collectionsDeletionResult.success) {
+    if (!recordsDeletionResult.success || !collectionsDeletionResult.success || !exampleRecordsDeletionResult.success) {
       return rejectWithValue(
-        recordsDeletionResult.message ?? collectionsDeletionResult.message ?? "Failed to delete records"
+        recordsDeletionResult.message ??
+          collectionsDeletionResult.message ??
+          exampleRecordsDeletionResult.message ??
+          "Failed to delete records"
       );
     }
 
-    dispatch(apiRecordsActions.recordsDeleted([...apiRecordIds, ...collectionRecordIds]));
+    const exampleRecordIds = exampleRecords.map((record) => record.id);
+    dispatch(apiRecordsActions.recordsDeleted([...apiRecordIds, ...collectionRecordIds, ...exampleRecordIds]));
 
     return {
       recordsDeletionResult,
       collectionsDeletionResult,
       deletedApiRecords: apiRecords as RQAPI.ApiRecord[],
       deletedCollectionRecords: collectionRecords as RQAPI.CollectionRecord[],
+      deletedExampleRecords: exampleRecords as RQAPI.ExampleApiRecord[],
     };
   },
   {
@@ -204,11 +212,29 @@ export const duplicateRecords = createAsyncThunk<
   const recordsToRender = getRecordsToRender({ apiClientRecords });
   const childParentMap = selectChildToParent(getState());
   const processedRecords = filterOutChildrenRecords(recordIds, childParentMap, recordsToRender.recordsMap);
-  const recordsToDuplicate = processRecordsForDuplication(processedRecords, repository, context);
+  const { recordsToDuplicate, examplesToDuplicate } = processRecordsForDuplication(
+    processedRecords,
+    repository,
+    context
+  );
 
   const duplicatedRecords = await repository.duplicateApiEntities(recordsToDuplicate);
 
   dispatch(apiRecordsActions.upsertRecords(duplicatedRecords));
+
+  if (examplesToDuplicate.length > 0) {
+    await Promise.all(
+      examplesToDuplicate.map(({ parentRequestId, example }) =>
+        dispatch(
+          createExampleRequest({
+            parentRequestId,
+            example: { ...example, parentRequestId },
+            repository,
+          }) as any
+        )
+      )
+    );
+  }
 
   const isMultiView = reduxStore.getState().workspaceView.viewMode === ApiClientViewMode.MULTI;
   if (isMultiView) {

@@ -67,8 +67,10 @@ export const DeleteApiRecordModal: React.FC<DeleteApiRecordModalProps> = ({
 
       toast.success(
         records.length === 1
-          ? records[0].type === RQAPI.RecordType.API
+          ? records[0]?.type === RQAPI.RecordType.API
             ? "API request deleted"
+            : records[0]?.type === RQAPI.RecordType.EXAMPLE_API
+            ? "Example deleted"
             : "Collection deleted"
           : "Records Deleted"
       );
@@ -85,15 +87,19 @@ export const DeleteApiRecordModal: React.FC<DeleteApiRecordModalProps> = ({
 
   const header =
     records.length === 1
-      ? records[0].type === RQAPI.RecordType.API
+      ? records[0]?.type === RQAPI.RecordType.API
         ? "Delete API Request"
+        : records[0]?.type === RQAPI.RecordType.EXAMPLE_API
+        ? "Delete Example"
         : "Delete Collection"
       : "Delete Records";
 
   const description =
     records.length === 1
-      ? records[0].type === RQAPI.RecordType.API
+      ? records[0]?.type === RQAPI.RecordType.API
         ? `This action will permanently delete this API request. Are you sure you want to continue?`
+        : records[0]?.type === RQAPI.RecordType.EXAMPLE_API
+        ? "This action will permanently delete this example. Are you sure you want to continue?"
         : `This action will permanently delete the entire collection and its ${apiRequestCount} requests. Are you sure you want to continue?`
       : "This action will permanently delete the selected Collections, APIs, and their associated requests. Are you sure you want to proceed?";
 
@@ -116,9 +122,11 @@ export const DeleteApiRecordModal: React.FC<DeleteApiRecordModalProps> = ({
         </RQButton>
         <RQButton block type="danger" loading={isDeleting} onClick={handleDeleteApiRecord}>
           {records.length === 1
-            ? records[0].type === RQAPI.RecordType.API
+            ? records[0]?.type === RQAPI.RecordType.API
               ? "Delete API"
-              : "Delete collection"
+              : records[0]?.type === RQAPI.RecordType.EXAMPLE_API
+              ? "Delete Example"
+              : "Delete Collection"
             : "Delete Records"}
         </RQButton>
       </div>

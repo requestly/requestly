@@ -309,9 +309,12 @@ const GraphQLClientView: React.FC<GraphQLClientViewProps> = ({
 
   const handleRecordNameUpdate = useCallback(
     async (newName: string) => {
-      const record = lodash.cloneDeep(entity.getEntityFromState(store.getState()));
+      const record = lodash.cloneDeep(entity.getEntityFromState(store.getState())) as RQAPI.ApiClientRecord;
       record.name = newName;
-      const result = await repositories.apiClientRecordsRepository.updateRecord(record, entity.meta.referenceId);
+      const result =
+        record.type === RQAPI.RecordType.EXAMPLE_API
+          ? await repositories.apiClientRecordsRepository.updateExampleRequest(record)
+          : await repositories.apiClientRecordsRepository.updateRecord(record, entity.meta.referenceId);
       if (!result.success) {
         notification.error({
           message: "Could not rename request",
