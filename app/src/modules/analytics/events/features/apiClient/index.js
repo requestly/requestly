@@ -176,6 +176,11 @@ export const trackImportSuccess = (type, collectionsCount, requestsCount) => {
   });
 };
 
+export const trackPostmanUnsupportedFeatures = (unsupportedFeaturesList) => {
+  const params = { unsupported_features_list: unsupportedFeaturesList };
+  trackEvent(API_CLIENT.POSTMAN_UNSUPPORTED_FEATURES, params);
+};
+
 export const trackImportFailed = (type, reason) => {
   trackEvent(API_CLIENT.IMPORT_FAILED, { import_type: type, reason });
 };
