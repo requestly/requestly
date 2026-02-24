@@ -18,7 +18,6 @@ import { getApiClientFeatureContext } from "../workspaceView/helpers/ApiClientCo
 import { Workspace } from "features/workspaces/types";
 import { erroredRecordsActions } from "../erroredRecords";
 import { closeTabByEntityId } from "componentsV2/Tabs/slice";
-import { apiRecordsRankingManager } from "features/apiClient/helpers/RankingManager";
 
 type Repository = ApiClientRecordsInterface<Record<string, unknown>>;
 
@@ -169,12 +168,10 @@ export const moveRecords = createAsyncThunk<
     { recordsToMove, collectionId, repository, sourceWorkspaceId, destinationWorkspaceId },
     { dispatch, rejectWithValue }
   ) => {
-    const context = getApiClientFeatureContext(destinationWorkspaceId);
-    const ranks = apiRecordsRankingManager.getRanksForNewApis(context, collectionId, recordsToMove);
     const updatedRecords = recordsToMove.map((record, index) => {
       return isApiCollection(record)
         ? { ...record, collectionId, data: omit(record.data, "children") }
-        : { ...record, collectionId, rank: ranks[index] };
+        : { ...record, collectionId };
     });
 
     try {
