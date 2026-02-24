@@ -18,7 +18,6 @@ import { getApiClientFeatureContext } from "../workspaceView/helpers/ApiClientCo
 import { Workspace } from "features/workspaces/types";
 import { erroredRecordsActions } from "../erroredRecords";
 import { closeTabByEntityId } from "componentsV2/Tabs/slice";
-import { apiRecordsRankingManager } from "features/apiClient/helpers/RankingManager";
 
 type Repository = ApiClientRecordsInterface<Record<string, unknown>>;
 
@@ -291,3 +290,32 @@ export const updateExampleRequest = createAsyncThunk<
     return rejectWithValue(error instanceof Error ? error.message : "Failed to update example request");
   }
 });
+
+export const deleteExampleRequests = createAsyncThunk<
+  { recordIdsDeleted: string[] },
+  { exampleRecords: RQAPI.ExampleApiRecord[]; repository: Repository },
+  { rejectValue: string }
+>(
+  "apiRecords/deleteExample",
+  async ({ exampleRecords, repository }, { dispatch, rejectWithValue }) => {
+    try {
+      const result = await repository.deleteExamples(exampleRecords);
+      if (!result.success) {
+        throw new Error(result.message ?? "Failed to delete example request");
+      }
+      dispatch(apiRecordsActions.recordsDeleted(exampleRecords.map((example) => example.id)));
+
+      return { recordIdsDeleted: exampleRecords.map((example) => example.id) };
+    } catch (error) {
+      return rejectWithValue(error instanceof Error ? error.message : "Failed to delete example request");
+    }
+  },
+  {
+    condition: async ({ exampleRecords }) => {
+      const allRecords = getAllRecords(exampleRecords);
+      return allRecords.every((r) =>
+        reduxStore.dispatch(closeTabByEntityId({ entityId: r.id, skipUnsavedPrompt: true }))
+      );
+    },
+  }
+);
