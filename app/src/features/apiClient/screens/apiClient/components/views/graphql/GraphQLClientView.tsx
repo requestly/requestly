@@ -35,7 +35,11 @@ import {
 } from "modules/analytics/events/features/apiClient";
 import { extractOperationNames } from "./utils";
 import ErrorBoundary from "features/apiClient/components/ErrorBoundary/ErrorBoundary";
-import { getContentTypeFromResponseHeaders, getRequestTypeForAnalyticEvent } from "../../../utils";
+import {
+  getContentTypeFromResponseHeaders,
+  getEmptyDraftApiRecord,
+  getRequestTypeForAnalyticEvent,
+} from "../../../utils";
 import { useGraphQLRequestExecutor } from "features/apiClient/hooks/requestExecutors/useGraphQLRequestExecutor";
 import { isExtensionInstalled } from "actions/ExtensionActions";
 import { isDesktopMode } from "utils/AppUtils";
@@ -64,6 +68,10 @@ import { sanitizeKeyValuePairs } from "../../../utils";
 import { GraphQLRecordProvider } from "features/apiClient/store/apiRecord/graphqlRecord/GraphQLRecordContextProvider";
 import { GenericApiClientOverride } from "../../../clientView/GenericApiClient";
 import { SaveRequestButton } from "../components/SaveRequestButton/SaveRequestButton";
+import { MdArrowOutward } from "@react-icons/all-files/md/MdArrowOutward";
+import { DraftRequestContainerTabSource } from "../components/DraftRequestContainer/draftRequestContainerTabSource";
+import { useTabActions } from "componentsV2/Tabs/slice";
+import { RQButton } from "lib/design-system-v2/components";
 
 function getEntry(entity: BufferedGraphQLRecordEntity, store: ApiClientStore) {
   return entity.getEntityFromState(store.getState()).data;
@@ -90,6 +98,7 @@ const GraphQLClientView: React.FC<GraphQLClientViewProps> = ({
   const repositories = useApiClientRepository();
 
   const { getIsActive } = useHostContext();
+  const { openBufferedTab } = useTabActions();
 
   const hasUnsavedChanges = useIsBufferDirty({
     type: "bufferId",
@@ -99,6 +108,7 @@ const GraphQLClientView: React.FC<GraphQLClientViewProps> = ({
   const url = useApiClientSelector((s) => entity.getUrl(s));
   const name = useApiClientSelector((s) => entity.getName(s) || "Untitled request");
   const isNew = useApiClientSelector((s) => bufferAdapterSelectors.selectById(s.buffer, entity.id)?.isNew) ?? false;
+  const isExample = useApiClientSelector((s) => entity.getType(s) === RQAPI.RecordType.EXAMPLE_API);
 
   const introspectionData = useGraphQLRecordStore((state) => state.introspectionData);
 
@@ -424,6 +434,21 @@ const GraphQLClientView: React.FC<GraphQLClientViewProps> = ({
     setIsRequestCancelled(true);
   }, [graphQLRequestExecutor]);
 
+  const handleUseAsTemplate = useCallback(() => {
+    openBufferedTab({
+      isNew: true,
+      preview: false,
+      source: new DraftRequestContainerTabSource({
+        apiEntryType: RQAPI.ApiEntryType.GRAPHQL,
+        context: {},
+        emptyRecord: getEmptyDraftApiRecord(
+          RQAPI.ApiEntryType.GRAPHQL,
+          entity.getEntityFromState(store.getState()).data
+        ),
+      }),
+    });
+  }, [entity, store, openBufferedTab]);
+
   return (
     <div className="api-client-view gql-client-view">
       <div className="api-client-header-container">
@@ -475,7 +500,13 @@ const GraphQLClientView: React.FC<GraphQLClientViewProps> = ({
                 onUrlChange={handleUrlChange}
               />
             </Space.Compact>
-            <SendQueryButton entity={entity} disabled={!url} loading={isSending} onSendClick={handleSend} />
+            {isExample ? (
+              <RQButton type="primary" className="api-client-use-as-template-button" onClick={handleUseAsTemplate}>
+                Use as template <MdArrowOutward />
+              </RQButton>
+            ) : (
+              <SendQueryButton entity={entity} disabled={!url} loading={isSending} onSendClick={handleSend} />
+            )}
 
             <SaveRequestButton
               disabled={!hasUnsavedChanges}
@@ -484,6 +515,7 @@ const GraphQLClientView: React.FC<GraphQLClientViewProps> = ({
               enableHotkey={enableHotkey}
               onClick={onSaveButtonClick}
               entity={entity}
+              isExample={isExample}
             />
           </div>
         </div>
