@@ -30,6 +30,7 @@ import {
   useApiClientRepository,
   useApiClientFeatureContext,
   createExampleRequest,
+  moveRecords,
 } from "features/apiClient/slices";
 import { useActiveTab, useTabActions } from "componentsV2/Tabs/slice";
 import { useWorkspaceId } from "features/apiClient/common/WorkspaceProvider";
@@ -141,7 +142,7 @@ export const RequestRow: React.FC<Props> = ({
   const [{ isOverCurrent }, drop] = useDrop(
     () => ({
       accept: [RQAPI.RecordType.API],
-      canDrop: (item: { record: RQAPI.ApiClientRecord; contextId: string; onDropComplete?: () => void }) => {
+      canDrop: (item: { record: RQAPI.ApiClientRecord; workspaceId: string; onDropComplete?: () => void }) => {
         if (isReadOnly) return false;
 
         if (item.record.id === record.id) return false;
@@ -150,7 +151,7 @@ export const RequestRow: React.FC<Props> = ({
         }
         return true;
       },
-      hover: (item: { record: RQAPI.ApiClientRecord; contextId: string; onDropComplete?: () => void }, monitor) => {
+      hover: (item: { record: RQAPI.ApiClientRecord; workspaceId: string; onDropComplete?: () => void }, monitor) => {
         if (!monitor.isOver({ shallow: true }) || !isFeatureCompatible(FEATURES.API_CLIENT_RECORDS_REORDERING)) {
           return;
         }
@@ -168,7 +169,7 @@ export const RequestRow: React.FC<Props> = ({
         }
       },
       drop: async (
-        item: { record: RQAPI.ApiClientRecord; contextId: string; onDropComplete?: () => void },
+        item: { record: RQAPI.ApiClientRecord; workspaceId: string; onDropComplete?: () => void },
         monitor
       ) => {
         if (!monitor.isOver({ shallow: true })) {
@@ -188,26 +189,26 @@ export const RequestRow: React.FC<Props> = ({
             droppedRecord: item.record,
             dropPosition: currentDropPosition,
           });
-          const targetCollectionId = record.collectionId;
+          const targetCollectionId = record.collectionId ?? "";
           if (item.record.type === RQAPI.RecordType.COLLECTION) {
             return;
           }
-          const patch: Partial<RQAPI.ApiRecord> = {
-            data: {
-              ...item.record.data,
-            },
-            id: item.record.id,
+
+          const droppedRecord = {
+            ...item.record,
             rank,
-            collectionId: targetCollectionId,
           };
-
-          const result = await apiClientRecordsRepository.updateRecord(patch, item.record.id);
-
-          if (result.success) {
-            onSaveRecord(result.data);
-          } else {
-            throw new Error("Failed to move record");
-          }
+          await context.store
+            .dispatch(
+              moveRecords({
+                recordsToMove: [droppedRecord],
+                collectionId: targetCollectionId,
+                repository: apiClientRecordsRepository,
+                sourceWorkspaceId: item.workspaceId,
+                destinationWorkspaceId: workspaceId,
+              }) as any
+            )
+            .unwrap();
         } catch (error) {
           notification.error({
             message: "Error moving record",
