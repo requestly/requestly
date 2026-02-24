@@ -1,3 +1,12 @@
+.request-row {
+  display: flex;
+  align-items: center;
+
+  a {
+    width: 100%;
+  }
+}
+
 svg.graphql-request-icon {
   color: #ff14a9;
   min-width: 32px;
@@ -30,4 +39,20 @@ svg.graphql-request-icon {
 .request-drop-after {
   border-bottom: 2px solid var(--requestly-color-primary-text, #1890ff);
   margin-bottom: -2px;
+}
+
+.collapsible-request-row-header {
+  display: flex;
+  align-items: center;
+  gap: var(--requestly-space-2, 4px);
+  // padding: var(--space-2, 4px);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.request-with-examples-row {
+  .ant-collapse-header:hover .request-options {
+    display: block !important;
+  }
 }
