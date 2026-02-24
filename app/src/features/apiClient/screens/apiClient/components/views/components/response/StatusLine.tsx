@@ -10,6 +10,7 @@ import { RQButton } from "lib/design-system-v2/components";
 import { MdOutlineDashboardCustomize } from "@react-icons/all-files/md/MdOutlineDashboardCustomize";
 import { BufferedGraphQLRecordEntity, BufferedHttpRecordEntity } from "features/apiClient/slices/entities";
 import { useApiClientFeatureContext } from "features/apiClient/slices";
+import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
 import { useSaveAsExample } from "features/apiClient/hooks/useSaveAsExample";
 
 interface Props {
@@ -20,7 +21,10 @@ interface Props {
 const StatusLine: React.FC<Props> = ({ response, entity }) => {
   const context = useApiClientFeatureContext();
 
+  const isLocalSyncEnabled = useCheckLocalSyncSupport();
+
   const { isSavingAsExample, handleSaveExample } = useSaveAsExample(entity);
+
   const entityType = entity.getType(context.store.getState());
 
   const formattedTime = useMemo(() => {
@@ -61,7 +65,7 @@ const StatusLine: React.FC<Props> = ({ response, entity }) => {
         value={<NetworkStatusField status={response.status} />}
       />
       <PropertyRow className="api-response-status-row__time" name="Time" value={formattedTime} />
-      {entityType === RQAPI.RecordType.API && (
+      {entityType === RQAPI.RecordType.API && !isLocalSyncEnabled && (
         <div className="api-response-status-row__save-button-wapper">
           <Tooltip title="Save the current request and response as an example." placement="bottom" color="#000">
             <RQButton

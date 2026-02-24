@@ -45,6 +45,7 @@ import FEATURES from "config/constants/sub/features";
 import { getRankForDroppedRecord } from "features/apiClient/helpers/RankingManager/utils";
 import { MdOutlineDashboardCustomize } from "@react-icons/all-files/md/MdOutlineDashboardCustomize";
 import { ExampleViewTabSource } from "../../../../views/components/ExampleRequestView/exampleViewTabSource";
+import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
 
 interface Props {
   record: RQAPI.ApiRecord;
@@ -116,6 +117,8 @@ export const RequestRow: React.FC<Props> = ({
   const context = useApiClientFeatureContext();
   const { apiClientRecordsRepository } = useApiClientRepository();
   const activeTabSourceId = useActiveTab()?.source.getSourceId();
+
+  const isLocalSyncEnabled = useCheckLocalSyncSupport();
 
   const [{ isDragging }, drag] = useDrag(
     () => ({
@@ -352,19 +355,23 @@ export const RequestRow: React.FC<Props> = ({
           handleDropdownVisibleChange(false);
         },
       },
-      {
-        key: "3",
-        label: (
-          <div>
-            <MdOutlineDashboardCustomize style={{ marginRight: 8 }} />
-            Add example
-          </div>
-        ),
-        onClick: (itemInfo) => {
-          itemInfo.domEvent?.stopPropagation?.();
-          handleAddExample(record);
-        },
-      },
+      ...(!isLocalSyncEnabled
+        ? [
+            {
+              key: "3",
+              label: (
+                <div>
+                  <MdOutlineDashboardCustomize style={{ marginRight: 8 }} />
+                  Add example
+                </div>
+              ),
+              onClick: (itemInfo: any) => {
+                itemInfo.domEvent?.stopPropagation?.();
+                handleAddExample(record);
+              },
+            },
+          ]
+        : []),
       {
         key: "4",
         label: (
@@ -381,7 +388,7 @@ export const RequestRow: React.FC<Props> = ({
         },
       },
     ];
-  }, [record, handleRecordsToBeDeleted, handleDuplicateRequest, handleAddExample]);
+  }, [record, handleRecordsToBeDeleted, handleDuplicateRequest, handleAddExample, isLocalSyncEnabled]);
 
   const examples = record.data.examples || [];
 
