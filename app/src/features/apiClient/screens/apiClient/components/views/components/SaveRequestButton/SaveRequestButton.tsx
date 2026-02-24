@@ -19,7 +19,6 @@ import { useTabActions } from "componentsV2/Tabs/slice";
 import { ExampleViewTabSource } from "../ExampleRequestView/exampleViewTabSource";
 import { toast } from "utils/Toast";
 import "./saveRequestButton.scss";
-import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
 import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
 
 interface Props {
@@ -51,8 +50,6 @@ export const SaveRequestButton: React.FC<Props> = ({
   const { isValidPermission } = validatePermission("api_client_request", "create");
   const context = useApiClientFeatureContext();
   const { openBufferedTab } = useTabActions();
-
-  const isLocalSyncEnabled = useCheckLocalSyncSupport();
 
   const [isSavingAsExample, setIsSavingAsExample] = useState(false);
 
@@ -139,7 +136,7 @@ export const SaveRequestButton: React.FC<Props> = ({
     [handleSaveAsExample, isValidPermission]
   );
 
-  if (isLocalSyncEnabled || isDraft) {
+  if (isDraft) {
     return (
       <RQButton
         onClick={onClick}
