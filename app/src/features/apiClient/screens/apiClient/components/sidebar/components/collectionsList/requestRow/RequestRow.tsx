@@ -312,6 +312,11 @@ export const RequestRow: React.FC<Props> = ({
             }) as any
           )
           .unwrap();
+
+        if (!expandedRecordIds.includes(record.id)) {
+          setExpandedRecordIds?.([...expandedRecordIds, record.id]);
+        }
+
         openBufferedTab({
           preview: false,
           source: new ExampleViewTabSource({
@@ -325,7 +330,7 @@ export const RequestRow: React.FC<Props> = ({
         toast.error("Something went wrong while creating the example.");
       }
     },
-    [context, openBufferedTab, workspaceId]
+    [context, openBufferedTab, workspaceId, expandedRecordIds, setExpandedRecordIds]
   );
 
   const requestOptions = useMemo((): MenuProps["items"] => {

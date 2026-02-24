@@ -5,7 +5,7 @@ import { RQButton } from "lib/design-system-v2/components";
 import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
 import { MdOutlineBorderColor } from "@react-icons/all-files/md/MdOutlineBorderColor";
 import { MdOutlineDelete } from "@react-icons/all-files/md/MdOutlineDelete";
-import { MdOutlineDashboardCustomize } from "@react-icons/all-files/md/MdOutlineDashboardCustomize";
+import { MdOutlineDashboard } from "@react-icons/all-files/md/MdOutlineDashboard";
 import { Conditional } from "components/common/Conditional";
 import { NewRecordNameInput } from "../newRecordNameInput/NewRecordNameInput";
 import { ExampleViewTabSource } from "../../../../views/components/ExampleRequestView/exampleViewTabSource";
@@ -251,7 +251,7 @@ export const ExampleRow: React.FC<Props> = ({ record, isReadOnly, handleRecordsT
         }}
       >
         <div style={{ width: 8 }} />
-        <MdOutlineDashboardCustomize className="example-row-icon" />
+        <MdOutlineDashboard className="example-row-icon" />
         <Typography.Text
           ellipsis={{
             tooltip: {
