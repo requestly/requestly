@@ -4,7 +4,7 @@ import { APIS_NODE, EXAMPLES_REQUESTS_NODE } from "./constants";
 import { RQAPI } from "features/apiClient/types";
 import * as Sentry from "@sentry/react";
 
-export const deleteExamples = async (uid: string, exampleRecords: RQAPI.ExampleApiRecord[], teamId?: string) => {
+export const deleteExamples = async (uid: string, exampleRecords: RQAPI.ExampleApiRecord[]) => {
   try {
     const db = getFirestore(firebaseApp);
     const exampleRefs = exampleRecords.map((example) =>
