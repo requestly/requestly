@@ -376,9 +376,13 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
 
   const handleRecordNameUpdate = useCallback(
     async (name: string) => {
-      const record = lodash.cloneDeep(entity.getEntityFromState(store.getState()));
+      // FIX: current record type arch does not have proper intersection between ApiRecord and ExampleApiRecord
+      const record = lodash.cloneDeep(entity.getEntityFromState(store.getState())) as RQAPI.ApiClientRecord;
       record.name = name;
-      const result = await apiClientRecordsRepository.updateRecord(record, entity.meta.referenceId);
+      const result =
+        record.type === RQAPI.RecordType.EXAMPLE_API
+          ? await apiClientRecordsRepository.updateExampleRequest(record)
+          : await apiClientRecordsRepository.updateRecord(record, entity.meta.referenceId);
       if (!result.success) {
         notification.error({
           message: "Could not rename record",

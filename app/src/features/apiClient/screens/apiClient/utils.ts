@@ -838,6 +838,7 @@ export const processRecordsForDuplication = (
   context: ApiClientFeatureContext
 ) => {
   const recordsToDuplicate: RQAPI.ApiClientRecord[] = [];
+  const examplesToDuplicate: Array<{ parentRequestId: string; example: RQAPI.ExampleApiRecord }> = [];
   const queue: RQAPI.ApiClientRecord[] = [...recordsToProcess];
 
   while (queue.length > 0) {
@@ -863,9 +864,10 @@ export const processRecordsForDuplication = (
         );
         queue.push(...childrenToDuplicate);
       }
-    } else {
+    } else if (record.type === RQAPI.RecordType.API) {
+      const newId = apiClientRecordsRepository.generateApiRecordId(record.collectionId ?? undefined);
       const requestToDuplicate: RQAPI.ApiClientRecord = Object.assign({}, record, {
-        id: apiClientRecordsRepository.generateApiRecordId(record.collectionId ?? undefined),
+        id: newId,
         name: `(Copy) ${record.name}`,
       });
       // Set rank for the duplicated request
@@ -876,10 +878,17 @@ export const processRecordsForDuplication = (
       );
 
       recordsToDuplicate.push(requestToDuplicate);
+
+      // Collect examples associated with this request for duplication
+      if (record.data.examples?.length) {
+        for (const example of record.data.examples) {
+          examplesToDuplicate.push({ parentRequestId: newId, example });
+        }
+      }
     }
   }
 
-  return recordsToDuplicate;
+  return { recordsToDuplicate, examplesToDuplicate };
 };
 
 export const resolveAuth = (
