@@ -77,6 +77,7 @@ export enum BulkActions {
   EXPORT = "EXPORT",
   EXPORT_REQUESTLY = "EXPORT_REQUESTLY",
   EXPORT_POSTMAN = "EXPORT_POSTMAN",
+  EXPORT_OPENAPI = "EXPORT_OPENAPI",
   SELECT_ALL = "SELECT_ALL",
 }
 
@@ -110,6 +111,9 @@ export namespace RQAPI {
     POST_RESPONSE = "postResponse",
   }
 
+  /* kept string here as backward compability for already generated uuids saved in firebase, 
+    for new request number should be data-type 
+  */
   export type PathVariable = {
     id: number | string;
     key: string;
