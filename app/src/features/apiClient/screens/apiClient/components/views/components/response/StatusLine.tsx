@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import { RQAPI } from "../../../../../../types";
 import { Popover, Space, Tooltip } from "antd";
 import PropertyRow from "./PropertyRow/PropertyRow";
@@ -9,10 +9,8 @@ import { isHttpResponse } from "features/apiClient/screens/apiClient/utils";
 import { RQButton } from "lib/design-system-v2/components";
 import { MdOutlineDashboardCustomize } from "@react-icons/all-files/md/MdOutlineDashboardCustomize";
 import { BufferedGraphQLRecordEntity, BufferedHttpRecordEntity } from "features/apiClient/slices/entities";
-import { createExampleRequest, useApiClientFeatureContext } from "features/apiClient/slices";
-import { useTabActions } from "componentsV2/Tabs/slice";
-import { ExampleViewTabSource } from "../ExampleRequestView/exampleViewTabSource";
-import { toast } from "utils/Toast";
+import { useApiClientFeatureContext } from "features/apiClient/slices";
+import { useSaveAsExample } from "features/apiClient/hooks/useSaveAsExample";
 
 interface Props {
   response: RQAPI.Response;
@@ -21,10 +19,8 @@ interface Props {
 
 const StatusLine: React.FC<Props> = ({ response, entity }) => {
   const context = useApiClientFeatureContext();
-  const { openBufferedTab } = useTabActions();
 
-  const [isSavingAsExample, setIsSavingAsExample] = useState(false);
-
+  const { isSavingAsExample, handleSaveExample } = useSaveAsExample(entity);
   const entityType = entity.getType(context.store.getState());
 
   const formattedTime = useMemo(() => {
@@ -45,44 +41,6 @@ const StatusLine: React.FC<Props> = ({ response, entity }) => {
     // @ts-ignore
     return response?.statusText || statusCodes[response?.status];
   }, [response?.status, response?.statusText]);
-
-  const handleSaveResponseClick = useCallback(async () => {
-    try {
-      setIsSavingAsExample(true);
-      const requestRecord = entity.getEntityFromState(context.store.getState());
-      const exampleRecordToCreate: RQAPI.ExampleApiRecord = {
-        ...requestRecord,
-        parentRequestId: entity.meta.referenceId,
-        type: RQAPI.RecordType.EXAMPLE_API,
-      };
-      exampleRecordToCreate.collectionId = null;
-
-      const { exampleRecord } = await context.store
-        .dispatch(
-          createExampleRequest({
-            parentRequestId: entity.meta.referenceId,
-            example: exampleRecordToCreate,
-            repository: context.repositories.apiClientRecordsRepository,
-          }) as any
-        )
-        .unwrap();
-
-      openBufferedTab({
-        preview: false,
-        source: new ExampleViewTabSource({
-          id: exampleRecord.id,
-          title: exampleRecord.name || "Example",
-          apiEntryDetails: exampleRecord,
-          context: { id: context.workspaceId },
-        }),
-      });
-      toast.success("Response saved as example successfully.");
-    } catch (error) {
-      toast.error("Something went wrong while saving the response as example.");
-    } finally {
-      setIsSavingAsExample(false);
-    }
-  }, [context.repositories.apiClientRecordsRepository, context.store, context.workspaceId, entity, openBufferedTab]);
 
   if (!response) {
     return null;
@@ -110,7 +68,7 @@ const StatusLine: React.FC<Props> = ({ response, entity }) => {
               size="small"
               type="transparent"
               icon={<MdOutlineDashboardCustomize />}
-              onClick={handleSaveResponseClick}
+              onClick={handleSaveExample}
               loading={isSavingAsExample}
             >
               Save
