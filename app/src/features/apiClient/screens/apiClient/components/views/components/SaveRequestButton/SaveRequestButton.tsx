@@ -19,6 +19,7 @@ import { useTabActions } from "componentsV2/Tabs/slice";
 import { ExampleViewTabSource } from "../ExampleRequestView/exampleViewTabSource";
 import { toast } from "utils/Toast";
 import "./saveRequestButton.scss";
+import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
 import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
 
 interface Props {
@@ -29,6 +30,7 @@ interface Props {
   onClick: () => void;
   entity: BufferedHttpRecordEntity | BufferedGraphQLRecordEntity;
   isExample: boolean;
+  isDraft: boolean;
 }
 
 const getRecord = (entity: BufferedHttpRecordEntity | BufferedGraphQLRecordEntity, store: ApiClientStore) => {
@@ -43,11 +45,14 @@ export const SaveRequestButton: React.FC<Props> = ({
   onClick,
   entity,
   isExample,
+  isDraft,
 }) => {
   const { validatePermission } = useRBAC();
   const { isValidPermission } = validatePermission("api_client_request", "create");
   const context = useApiClientFeatureContext();
   const { openBufferedTab } = useTabActions();
+
+  const isLocalSyncEnabled = useCheckLocalSyncSupport();
 
   const [isSavingAsExample, setIsSavingAsExample] = useState(false);
 
@@ -133,6 +138,21 @@ export const SaveRequestButton: React.FC<Props> = ({
     ],
     [handleSaveAsExample, isValidPermission]
   );
+
+  if (isLocalSyncEnabled || isDraft) {
+    return (
+      <RQButton
+        onClick={onClick}
+        disabled={disabled || !isValidPermission}
+        hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SAVE_REQUEST!.hotKey}
+        loading={loading}
+        className="api-client-save-request-button"
+        enableHotKey={enableHotkey}
+      >
+        Save
+      </RQButton>
+    );
+  }
 
   return (
     <Conditional condition={!hidden}>
