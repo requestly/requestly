@@ -10,8 +10,8 @@ import { RQButton } from "lib/design-system-v2/components";
 import { MdOutlineDashboardCustomize } from "@react-icons/all-files/md/MdOutlineDashboardCustomize";
 import { BufferedGraphQLRecordEntity, BufferedHttpRecordEntity } from "features/apiClient/slices/entities";
 import { useApiClientFeatureContext } from "features/apiClient/slices";
-import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
 import { useSaveAsExample } from "features/apiClient/hooks/useSaveAsExample";
+import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
 
 interface Props {
   response: RQAPI.Response;
