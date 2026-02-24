@@ -642,6 +642,7 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
               onClick={onSaveButtonClick}
               entity={entity}
               isExample={isExample}
+              isDraft={!!isNew}
             />
           </div>
         </div>
