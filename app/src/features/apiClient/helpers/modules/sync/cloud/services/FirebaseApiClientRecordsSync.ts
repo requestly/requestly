@@ -327,7 +327,7 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
   }
 
   async deleteExamples(exampleRecords: RQAPI.ExampleApiRecord[]): Promise<{ success: boolean; message?: string }> {
-    const result = await deleteExamples(this.meta.uid, exampleRecords, this.meta.teamId);
+    const result = await deleteExamples(this.meta.uid, exampleRecords);
     return result;
   }
 }
