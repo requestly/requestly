@@ -65,6 +65,7 @@ export const KeyValueTableSplitLayout: React.FC<React.PropsWithChildren<{}>> = (
       <div className="table-container">
         <div className="table-content">
           <Split
+            key={isBottomSheetAtBottom ? "horizontal" : "vertical"}
             className={`key-value-split-${isBottomSheetAtBottom ? "horizontal" : "vertical"} ${
               !showBulkEditPanel ? "bulk-editor-closed" : ""
             }`}

@@ -10,7 +10,6 @@ import {
   KeyValueTableSplitLayout,
   useKeyValueTableSplitLayout,
 } from "../KeyValueTable/KeyValueTableSplitLayout/KeyValueTableSplitLayout";
-import { AutoScrollContainer } from "../AutoScrollContainer";
 
 interface HeadersTableProps {
   entity: BufferedHttpRecordEntity | BufferedGraphQLRecordEntity;
@@ -27,6 +26,14 @@ function HeadersTableContent(props: {
   const scrollTargetRef = useRef<HTMLDivElement>(null);
 
   const layoutContext = useKeyValueTableSplitLayout();
+
+  const prevLength = useRef(headers.length);
+  useEffect(() => {
+    if (headers.length !== prevLength.current) {
+      scrollTargetRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      prevLength.current = headers.length;
+    }
+  }, [headers.length]);
 
   const handleChange = useCallback(
     (updated: KeyValuePair[]) => {
@@ -62,27 +69,25 @@ function HeadersTableContent(props: {
   );
 
   return (
-    <div className="key-value-table" style={{ display: "flex", flexDirection: "column", flex: 1, overflow: "hidden" }}>
-      <AutoScrollContainer trigger={headers.length} scrollTargetRef={scrollTargetRef}>
-        {headerContent}
-        <KeyValueTable
-          data={headers}
-          variables={scopedVariables}
-          onChange={handleChange}
-          config={{ checkInvalidCharacter: true }}
-          extraColumns={{
-            description: {
-              visible: showDescription,
-              onToggle: setShowDescription,
-            },
-            dataType: { visible: true },
-          }}
-          tableType={KeyValueFormType.HEADERS}
-          setShowBulkEditPanel={handleSetShowBulkEdit}
-        />
-        <div ref={scrollTargetRef} />
-      </AutoScrollContainer>
-    </div>
+    <>
+      {headerContent}
+      <KeyValueTable
+        data={headers}
+        variables={scopedVariables}
+        onChange={handleChange}
+        config={{ checkInvalidCharacter: true }}
+        extraColumns={{
+          description: {
+            visible: showDescription,
+            onToggle: setShowDescription,
+          },
+          dataType: { visible: true },
+        }}
+        tableType={KeyValueFormType.HEADERS}
+        setShowBulkEditPanel={handleSetShowBulkEdit}
+      />
+      <div ref={scrollTargetRef} />
+    </>
   );
 }
 
@@ -94,12 +99,8 @@ export const HeadersTable: React.FC<HeadersTableProps> = React.memo(({ entity })
   );
 
   return (
-    <div className="table-container" style={{ height: "100%", display: "flex", flexDirection: "column" }}>
-      <div className="table-content" style={{ height: "100%", display: "flex", flexDirection: "column", minHeight: 0 }}>
-        <KeyValueTableSplitLayout>
-          <HeadersTableContent entity={entity} headerContent={headerContent} />
-        </KeyValueTableSplitLayout>
-      </div>
-    </div>
+    <KeyValueTableSplitLayout>
+      <HeadersTableContent entity={entity} headerContent={headerContent} />
+    </KeyValueTableSplitLayout>
   );
 });

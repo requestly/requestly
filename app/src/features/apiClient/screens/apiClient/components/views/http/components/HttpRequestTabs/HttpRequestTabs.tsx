@@ -79,7 +79,11 @@ const HttpRequestTabs: React.FC<Props> = ({
       {
         key: RequestTab.HEADERS,
         label: <RequestTabLabel label="Headers" count={headersLength} />,
-        children: <HeadersTable entity={entity} />,
+        children: (
+          <div className="non-scrollable-tab-content">
+            <HeadersTable entity={entity} />
+          </div>
+        ),
       },
       {
         key: RequestTab.AUTHORIZATION,
