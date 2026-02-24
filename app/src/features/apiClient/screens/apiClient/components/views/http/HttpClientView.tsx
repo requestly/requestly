@@ -21,6 +21,7 @@ import {
   ApiClientStore,
   bufferActions,
   bufferAdapterSelectors,
+  selectRecordById,
   useApiClientRepository,
   useApiClientStore,
 } from "features/apiClient/slices";
@@ -446,7 +447,7 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
             },
             async save(record, repositories) {
               if (override?.onSaveClick) {
-                return override.onSaveClick.save(record, repositories);
+                return override.onSaveClick.save(record as RQAPI.HttpApiRecord, repositories);
               }
               const result = await repositories.apiClientRecordsRepository.updateRecord(record, record.id);
               if (!result.success) {
@@ -465,7 +466,7 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
             },
             onSuccess(result) {
               toast.success("Request saved!");
-              override?.onSaveClick?.onSuccess(result);
+              override?.onSaveClick?.onSuccess(result as RQAPI.HttpApiRecord);
               trackRequestSaved({
                 src: "api_client_view",
                 has_scripts: Boolean(result.data.scripts?.preRequest),
@@ -553,13 +554,28 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
   );
 
   const handleUseAsTemplate = useCallback(() => {
+    const record = entity.getEntityFromState(store.getState());
+    const exampleData = { ...record.data };
+
+    if (record.type === RQAPI.RecordType.EXAMPLE_API) {
+      const parentRecord = selectRecordById(store.getState(), record.parentRequestId);
+      if (parentRecord?.data) {
+        if (parentRecord.data.auth) {
+          exampleData.auth = parentRecord.data.auth;
+        }
+        if (parentRecord.data.scripts) {
+          exampleData.scripts = parentRecord.data.scripts;
+        }
+      }
+    }
+
     openBufferedTab({
       isNew: true,
       preview: false,
       source: new DraftRequestContainerTabSource({
         apiEntryType: RQAPI.ApiEntryType.HTTP,
         context: {},
-        emptyRecord: getEmptyDraftApiRecord(RQAPI.ApiEntryType.HTTP, entity.getEntityFromState(store.getState()).data),
+        emptyRecord: getEmptyDraftApiRecord(RQAPI.ApiEntryType.HTTP, exampleData),
       }),
     });
   }, [entity, store, openBufferedTab]);

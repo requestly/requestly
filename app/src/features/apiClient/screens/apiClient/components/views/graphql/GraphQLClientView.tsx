@@ -58,6 +58,7 @@ import {
   ApiClientStore,
   bufferActions,
   bufferAdapterSelectors,
+  selectRecordById,
   useApiClientRepository,
   useApiClientStore,
 } from "features/apiClient/slices";
@@ -268,7 +269,10 @@ const GraphQLClientView: React.FC<GraphQLClientViewProps> = ({
         },
         async save(record, repositories) {
           if (override?.onSaveClick) {
-            return override.onSaveClick.save(record, repositories) as Promise<RQAPI.GraphQLApiRecord>;
+            return override.onSaveClick.save(
+              record as RQAPI.GraphQLApiRecord,
+              repositories
+            ) as Promise<RQAPI.GraphQLApiRecord>;
           }
           const result = await repositories.apiClientRecordsRepository.updateRecord(record, record.id);
           if (!result.success) {
@@ -292,7 +296,7 @@ const GraphQLClientView: React.FC<GraphQLClientViewProps> = ({
             auth_type: result.data?.auth?.currentAuthType,
             type: RQAPI.ApiEntryType.GRAPHQL,
           });
-          override?.onSaveClick?.onSuccess(result);
+          override?.onSaveClick?.onSuccess(result as RQAPI.GraphQLApiRecord);
         },
         onError(e) {
           notification.error({
@@ -438,16 +442,28 @@ const GraphQLClientView: React.FC<GraphQLClientViewProps> = ({
   }, [graphQLRequestExecutor]);
 
   const handleUseAsTemplate = useCallback(() => {
+    const record = entity.getEntityFromState(store.getState());
+    const exampleData = { ...record.data };
+
+    if (record.type === RQAPI.RecordType.EXAMPLE_API) {
+      const parentRecord = selectRecordById(store.getState(), record.parentRequestId);
+      if (parentRecord?.data) {
+        if (parentRecord.data.auth) {
+          exampleData.auth = parentRecord.data.auth;
+        }
+        if (parentRecord.data.scripts) {
+          exampleData.scripts = parentRecord.data.scripts;
+        }
+      }
+    }
+
     openBufferedTab({
       isNew: true,
       preview: false,
       source: new DraftRequestContainerTabSource({
         apiEntryType: RQAPI.ApiEntryType.GRAPHQL,
         context: {},
-        emptyRecord: getEmptyDraftApiRecord(
-          RQAPI.ApiEntryType.GRAPHQL,
-          entity.getEntityFromState(store.getState()).data
-        ),
+        emptyRecord: getEmptyDraftApiRecord(RQAPI.ApiEntryType.GRAPHQL, exampleData),
       }),
     });
   }, [entity, store, openBufferedTab]);
