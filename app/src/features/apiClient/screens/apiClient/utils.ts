@@ -177,9 +177,9 @@ export const getEmptyApiEntry = (apiEntryType: RQAPI.ApiEntryType, request?: RQA
   }
 };
 
-export const getEmptyDraftApiRecord = (apiEntryType: RQAPI.ApiEntryType, request?: RQAPI.Request): RQAPI.ApiRecord => {
+export const getEmptyDraftApiRecord = (apiEntryType: RQAPI.ApiEntryType, entry?: RQAPI.ApiEntry): RQAPI.ApiRecord => {
   return {
-    data: getEmptyApiEntry(apiEntryType),
+    data: entry ?? getEmptyApiEntry(apiEntryType),
     type: RQAPI.RecordType.API,
     id: "",
     name: DEFAULT_REQUEST_NAME,
@@ -522,6 +522,10 @@ const sortNestedRecords = (records: RQAPI.ApiClientRecord[]) => {
   });
 };
 
+export const isExampleApiRecord = (record: RQAPI.ApiClientRecord): record is RQAPI.ExampleApiRecord => {
+  return record.type === RQAPI.RecordType.EXAMPLE_API;
+};
+
 export const convertFlatRecordsToNestedRecords = (records: RQAPI.ApiClientRecord[]) => {
   const recordsCopy = [...records];
   const recordsMap: Record<string, RQAPI.ApiClientRecord> = {};
@@ -534,11 +538,28 @@ export const convertFlatRecordsToNestedRecords = (records: RQAPI.ApiClientRecord
         data: { ...record.data, children: [] },
       };
     } else if (isApiRequest(record)) {
-      recordsMap[record.id] = record;
+      recordsMap[record.id] = {
+        ...record,
+        data: { ...record.data, examples: [] },
+      };
+    }
+  });
+
+  // Attach example records to their parent requests
+  recordsCopy.forEach((record) => {
+    if (isExampleApiRecord(record)) {
+      const parentRequest = recordsMap[record.parentRequestId] as RQAPI.ApiRecord | undefined;
+      if (parentRequest && isApiRequest(parentRequest)) {
+        if (!parentRequest.data.examples) {
+          parentRequest.data.examples = [];
+        }
+        parentRequest.data.examples.push(record);
+      }
     }
   });
 
   recordsCopy.forEach((record) => {
+    if (isExampleApiRecord(record)) return;
     const recordState = recordsMap[record.id];
     const parentNode = recordsMap[record.collectionId as string] as RQAPI.CollectionRecord;
     if (parentNode) {

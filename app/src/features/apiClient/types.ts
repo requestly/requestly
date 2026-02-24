@@ -92,6 +92,7 @@ export namespace RQAPI {
   export type AnalyticsEventSource =
     | "home_screen"
     | "collection_row"
+    | "example_row"
     | "collection_list_empty_state"
     | "api_client_sidebar_header"
     | "api_client_sidebar"
@@ -204,6 +205,7 @@ export namespace RQAPI {
       postResponse: string;
     };
     auth: Auth;
+    examples?: ExampleApiRecord[];
   };
 
   export enum ApiEntryType {

@@ -7,7 +7,8 @@ import { BufferedApiClientEntity, BufferedApiClientEntityMeta } from "./factory"
 
 export class BufferedHttpRecordEntity
   extends HttpRecordEntity<BufferedApiClientEntityMeta>
-  implements BufferedApiClientEntity {
+  implements BufferedApiClientEntity
+{
   origin = new HttpRecordEntity(this.dispatch, { id: this.meta.referenceId });
   dispatchCommand(command: UpdateCommand<RQAPI.HttpApiRecord>): void {
     this.dispatch(bufferActions.applyPatch({ id: this.meta.id, command }));
@@ -20,7 +21,7 @@ export class BufferedHttpRecordEntity
     }
 
     const record = entry.current as RQAPI.ApiClientRecord;
-    if (record.type !== RQAPI.RecordType.API) {
+    if (record.type !== RQAPI.RecordType.API && record.type !== RQAPI.RecordType.EXAMPLE_API) {
       throw new InvalidEntityShape({
         id: this.id,
         expectedType: RQAPI.RecordType.API,

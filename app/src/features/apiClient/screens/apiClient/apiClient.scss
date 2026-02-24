@@ -243,6 +243,17 @@
   .bottomsheet-split-layout-container {
     height: calc(100% - 93px);
   }
+
+  .api-client-use-as-template-button {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+
+    svg {
+      width: 14px;
+      height: 14px;
+    }
+  }
 }
 
 .import-modal {
