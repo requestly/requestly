@@ -111,6 +111,9 @@ export namespace RQAPI {
     POST_RESPONSE = "postResponse",
   }
 
+  /* kept string here as backward compability for already generated uuids saved in firebase, 
+    for new request number should be data-type 
+  */
   export type PathVariable = {
     id: number | string;
     key: string;
