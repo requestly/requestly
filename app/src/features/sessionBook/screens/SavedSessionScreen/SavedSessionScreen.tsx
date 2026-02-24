@@ -26,7 +26,7 @@ export const SavedSessionScreen: React.FC = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
-  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId) ?? null;
   const [isFetching, setIsFetching] = useState(false);
   const [showPermissionError, setShowPermissionError] = useState(false);
   const [showNotFoundError, setShowNotFoundError] = useState(false);
