@@ -7,7 +7,6 @@ import { ApiClientEntityType } from "./types";
 import { ApiClientEntityMeta } from "./base";
 import { supportsRequestBody } from "features/apiClient/screens/apiClient/utils";
 import { CONTENT_TYPE_HEADER } from "features/apiClient/constants";
-import { v4 } from "uuid";
 
 export class HttpRecordEntity<M extends ApiClientEntityMeta = ApiClientEntityMeta> extends ApiClientRecordEntity<
   RQAPI.HttpApiRecord,

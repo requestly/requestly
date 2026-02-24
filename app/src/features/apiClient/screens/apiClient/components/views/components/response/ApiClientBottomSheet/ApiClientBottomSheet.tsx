@@ -22,7 +22,7 @@ import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks
 import { hasTests } from "features/apiClient/helpers/testGeneration/buildPostResponseTests";
 
 interface Props {
-  entity: HttpRecordEntity | GraphQLRecordEntity,
+  entity: HttpRecordEntity | GraphQLRecordEntity;
   onGenerateTests?: () => void;
   isGeneratingTests?: boolean;
   isLoading: boolean;
@@ -58,11 +58,11 @@ export const ApiClientBottomSheet: React.FC<Props> = ({
   executeRequest,
   onDismissError,
 }) => {
-  const response = useApiClientSelector(s => entity.getResponse(s));
-  const postResponseScript = useApiClientSelector(s => entity.getPostResponseScript(s));
-  const testResults = useApiClientSelector(s => entity.getTestResults(s));
+  const response = useApiClientSelector((s) => entity.getResponse(s));
+  const postResponseScript = useApiClientSelector((s) => entity.getPostResponseScript(s));
+  const testResults = useApiClientSelector((s) => entity.getTestResults(s));
 
-   const canGenerateTests = useMemo(() => {
+  const canGenerateTests = useMemo(() => {
     const responseExists = Boolean(postResponseScript);
     if (!responseExists) return false;
     return !hasTests(postResponseScript);
