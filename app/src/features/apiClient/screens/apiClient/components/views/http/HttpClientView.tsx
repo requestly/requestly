@@ -97,6 +97,7 @@ export type HttpClientViewProps = {
   };
   openInModal?: boolean;
   notifyApiRequestFinished: (apiEntry: RQAPI.HttpApiEntry) => void;
+  isDraftMode?: boolean;
 };
 
 const HttpClientView: React.FC<HttpClientViewProps> = ({
@@ -104,6 +105,7 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
   notifyApiRequestFinished,
   entity,
   override,
+  isDraftMode = false,
 }) => {
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
@@ -600,7 +602,7 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
         <div className="api-client-header-container__header">
           <div className="api-client-breadcrumb-container">
             <ApiClientBreadCrumb
-              isDraft={!!isNew}
+              isDraft={isDraftMode}
               id={entity.meta.referenceId}
               openInModal={openInModal}
               placeholder="Untitled request"
@@ -668,7 +670,7 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
               onClick={onSaveButtonClick}
               entity={entity}
               isExample={isExample}
-              isDraft={!!isNew}
+              isDraft={isDraftMode}
             />
           </div>
         </div>

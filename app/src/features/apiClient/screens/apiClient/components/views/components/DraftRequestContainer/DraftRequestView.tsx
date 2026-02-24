@@ -51,5 +51,7 @@ export const DraftRequestView: React.FC<{
     },
   };
 
-  return <GenericApiClient override={override} entity={scratchBuffer} handleAppRequestFinished={() => {}} />;
+  return (
+    <GenericApiClient override={override} entity={scratchBuffer} handleAppRequestFinished={() => {}} isDraftMode />
+  );
 };

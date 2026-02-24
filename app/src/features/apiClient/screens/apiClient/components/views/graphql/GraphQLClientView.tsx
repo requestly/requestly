@@ -82,6 +82,7 @@ export type GraphQLClientViewProps = {
   entity: BufferedGraphQLRecordEntity;
   override?: GenericApiClientOverride;
   openInModal?: boolean;
+  isDraftMode?: boolean;
   notifyApiRequestFinished: (apiEntry: RQAPI.GraphQLApiEntry) => void;
 };
 
@@ -90,6 +91,7 @@ const GraphQLClientView: React.FC<GraphQLClientViewProps> = ({
   notifyApiRequestFinished,
   entity,
   override,
+  isDraftMode = false,
 }) => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
@@ -491,7 +493,7 @@ const GraphQLClientView: React.FC<GraphQLClientViewProps> = ({
               openInModal={openInModal}
               name={name}
               autoFocus={isNew}
-              isDraft={!!isNew}
+              isDraft={isDraftMode}
               onBlur={(newName) => {
                 if (override?.handleNameChange) {
                   override.handleNameChange(newName);
@@ -535,7 +537,7 @@ const GraphQLClientView: React.FC<GraphQLClientViewProps> = ({
               onClick={onSaveButtonClick}
               entity={entity}
               isExample={isExample}
-              isDraft={!!isNew}
+              isDraft={isDraftMode}
             />
           </div>
         </div>
