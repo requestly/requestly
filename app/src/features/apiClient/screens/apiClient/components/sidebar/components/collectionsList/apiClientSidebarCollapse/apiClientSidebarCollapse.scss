@@ -1,0 +1,114 @@
+.api-client-sidebar-collapse.ant-collapse {
+  padding: 0;
+  border-width: 1px;
+  border-style: solid;
+  border-color: transparent;
+  box-sizing: border-box;
+
+  .collection-checkbox-container {
+    margin-left: 1px;
+  }
+
+  .ant-collapse-item {
+    width: 100%;
+
+    .ant-collapse-header {
+      height: 28px;
+      padding: 2px 4px;
+      border-radius: 4px !important;
+      user-select: none;
+      display: flex;
+      align-items: center;
+      gap: var(--requestly-space-2, 4px);
+      color: var(--requestly-color-text-subtle);
+
+      &-text {
+        overflow: hidden;
+      }
+
+      &:hover {
+        background: var(--requestly-color-white-t-10);
+      }
+
+      .ant-collapse-expand-icon {
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+
+        svg {
+          width: 20px;
+          height: 20px;
+          padding: 3px;
+          color: inherit;
+          margin: 0;
+        }
+
+        .collection-expand-icon {
+          &:hover {
+            background: var(--requestly-color-white-t-20);
+            border-radius: 4px;
+          }
+        }
+
+        .ant-checkbox-wrapper {
+          margin-right: 4px;
+        }
+      }
+
+      .ant-collapse-header-text {
+        flex: auto;
+      }
+
+      color: var(--requestly-color-text-default);
+    }
+
+    &.ant-collapse-item-active {
+      .ant-collapse-header {
+        color: var(--requestly-color-text-default);
+      }
+    }
+
+    .ant-collapse-content-box {
+      margin-left: 13px;
+      padding: 1px 0px 0px 6px !important;
+      border-left: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.12));
+
+      &:hover {
+        border-left: 1px solid var(--requestly-color-white-t-20, rgba(255, 255, 255, 0.12));
+      }
+    }
+  }
+}
+
+// Panel active state
+.api-client-sidebar-collapse-panel.active {
+  > .ant-collapse-header {
+    background: var(--requestly-color-white-t-20);
+    box-shadow: inset 2px 0px 0px 0px var(--requestly-color-primary);
+    transition: unset;
+
+    &:hover {
+      background: var(--requestly-color-white-t-20) !important;
+    }
+  }
+}
+
+// Panel selected state
+.api-client-sidebar-collapse-panel.selected {
+  > .ant-collapse-header {
+    background-color: rgba(255, 255, 255, 0.08) !important;
+    padding-left: calc(var(--requestly-space-4) - 3px);
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.12) !important;
+    }
+  }
+}
+
+.api-client-sidebar-collapse-panel.active.selected > .ant-collapse-header {
+  border-left: 2px solid var(--requestly-color-primary-500);
+}
+
+.api-client-sidebar-collapse-panel.selected + .ant-collapse-content {
+  background: transparent;
+}
