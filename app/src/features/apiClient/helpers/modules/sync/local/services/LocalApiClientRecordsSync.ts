@@ -784,4 +784,11 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
       data: example,
     };
   }
+
+  async deleteExamples(exampleRecords: RQAPI.ExampleApiRecord[]): Promise<{ success: boolean; message?: string }> {
+    return {
+      success: true,
+      message: "Not implemented",
+    };
+  }
 }
