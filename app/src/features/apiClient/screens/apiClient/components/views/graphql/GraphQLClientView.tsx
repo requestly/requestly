@@ -516,6 +516,7 @@ const GraphQLClientView: React.FC<GraphQLClientViewProps> = ({
               onClick={onSaveButtonClick}
               entity={entity}
               isExample={isExample}
+              isDraft={!!isNew}
             />
           </div>
         </div>

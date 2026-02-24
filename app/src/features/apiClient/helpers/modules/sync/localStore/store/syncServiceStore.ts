@@ -7,7 +7,8 @@ import { LocalStoreEnvSync } from "../services/LocalStoreEnvSync";
 import { toast } from "utils/Toast";
 import { trackLocalStorageSyncStarted } from "modules/analytics/events/features/apiClient";
 import { EnvironmentData } from "backend/environment/types";
-import { isApiCollection } from "features/apiClient/screens/apiClient/utils";
+import { isApiCollection, isExampleApiRecord } from "features/apiClient/screens/apiClient/utils";
+import { RQAPI } from "features/apiClient/types";
 import { LocalStore } from "../services/types";
 import { NativeError } from "errors/NativeError";
 
@@ -54,7 +55,25 @@ export const createSyncServiceStore = () => {
           ? result.data.records.filter((r) => !recordsToSkip.has(r.id))
           : result.data.records;
 
-        const recordsToSync = filteredRecords.map((record) => {
+        const { exampleRecords, nonExampleRecords } = filteredRecords.reduce(
+          (
+            acc: {
+              exampleRecords: RQAPI.ExampleApiRecord[];
+              nonExampleRecords: (RQAPI.ApiRecord | LocalStore.CollectionRecord)[];
+            },
+            record
+          ) => {
+            if (isExampleApiRecord(record)) {
+              acc.exampleRecords.push(record);
+            } else {
+              acc.nonExampleRecords.push(record);
+            }
+            return acc;
+          },
+          { exampleRecords: [], nonExampleRecords: [] }
+        );
+
+        const recordsToSync = nonExampleRecords.map((record) => {
           if (isApiCollection(record)) {
             // runConfigs & runResults are synced separately
             const { runConfigs, runResults, ...rest } = record as LocalStore.CollectionRecord;
@@ -72,7 +91,11 @@ export const createSyncServiceStore = () => {
           throw new NativeError(syncResult.message ?? "Failed to sync API records!");
         }
 
-        const runDetails = filteredRecords
+        for (const example of exampleRecords) {
+          await syncRepository.apiClientRecordsRepository.createExampleRequest(example.parentRequestId, example);
+        }
+
+        const runDetails = nonExampleRecords
           .filter((record) => isApiCollection(record))
           .map((record: LocalStore.CollectionRecord) => ({
             collectionId: record.id,

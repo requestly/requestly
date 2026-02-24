@@ -45,6 +45,7 @@ import FEATURES from "config/constants/sub/features";
 import { getRankForDroppedRecord } from "features/apiClient/helpers/RankingManager/utils";
 import { MdOutlineDashboardCustomize } from "@react-icons/all-files/md/MdOutlineDashboardCustomize";
 import { ExampleViewTabSource } from "../../../../views/components/ExampleRequestView/exampleViewTabSource";
+import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
 
 interface Props {
   record: RQAPI.ApiRecord;
@@ -116,6 +117,8 @@ export const RequestRow: React.FC<Props> = ({
   const context = useApiClientFeatureContext();
   const { apiClientRecordsRepository } = useApiClientRepository();
   const activeTabSourceId = useActiveTab()?.source.getSourceId();
+
+  const isLocalSyncEnabled = useCheckLocalSyncSupport();
 
   const [{ isDragging }, drag] = useDrag(
     () => ({
@@ -240,7 +243,7 @@ export const RequestRow: React.FC<Props> = ({
       const { id, ...rest } = record;
 
       // Generate rank for the duplicated request to place it immediately after the original
-      const rank = apiRecordsRankingManager.getRankForDuplicatedApi(context, record, record.collectionId ?? "");
+      const rank = apiRecordsRankingManager.getRankForDuplicatedRecord(context, record, record.collectionId ?? "");
 
       const newRecord: Omit<RQAPI.ApiRecord, "id"> = {
         ...rest,
@@ -277,6 +280,7 @@ export const RequestRow: React.FC<Props> = ({
           type: RQAPI.RecordType.EXAMPLE_API,
           collectionId: null,
           parentRequestId: record.id,
+          rank: apiRecordsRankingManager.getRanksForNewApiRecords(context, record.id, [record])[0],
         };
         const { exampleRecord } = await context.store
           .dispatch(
@@ -300,7 +304,7 @@ export const RequestRow: React.FC<Props> = ({
         toast.error("Something went wrong while creating the example.");
       }
     },
-    [context.store, context.repositories.apiClientRecordsRepository, openBufferedTab, workspaceId]
+    [context, openBufferedTab, workspaceId]
   );
 
   const requestOptions = useMemo((): MenuProps["items"] => {
@@ -351,19 +355,23 @@ export const RequestRow: React.FC<Props> = ({
           handleDropdownVisibleChange(false);
         },
       },
-      {
-        key: "3",
-        label: (
-          <div>
-            <MdOutlineDashboardCustomize style={{ marginRight: 8 }} />
-            Add example
-          </div>
-        ),
-        onClick: (itemInfo) => {
-          itemInfo.domEvent?.stopPropagation?.();
-          handleAddExample(record);
-        },
-      },
+      ...(!isLocalSyncEnabled
+        ? [
+            {
+              key: "3",
+              label: (
+                <div>
+                  <MdOutlineDashboardCustomize style={{ marginRight: 8 }} />
+                  Add example
+                </div>
+              ),
+              onClick: (itemInfo: any) => {
+                itemInfo.domEvent?.stopPropagation?.();
+                handleAddExample(record);
+              },
+            },
+          ]
+        : []),
       {
         key: "4",
         label: (
@@ -380,7 +388,7 @@ export const RequestRow: React.FC<Props> = ({
         },
       },
     ];
-  }, [record, handleRecordsToBeDeleted, handleDuplicateRequest, handleAddExample]);
+  }, [record, handleRecordsToBeDeleted, handleDuplicateRequest, handleAddExample, isLocalSyncEnabled]);
 
   const examples = record.data.examples || [];
 
