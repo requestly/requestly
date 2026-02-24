@@ -771,4 +771,10 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
       data: example,
     };
   }
+  async updateExampleRequest(example: RQAPI.ExampleApiRecord): RQAPI.ApiClientRecordPromise {
+    return {
+      success: true,
+      data: example,
+    };
+  }
 }
