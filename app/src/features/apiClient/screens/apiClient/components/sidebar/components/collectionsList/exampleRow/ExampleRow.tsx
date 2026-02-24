@@ -100,7 +100,6 @@ export const ExampleRow: React.FC<Props> = ({ record, isReadOnly, handleRecordsT
             droppedExample: item.record,
             dropPosition: currentDropPosition,
           });
-          console.log("rank", rank);
 
           await context.store
             .dispatch(

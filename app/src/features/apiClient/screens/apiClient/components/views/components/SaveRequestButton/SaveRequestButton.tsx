@@ -8,18 +8,11 @@ import { MdOutlineKeyboardArrowDown } from "@react-icons/all-files/md/MdOutlineK
 import { MdOutlineDashboardCustomize } from "@react-icons/all-files/md/MdOutlineDashboardCustomize";
 import { useRBAC } from "features/rbac";
 import { BufferedGraphQLRecordEntity, BufferedHttpRecordEntity } from "features/apiClient/slices/entities";
-import {
-  ApiClientStore,
-  createExampleRequest,
-  updateExampleRequest,
-  useApiClientFeatureContext,
-} from "features/apiClient/slices";
-import { RQAPI } from "features/apiClient/types";
-import { useTabActions } from "componentsV2/Tabs/slice";
-import { ExampleViewTabSource } from "../ExampleRequestView/exampleViewTabSource";
+import { ApiClientStore, updateExampleRequest, useApiClientFeatureContext } from "features/apiClient/slices";
 import { toast } from "utils/Toast";
-import "./saveRequestButton.scss";
 import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
+import { useSaveAsExample } from "features/apiClient/hooks/useSaveAsExample";
+import "./saveRequestButton.scss";
 
 interface Props {
   hidden?: boolean;
@@ -49,13 +42,13 @@ export const SaveRequestButton: React.FC<Props> = ({
   const { validatePermission } = useRBAC();
   const { isValidPermission } = validatePermission("api_client_request", "create");
   const context = useApiClientFeatureContext();
-  const { openBufferedTab } = useTabActions();
 
-  const [isSavingAsExample, setIsSavingAsExample] = useState(false);
+  const [isUpdatingExample, setIsUpdatingExample] = useState(false);
+  const { isSavingAsExample, handleSaveExample } = useSaveAsExample(entity);
 
   const handleUpdateExample = useCallback(async () => {
     try {
-      setIsSavingAsExample(true);
+      setIsUpdatingExample(true);
       const record = getRecord(entity, context.store);
       await context.store
         .dispatch(
@@ -69,47 +62,9 @@ export const SaveRequestButton: React.FC<Props> = ({
     } catch (error) {
       toast.error("Something went wrong while updating the example.");
     } finally {
-      setIsSavingAsExample(false);
+      setIsUpdatingExample(false);
     }
   }, [entity, context.store, context.repositories.apiClientRecordsRepository]);
-
-  const handleSaveAsExample = useCallback(async () => {
-    try {
-      setIsSavingAsExample(true);
-      const requestRecord = getRecord(entity, context.store);
-      const exampleRecordToCreate: RQAPI.ExampleApiRecord = {
-        ...requestRecord,
-        parentRequestId: entity.meta.referenceId,
-        type: RQAPI.RecordType.EXAMPLE_API,
-      };
-      exampleRecordToCreate.collectionId = null;
-
-      const { exampleRecord } = await context.store
-        .dispatch(
-          createExampleRequest({
-            parentRequestId: entity.meta.referenceId,
-            example: exampleRecordToCreate,
-            repository: context.repositories.apiClientRecordsRepository,
-          }) as any
-        )
-        .unwrap();
-
-      openBufferedTab({
-        preview: false,
-        source: new ExampleViewTabSource({
-          id: exampleRecord.id,
-          title: exampleRecord.name || "Example",
-          apiEntryDetails: exampleRecord,
-          context: { id: context.workspaceId },
-        }),
-      });
-      toast.success("Example created successfully.");
-    } catch (error) {
-      toast.error("Something went wrong while creating the example.");
-    } finally {
-      setIsSavingAsExample(false);
-    }
-  }, [entity, context.store, context.repositories.apiClientRecordsRepository, context.workspaceId, openBufferedTab]);
 
   const saveMenuItems: MenuProps["items"] = useMemo(
     () => [
@@ -130,10 +85,10 @@ export const SaveRequestButton: React.FC<Props> = ({
           </div>
         ),
         disabled: !isValidPermission,
-        onClick: handleSaveAsExample,
+        onClick: handleSaveExample,
       },
     ],
-    [handleSaveAsExample, isValidPermission]
+    [handleSaveExample, isValidPermission]
   );
 
   if (isDraft) {
@@ -166,7 +121,7 @@ export const SaveRequestButton: React.FC<Props> = ({
           <RQButton
             onClick={handleUpdateExample}
             disabled={disabled || !isValidPermission}
-            loading={isSavingAsExample}
+            loading={isSavingAsExample || isUpdatingExample}
             className="api-client-save-request-button"
             enableHotKey={enableHotkey}
             hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SAVE_REQUEST!.hotKey}
@@ -179,7 +134,7 @@ export const SaveRequestButton: React.FC<Props> = ({
               onClick={onClick}
               disabled={disabled || !isValidPermission}
               hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SAVE_REQUEST!.hotKey}
-              loading={loading || isSavingAsExample}
+              loading={loading || isSavingAsExample || isUpdatingExample}
               className="api-client-save-request-button"
               enableHotKey={enableHotkey}
             >
@@ -192,7 +147,10 @@ export const SaveRequestButton: React.FC<Props> = ({
               trigger={["click"]}
               placement="bottomRight"
             >
-              <RQButton className="api-client-save-request-dropdown-button" loading={isSavingAsExample}>
+              <RQButton
+                className="api-client-save-request-dropdown-button"
+                loading={isSavingAsExample || isUpdatingExample}
+              >
                 <MdOutlineKeyboardArrowDown />
               </RQButton>
             </Dropdown>
