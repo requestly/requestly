@@ -247,89 +247,14 @@
   }
 }
 
-.key-value-split-horizontal,
-.key-value-split-vertical {
-  width: 100%;
-  height: 100%;
-  display: flex;
-
-  .key-value-table {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    width: 100%;
-    overflow: hidden;
-
-    > div,
-    .tab-scroll-container {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      min-height: 0;
-      position: relative;
-      height: 100%;
-      overflow: auto !important;
-    }
-  }
-
-  .key-value-bulk-editor {
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    z-index: 1;
-    height: 100%;
-
-    .key-value-bulk-edit-panel {
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-    }
-
-    .bulk-edit-panel-content {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      min-height: 0;
-      overflow: hidden;
-    }
-
-    .cm-editor,
-    .components-code-editor {
-      height: 100% !important;
-      flex: 1;
-    }
-  }
-}
-
 .key-value-split-horizontal {
-  flex-direction: row;
-  .key-value-bulk-editor {
+  .key-value-table-split-panel-right {
     border-left: 1px solid var(--border-dark);
   }
 }
 
 .key-value-split-vertical {
-  flex-direction: column;
-  .key-value-bulk-editor {
+  .key-value-table-split-panel-right {
     border-top: 1px solid var(--border-dark);
   }
-}
-
-.gutter {
-  z-index: 10;
-
-  &:hover {
-    transition: background-color 0.2s;
-  }
-}
-
-.gutter.gutter-horizontal {
-  width: 3px !important;
-  cursor: col-resize;
-}
-
-.gutter.gutter-vertical {
-  height: 3px !important;
-  cursor: row-resize;
 }
