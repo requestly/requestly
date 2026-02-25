@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import * as Sentry from "@sentry/react";
 import { SPAN_STATUS_ERROR, SPAN_STATUS_OK } from "@sentry/core";
 import { Input, Button, Spin, Tooltip } from "antd";
-import { LoadingOutlined, ExclamationCircleFilled } from "@ant-design/icons";
+import { ExclamationCircleFilled } from "@ant-design/icons";
 import { toast } from "utils/Toast";
 import { wrapWithCustomSpan } from "utils/sentry";
 import { FilePicker } from "components/common/FilePicker";
@@ -37,6 +37,7 @@ interface ImportInputViewProps {
   importer: ApiClientImporterMethod<ImportFile>;
   importerType: ApiClientImporterType;
   onDataProcessed: (data: { collections: RQAPI.CollectionRecord[]; environments: EnvironmentData[] }) => void;
+  renderLoadingView?: () => React.ReactNode;
 }
 
 export const ImportInputView: React.FC<ImportInputViewProps> = ({
@@ -46,6 +47,7 @@ export const ImportInputView: React.FC<ImportInputViewProps> = ({
   importer,
   importerType,
   onDataProcessed,
+  renderLoadingView,
 }) => {
   const [isDataProcessing, setIsDataProcessing] = useState<boolean>(false);
   const [importError, setImportError] = useState<string | null>(null);
@@ -208,21 +210,15 @@ export const ImportInputView: React.FC<ImportInputViewProps> = ({
 
       await processImportFiles([importFile]);
     } catch (err: any) {
-      const errorMsg = err.message || "Failed to fetch from URL";
+      const errorMsg = err?.message || "Failed to fetch from URL";
       setLinkError(errorMsg);
     } finally {
       setIsFetchingFromUrl(false);
     }
   }, [linkUrl, linkView, processImportFiles, isLinkFeatureReady]);
 
-  if ((isDataProcessing || isFetchingFromUrl) && importerType === ApiClientImporterType.SOAP) {
-    return (
-      <div className="soap-parsing-loading-view">
-        <Spin indicator={<LoadingOutlined style={{ fontSize: 48 }} spin />} />
-        <div className="loading-text">Parsing WSDL</div>
-        <div className="loading-subtext">This may take a moment for larger files. Please keep this window open.</div>
-      </div>
-    );
+  if ((isDataProcessing || isFetchingFromUrl) && renderLoadingView) {
+    return <>{renderLoadingView()}</>;
   }
 
   let tooltipTitle = "";

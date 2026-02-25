@@ -31,6 +31,7 @@ export interface CommonApiClientImporterProps {
   docsLink?: string;
   linkView?: LinkViewConfig;
   renderSuccessView?: (props: SuccessfulParseViewProps) => React.ReactNode;
+  renderLoadingView?: () => React.ReactNode;
 }
 
 export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = ({
@@ -42,6 +43,7 @@ export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = (
   docsLink,
   linkView,
   renderSuccessView,
+  renderLoadingView,
 }) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isParseComplete, setIsParseComplete] = useState<boolean>(false);
@@ -477,6 +479,7 @@ export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = (
             importer={importer}
             importerType={importerType}
             onDataProcessed={handleDataProcessed}
+            renderLoadingView={renderLoadingView}
           />
         )}
       </div>
