@@ -6,15 +6,15 @@ import { HttpRecordEntity } from "../http";
 import { BufferedApiClientEntity, BufferedApiClientEntityMeta } from "./factory";
 
 export class BufferedHttpRecordEntity
-  extends HttpRecordEntity<BufferedApiClientEntityMeta>
+  extends HttpRecordEntity<BufferedApiClientEntityMeta, RQAPI.HttpApiRecord | RQAPI.HttpExampleApiRecord>
   implements BufferedApiClientEntity
 {
   origin = new HttpRecordEntity(this.dispatch, { id: this.meta.referenceId });
-  dispatchCommand(command: UpdateCommand<RQAPI.HttpApiRecord>): void {
+  dispatchCommand(command: UpdateCommand<RQAPI.HttpApiRecord | RQAPI.HttpExampleApiRecord>): void {
     this.dispatch(bufferActions.applyPatch({ id: this.meta.id, command }));
   }
 
-  getEntityFromState(state: ApiClientRootState): RQAPI.HttpApiRecord {
+  getEntityFromState(state: ApiClientRootState): RQAPI.HttpApiRecord | RQAPI.HttpExampleApiRecord {
     const entry = bufferAdapterSelectors.selectById(state.buffer, this.meta.id);
     if (!entry) {
       throw new EntityNotFound(this.id, this.type);
@@ -37,15 +37,15 @@ export class BufferedHttpRecordEntity
       });
     }
 
-    return record as RQAPI.HttpApiRecord;
+    return record as RQAPI.HttpApiRecord | RQAPI.HttpExampleApiRecord;
   }
 
-  dispatchUnsafePatch(patcher: (record: RQAPI.HttpApiRecord) => void): void {
+  dispatchUnsafePatch(patcher: (record: RQAPI.HttpApiRecord | RQAPI.HttpExampleApiRecord) => void): void {
     this.dispatch(
       bufferActions.unsafePatch({
         id: this.meta.id,
         patcher: (entry) => {
-          patcher(entry.current as RQAPI.HttpApiRecord);
+          patcher(entry.current as RQAPI.HttpApiRecord | RQAPI.HttpExampleApiRecord);
         },
       })
     );

@@ -5,6 +5,9 @@ import { BufferedGraphQLRecordEntity, BufferedHttpRecordEntity } from "../slices
 import { RQAPI } from "../types";
 import { ExampleViewTabSource } from "../screens/apiClient/components/views/components/ExampleRequestView/exampleViewTabSource";
 import { toast } from "utils/Toast";
+import { sessionStorage } from "utils/sessionStorage";
+import { SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY } from "../constants";
+import { EXPANDED_RECORD_IDS_UPDATED } from "../slices/exampleCollections";
 
 export const useSaveAsExample = (entity: BufferedHttpRecordEntity | BufferedGraphQLRecordEntity) => {
   const context = useApiClientFeatureContext();
@@ -45,6 +48,16 @@ export const useSaveAsExample = (entity: BufferedHttpRecordEntity | BufferedGrap
           context: { id: context.workspaceId },
         }),
       });
+
+      const parentRequestId = entity.meta.referenceId;
+      if (parentRequestId) {
+        const existingExpanded = sessionStorage.getItem(SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY, []);
+        if (!existingExpanded.includes(parentRequestId)) {
+          sessionStorage.setItem(SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY, [...existingExpanded, parentRequestId]);
+          window.dispatchEvent(new CustomEvent(EXPANDED_RECORD_IDS_UPDATED));
+        }
+      }
+
       toast.success("Example created successfully.");
     } catch (error) {
       toast.error("Something went wrong while creating the example.");

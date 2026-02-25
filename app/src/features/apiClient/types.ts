@@ -334,6 +334,10 @@ export namespace RQAPI {
     data: ApiEntry;
   };
 
+  export type HttpExampleApiRecord = ExampleApiRecord & { data: HttpApiEntry };
+
+  export type GraphQLExampleApiRecord = ExampleApiRecord & { data: GraphQLApiEntry };
+
   export type ApiClientRecord = ApiRecord | CollectionRecord | ExampleApiRecord;
 
   export type ApiClientRecordPromise = Promise<

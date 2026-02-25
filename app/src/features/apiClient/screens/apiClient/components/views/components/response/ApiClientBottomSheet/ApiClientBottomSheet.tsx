@@ -22,7 +22,7 @@ import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks
 import { hasTests } from "features/apiClient/helpers/testGeneration/buildPostResponseTests";
 
 interface Props {
-  entity: HttpRecordEntity | GraphQLRecordEntity;
+  entity: HttpRecordEntity<any, any> | GraphQLRecordEntity<any, any>;
   onGenerateTests?: () => void;
   isGeneratingTests?: boolean;
   isLoading: boolean;
