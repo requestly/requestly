@@ -92,7 +92,17 @@ export const createSyncServiceStore = () => {
         }
 
         for (const example of exampleRecords) {
-          await syncRepository.apiClientRecordsRepository.createExampleRequest(example.parentRequestId, example);
+          const exampleSyncResult = await syncRepository.apiClientRecordsRepository.createExampleRequest(
+            example.parentRequestId,
+            example
+          );
+          if (!exampleSyncResult.success) {
+            throw new NativeError("Failed to sync example request").addContext({
+              exampleId: example.id,
+              parentRequestId: example.parentRequestId,
+              error: exampleSyncResult.message,
+            });
+          }
         }
 
         const runDetails = nonExampleRecords
