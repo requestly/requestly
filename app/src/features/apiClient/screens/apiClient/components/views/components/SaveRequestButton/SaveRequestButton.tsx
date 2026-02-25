@@ -8,7 +8,12 @@ import { MdOutlineKeyboardArrowDown } from "@react-icons/all-files/md/MdOutlineK
 import { MdOutlineDashboardCustomize } from "@react-icons/all-files/md/MdOutlineDashboardCustomize";
 import { useRBAC } from "features/rbac";
 import { BufferedGraphQLRecordEntity, BufferedHttpRecordEntity } from "features/apiClient/slices/entities";
-import { ApiClientStore, updateExampleRequest, useApiClientFeatureContext } from "features/apiClient/slices";
+import {
+  ApiClientStore,
+  bufferActions,
+  updateExampleRequest,
+  useApiClientFeatureContext,
+} from "features/apiClient/slices";
 import { toast } from "utils/Toast";
 import "./saveRequestButton.scss";
 import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
@@ -64,6 +69,12 @@ export const SaveRequestButton: React.FC<Props> = ({
           }) as any
         )
         .unwrap();
+      context.store.dispatch(
+        bufferActions.markSaved({
+          id: entity.meta.id,
+          savedData: record,
+        })
+      );
       toast.success("Example updated successfully.");
     } catch (error) {
       toast.error("Something went wrong while updating the example.");
