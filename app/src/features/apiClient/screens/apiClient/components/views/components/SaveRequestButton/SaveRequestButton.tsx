@@ -14,6 +14,7 @@ import "./saveRequestButton.scss";
 import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
 import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
 import { useSaveAsExample } from "features/apiClient/hooks/useSaveAsExample";
+import { RQAPI } from "features/apiClient/types";
 
 interface Props {
   hidden?: boolean;
@@ -51,8 +52,10 @@ export const SaveRequestButton: React.FC<Props> = ({
 
   const handleUpdateExample = useCallback(async () => {
     try {
-      setIsUpdatingExample(true);
       const record = getRecord(entity, context.store);
+      if (record.type !== RQAPI.RecordType.EXAMPLE_API) return;
+
+      setIsUpdatingExample(true);
       await context.store
         .dispatch(
           updateExampleRequest({
