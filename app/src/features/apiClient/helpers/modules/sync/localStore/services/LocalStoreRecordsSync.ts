@@ -527,6 +527,7 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
       collectionId: null,
       deleted: false,
       createdBy: "",
+      ownerId: "",
       updatedBy: "",
       createdTs: Timestamp.now().toMillis(),
       updatedTs: Timestamp.now().toMillis(),
@@ -556,7 +557,7 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
     await this.queryService.deleteRecords(exampleRecords.map((example) => example.id));
     return {
       success: true,
-      message: "Not implemented",
+      message: "Examples deleted successfully",
     };
   }
 }

@@ -110,5 +110,6 @@ FEATURES.API_CLIENT_KEY_VALUE_TABLE_DATA_TYPE_COMPATIBILITY = "api_client_key_va
 FEATURES.API_CLIENT_RECORDS_REORDERING = "api_client_records_reordering";
 
 FEATURES.ONBOARDING_V2 = "onboarding_v2";
+FEATURES.DESKTOP_BETA_PREVIEW_URL_CONFIGURATION = "desktop_beta_preview_url_configuration";
 
 export default FEATURES;

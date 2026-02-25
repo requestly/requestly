@@ -6,15 +6,19 @@ import { GraphQLRecordEntity } from "../graphql";
 import { BufferedApiClientEntity, BufferedApiClientEntityMeta } from "./factory";
 
 export class BufferedGraphQLRecordEntity
-  extends GraphQLRecordEntity<BufferedApiClientEntityMeta>
+  extends GraphQLRecordEntity<BufferedApiClientEntityMeta, RQAPI.GraphQLApiRecord | RQAPI.GraphQLExampleApiRecord>
   implements BufferedApiClientEntity
 {
   origin = new GraphQLRecordEntity(this.dispatch, { id: this.meta.referenceId });
-  override dispatchCommand(command: UpdateCommand<RQAPI.GraphQLApiRecord>): void {
+  override dispatchCommand(
+    command: UpdateCommand<RQAPI.GraphQLApiRecord | RQAPI.GraphQLExampleApiRecord>
+  ): void {
     this.dispatch(bufferActions.applyPatch({ id: this.meta.id, command }));
   }
 
-  override getEntityFromState(state: ApiClientRootState): RQAPI.GraphQLApiRecord {
+  override getEntityFromState(
+    state: ApiClientRootState
+  ): RQAPI.GraphQLApiRecord | RQAPI.GraphQLExampleApiRecord {
     const entry = bufferAdapterSelectors.selectById(state.buffer, this.meta.id);
     if (!entry) {
       throw new EntityNotFound(this.id, this.type);
@@ -36,6 +40,6 @@ export class BufferedGraphQLRecordEntity
       });
     }
 
-    return record as RQAPI.GraphQLApiRecord;
+    return record as RQAPI.GraphQLApiRecord | RQAPI.GraphQLExampleApiRecord;
   }
 }

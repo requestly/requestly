@@ -66,7 +66,7 @@ const StatusLine: React.FC<Props> = ({ response, entity }) => {
       />
       <PropertyRow className="api-response-status-row__time" name="Time" value={formattedTime} />
       {entityType === RQAPI.RecordType.API && !isLocalSyncEnabled && (
-        <div className="api-response-status-row__save-button-wapper">
+        <div className="api-response-status-row__save-button-wrapper">
           <Tooltip title="Save the current request and response as an example." placement="bottom" color="#000">
             <RQButton
               size="small"

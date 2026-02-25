@@ -35,9 +35,8 @@ import { getFileContents } from "components/mode-specific/desktop/DesktopFilePic
 import { NativeError } from "errors/NativeError";
 import { trackCollectionRunnerRecordLimitExceeded } from "modules/analytics/events/features/apiClient";
 import { getBoundary, parse as multipartParser } from "parse-multipart-data";
-import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 import { apiRecordsRankingManager } from "features/apiClient/helpers/RankingManager";
-import { TreeIndices } from "features/apiClient/slices";
+import { ApiClientFeatureContext, TreeIndices } from "features/apiClient/slices";
 
 const createAbortError = (signal: AbortSignal) => {
   if (signal && signal.reason === AbortReason.USER_CANCELLED) {
@@ -811,6 +810,11 @@ export const apiRequestToHarRequestAdapter = (apiRequest: RQAPI.HttpRequest): Ha
         mimeType: RequestContentType.JSON,
         text: (apiRequest.body as string) ?? "",
       };
+    } else if (apiRequest?.contentType === RequestContentType.XML) {
+      harRequest.postData = {
+        mimeType: RequestContentType.XML,
+        text: (apiRequest.body as string) ?? "",
+      };
     } else if (apiRequest?.contentType === RequestContentType.FORM) {
       harRequest.postData = {
         mimeType: RequestContentType.FORM,
@@ -866,9 +870,11 @@ export const processRecordsForDuplication = (
       }
     } else if (record.type === RQAPI.RecordType.API) {
       const newId = apiClientRecordsRepository.generateApiRecordId(record.collectionId ?? undefined);
+      const { examples = [], ...requestData } = record.data;
       const requestToDuplicate: RQAPI.ApiClientRecord = Object.assign({}, record, {
         id: newId,
         name: `(Copy) ${record.name}`,
+        data: requestData,
       });
       // Set rank for the duplicated request
       requestToDuplicate.rank = apiRecordsRankingManager.getRankForDuplicatedRecord(
@@ -880,8 +886,8 @@ export const processRecordsForDuplication = (
       recordsToDuplicate.push(requestToDuplicate);
 
       // Collect examples associated with this request for duplication
-      if (record.data.examples?.length) {
-        for (const example of record.data.examples) {
+      if (examples.length) {
+        for (const example of examples) {
           examplesToDuplicate.push({ parentRequestId: newId, example });
         }
       }
