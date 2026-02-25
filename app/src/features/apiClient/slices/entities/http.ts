@@ -6,8 +6,6 @@ import { ApiClientRecordEntity } from "./api-client-record-entity";
 import { ApiClientEntityType } from "./types";
 import { ApiClientEntityMeta } from "./base";
 
-import { v4 } from "uuid";
-
 export class HttpRecordEntity<M extends ApiClientEntityMeta = ApiClientEntityMeta> extends ApiClientRecordEntity<
   RQAPI.HttpApiRecord,
   M
@@ -100,7 +98,7 @@ export class HttpRecordEntity<M extends ApiClientEntityMeta = ApiClientEntityMet
     }
     const existingPathVariables = state.data.request.pathVariables;
     existingPathVariables.push({
-      id: v4(),
+      id: Date.now(),
       key,
       value: "",
       description: "",

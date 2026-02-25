@@ -1,6 +1,5 @@
-import { collection, doc, getFirestore, writeBatch } from "firebase/firestore";
+import { collection, doc, getFirestore } from "firebase/firestore";
 import firebaseApp from "../firebase";
-import { updateRecordMetaData } from "./apiClient/utils";
 
 export const LOGGED_OUT_STATE_UID = "local";
 
@@ -40,25 +39,4 @@ export const batchWrite = async (batchSize: number, items: any[], writeFunction:
     results.push(...batchResults);
   }
   return results;
-};
-
-// TODO: Merge this with backend/api client core functions (upsertAPIRecord)
-export const firebaseBatchWrite = async (path: string, data: any[]) => {
-  const db = getFirestore(firebaseApp);
-  const batch = writeBatch(db);
-
-  const updatedRecords: any[] = [];
-  try {
-    data.forEach((item) => {
-      const updatedItem = updateRecordMetaData(item);
-      updatedRecords.push(updatedItem);
-      const recordRef = doc(db, path, updatedItem.id);
-      batch.set(recordRef, updatedItem, { merge: true });
-    });
-
-    await batch.commit();
-    return updatedRecords;
-  } catch (error) {
-    throw new Error(error);
-  }
 };
