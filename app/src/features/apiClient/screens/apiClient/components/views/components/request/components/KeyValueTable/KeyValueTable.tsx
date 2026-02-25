@@ -195,7 +195,7 @@ export const KeyValueTable: React.FC<React.PropsWithChildren<KeyValueTableProps>
         ? {
             title: "Type",
             dataIndex: "dataType",
-            width: isDescriptionVisible ? 110 : 120,
+            width: isDescriptionVisible ? 140 : 160,
             editable: true,
             onCell: (record: KeyValuePair) => ({
               record,
@@ -224,7 +224,7 @@ export const KeyValueTable: React.FC<React.PropsWithChildren<KeyValueTableProps>
           }
         : null,
       {
-        width: "50px",
+        width: "110px",
         fixed: "right",
         title: () =>
           isDataTypeVisible &&
