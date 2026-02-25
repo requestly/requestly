@@ -70,7 +70,12 @@ const ResponseBody: React.FC<Props> = ({ responseText, contentTypeHeader }) => {
 
   const preview = useMemo<ReactElement>(() => {
     if (contentTypeHeader?.includes("text/html")) {
-      return <HTMLResponsePreview responseText={responseText} />;
+      return (
+        <div className="api-response-body-editor-container">
+          <div>{bodyPreviewModeOptions}</div>
+          <HTMLResponsePreview responseText={responseText} />
+        </div>
+      );
     }
 
     if (contentTypeHeader?.includes("image/")) {

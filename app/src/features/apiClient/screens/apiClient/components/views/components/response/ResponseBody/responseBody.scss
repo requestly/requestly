@@ -5,6 +5,13 @@
   .api-response-body-editor-container {
     height: 100%;
 
+    .html-response-preview {
+      height: calc(100% - 36px);
+      width: 100%;
+      background-color: #fff;
+      pointer-events: none;
+    }
+
     .react-resizable {
       height: calc(100% - 46px) !important;
       min-height: 20px !important;
@@ -51,13 +58,6 @@
       overflow: hidden;
       word-wrap: break-word;
       white-space: pre-wrap;
-    }
-
-    .html-response-preview {
-      height: 100%;
-      width: 100%;
-      background-color: #fff;
-      pointer-events: none;
     }
   }
 
