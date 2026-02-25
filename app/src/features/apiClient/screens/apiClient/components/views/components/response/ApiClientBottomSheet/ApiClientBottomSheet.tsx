@@ -17,12 +17,12 @@ import { ApiClientWarningPanel } from "../../errors/ApiClientWarningPanel/ApiCli
 import "./apiclientBottomSheet.scss";
 import { ApiClientLargeFileLoader } from "../../../../clientView/components/response/LargeFileLoadingPlaceholder";
 import { BottomSheetTabLabel } from "componentsV2/BottomSheet/components/BottomSheetLayout/components/BottomSheetTabLabel/BottomSheetTabLabel";
-import { GraphQLRecordEntity, HttpRecordEntity } from "features/apiClient/slices/entities";
+import { BufferedGraphQLRecordEntity, BufferedHttpRecordEntity } from "features/apiClient/slices/entities";
 import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
 import { hasTests } from "features/apiClient/helpers/testGeneration/buildPostResponseTests";
 
 interface Props {
-  entity: HttpRecordEntity<any, any> | GraphQLRecordEntity<any, any>;
+  entity: BufferedHttpRecordEntity | BufferedGraphQLRecordEntity;
   onGenerateTests?: () => void;
   isGeneratingTests?: boolean;
   isLoading: boolean;
