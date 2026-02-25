@@ -136,7 +136,7 @@ export const ExampleRow: React.FC<Props> = ({ record, isReadOnly, handleRecordsT
             parentRequestId: record.parentRequestId,
             example: {
               ...record,
-              name: `${record.name} Copy`,
+              name: `${record.name || "Example"} Copy`,
               rank,
             },
             repository: context.repositories.apiClientRecordsRepository,

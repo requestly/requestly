@@ -296,8 +296,11 @@ export const RequestRow: React.FC<Props> = ({
     async (record: RQAPI.ApiRecord) => {
       try {
         handleDropdownVisibleChange(false);
+        const { data, ...recordMeta } = record;
+        const { examples: _examples, ...entryData } = data;
         const exampleRecordToCreate: RQAPI.ExampleApiRecord = {
-          ...record,
+          ...recordMeta,
+          data: entryData,
           type: RQAPI.RecordType.EXAMPLE_API,
           collectionId: null,
           parentRequestId: record.id,
