@@ -1,15 +1,10 @@
-/**
- * Path and leaf-value utilities for the secrets object.
- * Only SecretVariable objects are considered resolvable leaf values in templates.
- */
-
 import { get } from "lodash";
 import { VariableScope } from "@requestly/shared/types/entities/apiClient";
 import { SecretVariable, SecretVariableTree } from "./types";
 
 /**
  * Gets a value from the secrets tree using dot notation path.
- * Uses lodash.get for robust path traversal.
+ * Uses lodash.get for path traversal.
  */
 export function getValueByPath(obj: SecretVariableTree, path: string) {
   return get(obj, path);
