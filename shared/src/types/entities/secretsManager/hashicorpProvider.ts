@@ -13,7 +13,7 @@ export type HashicorpVaultProviderConfig = ProviderConfig<
 >;
 
 export interface VaultSecretReference extends SecretReference<SecretProviderType.HASHICORP_VAULT> {
-  path: string;
+  identifier: string;
   version?: number;
 }
 
@@ -22,7 +22,7 @@ export interface VaultSecretValue {
   providerId: string;
   secretReference: VaultSecretReference;
   fetchedAt: number;
-  path: string;
+  identifier: string;
   data: Record<string, any>;
   metadata?: {
     version: number;
