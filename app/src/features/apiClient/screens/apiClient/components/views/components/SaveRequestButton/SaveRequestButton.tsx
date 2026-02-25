@@ -51,10 +51,10 @@ export const SaveRequestButton: React.FC<Props> = ({
   const { isSavingAsExample, handleSaveExample } = useSaveAsExample(entity);
 
   const handleUpdateExample = useCallback(async () => {
-    const record = getRecord(entity, context.store);
-    if (record.type !== RQAPI.RecordType.EXAMPLE_API) return;
-
     try {
+      const record = getRecord(entity, context.store);
+      if (record.type !== RQAPI.RecordType.EXAMPLE_API) return;
+
       setIsUpdatingExample(true);
       await context.store
         .dispatch(

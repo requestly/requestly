@@ -10,7 +10,7 @@ import { BufferedGraphQLRecordEntity, BufferedHttpRecordEntity } from "features/
 import { ApiClientRepositoryInterface } from "features/apiClient/helpers/modules/sync/interfaces";
 
 export type GenericApiClientOverride = {
-  handleNameChange?: (name: string) => Promise<void> | void;
+  handleNameChange?: (name: string) => Promise<void>;
   onSaveClick?: {
     save: (record: RQAPI.ApiRecord, repositories: ApiClientRepositoryInterface) => Promise<RQAPI.ApiRecord> | void;
     onSuccess: (record: RQAPI.ApiRecord) => void;

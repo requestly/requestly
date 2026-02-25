@@ -26,7 +26,7 @@ export const DraftRequestView: React.FC<{
   });
 
   const handleRecordNameUpdate = useCallback(
-    (name: string) => {
+    async (name: string) => {
       scratchBuffer.setName(name);
     },
     [scratchBuffer]
