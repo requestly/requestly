@@ -20,7 +20,7 @@ export const PathVariableTable: React.FC<PathVariableTableProps> = ({ entity }) 
 
   const prevLength = useRef(variables.length);
   useEffect(() => {
-    if (variables.length !== prevLength.current) {
+    if (variables.length > prevLength.current) {
       scrollTargetRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
       prevLength.current = variables.length;
     }

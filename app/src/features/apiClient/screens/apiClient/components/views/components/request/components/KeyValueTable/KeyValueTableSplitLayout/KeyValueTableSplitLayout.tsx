@@ -58,10 +58,15 @@ export const KeyValueTableSplitLayout: React.FC<React.PropsWithChildren<{}>> = (
     }
   }, [showBulkEditPanel, isBottomSheetAtBottom]);
 
+  const contextValue = useMemo(() => ({ bulkEditorState, openBulkEditor, closeBulkEditor, syncBulkEditor }), [
+    bulkEditorState,
+    openBulkEditor,
+    closeBulkEditor,
+    syncBulkEditor,
+  ]);
+
   return (
-    <KeyValueTableSplitLayoutContext.Provider
-      value={{ bulkEditorState, openBulkEditor, closeBulkEditor, syncBulkEditor }}
-    >
+    <KeyValueTableSplitLayoutContext.Provider value={contextValue}>
       <div className="table-container">
         <div className="table-content">
           <Split
