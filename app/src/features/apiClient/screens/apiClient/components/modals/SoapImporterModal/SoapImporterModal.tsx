@@ -15,18 +15,12 @@ interface SoapImporterModalProps {
 }
 
 export const SoapImporterModal: React.FC<SoapImporterModalProps> = ({ isOpen, onClose, importer }) => {
-  const { fetchWsdlFromUrl, error: wsdlFetchError } = useWsdlFetcher();
-
+  const { fetchWsdlFromUrl } = useWsdlFetcher();
   const handleFetchWsdl = useCallback(
     async (url: string): Promise<ImportFile | null> => {
-      const importFile = await fetchWsdlFromUrl(url);
-      if (!importFile && wsdlFetchError) {
-        throw wsdlFetchError;
-      }
-
-      return importFile;
+      return fetchWsdlFromUrl(url);
     },
-    [fetchWsdlFromUrl, wsdlFetchError]
+    [fetchWsdlFromUrl]
   );
 
   return (
