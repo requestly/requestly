@@ -289,7 +289,6 @@ export const CollectionRow: React.FC<Props> = ({
         if (!expandedRecordIds.includes(record.id)) {
           const newExpandedRecordIds = [...expandedRecordIds, destination.collectionId];
           updateExpandedRecordIds(newExpandedRecordIds);
-          updateExpandedRecordIds(newExpandedRecordIds);
         }
       } catch (error) {
         notification.error({

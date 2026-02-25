@@ -327,9 +327,17 @@ export const deleteExampleRequests = createAsyncThunk<
   {
     condition: async ({ exampleRecords }) => {
       const allRecords = getAllRecords(exampleRecords);
-      return allRecords.every((r) =>
-        reduxStore.dispatch(closeTabByEntityId({ entityId: r.id, skipUnsavedPrompt: true }))
+
+      const results = await Promise.allSettled(
+        allRecords.map((r) => reduxStore.dispatch(closeTabByEntityId({ entityId: r.id, skipUnsavedPrompt: true })))
       );
+
+      return results.every((result) => {
+        if (result.status === "fulfilled") {
+          return closeTabByEntityId.fulfilled.match(result.value);
+        }
+        return false;
+      });
     },
   }
 );

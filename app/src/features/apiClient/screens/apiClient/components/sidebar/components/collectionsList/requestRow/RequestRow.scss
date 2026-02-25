@@ -10,8 +10,6 @@
 svg.graphql-request-icon {
   color: #ff14a9;
   min-width: 32px;
-  // position: relative;
-  // left: -5px;
 }
 
 .request-dropdown-menu .ant-dropdown-menu {
@@ -45,7 +43,6 @@ svg.graphql-request-icon {
   display: flex;
   align-items: center;
   gap: var(--requestly-space-2, 4px);
-  // padding: var(--space-2, 4px);
   border-radius: 4px;
   cursor: pointer;
   transition: background-color 0.2s ease;

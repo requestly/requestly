@@ -871,9 +871,11 @@ export const processRecordsForDuplication = (
       }
     } else if (record.type === RQAPI.RecordType.API) {
       const newId = apiClientRecordsRepository.generateApiRecordId(record.collectionId ?? undefined);
+      const { examples = [], ...requestData } = record.data;
       const requestToDuplicate: RQAPI.ApiClientRecord = Object.assign({}, record, {
         id: newId,
         name: `(Copy) ${record.name}`,
+        data: requestData,
       });
       // Set rank for the duplicated request
       requestToDuplicate.rank = apiRecordsRankingManager.getRankForDuplicatedRecord(
@@ -885,8 +887,8 @@ export const processRecordsForDuplication = (
       recordsToDuplicate.push(requestToDuplicate);
 
       // Collect examples associated with this request for duplication
-      if (record.data.examples?.length) {
-        for (const example of record.data.examples) {
+      if (examples.length) {
+        for (const example of examples) {
           examplesToDuplicate.push({ parentRequestId: newId, example });
         }
       }

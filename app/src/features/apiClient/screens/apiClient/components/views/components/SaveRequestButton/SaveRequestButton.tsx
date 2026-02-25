@@ -94,6 +94,8 @@ export const SaveRequestButton: React.FC<Props> = ({
     [handleSaveExample, isValidPermission]
   );
 
+  if (hidden) return null;
+
   if (isLocalSyncEnabled || isDraft) {
     return (
       <RQButton

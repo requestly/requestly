@@ -16,12 +16,15 @@ export const useSaveAsExample = (entity: BufferedHttpRecordEntity | BufferedGrap
     try {
       setIsSavingAsExample(true);
       const requestRecord = entity.getEntityFromState(context.store.getState());
+      const { data, ...recordMeta } = requestRecord;
+      const { examples: _examples, ...entryData } = data;
       const exampleRecordToCreate: RQAPI.ExampleApiRecord = {
-        ...requestRecord,
+        ...recordMeta,
+        data: entryData,
         parentRequestId: entity.meta.referenceId,
         type: RQAPI.RecordType.EXAMPLE_API,
+        collectionId: null,
       };
-      exampleRecordToCreate.collectionId = null;
 
       const { exampleRecord } = await context.store
         .dispatch(
