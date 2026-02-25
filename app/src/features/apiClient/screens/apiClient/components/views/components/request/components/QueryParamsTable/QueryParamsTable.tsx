@@ -31,7 +31,7 @@ export const QueryParamsTable: React.FC<QueryParamsTableProps> = React.memo(({ e
 
   const prevLength = useRef(queryParams.length);
   useEffect(() => {
-    if (queryParams.length !== prevLength.current) {
+    if (queryParams.length > prevLength.current) {
       scrollTargetRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
       prevLength.current = queryParams.length;
     }

@@ -29,7 +29,7 @@ function HeadersTableContent(props: {
 
   const prevLength = useRef(headers.length);
   useEffect(() => {
-    if (headers.length !== prevLength.current) {
+    if (headers.length > prevLength.current) {
       scrollTargetRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
       prevLength.current = headers.length;
     }
