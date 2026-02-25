@@ -33,9 +33,9 @@ export const SoapSuccessfulParseView: React.FC<SuccessfulParseViewProps> = ({
     return collectionsData
       .map((rootCollection) => {
         if (!rootCollection) return undefined;
+        const children = rootCollection.data.children || [];
 
         if (hasMultipleVersions) {
-          const children = rootCollection.data.children || [];
           const targetIndex = selectedVersion === SoapVersion.V1_1 ? 0 : 1;
           const childRecord = children[targetIndex];
 
@@ -43,6 +43,10 @@ export const SoapSuccessfulParseView: React.FC<SuccessfulParseViewProps> = ({
             return childRecord as RQAPI.CollectionRecord;
           }
           return undefined;
+        }
+
+        if (children.length === 1 && children[0]?.type === "collection") {
+          return children[0] as RQAPI.CollectionRecord;
         }
 
         return rootCollection;
@@ -59,7 +63,7 @@ export const SoapSuccessfulParseView: React.FC<SuccessfulParseViewProps> = ({
 
         const children = targetToProcess.data?.children || [];
         if (children.length === 1 && children[0]?.type === "collection") {
-          targetToProcess = children[0];
+          targetToProcess = children[0] as RQAPI.CollectionRecord;
         }
 
         let processedCollection = cloneDeep(targetToProcess);

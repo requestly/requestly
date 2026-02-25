@@ -1,6 +1,6 @@
 import { NativeError } from "errors/NativeError";
 
-export enum SoapImportErrorType {
+export enum WsdlFetchErrorType {
   INVALID_URL = "INVALID_URL",
   FETCH_FAILED = "FETCH_FAILED",
   INVALID_RESPONSE = "INVALID_RESPONSE",
@@ -8,38 +8,46 @@ export enum SoapImportErrorType {
   TIMEOUT = "TIMEOUT",
 }
 
-export const SOAP_IMPORT_ERROR_MESSAGES: Record<SoapImportErrorType, string> = {
-  [SoapImportErrorType.INVALID_URL]: "Please enter a valid WSDL URL",
-  [SoapImportErrorType.FETCH_FAILED]: "Failed to fetch WSDL from the provided URL",
-  [SoapImportErrorType.INVALID_RESPONSE]: "The response does not appear to be valid WSDL/XML",
-  [SoapImportErrorType.NETWORK_ERROR]: "Network error while fetching WSDL",
-  [SoapImportErrorType.TIMEOUT]: "Request timeout while fetching WSDL",
+export const SOAP_IMPORT_ERROR_MESSAGES: Record<WsdlFetchErrorType, string> = {
+  [WsdlFetchErrorType.INVALID_URL]: "Please enter a valid WSDL URL",
+  [WsdlFetchErrorType.FETCH_FAILED]: "Failed to fetch WSDL from the provided URL",
+  [WsdlFetchErrorType.INVALID_RESPONSE]: "The response does not appear to be valid WSDL/XML",
+  [WsdlFetchErrorType.NETWORK_ERROR]: "Network error while fetching WSDL",
+  [WsdlFetchErrorType.TIMEOUT]: "Request timeout while fetching WSDL",
 };
 
-export class SoapImportError extends NativeError {
-  constructor(readonly errorType: SoapImportErrorType, customMessage?: string) {
+export class WsdlFetchError extends NativeError {
+  constructor(readonly errorType: WsdlFetchErrorType, customMessage?: string, readonly originalError?: unknown) {
     const message = customMessage || SOAP_IMPORT_ERROR_MESSAGES[errorType];
     super(message);
-    this.name = "SoapImportError";
+    this.name = "WsdlFetchError";
+
+    if (originalError) {
+      this.cause = originalError;
+    }
+
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, this.constructor);
+    }
   }
 
-  static invalidUrl() {
-    return new SoapImportError(SoapImportErrorType.INVALID_URL);
+  static invalidUrl(originalError?: unknown) {
+    return new WsdlFetchError(WsdlFetchErrorType.INVALID_URL, undefined, originalError);
   }
 
-  static fetchFailed(customMessage?: string) {
-    return new SoapImportError(SoapImportErrorType.FETCH_FAILED, customMessage);
+  static fetchFailed(customMessage?: string, originalError?: unknown) {
+    return new WsdlFetchError(WsdlFetchErrorType.FETCH_FAILED, customMessage, originalError);
   }
 
-  static invalidResponse() {
-    return new SoapImportError(SoapImportErrorType.INVALID_RESPONSE);
+  static invalidResponse(originalError?: unknown) {
+    return new WsdlFetchError(WsdlFetchErrorType.INVALID_RESPONSE, undefined, originalError);
   }
 
-  static networkError(customMessage?: string) {
-    return new SoapImportError(SoapImportErrorType.NETWORK_ERROR, customMessage);
+  static networkError(customMessage?: string, originalError?: unknown) {
+    return new WsdlFetchError(WsdlFetchErrorType.NETWORK_ERROR, customMessage, originalError);
   }
 
-  static timeout() {
-    return new SoapImportError(SoapImportErrorType.TIMEOUT);
+  static timeout(originalError?: unknown) {
+    return new WsdlFetchError(WsdlFetchErrorType.TIMEOUT, undefined, originalError);
   }
 }

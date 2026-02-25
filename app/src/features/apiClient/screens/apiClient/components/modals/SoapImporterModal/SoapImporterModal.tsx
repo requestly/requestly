@@ -1,10 +1,11 @@
 import React, { useCallback } from "react";
-import { Modal } from "antd";
+import { Modal, Spin } from "antd";
+import { LoadingOutlined } from "@ant-design/icons";
 import { CommonApiClientImporter, ImportFile } from "../../CommonApiClientImporter/CommonApiClientImporter";
 import { ApiClientImporterMethod } from "@requestly/alternative-importers";
 import { ApiClientImporterType } from "@requestly/shared/types/entities/apiClient";
 import { useWsdlFetcher } from "../../../../../hooks/useWsdlFetcher";
-import { SoapImportError } from "../../../../../errors/SoapImportError/SoapImportError";
+import { WsdlFetchError } from "../../../../../errors/SoapImportError/SoapImportError";
 import { SoapSuccessfulParseView } from "./SoapSuccessfulParseView";
 
 interface SoapImporterModalProps {
@@ -14,13 +15,18 @@ interface SoapImporterModalProps {
 }
 
 export const SoapImporterModal: React.FC<SoapImporterModalProps> = ({ isOpen, onClose, importer }) => {
-  const { fetchWsdlFromUrl } = useWsdlFetcher();
+  const { fetchWsdlFromUrl, error: wsdlFetchError } = useWsdlFetcher();
 
   const handleFetchWsdl = useCallback(
     async (url: string): Promise<ImportFile | null> => {
-      return fetchWsdlFromUrl(url);
+      const importFile = await fetchWsdlFromUrl(url);
+      if (!importFile && wsdlFetchError) {
+        throw wsdlFetchError;
+      }
+
+      return importFile;
     },
-    [fetchWsdlFromUrl]
+    [fetchWsdlFromUrl, wsdlFetchError]
   );
 
   return (
@@ -33,12 +39,21 @@ export const SoapImporterModal: React.FC<SoapImporterModalProps> = ({ isOpen, on
         onImportSuccess={onClose}
         docsLink="" // TBD: Add documentation link when available
         renderSuccessView={(props) => <SoapSuccessfulParseView {...props} />}
+        renderLoadingView={() => (
+          <div className="soap-parsing-loading-view">
+            <Spin indicator={<LoadingOutlined style={{ fontSize: 48 }} spin />} />
+            <div className="loading-text">Parsing WSDL</div>
+            <div className="loading-subtext">
+              This may take a moment for larger files. Please keep this window open.
+            </div>
+          </div>
+        )}
         linkView={{
           enabled: true,
           placeholder: "Paste or type URL to import",
           onFetchFromUrl: handleFetchWsdl,
           urlValidationRegex: /^https?:\/\//i,
-          urlValidationErrorMessage: SoapImportError.invalidUrl().message,
+          urlValidationErrorMessage: WsdlFetchError.invalidUrl().message,
         }}
       />
     </Modal>

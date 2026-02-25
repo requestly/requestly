@@ -2,7 +2,7 @@ import { useCallback, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { useHttpRequestExecutor } from "./requestExecutors/useHttpRequestExecutor";
 import { RQAPI } from "@requestly/shared/types/entities/apiClient";
-import { SoapImportError } from "../errors/SoapImportError/SoapImportError";
+import { WsdlFetchError } from "../errors/SoapImportError/SoapImportError";
 import { ImportFile } from "../screens/apiClient/components/CommonApiClientImporter/CommonApiClientImporter";
 import { RequestMethod } from "../types";
 import { getDefaultAuth } from "../screens/apiClient/components/views/components/request/components/AuthorizationView/defaults";
@@ -10,13 +10,13 @@ import { extractQueryParams } from "../screens/apiClient/utils";
 
 interface UseWsdlFetcherResult {
   isFetching: boolean;
-  error: string | null;
+  error: WsdlFetchError | null;
   fetchWsdlFromUrl: (url: string) => Promise<ImportFile | null>;
 }
 
 export const useWsdlFetcher = (): UseWsdlFetcherResult => {
   const [isFetching, setIsFetching] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<WsdlFetchError | null>(null);
 
   // Create a temporary record ID for the executor
   const [tempRecordId] = useState(() => uuidv4());
@@ -26,7 +26,8 @@ export const useWsdlFetcher = (): UseWsdlFetcherResult => {
     async (url: string): Promise<ImportFile | null> => {
       const urlValidationRegex = /^https?:\/\//i;
       if (!urlValidationRegex.test(url)) {
-        setError(SoapImportError.invalidUrl().message);
+        const invalidUrlError = WsdlFetchError.invalidUrl();
+        setError(invalidUrlError);
         return null;
       }
 
@@ -67,14 +68,15 @@ export const useWsdlFetcher = (): UseWsdlFetcherResult => {
         );
 
         if (executionResult.status === "error") {
-          const errorMessage = executionResult.error?.message || SoapImportError.fetchFailed().message;
-          setError(errorMessage);
+          const fetchError = WsdlFetchError.fetchFailed(executionResult.error?.message, executionResult.error);
+          setError(fetchError);
           return null;
         }
 
         const response = executionResult.executedEntry?.response;
         if (!response || !response.body) {
-          setError(SoapImportError.invalidResponse().message);
+          const invalidResponseError = WsdlFetchError.invalidResponse();
+          setError(invalidResponseError);
           return null;
         }
 
@@ -87,9 +89,9 @@ export const useWsdlFetcher = (): UseWsdlFetcherResult => {
 
         return importFile;
       } catch (err) {
-        const error = err instanceof Error ? err : new Error("Unknown error");
-        const soapError = SoapImportError.fetchFailed(error.message);
-        setError(soapError.message);
+        const originalError = err instanceof Error ? err : new Error("Unknown error");
+        const fetchError = WsdlFetchError.fetchFailed(originalError.message, originalError);
+        setError(fetchError);
         return null;
       } finally {
         setIsFetching(false);
