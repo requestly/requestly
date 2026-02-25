@@ -8,9 +8,9 @@ export interface SecretVariable {
 }
 
 /**
- * Recursive type that represents either a SecretVariable or a nested object
- * containing more SecretVariables (supports arbitrary nesting levels).
+ * Type that represents either a SecretVariable or a nested object
+ * containing SecretVariables (supports up to 2 levels of nesting).
  */
 export interface SecretVariableTree {
-  [key: string]: SecretVariable | SecretVariableTree;
+  [key: string]: SecretVariable | { [key: string]: SecretVariable };
 }
