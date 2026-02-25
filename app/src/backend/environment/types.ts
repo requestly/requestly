@@ -28,4 +28,5 @@ export enum VariableScope {
   COLLECTION = "collection",
   GLOBAL = "global",
   DYNAMIC = "dynamic",
+  SECRETS = "secrets",
 }

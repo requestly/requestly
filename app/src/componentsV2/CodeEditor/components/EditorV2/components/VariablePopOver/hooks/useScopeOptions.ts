@@ -3,6 +3,7 @@ import React from "react";
 import { VariableScope } from "backend/environment/types";
 import type { ScopeOption } from "../types";
 import { MdOutlineCategory } from "@react-icons/all-files/md/MdOutlineCategory";
+import { MdLock } from "@react-icons/all-files/md/MdLock";
 import { BiNote } from "@react-icons/all-files/bi/BiNote";
 import { BsGlobeCentralSouthAsia } from "@react-icons/all-files/bs/BsGlobeCentralSouthAsia";
 import { MdHorizontalSplit } from "@react-icons/all-files/md/MdHorizontalSplit";
@@ -85,6 +86,13 @@ export const getScopeIcon = (
         MdOutlineCategory,
         "var(--requestly-color-warning-dark)",
         showBackgroundColor ? "var(--requestly-color-warning-darker)" : "transparent"
+      );
+    case VariableScope.SECRETS:
+      return createIconWithWrapper(
+        MdLock,
+        "var(--requestly-color-text-subtle)",
+        showBackgroundColor ? "var(--requestly-color-surface-2)" : "transparent",
+        showText ? "SECRETS" : undefined
       );
     default:
       return null;
