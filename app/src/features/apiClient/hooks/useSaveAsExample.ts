@@ -5,6 +5,9 @@ import { BufferedGraphQLRecordEntity, BufferedHttpRecordEntity } from "../slices
 import { RQAPI } from "../types";
 import { ExampleViewTabSource } from "../screens/apiClient/components/views/components/ExampleRequestView/exampleViewTabSource";
 import { toast } from "utils/Toast";
+import { sessionStorage } from "utils/sessionStorage";
+import { SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY } from "../constants";
+import { EXPANDED_RECORD_IDS_UPDATED } from "../slices/exampleCollections";
 
 export const useSaveAsExample = (entity: BufferedHttpRecordEntity | BufferedGraphQLRecordEntity) => {
   const context = useApiClientFeatureContext();
@@ -16,12 +19,15 @@ export const useSaveAsExample = (entity: BufferedHttpRecordEntity | BufferedGrap
     try {
       setIsSavingAsExample(true);
       const requestRecord = entity.getEntityFromState(context.store.getState());
+      const { data, ...recordMeta } = requestRecord;
+      const { examples: _examples, ...entryData } = data;
       const exampleRecordToCreate: RQAPI.ExampleApiRecord = {
-        ...requestRecord,
+        ...recordMeta,
+        data: entryData,
         parentRequestId: entity.meta.referenceId,
         type: RQAPI.RecordType.EXAMPLE_API,
+        collectionId: null,
       };
-      exampleRecordToCreate.collectionId = null;
 
       const { exampleRecord } = await context.store
         .dispatch(
@@ -42,6 +48,16 @@ export const useSaveAsExample = (entity: BufferedHttpRecordEntity | BufferedGrap
           context: { id: context.workspaceId },
         }),
       });
+
+      const parentRequestId = entity.meta.referenceId;
+      if (parentRequestId) {
+        const existingExpanded = sessionStorage.getItem(SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY, []);
+        if (!existingExpanded.includes(parentRequestId)) {
+          sessionStorage.setItem(SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY, [...existingExpanded, parentRequestId]);
+          window.dispatchEvent(new CustomEvent(EXPANDED_RECORD_IDS_UPDATED));
+        }
+      }
+
       toast.success("Example created successfully.");
     } catch (error) {
       toast.error("Something went wrong while creating the example.");

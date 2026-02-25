@@ -4,6 +4,7 @@ import { IoCloseSharp } from "@react-icons/all-files/io5/IoCloseSharp";
 import { CgTrash } from "@react-icons/all-files/cg/CgTrash";
 import { MdOutlineFileDownload } from "@react-icons/all-files/md/MdOutlineFileDownload";
 import { IoDuplicateOutline } from "@react-icons/all-files/io5/IoDuplicateOutline";
+import { SiOpenapiinitiative } from "@react-icons/all-files/si/SiOpenapiinitiative";
 import { BulkActions } from "features/apiClient/types";
 import { Checkbox, Dropdown, TooltipProps } from "antd";
 import { RQButton, RQTooltip } from "lib/design-system-v2/components";
@@ -44,6 +45,12 @@ const ActionMenu: React.FC<ActionMenuProps> = ({
         label: "Postman (v2.1 format)",
         icon: <img src={PostmanIcon} alt="Postman Icon" height="16px" width="16px" />,
         onClick: () => bulkActionsHandler(BulkActions.EXPORT_POSTMAN),
+      },
+      {
+        key: "openapi",
+        label: "OpenAPI 3.0",
+        icon: <SiOpenapiinitiative style={{ fontSize: "16px" }} />,
+        onClick: () => bulkActionsHandler(BulkActions.EXPORT_OPENAPI),
       },
     ];
   }, [bulkActionsHandler]);

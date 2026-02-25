@@ -8,11 +8,17 @@ import { MdOutlineKeyboardArrowDown } from "@react-icons/all-files/md/MdOutlineK
 import { MdOutlineDashboardCustomize } from "@react-icons/all-files/md/MdOutlineDashboardCustomize";
 import { useRBAC } from "features/rbac";
 import { BufferedGraphQLRecordEntity, BufferedHttpRecordEntity } from "features/apiClient/slices/entities";
-import { ApiClientStore, updateExampleRequest, useApiClientFeatureContext } from "features/apiClient/slices";
+import {
+  ApiClientStore,
+  bufferActions,
+  updateExampleRequest,
+  useApiClientFeatureContext,
+} from "features/apiClient/slices";
 import { toast } from "utils/Toast";
 import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
 import { useSaveAsExample } from "features/apiClient/hooks/useSaveAsExample";
 import "./saveRequestButton.scss";
+import { RQAPI } from "features/apiClient/types";
 
 interface Props {
   hidden?: boolean;
@@ -48,8 +54,10 @@ export const SaveRequestButton: React.FC<Props> = ({
 
   const handleUpdateExample = useCallback(async () => {
     try {
-      setIsUpdatingExample(true);
       const record = getRecord(entity, context.store);
+      if (!record || record.type !== RQAPI.RecordType.EXAMPLE_API) return;
+
+      setIsUpdatingExample(true);
       await context.store
         .dispatch(
           updateExampleRequest({
@@ -58,6 +66,12 @@ export const SaveRequestButton: React.FC<Props> = ({
           }) as any
         )
         .unwrap();
+      context.store.dispatch(
+        bufferActions.markSaved({
+          id: entity.meta.id,
+          savedData: record,
+        })
+      );
       toast.success("Example updated successfully.");
     } catch (error) {
       toast.error("Something went wrong while updating the example.");
@@ -90,6 +104,8 @@ export const SaveRequestButton: React.FC<Props> = ({
     ],
     [handleSaveExample, isValidPermission]
   );
+
+  if (hidden) return null;
 
   if (isDraft) {
     return (

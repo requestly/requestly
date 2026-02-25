@@ -110,7 +110,7 @@ const MoveRecordAcrossWorkspaceModal: React.FC<Props> = ({ isOpen, onClose, reco
     } catch (error) {
       notification.error({
         message: `Error moving records to collection`,
-        description: error?.message,
+        description: error?.message || (typeof error === "string" ? error : "Failed to move records"),
         placement: "bottomRight",
       });
 
@@ -246,7 +246,7 @@ const MoveRecordInSameWorkspaceModal: React.FC<Props> = ({
     } catch (error) {
       notification.error({
         message: `Error moving records to collection`,
-        description: error?.message,
+        description: error?.message || (typeof error === "string" ? error : "Failed to move records"),
         placement: "bottomRight",
       });
 

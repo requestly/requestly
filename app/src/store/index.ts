@@ -17,6 +17,7 @@ import { runtimeVariablesReducerWithPersist } from "features/apiClient/slices/ru
 import { tabsReducerWithPersist, tabBufferMiddleware } from "componentsV2/Tabs/slice";
 import { tabCloseMiddleware } from "componentsV2/Tabs/slice/tabCloseMiddleware";
 import { exampleCollectionsReducerWithPersist } from "features/apiClient/slices/exampleCollections";
+import { eventsReducer } from "./slices/eventsStream/slice";
 
 export const reduxStore = configureStore({
   reducer: {
@@ -32,6 +33,7 @@ export const reduxStore = configureStore({
     [ReducerKeys.TABS]: tabsReducerWithPersist,
     [ReducerKeys.RUNTIME_VARIABLES]: runtimeVariablesReducerWithPersist,
     [ReducerKeys.EXAMPLE_COLLECTIONS]: exampleCollectionsReducerWithPersist,
+    [ReducerKeys.EVENTS]: eventsReducer,
   },
   middleware: (getDefaultMiddleware) => {
     // In development mode redux-toolkit will

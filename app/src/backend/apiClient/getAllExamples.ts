@@ -64,7 +64,7 @@ export const getExamplesForApiRecords = async (
     return {
       success: true,
       data: allExamples,
-      failedRecordIds: failedRecordIds ?? undefined,
+      failedRecordIds: failedRecordIds ?? [],
     };
   } catch (error) {
     Logger.error("Error fetching examples for multiple API records:", error);
