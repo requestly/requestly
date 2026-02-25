@@ -7,7 +7,7 @@ import { ApiClientFeatureContext } from "features/apiClient/slices";
 import { reduxStore } from "store";
 import { DepGraph } from "dependency-graph";
 import { variableResolver } from "../../lib/dynamic-variables";
-import { getSecrets, hasSecretsPath } from "../../lib/secret-variables";
+import { secretVariables } from "../../lib/secret-variables";
 
 type Variables = Record<string, string | number | boolean>;
 interface RenderResult<T> {
@@ -107,7 +107,7 @@ const processObject = <T extends Record<string, any>>(input: T, variables: Varia
 const processTemplateString = <T extends string>(input: T, variables: Variables): RenderResult<T> => {
   try {
     const { wrappedTemplate, usedVariables } = collectAndEscapeVariablesFromTemplate(input, variables);
-    const contextWithSecrets = { ...variables, secrets: getSecrets() };
+    const contextWithSecrets = { ...variables, secrets: secretVariables.getSecrets() };
 
     console.log("!!!debug", "contextWithSecrets", { contextWithSecrets, usedVariables, wrappedTemplate });
 
@@ -142,7 +142,7 @@ const isDynamicVariable = (varName: string): boolean => {
 };
 
 /** Checks if a variable name is a valid secrets path (e.g. secrets.cities.chicago, leaf only). */
-const isSecretsVariable = (varName: string): boolean => hasSecretsPath(varName);
+const isSecretsVariable = (varName: string): boolean => secretVariables.hasSecretsPath(varName);
 
 const collectAndEscapeVariablesFromTemplate = (
   template: string,
@@ -243,7 +243,7 @@ const resolveCompositeVariables = (variables: Variables): Variables => {
       delete resolutionContext[varName];
 
       const { wrappedTemplate } = collectAndEscapeVariablesFromTemplate(value, resolutionContext);
-      const contextWithSecrets = { ...resolutionContext, secrets: getSecrets() };
+      const contextWithSecrets = { ...resolutionContext, secrets: secretVariables.getSecrets() };
       const renderedValue = variableResolver.resolve(wrappedTemplate, contextWithSecrets);
       resolved[varName] = renderedValue;
     } catch (e) {
