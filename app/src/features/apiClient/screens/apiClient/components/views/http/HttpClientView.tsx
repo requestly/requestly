@@ -63,7 +63,7 @@ import {
   getContentTypeFromResponseHeaders,
   getRequestTypeForAnalyticEvent,
   sanitizeEntry,
-  supportsGetRequestBody,
+  supportsRequestBodyForAllMethods,
 } from "../../../utils";
 import { ApiClientBreadCrumb, BreadcrumbType } from "../components/ApiClientBreadCrumb/ApiClientBreadCrumb";
 import { ClientCodeButton } from "../components/ClientCodeButton/ClientCodeButton";
@@ -142,9 +142,11 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
   const name = useApiClientSelector((s) => entity.getName(s));
   const isNew = useApiClientSelector((s) => bufferAdapterSelectors.selectById(s.buffer, entity.id)?.isNew);
 
-  const isGetWithBodyInNonDesktop = method === RequestMethod.GET && bodyLength > 0 && !supportsGetRequestBody(appMode);
+  const METHODS_WITHOUT_BODY = [RequestMethod.GET, RequestMethod.HEAD];
+  const isNonBodyMethodWithBodyInNonDesktop =
+    METHODS_WITHOUT_BODY.includes(method) && bodyLength > 0 && !supportsRequestBodyForAllMethods(appMode);
   const isMultipartInNonDesktop = contentType === RequestContentType.MULTIPART_FORM && appMode !== "DESKTOP";
-  const isSendDisabledDueToDesktopOnly = isGetWithBodyInNonDesktop || isMultipartInNonDesktop;
+  const isSendDisabledDueToDesktopOnly = isNonBodyMethodWithBodyInNonDesktop || isMultipartInNonDesktop;
 
   const saveBuffer = useSaveBuffer();
 
@@ -614,15 +616,15 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
                 isSendDisabledDueToDesktopOnly ? (
                   <div className="send-disabled-tooltip">
                     <span>
-                      {isGetWithBodyInNonDesktop
-                        ? "Sending GET request requires the desktop app."
+                      {isNonBodyMethodWithBodyInNonDesktop
+                        ? "Sending request body with this method requires the desktop app."
                         : "Sending multipart/form-data request requires the desktop app."}
                     </span>
                     <RQButton
                       size="small"
                       onClick={() =>
                         trackDesktopAppPromoClicked(
-                          isGetWithBodyInNonDesktop ? "get_request_body_send" : "multipart_form_data_send",
+                          isNonBodyMethodWithBodyInNonDesktop ? "request_body_send" : "multipart_form_data_send",
                           "web_app"
                         )
                       }

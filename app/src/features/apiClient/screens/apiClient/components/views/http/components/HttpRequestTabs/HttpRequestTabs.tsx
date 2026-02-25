@@ -2,7 +2,7 @@ import { useFeatureValue } from "@growthbook/growthbook-react";
 import { Checkbox } from "antd";
 import { Conditional } from "components/common/Conditional";
 import FEATURES from "config/constants/sub/features";
-import { sanitizeKeyValuePairs, supportsGetRequestBody } from "features/apiClient/screens/apiClient/utils";
+import { sanitizeKeyValuePairs, supportsRequestBodyForAllMethods } from "features/apiClient/screens/apiClient/utils";
 import { BufferedHttpRecordEntity } from "features/apiClient/slices/entities";
 import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
 import { RequestMethod, RQAPI } from "features/apiClient/types";
@@ -18,7 +18,7 @@ import { QueryParamsTable } from "../../../components/request/components/QueryPa
 import RequestBody from "../../../components/request/RequestBody";
 import { ScriptEditor } from "../../../components/Scripts/components/ScriptEditor/ScriptEditor";
 import { PathVariableTable } from "../PathVariableTable";
-import GetRequestBodyRedirectScreen from "../../../../clientView/components/GetRequestBodyRedirectScreen";
+import RequestBodyRedirectScreen from "../../../../clientView/components/RequestBodyRedirectScreen";
 
 export enum RequestTab {
   QUERY_PARAMS = "query_params",
@@ -56,9 +56,10 @@ const HttpRequestTabs: React.FC<Props> = ({
 
   const requestEntry = useApiClientSelector((s) => entity.getEntityFromState(s).data);
 
-  const isRequestBodySupported =
-    method !== RequestMethod.HEAD && (method !== RequestMethod.GET || supportsGetRequestBody(appMode));
-  const isGetRequestInNonDesktopMode = method === RequestMethod.GET && !supportsGetRequestBody(appMode);
+  const METHODS_WITHOUT_BODY = [RequestMethod.GET, RequestMethod.HEAD];
+  const needsDesktopForBody = METHODS_WITHOUT_BODY.includes(method);
+  const isRequestBodySupported = !needsDesktopForBody || supportsRequestBodyForAllMethods(appMode);
+  const isNonBodyMethodInNonDesktop = needsDesktopForBody && !supportsRequestBodyForAllMethods(appMode);
   const hasScriptError = error?.type === RQAPI.ApiClientErrorType.SCRIPT;
 
   const items = useMemo(() => {
@@ -77,8 +78,7 @@ const HttpRequestTabs: React.FC<Props> = ({
       {
         key: RequestTab.BODY,
         label: <RequestTabLabel label="Body" count={bodyLength ? 1 : 0} showDot={isRequestBodySupported} />,
-        children: isGetRequestInNonDesktopMode ? <GetRequestBodyRedirectScreen /> : <RequestBody entity={entity} />,
-        disabled: method === RequestMethod.HEAD,
+        children: isNonBodyMethodInNonDesktop ? <RequestBodyRedirectScreen /> : <RequestBody entity={entity} />,
       },
       {
         key: RequestTab.HEADERS,
@@ -130,7 +130,7 @@ const HttpRequestTabs: React.FC<Props> = ({
     entity,
     bodyLength,
     isRequestBodySupported,
-    isGetRequestInNonDesktopMode,
+    isNonBodyMethodInNonDesktop,
     headersLength,
     auth,
     handleAuthChange,

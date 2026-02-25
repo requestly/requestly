@@ -3,10 +3,10 @@ import React from "react";
 import "./index.scss";
 import { trackDesktopAppPromoClicked } from "modules/analytics/events/common/onboarding";
 
-const GetRequestBodyRedirectScreen: React.FC = () => {
+const RequestBodyRedirectScreen: React.FC = () => {
   return (
-    <div className="get-request-body-redirect-screen-container">
-      <div className="get-request-body-redirect-screen-empty-state">
+    <div className="request-body-redirect-screen-container">
+      <div className="request-body-redirect-screen-empty-state">
         <img
           src="/assets/media/apiClient/desktop-not-available.svg"
           alt="Not supported in web version"
@@ -15,16 +15,16 @@ const GetRequestBodyRedirectScreen: React.FC = () => {
             height: "64px",
           }}
         />
-        <div className="get-request-body-redirect-screen-content">
-          <span className="get-request-body-redirect-screen-title">Body for GET request is not available on web</span>
-          <p className="get-request-body-redirect-screen-description">
-            Sending a body with a GET request isn't supported in the web application.
+        <div className="request-body-redirect-screen-content">
+          <span className="request-body-redirect-screen-title">Request body is not available on web</span>
+          <p className="request-body-redirect-screen-description">
+            Sending a request body with this method isn't supported in the web application.
             <br /> Use the desktop app to enable this capability.
           </p>
         </div>
 
         <RQButton
-          onClick={() => trackDesktopAppPromoClicked("get_request_body", "web_app")}
+          onClick={() => trackDesktopAppPromoClicked("request_body", "web_app")}
           href="https://requestly.com/downloads/desktop/"
           target="_blank"
         >
@@ -35,4 +35,4 @@ const GetRequestBodyRedirectScreen: React.FC = () => {
   );
 };
 
-export default GetRequestBodyRedirectScreen;
+export default RequestBodyRedirectScreen;
