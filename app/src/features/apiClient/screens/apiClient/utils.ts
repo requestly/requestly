@@ -248,7 +248,7 @@ export const sanitizeKeyValuePairs = <T extends KeyValuePair>(keyValuePairs: T[]
     .filter((pair) => !removeInvalidPairs || (pair.isEnabled && pair.key?.length > 0));
 };
 
-export const supportsGetRequestBody = (appMode: string): boolean => {
+export const supportsRequestBodyForAllMethods = (appMode: string): boolean => {
   return appMode === CONSTANTS.APP_MODES.DESKTOP;
 };
 

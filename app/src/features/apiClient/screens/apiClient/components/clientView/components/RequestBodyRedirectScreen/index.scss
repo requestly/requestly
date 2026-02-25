@@ -1,4 +1,4 @@
-.get-request-body-redirect-screen-container {
+.request-body-redirect-screen-container {
   display: flex;
   padding: 40px 0px;
   flex-direction: column;
@@ -6,7 +6,7 @@
   gap: 0px;
   align-self: stretch;
 
-  .get-request-body-redirect-screen-empty-state {
+  .request-body-redirect-screen-empty-state {
     display: flex;
     width: 440px;
     flex-direction: column;
@@ -14,7 +14,7 @@
     align-items: center;
     gap: 24px;
 
-    .get-request-body-redirect-screen-content {
+    .request-body-redirect-screen-content {
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -22,7 +22,7 @@
       gap: 8px;
       align-self: stretch;
 
-      .get-request-body-redirect-screen-title {
+      .request-body-redirect-screen-title {
         overflow: hidden;
         text-align: center;
         text-overflow: ellipsis;
@@ -31,7 +31,7 @@
         line-height: 20px;
       }
 
-      .get-request-body-redirect-screen-description {
+      .request-body-redirect-screen-description {
         color: var(--requestly-color-text-subtle);
         text-align: center;
         font-size: 11px;

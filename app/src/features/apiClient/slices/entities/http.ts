@@ -5,7 +5,7 @@ import { ApiClientStoreState } from "../workspaceView/helpers/ApiClientContextRe
 import { ApiClientRecordEntity } from "./api-client-record-entity";
 import { ApiClientEntityType } from "./types";
 import { ApiClientEntityMeta } from "./base";
-import { CONTENT_TYPE_HEADER } from "features/apiClient/constants";
+
 import { v4 } from "uuid";
 
 export class HttpRecordEntity<M extends ApiClientEntityMeta = ApiClientEntityMeta> extends ApiClientRecordEntity<
@@ -153,11 +153,6 @@ export class HttpRecordEntity<M extends ApiClientEntityMeta = ApiClientEntityMet
   }
 
   setMethod(method: RequestMethod): void {
-    if (method === RequestMethod.HEAD) {
-      this.deleteBody();
-      this.setContentType(RequestContentType.RAW);
-      this.deleteHeader((header) => header.key === CONTENT_TYPE_HEADER);
-    }
     this.SET({ data: { request: { method } } });
   }
 
