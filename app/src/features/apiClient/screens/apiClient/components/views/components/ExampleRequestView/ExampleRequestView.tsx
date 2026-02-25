@@ -28,6 +28,8 @@ export const ExampleRequestView: React.FC<Props> = React.memo(({ exampleId }) =>
     type: entityType,
   });
 
+  if (!record) return null;
+
   return (
     <BottomSheetProvider context={BottomSheetFeatureContext.API_CLIENT}>
       <div className="api-client-container-content">
