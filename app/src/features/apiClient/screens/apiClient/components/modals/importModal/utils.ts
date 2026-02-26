@@ -1,11 +1,11 @@
 import { RQAPI } from "features/apiClient/types";
-import { isApiCollection, isApiRequest } from "../../../utils";
+import { isApiCollection, isApiRequest, isExampleApiRecord } from "../../../utils";
 import { ApiClientRecordsInterface } from "features/apiClient/helpers/modules/sync/interfaces";
-import { EnvironmentVariableData } from "features/apiClient/store/variables/types";
+import { EnvironmentVariableData } from "@requestly/shared/types/entities/apiClient";
 import { KeyValuePair } from "@requestly/shared/types/entities/apiClient";
 
 export interface RQImportData {
-  records: (RQAPI.ApiRecord | RQAPI.CollectionRecord)[];
+  records: (RQAPI.ApiRecord | RQAPI.CollectionRecord | RQAPI.ExampleApiRecord)[];
   environments: { name: string; variables: Record<string, EnvironmentVariableData>; isGlobal: boolean }[];
 }
 
@@ -28,6 +28,7 @@ export const processRqImportData = (
 } => {
   const apis: RQAPI.ApiRecord[] = [];
   const collections: RQAPI.CollectionRecord[] = [];
+  const examples: RQAPI.ExampleApiRecord[] = [];
 
   const { records = [], environments = [] } = fileContent;
 
@@ -36,7 +37,9 @@ export const processRqImportData = (
     record.updatedBy = uid || null;
     record.ownerId = uid || null;
 
-    if (isApiRequest(record)) {
+    if (isExampleApiRecord(record)) {
+      examples.push(record);
+    } else if (isApiRequest(record)) {
       apis.push(record);
     } else if (isApiCollection(record)) {
       collections.push(record);
@@ -97,6 +100,8 @@ export const processRqImportData = (
 
     updatedApiRecordsToImport.apis.push(updatedApi);
   });
+
+  updatedApiRecordsToImport.examples.push(...examples);
 
   return {
     apis: updatedApiRecordsToImport.apis,
