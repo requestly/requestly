@@ -21,7 +21,7 @@ interface VariableItemProps {
 
 const VariableItem = memo<VariableItemProps>(({ item, index, isSelected, onSelect, onHover }) => {
   const isDynamic = checkIsDynamicVariable(item.variable);
-  const variableScope = isDynamic ? item.variable.scope : item.variable[1].scope;
+  const variableScope = Array.isArray(item.variable) ? item.variable[1].scope : item.variable.scope;
 
   const handleMouseDown = useCallback(
     (e: React.MouseEvent) => {

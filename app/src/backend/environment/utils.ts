@@ -7,6 +7,7 @@ import { ApiClientFeatureContext } from "features/apiClient/slices";
 import { reduxStore } from "store";
 import { DepGraph } from "dependency-graph";
 import { variableResolver } from "../../lib/dynamic-variables";
+import { secretVariables } from "../../lib/secret-variables";
 
 type Variables = Record<string, string | number | boolean>;
 interface RenderResult<T> {
@@ -106,7 +107,11 @@ const processObject = <T extends Record<string, any>>(input: T, variables: Varia
 const processTemplateString = <T extends string>(input: T, variables: Variables): RenderResult<T> => {
   try {
     const { wrappedTemplate, usedVariables } = collectAndEscapeVariablesFromTemplate(input, variables);
-    const renderedTemplate = variableResolver.resolve(wrappedTemplate, variables) as T; // since handlebars generic types resolve to any; not string
+    const contextWithSecrets = { ...variables, secrets: secretVariables.getSecrets() };
+
+    console.log("!!!debug", "contextWithSecrets", { contextWithSecrets, usedVariables, wrappedTemplate });
+
+    const renderedTemplate = variableResolver.resolve(wrappedTemplate, contextWithSecrets) as T; // since handlebars generic types resolve to any; not string
 
     return {
       renderedTemplate,
@@ -136,6 +141,9 @@ const isDynamicVariable = (varName: string): boolean => {
   return variableResolver.has(variableNameOnly);
 };
 
+/** Checks if a variable name is a valid secrets path (e.g. secrets.cities.chicago, leaf only). */
+const isSecretsVariable = (varName: string): boolean => secretVariables.hasSecretsPath(varName);
+
 const collectAndEscapeVariablesFromTemplate = (
   template: string,
   variables: Variables
@@ -147,6 +155,7 @@ const collectAndEscapeVariablesFromTemplate = (
     const isMatchEmpty = varName === ""; // {{}}
     const isUserVariable = varName in variables;
     const isDynamic = isDynamicVariable(varName);
+    const isSecrets = isSecretsVariable(varName);
 
     if (isUserVariable) {
       usedVariables[varName] = variables[varName];
@@ -157,8 +166,8 @@ const collectAndEscapeVariablesFromTemplate = (
       return escapeMatchFromHandlebars(completeMatch);
     }
 
-    // Or escape if not a user variable AND not a dynamic variable
-    const shouldEscape = !isUserVariable && !isDynamic;
+    // Or escape if not a user variable AND not a dynamic variable AND not a secrets path
+    const shouldEscape = !isUserVariable && !isDynamic && !isSecrets;
     if (shouldEscape) {
       return escapeMatchFromHandlebars(completeMatch);
     }
@@ -234,7 +243,8 @@ const resolveCompositeVariables = (variables: Variables): Variables => {
       delete resolutionContext[varName];
 
       const { wrappedTemplate } = collectAndEscapeVariablesFromTemplate(value, resolutionContext);
-      const renderedValue = variableResolver.resolve(wrappedTemplate, resolutionContext);
+      const contextWithSecrets = { ...resolutionContext, secrets: secretVariables.getSecrets() };
+      const renderedValue = variableResolver.resolve(wrappedTemplate, contextWithSecrets);
       resolved[varName] = renderedValue;
     } catch (e) {
       // Keep the original value if rendering fails
