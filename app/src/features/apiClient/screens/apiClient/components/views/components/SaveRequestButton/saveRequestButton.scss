@@ -20,4 +20,15 @@
   .ant-dropdown-menu-item {
     color: var(--requestly-color-text-default);
   }
+
+  .save-as-example-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex: 1;
+
+    svg {
+      color: var(--requestly-color-text-subtle);
+    }
+  }
 }

@@ -2,6 +2,7 @@ import { RQAPI } from "features/apiClient/types";
 import { isApiCollection, isApiRequest } from "../../../utils";
 import { ApiClientRecordsInterface } from "features/apiClient/helpers/modules/sync/interfaces";
 import { EnvironmentVariableData } from "features/apiClient/store/variables/types";
+import { KeyValuePair } from "@requestly/shared/types/entities/apiClient";
 
 export interface RQImportData {
   records: (RQAPI.ApiRecord | RQAPI.CollectionRecord)[];
@@ -70,24 +71,31 @@ export const processRqImportData = (
   apis.forEach((api: RQAPI.ApiRecord) => {
     const apiToImport = { ...api };
     const newCollectionId = oldToNewIdMap[apiToImport.collectionId];
-    const newApiId = apiClientRecordsRepository.generateApiRecordId(newCollectionId);
+    const updatedApi = { ...apiToImport, collectionId: newCollectionId };
 
-    apiToImport.id = newApiId;
-    apiToImport.collectionId = newCollectionId;
-    apiToImport.data.type = apiToImport.data.type || RQAPI.ApiEntryType.HTTP;
-
-    // Flatten nested examples for the hook to process
-    apiToImport?.data?.examples?.forEach((example) => {
-      updatedApiRecordsToImport.examples.push({
-        ...example,
-        parentRequestId: newApiId,
-        collectionId: newCollectionId,
-        ownerId: uid,
-        createdBy: uid,
+    if (updatedApi.data.request?.headers?.length > 0) {
+      updatedApi.data.request.headers = updatedApi.data.request.headers.map((header: KeyValuePair, index: number) => {
+        return {
+          ...header,
+          isEnabled: header.isEnabled ?? true,
+          id: header.id ?? index,
+        };
       });
-    });
+    }
 
-    updatedApiRecordsToImport.apis.push(apiToImport);
+    if (updatedApi?.data?.type === RQAPI.ApiEntryType.HTTP && updatedApi.data.request?.queryParams.length > 0) {
+      updatedApi.data.request.queryParams = updatedApi.data.request.queryParams.map(
+        (queryParam: KeyValuePair, index: number) => {
+          return {
+            ...queryParam,
+            isEnabled: queryParam.isEnabled ?? true,
+            id: queryParam.id ?? index,
+          };
+        }
+      );
+    }
+
+    updatedApiRecordsToImport.apis.push(updatedApi);
   });
 
   return {

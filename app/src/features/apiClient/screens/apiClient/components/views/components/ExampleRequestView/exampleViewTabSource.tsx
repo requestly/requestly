@@ -4,7 +4,7 @@ import { ExampleRequestView } from "./ExampleRequestView";
 import { RQAPI } from "features/apiClient/types";
 import { MatchedTabSource, TabSourceMetadata } from "componentsV2/Tabs/types";
 import { getApiClientFeatureContext } from "features/apiClient/slices";
-import { MdOutlineDashboardCustomize } from "@react-icons/all-files/md/MdOutlineDashboardCustomize";
+import { MdOutlineDashboard } from "@react-icons/all-files/md/MdOutlineDashboard";
 
 interface ExampleViewTabSourceMetadata extends TabSourceMetadata {
   apiEntryDetails?: RQAPI.ExampleApiRecord;
@@ -19,7 +19,7 @@ export class ExampleViewTabSource extends BaseTabSource {
       name: "example",
     };
     this.urlPath = `${PATHS.API_CLIENT.ABSOLUTE}/${this.metadata.name}/${encodeURI(this.metadata.id)}`;
-    this.icon = <MdOutlineDashboardCustomize />;
+    this.icon = <MdOutlineDashboard />;
   }
 
   static create(matchedPath: MatchedTabSource["matchedPath"]): ExampleViewTabSource {

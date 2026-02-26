@@ -7,6 +7,7 @@ export enum EditorLanguage {
   JSON = "json",
   JSON5 = "json5",
   HTML = "html",
+  XML = "xml",
   CSS = "css",
 }
 
@@ -31,6 +32,13 @@ const contentTypeToLanguageMap: { regex: RegExp; language: EditorLanguage }[] = 
   { regex: /^text\/json$/, language: EditorLanguage.JSON },
   // Vendor-specific JSON types (e.g., application/vnd.api+json)
   { regex: /^application\/[\w.-]+\+json$/, language: EditorLanguage.JSON },
+
+  // XML
+  { regex: /^text\/xml$/, language: EditorLanguage.XML },
+  { regex: /^application\/xml$/, language: EditorLanguage.XML },
+  { regex: /^application\/soap\+xml$/, language: EditorLanguage.XML },
+  // Vendor-specific XML types (Catch-all for anything ending in +xml, e.g., atom+xml)
+  { regex: /^application\/[\w.-]+\+xml$/, language: EditorLanguage.XML },
 ];
 
 export type EditorCustomToolbar = {
