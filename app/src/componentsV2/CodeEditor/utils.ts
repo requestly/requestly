@@ -6,6 +6,10 @@ export const getEditorParserConfig = async (language: EditorLanguage) => {
   let parserPlugin = await import("prettier/parser-babel");
 
   switch (language) {
+    case EditorLanguage.XML:
+      parser = "xml";
+      parserPlugin = await import("@prettier/plugin-xml");
+      break;
     case EditorLanguage.HTML:
       parser = "html";
       parserPlugin = await import("prettier/parser-html");

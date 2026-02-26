@@ -10,6 +10,7 @@ export type AuthSyncMetadata = {
     isExistingUser: boolean;
     isSyncedUser: boolean;
     providers: AuthProvider[];
+    forceBstackAuth?: boolean;
   };
 };
 export interface CredentialResponse {

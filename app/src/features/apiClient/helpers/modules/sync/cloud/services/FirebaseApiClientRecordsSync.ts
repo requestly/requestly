@@ -13,7 +13,7 @@ import {
   createExample,
 } from "backend/apiClient";
 import { ApiClientCloudMeta, ApiClientRecordsInterface } from "../../interfaces";
-import { batchWrite, firebaseBatchWrite, generateDocumentId, getOwnerId } from "backend/utils";
+import { batchWrite, generateDocumentId, getOwnerId } from "backend/utils";
 import { isApiCollection } from "features/apiClient/screens/apiClient/utils";
 import { omit } from "lodash";
 import { RQAPI } from "features/apiClient/types";
@@ -28,6 +28,7 @@ import { SentryCustomSpan } from "utils/sentry";
 import { captureException } from "backend/apiClient/utils";
 import { apiRecordsRankingManager } from "features/apiClient/helpers/RankingManager";
 import { updateExample } from "backend/apiClient/updateExample";
+import { deleteExamples } from "backend/apiClient/deleteExamples";
 
 export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<ApiClientCloudMeta> {
   meta: ApiClientCloudMeta;
@@ -223,7 +224,8 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
   }
 
   async duplicateApiEntities(entities: RQAPI.ApiClientRecord[]) {
-    return firebaseBatchWrite("apis", entities);
+    const result = await batchUpsertApiRecords(this.meta.uid, entities, this.meta.teamId);
+    return result.success ? (result.data as RQAPI.ApiRecord[]) : [];
   }
 
   async moveAPIEntities(entities: RQAPI.ApiClientRecord[], newParentId: string) {
@@ -232,7 +234,9 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
         ? { ...record, collectionId: newParentId, data: omit(record.data, "children") }
         : { ...record, collectionId: newParentId }
     );
-    return await firebaseBatchWrite("apis", updatedRequests);
+
+    const result = await batchUpsertApiRecords(this.meta.uid, updatedRequests, this.meta.teamId);
+    return result.success ? (result.data as RQAPI.ApiRecord[]) : [];
   }
 
   async batchCreateRecordsWithExistingId(records: RQAPI.ApiClientRecord[]): RQAPI.RecordsPromise {
@@ -322,6 +326,11 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
 
   async updateExampleRequest(example: RQAPI.ExampleApiRecord): RQAPI.ApiClientRecordPromise {
     const result = await updateExample(this.meta.uid, example, this.meta.teamId);
+    return result;
+  }
+
+  async deleteExamples(exampleRecords: RQAPI.ExampleApiRecord[]): Promise<{ success: boolean; message?: string }> {
+    const result = await deleteExamples(this.meta.uid, exampleRecords);
     return result;
   }
 }
