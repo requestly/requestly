@@ -101,6 +101,7 @@ export interface ApiClientRecordsInterface<Meta extends Record<string, any>> {
     collectionId: RQAPI.ApiClientRecord["collectionId"],
     runResult: RunResult
   ): ResponsePromise<SavedRunResult>;
+  deleteExamples(exampleRecords: RQAPI.ExampleApiRecord[]): Promise<{ success: boolean; message?: string }>;
 }
 
 export enum RepoType {

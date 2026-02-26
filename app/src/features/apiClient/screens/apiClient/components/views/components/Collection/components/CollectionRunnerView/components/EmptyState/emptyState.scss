@@ -8,9 +8,11 @@
   justify-content: center;
 
   img {
-    width: 80px;
-    height: 80px;
+    width: 64px;
+    height: 64px;
     flex-shrink: 0;
+    filter: grayscale(1);
+    opacity: 0.6;
   }
 
   .title {

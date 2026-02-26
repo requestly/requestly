@@ -21,6 +21,7 @@ import {
   ApiClientStore,
   bufferActions,
   bufferAdapterSelectors,
+  selectRecordById,
   useApiClientRepository,
   useApiClientStore,
 } from "features/apiClient/slices";
@@ -70,11 +71,11 @@ import { Authorization } from "../components/request/components/AuthorizationVie
 import { ApiClientBottomSheet } from "../components/response/ApiClientBottomSheet/ApiClientBottomSheet";
 import HttpApiClientUrl from "./components/HttpClientUrl/HttpClientUrl";
 import HttpRequestTabs, { RequestTab } from "./components/HttpRequestTabs/HttpRequestTabs";
-import "./httpClientView.scss";
 import { SaveRequestButton } from "../components/SaveRequestButton/SaveRequestButton";
 import { MdArrowOutward } from "@react-icons/all-files/md/MdArrowOutward";
 import { DraftRequestContainerTabSource } from "../components/DraftRequestContainer/draftRequestContainerTabSource";
 import { useTabActions } from "componentsV2/Tabs/slice";
+import "./httpClientView.scss";
 
 function getEntry(entity: BufferedHttpRecordEntity, store: ApiClientStore) {
   return entity.getEntityFromState(store.getState()).data;
@@ -96,6 +97,7 @@ export type HttpClientViewProps = {
   };
   openInModal?: boolean;
   notifyApiRequestFinished: (apiEntry: RQAPI.HttpApiEntry) => void;
+  isDraftMode?: boolean;
 };
 
 const HttpClientView: React.FC<HttpClientViewProps> = ({
@@ -103,6 +105,7 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
   notifyApiRequestFinished,
   entity,
   override,
+  isDraftMode = false,
 }) => {
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
@@ -324,7 +327,13 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
                     queryParams: executedEntry.request.queryParams,
                   });
                   scope.setFingerprint(["api_request_error", executedEntry.request.method, error.source]);
-                  Sentry.captureException(new Error(`API Request Failed: ${error.message || "Unknown error"}`));
+                  const sentryError = new Error(
+                    `API Request Failed: ${error.message || error.name || "Unknown error"}`
+                  );
+                  if (error.stack) {
+                    sentryError.stack = error.stack;
+                  }
+                  Sentry.captureException(sentryError);
                 });
               }
               trackRequestFailed(
@@ -376,9 +385,13 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
 
   const handleRecordNameUpdate = useCallback(
     async (name: string) => {
-      const record = lodash.cloneDeep(entity.getEntityFromState(store.getState()));
+      // FIX: current record type arch does not have proper intersection between ApiRecord and ExampleApiRecord
+      const record = lodash.cloneDeep(entity.getEntityFromState(store.getState())) as RQAPI.ApiClientRecord;
       record.name = name;
-      const result = await apiClientRecordsRepository.updateRecord(record, entity.meta.referenceId);
+      const result =
+        record.type === RQAPI.RecordType.EXAMPLE_API
+          ? await apiClientRecordsRepository.updateExampleRequest(record)
+          : await apiClientRecordsRepository.updateRecord(record, entity.meta.referenceId);
       if (!result.success) {
         notification.error({
           message: "Could not rename record",
@@ -436,7 +449,7 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
             },
             async save(record, repositories) {
               if (override?.onSaveClick) {
-                return override.onSaveClick.save(record, repositories);
+                return override.onSaveClick.save(record as RQAPI.HttpApiRecord, repositories);
               }
               const result = await repositories.apiClientRecordsRepository.updateRecord(record, record.id);
               if (!result.success) {
@@ -455,7 +468,7 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
             },
             onSuccess(result) {
               toast.success("Request saved!");
-              override?.onSaveClick?.onSuccess(result);
+              override?.onSaveClick?.onSuccess(result as RQAPI.HttpApiRecord);
               trackRequestSaved({
                 src: "api_client_view",
                 has_scripts: Boolean(result.data.scripts?.preRequest),
@@ -543,13 +556,28 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
   );
 
   const handleUseAsTemplate = useCallback(() => {
+    const record = entity.getEntityFromState(store.getState());
+    const exampleData = { ...record.data };
+
+    if (record.type === RQAPI.RecordType.EXAMPLE_API) {
+      const parentRecord = selectRecordById(store.getState(), record.parentRequestId);
+      if (parentRecord?.data) {
+        if (parentRecord.data.auth) {
+          exampleData.auth = parentRecord.data.auth;
+        }
+        if (parentRecord.data.scripts) {
+          exampleData.scripts = parentRecord.data.scripts;
+        }
+      }
+    }
+
     openBufferedTab({
       isNew: true,
       preview: false,
       source: new DraftRequestContainerTabSource({
         apiEntryType: RQAPI.ApiEntryType.HTTP,
         context: {},
-        emptyRecord: getEmptyDraftApiRecord(RQAPI.ApiEntryType.HTTP, entity.getEntityFromState(store.getState()).data),
+        emptyRecord: getEmptyDraftApiRecord(RQAPI.ApiEntryType.HTTP, exampleData),
       }),
     });
   }, [entity, store, openBufferedTab]);
@@ -574,7 +602,7 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
         <div className="api-client-header-container__header">
           <div className="api-client-breadcrumb-container">
             <ApiClientBreadCrumb
-              isDraft={!!isNew}
+              isDraft={isDraftMode}
               id={entity.meta.referenceId}
               openInModal={openInModal}
               placeholder="Untitled request"
@@ -642,6 +670,7 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
               onClick={onSaveButtonClick}
               entity={entity}
               isExample={isExample}
+              isDraft={isDraftMode}
             />
           </div>
         </div>
