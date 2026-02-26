@@ -69,38 +69,32 @@ const ResponseBody: React.FC<Props> = ({ responseText, contentTypeHeader }) => {
   }, [onResponseModeChange, responseMode]);
 
   const preview = useMemo<ReactElement>(() => {
+    let previewComponent: ReactElement | null = null;
     if (contentTypeHeader?.includes("text/html")) {
+      previewComponent = <HTMLResponsePreview responseText={responseText} />;
+    } else if (contentTypeHeader?.includes("image/")) {
+      previewComponent = <ImageResponsePreview responseText={responseText} mimeType={contentTypeHeader} />;
+    } else {
+      const editorLanguage = getEditorLanguageFromContentType(contentTypeHeader);
       return (
         <div className="api-response-body-editor-container">
-          <div>{bodyPreviewModeOptions}</div>
-          <HTMLResponsePreview responseText={responseText} />
+          <Editor
+            prettifyOnInit
+            value={shouldRenderPreview(responseText, contentTypeHeader) ? responseText : "Preview not available"}
+            language={editorLanguage}
+            isReadOnly
+            toolbarOptions={{
+              title: "",
+              options: [bodyPreviewModeOptions],
+            }}
+          />
         </div>
       );
     }
-
-    if (contentTypeHeader?.includes("image/")) {
-      return (
-        <div className="api-response-body-editor-container">
-          <div>{bodyPreviewModeOptions}</div>
-          <ImageResponsePreview responseText={responseText} mimeType={contentTypeHeader} />
-        </div>
-      );
-    }
-
-    const editorLanguage = getEditorLanguageFromContentType(contentTypeHeader);
-
     return (
       <div className="api-response-body-editor-container">
-        <Editor
-          prettifyOnInit
-          value={shouldRenderPreview(responseText, contentTypeHeader) ? responseText : "Preview not available"}
-          language={editorLanguage}
-          isReadOnly
-          toolbarOptions={{
-            title: "",
-            options: [bodyPreviewModeOptions],
-          }}
-        />
+        <div>{bodyPreviewModeOptions}</div>
+        {previewComponent}
       </div>
     );
   }, [contentTypeHeader, responseText, bodyPreviewModeOptions]);
