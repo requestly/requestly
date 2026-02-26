@@ -14,13 +14,14 @@ import {
   WorkspaceInfo,
 } from "features/apiClient/slices";
 import { ApiClientExportModal } from "../../../modals/exportModal/ApiClientExportModal";
-import { captureException } from "backend/apiClient/utils";
 import { DeleteApiRecordModal } from "../../../modals";
 import { ContextualCollectionsList } from "./CollectionsList/ContextualCollectionsList";
 import { PostmanExportModal } from "../../../modals/postmanCollectionExportModal/PostmanCollectionExportModal";
 import { WorkspaceProvider } from "../WorkspaceProvider/WorkspaceProvider";
 import { WorkspaceIdContextProvider } from "features/apiClient/common/WorkspaceProvider";
 import "./contextualCollectionsSidebar.scss";
+import { ErrorSeverity } from "errors/types";
+import { NativeError } from "errors/NativeError";
 
 export const ContextualCollectionsSidebar: React.FC<{
   onNewClick: (src: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType) => Promise<void>;
@@ -140,7 +141,7 @@ export const ContextualCollectionsSidebar: React.FC<{
       await Promise.all(promises);
       deselect();
     } catch (error) {
-      captureException(error);
+      throw NativeError.fromError(error).setShowBoundary(true).setSeverity(ErrorSeverity.ERROR);
     }
   }, [deselect]);
 

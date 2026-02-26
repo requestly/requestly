@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
 import { Checkbox, Dropdown, MenuProps, Skeleton, Typography, notification } from "antd";
 import { RQAPI } from "features/apiClient/types";
+import { RQAPI as SharedRQAPI } from "@requestly/shared/types/entities/apiClient";
 import { RQButton } from "lib/design-system-v2/components";
 import { NewRecordNameInput } from "../newRecordNameInput/NewRecordNameInput";
 import { RequestRow } from "../requestRow/RequestRow";
@@ -9,9 +10,7 @@ import { ApiRecordEmptyState } from "../apiRecordEmptyState/ApiRecordEmptyState"
 import { IoChevronForward } from "@react-icons/all-files/io5/IoChevronForward";
 import { ApiClientSidebarCollapse } from "../apiClientSidebarCollapse/ApiClientSidebarCollapse";
 import { SidebarPlaceholderItem } from "../../SidebarPlaceholderItem/SidebarPlaceholderItem";
-import { isEmpty } from "lodash";
-import { sessionStorage } from "utils/sessionStorage";
-import { SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY } from "features/apiClient/constants";
+import { useCollapsibleRow } from "../../../../../../../hooks/useCollapsibleRow";
 import { MdOutlineBorderColor } from "@react-icons/all-files/md/MdOutlineBorderColor";
 import { MdOutlineDelete } from "@react-icons/all-files/md/MdOutlineDelete";
 import { MdOutlineIosShare } from "@react-icons/all-files/md/MdOutlineIosShare";
@@ -26,6 +25,9 @@ import "./CollectionRow.scss";
 import { ApiClientExportModal } from "../../../../modals/exportModal/ApiClientExportModal";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { PostmanExportModal } from "../../../../modals/postmanCollectionExportModal/PostmanCollectionExportModal";
+import { CommonApiClientExportModal } from "../../../../modals/CommonApiClientExportModal";
+import { ExporterFunction } from "features/apiClient/helpers/exporters/types";
+import { createOpenApiExporter } from "features/apiClient/helpers/exporters/openapi";
 import { MdOutlineVideoLibrary } from "@react-icons/all-files/md/MdOutlineVideoLibrary";
 import { CollectionRowOptionsCustomEvent, dispatchCustomEvent } from "./utils";
 import {
@@ -39,11 +41,10 @@ import { useActiveTab, useTabActions } from "componentsV2/Tabs/slice";
 import { getAncestorIds, getRecord } from "features/apiClient/slices/apiRecords/utils";
 import { Workspace } from "features/workspaces/types";
 import { EnvironmentVariables } from "backend/environment/types";
-
-export enum ExportType {
-  REQUESTLY = "requestly",
-  POSTMAN = "postman",
-}
+import { SiOpenapiinitiative } from "@react-icons/all-files/si/SiOpenapiinitiative";
+import { ExportType } from "features/apiClient/helpers/exporters/types";
+import { NativeError } from "errors/NativeError";
+import { ErrorSeverity } from "errors/types";
 
 interface Props {
   record: RQAPI.CollectionRecord;
@@ -85,9 +86,11 @@ export const CollectionRow: React.FC<Props> = ({
 }) => {
   const { selectedRecords, showSelection, recordsSelectionHandler, setShowSelection } = bulkActionOptions || {};
   const [isEditMode, setIsEditMode] = useState(false);
-  const [activeKey, setActiveKey] = useState<string | undefined>(
-    expandedRecordIds?.includes(record.id) ? record.id : undefined
-  );
+  const { activeKey, setActiveKey, updateExpandedRecordIds, collapseChangeHandler } = useCollapsibleRow({
+    recordId: record.id,
+    expandedRecordIds,
+    setExpandedRecordIds,
+  });
   const hoverExpandTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
   const [createNewField, setCreateNewField] = useState<RQAPI.RecordType | null>(null);
   const [hoveredId, setHoveredId] = useState("");
@@ -95,12 +98,18 @@ export const CollectionRow: React.FC<Props> = ({
 
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [isPostmanExportModalOpen, setIsPostmanExportModalOpen] = useState(false);
+  const [commonExporterConfig, setCommonExporterConfig] = useState<{
+    exporter: ExporterFunction;
+    exportType: ExportType;
+    title: string;
+  } | null>(null);
 
   const [collectionsToExport, setCollectionsToExport] = useState<RQAPI.CollectionRecord[]>([]);
 
   const { onNewClickV2 } = useApiClientContext();
 
   const workspaceId = useWorkspaceId() || null;
+
   const { openBufferedTab } = useTabActions();
   const activeTabSourceId = useActiveTab()?.source.getSourceId();
 
@@ -126,6 +135,13 @@ export const CollectionRow: React.FC<Props> = ({
           break;
         case ExportType.POSTMAN:
           setIsPostmanExportModalOpen(true);
+          break;
+        case ExportType.OPENAPI:
+          setCommonExporterConfig({
+            exporter: createOpenApiExporter(exportData as SharedRQAPI.CollectionRecord),
+            exportType: ExportType.OPENAPI,
+            title: "OpenAPI 3.0",
+          });
           break;
         default:
           console.warn(`Unknown export type: ${exportType}`);
@@ -178,6 +194,15 @@ export const CollectionRow: React.FC<Props> = ({
                 handleCollectionExport(record, ExportType.POSTMAN);
               },
             },
+            {
+              key: "1-3",
+              label: "OpenAPI 3.0",
+              icon: <SiOpenapiinitiative style={{ width: 16, height: 16, marginRight: 8 }} />,
+              onClick: (itemInfo) => {
+                itemInfo.domEvent?.stopPropagation?.();
+                handleCollectionExport(record, ExportType.OPENAPI);
+              },
+            },
           ],
         },
         {
@@ -221,33 +246,6 @@ export const CollectionRow: React.FC<Props> = ({
     },
     [handleCollectionExport, openBufferedTab, workspaceId, handleRecordsToBeDeleted]
   );
-
-  const updateExpandedRecordIds = useCallback(
-    (newExpandedIds: RQAPI.ApiClientRecord["id"][]) => {
-      setExpandedRecordIds(newExpandedIds);
-      isEmpty(newExpandedIds)
-        ? sessionStorage.removeItem(SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY)
-        : sessionStorage.setItem(SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY, newExpandedIds);
-    },
-    [setExpandedRecordIds]
-  );
-
-  const collapseChangeHandler = useCallback(
-    (keys: RQAPI.ApiClientRecord["id"][]) => {
-      let activeKeysCopy = [...expandedRecordIds];
-      if (isEmpty(keys)) {
-        activeKeysCopy = activeKeysCopy.filter((key) => key !== record.id);
-      } else if (!activeKeysCopy.includes(record.id)) {
-        activeKeysCopy.push(record.id);
-      }
-      updateExpandedRecordIds(activeKeysCopy);
-    },
-    [record, expandedRecordIds, updateExpandedRecordIds]
-  );
-
-  useEffect(() => {
-    setActiveKey(expandedRecordIds?.includes(record.id) ? record.id : undefined);
-  }, [expandedRecordIds, record.id]);
 
   useEffect(() => {
     /* Temporary Change-> To remove previous key from session storage
@@ -295,9 +293,10 @@ export const CollectionRow: React.FC<Props> = ({
       } catch (error) {
         notification.error({
           message: "Error moving item",
-          description: error?.message || "Failed to move item. Please try again.",
+          description: error?.message || (typeof error === "string" ? error : "Failed to move item. Please try again."),
           placement: "bottomRight",
         });
+        throw NativeError.fromError(error).setShowBoundary(true).setSeverity(ErrorSeverity.ERROR);
       } finally {
         setIsCollectionRowLoading(false);
       }
@@ -340,6 +339,7 @@ export const CollectionRow: React.FC<Props> = ({
     }),
     [record, workspaceId]
   );
+
   const handleHoverExpand = useCallback(
     (item: DraggableApiRecord, monitor: DropTargetMonitor) => {
       const isOverAny = monitor.isOver();
@@ -403,6 +403,19 @@ export const CollectionRow: React.FC<Props> = ({
             setCollectionsToExport([]);
             setIsPostmanExportModalOpen(false);
           }}
+        />
+      )}
+
+      {commonExporterConfig && (
+        <CommonApiClientExportModal
+          isOpen={!!commonExporterConfig}
+          onClose={() => {
+            setCollectionsToExport([]);
+            setCommonExporterConfig(null);
+          }}
+          title={commonExporterConfig.title}
+          exporter={commonExporterConfig.exporter}
+          exporterType={commonExporterConfig.exportType}
         />
       )}
 
@@ -489,7 +502,7 @@ export const CollectionRow: React.FC<Props> = ({
                   ellipsis={{
                     tooltip: {
                       title: record.name,
-                      placement: "right",
+                      placement: "top",
                       color: "#000",
                       mouseEnterDelay: 0.5,
                     },

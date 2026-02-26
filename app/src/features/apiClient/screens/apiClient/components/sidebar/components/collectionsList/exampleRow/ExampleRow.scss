@@ -1,4 +1,28 @@
+.example-row-wrapper {
+  cursor: grab;
+
+  &:active {
+    cursor: grabbing;
+  }
+}
+
+.example-drop-before {
+  border-top: 2px solid var(--requestly-color-primary-text, #1890ff);
+  margin-top: -2px;
+}
+
+.example-drop-after {
+  border-bottom: 2px solid var(--requestly-color-primary-text, #1890ff);
+  margin-bottom: -2px;
+}
+
 .collections-list-item.example-row {
+  &.active {
+    .example-row-name {
+      color: var(--requestly-color-text-default) !important;
+    }
+  }
+
   .example-row-icon {
     flex-shrink: 0;
     width: 14px;

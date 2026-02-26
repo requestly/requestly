@@ -18,7 +18,6 @@ import { getApiClientFeatureContext } from "../workspaceView/helpers/ApiClientCo
 import { Workspace } from "features/workspaces/types";
 import { erroredRecordsActions } from "../erroredRecords";
 import { closeTabByEntityId } from "componentsV2/Tabs/slice";
-import { apiRecordsRankingManager } from "features/apiClient/helpers/RankingManager";
 
 type Repository = ApiClientRecordsInterface<Record<string, unknown>>;
 
@@ -71,6 +70,7 @@ type DeleteRecordsResult = {
   collectionsDeletionResult: { success: boolean; data: unknown; message?: string };
   deletedApiRecords: RQAPI.ApiRecord[];
   deletedCollectionRecords: RQAPI.CollectionRecord[];
+  deletedExampleRecords: RQAPI.ExampleApiRecord[];
 };
 
 export const deleteRecords = createAsyncThunk<
@@ -85,26 +85,33 @@ export const deleteRecords = createAsyncThunk<
   async ({ records, repository }, { dispatch, rejectWithValue, getState, signal }) => {
     const recordsToBeDeleted = getAllRecords(records);
 
-    const [apiRecords, collectionRecords] = partition(recordsToBeDeleted, isApiRequest);
+    const [apiRecords, nonApiRecords] = partition(recordsToBeDeleted, isApiRequest);
+    const [collectionRecords, exampleRecords] = partition(nonApiRecords, isApiCollection);
     const apiRecordIds = apiRecords.map((record) => record.id);
     const collectionRecordIds = collectionRecords.map((record) => record.id);
 
     const recordsDeletionResult = await repository.deleteRecords(apiRecordIds);
     const collectionsDeletionResult = await repository.deleteCollections(collectionRecordIds);
+    const exampleRecordsDeletionResult = await repository.deleteExamples(exampleRecords as RQAPI.ExampleApiRecord[]);
 
-    if (!recordsDeletionResult.success || !collectionsDeletionResult.success) {
+    if (!recordsDeletionResult.success || !collectionsDeletionResult.success || !exampleRecordsDeletionResult.success) {
       return rejectWithValue(
-        recordsDeletionResult.message ?? collectionsDeletionResult.message ?? "Failed to delete records"
+        recordsDeletionResult.message ??
+          collectionsDeletionResult.message ??
+          exampleRecordsDeletionResult.message ??
+          "Failed to delete records"
       );
     }
 
-    dispatch(apiRecordsActions.recordsDeleted([...apiRecordIds, ...collectionRecordIds]));
+    const exampleRecordIds = exampleRecords.map((record) => record.id);
+    dispatch(apiRecordsActions.recordsDeleted([...apiRecordIds, ...collectionRecordIds, ...exampleRecordIds]));
 
     return {
       recordsDeletionResult,
       collectionsDeletionResult,
       deletedApiRecords: apiRecords as RQAPI.ApiRecord[],
       deletedCollectionRecords: collectionRecords as RQAPI.CollectionRecord[],
+      deletedExampleRecords: exampleRecords as RQAPI.ExampleApiRecord[],
     };
   },
   {
@@ -130,26 +137,22 @@ export const deleteRecords = createAsyncThunk<
 export const forceRefreshRecords = createAsyncThunk<boolean, { repository: Repository }, { rejectValue: string }>(
   "apiRecords/forceRefresh",
   async ({ repository }, { dispatch, rejectWithValue }) => {
-    try {
-      const recordsToRefresh = await repository.getRecordsForForceRefresh();
-      if (!recordsToRefresh || !recordsToRefresh.success) {
-        return false;
-      }
-
-      dispatch(
-        apiRecordsActions.hydrate({
-          records: recordsToRefresh.data.records,
-          erroredRecords: recordsToRefresh.data.erroredRecords, // TODO: cleanup
-        })
-      );
-
-      dispatch(erroredRecordsActions.setApiErroredRecords(recordsToRefresh.data.erroredRecords));
-      // closeCorruptedTabs();
-
-      return true;
-    } catch (error) {
-      return rejectWithValue(error instanceof Error ? error.message : "Failed to refresh records");
+    const recordsToRefresh = await repository.getRecordsForForceRefresh();
+    if (!recordsToRefresh || !recordsToRefresh.success) {
+      return false;
     }
+
+    dispatch(
+      apiRecordsActions.hydrate({
+        records: recordsToRefresh.data.records,
+        erroredRecords: recordsToRefresh.data.erroredRecords, // TODO: cleanup
+      })
+    );
+
+    dispatch(erroredRecordsActions.setApiErroredRecords(recordsToRefresh.data.erroredRecords));
+    // closeCorruptedTabs();
+
+    return true;
   }
 );
 
@@ -169,39 +172,33 @@ export const moveRecords = createAsyncThunk<
     { recordsToMove, collectionId, repository, sourceWorkspaceId, destinationWorkspaceId },
     { dispatch, rejectWithValue }
   ) => {
-    const context = getApiClientFeatureContext(destinationWorkspaceId);
-    const ranks = apiRecordsRankingManager.getRanksForNewApis(context, collectionId, recordsToMove);
     const updatedRecords = recordsToMove.map((record, index) => {
       return isApiCollection(record)
         ? { ...record, collectionId, data: omit(record.data, "children") }
-        : { ...record, collectionId, rank: ranks[index] };
+        : { ...record, collectionId };
     });
 
-    try {
-      const movedRecords = await repository.moveAPIEntities(updatedRecords, collectionId);
+    const movedRecords = await repository.moveAPIEntities(updatedRecords, collectionId);
 
-      dispatch(apiRecordsActions.upsertRecords(movedRecords));
+    dispatch(apiRecordsActions.upsertRecords(movedRecords));
 
-      // TODO: check why we need to refresh for local workspace, when move is in same workspace
-      const sourceContext = getApiClientFeatureContext(sourceWorkspaceId);
-      await sourceContext.store
-        .dispatch(forceRefreshRecords({ repository: sourceContext.repositories.apiClientRecordsRepository }) as any)
+    // TODO: check why we need to refresh for local workspace, when move is in same workspace
+    const sourceContext = getApiClientFeatureContext(sourceWorkspaceId);
+    await sourceContext.store
+      .dispatch(forceRefreshRecords({ repository: sourceContext.repositories.apiClientRecordsRepository }) as any)
+      .unwrap();
+
+    if (destinationWorkspaceId && destinationWorkspaceId !== sourceWorkspaceId) {
+      const destinationContext = getApiClientFeatureContext(destinationWorkspaceId);
+
+      await destinationContext.store
+        .dispatch(
+          forceRefreshRecords({ repository: destinationContext.repositories.apiClientRecordsRepository }) as any
+        )
         .unwrap();
-
-      if (destinationWorkspaceId && destinationWorkspaceId !== sourceWorkspaceId) {
-        const destinationContext = getApiClientFeatureContext(destinationWorkspaceId);
-
-        await destinationContext.store
-          .dispatch(
-            forceRefreshRecords({ repository: destinationContext.repositories.apiClientRecordsRepository }) as any
-          )
-          .unwrap();
-      }
-
-      return { movedRecords };
-    } catch (error) {
-      return rejectWithValue("Failed to move records");
     }
+
+    return { movedRecords };
   }
 );
 
@@ -210,27 +207,41 @@ export const duplicateRecords = createAsyncThunk<
   { recordIds: Set<string>; repository: Repository },
   { rejectValue: string; state: ApiClientStoreState }
 >("apiRecords/duplicate", async ({ recordIds, repository }, { dispatch, rejectWithValue, getState }) => {
-  try {
-    const context = getApiClientFeatureContext();
-    const apiClientRecords = selectAllRecords(getState());
-    const recordsToRender = getRecordsToRender({ apiClientRecords });
-    const childParentMap = selectChildToParent(getState());
-    const processedRecords = filterOutChildrenRecords(recordIds, childParentMap, recordsToRender.recordsMap);
-    const recordsToDuplicate = processRecordsForDuplication(processedRecords, repository, context);
+  const context = getApiClientFeatureContext();
+  const apiClientRecords = selectAllRecords(getState());
+  const recordsToRender = getRecordsToRender({ apiClientRecords });
+  const childParentMap = selectChildToParent(getState());
+  const processedRecords = filterOutChildrenRecords(recordIds, childParentMap, recordsToRender.recordsMap);
+  const { recordsToDuplicate, examplesToDuplicate } = processRecordsForDuplication(
+    processedRecords,
+    repository,
+    context
+  );
 
-    const duplicatedRecords = await repository.duplicateApiEntities(recordsToDuplicate);
+  const duplicatedRecords = await repository.duplicateApiEntities(recordsToDuplicate);
 
-    dispatch(apiRecordsActions.upsertRecords(duplicatedRecords));
+  dispatch(apiRecordsActions.upsertRecords(duplicatedRecords));
 
-    const isMultiView = reduxStore.getState().workspaceView.viewMode === ApiClientViewMode.MULTI;
-    if (isMultiView) {
-      await dispatch(forceRefreshRecords({ repository })).unwrap();
-    }
-
-    return { duplicatedRecords };
-  } catch (error) {
-    return rejectWithValue(error instanceof Error ? error.message : "Failed to duplicate records");
+  if (examplesToDuplicate.length > 0) {
+    await Promise.all(
+      examplesToDuplicate.map(({ parentRequestId, example }) =>
+        dispatch(
+          createExampleRequest({
+            parentRequestId,
+            example: { ...example, parentRequestId },
+            repository,
+          }) as any
+        )
+      )
+    );
   }
+
+  const isMultiView = reduxStore.getState().workspaceView.viewMode === ApiClientViewMode.MULTI;
+  if (isMultiView) {
+    await dispatch(forceRefreshRecords({ repository })).unwrap();
+  }
+
+  return { duplicatedRecords };
 });
 
 export const getExamplesForApiRecords = createAsyncThunk<
@@ -253,7 +264,7 @@ export const getExamplesForApiRecords = createAsyncThunk<
 });
 
 export const createExampleRequest = createAsyncThunk<
-  RQAPI.ExampleApiRecord,
+  { exampleRecord: RQAPI.ExampleApiRecord },
   { parentRequestId: string; example: RQAPI.ExampleApiRecord; repository: Repository },
   { rejectValue: string }
 >("apiRecords/createExample", async ({ parentRequestId, example, repository }, { dispatch, rejectWithValue }) => {
@@ -267,14 +278,14 @@ export const createExampleRequest = createAsyncThunk<
 
     dispatch(apiRecordsActions.upsertRecord(record));
 
-    return record;
+    return { exampleRecord: record };
   } catch (error) {
     return rejectWithValue(error instanceof Error ? error.message : "Failed to create example request");
   }
 });
 
 export const updateExampleRequest = createAsyncThunk<
-  RQAPI.ExampleApiRecord,
+  { exampleRecord: RQAPI.ExampleApiRecord },
   { example: RQAPI.ExampleApiRecord; repository: Repository },
   { rejectValue: string }
 >("apiRecords/updateExample", async ({ example, repository }, { dispatch, rejectWithValue }) => {
@@ -288,8 +299,45 @@ export const updateExampleRequest = createAsyncThunk<
 
     dispatch(apiRecordsActions.upsertRecord(record));
 
-    return record;
+    return { exampleRecord: record };
   } catch (error) {
     return rejectWithValue(error instanceof Error ? error.message : "Failed to update example request");
   }
 });
+
+export const deleteExampleRequests = createAsyncThunk<
+  { recordIdsDeleted: string[] },
+  { exampleRecords: RQAPI.ExampleApiRecord[]; repository: Repository },
+  { rejectValue: string }
+>(
+  "apiRecords/deleteExample",
+  async ({ exampleRecords, repository }, { dispatch, rejectWithValue }) => {
+    try {
+      const result = await repository.deleteExamples(exampleRecords);
+      if (!result.success) {
+        throw new Error(result.message ?? "Failed to delete example request");
+      }
+      dispatch(apiRecordsActions.recordsDeleted(exampleRecords.map((example) => example.id)));
+
+      return { recordIdsDeleted: exampleRecords.map((example) => example.id) };
+    } catch (error) {
+      return rejectWithValue(error instanceof Error ? error.message : "Failed to delete example request");
+    }
+  },
+  {
+    condition: async ({ exampleRecords }) => {
+      const allRecords = getAllRecords(exampleRecords);
+
+      const results = await Promise.allSettled(
+        allRecords.map((r) => reduxStore.dispatch(closeTabByEntityId({ entityId: r.id, skipUnsavedPrompt: true })))
+      );
+
+      return results.every((result) => {
+        if (result.status === "fulfilled") {
+          return closeTabByEntityId.fulfilled.match(result.value);
+        }
+        return false;
+      });
+    },
+  }
+);
