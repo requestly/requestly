@@ -27,6 +27,7 @@ const RequestBodyRedirectScreen: React.FC = () => {
           onClick={() => trackDesktopAppPromoClicked("request_body", "web_app")}
           href="https://requestly.com/downloads/desktop/"
           target="_blank"
+          rel="noopener noreferrer"
         >
           Download the desktop app
         </RQButton>

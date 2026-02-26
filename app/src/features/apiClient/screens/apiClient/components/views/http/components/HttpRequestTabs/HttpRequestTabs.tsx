@@ -57,9 +57,9 @@ const HttpRequestTabs: React.FC<Props> = ({
   const requestEntry = useApiClientSelector((s) => entity.getEntityFromState(s).data);
 
   const METHODS_WITHOUT_BODY = [RequestMethod.GET, RequestMethod.HEAD];
+  const supportsRequestBody = supportsRequestBodyForAllMethods(appMode);
   const needsDesktopForBody = METHODS_WITHOUT_BODY.includes(method);
-  const isRequestBodySupported = !needsDesktopForBody || supportsRequestBodyForAllMethods(appMode);
-  const isNonBodyMethodInNonDesktop = needsDesktopForBody && !supportsRequestBodyForAllMethods(appMode);
+  const canHaveRequestBody = supportsRequestBody || !needsDesktopForBody;
   const hasScriptError = error?.type === RQAPI.ApiClientErrorType.SCRIPT;
 
   const items = useMemo(() => {
@@ -77,8 +77,8 @@ const HttpRequestTabs: React.FC<Props> = ({
       },
       {
         key: RequestTab.BODY,
-        label: <RequestTabLabel label="Body" count={bodyLength ? 1 : 0} showDot={isRequestBodySupported} />,
-        children: isNonBodyMethodInNonDesktop ? <RequestBodyRedirectScreen /> : <RequestBody entity={entity} />,
+        label: <RequestTabLabel label="Body" count={bodyLength ? 1 : 0} showDot={canHaveRequestBody} />,
+        children: !canHaveRequestBody ? <RequestBodyRedirectScreen /> : <RequestBody entity={entity} />,
       },
       {
         key: RequestTab.HEADERS,
@@ -129,8 +129,7 @@ const HttpRequestTabs: React.FC<Props> = ({
     pathVariables?.length,
     entity,
     bodyLength,
-    isRequestBodySupported,
-    isNonBodyMethodInNonDesktop,
+    canHaveRequestBody,
     headersLength,
     auth,
     handleAuthChange,
