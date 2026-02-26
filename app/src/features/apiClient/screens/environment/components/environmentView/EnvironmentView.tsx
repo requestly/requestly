@@ -17,6 +17,7 @@ import { EnvironmentVariablesList } from "../VariablesList/EnvironmentVariablesL
 import { VariablesListHeader } from "../VariablesListHeader/VariablesListHeader";
 import "./environmentView.scss";
 import { ApiClientStoreState } from "features/apiClient/slices";
+import { useTotalEnvironments } from "features/apiClient/slices/environments/environments.hooks";
 
 interface EnvironmentViewProps {
   entity: OriginExists<BufferedEnvironmentEntity | BufferedGlobalEnvironmentEntity>;
@@ -29,6 +30,9 @@ export const EnvironmentView: React.FC<EnvironmentViewProps> = ({ entity, enviro
   const [isPostmanExportModalOpen, setIsPostmanExportModalOpen] = useState(false);
 
   const isNewEnvironment = useApiClientSelector((s) => s.buffer.entities[entity.id]?.isNew);
+
+  const totalEnvironments = useTotalEnvironments();
+  const isFirstNonGlobalEnvironment = !isGlobal && totalEnvironments === 1;
 
   const [searchValue, setSearchValue] = useState("");
   const [isSaving, setIsSaving] = useState(false);
@@ -75,7 +79,7 @@ export const EnvironmentView: React.FC<EnvironmentViewProps> = ({ entity, enviro
     <div key={environmentId} className="variables-list-view-container">
       <div className="variables-list-view">
         <VariablesListHeader
-          isNewEnvironment={isNewEnvironment || false}
+          isNewEnvironment={isNewEnvironment || isFirstNonGlobalEnvironment || false}
           searchValue={searchValue}
           onSearchValueChange={setSearchValue}
           currentEnvironmentName={environmentName}
