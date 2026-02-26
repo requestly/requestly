@@ -1,6 +1,6 @@
 {
   "name": "@requestly/shared",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "",
   "engines": {
     "node": ">=18.18.0",

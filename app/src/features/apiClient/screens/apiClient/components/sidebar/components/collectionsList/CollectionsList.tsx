@@ -1,9 +1,11 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { BulkActions, RQAPI } from "features/apiClient/types";
+import { Authorization, RQAPI as SharedRQAPI } from "@requestly/shared/types/entities/apiClient";
 import { notification } from "antd";
 import { useApiClientContext } from "features/apiClient/contexts";
-import { CollectionRow, ExportType } from "./collectionRow/CollectionRow";
+import { CollectionRow } from "./collectionRow/CollectionRow";
+import { ExportType } from "features/apiClient/helpers/exporters/types";
 import { RequestRow } from "./requestRow/RequestRow";
 import {
   convertFlatRecordsToNestedRecords,
@@ -12,6 +14,7 @@ import {
   filterRecordsBySearch,
   getRecordIdsToBeExpanded,
   filterOutChildrenRecords,
+  sortRecords,
 } from "../../../../utils";
 import { ApiRecordEmptyState } from "./apiRecordEmptyState/ApiRecordEmptyState";
 import { SidebarPlaceholderItem } from "../SidebarPlaceholderItem/SidebarPlaceholderItem";
@@ -22,11 +25,13 @@ import { debounce, head, isEmpty, union } from "lodash";
 import { SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY } from "features/apiClient/constants";
 import { ApiClientExportModal } from "../../../modals/exportModal/ApiClientExportModal";
 import { PostmanExportModal } from "../../../modals/postmanCollectionExportModal/PostmanCollectionExportModal";
+import { CommonApiClientExportModal } from "../../../modals/CommonApiClientExportModal";
+import { ExporterFunction } from "features/apiClient/helpers/exporters/types";
 import { toast } from "utils/Toast";
 import { MoveToCollectionModal } from "../../../modals/MoveToCollectionModal/MoveToCollectionModal";
+import { createOpenApiExporter } from "features/apiClient/helpers/exporters/openapi";
 import ActionMenu from "./BulkActionsMenu";
 import { useRBAC } from "features/rbac";
-import * as Sentry from "@sentry/react";
 import { ExampleCollectionsNudge } from "../ExampleCollectionsNudge/ExampleCollectionsNudge";
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
@@ -34,12 +39,40 @@ import APP_CONSTANTS from "config/constants";
 import { duplicateRecords, useAllRecords, useApiClientRepository, useChildToParent } from "features/apiClient/slices";
 import { useApiClientDispatch } from "features/apiClient/slices/hooks/base.hooks";
 import { EXPANDED_RECORD_IDS_UPDATED } from "features/apiClient/slices/exampleCollections";
+import { ErrorSeverity } from "errors/types";
+import { NativeError } from "errors/NativeError";
 
 interface Props {
   onNewClick: (src: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType) => Promise<void>;
   recordTypeToBeCreated: RQAPI.RecordType | null;
   handleRecordsToBeDeleted: (records: RQAPI.ApiClientRecord[]) => void;
 }
+
+const wrapRecordsInCollection = (processedRecords: RQAPI.ApiClientRecord[]): RQAPI.CollectionRecord => {
+  const dummyCollection: RQAPI.CollectionRecord = {
+    id: `rq-collection-${Date.now()}`,
+    name: "Requestly Collection",
+    description: "Exported from Requestly API Client",
+    type: RQAPI.RecordType.COLLECTION,
+    collectionId: null,
+    deleted: false,
+    data: {
+      children: processedRecords,
+      variables: {},
+      auth: {
+        currentAuthType: Authorization.Type.INHERIT,
+        authConfigStore: {},
+      },
+    },
+    createdTs: Date.now(),
+    updatedTs: Date.now(),
+    ownerId: "",
+    createdBy: "",
+    updatedBy: "",
+  };
+
+  return dummyCollection;
+};
 
 const trackUserProperties = (records: RQAPI.ApiClientRecord[]) => {
   const totalCollections = records.filter((record) => isApiCollection(record)).length;
@@ -64,6 +97,11 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
   const [collectionsToExport, setCollectionsToExport] = useState<RQAPI.ApiClientRecord[]>([]);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [isPostmanExportModalOpen, setIsPostmanExportModalOpen] = useState(false);
+  const [commonExporterConfig, setCommonExporterConfig] = useState<{
+    title: string;
+    exporter: ExporterFunction;
+    exportType: ExportType;
+  } | null>(null);
   const [showSelection, setShowSelection] = useState(false);
   const [isMoveCollectionModalOpen, setIsMoveCollectionModalOpen] = useState(false);
   const [selectedRecords, setSelectedRecords] = useState<Set<RQAPI.ApiClientRecord["id"]>>(new Set());
@@ -100,33 +138,12 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
     const { updatedRecords, recordsMap } = convertFlatRecordsToNestedRecords(records);
     setShowSelection(false);
 
-    updatedRecords.sort((recordA, recordB) => {
-      // If different type, then keep collection first
-      if (recordA.type === RQAPI.RecordType.COLLECTION && recordA.isExample && !recordB.isExample) {
-        return -1;
-      }
-
-      if (recordB.type === RQAPI.RecordType.COLLECTION && recordB.isExample && !recordA.isExample) {
-        return 1;
-      }
-
-      if (recordA.type !== recordB.type) {
-        return recordA.type === RQAPI.RecordType.COLLECTION ? -1 : 1;
-      }
-
-      // If types are the same, sort lexicographically by name
-      if (recordA.name.toLowerCase() !== recordB.name.toLowerCase()) {
-        return recordA.name.toLowerCase() < recordB.name.toLowerCase() ? -1 : 1;
-      }
-
-      // If names are the same, sort by creation date
-      return recordA.createdTs - recordB.createdTs;
-    });
+    const sortedRecords = sortRecords(updatedRecords);
 
     return {
-      count: updatedRecords.length,
-      collections: updatedRecords.filter((record) => isApiCollection(record)) as RQAPI.CollectionRecord[],
-      requests: updatedRecords.filter((record) => isApiRequest(record)) as RQAPI.ApiRecord[],
+      count: sortedRecords.length,
+      collections: sortedRecords.filter((record) => isApiCollection(record)) as RQAPI.CollectionRecord[],
+      requests: sortedRecords.filter((record) => isApiRequest(record)) as RQAPI.ApiRecord[],
       recordsMap: recordsMap,
     };
   }, []);
@@ -205,6 +222,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
       }
 
       const processedRecords = filterOutChildrenRecords(selectedRecords, childParentMap, updatedRecords.recordsMap);
+
       switch (action) {
         case BulkActions.DUPLICATE: {
           try {
@@ -226,10 +244,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
               description: error?.message,
               placement: "bottomRight",
             });
-            Sentry.withScope((scope) => {
-              scope.setTag("error_type", "api_client_record_duplication");
-              Sentry.captureException(error);
-            });
+            throw NativeError.fromError(error).setShowBoundary(true).setSeverity(ErrorSeverity.ERROR);
           }
 
           break;
@@ -252,6 +267,17 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
           setIsPostmanExportModalOpen(true);
           setCollectionsToExport(processedRecords);
           break;
+
+        case BulkActions.EXPORT_OPENAPI: {
+          const dummyCollection = wrapRecordsInCollection(processedRecords);
+          const exporter = createOpenApiExporter(dummyCollection as SharedRQAPI.CollectionRecord);
+          setCommonExporterConfig({
+            exporter,
+            exportType: ExportType.OPENAPI,
+            title: "OpenAPI 3.0",
+          });
+          break;
+        }
 
         case BulkActions.MOVE:
           setIsMoveCollectionModalOpen(true);
@@ -480,6 +506,16 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
             setCollectionsToExport([]);
             setIsPostmanExportModalOpen(false);
           }}
+        />
+      )}
+
+      {commonExporterConfig && (
+        <CommonApiClientExportModal
+          isOpen={true}
+          onClose={() => setCommonExporterConfig(null)}
+          title={commonExporterConfig.title}
+          exporter={commonExporterConfig.exporter}
+          exporterType={commonExporterConfig.exportType}
         />
       )}
 
