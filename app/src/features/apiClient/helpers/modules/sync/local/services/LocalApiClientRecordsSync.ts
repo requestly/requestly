@@ -283,6 +283,11 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
       data: parsedApiRecord,
     };
   }
+
+  @SentryCustomSpan({
+    name: "local_sync.updateRecord",
+    op: "function.local_sync",
+  })
   async updateRecord(
     patch: Partial<Omit<RQAPI.ApiClientRecord, "id">>,
     nativeId: string
