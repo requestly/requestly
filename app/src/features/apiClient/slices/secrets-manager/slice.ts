@@ -29,6 +29,15 @@ export const secretsManagerSlice = createSlice({
     removeProvider(state, action: PayloadAction<string>) {
       providersAdapter.removeOne(state.providers, action.payload);
     },
+    unsafePatchProvider(
+      state,
+      action: PayloadAction<{ id: string; patcher: (provider: SecretProviderMetadata) => void }>
+    ) {
+      const provider = state.providers.entities[action.payload.id];
+      if (provider) {
+        action.payload.patcher(provider);
+      }
+    },
 
     upsertSecrets(state, action: PayloadAction<SecretValue[]>) {
       secretsAdapter.upsertMany(state.secrets, action.payload);
@@ -39,20 +48,14 @@ export const secretsManagerSlice = createSlice({
     removeSecrets(state, action: PayloadAction<string[]>) {
       secretsAdapter.removeMany(state.secrets, action.payload);
     },
+    unsafePatchSecret(state, action: PayloadAction<{ id: string; patcher: (secret: SecretValue) => void }>) {
+      const secret = state.secrets.entities[action.payload.id];
+      if (secret) {
+        action.payload.patcher(secret);
+      }
+    },
   },
 });
 
 export const secretsManagerActions = secretsManagerSlice.actions;
 export const secretsManagerReducer = secretsManagerSlice.reducer;
-
-export const secretsManagerSelectors = {
-  selectAllProviders: (state: { secretsManager: SecretsManagerState }) =>
-    providersAdapter.getSelectors().selectAll(state.secretsManager.providers),
-  selectProviderById: (state: { secretsManager: SecretsManagerState }, id: string) =>
-    providersAdapter.getSelectors().selectById(state.secretsManager.providers, id),
-
-  selectAllSecrets: (state: { secretsManager: SecretsManagerState }) =>
-    secretsAdapter.getSelectors().selectAll(state.secretsManager.secrets),
-  selectSecretById: (state: { secretsManager: SecretsManagerState }, id: string) =>
-    secretsAdapter.getSelectors().selectById(state.secretsManager.secrets, id),
-};
