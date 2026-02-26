@@ -18,6 +18,7 @@ import { renameWorkspace } from "backend/workspace";
 import { useWorkspaceViewActions } from "features/apiClient/slices";
 import { dummyPersonalWorkspace } from "store/slices/workspaces/selectors";
 import { WorkspaceType } from "features/workspaces/types";
+import { FAKE_LOGGED_OUT_WORKSPACE_ID } from "features/apiClient/slices/common/constants";
 
 const TeamSettings = ({ teamId, isTeamAdmin, isTeamArchived, teamOwnerId }) => {
   const navigate = useNavigate();
@@ -74,11 +75,16 @@ const TeamSettings = ({ teamId, isTeamAdmin, isTeamArchived, teamOwnerId }) => {
       redirectToRules(navigate);
       await handleSwitchToPrivateWorkspace();
       await switchContext({
-        workspace: {
-          id: dummyPersonalWorkspace.id,
-          meta: { type: WorkspaceType.PERSONAL },
-        },
-        userId: user?.details?.profile?.uid,
+        workspace: userId
+          ? {
+              id: dummyPersonalWorkspace.id,
+              meta: { type: WorkspaceType.PERSONAL },
+            }
+          : {
+              id: FAKE_LOGGED_OUT_WORKSPACE_ID,
+              meta: { type: WorkspaceType.LOCAL_STORAGE },
+            },
+        userId,
       });
     } catch (err) {
       toast.error("Only owner can delete the workspace!");

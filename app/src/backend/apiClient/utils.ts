@@ -1,5 +1,6 @@
 import * as Sentry from "@sentry/react";
 import { EnvironmentVariables } from "backend/environment/types";
+import { Authorization } from "features/apiClient/screens/apiClient/components/views/components/request/components/AuthorizationView/types/AuthConfig";
 import { RQAPI } from "features/apiClient/types";
 import { Timestamp } from "firebase/firestore";
 import lodash from "lodash";
@@ -37,5 +38,15 @@ export function captureException(e: any) {
 export const sanitizeExample = (example: Partial<RQAPI.ExampleApiRecord>) => {
   const sanitizedExample = lodash.cloneDeep(example);
   delete sanitizedExample?.data?.testResults;
+  if (sanitizedExample.data) {
+    sanitizedExample.data.scripts = {
+      preRequest: "",
+      postResponse: "",
+    };
+    sanitizedExample.data.auth = {
+      currentAuthType: Authorization.Type.NO_AUTH,
+      authConfigStore: {},
+    };
+  }
   return sanitizedExample;
 };

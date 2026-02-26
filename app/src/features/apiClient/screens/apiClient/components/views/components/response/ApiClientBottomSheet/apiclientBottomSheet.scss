@@ -10,6 +10,23 @@
     .ant-tabs {
       .ant-tabs-nav-wrap {
         padding-left: 0;
+
+        .ant-tabs-tab {
+          padding: unset;
+        }
+      }
+    }
+
+    .api-response-status-row__save-button-wrapper {
+      border-left: 1px solid var(--requestly-color-white-t-20);
+      padding-left: var(--requestly-space-4);
+
+      .ant-btn {
+        color: var(--requestly-color-text-subtle);
+
+        &:hover {
+          color: var(--requestly-color-text-default);
+        }
       }
     }
 

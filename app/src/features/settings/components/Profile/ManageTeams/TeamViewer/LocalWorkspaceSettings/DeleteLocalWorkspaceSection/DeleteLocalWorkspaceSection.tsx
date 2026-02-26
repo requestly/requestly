@@ -23,6 +23,7 @@ import "./deleteLocalWorkspaceSection.scss";
 import { clearCurrentlyActiveWorkspace } from "actions/TeamWorkspaceActions";
 import { useWorkspaceViewActions } from "features/apiClient/slices";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
+import { FAKE_LOGGED_OUT_WORKSPACE_ID } from "features/apiClient/slices/common/constants";
 
 export const DeleteLocalWorkspaceSection: React.FC = () => {
   const dispatch = useDispatch();
@@ -97,12 +98,19 @@ export const DeleteLocalWorkspaceSection: React.FC = () => {
 
       if (activeWorkspaceId === workspaceId) {
         await clearCurrentlyActiveWorkspace(dispatch, appMode);
+
+        const userId = user?.details?.profile?.uid;
         await switchContext({
-          workspace: {
-            id: dummyPersonalWorkspace.id,
-            meta: { type: WorkspaceType.PERSONAL },
-          },
-          userId: user?.details?.profile?.uid,
+          workspace: userId
+            ? {
+                id: dummyPersonalWorkspace.id,
+                meta: { type: WorkspaceType.PERSONAL },
+              }
+            : {
+                id: FAKE_LOGGED_OUT_WORKSPACE_ID,
+                meta: { type: WorkspaceType.LOCAL_STORAGE },
+              },
+          userId,
         });
       }
       if (hadPermissionIssue) {

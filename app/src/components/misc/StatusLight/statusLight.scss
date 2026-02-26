@@ -11,15 +11,15 @@
   text-transform: uppercase;
   padding: var(--requestly-space-1, 2px) var(--requestly-space-2, 4px);
 
-  &::before {
-    content: "";
-    width: 8px;
-    height: 8px;
-    display: inline-flex;
-    align-items: center;
-    border-radius: 50%;
-    background-color: currentColor;
-  }
+  // &::before {
+  //   content: "";
+  //   width: 8px;
+  //   height: 8px;
+  //   display: inline-flex;
+  //   align-items: center;
+  //   border-radius: 50%;
+  //   background-color: currentColor;
+  // }
 
   &.success {
     color: var(--requestly-color-success-text);

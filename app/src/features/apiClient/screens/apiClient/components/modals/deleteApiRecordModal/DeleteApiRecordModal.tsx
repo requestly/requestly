@@ -8,8 +8,9 @@ import { isEmpty } from "lodash";
 import { deleteRecords } from "features/apiClient/slices/apiRecords/thunks";
 import { toast } from "utils/Toast";
 import { isApiCollection } from "../../../utils";
-import * as Sentry from "@sentry/react";
-import { ApiClientFeatureContext } from "features/apiClient/slices";
+import { ApiClientFeatureContext, selectChildrenIds, useApiClientFeatureContext } from "features/apiClient/slices";
+import { NativeError } from "errors/NativeError";
+import { ErrorSeverity } from "errors/types";
 
 interface DeleteApiRecordModalProps {
   open: boolean;
@@ -27,6 +28,7 @@ export const DeleteApiRecordModal: React.FC<DeleteApiRecordModalProps> = ({
   onClose,
   onSuccess,
 }) => {
+  const context = useApiClientFeatureContext();
   const recordsWithContext = useMemo(() => {
     return getRecordsToDelete();
   }, [getRecordsToDelete]);
@@ -34,6 +36,12 @@ export const DeleteApiRecordModal: React.FC<DeleteApiRecordModalProps> = ({
   const records = useMemo(() => {
     return recordsWithContext.map(({ records }) => records).flat();
   }, [recordsWithContext]);
+
+  const examplesCountInRequest = useMemo(() => {
+    if (records.length !== 1 || records[0]?.type !== RQAPI.RecordType.API) return 0;
+    const state = context.store.getState();
+    return selectChildrenIds(state, records[0].id).length ?? 0;
+  }, [records, context]);
 
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -66,8 +74,10 @@ export const DeleteApiRecordModal: React.FC<DeleteApiRecordModalProps> = ({
 
       toast.success(
         records.length === 1
-          ? records[0].type === RQAPI.RecordType.API
+          ? records[0]?.type === RQAPI.RecordType.API
             ? "API request deleted"
+            : records[0]?.type === RQAPI.RecordType.EXAMPLE_API
+            ? "Example deleted"
             : "Collection deleted"
           : "Records Deleted"
       );
@@ -76,10 +86,7 @@ export const DeleteApiRecordModal: React.FC<DeleteApiRecordModalProps> = ({
     } catch (error) {
       toast.error("Error while deleting!");
 
-      Sentry.withScope((scope) => {
-        scope.setTag("error_type", "api_client_record_deletion");
-        Sentry.captureException(`Error deleting ${records.length === 1 ? "record" : "records"}`);
-      });
+      throw NativeError.fromError(error).setShowBoundary(true).setSeverity(ErrorSeverity.ERROR);
     } finally {
       setIsDeleting(false);
     }
@@ -87,15 +94,21 @@ export const DeleteApiRecordModal: React.FC<DeleteApiRecordModalProps> = ({
 
   const header =
     records.length === 1
-      ? records[0].type === RQAPI.RecordType.API
+      ? records[0]?.type === RQAPI.RecordType.API
         ? "Delete API Request"
+        : records[0]?.type === RQAPI.RecordType.EXAMPLE_API
+        ? "Delete Example"
         : "Delete Collection"
       : "Delete Records";
 
   const description =
     records.length === 1
-      ? records[0].type === RQAPI.RecordType.API
-        ? `This action will permanently delete this API request. Are you sure you want to continue?`
+      ? records[0]?.type === RQAPI.RecordType.API
+        ? `This action will permanently delete this API request ${
+            examplesCountInRequest > 0 ? `and ${examplesCountInRequest} examples` : ""
+          }. Are you sure you want to continue?`
+        : records[0]?.type === RQAPI.RecordType.EXAMPLE_API
+        ? "This action will permanently delete this example. Are you sure you want to continue?"
         : `This action will permanently delete the entire collection and its ${apiRequestCount} requests. Are you sure you want to continue?`
       : "This action will permanently delete the selected Collections, APIs, and their associated requests. Are you sure you want to proceed?";
 
@@ -118,9 +131,11 @@ export const DeleteApiRecordModal: React.FC<DeleteApiRecordModalProps> = ({
         </RQButton>
         <RQButton block type="danger" loading={isDeleting} onClick={handleDeleteApiRecord}>
           {records.length === 1
-            ? records[0].type === RQAPI.RecordType.API
+            ? records[0]?.type === RQAPI.RecordType.API
               ? "Delete API"
-              : "Delete collection"
+              : records[0]?.type === RQAPI.RecordType.EXAMPLE_API
+              ? "Delete Example"
+              : "Delete Collection"
             : "Delete Records"}
         </RQButton>
       </div>

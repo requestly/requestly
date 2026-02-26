@@ -117,13 +117,13 @@ export const importExampleCollections = createAsyncThunk<
     try {
       await repository.environmentVariablesRepository.createEnvironments(environmentsToCreate);
     } catch (envError) {
-      const error = new NativeError(
-        `Failed to create environments: ${envError instanceof Error ? envError.message : "Unknown error"}`
-      );
+      const error =
+        envError instanceof Error
+          ? NativeError.fromError(envError)
+          : new NativeError(`Failed to create environments: Unknown error`);
       error.addContext({
         reason: "ENVIRONMENT_ERROR",
         environmentsCount: environmentsToCreate.length,
-        cause: envError,
       });
       throw error;
     }

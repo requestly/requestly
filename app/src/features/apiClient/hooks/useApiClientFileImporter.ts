@@ -14,10 +14,9 @@ import { processRqImportData } from "features/apiClient/screens/apiClient/compon
 
 import * as Sentry from "@sentry/react";
 import { useNewApiClientContext } from "./useNewApiClientContext";
-import { EnvironmentVariableData } from "../store/variables/types";
 import { createEnvironment, updateEnvironmentVariables } from "../slices/environments/thunks";
-import { useApiClientDispatch } from "../slices/hooks/base.hooks";
-import { useApiClientRepository } from "../slices";
+import { getApiClientFeatureContext, useApiClientRepository } from "../slices";
+import { EnvironmentVariableData } from "@requestly/shared/types/entities/apiClient";
 
 const BATCH_SIZE = 25;
 
@@ -60,7 +59,6 @@ const useApiClientFileImporter = (importer: ImporterType) => {
   const { onSaveRecord } = useNewApiClientContext();
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
-  const dispatch = useApiClientDispatch();
 
   const { environments = [], collections = [], apis = [], examples = [] } = processedFileData;
 
@@ -150,6 +148,7 @@ const useApiClientFileImporter = (importer: ImporterType) => {
   const globalEnvId = environmentVariablesRepository.getGlobalEnvironmentId();
   const handleImportEnvironments = useCallback(async (): Promise<number> => {
     try {
+      const dispatch = getApiClientFeatureContext().store.dispatch;
       const importPromises = environments.map(async (env) => {
         try {
           if (env.isGlobal) {
@@ -158,7 +157,7 @@ const useApiClientFileImporter = (importer: ImporterType) => {
                 environmentId: globalEnvId,
                 variables: env.variables,
                 repository: environmentVariablesRepository,
-              })
+              }) as any
             ).unwrap();
             return true;
           } else {
@@ -167,7 +166,7 @@ const useApiClientFileImporter = (importer: ImporterType) => {
                 name: env.name,
                 variables: env.variables,
                 repository: environmentVariablesRepository,
-              })
+              }) as any
             ).unwrap();
             return true;
           }
@@ -183,7 +182,7 @@ const useApiClientFileImporter = (importer: ImporterType) => {
       Logger.error("Data import failed:", error);
       throw error;
     }
-  }, [dispatch, environments, environmentVariablesRepository, globalEnvId]);
+  }, [environments, environmentVariablesRepository, globalEnvId]);
 
   const handleImportCollectionsAndApis = useCallback(async () => {
     let importedCollectionsCount = 0;

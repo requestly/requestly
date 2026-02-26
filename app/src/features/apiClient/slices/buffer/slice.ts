@@ -225,6 +225,13 @@ export const bufferSlice = createSlice({
           set(entry.diff as object, path, value);
         }
       }
+
+      const nullPaths = objectToDeletePaths(userEdits);
+      for (const path of nullPaths) {
+        set(entry.current as object, path, null);
+        set(entry.diff as object, path, null);
+      }
+
       entry.isNew = false;
     },
 
