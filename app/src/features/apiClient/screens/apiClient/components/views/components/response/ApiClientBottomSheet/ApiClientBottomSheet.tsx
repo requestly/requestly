@@ -61,6 +61,7 @@ export const ApiClientBottomSheet: React.FC<Props> = ({
   const response = useApiClientSelector((s) => entity.getResponse(s));
   const postResponseScript = useApiClientSelector((s) => entity.getPostResponseScript(s));
   const testResults = useApiClientSelector((s) => entity.getTestResults(s));
+  const isExample = useApiClientSelector((s) => entity.getType(s) === RQAPI.RecordType.EXAMPLE_API);
 
   const canGenerateTests = useMemo(() => {
     const responseExists = Boolean(postResponseScript);
@@ -112,25 +113,30 @@ export const ApiClientBottomSheet: React.FC<Props> = ({
         ),
         children: <ResponseHeaders headers={response?.headers} />,
       },
-      {
-        key: BOTTOM_SHEET_TAB_KEYS.TEST_RESULTS,
-        label: (
-          <BottomSheetTabLabel label="Test results">
-            <span className="bottom-sheet-tab">
-              <span>Tests {testResultsStats}</span>
-            </span>
-          </BottomSheetTabLabel>
-        ),
-        children: (
-          <TestsView
-            testResults={testResults}
-            handleTestResultRefresh={handleTestResultRefresh}
-            onGenerateTests={onGenerateTests}
-            isGeneratingTests={isGeneratingTests}
-            canGenerateTests={canGenerateTests}
-          />
-        ),
-      },
+      ...(!isExample
+        ? [
+            {
+              key: BOTTOM_SHEET_TAB_KEYS.TEST_RESULTS,
+              label: (
+                <BottomSheetTabLabel label="Test results">
+                  <span className="bottom-sheet-tab">
+                    <span>Tests {testResultsStats}</span>
+                  </span>
+                </BottomSheetTabLabel>
+              ),
+
+              children: (
+                <TestsView
+                  testResults={testResults}
+                  handleTestResultRefresh={handleTestResultRefresh}
+                  onGenerateTests={onGenerateTests}
+                  isGeneratingTests={isGeneratingTests}
+                  canGenerateTests={canGenerateTests}
+                />
+              ),
+            },
+          ]
+        : []),
     ];
 
     if (isLongRequest) {
@@ -202,6 +208,7 @@ export const ApiClientBottomSheet: React.FC<Props> = ({
     canGenerateTests,
     isGeneratingTests,
     onGenerateTests,
+    isExample,
   ]);
 
   return (
