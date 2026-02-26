@@ -146,7 +146,8 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
   const METHODS_WITHOUT_BODY = [RequestMethod.GET, RequestMethod.HEAD];
   const isNonBodyMethodWithBodyInNonDesktop =
     METHODS_WITHOUT_BODY.includes(method) && bodyLength > 0 && !supportsRequestBodyForAllMethods(appMode);
-  const isMultipartInNonDesktop = contentType === RequestContentType.MULTIPART_FORM && appMode !== "DESKTOP";
+  const isMultipartInNonDesktop =
+    contentType === RequestContentType.MULTIPART_FORM && !supportsRequestBodyForAllMethods(appMode);
   const isSendDisabledDueToDesktopOnly = isNonBodyMethodWithBodyInNonDesktop || isMultipartInNonDesktop;
 
   const saveBuffer = useSaveBuffer();
