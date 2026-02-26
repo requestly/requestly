@@ -8,7 +8,7 @@ import { isEmpty } from "lodash";
 import { deleteRecords } from "features/apiClient/slices/apiRecords/thunks";
 import { toast } from "utils/Toast";
 import { isApiCollection } from "../../../utils";
-import { ApiClientFeatureContext } from "features/apiClient/slices";
+import { ApiClientFeatureContext, selectChildrenIds, useApiClientFeatureContext } from "features/apiClient/slices";
 import { NativeError } from "errors/NativeError";
 import { ErrorSeverity } from "errors/types";
 
@@ -28,6 +28,7 @@ export const DeleteApiRecordModal: React.FC<DeleteApiRecordModalProps> = ({
   onClose,
   onSuccess,
 }) => {
+  const context = useApiClientFeatureContext();
   const recordsWithContext = useMemo(() => {
     return getRecordsToDelete();
   }, [getRecordsToDelete]);
@@ -35,6 +36,12 @@ export const DeleteApiRecordModal: React.FC<DeleteApiRecordModalProps> = ({
   const records = useMemo(() => {
     return recordsWithContext.map(({ records }) => records).flat();
   }, [recordsWithContext]);
+
+  const examplesCountInRequest = useMemo(() => {
+    if (records.length !== 1 || records[0]?.type !== RQAPI.RecordType.API) return 0;
+    const state = context.store.getState();
+    return selectChildrenIds(state, records[0].id).length ?? 0;
+  }, [records, context]);
 
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -97,7 +104,9 @@ export const DeleteApiRecordModal: React.FC<DeleteApiRecordModalProps> = ({
   const description =
     records.length === 1
       ? records[0]?.type === RQAPI.RecordType.API
-        ? `This action will permanently delete this API request. Are you sure you want to continue?`
+        ? `This action will permanently delete this API request ${
+            examplesCountInRequest > 0 ? `and ${examplesCountInRequest} examples` : ""
+          }. Are you sure you want to continue?`
         : records[0]?.type === RQAPI.RecordType.EXAMPLE_API
         ? "This action will permanently delete this example. Are you sure you want to continue?"
         : `This action will permanently delete the entire collection and its ${apiRequestCount} requests. Are you sure you want to continue?`
