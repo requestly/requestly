@@ -300,7 +300,7 @@ const createExampleApiRecord = (
       dataType: getInferredKeyValueDataType(header.value),
     })) ?? [];
 
-  const response: RQAPI.HttpResponse = {
+  const response: RQAPI.Response = {
     body: exampleResponse?.body ?? "",
     headers: responseHeaders,
     status: parseInt(exampleResponse?.code) || 200,
@@ -333,7 +333,7 @@ const createExampleApiRecord = (
     type: RQAPI.RecordType.EXAMPLE_API,
     deleted: false,
     data: {
-      type: RQAPI.ApiEntryType.HTTP,
+      type: request.body?.mode === PostmanBodyMode.GRAPHQL ? RQAPI.ApiEntryType.GRAPHQL : RQAPI.ApiEntryType.HTTP,
       request: {
         url: typeof request?.url === "string" ? request.url : request?.url?.raw ?? "",
         method: request?.method || RequestMethod.GET,
@@ -661,22 +661,18 @@ export const processPostmanCollectionData = (
         result.apis.push(...subItems.apis);
         result.examples.push(...subItems.examples);
       } else if (item.request) {
-        // This is an API endpoint
-        const apiRecord = createApiRecord(item, parentCollectionId, apiClientRecordsRepository);
-        result.apis.push(apiRecord);
-
         const data =
           item.request.body?.mode === PostmanBodyMode.GRAPHQL && item.request.body?.graphql
             ? createGraphQLApiRecord(item, parentCollectionId, apiClientRecordsRepository)
             : createApiRecord(item, parentCollectionId, apiClientRecordsRepository);
         result.apis.push(data);
 
-        // Process examples/responses if they exist
-        if (item.response && Array.isArray(item.response) && item.response.length > 0 && apiRecord.id) {
+        // Process examples/responses if they exist (use same record id as parent for examples)
+        if (item.response && item.response.length > 0 && data.id) {
           item.response.forEach((exampleResponse: any) => {
             const exampleRecord = createExampleApiRecord(
               exampleResponse,
-              apiRecord.id as string,
+              data.id as string,
               parentCollectionId,
               apiClientRecordsRepository
             );

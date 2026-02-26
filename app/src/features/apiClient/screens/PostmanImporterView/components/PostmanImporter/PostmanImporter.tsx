@@ -350,18 +350,13 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
 
     // Import examples after APIs are imported
     const handleExampleWrites = async (example: RQAPI.ExampleApiRecord) => {
-      const newCollectionId = collections.find((collection) => collection.id === example.collectionId)?.id;
-      if (!newCollectionId) {
-        throw new Error(`Failed to find new collection ID for Example: ${example.name || example.id}`);
-      }
-
       // Find the parent request ID - it should already be imported
       const parentRequest = apis.find((api) => api.id === example.parentRequestId);
       if (!parentRequest || !parentRequest.id) {
         throw new Error(`Failed to find parent request for Example: ${example.name || example.id}`);
       }
 
-      const updatedExample = { ...example, collectionId: newCollectionId };
+      const updatedExample = { ...example, parentRequestId: parentRequest.id, collectionId: null };
       try {
         const newExample = await apiClientRecordsRepository.createExampleRequest(parentRequest.id, updatedExample);
         if (newExample.success) {
