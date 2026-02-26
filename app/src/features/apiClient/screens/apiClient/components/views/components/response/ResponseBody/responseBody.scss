@@ -14,7 +14,7 @@
 
     .image-response-preview {
       max-width: 100%;
-      max-height: 100%;
+      max-height: calc(100% - 36px);
       object-fit: contain;
     }
 
@@ -44,6 +44,7 @@
       .api-response-body-mode-selector {
         margin: 0;
       }
+
       .ant-btn .copy-raw-response-icon {
         width: 16px;
         height: 16px;
@@ -80,9 +81,11 @@
       &::before {
         display: none;
       }
+
       &:hover {
         color: var(--requestly-color-text-default);
       }
+
       &:focus,
       &:active {
         border: none;
