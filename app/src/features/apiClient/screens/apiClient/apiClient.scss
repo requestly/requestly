@@ -30,6 +30,7 @@
 
   .api-client-header-container {
     position: sticky;
+    z-index: 100;
     border-bottom: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
 
     &__header {
@@ -204,15 +205,6 @@
     .ant-space-item {
       display: flex;
       align-items: center;
-
-      .ant-btn {
-        padding: 0;
-        color: var(--requestly-color-text-subtle, #bbb);
-
-        &:hover {
-          background-color: transparent;
-        }
-      }
     }
 
     .ant-space-item:last-child::after {

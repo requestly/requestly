@@ -87,13 +87,13 @@ export function getEntityDataFromTabSource(
   }
 
   if (isExample) {
-    const exampleRecord = apiRecordsAdapter
-      .getSelectors()
-      .selectById(state.records.records, sourceId) as RQAPI.ExampleApiRecord;
+    const record = apiRecordsAdapter.getSelectors().selectById(state.records.records, sourceId);
 
-    if (!exampleRecord) {
+    if (!record || record.type !== RQAPI.RecordType.EXAMPLE_API) {
       throw new EntityNotFound(sourceId, source.type);
     }
+
+    const exampleRecord = record as RQAPI.ExampleApiRecord;
 
     const entityType =
       exampleRecord.data?.type === RQAPI.ApiEntryType.GRAPHQL

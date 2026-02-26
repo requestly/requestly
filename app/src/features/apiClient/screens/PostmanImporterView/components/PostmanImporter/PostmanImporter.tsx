@@ -1,6 +1,12 @@
 import React, { useCallback, useRef, useState } from "react";
 import { FilePicker } from "components/common/FilePicker";
-import { getUploadedPostmanFileType, processPostmanCollectionData, processPostmanEnvironmentData } from "./utils";
+import {
+  getUploadedPostmanFileType,
+  processPostmanCollectionData,
+  processPostmanEnvironmentData,
+  detectUnsupportedFeatures,
+  detectVaultVariables,
+} from "./utils";
 import { toast } from "utils/Toast";
 import { RQButton } from "lib/design-system-v2/components";
 import { MdCheckCircleOutline } from "@react-icons/all-files/md/MdCheckCircleOutline";
@@ -14,6 +20,7 @@ import {
   trackImportParsed,
   trackImportParseFailed,
   trackImportSuccess,
+  trackPostmanUnsupportedFeatures,
 } from "modules/analytics/events/features/apiClient";
 import Logger from "lib/logger";
 import "./postmanImporter.scss";
@@ -98,9 +105,23 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
                   }
 
                   if (postmanFileType === "environment") {
+                    const hasVaultVariables = detectVaultVariables(fileContent);
+                    if (hasVaultVariables) {
+                      trackPostmanUnsupportedFeatures(["vault variables"]);
+                    }
                     const processedData = processPostmanEnvironmentData(fileContent);
                     resolve({ type: postmanFileType, data: processedData });
                   } else {
+                    try {
+                      const unsupportedFeaturesList = detectUnsupportedFeatures(fileContent);
+                      if (unsupportedFeaturesList.length > 0) {
+                        trackPostmanUnsupportedFeatures(unsupportedFeaturesList);
+                      }
+                    } catch (error) {
+                      // not logging on sentry, since this is for analytics purpose only
+                      Logger.error("Error detecting unsupported features:", error);
+                    }
+
                     const processedApiRecords = processPostmanCollectionData(fileContent, apiClientRecordsRepository);
                     resolve({
                       type: postmanFileType,
