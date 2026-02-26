@@ -79,7 +79,12 @@ const ResponseBody: React.FC<Props> = ({ responseText, contentTypeHeader }) => {
     }
 
     if (contentTypeHeader?.includes("image/")) {
-      return <ImageResponsePreview responseText={responseText} mimeType={contentTypeHeader} />;
+      return (
+        <div className="api-response-body-editor-container">
+          <div>{bodyPreviewModeOptions}</div>
+          <ImageResponsePreview responseText={responseText} mimeType={contentTypeHeader} />
+        </div>
+      );
     }
 
     const editorLanguage = getEditorLanguageFromContentType(contentTypeHeader);
