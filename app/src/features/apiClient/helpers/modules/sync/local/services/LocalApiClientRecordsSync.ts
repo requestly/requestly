@@ -8,7 +8,7 @@ import { EnvironmentVariables } from "backend/environment/types";
 import { Authorization } from "features/apiClient/screens/apiClient/components/views/components/request/components/AuthorizationView/types/AuthConfig";
 import { ResponsePromise } from "backend/types";
 import { SavedRunConfig } from "features/apiClient/slices/runConfig/types";
-import * as Sentry from "@sentry/react";
+import { SentryCustomSpan } from "utils/sentry";
 import { RunResult, SavedRunResult } from "features/apiClient/slices/common/runResults";
 import { apiRecordsRankingManager } from "features/apiClient/helpers/RankingManager";
 
@@ -625,64 +625,56 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
     }
   }
 
+  @SentryCustomSpan({
+    name: "local_sync.duplicateApiEntities",
+    op: "function.local_sync",
+  })
   async duplicateApiEntities(entities: RQAPI.ApiClientRecord[]) {
-    return await Sentry.startSpan(
-      {
-        name: "local_sync.duplicateApiEntities",
-        op: "function.local_sync",
-      },
-      async () => {
-        const result: RQAPI.ApiClientRecord[] = [];
-        for (const entity of entities) {
-          const duplicationResult = await (async () => {
-            if (entity.type === RQAPI.RecordType.API) {
-              return this.createRecordWithId(entity, entity.id);
-            }
-            return this.createCollectionFromImport(entity, entity.id);
-          })();
-          if (duplicationResult.success) {
-            result.push(duplicationResult.data);
-          }
+    const result: RQAPI.ApiClientRecord[] = [];
+    for (const entity of entities) {
+      const duplicationResult = await (async () => {
+        if (entity.type === RQAPI.RecordType.API) {
+          return this.createRecordWithId(entity, entity.id);
         }
-        return result;
+        return this.createCollectionFromImport(entity, entity.id);
+      })();
+      if (duplicationResult.success) {
+        result.push(duplicationResult.data);
       }
-    );
+    }
+    return result;
   }
 
+  @SentryCustomSpan({
+    name: "local_sync.moveAPIEntities",
+    op: "function.local_sync",
+  })
   async moveAPIEntities(entities: RQAPI.ApiClientRecord[], newParentId: string) {
-    return await Sentry.startSpan(
-      {
-        name: "local_sync.moveAPIEntities",
-        op: "function.local_sync",
-      },
-      async () => {
-        const service = await this.getAdapter();
-        const result: RQAPI.ApiClientRecord[] = [];
+    const service = await this.getAdapter();
+    const result: RQAPI.ApiClientRecord[] = [];
 
-        for (const entity of entities) {
-          const moveResult = await (async () => {
-            if (entity.type === RQAPI.RecordType.API) {
-              await service.updateRecord(
-                {
-                  ...this.parseApiRecordRequest(entity as RQAPI.ApiRecord),
-                  name: entity.name,
-                },
-                parseNativeId(entity.id)
-              );
-              return service.moveRecord(entity.id, newParentId);
-            }
-            return service.moveCollection(entity.id, newParentId);
-          })();
-
-          if (moveResult.type === "success") {
-            const parsedCollection = this.parseAPIEntities([moveResult.content as APIEntity]);
-            result.push(parsedCollection[0]);
-          }
+    for (const entity of entities) {
+      const moveResult = await (async () => {
+        if (entity.type === RQAPI.RecordType.API) {
+          await service.updateRecord(
+            {
+              ...this.parseApiRecordRequest(entity as RQAPI.ApiRecord),
+              name: entity.name,
+            },
+            parseNativeId(entity.id)
+          );
+          return service.moveRecord(entity.id, newParentId);
         }
+        return service.moveCollection(entity.id, newParentId);
+      })();
 
-        return result;
+      if (moveResult.type === "success") {
+        const parsedCollection = this.parseAPIEntities([moveResult.content as APIEntity]);
+        result.push(parsedCollection[0]);
       }
-    );
+    }
+
+    return result;
   }
 
   async batchCreateRecordsWithExistingId(entities: RQAPI.ApiClientRecord[]): RQAPI.RecordsPromise {
