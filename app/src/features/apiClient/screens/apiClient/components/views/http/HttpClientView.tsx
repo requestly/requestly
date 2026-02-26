@@ -309,6 +309,7 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
               }
 
               if (error) {
+                console.log("Tert", error);
                 Sentry.withScope((scope) => {
                   scope.setTag("error_type", "api_request_failure");
                   scope.setContext("request_details", {
@@ -404,7 +405,7 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
         },
       },
       async () => {
-        saveBuffer(
+        return await saveBuffer(
           {
             entity,
             skipMarkSaved: override?.onSaveClick?.skipMarkSaved,
