@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { RQButton } from "lib/design-system-v2/components";
 import { MdOutlineHistory } from "@react-icons/all-files/md/MdOutlineHistory";
+import { MdArrowBack } from "@react-icons/all-files/md/MdArrowBack";
 import { EmptyRunResultContainer, RunResultContainer } from "./RunResultContainer/RunResultContainer";
 import { TestsRunningLoader } from "./TestsRunningLoader/TestsRunningLoader";
 import { RunStatus } from "features/apiClient/slices/common/runResults/types";
@@ -20,9 +21,22 @@ import {
 } from "features/apiClient/slices/liveRunResults/selectors";
 import { selectCollectionHistoryStatus } from "features/apiClient/slices/runHistory/selectors";
 import { RunHistorySaveStatus } from "features/apiClient/slices/runHistory/types";
+import { useEntity } from "features/apiClient/slices/entities/hooks";
+import { ApiClientEntityType } from "features/apiClient/slices/entities/types";
 
-export const RunResultView: React.FC = () => {
+interface RunResultViewProps {
+  isDetailedViewOpen?: boolean;
+  onToggleDetailedView?: (open: boolean) => void;
+}
+
+export const RunResultView: React.FC<RunResultViewProps> = ({ isDetailedViewOpen, onToggleDetailedView }) => {
   const { collectionId, bufferedEntity } = useCollectionView();
+
+  const entity = useEntity({
+    id: collectionId,
+    type: ApiClientEntityType.COLLECTION_RECORD,
+  });
+  const collectionName = useApiClientSelector((s) => entity.getName(s));
 
   const startTime = useApiClientSelector((s) => selectLiveRunResultStartTime(s, collectionId));
   const runStatus = useApiClientSelector((s) => selectLiveRunResultRunStatus(s, collectionId));
@@ -49,8 +63,22 @@ export const RunResultView: React.FC = () => {
 
   return (
     <div className="run-result-view-container">
-      <div className="run-result-view-header">
-        <span className="header">Test results</span>
+      <div className={`run-result-view-header ${isDetailedViewOpen ? "hide-border" : ""}`}>
+        <div className="left-section">
+          {isDetailedViewOpen && (
+            <RQButton
+              size="small"
+              type="secondary"
+              icon={<MdArrowBack />}
+              className="back-button"
+              onClick={() => {
+                onToggleDetailedView?.(false);
+              }}
+            />
+          )}
+          <span className="header">Test results</span>
+          {isDetailedViewOpen && <span className="collection-name">- {collectionName || ""}</span>}
+        </div>
         <RQButton
           size="small"
           type="transparent"
@@ -80,6 +108,8 @@ export const RunResultView: React.FC = () => {
           result={testResults}
           ranAt={startTime ?? Date.now()}
           totalIterationCount={totalIterationCount}
+          isDetailedViewOpen={isDetailedViewOpen}
+          onToggleDetailedView={onToggleDetailedView}
         />
       )}
       {runStatus === RunStatus.RUNNING ? <TestsRunningLoader /> : null}

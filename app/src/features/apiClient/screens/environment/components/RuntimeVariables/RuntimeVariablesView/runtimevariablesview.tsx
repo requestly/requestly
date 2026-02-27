@@ -10,6 +10,8 @@ import { isEmpty } from "lodash";
 import "./runtimevariableview.scss";
 import { DeleteAllRuntimeVariablesModal } from "features/apiClient/screens/apiClient/components/modals/DeleteAllRuntimeVariablesModal/deleteAllRuntimeVariablesModal";
 import { useSaveBuffer } from "features/apiClient/slices/buffer/hooks";
+import { NativeError } from "errors/NativeError";
+import { ErrorSeverity } from "errors/types";
 
 export const RuntimeVariablesView: React.FC = () => {
   const globalDispatch = useDispatch();
@@ -46,6 +48,7 @@ export const RuntimeVariablesView: React.FC = () => {
         onError(error) {
           console.error("Failed to update variables", error);
           toast.error("Failed to update variables");
+          throw NativeError.fromError(error).setShowBoundary(true).setSeverity(ErrorSeverity.ERROR);
         },
         onSuccess(changes, entity) {
           toast.success("Variables updated successfully");

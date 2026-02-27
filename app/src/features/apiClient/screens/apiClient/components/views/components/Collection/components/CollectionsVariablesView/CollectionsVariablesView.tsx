@@ -11,6 +11,8 @@ import { toast } from "utils/Toast";
 import { TAB_KEYS } from "../../CollectionView";
 import { CollectionsVariablesList } from "../CollectionsVariablesList";
 import "./collectionsVariablesView.scss";
+import { ErrorSeverity } from "errors/types";
+import { NativeError } from "errors/NativeError";
 
 interface CollectionsVariablesViewProps {
   collectionId: string;
@@ -55,6 +57,7 @@ export const CollectionsVariablesView: React.FC<CollectionsVariablesViewProps> =
             description: error?.message || "An unexpected error occurred",
             placement: "bottomRight",
           });
+          throw NativeError.fromError(error).setShowBoundary(true).setSeverity(ErrorSeverity.ERROR);
         },
         onSuccess(changes) {
           toast.success("Variables updated successfully");
