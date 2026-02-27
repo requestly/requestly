@@ -170,6 +170,10 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
     return uuidv4();
   }
 
+  @SentryCustomSpan({
+    name: "local_sync.getAllRecords",
+    op: "function.local_sync",
+  })
   async getAllRecords(): RQAPI.RecordsPromise {
     const service = await this.getAdapter();
     const result = await service.getAllRecords();
@@ -195,6 +199,11 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
   getRecordsForForceRefresh(): RQAPI.RecordsPromise | Promise<void> {
     return this.getAllRecords();
   }
+
+  @SentryCustomSpan({
+    name: "local_sync.getRecord",
+    op: "function.local_sync",
+  })
   async getRecord(nativeId: string): RQAPI.ApiClientRecordPromise {
     const id = parseNativeId(nativeId);
     const service = await this.getAdapter();
@@ -239,6 +248,10 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
     };
   }
 
+  @SentryCustomSpan({
+    name: "local_sync.createCollection",
+    op: "function.local_sync",
+  })
   async createCollection(record: Partial<Omit<RQAPI.CollectionRecord, "id">>): RQAPI.ApiClientRecordPromise {
     const service = await this.getAdapter();
     const result = await service.createCollection(record.name ?? "Untitled Collection", record.collectionId);
@@ -262,6 +275,10 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
     };
   }
 
+  @SentryCustomSpan({
+    name: "local_sync.createRecordWithId",
+    op: "function.local_sync",
+  })
   async createRecordWithId(record: Partial<RQAPI.ApiRecord>, nativeId: string): RQAPI.ApiClientRecordPromise {
     const id = parseNativeId(nativeId);
     const service = await this.getAdapter();
@@ -416,6 +433,10 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
     };
   }
 
+  @SentryCustomSpan({
+    name: "local_sync.deleteRecords",
+    op: "function.local_sync",
+  })
   async deleteRecords(recordIds: string[]) {
     const service = await this.getAdapter();
     const result = await service.deleteRecords(recordIds);
@@ -432,6 +453,10 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
     };
   }
 
+  @SentryCustomSpan({
+    name: "local_sync.getCollection",
+    op: "function.local_sync",
+  })
   async getCollection(recordId: string): RQAPI.ApiClientRecordPromise {
     const service = await this.getAdapter();
     const result = await service.getCollection(recordId);
@@ -449,6 +474,10 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
     };
   }
 
+  @SentryCustomSpan({
+    name: "local_sync.renameCollection",
+    op: "function.local_sync",
+  })
   async renameCollection(id: string, newName: string): RQAPI.ApiClientRecordPromise {
     const service = await this.getAdapter();
     const result = await service.renameCollection(id, newName);
@@ -466,6 +495,10 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
     };
   }
 
+  @SentryCustomSpan({
+    name: "local_sync.deleteCollections",
+    op: "function.local_sync",
+  })
   async deleteCollections(ids: string[]): Promise<{ success: boolean; data: unknown; message?: string }> {
     const service = await this.getAdapter();
     const result = await service.deleteCollections(ids);
@@ -482,6 +515,10 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
     };
   }
 
+  @SentryCustomSpan({
+    name: "local_sync.setCollectionVariables",
+    op: "function.local_sync",
+  })
   async setCollectionVariables(
     id: string,
     variables: EnvironmentVariables
@@ -501,6 +538,10 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
     };
   }
 
+  @SentryCustomSpan({
+    name: "local_sync.updateCollectionDescription",
+    op: "function.local_sync",
+  })
   async updateCollectionDescription(
     id: string,
     description: string
@@ -522,6 +563,10 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
     };
   }
 
+  @SentryCustomSpan({
+    name: "local_sync.updateCollectionAuthData",
+    op: "function.local_sync",
+  })
   async updateCollectionAuthData(collection: RQAPI.CollectionRecord): RQAPI.ApiClientRecordPromise {
     const service = await this.getAdapter();
     const result = await service.updateCollectionAuthData(collection.id, collection.data.auth);
@@ -546,6 +591,10 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
     };
   }
 
+  @SentryCustomSpan({
+    name: "local_sync.writeToRawFile",
+    op: "function.local_sync",
+  })
   async writeToRawFile(
     id: string,
     record: any,
@@ -566,6 +615,10 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
     };
   }
 
+  @SentryCustomSpan({
+    name: "local_sync.getRawFileData",
+    op: "function.local_sync",
+  })
   async getRawFileData(id: string): Promise<{ success: boolean; data: string | null; message?: string }> {
     const service = await this.getAdapter();
     const result = await service.getRawFileData(id);
@@ -582,6 +635,10 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
     };
   }
 
+  @SentryCustomSpan({
+    name: "local_sync.createCollectionFromImport",
+    op: "function.local_sync",
+  })
   async createCollectionFromImport(collection: RQAPI.CollectionRecord, id: string): RQAPI.ApiClientRecordPromise {
     const service = await this.getAdapter();
     const result = await service.createCollectionFromCompleteRecord(collection, id);
@@ -599,6 +656,10 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
     };
   }
 
+  @SentryCustomSpan({
+    name: "local_sync.batchWriteApiEntities",
+    op: "function.local_sync",
+  })
   async batchWriteApiEntities(
     batchSize: number,
     entities: RQAPI.ApiClientRecord[],
@@ -619,6 +680,10 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
     };
   }
 
+  @SentryCustomSpan({
+    name: "local_sync.batchWriteApiRecords",
+    op: "function.local_sync",
+  })
   async batchWriteApiRecords(records: RQAPI.ApiRecord[]): Promise<RQAPI.ApiRecord[]> {
     try {
       for (const record of records) {
@@ -682,6 +747,10 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
     return result;
   }
 
+  @SentryCustomSpan({
+    name: "local_sync.batchCreateRecordsWithExistingId",
+    op: "function.local_sync",
+  })
   async batchCreateRecordsWithExistingId(entities: RQAPI.ApiClientRecord[]): RQAPI.RecordsPromise {
     if (entities.length === 0) {
       return {
