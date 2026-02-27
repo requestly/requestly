@@ -2,6 +2,7 @@ import { notification } from "antd";
 import { DraggableApiRecord } from "../collectionRow/CollectionRow";
 import { Workspace } from "features/workspaces/types";
 import { getApiClientFeatureContext, moveRecords } from "features/apiClient/slices";
+import * as Sentry from "@sentry/react";
 
 export interface HandleRecordDropOptions {
   /** The target collection ID where the item should be dropped. Empty string for top-level. */
@@ -26,12 +27,10 @@ export const handleRecordDrop = async (
 ): Promise<void> => {
   try {
     const sourceContext = getApiClientFeatureContext(item.workspaceId);
-    if (!sourceContext) {
-      throw new Error(`Source context not found for id: ${item.workspaceId}`);
-    }
+    if (!sourceContext) return;
 
     const destination = {
-      workspaceId: dropWorkspaceId ?? undefined,
+      workspaceId: dropWorkspaceId,
       collectionId: options.targetCollectionId,
     };
 
@@ -49,7 +48,7 @@ export const handleRecordDrop = async (
 
     options.onSuccess?.();
   } catch (error) {
-    console.error("Error moving item:", error);
+    Sentry.captureException(error);
     notification.error({
       message: "Error moving item",
       description: (error as any)?.message || "Failed to move item. Please try again.",
