@@ -298,6 +298,9 @@ export class HttpRequestExecutor {
       },
     });
 
+    /*
+      We are manually constructing the URL with encoded query parameters here because we want to clear `queryParams` in the request object passed to `makeRequest` so that they aren't appended again or double-encoded downstream.
+    */
     const preparedEntryRequest = {
       ...preparedEntry.request,
       url: queryParamsToURLString(preparedEntry.request.queryParams, preparedEntry.request.url, true),
