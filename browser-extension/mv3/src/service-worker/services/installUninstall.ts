@@ -4,7 +4,7 @@ import { initBlockedDomainsStorage } from "../../utils";
 const handleExtensionInstalledOrUpdated = (details: chrome.runtime.InstalledDetails) => {
   if (details.reason === chrome.runtime.OnInstalledReason.INSTALL) {
     initBlockedDomainsStorage();
-    chrome.tabs.create({ url: config.LANDING_PAGE_BASE_URL + "/extension-installed-success" });
+    chrome.tabs.create({ url: config.LANDING_PAGE_BASE_URL + "/home" });
   }
 
   if (details.reason === chrome.runtime.OnInstalledReason.UPDATE) {
