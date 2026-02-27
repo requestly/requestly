@@ -3,7 +3,7 @@ import { HttpRequestPreparationService } from "./httpRequestPreparationService";
 import { HttpRequestValidationService } from "./httpRequestValidationService";
 import { UserAbortError } from "../../errors/UserAbortError/UserAbortError";
 import { trackRequestFailed } from "modules/analytics/events/features/apiClient";
-import { makeRequest } from "../../screens/apiClient/utils";
+import { makeRequest, queryParamsToURLString } from "../../screens/apiClient/utils";
 import { DEFAULT_SCRIPT_VALUES } from "../../constants";
 import {
   trackScriptExecutionCompleted,
@@ -298,8 +298,14 @@ export class HttpRequestExecutor {
       },
     });
 
+    const preparedEntryRequest = {
+      ...preparedEntry.request,
+      url: queryParamsToURLString(preparedEntry.request.queryParams, preparedEntry.request.url, true),
+      queryParams: [],
+    };
+
     try {
-      const response = await makeRequest(this.appMode, preparedEntry.request, this.abortController.signal);
+      const response = await makeRequest(this.appMode, preparedEntryRequest, this.abortController.signal);
       preparedEntry.response = response;
       scriptExecutionContext.setResponse(response);
       const rqErrorHeader = response?.headers?.find((header) => header.key === "x-rq-error");
