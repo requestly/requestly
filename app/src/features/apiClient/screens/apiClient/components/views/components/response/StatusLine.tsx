@@ -14,11 +14,12 @@ import { useSaveAsExample } from "features/apiClient/hooks/useSaveAsExample";
 import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
 
 interface Props {
+  isDraftMode: boolean;
   response: RQAPI.Response;
   entity: BufferedHttpRecordEntity | BufferedGraphQLRecordEntity;
 }
 
-const StatusLine: React.FC<Props> = ({ response, entity }) => {
+const StatusLine: React.FC<Props> = ({ response, entity, isDraftMode }) => {
   const context = useApiClientFeatureContext();
 
   const isLocalSyncEnabled = useCheckLocalSyncSupport();
@@ -65,7 +66,7 @@ const StatusLine: React.FC<Props> = ({ response, entity }) => {
         value={<NetworkStatusField status={response.status} />}
       />
       <PropertyRow className="api-response-status-row__time" name="Time" value={formattedTime} />
-      {entityType === RQAPI.RecordType.API && !isLocalSyncEnabled && (
+      {entityType === RQAPI.RecordType.API && !isLocalSyncEnabled && !isDraftMode && (
         <div className="api-response-status-row__save-button-wrapper">
           <Tooltip title="Save the current request and response as an example." placement="bottom" color="#000">
             <RQButton

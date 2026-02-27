@@ -553,6 +553,7 @@ const GraphQLClientView: React.FC<GraphQLClientViewProps> = ({
             isFailed={isRequestFailed}
             isLongRequest={false}
             isRequestCancelled={isRequestCancelled}
+            isDraftMode={isDraftMode}
             onCancelRequest={handleCancelRequest}
             handleTestResultRefresh={handleTestResultRefresh}
             error={error}

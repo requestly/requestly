@@ -686,6 +686,7 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
             isFailed={isFailed}
             isLongRequest={isLongRequest}
             isRequestCancelled={isRequestCancelled}
+            isDraftMode={isDraftMode}
             onCancelRequest={handleCancelRequest}
             handleTestResultRefresh={handleTestResultRefresh}
             error={error}
