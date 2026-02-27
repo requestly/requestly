@@ -17,6 +17,9 @@ import { useRBAC } from "features/rbac";
 import { useWorkspaceId } from "features/apiClient/common/WorkspaceProvider";
 import { NoopContextId } from "features/apiClient/commands/utils";
 import { createPortal } from "react-dom";
+import { DynamicVariableInfoPopover } from "features/apiClient/screens/environment/components/DynamicVariableInfoPopover/DynamicVariableInfoPopover";
+import { DynamicVariable } from "lib/dynamic-variables/types";
+import { getVariable, checkIsDynamicVariable } from "features/apiClient/helpers/variableResolver/variableHelper";
 
 type VariableData = ScopedVariable[0];
 
@@ -57,7 +60,11 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
 }) => {
   const workspaceId = useWorkspaceId();
   const isNoopContext = workspaceId === NoopContextId;
-  const variableData = variables[hoveredVariable];
+
+  // Extract base variable name for dynamic variables with arguments (e.g., "$randomInt 0 100" -> "$randomInt")
+  const baseVariableName = hoveredVariable.split(" ")[0] || hoveredVariable;
+  const variableData = getVariable(baseVariableName, variables);
+
   const [currentView, setCurrentView] = useState<PopoverView>(() => {
     return variableData ? PopoverView.VARIABLE_INFO : PopoverView.NOT_FOUND;
   });
@@ -108,6 +115,8 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
     onClose?.();
   }, [transitionToView, onClose, onPinChange]);
 
+  const isDynamicVariable: boolean = !!variableData && checkIsDynamicVariable(variableData);
+
   const popoverContent = (() => {
     switch (currentView) {
       case PopoverView.IDLE: {
@@ -117,14 +126,20 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
       case PopoverView.VARIABLE_INFO: {
         if (!variableData) return null;
         return (
-          <VariableInfo
-            params={{
-              name: hoveredVariable,
-              variable: variableData,
-            }}
-            onEditClick={handleEditClick}
-            isNoopContext={isNoopContext}
-          />
+          <>
+            {isDynamicVariable ? (
+              <DynamicVariableInfoPopover variable={variableData as DynamicVariable} showIconHeader />
+            ) : (
+              <VariableInfo
+                params={{
+                  name: hoveredVariable,
+                  variable: variableData as ScopedVariable,
+                }}
+                onEditClick={handleEditClick}
+                isNoopContext={isNoopContext}
+              />
+            )}
+          </>
         );
       }
 
@@ -144,7 +159,7 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
 
       case PopoverView.EDIT_FORM: {
         if (!variableData) return null;
-        const [variable, source] = variableData;
+        const [variable, source] = variableData as ScopedVariable;
         return (
           <EditVariableView
             variableName={hoveredVariable}
@@ -187,7 +202,9 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
   // A full refactor will be carried out for the editor in the future
   return createPortal(
     <Popover
-      content={<div className="variable-info-body">{popoverContent}</div>}
+      content={
+        <div className={`variable-info-body ${isDynamicVariable ? "dynamic-variable-view" : ""}`}>{popoverContent}</div>
+      }
       open
       destroyTooltipOnHide
       onOpenChange={(nextOpen) => {
