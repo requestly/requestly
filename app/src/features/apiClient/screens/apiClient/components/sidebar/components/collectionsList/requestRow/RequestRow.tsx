@@ -381,19 +381,23 @@ export const RequestRow: React.FC<Props> = ({
           handleDropdownVisibleChange(false);
         },
       },
-      {
-        key: "3",
-        label: (
-          <div>
-            <MdOutlineDashboardCustomize style={{ marginRight: 8 }} />
-            Add example
-          </div>
-        ),
-        onClick: (itemInfo: any) => {
-          itemInfo.domEvent?.stopPropagation?.();
-          handleAddExample(record);
-        },
-      },
+      ...(isFeatureCompatible(FEATURES.API_CLIENT_EXAMPLE_REQUESTS)
+        ? [
+            {
+              key: "3",
+              label: (
+                <div>
+                  <MdOutlineDashboardCustomize style={{ marginRight: 8 }} />
+                  Add example
+                </div>
+              ),
+              onClick: (itemInfo: any) => {
+                itemInfo.domEvent?.stopPropagation?.();
+                handleAddExample(record);
+              },
+            },
+          ]
+        : []),
       {
         key: "4",
         label: (
