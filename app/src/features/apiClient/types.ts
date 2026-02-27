@@ -9,6 +9,8 @@ import {
 import { ErroredRecord } from "./helpers/modules/sync/local/services/types";
 import { ApiClientFile, FileId } from "./store/apiClientFilesStore";
 
+export type ExecutionId = string;
+
 export enum RequestMethod {
   GET = "GET",
   POST = "POST",
@@ -75,6 +77,7 @@ export enum BulkActions {
   EXPORT = "EXPORT",
   EXPORT_REQUESTLY = "EXPORT_REQUESTLY",
   EXPORT_POSTMAN = "EXPORT_POSTMAN",
+  EXPORT_OPENAPI = "EXPORT_OPENAPI",
   SELECT_ALL = "SELECT_ALL",
 }
 
@@ -108,6 +111,9 @@ export namespace RQAPI {
     POST_RESPONSE = "postResponse",
   }
 
+  /* kept string here as backward compability for already generated uuids saved in firebase, 
+    for new request number should be data-type 
+  */
   export type PathVariable = {
     id: number | string;
     key: string;
@@ -253,11 +259,13 @@ export namespace RQAPI {
 
   export type ExecutionResult =
     | {
+        executionId: ExecutionId;
         status: ExecutionStatus.SUCCESS;
         executedEntry: ApiEntry;
         warning?: ExecutionWarning;
       }
     | {
+        executionId: ExecutionId;
         status: ExecutionStatus.ERROR;
         executedEntry: ApiEntry;
         error: ExecutionError;
@@ -265,12 +273,14 @@ export namespace RQAPI {
 
   export type RerunResult =
     | {
+        executionId: ExecutionId;
         status: ExecutionStatus.SUCCESS;
         artifacts: {
           testResults: TestResult[];
         };
       }
     | {
+        executionId: ExecutionId;
         status: ExecutionStatus.ERROR;
         error: ExecutionError;
       };
@@ -291,6 +301,7 @@ export namespace RQAPI {
     name: string;
     description?: string;
     collectionId: string | null;
+    rank?: string;
     isExample?: boolean;
     ownerId: string;
     deleted: boolean;

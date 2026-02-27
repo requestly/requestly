@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
 import { Checkbox, Collapse, Dropdown, MenuProps, Skeleton, Typography, notification } from "antd";
 import { RQAPI } from "features/apiClient/types";
+import { RQAPI as SharedRQAPI } from "@requestly/shared/types/entities/apiClient";
 import { RQButton } from "lib/design-system-v2/components";
 import { NewRecordNameInput } from "../newRecordNameInput/NewRecordNameInput";
 import { RequestRow } from "../requestRow/RequestRow";
@@ -18,7 +19,7 @@ import { MdOutlineDelete } from "@react-icons/all-files/md/MdOutlineDelete";
 import { MdOutlineIosShare } from "@react-icons/all-files/md/MdOutlineIosShare";
 import { Conditional } from "components/common/Conditional";
 import { CollectionViewTabSource } from "../../../../views/components/Collection/collectionViewTabSource";
-import { useDrag, useDrop } from "react-dnd";
+import { DropTargetMonitor, useDrag, useDrop } from "react-dnd";
 import { MdAdd } from "@react-icons/all-files/md/MdAdd";
 import RequestlyIcon from "assets/img/brand/rq_logo.svg";
 import PostmanIcon from "assets/img/brand/postman-icon.svg";
@@ -27,6 +28,9 @@ import "./CollectionRow.scss";
 import { ApiClientExportModal } from "../../../../modals/exportModal/ApiClientExportModal";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { PostmanExportModal } from "../../../../modals/postmanCollectionExportModal/PostmanCollectionExportModal";
+import { CommonApiClientExportModal } from "../../../../modals/CommonApiClientExportModal";
+import { ExporterFunction } from "features/apiClient/helpers/exporters/types";
+import { createOpenApiExporter } from "features/apiClient/helpers/exporters/openapi";
 import { MdOutlineVideoLibrary } from "@react-icons/all-files/md/MdOutlineVideoLibrary";
 import { CollectionRowOptionsCustomEvent, dispatchCustomEvent } from "./utils";
 import { ApiClientFeatureContext, EntityNotFound } from "features/apiClient/slices";
@@ -36,11 +40,10 @@ import { useActiveTab, useTabActions } from "componentsV2/Tabs/slice";
 import { getAncestorIds, getRecord } from "features/apiClient/slices/apiRecords/utils";
 import { Workspace } from "features/workspaces/types";
 import { EnvironmentVariables } from "backend/environment/types";
-
-export enum ExportType {
-  REQUESTLY = "requestly",
-  POSTMAN = "postman",
-}
+import { SiOpenapiinitiative } from "@react-icons/all-files/si/SiOpenapiinitiative";
+import { ExportType } from "features/apiClient/helpers/exporters/types";
+import { NativeError } from "errors/NativeError";
+import { ErrorSeverity } from "errors/types";
 
 interface Props {
   record: RQAPI.CollectionRecord;
@@ -85,18 +88,24 @@ export const CollectionRow: React.FC<Props> = ({
   const [activeKey, setActiveKey] = useState<string | undefined>(
     expandedRecordIds?.includes(record.id) ? record.id : undefined
   );
+  const hoverExpandTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
   const [createNewField, setCreateNewField] = useState<RQAPI.RecordType | null>(null);
   const [hoveredId, setHoveredId] = useState("");
   const [isCollectionRowLoading, setIsCollectionRowLoading] = useState(false);
 
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [isPostmanExportModalOpen, setIsPostmanExportModalOpen] = useState(false);
+  const [commonExporterConfig, setCommonExporterConfig] = useState<{
+    exporter: ExporterFunction;
+    exportType: ExportType;
+    title: string;
+  } | null>(null);
 
   const [collectionsToExport, setCollectionsToExport] = useState<RQAPI.CollectionRecord[]>([]);
 
   const { onNewClickV2 } = useApiClientContext();
 
-  const workspaceId = useWorkspaceId();
+  const workspaceId = useWorkspaceId() || null;
   const { openBufferedTab } = useTabActions();
   const activeTabSourceId = useActiveTab()?.source.getSourceId();
 
@@ -122,6 +131,13 @@ export const CollectionRow: React.FC<Props> = ({
           break;
         case ExportType.POSTMAN:
           setIsPostmanExportModalOpen(true);
+          break;
+        case ExportType.OPENAPI:
+          setCommonExporterConfig({
+            exporter: createOpenApiExporter(exportData as SharedRQAPI.CollectionRecord),
+            exportType: ExportType.OPENAPI,
+            title: "OpenAPI 3.0",
+          });
           break;
         default:
           console.warn(`Unknown export type: ${exportType}`);
@@ -174,6 +190,15 @@ export const CollectionRow: React.FC<Props> = ({
                 handleCollectionExport(record, ExportType.POSTMAN);
               },
             },
+            {
+              key: "1-3",
+              label: "OpenAPI 3.0",
+              icon: <SiOpenapiinitiative style={{ width: 16, height: 16, marginRight: 8 }} />,
+              onClick: (itemInfo) => {
+                itemInfo.domEvent?.stopPropagation?.();
+                handleCollectionExport(record, ExportType.OPENAPI);
+              },
+            },
           ],
         },
         {
@@ -218,6 +243,16 @@ export const CollectionRow: React.FC<Props> = ({
     [handleCollectionExport, openBufferedTab, workspaceId, handleRecordsToBeDeleted]
   );
 
+  const updateExpandedRecordIds = useCallback(
+    (newExpandedIds: RQAPI.ApiClientRecord["id"][]) => {
+      setExpandedRecordIds(newExpandedIds);
+      isEmpty(newExpandedIds)
+        ? sessionStorage.removeItem(SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY)
+        : sessionStorage.setItem(SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY, newExpandedIds);
+    },
+    [setExpandedRecordIds]
+  );
+
   const collapseChangeHandler = useCallback(
     (keys: RQAPI.ApiClientRecord["id"][]) => {
       let activeKeysCopy = [...expandedRecordIds];
@@ -226,12 +261,9 @@ export const CollectionRow: React.FC<Props> = ({
       } else if (!activeKeysCopy.includes(record.id)) {
         activeKeysCopy.push(record.id);
       }
-      setExpandedRecordIds(activeKeysCopy);
-      isEmpty(activeKeysCopy)
-        ? sessionStorage.removeItem(SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY)
-        : sessionStorage.setItem(SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY, activeKeysCopy);
+      updateExpandedRecordIds(activeKeysCopy);
     },
-    [record, expandedRecordIds, setExpandedRecordIds]
+    [record, expandedRecordIds, updateExpandedRecordIds]
   );
 
   useEffect(() => {
@@ -242,6 +274,14 @@ export const CollectionRow: React.FC<Props> = ({
     /* Temporary Change-> To remove previous key from session storage
        which was added due to the previous logic can be removed after some time */
     sessionStorage.removeItem("collapsed_collection_keys");
+
+    // clean up hover timeout on unmount
+    return () => {
+      if (hoverExpandTimeoutRef.current) {
+        clearTimeout(hoverExpandTimeoutRef.current);
+        hoverExpandTimeoutRef.current = null;
+      }
+    };
   }, []);
 
   const handleRecordDropToCollection = useCallback(
@@ -260,7 +300,7 @@ export const CollectionRow: React.FC<Props> = ({
         },
       });
     },
-    [record.id, expandedRecordIds, setExpandedRecordIds]
+    [record.id, expandedRecordIds, updateExpandedRecordIds]
   );
 
   const checkCanDropItem = useCallback(
@@ -298,7 +338,27 @@ export const CollectionRow: React.FC<Props> = ({
     }),
     [record, workspaceId]
   );
-
+  const handleHoverExpand = useCallback(
+    (item: DraggableApiRecord, monitor: DropTargetMonitor) => {
+      const isOverAny = monitor.isOver();
+      if (!isOverAny) {
+        if (hoverExpandTimeoutRef.current) {
+          clearTimeout(hoverExpandTimeoutRef.current);
+          hoverExpandTimeoutRef.current = null;
+        }
+        return;
+      }
+      const IsTargetCollectionCollapsed = !expandedRecordIds.includes(record.id);
+      if (IsTargetCollectionCollapsed && !hoverExpandTimeoutRef.current) {
+        hoverExpandTimeoutRef.current = setTimeout(() => {
+          const newExpandedRecordIds = [...expandedRecordIds, record.id];
+          updateExpandedRecordIds(newExpandedRecordIds);
+          hoverExpandTimeoutRef.current = null;
+        }, 600);
+      }
+    },
+    [expandedRecordIds, record.id, updateExpandedRecordIds]
+  );
   const [{ isOver }, drop] = useDrop(
     () => ({
       accept: [RQAPI.RecordType.API, RQAPI.RecordType.COLLECTION],
@@ -310,6 +370,7 @@ export const CollectionRow: React.FC<Props> = ({
         setIsCollectionRowLoading(true);
         handleRecordDropToCollection(item, workspaceId);
       },
+      hover: handleHoverExpand,
       canDrop: checkCanDropItem,
       collect: (monitor) => ({
         isOver: monitor.isOver({ shallow: true }),
@@ -340,6 +401,19 @@ export const CollectionRow: React.FC<Props> = ({
             setCollectionsToExport([]);
             setIsPostmanExportModalOpen(false);
           }}
+        />
+      )}
+
+      {commonExporterConfig && (
+        <CommonApiClientExportModal
+          isOpen={!!commonExporterConfig}
+          onClose={() => {
+            setCollectionsToExport([]);
+            setCommonExporterConfig(null);
+          }}
+          title={commonExporterConfig.title}
+          exporter={commonExporterConfig.exporter}
+          exporterType={commonExporterConfig.exportType}
         />
       )}
 
