@@ -7,6 +7,7 @@ import {
   ErroredRecord,
   FileType,
   FileSystemResult,
+  ExampleAPI,
 } from "features/apiClient/helpers/modules/sync/local/services/types";
 import BackgroundServiceAdapter, { rpc, rpcWithRetry } from "./DesktopBackgroundService";
 import { EnvironmentData, EnvironmentVariables } from "backend/environment/types";
@@ -173,6 +174,27 @@ export class FsManagerServiceAdapter extends BackgroundServiceAdapter {
   async moveCollection(id: string, newParentId: string) {
     return this.invokeProcedureInBG("moveCollection", id, newParentId) as Promise<
       FileSystemResult<RQAPI.ApiClientRecord>
+    >;
+  }
+
+  @FsErrorHandler
+  async createExampleRequest(parentRequestId: string, example: ExampleAPI["data"]) {
+    return this.invokeProcedureInBG("createExampleRequest", parentRequestId, example) as Promise<
+      FileSystemResult<ExampleAPI>
+    >;
+  }
+
+  @FsErrorHandler
+  async updateExampleRequest(parentRequestId: string, exampleId: string, example: ExampleAPI["data"]) {
+    return this.invokeProcedureInBG("updateExampleRequest", parentRequestId, exampleId, example) as Promise<
+      FileSystemResult<ExampleAPI>
+    >;
+  }
+
+  @FsErrorHandler
+  async deleteExampleRequest(parentRequestId: string, exampleId: string) {
+    return this.invokeProcedureInBG("deleteExampleRequest", parentRequestId, exampleId) as Promise<
+      FileSystemResult<void>
     >;
   }
 }

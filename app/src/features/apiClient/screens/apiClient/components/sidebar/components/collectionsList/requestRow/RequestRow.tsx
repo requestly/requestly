@@ -45,7 +45,6 @@ import FEATURES from "config/constants/sub/features";
 import { getRankForDroppedRecord } from "features/apiClient/helpers/RankingManager/utils";
 import { MdOutlineDashboardCustomize } from "@react-icons/all-files/md/MdOutlineDashboardCustomize";
 import { ExampleViewTabSource } from "../../../../views/components/ExampleRequestView/exampleViewTabSource";
-import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
 import { NativeError } from "errors/NativeError";
 import { ErrorSeverity } from "errors/types";
 
@@ -119,8 +118,6 @@ export const RequestRow: React.FC<Props> = ({
   const context = useApiClientFeatureContext();
   const { apiClientRecordsRepository } = useApiClientRepository();
   const activeTabSourceId = useActiveTab()?.source.getSourceId();
-
-  const isLocalSyncEnabled = useCheckLocalSyncSupport();
 
   const [{ isDragging }, drag] = useDrag(
     () => ({
@@ -384,7 +381,7 @@ export const RequestRow: React.FC<Props> = ({
           handleDropdownVisibleChange(false);
         },
       },
-      ...(!isLocalSyncEnabled
+      ...(isFeatureCompatible(FEATURES.API_CLIENT_EXAMPLE_REQUESTS)
         ? [
             {
               key: "3",
@@ -417,7 +414,7 @@ export const RequestRow: React.FC<Props> = ({
         },
       },
     ];
-  }, [record, handleRecordsToBeDeleted, handleDuplicateRequest, handleAddExample, isLocalSyncEnabled]);
+  }, [record, handleRecordsToBeDeleted, handleDuplicateRequest, handleAddExample]);
 
   const examples = record.data.examples || [];
 
