@@ -1,11 +1,7 @@
 import { RQAPI } from "features/apiClient/types";
 import { RBACButton, useRBAC } from "features/rbac";
-import {
-  getApiClientFeatureContext,
-  useIsAnyWorkspaceLoading,
-  useTotalRecords,
-  useWorkspaceLoadingError,
-} from "features/apiClient/slices";
+import { useIsAnyWorkspaceLoading, useTotalRecords, useWorkspaceLoadingError } from "features/apiClient/slices";
+import { apiClientContextRegistry } from "features/apiClient/slices/workspaceView/helpers/ApiClientContextRegistry/ApiClientContextRegistry";
 import {
   NewApiRecordDropdown,
   NewRecordDropdownItemType,
@@ -97,15 +93,15 @@ export const ApiClientEmptyView = () => {
     throw loadingError;
   }
 
-  if (isLoading) {
+  const ctx = apiClientContextRegistry.getLastUsedContext();
+
+  if (isLoading || !ctx) {
     return (
       <div className="api-client-empty-view-container">
         <Skeleton active className="api-client-header-skeleton" paragraph={{ rows: 3, width: "100%" }} />
       </div>
     );
   }
-
-  const ctx = getApiClientFeatureContext();
 
   return (
     <WorkspaceProvider workspaceId={ctx.workspaceId}>

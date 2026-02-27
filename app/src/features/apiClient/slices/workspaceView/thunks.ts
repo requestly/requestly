@@ -208,6 +208,7 @@ export const switchContext = createAsyncThunk(
   `${SLICE_NAME}/switchContext`,
   async (params: { workspace: WorkspaceInfo; userId?: string }, { dispatch }) => {
     const { workspace, userId } = params;
+
     apiClientContextRegistry.clearAll();
     dispatch(workspaceViewActions.resetToSingleView());
 
@@ -258,7 +259,7 @@ function isWorkspaceDeletedError(error: Error) {
 // TODO: check how it behaves with redux hydration
 export const setupWorkspaceView = createAsyncThunk(
   `${SLICE_NAME}/setupWorkspaceView`,
-  async (params: { userId?: string }, { dispatch, getState }) => {
+  async (params: { userId?: string }, { dispatch, getState, signal }) => {
     const { userId } = params;
     const rootState = getState() as RootState;
     const selectedWorkspaces = getAllSelectedWorkspaces(rootState.workspaceView);
@@ -271,6 +272,7 @@ export const setupWorkspaceView = createAsyncThunk(
       const activeLocalWorkspace = localWorkspaces.find((ws) => ws.id === activeWorkspaceId);
 
       if (viewMode === ApiClientViewMode.SINGLE && activeLocalWorkspace) {
+        if (signal.aborted) return;
         // Single mode with a local workspace that matches active - keep it active
         return dispatch(
           switchContext({
@@ -280,10 +282,12 @@ export const setupWorkspaceView = createAsyncThunk(
       }
 
       if (viewMode === ApiClientViewMode.MULTI && localWorkspaces.length > 0) {
+        if (signal.aborted) return;
         // Multi-view mode with local workspaces - maintain that state
         return dispatch(workspaceViewManager({ workspaces: localWorkspaces, action: "add" })).unwrap();
       }
 
+      if (signal.aborted) return;
       // No local workspaces, fallback to logged out workspace
       return dispatch(
         switchContext({
@@ -308,6 +312,7 @@ export const setupWorkspaceView = createAsyncThunk(
         const activeWorkspace = getWorkspaceById(activeWorkspaceId)(rootState);
 
         if (!activeWorkspaceId || !activeWorkspace || !activeWorkspace.workspaceType) {
+          if (signal.aborted) return;
           const result = await dispatch(
             switchContext({
               workspace: {
@@ -322,6 +327,7 @@ export const setupWorkspaceView = createAsyncThunk(
           return result;
         }
 
+        if (signal.aborted) return;
         return dispatch(
           switchContext({
             workspace: {
@@ -337,6 +343,7 @@ export const setupWorkspaceView = createAsyncThunk(
       }
 
       try {
+        if (signal.aborted) return;
         return dispatch(
           switchContext({
             workspace: selectedWorkspace,
@@ -345,6 +352,7 @@ export const setupWorkspaceView = createAsyncThunk(
         ).unwrap();
       } catch (error) {
         if (isWorkspaceDeletedError(error)) {
+          if (signal.aborted) return;
           // workspace deleted, fallback to private
           const result = dispatch(
             switchContext({
@@ -369,6 +377,7 @@ export const setupWorkspaceView = createAsyncThunk(
       throw new Error("No workspaces are currently selected in multi-view mode");
     }
 
+    if (signal.aborted) return;
     return dispatch(workspaceViewManager({ workspaces: selectedWorkspaces, userId, action: "add" })).unwrap();
   }
 );

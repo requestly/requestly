@@ -1,5 +1,5 @@
 import { TabsContainer } from "componentsV2/Tabs/components/TabsContainer";
-import React, { useEffect, useLayoutEffect, useState } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { useDispatch, useSelector } from "react-redux";
@@ -35,12 +35,25 @@ const ApiClientFeatureContainer: React.FC = () => {
     return screenWidth < 1440 ? 700 : 800;
   };
 
+  const setupPromiseRef = useRef<ReturnType<typeof dispatch> & { abort?: () => void }>(undefined);
+
   useEffect(() => {
-    dispatch(
+    // Abort any in-flight setup before starting a new one.
+    // createAsyncThunk returns a promise with .abort() that sets signal.aborted = true
+    // and rejects the thunk, preventing stale clearAll()/addContext() from racing.
+    setupPromiseRef.current?.abort?.();
+
+    const promise = dispatch(
       setupWorkspaceView({
         userId: user.details?.profile?.uid,
       }) as any
     );
+
+    setupPromiseRef.current = promise;
+
+    return () => {
+      promise.abort?.();
+    };
   }, [dispatch, user.details?.profile?.uid]);
 
   if (!isSetupDone) {
