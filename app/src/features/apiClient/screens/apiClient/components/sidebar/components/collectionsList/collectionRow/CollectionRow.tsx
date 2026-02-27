@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
-import { Checkbox, Collapse, Dropdown, MenuProps, Skeleton, Typography, notification } from "antd";
+import { Checkbox, Collapse, Dropdown, MenuProps, Skeleton, Typography } from "antd";
 import { RQAPI } from "features/apiClient/types";
 import { RQAPI as SharedRQAPI } from "@requestly/shared/types/entities/apiClient";
 import { RQButton } from "lib/design-system-v2/components";
@@ -42,8 +42,6 @@ import { Workspace } from "features/workspaces/types";
 import { EnvironmentVariables } from "backend/environment/types";
 import { SiOpenapiinitiative } from "@react-icons/all-files/si/SiOpenapiinitiative";
 import { ExportType } from "features/apiClient/helpers/exporters/types";
-import { NativeError } from "errors/NativeError";
-import { ErrorSeverity } from "errors/types";
 
 interface Props {
   record: RQAPI.CollectionRecord;
@@ -291,8 +289,7 @@ export const CollectionRow: React.FC<Props> = ({
         onSuccess: () => {
           if (!expandedRecordIds.includes(record.id)) {
             const newExpandedRecordIds = [...expandedRecordIds, record.id];
-            setExpandedRecordIds(newExpandedRecordIds);
-            sessionStorage.setItem(SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY, newExpandedRecordIds);
+            updateExpandedRecordIds(newExpandedRecordIds);
           }
         },
         onFinally: () => {
