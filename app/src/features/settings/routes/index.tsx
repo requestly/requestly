@@ -15,6 +15,9 @@ import Profile from "../components/Profile/ManageAccount";
 import { BillingTeamDetails } from "../components/BillingTeam/components/BillingDetails";
 import { BillingList } from "../components/BillingTeam/components/BillingList";
 import { UserPlanDetails } from "../components/BillingTeam/components/UserPlanDetails";
+import { isDesktopMode } from "utils/AppUtils";
+import Secrets from "features/settings/Secrets";
+import SecretsLayout from "../Secrets/SecretsLayout";
 
 const isSessionsNewSettingsPageCompatible = isFeatureCompatible(FEATURES.SESSION_ONBOARDING);
 
@@ -31,6 +34,25 @@ export const settingRoutes: RouteObject[] = [
         path: PATHS.SETTINGS.DESKTOP_SETTINGS.RELATIVE,
         element: <DesktopSettings />,
       },
+      // Desktop-only Secrets route
+      ...(isDesktopMode()
+        ? [
+            {
+              path: PATHS.SETTINGS.SECRETS.RELATIVE,
+              element: <SecretsLayout />,
+              children: [
+                {
+                  index: true,
+                  element: <Secrets />,
+                },
+                {
+                  path: "manage-providers",
+                  element: <></>,
+                },
+              ],
+            },
+          ]
+        : []),
       {
         path: PATHS.SETTINGS.SESSION_BOOK.RELATIVE,
         element: (
