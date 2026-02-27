@@ -50,6 +50,12 @@
       .top-level-drop-zone {
         min-height: 20px;
         transition: all 0.2s ease;
+
+        &.active {
+          min-height: 10px;
+          opacity: 0.2;
+          border-radius: 4px;
+        }
       }
     }
 
