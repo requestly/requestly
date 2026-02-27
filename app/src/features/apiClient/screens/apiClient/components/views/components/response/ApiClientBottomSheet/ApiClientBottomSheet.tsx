@@ -24,6 +24,7 @@ import { hasTests } from "features/apiClient/helpers/testGeneration/buildPostRes
 interface Props {
   entity: BufferedHttpRecordEntity | BufferedGraphQLRecordEntity;
   onGenerateTests?: () => void;
+  isDraftMode: boolean;
   isGeneratingTests?: boolean;
   isLoading: boolean;
   isLongRequest?: boolean;
@@ -45,6 +46,7 @@ const BOTTOM_SHEET_TAB_KEYS = {
 
 export const ApiClientBottomSheet: React.FC<Props> = ({
   entity,
+  isDraftMode,
   onGenerateTests,
   isGeneratingTests = false,
   isLoading,
@@ -220,7 +222,9 @@ export const ApiClientBottomSheet: React.FC<Props> = ({
       <div className="api-client-sheet-panel">
         <BottomSheet
           items={bottomSheetTabItems}
-          tabBarExtraContent={!isLoading && <StatusLine response={response} entity={entity} />}
+          tabBarExtraContent={
+            !isLoading && <StatusLine isDraftMode={isDraftMode} response={response} entity={entity} />
+          }
         />
       </div>
     </div>
