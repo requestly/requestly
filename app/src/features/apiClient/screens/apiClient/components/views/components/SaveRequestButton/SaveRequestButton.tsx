@@ -19,6 +19,8 @@ import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
 import { useSaveAsExample } from "features/apiClient/hooks/useSaveAsExample";
 import "./saveRequestButton.scss";
 import { RQAPI } from "features/apiClient/types";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import FEATURES from "config/constants/sub/features";
 
 interface Props {
   hidden?: boolean;
@@ -107,18 +109,28 @@ export const SaveRequestButton: React.FC<Props> = ({
 
   if (hidden) return null;
 
-  if (isDraft) {
+  if (isDraft || !isFeatureCompatible(FEATURES.API_CLIENT_EXAMPLE_REQUESTS)) {
     return (
-      <RQButton
-        onClick={onClick}
-        disabled={disabled || !isValidPermission}
-        hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SAVE_REQUEST!.hotKey}
-        loading={loading}
-        className="api-client-save-request-button"
-        enableHotKey={enableHotkey}
+      <Tooltip
+        title={
+          !isValidPermission
+            ? "Saving is not allowed in view-only mode. You can update and view changes but cannot save them."
+            : undefined
+        }
+        placement="topLeft"
+        color="#000"
       >
-        Save
-      </RQButton>
+        <RQButton
+          onClick={onClick}
+          disabled={disabled || !isValidPermission}
+          hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SAVE_REQUEST!.hotKey}
+          loading={loading}
+          className="api-client-save-request-button"
+          enableHotKey={enableHotkey}
+        >
+          Save
+        </RQButton>
+      </Tooltip>
     );
   }
 
