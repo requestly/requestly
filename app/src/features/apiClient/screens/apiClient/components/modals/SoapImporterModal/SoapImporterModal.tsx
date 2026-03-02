@@ -36,7 +36,7 @@ export const SoapImporterModal: React.FC<SoapImporterModalProps> = ({ isOpen, on
         renderLoadingView={() => (
           <div className="soap-parsing-loading-view">
             <Spin indicator={<LoadingOutlined style={{ fontSize: 48 }} spin />} />
-            <div className="loading-text">Parsing WSDL</div>
+            <div className="loading-text">Fetching WSDL</div>
             <div className="loading-subtext">
               This may take a moment for larger files. Please keep this window open.
             </div>
