@@ -17,7 +17,7 @@ interface VariableItemProps {
   item: AutocompleteItem;
   index: number;
   isSelected: boolean;
-  onSelect: (name: string, isDynamic: boolean, isNamespace: boolean) => void;
+  onSelect: (name: string) => void;
   onHover: (index: number) => void;
 }
 
@@ -29,9 +29,9 @@ const VariableItem = memo<VariableItemProps>(({ item, index, isSelected, onSelec
     (e: React.MouseEvent) => {
       e.preventDefault();
       e.stopPropagation();
-      onSelect(item.name, isDynamic, item.isNamespace);
+      onSelect(item.name);
     },
-    [item.name, isDynamic, item.isNamespace, onSelect]
+    [item.name, onSelect]
   );
 
   const handleHover = useCallback(() => {
@@ -87,7 +87,7 @@ interface VariableAutocompleteProps {
   position: { x: number; y: number };
   search: string;
   variables: ScopedVariables | undefined;
-  onSelect: (variableKey: string, isDynamic: boolean, isNamespace: boolean) => void;
+  onSelect: (variableKey: string) => void;
   onClose?: () => void;
 }
 
@@ -143,7 +143,7 @@ export const VariableAutocompletePopover: React.FC<VariableAutocompleteProps> = 
             e.stopPropagation();
             const item = items[indexRef.current];
             if (item) {
-              onSelectRef.current(item.name, checkIsDynamicVariable(item.variable), item.isNamespace);
+              onSelectRef.current(item.name);
             }
             break;
           }
@@ -189,7 +189,7 @@ export const VariableAutocompletePopover: React.FC<VariableAutocompleteProps> = 
                     item={item}
                     index={index}
                     isSelected={index === selectedIndex}
-                    onSelect={(name, isDyn, isNs) => onSelectRef.current(name, isDyn, isNs)}
+                    onSelect={(name) => onSelectRef.current(name)}
                     onHover={setSelectedIndex}
                   />
                 )}
