@@ -1,0 +1,85 @@
+.manage-providers-row {
+  display: flex;
+  width: 100%;
+  border: 1px solid var(--requestly-color-white-t-20, rgba(255, 255, 255, 0.12));
+  background: var(--requestly-color-background, #1a1a1a);
+  padding: var(--space-4, 8px) var(--space-5, 12px);
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 4px 4px 0 0;
+  &:hover {
+    background: var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.1));
+  }
+
+  .manage-providers-col1 {
+    .provider-details-block {
+      display: flex;
+      flex-direction: column;
+      gap: 4px !important;
+
+      .provider-name-block {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        align-self: stretch;
+        .provider-name {
+          color: var(--requestly-color-text-default, #fff);
+          font-family: var(--font-family-default, Inter);
+          font-size: var(--font-size-sm, 12px);
+          font-style: normal;
+          font-weight: 500;
+          line-height: 18px; /* 150% */
+        }
+
+        .provider-status {
+          color: var(--requestly-color-text-subtle, #bbb);
+          text-align: center;
+          font-family: var(--font-family-default, Inter);
+          font-size: var(--font-size-xs, 11px);
+          font-style: normal;
+          font-weight: 400;
+          line-height: 17px;
+        }
+      }
+
+      .provider-type {
+        color: var(--requestly-color-text-subtle, #bbb);
+        font-family: var(--font-family-default, Inter);
+        font-size: var(--font-size-xs, 11px);
+        font-style: normal;
+        font-weight: 400;
+        line-height: 17px;
+        margin-bottom: 0px;
+      }
+    }
+  }
+
+  .manage-providers-col2 {
+    display: flex;
+    align-items: center;
+    .provider-secrets-count {
+      color: var(--requestly-color-text-subtle, #bbb);
+      font-family: var(--font-family-default, Inter);
+      font-size: var(--font-size-xs, 11px);
+      font-style: normal;
+      font-weight: 400;
+      line-height: 17px; /* 154.545% */
+    }
+  }
+  .manage-providers-col3 {
+    display: flex;
+    justify-content: flex-end;
+
+    .provider-actions {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 16px;
+
+      .edit-provider-button,
+      .delete-provider-button {
+        color: var(--requestly-color-text-subtle, #bbb);
+      }
+    }
+  }
+}

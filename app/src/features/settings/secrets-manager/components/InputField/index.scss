@@ -28,12 +28,18 @@
     width: 100%;
     background: none !important;
   }
-  .ant-input-password {
-    padding-left: 10px !important;
+  .ant-input-password > .ant-input {
+    padding: 0px !important;
+    background: none !important;
   }
 
-  .ant-input {
-    padding-left: 0px !important;
+  .ant-input.form-input {
+    padding-left: 10px !important;
+    background: none !important;
+  }
+
+  .form-input > .ant-input {
+    padding: 0px !important;
     background: none !important;
   }
 

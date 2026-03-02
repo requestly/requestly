@@ -6,7 +6,7 @@ interface InputProps {
   id?: string;
   value: string;
   label: ReactNode | string;
-  placeholder: string;
+  placeholder?: string;
   type?: string;
   onValueChange: (value: string) => void;
   onPressEnter?: () => void;
