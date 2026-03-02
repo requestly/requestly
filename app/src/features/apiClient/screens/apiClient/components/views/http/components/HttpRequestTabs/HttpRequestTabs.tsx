@@ -78,7 +78,7 @@ const HttpRequestTabs: React.FC<Props> = ({
       {
         key: RequestTab.BODY,
         label: <RequestTabLabel label="Body" count={bodyLength ? 1 : 0} showDot={canHaveRequestBody} />,
-        children: !canHaveRequestBody ? <RequestBodyRedirectScreen /> : <RequestBody entity={entity} />,
+        children: !canHaveRequestBody ? <RequestBodyRedirectScreen method={method} /> : <RequestBody entity={entity} />,
       },
       {
         key: RequestTab.HEADERS,

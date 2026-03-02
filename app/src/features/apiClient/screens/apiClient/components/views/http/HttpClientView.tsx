@@ -614,6 +614,7 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
               />
             </Space.Compact>
             <Tooltip
+              color="var(--requestly-color-black)"
               title={
                 isSendDisabledDueToDesktopOnly ? (
                   <div className="send-disabled-tooltip">
