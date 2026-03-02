@@ -133,7 +133,7 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
         key: "6",
         label: (
           <div className="new-btn-option">
-            <LuCodeXml /> SOAP
+            <LuCodeXml /> WSDL
           </div>
         ),
         onClick: () => {
