@@ -1,9 +1,10 @@
 import React, { useMemo, useState } from "react";
-import { Select, Row } from "antd";
+import { Select, Row, Tooltip } from "antd";
 import { RQButton } from "lib/design-system-v2/components";
 import { cloneDeep } from "lodash";
 import { RQAPI } from "@requestly/shared/types/entities/apiClient";
 import { SuccessfulParseViewProps } from "../../CommonApiClientImporter/components/SuccessfulParseView";
+import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
 import "./soapSuccessfulParseView.scss";
 
 export enum SoapVersion {
@@ -93,14 +94,12 @@ export const SoapSuccessfulParseView: React.FC<SuccessfulParseViewProps> = ({
   return (
     <div className="soap-success-view">
       <div className="soap-collection-name">
-        {`WSDL Processed - ${processedCollections.length} collection(s) : ${processedCollections
-          .map((c) => c.name)
-          .join(", ")}`}
+        {`WSDL Fetched: ${processedCollections.map((c) => c.name).join(", ")}`}
       </div>
       <div className="soap-options-container">
         {hasMultipleVersions && (
           <div className="soap-option-item">
-            <div className="select-heading">SOAP Version</div>
+            <div className="select-heading">SOAP version</div>
             <Select
               value={selectedVersion}
               onChange={setSelectedVersion}
@@ -113,7 +112,16 @@ export const SoapSuccessfulParseView: React.FC<SuccessfulParseViewProps> = ({
         )}
 
         <div className="soap-option-item">
-          <div className="select-heading">Collection Organisation</div>
+          <div className="select-heading">
+            Collection organisation
+            <Tooltip
+              title="Group requests into folders based on WSDL versions, or import as a flat list."
+              placement="right"
+              color="#000"
+            >
+              <MdInfoOutline className="info-tooltip-icon" />
+            </Tooltip>
+          </div>
           <Select
             value={organisation}
             onChange={setOrganisation}
