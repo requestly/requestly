@@ -1,0 +1,90 @@
+.add-edit-provider-modal {
+  display: flex;
+  width: 480px;
+  min-width: 320px;
+  flex-direction: column;
+  flex-shrink: 0;
+  border-radius: 8px;
+  background: var(--requestly-color-surface-0, #212121);
+  box-shadow: 0 16px 24px -4px rgba(0, 0, 0, 0.32);
+  height: fit-content;
+  padding-bottom: 0px !important;
+
+  .ant-modal-header {
+    border: none;
+    padding: 8px 8px 0 16px;
+  }
+  .ant-modal-body {
+    display: flex;
+    align-items: flex-start;
+    gap: 64px;
+    align-self: stretch;
+    padding: 0px 16px 16px;
+  }
+
+  .ant-modal-footer {
+    border: none;
+    padding: 0px;
+  }
+
+  .ant-modal-close {
+    margin-top: -10px !important;
+    svg {
+      width: 12px !important;
+      height: 12px !important;
+      color: var(--requestly-color-text-default);
+    }
+  }
+
+  .add-edit-provider-modal-header {
+    color: var(--requestly-color-text-default, #fff);
+    font-family: var(--font-family-default, Inter);
+    font-size: var(--font-size-md, 14px);
+    font-style: normal;
+    font-weight: 500;
+    line-height: 20px;
+  }
+
+  .add-edit-provider-modal-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-6, 16px);
+    align-self: stretch;
+    width: 100%;
+  }
+
+  .add-edit-provider-modal-footer {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 var(--space-6, 16px) var(--space-6, 16px) var(--space-6, 16px);
+    align-items: center;
+
+    .test-connection-button {
+      justify-self: flex-start;
+    }
+
+    .footer-right-section {
+      display: flex;
+    }
+  }
+}
+
+.error-tooltip {
+  background-color: black !important;
+
+  .ant-tooltip-inner,
+  .ant-tooltip-arrow-content {
+    padding: 0px;
+    background-color: black !important;
+    color: var(--requestly-color-white) !important;
+    font-family: var(--font-family-default, Inter);
+    font-size: 13px;
+    font-weight: 400;
+    display: flex;
+    align-items: center;
+    max-width: 280px;
+    max-height: 480px;
+    border-radius: 4px;
+  }
+}

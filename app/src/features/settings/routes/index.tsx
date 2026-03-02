@@ -16,8 +16,8 @@ import { BillingTeamDetails } from "../components/BillingTeam/components/Billing
 import { BillingList } from "../components/BillingTeam/components/BillingList";
 import { UserPlanDetails } from "../components/BillingTeam/components/UserPlanDetails";
 import { isDesktopMode } from "utils/AppUtils";
-import Secrets from "features/settings/Secrets";
-import SecretsLayout from "../Secrets/SecretsLayout";
+import Secrets from "features/settings/secrets-manager";
+import SecretsLayout from "../secrets-manager/SecretsLayout";
 
 const isSessionsNewSettingsPageCompatible = isFeatureCompatible(FEATURES.SESSION_ONBOARDING);
 
