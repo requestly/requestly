@@ -138,8 +138,8 @@ export const useVariableAutocomplete = (options?: { editorViewRef?: RefObject<Ed
       if (!view) return;
 
       const { from, to } = autocompleteStateRef.current;
-      const closingChars = getClosingBraces(view, to);
 
+      const closingChars = getClosingBraces(view, to);
       view.dispatch({
         changes: {
           from,
