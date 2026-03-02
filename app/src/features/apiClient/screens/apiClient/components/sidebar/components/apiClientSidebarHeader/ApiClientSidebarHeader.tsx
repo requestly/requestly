@@ -18,7 +18,7 @@ import { NewApiRecordDropdown } from "../NewApiRecordDropdown/NewApiRecordDropdo
 import { ApiClientSidebarTabKey } from "../../SingleWorkspaceSidebar/SingleWorkspaceSidebar";
 import { SiOpenapiinitiative } from "@react-icons/all-files/si/SiOpenapiinitiative";
 import { CommonApiClientImportModal } from "../../../modals/CommonApiClientImportModal/CommonApiClientImportModal";
-import { ApiClientImporterMethod, openApiImporter } from "@requestly/alternative-importers";
+import { ApiClientImporterMethod, openApiImporter } from "alternative-importers-beta";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { ApiClientViewMode, useViewMode } from "features/apiClient/slices";
 import { EnvironmentSwitcher } from "./components/environmentSwitcher/EnvironmentSwitcher";
