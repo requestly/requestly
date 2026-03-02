@@ -1,26 +1,24 @@
 import React, { memo, useCallback } from "react";
 import { List } from "antd";
-import { AutocompleteItem, checkIsDynamicVariable } from "features/apiClient/helpers/variableResolver/variableHelper";
+import { AutocompleteItem } from "features/apiClient/helpers/variableResolver/variableHelper";
 import { VariableRowContent } from "./VariableRowContent";
 
 interface LeafMainItemProps {
   item: AutocompleteItem;
   index: number;
   isSelected: boolean;
-  onSelect: (name: string, isDynamic: boolean, isNamespace: boolean) => void;
+  onSelect: (name: string) => void;
   onHover: (index: number) => void;
 }
 
 export const LeafMainItem = memo<LeafMainItemProps>(({ item, index, isSelected, onSelect, onHover }) => {
-  const isDynamic = checkIsDynamicVariable(item.variable);
-
   const handleMouseDown = useCallback(
     (e: React.MouseEvent) => {
       e.preventDefault();
       e.stopPropagation();
-      onSelect(item.name, isDynamic, false);
+      onSelect(item.name);
     },
-    [item.name, isDynamic, onSelect]
+    [item.name, onSelect]
   );
 
   const handleHover = useCallback(() => {

@@ -3,7 +3,6 @@ import { List, Popover } from "antd";
 import {
   AutocompleteItem,
   Variables,
-  checkIsDynamicVariable,
   getHierarchicalAutocompleteItems,
 } from "features/apiClient/helpers/variableResolver/variableHelper";
 import { VariableRowContent } from "./VariableRowContent";
@@ -12,7 +11,7 @@ interface NamespaceSubmenuItemProps {
   item: AutocompleteItem;
   index: number;
   allVariables: Variables;
-  onSelectLeaf: (name: string, isDynamic: boolean, isNamespace: boolean) => void;
+  onSelectLeaf: (name: string) => void;
   selectedIndex?: number;
   onItemHover?: (index: number) => void;
   isExpanded?: boolean;
@@ -76,7 +75,7 @@ NamespaceSubmenuItem.displayName = "NamespaceSubmenuItem";
 interface SubmenuContentProps {
   namespacePath: string;
   allVariables: Variables;
-  onSelectLeaf: (name: string, isDynamic: boolean, isNamespace: boolean) => void;
+  onSelectLeaf: (name: string) => void;
   selectedIndex?: number;
   onItemHover?: (index: number) => void;
   expandedChildName?: string;
@@ -142,7 +141,6 @@ export const SubmenuContent = memo<SubmenuContentProps>(function SubmenuContent(
             );
           }
 
-          const isDynamic = checkIsDynamicVariable(item.variable);
           return (
             <List.Item
               key={item.name}
@@ -151,7 +149,7 @@ export const SubmenuContent = memo<SubmenuContentProps>(function SubmenuContent(
               onMouseDown={(e: React.MouseEvent) => {
                 e.preventDefault();
                 e.stopPropagation();
-                onSelectLeaf(item.name, isDynamic, false);
+                onSelectLeaf(item.name);
               }}
               onMouseEnter={() => onItemHover?.(index)}
               style={{ cursor: "pointer" }}

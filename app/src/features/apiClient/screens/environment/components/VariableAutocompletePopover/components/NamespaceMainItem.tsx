@@ -8,7 +8,7 @@ interface NamespaceMainItemProps {
   item: AutocompleteItem;
   index: number;
   isSelected: boolean;
-  onSelect: (name: string, isDynamic: boolean, isNamespace: boolean) => void;
+  onSelect: (name: string) => void;
   onHover: (index: number) => void;
   allVariables: Variables;
   isKeyboardExpanded: boolean;

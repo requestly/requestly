@@ -2,7 +2,6 @@ import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import {
   AutocompleteItem,
   Variables,
-  checkIsDynamicVariable,
   getHierarchicalAutocompleteItems,
 } from "features/apiClient/helpers/variableResolver/variableHelper";
 
@@ -10,7 +9,7 @@ interface UseCascadingNavigationOptions {
   show: boolean;
   filteredVariables: AutocompleteItem[];
   allVariables: Variables;
-  onSelect: (variableKey: string, isDynamic: boolean, isNamespace: boolean) => void;
+  onSelect: (variableKey: string) => void;
   onClose?: () => void;
 }
 
@@ -178,7 +177,7 @@ export function useCascadingNavigation({
             if (item.isNamespace && level.expand) {
               level.expand(item.name);
             } else if (!item.isNamespace) {
-              onSelectRef.current(item.name, checkIsDynamicVariable(item.variable), false);
+              onSelectRef.current(item.name);
             }
           }
           break;
