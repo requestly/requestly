@@ -16,8 +16,8 @@ import { BillingTeamDetails } from "../components/BillingTeam/components/Billing
 import { BillingList } from "../components/BillingTeam/components/BillingList";
 import { UserPlanDetails } from "../components/BillingTeam/components/UserPlanDetails";
 import { isDesktopMode } from "utils/AppUtils";
-import Secrets from "features/settings/Secrets";
-import SecretsLayout from "../Secrets/SecretsLayout";
+import Secrets from "features/settings/secrets-manager";
+import SecretsLayout from "../secrets-manager/SecretsLayout";
 
 const isSessionsNewSettingsPageCompatible = isFeatureCompatible(FEATURES.SESSION_ONBOARDING);
 
@@ -46,7 +46,7 @@ export const settingRoutes: RouteObject[] = [
                   element: <Secrets />,
                 },
                 {
-                  path: "manage-providers",
+                  path: PATHS.SETTINGS.SECRETS.MANAGE_PROVIDERS, // This is a nested route for managing providers
                   element: <></>,
                 },
               ],
