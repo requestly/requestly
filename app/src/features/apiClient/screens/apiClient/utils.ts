@@ -615,16 +615,18 @@ export const extractQueryParams = (inputString: string) => {
   return queryParams;
 };
 
-export const queryParamsToURLString = (queryParams: KeyValuePair[], inputString: string) => {
+export const queryParamsToURLString = (queryParams: KeyValuePair[], inputString: string, shouldEncode = false) => {
   const baseUrl = split(inputString, "?")[0];
   const enabledParams = queryParams.filter((param) => param.isEnabled ?? true);
 
   const queryString = enabledParams
     .map(({ key, value }) => {
-      if (value === undefined || value === "") {
-        return key;
+      const encodedKey = shouldEncode ? encodeURIComponent(key) : key;
+      if (value === undefined || value === "" || value === null) {
+        return encodedKey;
       } else {
-        return `${key}=${value}`;
+        const encodedValue = shouldEncode ? encodeURIComponent(value) : value;
+        return `${encodedKey}=${encodedValue}`;
       }
     })
     .filter(Boolean)
