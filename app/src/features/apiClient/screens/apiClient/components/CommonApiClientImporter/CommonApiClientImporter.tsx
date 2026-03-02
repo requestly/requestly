@@ -364,8 +364,12 @@ export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = (
               toast.success(
                 `Successfully imported ${collectionsToImport.length} ${
                   collectionsToImport.length !== 1 ? "collections" : "collection"
-                } and ${environmentsToImport.length} ${
-                  environmentsToImport.length !== 1 ? "environments" : "environment"
+                } ${
+                  environmentsToImport.length > 0
+                    ? `and ${environmentsToImport.length} ${
+                        environmentsToImport.length !== 1 ? "environments" : "environment"
+                      }`
+                    : ""
                 }`
               );
               trackImportSuccess(importerType, totalImported, null);
