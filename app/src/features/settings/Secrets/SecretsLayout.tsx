@@ -5,15 +5,14 @@ import FilterIcon from "assets/icons/filter-manage.svg?react";
 import ShieldLockIcon from "assets/icons/shield-lock.svg?react";
 import { Outlet, useNavigate } from "react-router-dom"; // Added React Router imports
 import "./secrets.scss";
+import PATHS from "config/constants/sub/paths";
 
 // Made children optional since React Router will mostly use <Outlet />
 const SecretsLayout = ({ children }: { children?: React.ReactNode }) => {
   const navigate = useNavigate();
 
   const handleManageProvidersClick = () => {
-    // Navigates to the nested "manage-providers" route.
-    // If you added this to your PATHS constant, you can use that instead.
-    navigate("manage-providers");
+    navigate(PATHS.SETTINGS.SECRETS.MANAGE_PROVIDERS);
   };
 
   return (
