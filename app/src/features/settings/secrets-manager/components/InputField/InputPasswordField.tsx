@@ -7,7 +7,7 @@ interface InputProps {
   id?: string;
   value: string;
   label: ReactNode | string;
-  placeholder: string;
+  placeholder?: string;
   onValueChange: (value: string) => void;
   onPressEnter?: () => void;
   status?: "error" | "warning";

@@ -1,7 +1,11 @@
 import NoProvidersIcon from "assets/icons/no-providers.svg?react";
 import { RQButton } from "lib/design-system-v2/components";
+import { useSecretsModals } from "../context/SecretsModalsContext";
 import "./index.scss";
+
 const NoProvidersEmptyState = () => {
+  const { openAddProviderModal } = useSecretsModals();
+
   return (
     <section className="no-provider-empty-state-container">
       <NoProvidersIcon />
@@ -12,7 +16,7 @@ const NoProvidersEmptyState = () => {
           Requestly Cloud.
         </p>
       </div>
-      <RQButton type="primary" onClick={() => alert("Add provider functionality coming soon!")}>
+      <RQButton type="primary" onClick={openAddProviderModal}>
         Add provider
       </RQButton>
     </section>
