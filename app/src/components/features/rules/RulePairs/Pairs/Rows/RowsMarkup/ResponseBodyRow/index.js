@@ -23,11 +23,13 @@ import { RuleType } from "@requestly/shared/types/entities/rules";
 import { MdOutlineEdit } from "@react-icons/all-files/md/MdOutlineEdit";
 import "./ResponseBodyRow.css";
 import Editor from "componentsV2/CodeEditor";
+import { useEditorHeight } from "hooks/useEditorHeight";
 
 const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabled }) => {
   const theme = useTheme();
   const dispatch = useDispatch();
   const [isSelectedFileInputVisible, setIsSelectedFileInputVisible] = useState(false);
+  const { editorHeight, editorContainerRef, setEditorHeight } = useEditorHeight(300, 150);
 
   /*
   useRef is not the idle way to handle this, useState should be used to control the behaviour of updating the value in
@@ -323,7 +325,7 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
               justifyContent: "center",
             }}
           >
-            <Col xl="12" span={24}>
+            <Col xl="12" span={24} ref={editorContainerRef}>
               <Editor
                 // key={pair.response.type}
                 language={
@@ -335,6 +337,8 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
                 isReadOnly={isInputDisabled}
                 prettifyOnInit={true}
                 handleChange={responseBodyChangeHandler}
+                height={editorHeight}
+                onHeightChange={setEditorHeight}
                 isResizable
                 analyticEventProperties={{ source: "rule_editor", rule_type: RuleType.RESPONSE }}
                 toolbarOptions={{
