@@ -128,6 +128,10 @@ export const useVariableAutocomplete = (options?: { editorViewRef?: RefObject<Ed
     [options?.editorViewRef]
   );
 
+  /**
+   * Inserts a selected variable into the document.
+   * Uses a ref for state to avoid recreating the callback on every state change.
+   */
   const handleSelectVariable = useCallback(
     (variableKey: string) => {
       const view = editorViewRef.current;
