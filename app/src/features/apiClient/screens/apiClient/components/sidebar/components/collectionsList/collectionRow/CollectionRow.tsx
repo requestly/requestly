@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
-import { Checkbox, Collapse, Dropdown, MenuProps, Skeleton, Typography, notification } from "antd";
+import { Checkbox, Collapse, Dropdown, MenuProps, Skeleton, Typography } from "antd";
 import { RQAPI } from "features/apiClient/types";
 import { RQAPI as SharedRQAPI } from "@requestly/shared/types/entities/apiClient";
 import { RQButton } from "lib/design-system-v2/components";
@@ -33,12 +33,8 @@ import { ExporterFunction } from "features/apiClient/helpers/exporters/types";
 import { createOpenApiExporter } from "features/apiClient/helpers/exporters/openapi";
 import { MdOutlineVideoLibrary } from "@react-icons/all-files/md/MdOutlineVideoLibrary";
 import { CollectionRowOptionsCustomEvent, dispatchCustomEvent } from "./utils";
-import {
-  ApiClientFeatureContext,
-  EntityNotFound,
-  getApiClientFeatureContext,
-  moveRecords,
-} from "features/apiClient/slices";
+import { ApiClientFeatureContext, EntityNotFound } from "features/apiClient/slices";
+import { handleRecordDrop } from "../utils/handleRecordDrop";
 import { useWorkspaceId } from "features/apiClient/common/WorkspaceProvider";
 import { useActiveTab, useTabActions } from "componentsV2/Tabs/slice";
 import { getAncestorIds, getRecord } from "features/apiClient/slices/apiRecords/utils";
@@ -46,8 +42,6 @@ import { Workspace } from "features/workspaces/types";
 import { EnvironmentVariables } from "backend/environment/types";
 import { SiOpenapiinitiative } from "@react-icons/all-files/si/SiOpenapiinitiative";
 import { ExportType } from "features/apiClient/helpers/exporters/types";
-import { NativeError } from "errors/NativeError";
-import { ErrorSeverity } from "errors/types";
 
 interface Props {
   record: RQAPI.CollectionRecord;
@@ -288,45 +282,20 @@ export const CollectionRow: React.FC<Props> = ({
     };
   }, []);
 
-  const handleRecordDrop = useCallback(
+  const handleRecordDropToCollection = useCallback(
     async (item: DraggableApiRecord, dropWorkspaceId: Workspace["id"]) => {
-      try {
-        const sourceContext = getApiClientFeatureContext(item.workspaceId);
-        if (!sourceContext) {
-          throw new Error(`Source context not found for id: ${item.workspaceId}`);
-        }
-
-        const destination = {
-          workspaceId: dropWorkspaceId,
-          collectionId: record.id,
-        };
-
-        await sourceContext.store
-          .dispatch(
-            moveRecords({
-              recordsToMove: [item.record],
-              collectionId: destination.collectionId,
-              repository: sourceContext.repositories.apiClientRecordsRepository,
-              sourceWorkspaceId: item.workspaceId,
-              destinationWorkspaceId: destination.workspaceId,
-            }) as any
-          )
-          .unwrap();
-
-        if (!expandedRecordIds.includes(record.id)) {
-          const newExpandedRecordIds = [...expandedRecordIds, destination.collectionId];
-          updateExpandedRecordIds(newExpandedRecordIds);
-        }
-      } catch (error) {
-        notification.error({
-          message: "Error moving item",
-          description: error?.message || (typeof error === "string" ? error : "Failed to move item. Please try again."),
-          placement: "bottomRight",
-        });
-        throw NativeError.fromError(error).setShowBoundary(true).setSeverity(ErrorSeverity.ERROR);
-      } finally {
-        setIsCollectionRowLoading(false);
-      }
+      await handleRecordDrop(item, dropWorkspaceId, {
+        targetCollectionId: record.id,
+        onSuccess: () => {
+          if (!expandedRecordIds.includes(record.id)) {
+            const newExpandedRecordIds = [...expandedRecordIds, record.id];
+            updateExpandedRecordIds(newExpandedRecordIds);
+          }
+        },
+        onFinally: () => {
+          setIsCollectionRowLoading(false);
+        },
+      });
     },
     [record.id, expandedRecordIds, updateExpandedRecordIds]
   );
@@ -396,7 +365,7 @@ export const CollectionRow: React.FC<Props> = ({
 
         if (item.record.id === record.id) return;
         setIsCollectionRowLoading(true);
-        handleRecordDrop(item, workspaceId);
+        handleRecordDropToCollection(item, workspaceId);
       },
       hover: handleHoverExpand,
       canDrop: checkCanDropItem,
@@ -404,7 +373,7 @@ export const CollectionRow: React.FC<Props> = ({
         isOver: monitor.isOver({ shallow: true }),
       }),
     }),
-    [handleRecordDrop, checkCanDropItem, workspaceId]
+    [handleRecordDropToCollection, checkCanDropItem, workspaceId]
   );
 
   return (
