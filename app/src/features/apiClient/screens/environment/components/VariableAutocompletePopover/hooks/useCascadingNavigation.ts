@@ -14,6 +14,7 @@ interface UseCascadingNavigationOptions {
   onClose?: () => void;
 }
 
+// Currently, only handles 2 levels of nesting. It is not optmized for handling multi levels of nesting
 export function useCascadingNavigation({
   show,
   filteredVariables,
@@ -21,32 +22,80 @@ export function useCascadingNavigation({
   onSelect,
   onClose,
 }: UseCascadingNavigationOptions) {
-  // ─── State ──────────────────────────────────────────────────
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [expandedNamespace, setExpandedNamespace] = useState<string | null>(null);
   const [submenuSelectedIndex, setSubmenuSelectedIndex] = useState(0);
   const [expandedSubNamespace, setExpandedSubNamespace] = useState<string | null>(null);
   const [subSubmenuSelectedIndex, setSubSubmenuSelectedIndex] = useState(0);
 
-  // ─── Refs (latest values for the keydown closure) ───────────
-  const filteredRef = useRef<AutocompleteItem[]>([]);
-  const indexRef = useRef(0);
+  const stateRef = useRef({
+    selectedIndex,
+    expandedNamespace,
+    submenuSelectedIndex,
+    expandedSubNamespace,
+    subSubmenuSelectedIndex,
+  });
+  stateRef.current = {
+    selectedIndex,
+    expandedNamespace,
+    submenuSelectedIndex,
+    expandedSubNamespace,
+    subSubmenuSelectedIndex,
+  };
+
+  const filteredRef = useRef(filteredVariables);
   const onSelectRef = useRef(onSelect);
-  const expandedRef = useRef<string | null>(null);
-  const submenuIndexRef = useRef(0);
+  onSelectRef.current = onSelect;
+
   const submenuItemsRef = useRef<AutocompleteItem[]>([]);
-  const expandedSubRef = useRef<string | null>(null);
-  const subSubmenuIndexRef = useRef(0);
   const subSubmenuItemsRef = useRef<AutocompleteItem[]>([]);
 
-  useEffect(() => {
-    onSelectRef.current = onSelect;
-    indexRef.current = selectedIndex;
-    expandedRef.current = expandedNamespace;
-    submenuIndexRef.current = submenuSelectedIndex;
-    expandedSubRef.current = expandedSubNamespace;
-    subSubmenuIndexRef.current = subSubmenuSelectedIndex;
-  });
+  const resetAll = useCallback(() => {
+    setSelectedIndex(0);
+    setExpandedNamespace(null);
+    setSubmenuSelectedIndex(0);
+    setExpandedSubNamespace(null);
+    setSubSubmenuSelectedIndex(0);
+  }, []);
+
+  const updateSelectedIndex = useCallback((index: number) => {
+    setSelectedIndex(index);
+    setExpandedNamespace(null);
+    setSubmenuSelectedIndex(0);
+    setExpandedSubNamespace(null);
+    setSubSubmenuSelectedIndex(0);
+  }, []);
+
+  const expandNamespace = useCallback((namespace: string | null) => {
+    setExpandedNamespace(namespace);
+    setSubmenuSelectedIndex(0);
+    setExpandedSubNamespace(null);
+    setSubSubmenuSelectedIndex(0);
+  }, []);
+
+  const updateSubmenuIndex = useCallback((index: number) => {
+    setSubmenuSelectedIndex(index);
+    setExpandedSubNamespace(null);
+    setSubSubmenuSelectedIndex(0);
+  }, []);
+
+  const expandSubNamespace = useCallback((namespace: string | null) => {
+    setExpandedSubNamespace(namespace);
+    setSubSubmenuSelectedIndex(0);
+  }, []);
+
+  const [prevFilteredVars, setPrevFilteredVars] = useState(filteredVariables);
+  if (filteredVariables !== prevFilteredVars) {
+    setPrevFilteredVars(filteredVariables);
+    filteredRef.current = filteredVariables;
+    resetAll();
+  }
+
+  const [prevShow, setPrevShow] = useState(show);
+  if (show !== prevShow) {
+    setPrevShow(show);
+    if (!show) resetAll();
+  }
 
   // ─── Derived submenu item lists ─────────────────────────────
   const submenuItems = useMemo(() => {
@@ -59,185 +108,100 @@ export function useCascadingNavigation({
     return getHierarchicalAutocompleteItems(allVariables, expandedSubNamespace + ".");
   }, [allVariables, expandedSubNamespace]);
 
-  useEffect(() => {
-    submenuItemsRef.current = submenuItems;
-  }, [submenuItems]);
-
-  useEffect(() => {
-    subSubmenuItemsRef.current = subSubmenuItems;
-  }, [subSubmenuItems]);
-
-  // ─── Reset effects ──────────────────────────────────────────
-  useEffect(() => {
-    filteredRef.current = filteredVariables;
-    setSelectedIndex(0);
-    setExpandedNamespace(null);
-  }, [filteredVariables]);
+  submenuItemsRef.current = submenuItems;
+  subSubmenuItemsRef.current = subSubmenuItems;
 
   useEffect(() => {
     if (!show) {
-      setExpandedNamespace(null);
-      setExpandedSubNamespace(null);
+      return;
     }
-  }, [show]);
 
-  useEffect(() => {
-    setSubmenuSelectedIndex(0);
-    setExpandedSubNamespace(null);
-  }, [expandedNamespace]);
+    const getActiveLevel = () => {
+      const { expandedNamespace, expandedSubNamespace } = stateRef.current;
 
-  useEffect(() => {
-    setSubSubmenuSelectedIndex(0);
-  }, [expandedSubNamespace]);
-
-  const prevSelectedIndex = useRef(selectedIndex);
-  useEffect(() => {
-    if (prevSelectedIndex.current !== selectedIndex) setExpandedNamespace(null);
-    prevSelectedIndex.current = selectedIndex;
-  }, [selectedIndex]);
-
-  const prevSubmenuSelectedIndex = useRef(submenuSelectedIndex);
-  useEffect(() => {
-    if (prevSubmenuSelectedIndex.current !== submenuSelectedIndex) setExpandedSubNamespace(null);
-    prevSubmenuSelectedIndex.current = submenuSelectedIndex;
-  }, [submenuSelectedIndex]);
-
-  // ─── Keyboard handler ───────────────────────────────────────
-  useEffect(() => {
-    if (!show) return;
+      if (expandedNamespace && expandedSubNamespace) {
+        return {
+          items: subSubmenuItemsRef.current,
+          index: stateRef.current.subSubmenuSelectedIndex,
+          setIndex: (i: number) => setSubSubmenuSelectedIndex(i),
+          expand: null,
+          collapse: () => expandSubNamespace(null),
+        };
+      }
+      if (expandedNamespace) {
+        return {
+          items: submenuItemsRef.current,
+          index: stateRef.current.submenuSelectedIndex,
+          setIndex: (i: number) => updateSubmenuIndex(i),
+          expand: (name: string) => expandSubNamespace(name),
+          collapse: () => expandNamespace(null),
+        };
+      }
+      return {
+        items: filteredRef.current,
+        index: stateRef.current.selectedIndex,
+        setIndex: (i: number) => updateSelectedIndex(i),
+        expand: (name: string) => expandNamespace(name),
+        collapse: onClose ?? null,
+      };
+    };
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      const items = filteredRef.current;
-      if (!items.length) return;
+      const level = getActiveLevel();
+      if (!level.items.length) return;
 
-      // Third level: both namespace and sub-namespace expanded
-      if (expandedRef.current && expandedSubRef.current) {
-        const subSubItems = subSubmenuItemsRef.current;
-        switch (e.key) {
-          case "ArrowDown":
-            e.preventDefault();
-            e.stopPropagation();
-            if (subSubItems.length) setSubSubmenuSelectedIndex((p) => (p + 1) % subSubItems.length);
-            break;
-          case "ArrowUp":
-            e.preventDefault();
-            e.stopPropagation();
-            if (subSubItems.length)
-              setSubSubmenuSelectedIndex((p) => (p - 1 + subSubItems.length) % subSubItems.length);
-            break;
-          case "Enter": {
-            e.preventDefault();
-            e.stopPropagation();
-            const subSubItem = subSubItems[subSubmenuIndexRef.current];
-            if (subSubItem && !subSubItem.isNamespace) {
-              onSelectRef.current(subSubItem.name, checkIsDynamicVariable(subSubItem.variable), false);
-            }
-            break;
-          }
-          case "ArrowLeft":
-          case "Escape":
-            e.preventDefault();
-            e.stopPropagation();
-            setExpandedSubNamespace(null);
-            break;
-        }
-        return;
-      }
-
-      // Second level: namespace expanded
-      if (expandedRef.current) {
-        const subItems = submenuItemsRef.current;
-        switch (e.key) {
-          case "ArrowDown":
-            e.preventDefault();
-            e.stopPropagation();
-            if (subItems.length) setSubmenuSelectedIndex((p) => (p + 1) % subItems.length);
-            break;
-          case "ArrowUp":
-            e.preventDefault();
-            e.stopPropagation();
-            if (subItems.length) setSubmenuSelectedIndex((p) => (p - 1 + subItems.length) % subItems.length);
-            break;
-          case "ArrowRight": {
-            e.preventDefault();
-            e.stopPropagation();
-            const subItem = subItems[submenuIndexRef.current];
-            if (subItem?.isNamespace) setExpandedSubNamespace(subItem.name);
-            break;
-          }
-          case "Enter": {
-            e.preventDefault();
-            e.stopPropagation();
-            const subItem = subItems[submenuIndexRef.current];
-            if (subItem) {
-              if (subItem.isNamespace) {
-                setExpandedSubNamespace(subItem.name);
-              } else {
-                onSelectRef.current(subItem.name, checkIsDynamicVariable(subItem.variable), false);
-              }
-            }
-            break;
-          }
-          case "ArrowLeft":
-          case "Escape":
-            e.preventDefault();
-            e.stopPropagation();
-            setExpandedNamespace(null);
-            break;
-        }
-        return;
-      }
-
-      // First level: main list
       switch (e.key) {
         case "ArrowDown":
           e.preventDefault();
           e.stopPropagation();
-          setSelectedIndex((p) => (p + 1) % items.length);
+          level.setIndex((level.index + 1) % level.items.length);
           break;
         case "ArrowUp":
           e.preventDefault();
           e.stopPropagation();
-          setSelectedIndex((p) => (p - 1 + items.length) % items.length);
+          level.setIndex((level.index - 1 + level.items.length) % level.items.length);
           break;
         case "ArrowRight": {
-          const item = items[indexRef.current];
-          if (item?.isNamespace) {
+          const item = level.items[level.index];
+          if (item?.isNamespace && level.expand) {
             e.preventDefault();
             e.stopPropagation();
-            setExpandedNamespace(item.name);
+            level.expand(item.name);
           }
           break;
         }
         case "Enter": {
           e.preventDefault();
           e.stopPropagation();
-          const item = items[indexRef.current];
+          const item = level.items[level.index];
           if (item) {
-            if (item.isNamespace) {
-              setExpandedNamespace(item.name);
-            } else {
+            if (item.isNamespace && level.expand) {
+              level.expand(item.name);
+            } else if (!item.isNamespace) {
               onSelectRef.current(item.name, checkIsDynamicVariable(item.variable), false);
             }
           }
           break;
         }
+        case "ArrowLeft":
         case "Escape":
           e.preventDefault();
           e.stopPropagation();
-          onClose?.();
+          level.collapse?.();
           break;
       }
     };
 
     document.addEventListener("keydown", handleKeyDown, true);
     return () => document.removeEventListener("keydown", handleKeyDown, true);
-  }, [show, onClose]);
+  }, [show, onClose, updateSelectedIndex, expandNamespace, updateSubmenuIndex, expandSubNamespace]);
 
-  // ─── Hover callbacks ────────────────────────────────────────
-  const handleSubmenuHover = useCallback((index: number) => {
-    setSubmenuSelectedIndex(index);
-  }, []);
+  const handleSubmenuHover = useCallback(
+    (index: number) => {
+      updateSubmenuIndex(index);
+    },
+    [updateSubmenuIndex]
+  );
 
   const handleSubSubmenuHover = useCallback((index: number) => {
     setSubSubmenuSelectedIndex(index);
@@ -245,12 +209,12 @@ export function useCascadingNavigation({
 
   return {
     selectedIndex,
-    setSelectedIndex,
+    setSelectedIndex: updateSelectedIndex,
     expandedNamespace,
     submenuSelectedIndex,
     handleSubmenuHover,
     expandedSubNamespace,
-    setExpandedSubNamespace,
+    setExpandedSubNamespace: expandSubNamespace,
     subSubmenuSelectedIndex,
     handleSubSubmenuHover,
   };

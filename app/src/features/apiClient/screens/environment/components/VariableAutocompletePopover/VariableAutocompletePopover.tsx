@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect, useRef, memo } from "react";
+import React, { useMemo, useRef, memo, useEffect } from "react";
 import { List, Popover } from "antd";
 import { ScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
 import {
@@ -23,9 +23,10 @@ export const VariableAutocompletePopover: React.FC<VariableAutocompleteProps> = 
   ({ show, position, search, variables, onSelect, onClose }) => {
     const listRef = useRef<HTMLDivElement>(null);
     const onSelectRef = useRef(onSelect);
+
     useEffect(() => {
       onSelectRef.current = onSelect;
-    });
+    }, [onSelect]);
 
     const allVariables = useMemo(() => {
       return variables ? mergeAndParseAllVariables(variables) : {};
@@ -48,7 +49,9 @@ export const VariableAutocompletePopover: React.FC<VariableAutocompleteProps> = 
     } = useCascadingNavigation({ show, filteredVariables, allVariables, onSelect, onClose });
 
     useEffect(() => {
-      if (!show) return;
+      if (!show) {
+        return;
+      }
       const node = listRef.current?.querySelector(`[data-index="${selectedIndex}"]`) as HTMLElement;
       if (node) {
         node.scrollIntoView({ block: "nearest" });
