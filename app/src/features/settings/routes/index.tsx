@@ -46,7 +46,7 @@ export const settingRoutes: RouteObject[] = [
                   element: <Secrets />,
                 },
                 {
-                  path: "manage-providers",
+                  path: PATHS.SETTINGS.SECRETS.MANAGE_PROVIDERS, // This is a nested route for managing providers
                   element: <></>,
                 },
               ],
