@@ -2,10 +2,10 @@ import { Modal, Tooltip } from "antd";
 import "./index.scss";
 import { RQButton } from "lib/design-system-v2/components";
 import NetworkPingIcon from "assets/icons/network-ping.svg?react";
-import { InputField } from "../../Components/InputField/InputField";
-import { SelectField } from "../../Components/SelectField/Index";
-import { authMethodOptions, regionsList } from "../../Consts/dropdownOptions";
-import { InputPasswordField } from "../../Components/InputField/InputPasswordField";
+import { InputField } from "../../components/InputField/InputField";
+import { SelectField } from "../../components/SelectField/Index";
+import { authMethodOptions, regionsList } from "../../consts/dropdownOptions";
+import { InputPasswordField } from "../../components/InputField/InputPasswordField";
 import { InfoCircleOutlined } from "@ant-design/icons";
 
 interface AddEditProviderModalProps {
@@ -58,7 +58,7 @@ export const AddEditProviderModal = ({
     <Modal
       title={header}
       width={480}
-      open={true}
+      // open={true}
       maskClosable={false}
       destroyOnClose={true}
       className="add-edit-provider-modal"

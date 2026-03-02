@@ -8,7 +8,6 @@ interface InputProps {
   value: string;
   label: ReactNode | string;
   placeholder: string;
-  type?: string;
   onValueChange: (value: string) => void;
   onPressEnter?: () => void;
   status?: "error" | "warning";
@@ -24,7 +23,6 @@ export const InputPasswordField: React.FC<InputProps> = ({
   placeholder,
   onValueChange,
   onPressEnter,
-  type,
   status,
   disabled = false,
   suffix,
@@ -41,7 +39,6 @@ export const InputPasswordField: React.FC<InputProps> = ({
       )}
       <Input.Password
         className="form-input password"
-        type={type ?? "text"}
         onPressEnter={onPressEnter}
         placeholder={placeholder}
         id={id}

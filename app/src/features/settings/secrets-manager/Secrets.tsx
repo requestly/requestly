@@ -1,4 +1,4 @@
-import { AddEditProviderModal } from "./Modals/AddEditProviderModal.tsx/Index";
+import { AddEditProviderModal } from "./modals/AddEditProviderModal.tsx/Index";
 import NoProvidersEmptyState from "./NoProviderEmptyState";
 
 const Secrets = () => {
