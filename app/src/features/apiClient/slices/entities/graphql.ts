@@ -7,17 +7,17 @@ import { ApiClientRecordEntity } from "./api-client-record-entity";
 import { ApiClientEntityType } from "./types";
 import { ApiClientEntityMeta } from "./base";
 
-export class GraphQLRecordEntity<M extends ApiClientEntityMeta = ApiClientEntityMeta> extends ApiClientRecordEntity<
-  RQAPI.GraphQLApiRecord,
-  M
-> {
+export class GraphQLRecordEntity<
+  M extends ApiClientEntityMeta = ApiClientEntityMeta,
+  R extends RQAPI.GraphQLApiRecord | RQAPI.GraphQLExampleApiRecord = RQAPI.GraphQLApiRecord
+> extends ApiClientRecordEntity<R, M> {
   readonly type = ApiClientEntityType.GRAPHQL_RECORD;
 
-  dispatchCommand(command: UpdateCommand<RQAPI.GraphQLApiRecord>): void {
+  dispatchCommand(command: UpdateCommand<R>): void {
     this.dispatch(apiRecordsActions.applyPatch({ id: this.meta.id, command }));
   }
 
-  getEntityFromState(state: ApiClientStoreState): RQAPI.GraphQLApiRecord {
+  getEntityFromState(state: ApiClientStoreState): R {
     const record = selectRecordById(state, this.meta.id);
     if (record?.type !== RQAPI.RecordType.API) {
       throw new InvalidEntityShape({
@@ -33,7 +33,7 @@ export class GraphQLRecordEntity<M extends ApiClientEntityMeta = ApiClientEntity
         foundType: record.data.type,
       });
     }
-    return record as RQAPI.GraphQLApiRecord;
+    return record as R;
   }
 
   private getRequest(state: ApiClientStoreState): RQAPI.GraphQLRequest {
@@ -65,31 +65,31 @@ export class GraphQLRecordEntity<M extends ApiClientEntityMeta = ApiClientEntity
   }
 
   setUrl(url: string): void {
-    this.SET({ data: { request: { url } } });
+    this.SETCOMMON({ data: { request: { url } } });
   }
 
   setHeaders(headers: KeyValuePair[]): void {
-    this.SET({ data: { request: { headers } } });
+    this.SETCOMMON({ data: { request: { headers } } });
   }
 
   setOperation(operation: string): void {
-    this.SET({ data: { request: { operation } } });
+    this.SETCOMMON({ data: { request: { operation } } });
   }
 
   setVariables(variables: string): void {
-    this.SET({ data: { request: { variables } } });
+    this.SETCOMMON({ data: { request: { variables } } });
   }
 
   setOperationName(operationName: string): void {
-    this.SET({ data: { request: { operationName } } });
+    this.SETCOMMON({ data: { request: { operationName } } });
   }
 
   deleteOperation(): void {
-    this.DELETE({ data: { request: { operation: null } } });
+    this.DELETECOMMON({ data: { request: { operation: null } } });
   }
 
   deleteVariables(): void {
-    this.DELETE({ data: { request: { variables: null } } });
+    this.DELETECOMMON({ data: { request: { variables: null } } });
   }
 
   setResponse(response: RQAPI.GraphQLResponse): void {
