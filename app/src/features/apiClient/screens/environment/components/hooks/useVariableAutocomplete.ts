@@ -129,27 +129,16 @@ export const useVariableAutocomplete = (options?: { editorViewRef?: RefObject<Ed
   );
 
   /**
-   * Inserts a selected variable into the document.
-   * For namespace entries, appends a trailing dot and lets the editor update
-   * listener re-trigger the popover at the new depth. For leaf entries,
-   * appends closing braces and hides the popover.
+   * Inserts a selected leaf variable into the document, appending closing
+   * braces and hiding the popover. Namespace drill-down is handled entirely
+   * by the cascading submenu inside VariableAutocompletePopover.
    */
   const handleSelectVariable = useCallback(
-    (variableKey: string, _isDynamic: boolean, isNamespace: boolean) => {
+    (variableKey: string, _isDynamic: boolean, _isNamespace: boolean) => {
       const view = editorViewRef.current;
       if (!view) return;
 
       const { from, to } = autocompleteStateRef.current;
-
-      if (isNamespace) {
-        const insertText = variableKey + ".";
-        view.dispatch({
-          changes: { from, to, insert: insertText },
-          selection: { anchor: from + insertText.length },
-        });
-        view.focus();
-        return;
-      }
 
       const closingChars = getClosingBraces(view, to);
       view.dispatch({
