@@ -10,7 +10,14 @@ interface SelectFieldProps {
   emptyState?: ReactNode;
 }
 
-export const SelectField: React.FC<SelectFieldProps> = ({ id, label, value, options, handleFilterChange }) => {
+export const SelectField: React.FC<SelectFieldProps> = ({
+  id,
+  label,
+  value,
+  options,
+  handleFilterChange,
+  emptyState,
+}) => {
   return (
     <div className="form-select-wrapper">
       {typeof label === "string" ? (
@@ -20,7 +27,14 @@ export const SelectField: React.FC<SelectFieldProps> = ({ id, label, value, opti
       ) : (
         label
       )}
-      <Select id={id} className="form-select" value={value} options={options} onChange={handleFilterChange} />
+      <Select
+        id={id}
+        className="form-select"
+        value={value}
+        options={options}
+        onChange={handleFilterChange}
+        notFoundContent="No options available"
+      />
     </div>
   );
 };
