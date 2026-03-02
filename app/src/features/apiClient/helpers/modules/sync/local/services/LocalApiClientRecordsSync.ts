@@ -1,5 +1,5 @@
 import { ApiClientLocalMeta, ApiClientRecordsInterface } from "../../interfaces";
-import { RQAPI } from "features/apiClient/types";
+import { RequestMethod, RQAPI } from "features/apiClient/types";
 import { fsManagerServiceAdapterProvider } from "services/fsManagerServiceAdapter";
 import { API, APIEntity, ApiRequestDetails, FileSystemResult, FileType } from "./types";
 import { parseEntityVariables, parseFsId, parseNativeId } from "../../utils";
@@ -111,15 +111,15 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
           rank: record.rank,
           request: {
             type: record.data.type,
-            url: record.data.request.url,
+            url: record.data?.request?.url ?? "",
             scripts: record.data.scripts ?? { postResponse: "", preRequest: "" },
-            method: record.data.request.method,
+            method: record.data?.request?.method ?? RequestMethod.GET,
             queryParams: record.data.request.queryParams,
             headers: record.data.request.headers,
             body: record.data.request?.body,
             bodyContainer: record.data.request?.bodyContainer, // should be present Partial type is wrongly used
             contentType: record.data.request?.contentType,
-            auth: record.data.auth,
+            auth: record.data?.auth ?? {},
             pathVariables: record.data.request?.pathVariables,
           },
         };
@@ -129,13 +129,13 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
           rank: record.rank,
           request: {
             type: record.data.type,
-            url: record.data.request.url,
+            url: record.data.request.url ?? "",
             scripts: record.data.scripts ?? { postResponse: "", preRequest: "" },
-            operation: record.data.request.operation,
-            variables: record.data.request.variables,
+            operation: record.data.request.operation ?? "",
+            variables: record.data.request.variables ?? "",
             operationName: record.data.request.operationName,
             headers: record.data.request.headers,
-            auth: record.data.auth,
+            auth: record.data.auth ?? {},
           },
         };
       default: {
@@ -144,16 +144,16 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
           name: record.name || "Untitled Request",
           rank: record.rank,
           request: {
-            type: httpRecord.data.type,
-            url: httpRecord.data.request.url,
+            type: httpRecord.data?.type ?? RQAPI.ApiEntryType.HTTP,
+            url: httpRecord.data?.request?.url ?? "",
             scripts: httpRecord.data.scripts ?? { postResponse: "", preRequest: "" },
-            method: httpRecord.data.request.method,
+            method: httpRecord.data?.request?.method ?? RequestMethod.GET,
             queryParams: httpRecord.data.request.queryParams,
             headers: httpRecord.data.request.headers,
             body: httpRecord.data.request?.body,
             bodyContainer: httpRecord.data.request?.bodyContainer,
             contentType: httpRecord.data.request?.contentType,
-            auth: httpRecord.data.auth,
+            auth: httpRecord.data?.auth ?? {},
             pathVariables: httpRecord.data.request?.pathVariables,
           },
         };
