@@ -67,7 +67,12 @@ const SecretsLayout = ({ children }: { children?: React.ReactNode }) => {
       <section className="secrets-content-container">
         {isOnManageProvidersPage && (
           <div className="breadcrumb-container">
-            <RQBreadcrumb defaultBreadcrumbs={[{ label: "Secrets", pathname: PATHS.SETTINGS.SECRETS.ABSOLUTE }]} />
+            <RQBreadcrumb
+              defaultBreadcrumbs={[
+                { label: "Secrets", pathname: PATHS.SETTINGS.SECRETS.ABSOLUTE },
+                { label: "", pathname: "" },
+              ]}
+            />
           </div>
         )}
         <div className="header-container">
