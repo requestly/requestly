@@ -128,13 +128,8 @@ export const useVariableAutocomplete = (options?: { editorViewRef?: RefObject<Ed
     [options?.editorViewRef]
   );
 
-  /**
-   * Inserts a selected leaf variable into the document, appending closing
-   * braces and hiding the popover. Namespace drill-down is handled entirely
-   * by the cascading submenu inside VariableAutocompletePopover.
-   */
   const handleSelectVariable = useCallback(
-    (variableKey: string, _isDynamic: boolean, _isNamespace: boolean) => {
+    (variableKey: string) => {
       const view = editorViewRef.current;
       if (!view) return;
 

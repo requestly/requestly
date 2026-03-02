@@ -15,7 +15,7 @@ interface VariableAutocompleteProps {
   position: { x: number; y: number };
   search: string;
   variables: ScopedVariables | undefined;
-  onSelect: (variableKey: string, isDynamic: boolean, isNamespace: boolean) => void;
+  onSelect: (variableKey: string) => void;
   onClose?: () => void;
 }
 
@@ -79,7 +79,7 @@ export const VariableAutocompletePopover: React.FC<VariableAutocompleteProps> = 
                       item={item}
                       index={index}
                       isSelected={index === selectedIndex}
-                      onSelect={(name, isDyn, isNs) => onSelectRef.current(name, isDyn, isNs)}
+                      onSelect={(name) => onSelectRef.current(name)}
                       onHover={setSelectedIndex}
                       allVariables={allVariables}
                       isKeyboardExpanded={expandedNamespace === item.name}
@@ -96,7 +96,7 @@ export const VariableAutocompletePopover: React.FC<VariableAutocompleteProps> = 
                       item={item}
                       index={index}
                       isSelected={index === selectedIndex}
-                      onSelect={(name, isDyn, isNs) => onSelectRef.current(name, isDyn, isNs)}
+                      onSelect={(name) => onSelectRef.current(name)}
                       onHover={setSelectedIndex}
                     />
                   )
