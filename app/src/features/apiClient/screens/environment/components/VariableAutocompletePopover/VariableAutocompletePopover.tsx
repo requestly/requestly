@@ -9,7 +9,6 @@ import { useCascadingNavigation } from "./hooks/useCascadingNavigation";
 import { LeafMainItem } from "./components/LeafMainItem";
 import { NamespaceMainItem } from "./components/NamespaceMainItem";
 import "./variableAutocompletePopover.scss";
-
 interface VariableAutocompleteProps {
   show: boolean;
   position: { x: number; y: number };
