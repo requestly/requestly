@@ -29,16 +29,23 @@ import {
   ApiClientFeatureContext,
   useApiClientRepository,
   useApiClientFeatureContext,
+  createExampleRequest,
   moveRecords,
 } from "features/apiClient/slices";
 import { useActiveTab, useTabActions } from "componentsV2/Tabs/slice";
 import { useWorkspaceId } from "features/apiClient/common/WorkspaceProvider";
 import { apiRecordsRankingManager } from "features/apiClient/helpers/RankingManager";
+import { ApiClientSidebarCollapse } from "../apiClientSidebarCollapse/ApiClientSidebarCollapse";
+import { ExampleRow } from "../exampleRow/ExampleRow";
+import { useCollapsibleRow } from "../../../../../../../hooks/useCollapsibleRow";
 
 import clsx from "clsx";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
 import { getRankForDroppedRecord } from "features/apiClient/helpers/RankingManager/utils";
+import { MdOutlineDashboardCustomize } from "@react-icons/all-files/md/MdOutlineDashboardCustomize";
+import { ExampleViewTabSource } from "../../../../views/components/ExampleRequestView/exampleViewTabSource";
+import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
 import { NativeError } from "errors/NativeError";
 import { ErrorSeverity } from "errors/types";
 
@@ -51,6 +58,8 @@ interface Props {
     recordsSelectionHandler: (record: RQAPI.ApiClientRecord, event: React.ChangeEvent<HTMLInputElement>) => void;
     setShowSelection: (arg: boolean) => void;
   };
+  expandedRecordIds?: string[];
+  setExpandedRecordIds?: (keys: RQAPI.ApiClientRecord["id"][]) => void;
   handleRecordsToBeDeleted: (records: RQAPI.ApiClientRecord[], context?: ApiClientFeatureContext) => void;
   onItemClick?: (record: RQAPI.ApiClientRecord, event: React.MouseEvent) => void;
 }
@@ -89,6 +98,8 @@ export const RequestRow: React.FC<Props> = ({
   record,
   isReadOnly,
   bulkActionOptions,
+  expandedRecordIds = [],
+  setExpandedRecordIds,
   handleRecordsToBeDeleted,
   onItemClick,
 }) => {
@@ -108,6 +119,8 @@ export const RequestRow: React.FC<Props> = ({
   const context = useApiClientFeatureContext();
   const { apiClientRecordsRepository } = useApiClientRepository();
   const activeTabSourceId = useActiveTab()?.source.getSourceId();
+
+  const isLocalSyncEnabled = useCheckLocalSyncSupport();
 
   const [{ isDragging }, drag] = useDrag(
     () => ({
@@ -235,7 +248,7 @@ export const RequestRow: React.FC<Props> = ({
       const { id, ...rest } = record;
 
       // Generate rank for the duplicated request to place it immediately after the original
-      const rank = apiRecordsRankingManager.getRankForDuplicatedApi(context, record, record.collectionId ?? "");
+      const rank = apiRecordsRankingManager.getRankForDuplicatedRecord(context, record, record.collectionId ?? "");
 
       const newRecord: Omit<RQAPI.ApiRecord, "id"> = {
         ...rest,
@@ -246,6 +259,22 @@ export const RequestRow: React.FC<Props> = ({
       try {
         const result = await apiClientRecordsRepository.createRecord(newRecord);
         if (!result.success) throw new Error("Failed to duplicate request");
+
+        const newRequestId = result.data.id;
+        const examples = record.data.examples ?? [];
+        if (examples.length > 0) {
+          await Promise.all(
+            examples.map((example) =>
+              context.store.dispatch(
+                createExampleRequest({
+                  parentRequestId: newRequestId,
+                  example: { ...example, parentRequestId: newRequestId },
+                  repository: context.repositories.apiClientRecordsRepository,
+                }) as any
+              )
+            )
+          );
+        }
 
         onSaveRecord(result.data, "open");
         toast.success("Request duplicated successfully");
@@ -261,6 +290,50 @@ export const RequestRow: React.FC<Props> = ({
       }
     },
     [context, apiClientRecordsRepository, onSaveRecord]
+  );
+
+  const handleAddExample = useCallback(
+    async (record: RQAPI.ApiRecord) => {
+      try {
+        handleDropdownVisibleChange(false);
+        const { data, ...recordMeta } = record;
+        const { examples: _examples, ...entryData } = data;
+        const exampleRecordToCreate: RQAPI.ExampleApiRecord = {
+          ...recordMeta,
+          data: entryData,
+          type: RQAPI.RecordType.EXAMPLE_API,
+          collectionId: null,
+          parentRequestId: record.id,
+          rank: apiRecordsRankingManager.getRanksForNewApiRecords(context, record.id, [record])[0],
+        };
+        const { exampleRecord } = await context.store
+          .dispatch(
+            createExampleRequest({
+              parentRequestId: record.id,
+              example: exampleRecordToCreate,
+              repository: context.repositories.apiClientRecordsRepository,
+            }) as any
+          )
+          .unwrap();
+
+        if (!expandedRecordIds.includes(record.id)) {
+          setExpandedRecordIds?.([...expandedRecordIds, record.id]);
+        }
+
+        openBufferedTab({
+          preview: false,
+          source: new ExampleViewTabSource({
+            id: exampleRecord.id,
+            title: exampleRecord.name || "Example",
+            apiEntryDetails: exampleRecord,
+            context: { id: workspaceId },
+          }),
+        });
+      } catch {
+        toast.error("Something went wrong while creating the example.");
+      }
+    },
+    [context, openBufferedTab, workspaceId, expandedRecordIds, setExpandedRecordIds]
   );
 
   const requestOptions = useMemo((): MenuProps["items"] => {
@@ -311,8 +384,25 @@ export const RequestRow: React.FC<Props> = ({
           handleDropdownVisibleChange(false);
         },
       },
+      ...(!isLocalSyncEnabled
+        ? [
+            {
+              key: "3",
+              label: (
+                <div>
+                  <MdOutlineDashboardCustomize style={{ marginRight: 8 }} />
+                  Add example
+                </div>
+              ),
+              onClick: (itemInfo: any) => {
+                itemInfo.domEvent?.stopPropagation?.();
+                handleAddExample(record);
+              },
+            },
+          ]
+        : []),
       {
-        key: "3",
+        key: "4",
         label: (
           <div>
             <MdOutlineDelete style={{ marginRight: 8 }} />
@@ -327,7 +417,95 @@ export const RequestRow: React.FC<Props> = ({
         },
       },
     ];
-  }, [record, handleRecordsToBeDeleted, handleDuplicateRequest]);
+  }, [record, handleRecordsToBeDeleted, handleDuplicateRequest, handleAddExample, isLocalSyncEnabled]);
+
+  const examples = record.data.examples || [];
+
+  const { activeKey, collapseChangeHandler } = useCollapsibleRow({
+    recordId: record.id,
+    expandedRecordIds,
+    setExpandedRecordIds,
+  });
+
+  const requestRowHeader = (
+    <div
+      className="collapsible-request-row-header"
+      onClick={(e) => {
+        if (onItemClick && (e.metaKey || e.ctrlKey)) {
+          e.stopPropagation();
+          onItemClick(record, e);
+          return;
+        }
+
+        const isExpanded = activeKey === record.id;
+        const isAlreadyActive = activeTabSourceId === record.id;
+
+        if (!isExpanded) {
+          if (!isAlreadyActive) {
+            openBufferedTab({
+              source: new RequestViewTabSource({
+                id: record.id,
+                apiEntryDetails: record,
+                title: record.name || record.data.request?.url,
+                context: { id: workspaceId },
+              }),
+            });
+          }
+        } else {
+          if (!isAlreadyActive) {
+            e.stopPropagation();
+            openBufferedTab({
+              source: new RequestViewTabSource({
+                id: record.id,
+                apiEntryDetails: record,
+                title: record.name || record.data.request?.url,
+                context: { id: workspaceId },
+              }),
+            });
+          }
+        }
+      }}
+      style={{ opacity: isDragging ? 0.5 : 1 }}
+    >
+      <RequestIcon record={record} />
+
+      <Typography.Text
+        ellipsis={{
+          tooltip: {
+            title: record.name || record.data.request?.url,
+            placement: "top",
+            color: "#000",
+            mouseEnterDelay: 0.5,
+          },
+        }}
+        className="request-url"
+      >
+        {record.name || record.data.request?.url}
+      </Typography.Text>
+
+      <Conditional condition={!isReadOnly}>
+        <div className={`request-options ${isDropdownVisible ? "active" : ""}`}>
+          <Dropdown
+            trigger={["click"]}
+            menu={{ items: requestOptions }}
+            placement="bottomRight"
+            open={isDropdownVisible}
+            onOpenChange={handleDropdownVisibleChange}
+          >
+            <RQButton
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowSelection(false);
+              }}
+              size="small"
+              type="transparent"
+              icon={<MdOutlineMoreHoriz />}
+            />
+          </Dropdown>
+        </div>
+      </Conditional>
+    </div>
+  );
 
   return (
     <>
@@ -350,6 +528,50 @@ export const RequestRow: React.FC<Props> = ({
             setIsEditMode(false);
           }}
         />
+      ) : examples.length > 0 ? (
+        <div
+          className={clsx("request-row", {
+            "request-drop-before": dropPosition === "before",
+            "request-drop-after": dropPosition === "after",
+          })}
+          ref={(node) => {
+            requestRowRef.current = node;
+            drag(node);
+            drop(node);
+          }}
+          style={{ opacity: isDragging || isDropProcessing ? 0.5 : 1 }}
+        >
+          <ApiClientSidebarCollapse
+            id={record.id}
+            isActive={!!activeKey}
+            onCollapseToggle={collapseChangeHandler}
+            collapsible="icon"
+            className="request-with-examples-row"
+            panelClassName={`${record.id === activeTabSourceId ? "active" : ""} ${
+              selectedRecords.has(record.id) && showSelection ? "selected" : ""
+            }`}
+            expandIconPrefix={
+              showSelection ? (
+                <div className="collection-checkbox-container" onClick={(event) => event.stopPropagation()}>
+                  <Checkbox
+                    onChange={recordsSelectionHandler.bind(this, record)}
+                    checked={selectedRecords.has(record.id)}
+                  />
+                </div>
+              ) : undefined
+            }
+            header={requestRowHeader}
+          >
+            {examples.map((example) => (
+              <ExampleRow
+                key={example.id}
+                record={example}
+                isReadOnly={isReadOnly}
+                handleRecordsToBeDeleted={handleRecordsToBeDeleted}
+              />
+            ))}
+          </ApiClientSidebarCollapse>
+        </div>
       ) : (
         <div
           className={clsx("request-row", {
@@ -391,6 +613,7 @@ export const RequestRow: React.FC<Props> = ({
                 checked={selectedRecords.has(record.id)}
               />
             )}
+            <div style={{ width: 8 }} />
             <RequestIcon record={record} />
             <Typography.Text
               ellipsis={{

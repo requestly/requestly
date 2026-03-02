@@ -3,10 +3,9 @@ import React, { useMemo } from "react";
 
 interface Props {
   status: number;
-  statusText?: string;
 }
 
-const NetworkStatusField: React.FC<Props> = ({ status, statusText }) => {
+const NetworkStatusField: React.FC<Props> = ({ status }) => {
   const statusLightType = useMemo<StatusLightType>(() => {
     if (!status) {
       return StatusLightType.ERROR;
@@ -27,12 +26,7 @@ const NetworkStatusField: React.FC<Props> = ({ status, statusText }) => {
     return StatusLightType.INFO;
   }, [status]);
 
-  return (
-    <StatusLight type={statusLightType}>
-      {status || "Failed"}
-      {statusText ? ` ${statusText}` : null}
-    </StatusLight>
-  );
+  return <StatusLight type={statusLightType}>{status || "Failed"}</StatusLight>;
 };
 
 export default NetworkStatusField;

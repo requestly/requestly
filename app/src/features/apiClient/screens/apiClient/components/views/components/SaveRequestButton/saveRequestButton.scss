@@ -1,0 +1,34 @@
+.api-client-save-request-button-container {
+  display: flex;
+  align-items: center;
+
+  .api-client-save-request-button.ant-btn.ant-btn-default.rq-custom-btn {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    color: var(--requestly-color-text-default);
+  }
+  .api-client-save-request-dropdown-button.ant-btn {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    padding: 0 8px;
+  }
+}
+
+.api-client-save-request-dropdown {
+  width: 185px;
+
+  .ant-dropdown-menu-item {
+    color: var(--requestly-color-text-default);
+  }
+
+  .save-as-example-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex: 1;
+
+    svg {
+      color: var(--requestly-color-text-subtle);
+    }
+  }
+}

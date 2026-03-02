@@ -1,19 +1,16 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
-import { Checkbox, Collapse, Dropdown, MenuProps, Skeleton, Typography, notification } from "antd";
+import { Checkbox, Dropdown, MenuProps, Skeleton, Typography, notification } from "antd";
 import { RQAPI } from "features/apiClient/types";
 import { RQAPI as SharedRQAPI } from "@requestly/shared/types/entities/apiClient";
 import { RQButton } from "lib/design-system-v2/components";
 import { NewRecordNameInput } from "../newRecordNameInput/NewRecordNameInput";
 import { RequestRow } from "../requestRow/RequestRow";
 import { ApiRecordEmptyState } from "../apiRecordEmptyState/ApiRecordEmptyState";
-import { MdKeyboardArrowDown } from "@react-icons/all-files/md/MdKeyboardArrowDown";
-import { MdKeyboardArrowRight } from "@react-icons/all-files/md/MdKeyboardArrowRight";
 import { IoChevronForward } from "@react-icons/all-files/io5/IoChevronForward";
+import { ApiClientSidebarCollapse } from "../apiClientSidebarCollapse/ApiClientSidebarCollapse";
 import { SidebarPlaceholderItem } from "../../SidebarPlaceholderItem/SidebarPlaceholderItem";
-import { isEmpty } from "lodash";
-import { sessionStorage } from "utils/sessionStorage";
-import { SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY } from "features/apiClient/constants";
+import { useCollapsibleRow } from "../../../../../../../hooks/useCollapsibleRow";
 import { MdOutlineBorderColor } from "@react-icons/all-files/md/MdOutlineBorderColor";
 import { MdOutlineDelete } from "@react-icons/all-files/md/MdOutlineDelete";
 import { MdOutlineIosShare } from "@react-icons/all-files/md/MdOutlineIosShare";
@@ -89,9 +86,11 @@ export const CollectionRow: React.FC<Props> = ({
 }) => {
   const { selectedRecords, showSelection, recordsSelectionHandler, setShowSelection } = bulkActionOptions || {};
   const [isEditMode, setIsEditMode] = useState(false);
-  const [activeKey, setActiveKey] = useState<string | undefined>(
-    expandedRecordIds?.includes(record.id) ? record.id : undefined
-  );
+  const { activeKey, setActiveKey, updateExpandedRecordIds, collapseChangeHandler } = useCollapsibleRow({
+    recordId: record.id,
+    expandedRecordIds,
+    setExpandedRecordIds,
+  });
   const hoverExpandTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
   const [createNewField, setCreateNewField] = useState<RQAPI.RecordType | null>(null);
   const [hoveredId, setHoveredId] = useState("");
@@ -110,6 +109,7 @@ export const CollectionRow: React.FC<Props> = ({
   const { onNewClickV2 } = useApiClientContext();
 
   const workspaceId = useWorkspaceId() || null;
+
   const { openBufferedTab } = useTabActions();
   const activeTabSourceId = useActiveTab()?.source.getSourceId();
 
@@ -247,33 +247,6 @@ export const CollectionRow: React.FC<Props> = ({
     [handleCollectionExport, openBufferedTab, workspaceId, handleRecordsToBeDeleted]
   );
 
-  const updateExpandedRecordIds = useCallback(
-    (newExpandedIds: RQAPI.ApiClientRecord["id"][]) => {
-      setExpandedRecordIds(newExpandedIds);
-      isEmpty(newExpandedIds)
-        ? sessionStorage.removeItem(SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY)
-        : sessionStorage.setItem(SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY, newExpandedIds);
-    },
-    [setExpandedRecordIds]
-  );
-
-  const collapseChangeHandler = useCallback(
-    (keys: RQAPI.ApiClientRecord["id"][]) => {
-      let activeKeysCopy = [...expandedRecordIds];
-      if (isEmpty(keys)) {
-        activeKeysCopy = activeKeysCopy.filter((key) => key !== record.id);
-      } else if (!activeKeysCopy.includes(record.id)) {
-        activeKeysCopy.push(record.id);
-      }
-      updateExpandedRecordIds(activeKeysCopy);
-    },
-    [record, expandedRecordIds, updateExpandedRecordIds]
-  );
-
-  useEffect(() => {
-    setActiveKey(expandedRecordIds?.includes(record.id) ? record.id : undefined);
-  }, [expandedRecordIds, record.id]);
-
   useEffect(() => {
     /* Temporary Change-> To remove previous key from session storage
        which was added due to the previous logic can be removed after some time */
@@ -366,6 +339,7 @@ export const CollectionRow: React.FC<Props> = ({
     }),
     [record, workspaceId]
   );
+
   const handleHoverExpand = useCallback(
     (item: DraggableApiRecord, monitor: DropTargetMonitor) => {
       const isOverAny = monitor.isOver();
@@ -456,207 +430,189 @@ export const CollectionRow: React.FC<Props> = ({
         />
       ) : (
         <div ref={drop} className={isOver ? "collection-drop-target" : ""}>
-          <Collapse
-            activeKey={activeKey}
-            onChange={collapseChangeHandler}
-            collapsible="header"
-            defaultActiveKey={[record.id]}
-            ghost
-            className="collections-list-item collection"
-            expandIcon={({ isActive }) => {
-              return (
-                <>
-                  {showSelection && (
-                    <div className="collection-checkbox-container" onClick={(event) => event.stopPropagation()}>
-                      <Checkbox
-                        onChange={recordsSelectionHandler.bind(this, record)}
-                        checked={selectedRecords.has(record.id)}
-                      />
-                    </div>
-                  )}
-                  {isActive ? (
-                    <MdKeyboardArrowDown className="collection-expand-icon" />
-                  ) : (
-                    <MdKeyboardArrowRight className="collection-expand-icon" />
-                  )}
-                </>
-              );
-            }}
-          >
-            <Collapse.Panel
-              className={`collection-panel ${record.id === activeTabSourceId ? "active" : ""} ${
-                selectedRecords.has(record.id) && showSelection ? "selected" : ""
-              }`}
-              key={record.id}
-              header={
-                <div
-                  ref={drag}
-                  className="collection-name-container"
-                  onMouseEnter={() => setHoveredId(record.id)}
-                  onMouseLeave={() => setHoveredId("")}
-                  onClick={(e) => {
-                    if (onItemClick && (e.metaKey || e.ctrlKey)) {
+          <ApiClientSidebarCollapse
+            id={record.id}
+            isActive={activeKey === record.id}
+            onCollapseToggle={collapseChangeHandler}
+            className="collection"
+            panelClassName={`collection-panel ${record.id === activeTabSourceId ? "active" : ""} ${
+              selectedRecords.has(record.id) && showSelection ? "selected" : ""
+            }`}
+            expandIconPrefix={
+              showSelection ? (
+                <div className="collection-checkbox-container" onClick={(event) => event.stopPropagation()}>
+                  <Checkbox
+                    onChange={recordsSelectionHandler.bind(this, record)}
+                    checked={selectedRecords.has(record.id)}
+                  />
+                </div>
+              ) : null
+            }
+            header={
+              <div
+                ref={drag}
+                className="collection-name-container"
+                onMouseEnter={() => setHoveredId(record.id)}
+                onMouseLeave={() => setHoveredId("")}
+                onClick={(e) => {
+                  if (onItemClick && (e.metaKey || e.ctrlKey)) {
+                    e.stopPropagation();
+                    onItemClick(record, e);
+                    return;
+                  }
+                  const isExpanded = activeKey === record.id;
+                  const isAlreadyActive = activeTabSourceId === record.id;
+                  if (!isExpanded) {
+                    // Collection is collapsed - open tab and expand
+                    if (!isAlreadyActive) {
+                      openBufferedTab({
+                        source: new CollectionViewTabSource({
+                          id: record.id,
+                          title: record.name || "New Collection",
+                          context: {
+                            id: workspaceId,
+                          },
+                        }),
+                      });
+                    }
+                    // Don't stop propagation - allow expand
+                  } else {
+                    // Collection is expanded
+                    if (!isAlreadyActive) {
+                      // First click - make tab active and prevent collapse
                       e.stopPropagation();
-                      onItemClick(record, e);
-                      return;
+                      openBufferedTab({
+                        source: new CollectionViewTabSource({
+                          id: record.id,
+                          title: record.name || "New Collection",
+                          context: {
+                            id: workspaceId,
+                          },
+                        }),
+                      });
                     }
-                    const isExpanded = activeKey === record.id;
-                    const isAlreadyActive = activeTabSourceId === record.id;
-                    if (!isExpanded) {
-                      // Collection is collapsed - open tab and expand
-                      if (!isAlreadyActive) {
-                        openBufferedTab({
-                          source: new CollectionViewTabSource({
-                            id: record.id,
-                            title: record.name || "New Collection",
-                            context: {
-                              id: workspaceId,
-                            },
-                          }),
-                        });
-                      }
-                      // Don't stop propagation - allow expand
-                    } else {
-                      // Collection is expanded
-                      if (!isAlreadyActive) {
-                        // First click - make tab active and prevent collapse
-                        e.stopPropagation();
-                        openBufferedTab({
-                          source: new CollectionViewTabSource({
-                            id: record.id,
-                            title: record.name || "New Collection",
-                            context: {
-                              id: workspaceId,
-                            },
-                          }),
-                        });
-                      }
-                      // Second click (when already active) - allow collapse by not stopping propagation
-                    }
+                    // Second click (when already active) - allow collapse by not stopping propagation
+                  }
+                }}
+                style={{
+                  opacity: isDragging ? 0.5 : 1,
+                }}
+              >
+                <Typography.Text
+                  ellipsis={{
+                    tooltip: {
+                      title: record.name,
+                      placement: "top",
+                      color: "#000",
+                      mouseEnterDelay: 0.5,
+                    },
                   }}
-                  style={{
-                    opacity: isDragging ? 0.5 : 1,
-                  }}
+                  className="collection-name"
                 >
-                  <Typography.Text
-                    ellipsis={{
-                      tooltip: {
-                        title: record.name,
-                        placement: "right",
-                        color: "#000",
-                        mouseEnterDelay: 0.5,
-                      },
-                    }}
-                    className="collection-name"
-                  >
-                    {record.name}
-                  </Typography.Text>
+                  {record.name}
+                </Typography.Text>
 
-                  <Conditional condition={!isReadOnly}>
-                    <div className={`collection-options ${hoveredId === record.id ? "active" : " "}`}>
-                      <NewApiRecordDropdown
-                        invalidActions={[NewRecordDropdownItemType.ENVIRONMENT]}
-                        onSelect={(params) => {
-                          setActiveKey(record.id);
-                          setCreateNewField(params.recordType);
-                          onNewClick("collection_row", params.recordType, record.id, params.entryType).then(() => {
-                            setCreateNewField(null);
-                          });
+                <Conditional condition={!isReadOnly}>
+                  <div className={`collection-options ${hoveredId === record.id ? "active" : " "}`}>
+                    <NewApiRecordDropdown
+                      invalidActions={[NewRecordDropdownItemType.ENVIRONMENT]}
+                      onSelect={(params) => {
+                        setActiveKey(record.id);
+                        setCreateNewField(params.recordType);
+                        onNewClick("collection_row", params.recordType, record.id, params.entryType).then(() => {
+                          setCreateNewField(null);
+                        });
+                      }}
+                    >
+                      <RQButton size="small" type="transparent" icon={<MdAdd />} onClick={(e) => e.stopPropagation()} />
+                    </NewApiRecordDropdown>
+                    <Dropdown
+                      trigger={["click"]}
+                      menu={{ items: getCollectionOptions(record) }}
+                      placement="bottomRight"
+                      overlayClassName="collection-dropdown-menu"
+                    >
+                      <RQButton
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setShowSelection(false);
                         }}
-                      >
-                        <RQButton
-                          size="small"
-                          type="transparent"
-                          icon={<MdAdd />}
-                          onClick={(e) => e.stopPropagation()}
+                        size="small"
+                        type="transparent"
+                        icon={<MdOutlineMoreHoriz />}
+                      />
+                    </Dropdown>
+                  </div>
+                </Conditional>
+              </div>
+            }
+          >
+            {isCollectionRowLoading ? (
+              <div className="loading-collection-row">
+                <Skeleton paragraph={{ rows: 4 }} title={false} />
+              </div>
+            ) : (
+              <>
+                {record.data.children?.length === 0 ? (
+                  <ApiRecordEmptyState
+                    record={record}
+                    disabled={isReadOnly}
+                    message="No requests created yet"
+                    newRecordBtnText="New collection"
+                    onNewClick={(src, recordType, collectionId, entryType) =>
+                      onNewClickV2({
+                        contextId: workspaceId,
+                        analyticEventSource: src,
+                        recordType,
+                        collectionId,
+                        entryType,
+                      })
+                    }
+                  />
+                ) : (
+                  record.data.children?.map((apiRecord) => {
+                    if (apiRecord.type === RQAPI.RecordType.API) {
+                      return (
+                        <RequestRow
+                          isReadOnly={isReadOnly}
+                          key={apiRecord.id}
+                          record={apiRecord}
+                          bulkActionOptions={bulkActionOptions}
+                          handleRecordsToBeDeleted={handleRecordsToBeDeleted}
+                          onItemClick={onItemClick}
+                          setExpandedRecordIds={setExpandedRecordIds}
+                          expandedRecordIds={expandedRecordIds}
                         />
-                      </NewApiRecordDropdown>
-                      <Dropdown
-                        trigger={["click"]}
-                        menu={{ items: getCollectionOptions(record) }}
-                        placement="bottomRight"
-                        overlayClassName="collection-dropdown-menu"
-                      >
-                        <RQButton
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setShowSelection(false);
-                          }}
-                          size="small"
-                          type="transparent"
-                          icon={<MdOutlineMoreHoriz />}
+                      );
+                    } else if (apiRecord.type === RQAPI.RecordType.COLLECTION) {
+                      return (
+                        <CollectionRow
+                          isReadOnly={isReadOnly}
+                          key={apiRecord.id}
+                          record={apiRecord}
+                          onNewClick={onNewClick}
+                          onRequestlyExportClick={onExportClick} // FIXME: this will break in multi-view
+                          expandedRecordIds={expandedRecordIds}
+                          setExpandedRecordIds={setExpandedRecordIds}
+                          bulkActionOptions={bulkActionOptions}
+                          handleRecordsToBeDeleted={handleRecordsToBeDeleted}
+                          onItemClick={onItemClick}
                         />
-                      </Dropdown>
-                    </div>
-                  </Conditional>
-                </div>
-              }
-            >
-              {isCollectionRowLoading ? (
-                <div className="loading-collection-row">
-                  <Skeleton paragraph={{ rows: 4 }} title={false} />
-                </div>
-              ) : (
-                <>
-                  {record.data.children?.length === 0 ? (
-                    <ApiRecordEmptyState
-                      record={record}
-                      disabled={isReadOnly}
-                      message="No requests created yet"
-                      newRecordBtnText="New collection"
-                      onNewClick={(src, recordType, collectionId, entryType) =>
-                        onNewClickV2({
-                          contextId: workspaceId,
-                          analyticEventSource: src,
-                          recordType,
-                          collectionId,
-                          entryType,
-                        })
-                      }
-                    />
-                  ) : (
-                    record.data.children?.map((apiRecord) => {
-                      if (apiRecord.type === RQAPI.RecordType.API) {
-                        return (
-                          <RequestRow
-                            isReadOnly={isReadOnly}
-                            key={apiRecord.id}
-                            record={apiRecord}
-                            bulkActionOptions={bulkActionOptions}
-                            handleRecordsToBeDeleted={handleRecordsToBeDeleted}
-                            onItemClick={onItemClick}
-                          />
-                        );
-                      } else if (apiRecord.type === RQAPI.RecordType.COLLECTION) {
-                        return (
-                          <CollectionRow
-                            isReadOnly={isReadOnly}
-                            key={apiRecord.id}
-                            record={apiRecord}
-                            onNewClick={onNewClick}
-                            onRequestlyExportClick={onExportClick} // FIXME: this will break in multi-view
-                            expandedRecordIds={expandedRecordIds}
-                            setExpandedRecordIds={setExpandedRecordIds}
-                            bulkActionOptions={bulkActionOptions}
-                            handleRecordsToBeDeleted={handleRecordsToBeDeleted}
-                            onItemClick={onItemClick}
-                          />
-                        );
-                      }
+                      );
+                    }
 
-                      return null;
-                    })
-                  )}
+                    return null;
+                  })
+                )}
 
-                  {createNewField ? (
-                    <SidebarPlaceholderItem
-                      name={createNewField === RQAPI.RecordType.API ? "New Request" : "New Collection"}
-                    />
-                  ) : null}
-                </>
-              )}
-            </Collapse.Panel>
-          </Collapse>
+                {createNewField ? (
+                  <SidebarPlaceholderItem
+                    name={createNewField === RQAPI.RecordType.API ? "New Request" : "New Collection"}
+                  />
+                ) : null}
+              </>
+            )}
+          </ApiClientSidebarCollapse>
         </div>
       )}
     </>

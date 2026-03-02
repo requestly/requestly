@@ -1,4 +1,9 @@
-.ant-collapse.collections-list-item {
+.collection-row {
+  display: flex;
+  align-items: start;
+}
+
+.ant-collapse.collections-list-item.collection {
   border-width: 1px;
   border-style: solid;
   border-color: transparent;
@@ -6,13 +11,13 @@
 
   // TEMP FIX: Added left padding to colllection name because drag preview of collection looks broken;
   // TODO: Rever this when drap preview is implemented
-  .ant-collapse-header.ant-collapse-icon-collapsible-only {
-    gap: unset !important;
+  // .ant-collapse-header.ant-collapse-icon-collapsible-only {
+  //   gap: unset !important;
 
-    .collection-name-container {
-      padding-left: 8px;
-    }
-  }
+  //   // .collection-name-container {
+  //   //   padding-left: 8px;
+  //   // }
+  // }
 
   .loading-collection-row {
     li {
@@ -22,11 +27,43 @@
     }
   }
 
+  .collection-name-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .collection-name {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-style: normal;
+    color: var(--requestly-color-text-default);
+    font-size: var(--requestly-font-size-sm, 12px);
+    font-weight: var(--requestly-font-weight-medium);
+    line-height: var(--line-height-xs, 15px);
+  }
+
   .collection-options {
+    flex-shrink: 0;
+    margin-left: auto;
+    align-items: center;
+    gap: var(--space-1, 2px);
+    display: none;
+
+    svg {
+      color: var(--requestly-color-text-subtle);
+    }
+
     .ant-btn.ant-btn-sm.rq-custom-btn.icon-only-btn:hover {
       svg {
         color: white;
       }
+    }
+
+    &:hover,
+    &.active {
+      display: flex;
     }
   }
 }
