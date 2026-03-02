@@ -41,14 +41,15 @@ export const getPrettyPlanName = (planName) => {
     .join(" ");
 };
 
+const SAFE_URL_PROTOCOLS = ["http:", "https:", "file:"];
+
 export const isValidUrl = (string) => {
   try {
-    new URL(string);
+    const url = new URL(string);
+    return SAFE_URL_PROTOCOLS.includes(url.protocol);
   } catch (_) {
     return false;
   }
-
-  return true;
 };
 
 export const isValidRQUrl = (url) => {
