@@ -1,0 +1,56 @@
+.soap-success-view {
+  .soap-collection-name {
+    margin-bottom: 16px;
+    color: var(--requestly-color-text-subtle);
+    font-family: var(--font-family-default, Inter);
+    font-size: var(--font-size-sm, 12px);
+    font-style: normal;
+    font-weight: 400;
+    line-height: 18px;
+  }
+
+  .soap-options-container {
+    margin-bottom: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    .soap-option-item {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: space-between;
+
+      .select-heading {
+        justify-content: left;
+        font-size: 12px;
+        margin-bottom: 4px;
+        display: flex;
+
+        .info-tooltip-icon {
+          margin: 3px 3px 3px 6px;
+          color: var(--requestly-color-text-subtle);
+        }
+      }
+
+      .ant-select {
+        width: 100%;
+        height: 32px;
+      }
+    }
+  }
+
+  .imported-entities-container {
+    .collection-organisation-info {
+      color: var(--requestly-color-text-subtle);
+      font-size: 11px;
+      margin-left: 8px;
+    }
+  }
+
+  .importer-actions-row {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+}
