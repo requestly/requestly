@@ -68,6 +68,14 @@
       opacity: 0.5;
     }
 
+    .namespace-chevron {
+      display: flex;
+      align-items: center;
+      color: var(--requestly-color-text-placeholder);
+      font-size: 10px;
+      opacity: 0.6;
+    }
+
     .variable-label {
       color: var(--requestly-color-text-default);
       font-family: var(--font-family-default, Inter);

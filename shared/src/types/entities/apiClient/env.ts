@@ -39,8 +39,11 @@ export enum EnvironmentVariableType {
 }
 
 export enum VariableScope {
+  DATA_FILE = "data_file",
   RUNTIME = "runtime",
   ENVIRONMENT = "environment",
   COLLECTION = "collection",
   GLOBAL = "global",
+  DYNAMIC = "dynamic",
+  SECRETS = "secrets",
 }
