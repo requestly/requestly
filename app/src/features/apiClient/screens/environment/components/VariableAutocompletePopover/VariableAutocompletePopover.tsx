@@ -1,10 +1,12 @@
 import React, { useCallback, useMemo, useState, useEffect, useRef, memo } from "react";
 import { List, Popover, Tooltip } from "antd";
-import { InfoCircleOutlined } from "@ant-design/icons";
+import { InfoCircleOutlined, RightOutlined } from "@ant-design/icons";
 import { ScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
 import {
+  AutocompleteItem,
   checkIsDynamicVariable,
   mergeAndParseAllVariables,
+  getHierarchicalAutocompleteItems,
 } from "features/apiClient/helpers/variableResolver/variableHelper";
 import { getScopeIcon } from "componentsV2/CodeEditor/components/EditorV2/components/VariablePopOver/hooks/useScopeOptions";
 import { DynamicVariableInfoPopover } from "../DynamicVariableInfoPopover/DynamicVariableInfoPopover";
@@ -12,24 +14,24 @@ import { DynamicVariable } from "lib/dynamic-variables/types";
 import { capitalize } from "lodash";
 import "./variableAutocompletePopover.scss";
 interface VariableItemProps {
-  item: { name: string; variable: any };
+  item: AutocompleteItem;
   index: number;
   isSelected: boolean;
-  onSelect: (name: string, isDynamic: boolean) => void;
+  onSelect: (name: string) => void;
   onHover: (index: number) => void;
 }
 
 const VariableItem = memo<VariableItemProps>(({ item, index, isSelected, onSelect, onHover }) => {
   const isDynamic = checkIsDynamicVariable(item.variable);
-  const variableScope = isDynamic ? item.variable.scope : item.variable[1].scope;
+  const variableScope = Array.isArray(item.variable) ? item.variable[1].scope : item.variable.scope;
 
   const handleMouseDown = useCallback(
     (e: React.MouseEvent) => {
       e.preventDefault();
       e.stopPropagation();
-      onSelect(item.name, isDynamic);
+      onSelect(item.name);
     },
-    [item.name, isDynamic, onSelect]
+    [item.name, onSelect]
   );
 
   const handleHover = useCallback(() => {
@@ -58,18 +60,22 @@ const VariableItem = memo<VariableItemProps>(({ item, index, isSelected, onSelec
           </span>
         </Tooltip>
 
-        <span className="variable-label">{item.name}</span>
+        <span className="variable-label">{item.displayName}</span>
       </div>
 
-      {isDynamic && (
-        <Tooltip
-          title={<DynamicVariableInfoPopover variable={item.variable as DynamicVariable} />}
-          placement="rightTop"
-          showArrow={false}
-          overlayClassName="example-tooltip"
-        >
-          <InfoCircleOutlined className="info-icon" />
-        </Tooltip>
+      {item.isNamespace ? (
+        <RightOutlined className="namespace-chevron" />
+      ) : (
+        isDynamic && (
+          <Tooltip
+            title={<DynamicVariableInfoPopover variable={item.variable as DynamicVariable} />}
+            placement="rightTop"
+            showArrow={false}
+            overlayClassName="example-tooltip"
+          >
+            <InfoCircleOutlined className="info-icon" />
+          </Tooltip>
+        )
       )}
     </List.Item>
   );
@@ -81,7 +87,7 @@ interface VariableAutocompleteProps {
   position: { x: number; y: number };
   search: string;
   variables: ScopedVariables | undefined;
-  onSelect: (variableKey: string, isDynamic: boolean) => void;
+  onSelect: (variableKey: string) => void;
   onClose?: () => void;
 }
 
@@ -90,7 +96,7 @@ export const VariableAutocompletePopover: React.FC<VariableAutocompleteProps> = 
     const [selectedIndex, setSelectedIndex] = useState(0);
 
     const listRef = useRef<HTMLDivElement>(null);
-    const filteredRef = useRef<{ name: string; variable: any }[]>([]);
+    const filteredRef = useRef<AutocompleteItem[]>([]);
     const indexRef = useRef(0);
     const onSelectRef = useRef(onSelect);
 
@@ -104,18 +110,11 @@ export const VariableAutocompletePopover: React.FC<VariableAutocompleteProps> = 
     }, [variables]);
 
     const filteredVariables = useMemo(() => {
-      const entries = Object.entries(allVariables);
-
-      const lowerSearch = (search || "").toLowerCase();
-
-      return entries
-        .map(([key, variable]) => ({ name: key, variable }))
-        .filter(({ name }) => name.toLowerCase().includes(lowerSearch));
+      return getHierarchicalAutocompleteItems(allVariables, search);
     }, [allVariables, search]);
 
     useEffect(() => {
       filteredRef.current = filteredVariables;
-
       setSelectedIndex(0);
     }, [filteredVariables]);
 
@@ -144,7 +143,7 @@ export const VariableAutocompletePopover: React.FC<VariableAutocompleteProps> = 
             e.stopPropagation();
             const item = items[indexRef.current];
             if (item) {
-              onSelectRef.current(item.name, checkIsDynamicVariable(item.variable));
+              onSelectRef.current(item.name);
             }
             break;
           }
@@ -190,7 +189,7 @@ export const VariableAutocompletePopover: React.FC<VariableAutocompleteProps> = 
                     item={item}
                     index={index}
                     isSelected={index === selectedIndex}
-                    onSelect={(name, isDyn) => onSelectRef.current(name, isDyn)}
+                    onSelect={(name) => onSelectRef.current(name)}
                     onHover={setSelectedIndex}
                   />
                 )}
