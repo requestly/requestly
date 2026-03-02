@@ -16,6 +16,7 @@ import { QueryParamsTable } from "../../../components/request/components/QueryPa
 import RequestBody from "../../../components/request/RequestBody";
 import { ScriptEditor } from "../../../components/Scripts/components/ScriptEditor/ScriptEditor";
 import { PathVariableTable } from "../PathVariableTable";
+import { KeyValueTableSplitLayout } from "../../../components/request/components/KeyValueTable/KeyValueTableSplitLayout/KeyValueTableSplitLayout";
 
 export enum RequestTab {
   QUERY_PARAMS = "query_params",
@@ -62,9 +63,10 @@ const HttpRequestTabs: React.FC<Props> = ({
         label: <RequestTabLabel label="Params" count={queryParams.length || pathVariables?.length} showDot={true} />,
         children: (
           <div className="non-scrollable-tab-content">
-            <QueryParamsTable entity={entity}>
+            <KeyValueTableSplitLayout>
+              <QueryParamsTable entity={entity} />
               <PathVariableTable entity={entity} />
-            </QueryParamsTable>
+            </KeyValueTableSplitLayout>
           </div>
         ),
       },
@@ -77,7 +79,11 @@ const HttpRequestTabs: React.FC<Props> = ({
       {
         key: RequestTab.HEADERS,
         label: <RequestTabLabel label="Headers" count={headersLength} />,
-        children: <HeadersTable entity={entity} />,
+        children: (
+          <div className="non-scrollable-tab-content">
+            <HeadersTable entity={entity} />
+          </div>
+        ),
       },
       {
         key: RequestTab.AUTHORIZATION,

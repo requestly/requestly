@@ -1,146 +1,92 @@
-import React, { useCallback, useMemo, useState } from "react";
-import type { TableProps } from "antd";
-import { ContentListTable } from "componentsV2/ContentList";
-import { PathVariableTableEditableRow, PathVariableTableEditableCell } from "./PathVariableTableRow";
-import { KeyValueDataType, RQAPI } from "features/apiClient/types";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
 import "./pathVariableTable.scss";
-import { doesValueMatchDataType } from "features/apiClient/screens/apiClient/utils";
-import { KeyValueTableSettingsDropdown } from "../../../components/request/components/KeyValueTable/KeyValueTableSettingsDropdown";
-import { capitalize } from "lodash";
 import { BufferedHttpRecordEntity } from "features/apiClient/slices/entities";
 import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
+import { KeyValueTable } from "features/apiClient/screens/apiClient/components/views/components/request/components/KeyValueTable/KeyValueTable";
+import { KeyValuePair } from "features/apiClient/types";
+import { useKeyValueTableSplitLayout } from "../../../components/request/components/KeyValueTable/KeyValueTableSplitLayout/KeyValueTableSplitLayout";
 
 interface PathVariableTableProps {
-  entity: BufferedHttpRecordEntity,
+  entity: BufferedHttpRecordEntity;
 }
 
-type ColumnTypes = Exclude<TableProps<RQAPI.PathVariable>["columns"], undefined>;
-
 export const PathVariableTable: React.FC<PathVariableTableProps> = ({ entity }) => {
-  const variables = useApiClientSelector(s => entity.getPathVariables(s) || []);
+  const variables = useApiClientSelector((s) => entity.getPathVariables(s) || []);
   const scopedVariables = useScopedVariables(entity.meta.referenceId);
   const [showDescription, setShowDescription] = useState(false);
+  const scrollTargetRef = useRef<HTMLDivElement>(null);
+  const layoutContext = useKeyValueTableSplitLayout();
 
-  const handleUpdateVariable = useCallback(
-    (variable: RQAPI.PathVariable) => {
-      const { id, key, ...patch } = variable;
-      entity.setPathVariable(key, patch);
+  const prevLength = useRef(variables.length);
+  useEffect(() => {
+    if (variables.length > prevLength.current) {
+      scrollTargetRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      prevLength.current = variables.length;
+    }
+  }, [variables.length]);
+
+  const handleChange = useCallback(
+    (updatedVariables: KeyValuePair[]) => {
+      if (entity.setPathVariables) {
+        entity.setPathVariables(updatedVariables);
+      } else {
+        updatedVariables.forEach((v) => {
+          const { key, ...rest } = v;
+          entity.setPathVariable(key, rest);
+        });
+      }
     },
-    []
+    [entity]
   );
 
-  const columns = useMemo(() => {
-    return [
-      {
-        title: "Key",
-        dataIndex: "key",
-        minWidth: "30%",
-        editable: false,
-        onCell: (record: RQAPI.PathVariable) => ({
-          record,
-          editable: false,
-          dataIndex: "key",
-          title: "key",
-          environmentVariables: scopedVariables,
-          handleUpdateVariable,
-        }),
-      },
-      {
-        title: "Value",
-        dataIndex: "value",
-        minWidth: "30%",
-        editable: true,
-        onCell: (record: RQAPI.PathVariable) => ({
-          record,
-          editable: true,
-          dataIndex: "value",
-          title: "value",
-          environmentVariables: scopedVariables,
-          handleUpdateVariable,
-          error: doesValueMatchDataType(record.value, record.dataType ?? KeyValueDataType.STRING)
-            ? null
-            : `Value must be ${capitalize(record.dataType ?? KeyValueDataType.STRING)}`,
-        }),
-      },
-      {
-        title: (
-          <div className="path-variable-table-settings">
-            <span>Type</span>
-            {!showDescription && (
-              <KeyValueTableSettingsDropdown
-                showDescription={showDescription}
-                onToggleDescription={(show: any) => {
-                  setShowDescription(show);
-                }}
-              />
-            )}
-          </div>
-        ),
-        dataIndex: "dataType",
-        width: 110,
-        className: "path-variable-type-column",
-        editable: true,
-        onCell: (record: RQAPI.PathVariable) => ({
-          record,
-          editable: true,
-          dataIndex: "dataType",
-          title: "type",
-          environmentVariables: scopedVariables,
-          handleUpdateVariable,
-        }),
-      },
-      showDescription && {
-        title: (
-          <div className="path-variable-table-settings">
-            <span>Description</span>
-            <KeyValueTableSettingsDropdown
-              showDescription={showDescription}
-              onToggleDescription={(show: any) => {
-                setShowDescription(show);
-              }}
-            />
-          </div>
-        ),
-        dataIndex: "description",
-        width: "40%",
-        editable: true,
-        onCell: (record: RQAPI.PathVariable) => ({
-          record,
-          editable: true,
-          dataIndex: "description",
-          title: "description",
-          environmentVariables: scopedVariables,
-          handleUpdateVariable,
-        }),
-      },
-    ].filter(Boolean);
-  }, [handleUpdateVariable, scopedVariables, showDescription]);
+  useEffect(() => {
+    if (layoutContext?.bulkEditorState?.title === "Path Variables") {
+      layoutContext.syncBulkEditor({
+        data: variables,
+        onChange: handleChange,
+        title: "Path Variables",
+      });
+    }
+  }, [variables, handleChange, layoutContext]);
 
-  if (variables.length === 0) {
-    return null;
-  }
+  const handleSetShowBulkEdit = useCallback(
+    (show: boolean) => {
+      if (!layoutContext) return;
+      if (show) {
+        layoutContext.openBulkEditor({
+          data: variables,
+          onChange: handleChange,
+          title: "Path Variables",
+        });
+      } else {
+        layoutContext.closeBulkEditor();
+      }
+    },
+    [layoutContext, variables, handleChange]
+  );
+
+  if (variables.length === 0) return null;
 
   return (
     <>
       <div className="params-table-title path-variables-table-title">Path Variables</div>
-      <ContentListTable
-        id="api-path-variable-table"
-        className="api-path-variable-table"
-        bordered
-        showHeader={true}
-        rowKey="id"
-        columns={columns as ColumnTypes}
+      <KeyValueTable
         data={variables}
-        locale={{ emptyText: `No path variables found` }}
-        components={{
-          body: {
-            row: PathVariableTableEditableRow,
-            cell: PathVariableTableEditableCell,
+        variables={scopedVariables}
+        onChange={handleChange}
+        tableType="Path Variables"
+        extraColumns={{
+          description: {
+            visible: showDescription,
+            onToggle: setShowDescription,
           },
+          dataType: { visible: true },
         }}
-        scroll={{ x: true }}
+        setShowBulkEditPanel={handleSetShowBulkEdit}
+        hideIsEnabled={true}
       />
+      <div ref={scrollTargetRef} />
     </>
   );
 };

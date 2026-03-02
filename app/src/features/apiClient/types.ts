@@ -111,17 +111,6 @@ export namespace RQAPI {
     POST_RESPONSE = "postResponse",
   }
 
-  /* kept string here as backward compability for already generated uuids saved in firebase, 
-    for new request number should be data-type 
-  */
-  export type PathVariable = {
-    id: number | string;
-    key: string;
-    value: string;
-    description?: string;
-    dataType?: KeyValueDataType;
-  };
-
   export type RequestBody = RequestJsonBody | RequestRawBody | RequestFormBody | MultipartFormBody; // in case of form data, body will be key-value pairs
   export type RequestJsonBody = string;
   export type RequestRawBody = string;
@@ -162,7 +151,7 @@ export namespace RQAPI {
   export type HttpRequest = {
     url: string;
     queryParams: KeyValuePair[];
-    pathVariables?: PathVariable[];
+    pathVariables?: KeyValuePair[];
     method: RequestMethod;
     headers: KeyValuePair[];
     body?: RequestBody;
