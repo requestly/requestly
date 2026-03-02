@@ -6,19 +6,34 @@
   height: 100vh;
 }
 
-.settings-primary-sidebar-title-icon {
-  margin-top: 5px;
-  color: var(--requestly-color-text-default);
-  font-size: 1.25rem;
-  height: 1.25rem;
+.settings-primary-sidebar-back-btn {
   cursor: pointer;
+  margin-bottom: 12px;
+
+  &:hover {
+    opacity: 0.8;
+  }
+}
+
+.settings-primary-sidebar-title-icon {
+  margin-top: 3px;
+  color: var(--requestly-color-text-secondary);
+  font-size: 1rem;
+  height: 1rem;
+}
+
+.settings-primary-sidebar-back-label {
+  color: var(--requestly-color-text-secondary);
+  font-size: 0.9rem;
+  font-weight: 400;
 }
 
 .settings-primary-sidebar-title {
   color: var(--requestly-color-text-default);
-  font-size: 1rem;
-  font-weight: 500;
-  letter-spacing: 0.5px;
+  font-size: var(--requestly-font-size-lg, 16px);
+  font-weight: 400;
+  padding-left: 4px;
+  margin-bottom: 8px;
 }
 
 .settings-primary-sidebar-section:not(:first-child) {
