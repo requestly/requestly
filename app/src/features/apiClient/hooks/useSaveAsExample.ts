@@ -8,6 +8,27 @@ import { toast } from "utils/Toast";
 import { sessionStorage } from "utils/sessionStorage";
 import { SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY } from "../constants";
 import { EXPANDED_RECORD_IDS_UPDATED } from "../slices/exampleCollections";
+import { FormDropDownOptions, RequestContentType } from "../types";
+
+function clearMultipartFormFileValues(entryData: RQAPI.HttpApiEntry): RQAPI.HttpApiEntry {
+  const request = entryData?.request;
+  if (!request || request.contentType !== RequestContentType.MULTIPART_FORM || !Array.isArray(request.body)) {
+    return entryData;
+  }
+  const clearedMultipartFormBody = request.body.map((pair) => {
+    if (pair.type === FormDropDownOptions.FILE) {
+      return { ...pair, value: [] };
+    }
+    return pair;
+  }) as RQAPI.MultipartFormBody;
+  return {
+    ...entryData,
+    request: {
+      ...request,
+      body: clearedMultipartFormBody,
+    },
+  };
+}
 
 export const useSaveAsExample = (entity: BufferedHttpRecordEntity | BufferedGraphQLRecordEntity) => {
   const context = useApiClientFeatureContext();
@@ -21,9 +42,11 @@ export const useSaveAsExample = (entity: BufferedHttpRecordEntity | BufferedGrap
       const requestRecord = entity.getEntityFromState(context.store.getState());
       const { data, ...recordMeta } = requestRecord;
       const { examples: _examples, ...entryData } = data;
+      const sanitizedEntryData =
+        entryData?.type === RQAPI.ApiEntryType.HTTP ? clearMultipartFormFileValues(entryData) : entryData;
       const exampleRecordToCreate: RQAPI.ExampleApiRecord = {
         ...recordMeta,
-        data: entryData,
+        data: sanitizedEntryData,
         parentRequestId: entity.meta.referenceId,
         type: RQAPI.RecordType.EXAMPLE_API,
         collectionId: null,
