@@ -5,6 +5,7 @@ import { cloneDeep } from "lodash";
 import { RQAPI } from "@requestly/shared/types/entities/apiClient";
 import { SuccessfulParseViewProps } from "../../CommonApiClientImporter/components/SuccessfulParseView";
 import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
+import { AiOutlineQuestionCircle } from "@react-icons/all-files/ai/AiOutlineQuestionCircle";
 import "./soapSuccessfulParseView.scss";
 
 export enum SoapVersion {
@@ -24,6 +25,7 @@ export const SoapSuccessfulParseView: React.FC<SuccessfulParseViewProps> = ({
   handleImportData,
   onBack,
 }) => {
+  const helpLink = ""; // TBD: Add documentation link when available
   const firstRootCollection = collectionsData[0];
   const childrenCount = firstRootCollection?.data?.children?.length || 0;
   const hasMultipleVersions = childrenCount >= 2;
@@ -94,7 +96,7 @@ export const SoapSuccessfulParseView: React.FC<SuccessfulParseViewProps> = ({
   return (
     <div className="soap-success-view">
       <div className="soap-collection-name">
-        {`WSDL Fetched: ${processedCollections.map((c) => c.name).join(", ")}`}
+        {`WSDL fetched: ${processedCollections.map((c) => c.name).join(", ")}`}
       </div>
       <div className="soap-options-container">
         {hasMultipleVersions && (
@@ -134,6 +136,11 @@ export const SoapSuccessfulParseView: React.FC<SuccessfulParseViewProps> = ({
       </div>
 
       <Row className="importer-actions-row">
+        {helpLink && (
+          <a href={helpLink} target="_blank" rel="noopener noreferrer" className="need-help-link">
+            <AiOutlineQuestionCircle className="help-icon" /> Need help
+          </a>
+        )}
         {onBack && (
           <RQButton onClick={onBack} disabled={isLoading}>
             Back

@@ -276,7 +276,7 @@ export const ImportInputView: React.FC<ImportInputViewProps> = ({
                   type="primary"
                   loading={isFetchingFromUrl}
                   onClick={handleFetchAndImport}
-                  disabled={!isLinkFeatureReady}
+                  disabled={!isLinkFeatureReady || linkError !== null}
                 >
                   Continue
                 </Button>
