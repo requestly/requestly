@@ -285,6 +285,29 @@ export const parseGraphQLBody = (graphql: any): GraphQLBody => {
   return { operation, variables, operationName };
 };
 
+const normalizeRequestBodyForSchema = (
+  body: unknown,
+  arrayValueSchema: "form" | "multipart"
+): string | unknown[] | null => {
+  if (body === null || typeof body === "string" || Array.isArray(body)) {
+    if (!Array.isArray(body)) return body;
+    return body.map((item: { value?: unknown; [k: string]: unknown }) => {
+      if (!item || typeof item !== "object") return item;
+      const value = item.value;
+      const normalizedValue =
+        arrayValueSchema === "form"
+          ? typeof value === "string"
+            ? value
+            : ""
+          : value === null || typeof value === "string" || Array.isArray(value)
+          ? value
+          : "";
+      return { ...item, value: normalizedValue };
+    });
+  }
+  return "";
+};
+
 const processRequestBody = (request: any): RequestBodyProcessingResult => {
   if (!request.body) {
     return {
@@ -295,21 +318,39 @@ const processRequestBody = (request: any): RequestBodyProcessingResult => {
 
   const { mode, raw, formdata, options, urlencoded, graphql } = request.body;
 
+  let result: RequestBodyProcessingResult;
+  const isBodyNormalized = (m: string) =>
+    m === PostmanBodyMode.RAW || m === PostmanBodyMode.URL_ENCODED || m === PostmanBodyMode.FORMDATA;
+
   switch (mode) {
     case PostmanBodyMode.RAW:
-      return processRawRequestBody(raw, options);
+      result = processRawRequestBody(raw, options);
+      break;
     case PostmanBodyMode.FORMDATA:
-      return processFormDataBody(formdata);
+      result = processFormDataBody(formdata);
+      break;
     case PostmanBodyMode.URL_ENCODED:
-      return processUrlEncodedBody(urlencoded);
+      result = processUrlEncodedBody(urlencoded);
+      break;
     case PostmanBodyMode.GRAPHQL:
-      return parseGraphQLBody(graphql);
+      result = parseGraphQLBody(graphql);
+      return result;
     default:
-      return {
+      result = {
         requestBody: "",
         contentType: RequestContentType.RAW,
       };
   }
+
+  if (isBodyNormalized(mode)) {
+    const arraySchema =
+      mode === PostmanBodyMode.URL_ENCODED ? "form" : mode === PostmanBodyMode.FORMDATA ? "multipart" : "form";
+    (result as HttpRequestBody).requestBody = normalizeRequestBodyForSchema(
+      (result as HttpRequestBody).requestBody,
+      arraySchema
+    ) as HttpRequestBody["requestBody"];
+  }
+  return result;
 };
 
 export const processRequestHeaders = (request: any): RequestHeadersProcessingResult => {
