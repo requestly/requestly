@@ -13,6 +13,7 @@ export const fetchSecretProviders = createAsyncThunk<SecretProviderMetadata[], v
     }
 
     const providers = result.data;
+    console.log("!!!debug", "providers", providers);
     dispatch(secretsManagerActions.setAllProviders(providers));
     return providers;
   }

@@ -8,7 +8,6 @@ import { secretsManagerService, toSecretProviderConfig, toProviderData } from "s
 import { toast } from "utils/Toast";
 
 export interface ProviderData {
-  id?: string;
   instanceName: SecretProviderConfig["name"];
   secretManagerType: SecretProviderConfig["type"];
   authMethod: string;
@@ -16,6 +15,7 @@ export interface ProviderData {
   secretKey: AWSSecretProviderConfig["credentials"]["secretAccessKey"];
   sessionToken?: AWSSecretProviderConfig["credentials"]["sessionToken"];
   region: AWSSecretProviderConfig["credentials"]["region"];
+  createdAt?: number;
 }
 
 export const DEFAULT_FORM_DATA: ProviderData = {
@@ -119,7 +119,7 @@ export const SecretsModalsProvider: React.FC<{ children: React.ReactNode }> = ({
       addEdit: {
         isOpen: true,
         mode: "edit",
-        editingProviderId: data.id,
+        editingProviderId: providerId,
         formData: { ...data },
         isLoading: false,
       },

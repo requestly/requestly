@@ -110,7 +110,6 @@ export function toProviderData(config: SecretProviderConfig): ProviderData {
     case SecretProviderType.AWS_SECRETS_MANAGER: {
       const creds = config.credentials as AWSSecretsManagerCredentials;
       return {
-        id: config.id,
         instanceName: config.name,
         secretManagerType: SecretProviderType.AWS_SECRETS_MANAGER,
         authMethod: "credentials",
