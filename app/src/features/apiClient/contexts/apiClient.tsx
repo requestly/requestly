@@ -244,6 +244,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
               source: new EnvironmentViewTabSource({
                 id: newEnvironment.id,
                 title: newEnvironment.name,
+                isNewTab: true,
                 context: {
                   id: context.workspaceId,
                 },
