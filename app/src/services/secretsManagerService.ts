@@ -112,7 +112,7 @@ export function toProviderData(config: SecretProviderConfig): ProviderData {
       return {
         instanceName: config.name,
         secretManagerType: SecretProviderType.AWS_SECRETS_MANAGER,
-        authMethod: "credentials",
+        authMethod: "manual",
         accessKey: creds.accessKeyId,
         secretKey: creds.secretAccessKey,
         sessionToken: creds.sessionToken,
@@ -134,7 +134,7 @@ export function mapSecretManagerStringToType(value?: string): SecretProviderType
     case "HashiCorp Vault":
       return SecretProviderType.HASHICORP_VAULT;
     default:
-      return SecretProviderType.AWS_SECRETS_MANAGER;
+      throw new Error(`Unknown secret provider type: ${value}`);
   }
 }
 

@@ -10,7 +10,7 @@ import { toast } from "utils/Toast";
 export interface ProviderData {
   instanceName: SecretProviderConfig["name"];
   secretManagerType: SecretProviderConfig["type"];
-  authMethod: string;
+  authMethod: "manual";
   accessKey: AWSSecretProviderConfig["credentials"]["accessKeyId"];
   secretKey: AWSSecretProviderConfig["credentials"]["secretAccessKey"];
   sessionToken?: AWSSecretProviderConfig["credentials"]["sessionToken"];
@@ -104,26 +104,39 @@ export const SecretsModalsProvider: React.FC<{ children: React.ReactNode }> = ({
       },
     }));
 
-    const result = await secretsManagerService.getProviderConfig(providerId);
+    try {
+      const result = await secretsManagerService.getProviderConfig(providerId);
 
-    if (result.type === "error" || !result.data) {
-      toast.error(result.type === "error" ? result.error.message : "Provider not found");
+      if (result.type === "error" || !result.data) {
+        toast.error(result.type === "error" ? result.error.message : "Provider not found");
+        setModals((prev) => ({ ...prev, addEdit: { isOpen: false } }));
+        return;
+      }
+
+      const data = toProviderData(result.data);
+
+      setModals((prev) => {
+        const currentState = modalsRef.current.addEdit;
+        if (!currentState.isOpen || currentState.mode !== "edit" || currentState.editingProviderId !== providerId) {
+          return prev;
+        }
+
+        return {
+          ...prev,
+          addEdit: {
+            isOpen: true,
+            mode: "edit",
+            editingProviderId: providerId,
+            formData: { ...data },
+            isLoading: false,
+          },
+        };
+      });
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Failed to load provider configuration";
+      toast.error(errorMessage);
       setModals((prev) => ({ ...prev, addEdit: { isOpen: false } }));
-      return;
     }
-
-    const data = toProviderData(result.data);
-
-    setModals((prev) => ({
-      ...prev,
-      addEdit: {
-        isOpen: true,
-        mode: "edit",
-        editingProviderId: providerId,
-        formData: { ...data },
-        isLoading: false,
-      },
-    }));
   }, []);
 
   const closeAddEditProviderModal = useCallback(() => {

@@ -288,9 +288,10 @@ const AppModeInitializer = () => {
 
   useEffect(() => {
     if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
-      dispatch(initAndSubscribeSecretsManager());
+      const initPromise = dispatch(initAndSubscribeSecretsManager());
 
       return () => {
+        initPromise.abort();
         secretsManagerService.unsubscribeFromProvidersChange();
       };
     }
