@@ -4,7 +4,7 @@ import { RQButton } from "lib/design-system-v2/components";
 import NetworkPingIcon from "assets/icons/network-ping.svg?react";
 import { InputField } from "../../components/InputField/InputField";
 import { SelectField } from "../../components/SelectField/Index";
-import { authMethodOptions, regionsList } from "../../consts/dropdownOptions";
+import { authMethodOptions, regionsList, secretManagerOptions } from "../../consts/dropdownOptions";
 import { InputPasswordField } from "../../components/InputField/InputPasswordField";
 import { InfoCircleOutlined } from "@ant-design/icons";
 import { ProviderData } from "../../context/SecretsModalsContext";
@@ -91,13 +91,21 @@ export const AddEditProviderModal = ({
           suffix={error ? errorSuffix(error) : undefined}
           disabled={isLoading}
         />
-        <SelectField label="Secret manager" id="secret-manager" value="" options={[]} />
+        <SelectField
+          label="Secret manager"
+          id="secret-manager"
+          value={providerData?.secretManagerType ?? ""}
+          options={secretManagerOptions}
+          handleFilterChange={(value: string) => onChange({ secretManager: value })}
+          disabled={isLoading}
+        />
         <SelectField
           label="Auth method"
-          options={authMethodOptions as any}
+          options={authMethodOptions}
           id="auth-method"
-          value=""
-          handleFilterChange={() => {}}
+          value={providerData?.authMethod ?? ""}
+          handleFilterChange={(value: string) => onChange({ authMethod: value })}
+          disabled={isLoading}
         />
         <InputPasswordField
           label="Access key"
@@ -120,7 +128,14 @@ export const AddEditProviderModal = ({
           onValueChange={(value) => onChange({ sessionToken: value })}
           disabled={isLoading}
         />
-        <SelectField label="Region" options={regionsList as any} id="region" value="" handleFilterChange={() => {}} />
+        <SelectField
+          label="Region"
+          options={regionsList}
+          id="region"
+          value={providerData?.region ?? ""}
+          handleFilterChange={(value: string) => onChange({ region: value })}
+          disabled={isLoading}
+        />
       </div>
     </Modal>
   );

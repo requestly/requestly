@@ -6,26 +6,28 @@ import { MdOutlineEdit } from "@react-icons/all-files/md/MdOutlineEdit";
 import "./index.scss";
 import GreenTickIcon from "assets/icons/green-tick.svg?react";
 import { useSecretsModals } from "../../context/SecretsModalsContext";
+import { SecretProviderType } from "@requestly/shared/types/entities/secretsManager";
+import { mapProviderTypeToDisplayString } from "services/secretsManagerService";
 
 interface ManageProvidersRowProps {
-  providerId?: string;
-  providerName?: string;
-  providerType?: string;
+  providerId: string;
+  providerName: string;
+  providerType: SecretProviderType;
   secretsCount?: number;
   isActive?: boolean;
 }
 
 const ManageProvidersRow: React.FC<ManageProvidersRowProps> = ({
-  providerId = "1",
-  providerName = "Develop",
-  providerType = "AWS secret manager",
-  secretsCount = 5,
+  providerId,
+  providerName,
+  providerType,
+  secretsCount = 0,
   isActive = true,
 }) => {
   const { openEditProviderModal, openDeleteProviderModal } = useSecretsModals();
 
   const handleEdit = () => {
-    openEditProviderModal({ id: providerId, name: providerName, type: providerType });
+    openEditProviderModal(providerId);
   };
 
   const handleDelete = () => {
@@ -44,11 +46,11 @@ const ManageProvidersRow: React.FC<ManageProvidersRowProps> = ({
               </span>
             )}
           </div>
-          <p className="provider-type">{providerType}</p>
+          <p className="provider-type">{mapProviderTypeToDisplayString(providerType)}</p>
         </div>
       </Col>
       <Col xs={4} sm={4} md={4} lg={4} xl={4} className="manage-providers-col2">
-        <span className="provider-secrets-count"> {secretsCount} secrets</span>
+        <span className="provider-secrets-count">{secretsCount} secrets</span>
       </Col>
       <Col xs={8} sm={8} md={8} lg={8} xl={8} className="manage-providers-col3">
         <div className="provider-actions">

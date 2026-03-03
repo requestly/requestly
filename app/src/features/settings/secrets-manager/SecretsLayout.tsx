@@ -24,8 +24,6 @@ const SecretsLayout = ({ children }: { children?: React.ReactNode }) => {
     updateAddEditFormData,
   } = useSecretsModals();
 
-  console.log(modals, "Current state of secrets modals");
-
   const currentPath = window.location.pathname;
   const isOnManageProvidersPage = currentPath.includes(PATHS.SETTINGS.SECRETS.MANAGE_PROVIDERS);
 
@@ -34,7 +32,6 @@ const SecretsLayout = ({ children }: { children?: React.ReactNode }) => {
   };
 
   const handleFormChange = (updatedData: any) => {
-    console.log("Form data updated:", updatedData);
     updateAddEditFormData(updatedData);
   };
 

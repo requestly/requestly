@@ -10,3 +10,4 @@ export const GLOBAL_ENVIRONMENT_ID = "global";
 export const API_CLIENT_RUN_CONFIGS_SLICE_NAME = "runConfigs";
 export const API_CLIENT_LIVE_RUN_RESULTS_SLICE_NAME = "liveRunResults";
 export const API_CLIENT_RUN_HISTORY_SLICE_NAME = "runHistory";
+export const SECRETS_MANAGER_SLICE_NAME = "secretsManager";

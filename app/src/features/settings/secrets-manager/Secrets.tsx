@@ -1,8 +1,16 @@
+import { useSelector } from "react-redux";
+import { selectAllSecretProviders } from "features/apiClient/slices/secrets-manager";
 import NoProvidersEmptyState from "./NoProviderEmptyState";
+import ManageProviders from "./ManageProviders/Index";
 
 const Secrets = () => {
-  const showEmptyMessage = true; // Set this to false when the actual Secrets page is implemented
-  return <>{showEmptyMessage ? <NoProvidersEmptyState /> : <h1>Secrets Management Coming Soon!</h1>}</>;
+  const providers = useSelector(selectAllSecretProviders);
+
+  if (providers.length === 0) {
+    return <NoProvidersEmptyState />;
+  }
+
+  return <ManageProviders />;
 };
 
 export default Secrets;
