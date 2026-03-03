@@ -77,7 +77,7 @@ export const secretsManagerService = {
  * Generates a new UUID for new providers; reuses existingId for edits.
  */
 export function toSecretProviderConfig(formData: Partial<ProviderData>, existingId?: string): SecretProviderConfig {
-  const providerType = mapSecretManagerStringToType(formData.secretManager);
+  const providerType = mapSecretManagerStringToType(formData.secretManagerType);
   const now = Date.now();
 
   switch (providerType) {
@@ -98,7 +98,7 @@ export function toSecretProviderConfig(formData: Partial<ProviderData>, existing
       return config;
     }
     default:
-      throw new Error(`Unsupported provider type: ${formData.secretManager}`);
+      throw new Error(`Unsupported provider type: ${formData.secretManagerType}`);
   }
 }
 
@@ -112,7 +112,7 @@ export function toProviderData(config: SecretProviderConfig): ProviderData {
       return {
         id: config.id,
         instanceName: config.name,
-        secretManager: SecretProviderType.AWS_SECRETS_MANAGER,
+        secretManagerType: SecretProviderType.AWS_SECRETS_MANAGER,
         authMethod: "credentials",
         accessKey: creds.accessKeyId,
         secretKey: creds.secretAccessKey,

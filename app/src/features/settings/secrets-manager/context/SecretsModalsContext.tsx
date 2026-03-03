@@ -1,3 +1,4 @@
+import { AWSSecretProviderConfig, SecretProviderConfig } from "@requestly/shared/types/entities/secretsManager";
 import React, { createContext, useContext, useState, useCallback } from "react";
 import { secretsManagerService, toSecretProviderConfig, toProviderData } from "services/secretsManagerService";
 import { toast } from "utils/Toast";
@@ -7,14 +8,13 @@ import { toast } from "utils/Toast";
  */
 export interface ProviderData {
   id?: string;
-  instanceName: string;
-  secretManager: string;
+  instanceName: SecretProviderConfig["name"];
+  secretManagerType: SecretProviderConfig["type"];
   authMethod: string;
-  accessKey: string;
-  secretKey: string;
-  sessionToken?: string;
-  region: string;
-  [key: string]: any;
+  accessKey: AWSSecretProviderConfig["credentials"]["accessKeyId"];
+  secretKey: AWSSecretProviderConfig["credentials"]["secretAccessKey"];
+  sessionToken?: AWSSecretProviderConfig["credentials"]["sessionToken"];
+  region: AWSSecretProviderConfig["credentials"]["region"];
 }
 
 /**
