@@ -232,6 +232,30 @@ export const sanitizeEntry = (entry: RQAPI.HttpApiEntry, removeInvalidPairs = tr
 };
 
 /**
+ * Clears file-type key-value pair values in multipart form body.
+ * Use when saving/creating an example so the example does not store file references.
+ */
+export const sanitizeExampleMultiPartFormBody = (entryData: RQAPI.HttpApiEntry): RQAPI.HttpApiEntry => {
+  const request = entryData?.request;
+  if (!request || request.contentType !== RequestContentType.MULTIPART_FORM || !Array.isArray(request.body)) {
+    return entryData;
+  }
+  const clearedMultipartFormBody = request.body.map((pair) => {
+    if (pair.type === FormDropDownOptions.FILE) {
+      return { ...pair, value: [] };
+    }
+    return pair;
+  }) as RQAPI.MultipartFormBody;
+  return {
+    ...entryData,
+    request: {
+      ...request,
+      body: clearedMultipartFormBody,
+    },
+  };
+};
+
+/**
  * generic sanitization fx for keyValuePairs (form & multipartform)
  */
 export const sanitizeKeyValuePairs = <T extends KeyValuePair>(keyValuePairs: T[], removeInvalidPairs = true): T[] => {
