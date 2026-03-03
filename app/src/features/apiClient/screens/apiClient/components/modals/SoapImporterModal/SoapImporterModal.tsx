@@ -26,12 +26,11 @@ export const SoapImporterModal: React.FC<SoapImporterModalProps> = ({ isOpen, on
   return (
     <Modal destroyOnClose className="soap-importer-modal" open={isOpen} onCancel={onClose} footer={null} width={600}>
       <CommonApiClientImporter
-        productName="SOAP"
+        productName="WSDL"
         supportedFileTypes={[".xml", ".wsdl"]}
         importer={importer}
         importerType={ApiClientImporterType.SOAP}
         onImportSuccess={onClose}
-        docsLink="" // TBD: Add documentation link when available
         renderSuccessView={(props) => <SoapSuccessfulParseView {...props} />}
         renderLoadingView={() => (
           <div className="soap-parsing-loading-view">

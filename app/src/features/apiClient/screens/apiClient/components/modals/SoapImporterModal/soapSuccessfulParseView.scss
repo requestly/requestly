@@ -26,10 +26,14 @@
         font-size: 12px;
         margin-bottom: 4px;
         display: flex;
+        align-items: center;
 
         .info-tooltip-icon {
-          margin: 3px 3px 3px 6px;
+          margin-left: 6px;
           color: var(--requestly-color-text-subtle);
+          font-size: 16px;
+          width: 14px;
+          height: 14px;
         }
       }
 
@@ -51,6 +55,29 @@
   .importer-actions-row {
     display: flex;
     justify-content: flex-end;
+    align-items: center;
     gap: 8px;
+
+    .need-help-link {
+      margin-right: auto;
+      color: var(--requestly-color-text-subtle);
+      font-size: var(--font-size-sm, 12px);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+
+      .help-icon {
+        font-size: 16px;
+        width: 14px;
+        height: 14px;
+      }
+
+      &:hover,
+      &:focus {
+        text-decoration: underline;
+        color: var(--requestly-color-text);
+      }
+    }
   }
 }
