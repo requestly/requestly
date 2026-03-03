@@ -216,8 +216,9 @@
 
   .link-import-error {
     color: var(--requestly-color-error);
-    font-size: var(--requestly-font-size-xs);
+    font-size: var(--requestly-font-size-sm);
     margin-top: 4px;
+    margin-bottom: 4px;
   }
 
   &.expanded {
@@ -226,8 +227,6 @@
     margin-bottom: 0;
 
     .link-import-input-group {
-      padding-bottom: 12px;
-
       .link-input {
         height: 200px;
         min-height: unset;
@@ -255,7 +254,7 @@
 
     .error {
       color: var(--requestly-color-error);
-      font-size: var(--requestly-font-size-xs);
+      font-size: var(--requestly-font-size-sm);
     }
   }
 
@@ -263,6 +262,11 @@
     display: flex;
     justify-content: flex-end;
     gap: 12px;
+    margin-top: 8px;
+
+    .with-error {
+      margin-top: 0px;
+    }
   }
 }
 
