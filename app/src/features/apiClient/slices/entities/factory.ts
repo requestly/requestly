@@ -7,6 +7,7 @@ import { EnvironmentEntity, GlobalEnvironmentEntity } from "./environment";
 import { RuntimeVariablesEntity } from "./runtime-variables";
 import { RunConfigEntity } from "./runConfig";
 import { LiveRunResultEntity } from "./liveRunResult";
+import { SecretProviderEntity, SecretValueEntity } from "./secretsManager";
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace EntityFactory {
@@ -24,6 +25,10 @@ export namespace EntityFactory {
     ? RunConfigEntity
     : T extends ApiClientEntityType.LIVE_RUN_RESULT
     ? LiveRunResultEntity
+    : T extends ApiClientEntityType.SECRET_PROVIDER
+    ? SecretProviderEntity
+    : T extends ApiClientEntityType.SECRET_VALUE
+    ? SecretValueEntity
     : GraphQLRecordEntity;
 
   export const GlobalStateOverrideConfig: {
@@ -56,6 +61,10 @@ export namespace EntityFactory {
           return new RunConfigEntity(dispatch, meta);
         case ApiClientEntityType.LIVE_RUN_RESULT:
           return new LiveRunResultEntity(dispatch, meta);
+        case ApiClientEntityType.SECRET_PROVIDER:
+          return new SecretProviderEntity(dispatch, meta);
+        case ApiClientEntityType.SECRET_VALUE:
+          return new SecretValueEntity(dispatch, meta);
       }
     })() as EntityTypeMap<T>;
 

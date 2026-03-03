@@ -34,12 +34,15 @@ export function checkIsSecretsVariable(variable: Variable): variable is SecretVa
 export function mergeAndParseAllVariables(scopedVariables?: ScopedVariables): Variables {
   const unified: Variables = {};
 
+  // Add scoped variables first so they appear before dynamic and secrets
   if (scopedVariables) Object.assign(unified, scopedVariables);
   variableResolver.listAll().forEach((v) => {
     if (!unified[v.name]) {
       unified[v.name] = v;
     }
   });
+
+  // Add secrets variables that don't conflict
   secretVariables.getSecretsList().forEach((v) => {
     if (!unified[v.name]) {
       unified[v.name] = v;
