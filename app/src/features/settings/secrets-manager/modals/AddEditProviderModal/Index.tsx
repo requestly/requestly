@@ -91,12 +91,12 @@ export const AddEditProviderModal = ({
           suffix={error ? errorSuffix(error) : undefined}
           disabled={isLoading}
         />
-        <SelectField label="Secret manager" id="secret-manager" value="" options={[]} />
+        <SelectField label="Secret manager" id="secret-manager" value={providerData?.secretManager} options={[]} />
         <SelectField
           label="Auth method"
           options={authMethodOptions as any}
           id="auth-method"
-          value=""
+          value={providerData?.authMethod}
           handleFilterChange={() => {}}
         />
         <InputPasswordField
@@ -120,7 +120,13 @@ export const AddEditProviderModal = ({
           onValueChange={(value) => onChange({ sessionToken: value })}
           disabled={isLoading}
         />
-        <SelectField label="Region" options={regionsList as any} id="region" value="" handleFilterChange={() => {}} />
+        <SelectField
+          label="Region"
+          options={regionsList as any}
+          id="region"
+          value={providerData?.region}
+          handleFilterChange={() => {}}
+        />
       </div>
     </Modal>
   );
