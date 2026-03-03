@@ -1,4 +1,5 @@
 import { toast } from "utils/Toast.js";
+import { traceIPC } from "utils/TracingIPC";
 
 export function getAppVersion() {
   return window.RQ && window.RQ.DESKTOP && window.RQ.DESKTOP.VERSION;
@@ -53,5 +54,5 @@ export const invokeAppDetectionInBackground = (arrayOfApps) => {
 };
 
 export const getAPIResponse = (apiRequest) => {
-  return window.RQ.DESKTOP.SERVICES.IPC.invokeEventInMain("get-api-response", { apiRequest });
+  return traceIPC.invokeEventInMain("get-api-response", { apiRequest });
 };
