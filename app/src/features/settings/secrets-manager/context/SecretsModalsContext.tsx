@@ -175,50 +175,50 @@ export const SecretsModalsProvider: React.FC<{ children: React.ReactNode }> = ({
     setModals((prev) => ({ ...prev, delete: { isOpen: false } }));
   }, []);
 
-  const saveProvider = useCallback(async (formData: ProviderData) => {
+  const setAddEditLoading = useCallback((isLoading: boolean, error?: string) => {
     setModals((prev) => {
       if (!prev.addEdit.isOpen) return prev;
-      return { ...prev, addEdit: { ...prev.addEdit, isLoading: true, error: undefined } };
+      return { ...prev, addEdit: { ...prev.addEdit, isLoading, error } };
     });
-
-    try {
-      const addEditState = modalsRef.current.addEdit;
-      const existingId =
-        addEditState.isOpen && addEditState.mode === "edit" ? addEditState.editingProviderId : undefined;
-      const mode = addEditState.isOpen ? addEditState.mode : "add";
-
-      const config = toSecretProviderConfig(formData, existingId);
-      const result = await secretsManagerService.setProviderConfig(config);
-
-      if (result.type === "error") {
-        setModals((prev) => {
-          if (!prev.addEdit.isOpen) {
-            return prev;
-          }
-          return { ...prev, addEdit: { ...prev.addEdit, isLoading: false, error: result.error.message } };
-        });
-
-        return;
-      }
-
-      toast.success(`Provider ${mode === "add" ? "added" : "updated"} successfully`);
-      setModals((prev) => ({ ...prev, addEdit: { isOpen: false } }));
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Failed to save provider";
-      setModals((prev) => {
-        if (!prev.addEdit.isOpen) return prev;
-        return { ...prev, addEdit: { ...prev.addEdit, isLoading: false, error: errorMessage } };
-      });
-    }
   }, []);
 
-  const testConnection = useCallback(async () => {
-    setModals((prev) => {
-      if (!prev.addEdit.isOpen) {
-        return prev;
+  const handleAddEditError = useCallback(
+    (error: unknown, defaultMessage: string) => {
+      const errorMessage = error instanceof Error ? error.message : defaultMessage;
+      setAddEditLoading(false, errorMessage);
+    },
+    [setAddEditLoading]
+  );
+
+  const saveProvider = useCallback(
+    async (formData: ProviderData) => {
+      setAddEditLoading(true, undefined);
+
+      try {
+        const addEditState = modalsRef.current.addEdit;
+        const existingId =
+          addEditState.isOpen && addEditState.mode === "edit" ? addEditState.editingProviderId : undefined;
+        const mode = addEditState.isOpen ? addEditState.mode : "add";
+
+        const config = toSecretProviderConfig(formData, existingId);
+        const result = await secretsManagerService.setProviderConfig(config);
+
+        if (result.type === "error") {
+          setAddEditLoading(false, result.error.message);
+          return;
+        }
+
+        toast.success(`Provider ${mode === "add" ? "added" : "updated"} successfully`);
+        setModals((prev) => ({ ...prev, addEdit: { isOpen: false } }));
+      } catch (error) {
+        handleAddEditError(error, "Failed to save provider");
       }
-      return { ...prev, addEdit: { ...prev.addEdit, isLoading: true, error: undefined } };
-    });
+    },
+    [setAddEditLoading, handleAddEditError]
+  );
+
+  const testConnection = useCallback(async () => {
+    setAddEditLoading(true, undefined);
 
     try {
       const addEditState = modalsRef.current.addEdit;
@@ -231,10 +231,7 @@ export const SecretsModalsProvider: React.FC<{ children: React.ReactNode }> = ({
       const result = await secretsManagerService.testConnectionWithConfig(config);
 
       if (result.type === "error") {
-        setModals((prev) => {
-          if (!prev.addEdit.isOpen) return prev;
-          return { ...prev, addEdit: { ...prev.addEdit, isLoading: false, error: result.error.message } };
-        });
+        setAddEditLoading(false, result.error.message);
         return;
       }
 
@@ -244,25 +241,11 @@ export const SecretsModalsProvider: React.FC<{ children: React.ReactNode }> = ({
         toast.error("Connection failed. Please check your credentials.");
       }
 
-      setModals((prev) => {
-        if (!prev.addEdit.isOpen) {
-          return prev;
-        }
-        return {
-          ...prev,
-          addEdit: { ...prev.addEdit, isLoading: false, error: result.data ? undefined : "Connection test failed" },
-        };
-      });
+      setAddEditLoading(false, result.data ? undefined : "Connection test failed");
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Connection test failed";
-      setModals((prev) => {
-        if (!prev.addEdit.isOpen) {
-          return prev;
-        }
-        return { ...prev, addEdit: { ...prev.addEdit, isLoading: false, error: errorMessage } };
-      });
+      handleAddEditError(error, "Connection test failed");
     }
-  }, []);
+  }, [setAddEditLoading, handleAddEditError]);
 
   const deleteProvider = useCallback(async () => {
     const deleteState = modalsRef.current.delete;

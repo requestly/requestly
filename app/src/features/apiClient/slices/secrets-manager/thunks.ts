@@ -41,10 +41,6 @@ export const initAndSubscribeSecretsManager = createAsyncThunk<void, void, { rej
       });
     }
 
-    if (signal.aborted) {
-      return;
-    }
-
     await dispatch(fetchSecretProviders()).unwrap();
   }
 );
