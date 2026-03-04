@@ -1,6 +1,15 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { SecretProviderMetadata, SecretValue } from "@requestly/shared/types/entities/secretsManager";
+import {
+  SecretProviderMetadata,
+  SecretProviderType,
+  SecretValue,
+} from "@requestly/shared/types/entities/secretsManager";
 import { secretsManagerService } from "services/secretsManagerService";
+import { PendingSecretEntry } from "./types";
+import { selectAllSecrets, selectSelectedProviderId, selectAllSecretProviders } from "./selectors";
+import { secretsManagerActions } from "./slice";
+
+type RootState = { secretsManager: import("./types").SecretsManagerState };
 
 export const fetchSecretProviders = createAsyncThunk<SecretProviderMetadata[], void, { rejectValue: string }>(
   "secretsManager/fetchProviders",
@@ -15,23 +24,69 @@ export const fetchSecretProviders = createAsyncThunk<SecretProviderMetadata[], v
   }
 );
 
-export const fetchSecretsForProvider = createAsyncThunk<SecretValue[], string, { rejectValue: string }>(
-  "secretsManager/fetchSecretsForProvider",
-  async (providerId, { rejectWithValue }) => {
-    const result = await secretsManagerService.refreshSecrets(providerId);
+export const refreshSecretsForProvider = createAsyncThunk<
+  SecretValue[],
+  { providerId: string; pendingEntries: PendingSecretEntry[] },
+  { rejectValue: string; state: RootState }
+>("secretsManager/refreshSecretsForProvider", async ({ providerId, pendingEntries }, { rejectWithValue }) => {
+  const allSecrets: SecretValue[] = [];
 
+  const refreshResult = await secretsManagerService.refreshSecrets(providerId);
+  if (refreshResult.type === "error") {
+    return rejectWithValue(refreshResult.error.message);
+  }
+  const refreshedSecrets = refreshResult.data.filter((s): s is SecretValue => s !== null);
+  allSecrets.push(...refreshedSecrets);
+
+  if (pendingEntries.length > 0) {
+    const refs = pendingEntries.map((entry) => ({
+      providerId,
+      ref: {
+        type: SecretProviderType.AWS_SECRETS_MANAGER as const,
+        alias: entry.alias,
+        identifier: entry.identifier,
+        version: entry.version,
+      },
+    }));
+
+    const pendingResult = await secretsManagerService.getSecretValues(refs);
+    if (pendingResult.type === "error") {
+      return rejectWithValue(pendingResult.error.message);
+    }
+    allSecrets.push(...pendingResult.data);
+  }
+
+  return allSecrets;
+});
+
+export const getSecretsForProvider = createAsyncThunk<SecretValue[], string, { rejectValue: string; state: RootState }>(
+  "secretsManager/getSecretsForProvider",
+  async (providerId, { getState, rejectWithValue }) => {
+    const state = getState();
+    const existingSecrets = selectAllSecrets(state).filter((s) => s.providerId === providerId);
+
+    if (existingSecrets.length === 0) {
+      return [];
+    }
+
+    const refs = existingSecrets.map((s) => ({
+      providerId,
+      ref: s.secretReference,
+    }));
+
+    const result = await secretsManagerService.getSecretValues(refs);
     if (result.type === "error") {
       return rejectWithValue(result.error.message);
     }
 
-    return result.data.filter((s): s is SecretValue => s !== null);
+    return result.data;
   }
 );
 
 let isSubscriptionRegistered = false;
-export const initAndSubscribeSecretsManager = createAsyncThunk<void, void, { rejectValue: string }>(
+export const initAndSubscribeSecretsManager = createAsyncThunk<void, void, { rejectValue: string; state: RootState }>(
   "secretsManager/init",
-  async (_, { dispatch, rejectWithValue, signal }) => {
+  async (_, { dispatch, getState, rejectWithValue, signal }) => {
     const initResult = await secretsManagerService.init();
 
     if (initResult.type === "error") {
@@ -50,5 +105,25 @@ export const initAndSubscribeSecretsManager = createAsyncThunk<void, void, { rej
     }
 
     await dispatch(fetchSecretProviders());
+
+    if (signal.aborted) {
+      return;
+    }
+
+    const state = getState();
+    let activeProviderId = selectSelectedProviderId(state);
+
+    if (!activeProviderId) {
+      const providers = selectAllSecretProviders(state);
+      const firstProvider = providers[0];
+      if (firstProvider) {
+        activeProviderId = firstProvider.id;
+        dispatch(secretsManagerActions.setSelectedProviderId(activeProviderId));
+      }
+    }
+
+    if (activeProviderId) {
+      dispatch(refreshSecretsForProvider({ providerId: activeProviderId, pendingEntries: [] }));
+    }
   }
 );

@@ -8,6 +8,14 @@ export {
   selectFetchStatus,
   selectSecretsForSelectedProvider,
   selectLastFetchedForSelectedProvider,
+  selectPendingEntriesForSelectedProvider,
+  selectHasPendingEntries,
+  selectAllAliasesForProvider,
 } from "./selectors";
-export { initAndSubscribeSecretsManager, fetchSecretProviders, fetchSecretsForProvider } from "./thunks";
-export type { SecretsManagerState, FetchStatus } from "./types";
+export {
+  initAndSubscribeSecretsManager,
+  fetchSecretProviders,
+  refreshSecretsForProvider,
+  getSecretsForProvider,
+} from "./thunks";
+export type { SecretsManagerState, FetchStatus, PendingSecretEntry } from "./types";

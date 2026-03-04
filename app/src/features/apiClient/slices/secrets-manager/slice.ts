@@ -1,76 +1,17 @@
-import { createSlice, createEntityAdapter, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { SECRETS_MANAGER_SLICE_NAME } from "../common/constants";
-import {
-  SecretProviderMetadata,
-  SecretProviderType,
-  SecretValue,
-  AwsSecretValue,
-} from "@requestly/shared/types/entities/secretsManager";
-import { SecretsManagerState } from "./types";
-import { fetchSecretProviders, fetchSecretsForProvider } from "./thunks";
+import { SecretProviderMetadata, SecretValue } from "@requestly/shared/types/entities/secretsManager";
+import { SecretsManagerState, PendingSecretEntry } from "./types";
+import { fetchSecretProviders, refreshSecretsForProvider, getSecretsForProvider } from "./thunks";
+import { providersAdapter, secretsAdapter, getSecretId } from "./adapters";
 
-export const providersAdapter = createEntityAdapter<SecretProviderMetadata>({
-  selectId: (provider) => provider.id,
-});
-
-export const secretsAdapter = createEntityAdapter<SecretValue>({
-  selectId: (value) => getSecretId(value),
-});
-
-export function getSecretId(secret: SecretValue): string {
-  return `name:${secret.secretReference.identifier};version:${secret.secretReference.version ?? "latest"}`;
-}
-
-// TODO: Remove sample data once real provider/secret flows are fully wired
-const SAMPLE_PROVIDER_ID = "sample-provider-staging";
-
-const SAMPLE_PROVIDER: SecretProviderMetadata = {
-  id: SAMPLE_PROVIDER_ID,
-  type: SecretProviderType.AWS_SECRETS_MANAGER,
-  name: "Staging",
-  createdAt: Date.now(),
-  updatedAt: Date.now(),
-};
-
-const SAMPLE_SECRETS: AwsSecretValue[] = [
-  {
-    type: SecretProviderType.AWS_SECRETS_MANAGER,
-    providerId: SAMPLE_PROVIDER_ID,
-    secretReference: {
-      type: SecretProviderType.AWS_SECRETS_MANAGER,
-      identifier: "mysecret-a1b2",
-      version: "3sf3re-8er5-4er6-wer7-wereryy38",
-    },
-    fetchedAt: Date.now(),
-    name: "DB_PASSWORD",
-    value: "sk_test_supersecretpassword",
-    ARN: "arn:aws:secretsmanager:us-west-2:123456789012:secret:mysecret-a1b2",
-    versionId: "3sf3re-8er5-4er6-wer7-wereryy38",
-  },
-  {
-    type: SecretProviderType.AWS_SECRETS_MANAGER,
-    providerId: SAMPLE_PROVIDER_ID,
-    secretReference: {
-      type: SecretProviderType.AWS_SECRETS_MANAGER,
-      identifier: "stripe-keys",
-    },
-    fetchedAt: Date.now(),
-    name: "STRIPE_API_KEY",
-    value: '{"api_key":"sk_live_1234567890abcdef","web_sec":"whsec_abcdefghijklmnop"}',
-    ARN: "arn:aws:secretsmanager:us-east-1:123456789:secret:stripe-keys",
-    versionId: "",
-  },
-];
-// END TODO: Remove sample data
-
-// TODO: Remove sample data seeding
-const seededProviders = providersAdapter.setAll(providersAdapter.getInitialState(), [SAMPLE_PROVIDER]);
-const seededSecrets = secretsAdapter.setAll(secretsAdapter.getInitialState(), SAMPLE_SECRETS);
+export { providersAdapter, secretsAdapter, getSecretId } from "./adapters";
 
 const initialState: SecretsManagerState = {
-  providers: seededProviders,
-  secrets: seededSecrets,
-  selectedProviderId: SAMPLE_PROVIDER_ID,
+  providers: providersAdapter.getInitialState(),
+  secrets: secretsAdapter.getInitialState(),
+  pendingEntries: {},
+  selectedProviderId: null,
   fetchStatus: "idle",
 };
 
@@ -104,6 +45,13 @@ export const secretsManagerSlice = createSlice({
     upsertSecrets(state, action: PayloadAction<SecretValue[]>) {
       secretsAdapter.upsertMany(state.secrets, action.payload);
     },
+    setSecretsForProvider(state, action: PayloadAction<{ providerId: string; secrets: SecretValue[] }>) {
+      const { providerId, secrets } = action.payload;
+      const allSecrets = secretsAdapter.getSelectors().selectAll(state.secrets);
+      const idsToRemove = allSecrets.filter((s) => s.providerId === providerId).map((s) => getSecretId(s));
+      secretsAdapter.removeMany(state.secrets, idsToRemove);
+      secretsAdapter.upsertMany(state.secrets, secrets);
+    },
     removeSecret(state, action: PayloadAction<string>) {
       secretsAdapter.removeOne(state.secrets, action.payload);
     },
@@ -116,20 +64,70 @@ export const secretsManagerSlice = createSlice({
         action.payload.patcher(secret);
       }
     },
+
+    addPendingEntry(state, action: PayloadAction<{ providerId: string; entry: PendingSecretEntry }>) {
+      const { providerId, entry } = action.payload;
+      if (!state.pendingEntries[providerId]) {
+        state.pendingEntries[providerId] = [];
+      }
+      state.pendingEntries[providerId].push(entry);
+    },
+    updatePendingEntry(
+      state,
+      action: PayloadAction<{ providerId: string; index: number; entry: Partial<PendingSecretEntry> }>
+    ) {
+      const { providerId, index, entry } = action.payload;
+      const entries = state.pendingEntries[providerId];
+      if (entries && entries[index]) {
+        Object.assign(entries[index], entry);
+      }
+    },
+    removePendingEntry(state, action: PayloadAction<{ providerId: string; index: number }>) {
+      const { providerId, index } = action.payload;
+      const entries = state.pendingEntries[providerId];
+      if (entries) {
+        entries.splice(index, 1);
+        if (entries.length === 0) {
+          delete state.pendingEntries[providerId];
+        }
+      }
+    },
+    clearPendingEntries(state, action: PayloadAction<{ providerId: string }>) {
+      delete state.pendingEntries[action.payload.providerId];
+    },
   },
   extraReducers: (builder) => {
     builder
       .addCase(fetchSecretProviders.fulfilled, (state, action) => {
         providersAdapter.setAll(state.providers, action.payload);
       })
-      .addCase(fetchSecretsForProvider.pending, (state) => {
+      .addCase(refreshSecretsForProvider.pending, (state) => {
         state.fetchStatus = "loading";
       })
-      .addCase(fetchSecretsForProvider.fulfilled, (state, action) => {
+      .addCase(refreshSecretsForProvider.fulfilled, (state, action) => {
         state.fetchStatus = "succeeded";
+        const providerId = action.meta.arg.providerId;
+        const allSecrets = secretsAdapter.getSelectors().selectAll(state.secrets);
+        const idsToRemove = allSecrets.filter((s) => s.providerId === providerId).map((s) => getSecretId(s));
+        secretsAdapter.removeMany(state.secrets, idsToRemove);
+        secretsAdapter.upsertMany(state.secrets, action.payload);
+        delete state.pendingEntries[providerId];
+      })
+      .addCase(refreshSecretsForProvider.rejected, (state) => {
+        state.fetchStatus = "failed";
+      })
+      .addCase(getSecretsForProvider.pending, (state) => {
+        state.fetchStatus = "loading";
+      })
+      .addCase(getSecretsForProvider.fulfilled, (state, action) => {
+        state.fetchStatus = "succeeded";
+        const providerId = action.meta.arg;
+        const allSecrets = secretsAdapter.getSelectors().selectAll(state.secrets);
+        const idsToRemove = allSecrets.filter((s) => s.providerId === providerId).map((s) => getSecretId(s));
+        secretsAdapter.removeMany(state.secrets, idsToRemove);
         secretsAdapter.upsertMany(state.secrets, action.payload);
       })
-      .addCase(fetchSecretsForProvider.rejected, (state) => {
+      .addCase(getSecretsForProvider.rejected, (state) => {
         state.fetchStatus = "failed";
       });
   },

@@ -1,6 +1,6 @@
 import { createSelector } from "@reduxjs/toolkit";
-import { providersAdapter, secretsAdapter } from "./slice";
-import { SecretsManagerState } from "./types";
+import { providersAdapter, secretsAdapter } from "./adapters";
+import { SecretsManagerState, PendingSecretEntry } from "./types";
 
 type RootState = { secretsManager: SecretsManagerState };
 
@@ -35,3 +35,30 @@ export const selectLastFetchedForSelectedProvider = createSelector([selectSecret
   if (secrets.length === 0) return null;
   return Math.max(...secrets.map((s) => s.fetchedAt));
 });
+
+const selectAllPendingEntries = createSelector(selectSecretsManagerSlice, (slice) => slice.pendingEntries);
+
+export const selectPendingEntriesForSelectedProvider = createSelector(
+  [selectAllPendingEntries, selectSelectedProviderId],
+  (pendingEntries, selectedProviderId): PendingSecretEntry[] => {
+    if (!selectedProviderId) return [];
+    return pendingEntries[selectedProviderId] ?? [];
+  }
+);
+
+export const selectHasPendingEntries = createSelector([selectAllPendingEntries], (pendingEntries) => {
+  return Object.values(pendingEntries).some((entries) => entries.length > 0);
+});
+
+export const selectAllAliasesForProvider = (state: RootState, providerId: string): string[] => {
+  const allSecrets = secretsAdapterSelectors.selectAll(state);
+  const secretAliases = allSecrets
+    .filter((s) => s.providerId === providerId)
+    .map((s) => s.secretReference.alias)
+    .filter(Boolean);
+
+  const pendingEntries = state.secretsManager.pendingEntries[providerId] ?? [];
+  const pendingAliases = pendingEntries.map((e) => e.alias).filter(Boolean);
+
+  return [...secretAliases, ...pendingAliases];
+};

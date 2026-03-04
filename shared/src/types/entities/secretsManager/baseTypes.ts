@@ -26,4 +26,5 @@ export interface ProviderConfig<T extends SecretProviderType, C> {
  */
 export interface SecretReference<T extends SecretProviderType> {
   type: T;
+  alias: string;
 }

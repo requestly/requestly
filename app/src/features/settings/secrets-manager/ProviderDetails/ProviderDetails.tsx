@@ -10,8 +10,10 @@ import {
   selectSelectedProviderId,
   selectLastFetchedForSelectedProvider,
   selectFetchStatus,
+  selectPendingEntriesForSelectedProvider,
   secretsManagerActions,
-  fetchSecretsForProvider,
+  refreshSecretsForProvider,
+  getSecretsForProvider,
 } from "features/apiClient/slices/secrets-manager";
 
 const { Option } = Select;
@@ -36,6 +38,7 @@ const ProviderDetails: React.FC<ProviderDetailsProps> = ({ onViewKeyValues }) =>
   const selectedProviderId = useSelector(selectSelectedProviderId);
   const lastFetchedTimestamp = useSelector(selectLastFetchedForSelectedProvider);
   const fetchStatus = useSelector(selectFetchStatus);
+  const pendingEntries = useSelector(selectPendingEntriesForSelectedProvider);
 
   const isFetching = fetchStatus === "loading";
   const lastFetched = useMemo(() => (lastFetchedTimestamp ? formatRelativeTime(lastFetchedTimestamp) : null), [
@@ -45,15 +48,16 @@ const ProviderDetails: React.FC<ProviderDetailsProps> = ({ onViewKeyValues }) =>
   const handleInstanceChange = useCallback(
     (providerId: string) => {
       dispatch(secretsManagerActions.setSelectedProviderId(providerId));
+      dispatch(getSecretsForProvider(providerId) as any);
     },
     [dispatch]
   );
 
   const handleFetchSecrets = useCallback(() => {
     if (selectedProviderId) {
-      dispatch(fetchSecretsForProvider(selectedProviderId) as any);
+      dispatch(refreshSecretsForProvider({ providerId: selectedProviderId, pendingEntries }) as any);
     }
-  }, [dispatch, selectedProviderId]);
+  }, [dispatch, selectedProviderId, pendingEntries]);
 
   return (
     <div className="provider-details-container">
