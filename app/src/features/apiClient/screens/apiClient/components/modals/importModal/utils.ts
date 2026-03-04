@@ -82,6 +82,7 @@ export const processRqImportData = (
       updatedApi.data.request.headers = updatedApi.data.request.headers.map((header: KeyValuePair, index: number) => {
         return {
           ...header,
+          value: typeof header.value === "string" ? header.value : "",
           isEnabled: header.isEnabled ?? true,
           id: header.id ?? index,
         };
@@ -93,10 +94,21 @@ export const processRqImportData = (
         (queryParam: KeyValuePair, index: number) => {
           return {
             ...queryParam,
+            value: typeof queryParam.value === "string" ? queryParam.value : "",
             isEnabled: queryParam.isEnabled ?? true,
             id: queryParam.id ?? index,
           };
         }
+      );
+    }
+
+    if (updatedApi?.data?.type === RQAPI.ApiEntryType.HTTP && Array.isArray(updatedApi.data.request?.body)) {
+      updatedApi.data.request.body = (updatedApi.data.request.body as KeyValuePair[]).map(
+        (item: KeyValuePair, index: number) => ({
+          ...item,
+          value: typeof item.value === "string" ? item.value : "",
+          id: item.id ?? index,
+        })
       );
     }
 
