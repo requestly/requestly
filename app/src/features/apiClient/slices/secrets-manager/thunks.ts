@@ -13,23 +13,33 @@ export const fetchSecretProviders = createAsyncThunk<SecretProviderMetadata[], v
     }
 
     const providers = result.data;
+    console.log("!!!debug", "providers", providers);
     dispatch(secretsManagerActions.setAllProviders(providers));
     return providers;
   }
 );
 
+let isSubscriptionRegistered = false;
+
 export const initAndSubscribeSecretsManager = createAsyncThunk<void, void, { rejectValue: string }>(
   "secretsManager/init",
-  async (_, { dispatch, rejectWithValue }) => {
+  async (_, { dispatch, rejectWithValue, signal }) => {
     const initResult = await secretsManagerService.init();
 
     if (initResult.type === "error") {
       return rejectWithValue(initResult.error.message);
     }
 
-    secretsManagerService.subscribeToProvidersChange((providers) => {
-      dispatch(secretsManagerActions.setAllProviders(providers));
-    });
+    if (signal.aborted) {
+      return;
+    }
+
+    if (!isSubscriptionRegistered) {
+      isSubscriptionRegistered = true;
+      secretsManagerService.subscribeToProvidersChange((providers) => {
+        dispatch(secretsManagerActions.setAllProviders(providers));
+      });
+    }
 
     await dispatch(fetchSecretProviders()).unwrap();
   }

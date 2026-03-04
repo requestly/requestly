@@ -8,12 +8,13 @@ import { authMethodOptions, regionsList, secretManagerOptions } from "../../cons
 import { InputPasswordField } from "../../components/InputField/InputPasswordField";
 import { InfoCircleOutlined } from "@ant-design/icons";
 import { ProviderData } from "../../context/SecretsModalsContext";
+import { SecretProviderType } from "@requestly/shared/types/entities/secretsManager";
 
 interface AddEditProviderModalProps {
   mode: "add" | "edit";
   open: boolean;
-  providerData?: ProviderData;
-  onChange: (data: any) => void;
+  providerData: ProviderData;
+  onChange: (data: Partial<ProviderData>) => void;
   onClose: () => void;
   onSave: () => void | Promise<void>;
   onTestConnection: () => void | Promise<void>;
@@ -85,7 +86,7 @@ export const AddEditProviderModal = ({
         <InputField
           label="Instance name"
           id="instance-name"
-          value={providerData?.instanceName || ""}
+          value={providerData.instanceName}
           onValueChange={(value) => onChange({ instanceName: value })}
           status={error ? "error" : undefined}
           suffix={error ? errorSuffix(error) : undefined}
@@ -94,37 +95,37 @@ export const AddEditProviderModal = ({
         <SelectField
           label="Secret manager"
           id="secret-manager"
-          value={providerData?.secretManagerType ?? ""}
+          value={providerData.secretManagerType}
           options={secretManagerOptions}
-          handleFilterChange={(value: string) => onChange({ secretManager: value })}
+          handleFilterChange={(value: string) => onChange({ secretManagerType: value as SecretProviderType })}
           disabled={isLoading}
         />
         <SelectField
           label="Auth method"
           options={authMethodOptions}
           id="auth-method"
-          value={providerData?.authMethod ?? ""}
+          value={providerData.authMethod}
           handleFilterChange={(value: string) => onChange({ authMethod: value })}
           disabled={isLoading}
         />
         <InputPasswordField
           label="Access key"
           id="access-key"
-          value={providerData?.accessKey || ""}
+          value={providerData.accessKey}
           onValueChange={(value) => onChange({ accessKey: value })}
           disabled={isLoading}
         />
         <InputPasswordField
           label="Secret key"
           id="secret-key"
-          value={providerData?.secretKey || ""}
+          value={providerData.secretKey}
           onValueChange={(value) => onChange({ secretKey: value })}
           disabled={isLoading}
         />
         <InputPasswordField
           label="Session token"
           id="session-token"
-          value={providerData?.sessionToken || ""}
+          value={providerData.sessionToken || ""}
           onValueChange={(value) => onChange({ sessionToken: value })}
           disabled={isLoading}
         />
@@ -132,7 +133,7 @@ export const AddEditProviderModal = ({
           label="Region"
           options={regionsList}
           id="region"
-          value={providerData?.region ?? ""}
+          value={providerData.region}
           handleFilterChange={(value: string) => onChange({ region: value })}
           disabled={isLoading}
         />
