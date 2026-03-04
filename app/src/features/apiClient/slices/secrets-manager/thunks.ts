@@ -3,11 +3,13 @@ import {
   SecretProviderMetadata,
   SecretProviderType,
   SecretValue,
+  AwsSecretValue,
 } from "@requestly/shared/types/entities/secretsManager";
 import { secretsManagerService } from "services/secretsManagerService";
 import { PendingSecretEntry } from "./types";
 import { selectAllSecrets, selectSelectedProviderId, selectAllSecretProviders } from "./selectors";
 import { secretsManagerActions } from "./slice";
+import { secretVariables } from "lib/secret-variables";
 
 type RootState = { secretsManager: import("./types").SecretsManagerState };
 
@@ -56,6 +58,8 @@ export const refreshSecretsForProvider = createAsyncThunk<
     allSecrets.push(...pendingResult.data);
   }
 
+  secretVariables.updateSourceFromSecrets(allSecrets as AwsSecretValue[]);
+
   return allSecrets;
 });
 
@@ -78,6 +82,8 @@ export const getSecretsForProvider = createAsyncThunk<SecretValue[], string, { r
     if (result.type === "error") {
       return rejectWithValue(result.error.message);
     }
+
+    secretVariables.updateSourceFromSecrets(result.data as AwsSecretValue[]);
 
     return result.data;
   }

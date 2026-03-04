@@ -1,23 +1,11 @@
 import { VariableScope } from "../../backend/environment/types";
 import { SecretVariable, SecretVariableTree } from "./types";
 import { getValueByPath, isResolvableLeaf, flattenToLeafPaths } from "./utils";
+import { AwsSecretValue } from "@requestly/shared/types/entities/secretsManager";
 
 const SECRETS_PREFIX = "secrets.";
 
 export type SecretsSource = () => SecretVariableTree;
-
-function defaultSource(): SecretVariableTree {
-  return {
-    apple: { name: "apple", value: "red", id: "apple", scope: VariableScope.SECRETS },
-    banana: { name: "banana", value: "yellow", id: "banana", scope: VariableScope.SECRETS },
-    cherry: { name: "cherry", value: "red", id: "cherry", scope: VariableScope.SECRETS },
-    cities: {
-      newYork: { name: "newYork", value: "New York", id: "newYork", scope: VariableScope.SECRETS },
-      losAngeles: { name: "losAngeles", value: "Los Angeles", id: "losAngeles", scope: VariableScope.SECRETS },
-      chicago: { name: "chicago", value: "Chicago", id: "chicago", scope: VariableScope.SECRETS },
-    },
-  };
-}
 
 /**
  * Recursively transforms a SecretVariableTree into a plain object with just values.
@@ -39,10 +27,46 @@ function transformTreeToValues(tree: SecretVariableTree): Record<string, unknown
 }
 
 export class SecretVariablesService {
-  private source: SecretsSource = defaultSource;
+  private source: SecretsSource = () => ({});
 
   setSource(source: SecretsSource): void {
     this.source = source;
+  }
+
+  private buildSourceFromAwsSecrets(secrets: AwsSecretValue[]): SecretVariableTree {
+    const tree: SecretVariableTree = {};
+
+    for (const secret of secrets) {
+      const alias = secret.secretReference.alias;
+      if (!alias) continue;
+
+      let parsed: Record<string, unknown> | null = null;
+      try {
+        const result = JSON.parse(secret.value);
+        if (result && typeof result === "object" && !Array.isArray(result)) {
+          parsed = result as Record<string, unknown>;
+        }
+      } catch {
+        // plain string secret
+      }
+
+      if (parsed) {
+        const nested: { [key: string]: SecretVariable } = {};
+        for (const [k, v] of Object.entries(parsed)) {
+          nested[k] = { name: k, value: String(v), id: k, scope: VariableScope.SECRETS };
+        }
+        tree[alias] = nested;
+      } else {
+        tree[alias] = { name: alias, value: secret.value, id: alias, scope: VariableScope.SECRETS };
+      }
+    }
+
+    return tree;
+  }
+
+  updateSourceFromSecrets(secrets: AwsSecretValue[]): void {
+    const tree = this.buildSourceFromAwsSecrets(secrets);
+    this.setSource(() => tree);
   }
 
   /**
