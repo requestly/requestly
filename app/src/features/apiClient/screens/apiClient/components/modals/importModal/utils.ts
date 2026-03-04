@@ -93,6 +93,7 @@ export const processRqImportData = (
         (queryParam: KeyValuePair, index: number) => {
           return {
             ...queryParam,
+            value: typeof queryParam.value === "string" ? queryParam.value : "",
             isEnabled: queryParam.isEnabled ?? true,
             id: queryParam.id ?? index,
           };

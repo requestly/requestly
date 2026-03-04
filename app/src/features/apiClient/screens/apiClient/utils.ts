@@ -268,7 +268,7 @@ export const generateKeyValuePairs = (data: string | Record<string, string | str
     for (const value of valueArray) {
       result.push({
         key: key || "",
-        value,
+        value: typeof value === "string" ? value : "",
         id: Math.random(),
         isEnabled: true,
       });
