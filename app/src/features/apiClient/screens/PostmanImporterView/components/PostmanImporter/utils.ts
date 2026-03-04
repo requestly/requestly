@@ -239,7 +239,7 @@ const processRawRequestBody = (raw: string, options: any): RequestBodyProcessing
   const contentType = getContentTypeForRawBody(options?.raw?.language);
 
   return {
-    requestBody: raw,
+    requestBody: typeof raw === "string" ? raw : "",
     contentType,
   };
 };
@@ -250,7 +250,14 @@ const processFormDataBody = (formdata: any[]): RequestBodyProcessingResult => {
       formdata?.map((formData: { key: string; value?: any; src?: any; type: "file" | "text" }) => ({
         id: Date.now(),
         key: formData.key,
-        value: formData.type === "file" ? formData.src : formData.value,
+        value:
+          formData.type === "file"
+            ? typeof formData.src === "string"
+              ? formData.src
+              : ""
+            : typeof formData.value === "string"
+            ? formData.value
+            : "",
         isEnabled: true,
         type: formData.type,
       })) || [],
@@ -265,7 +272,7 @@ const processUrlEncodedBody = (urlencoded: any[]): RequestBodyProcessingResult =
     requestBody: urlencoded.map((data: { key: string; value: string }) => ({
       id: Date.now() + Math.random(),
       key: data?.key || "",
-      value: data?.value || "",
+      value: typeof data?.value === "string" ? data.value : "",
       isEnabled: true,
     })),
     contentType,
@@ -285,29 +292,6 @@ export const parseGraphQLBody = (graphql: any): GraphQLBody => {
   return { operation, variables, operationName };
 };
 
-const normalizeRequestBodyForSchema = (
-  body: unknown,
-  arrayValueSchema: "form" | "multipart"
-): string | unknown[] | null => {
-  if (body === null || typeof body === "string" || Array.isArray(body)) {
-    if (!Array.isArray(body)) return body;
-    return body.map((item: { value?: unknown; [k: string]: unknown }) => {
-      if (!item || typeof item !== "object") return item;
-      const value = item.value;
-      const normalizedValue =
-        arrayValueSchema === "form"
-          ? typeof value === "string"
-            ? value
-            : ""
-          : value === null || typeof value === "string" || Array.isArray(value)
-          ? value
-          : "";
-      return { ...item, value: normalizedValue };
-    });
-  }
-  return "";
-};
-
 const processRequestBody = (request: any): RequestBodyProcessingResult => {
   if (!request.body) {
     return {
@@ -319,9 +303,6 @@ const processRequestBody = (request: any): RequestBodyProcessingResult => {
   const { mode, raw, formdata, options, urlencoded, graphql } = request.body;
 
   let result: RequestBodyProcessingResult;
-  const isBodyNormalized = (m: string) =>
-    m === PostmanBodyMode.RAW || m === PostmanBodyMode.URL_ENCODED || m === PostmanBodyMode.FORMDATA;
-
   switch (mode) {
     case PostmanBodyMode.RAW:
       result = processRawRequestBody(raw, options);
@@ -341,15 +322,6 @@ const processRequestBody = (request: any): RequestBodyProcessingResult => {
         contentType: RequestContentType.RAW,
       };
   }
-
-  if (isBodyNormalized(mode)) {
-    const arraySchema =
-      mode === PostmanBodyMode.URL_ENCODED ? "form" : mode === PostmanBodyMode.FORMDATA ? "multipart" : "form";
-    (result as HttpRequestBody).requestBody = normalizeRequestBodyForSchema(
-      (result as HttpRequestBody).requestBody,
-      arraySchema
-    ) as HttpRequestBody["requestBody"];
-  }
   return result;
 };
 
@@ -362,7 +334,7 @@ export const processRequestHeaders = (request: any): RequestHeadersProcessingRes
       ) => ({
         id: index,
         key: header.key,
-        value: header.value,
+        value: typeof header.value === "string" ? header.value : "",
         isEnabled: !header?.disabled,
         description: header?.description || "",
         dataType: getInferredKeyValueDataType(header.value),
