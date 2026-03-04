@@ -5,7 +5,8 @@ import {
   SecretValue,
   AwsSecretValue,
 } from "@requestly/shared/types/entities/secretsManager";
-import { secretsManagerService } from "services/secretsManagerService";
+import { secretsManagerService, toSecretProviderConfig } from "services/secretsManagerService";
+import { ProviderData } from "features/settings/secrets-manager/context/SecretsModalsContext";
 import { PendingSecretEntry } from "./types";
 import { selectAllSecrets, selectSelectedProviderId, selectAllSecretProviders } from "./selectors";
 import { secretsManagerActions } from "./slice";
@@ -89,11 +90,29 @@ export const getSecretsForProvider = createAsyncThunk<SecretValue[], string, { r
   }
 );
 
+export const saveProvider = createAsyncThunk<
+  string,
+  { formData: ProviderData; existingId?: string; mode: "add" | "edit" },
+  { rejectValue: string; state: RootState }
+>("secretsManager/saveProvider", async ({ formData, existingId }, { dispatch, rejectWithValue }) => {
+  const config = toSecretProviderConfig(formData, existingId);
+
+  const result = await secretsManagerService.setProviderConfig(config);
+  if (result.type === "error") {
+    return rejectWithValue(result.error.message);
+  }
+
+  await dispatch(fetchSecretProviders());
+  dispatch(secretsManagerActions.setSelectedProviderId(config.id));
+
+  return config.id;
+});
+
 let isSubscriptionRegistered = false;
-export const initAndSubscribeSecretsManager = createAsyncThunk<void, void, { rejectValue: string; state: RootState }>(
+export const initAndSubscribeSecretsManager = createAsyncThunk<void, string, { rejectValue: string; state: RootState }>(
   "secretsManager/init",
-  async (_, { dispatch, getState, rejectWithValue, signal }) => {
-    const initResult = await secretsManagerService.init();
+  async (userId, { dispatch, getState, rejectWithValue, signal }) => {
+    const initResult = await secretsManagerService.init(userId);
 
     if (initResult.type === "error") {
       return rejectWithValue(initResult.error.message);

@@ -4,7 +4,9 @@ import {
   SecretProviderType,
 } from "@requestly/shared/types/entities/secretsManager";
 import React, { createContext, useContext, useState, useCallback, useRef } from "react";
+import { useDispatch } from "react-redux";
 import { secretsManagerService, toSecretProviderConfig, toProviderData } from "services/secretsManagerService";
+import { saveProvider as saveProviderThunk } from "features/apiClient/slices/secrets-manager";
 import { toast } from "utils/Toast";
 
 export interface ProviderData {
@@ -76,6 +78,7 @@ const initialState: ModalState = {
 const SecretsModalsContext = createContext<SecretsModalsContextValue | undefined>(undefined);
 
 export const SecretsModalsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const dispatch = useDispatch();
   const [modals, setModals] = useState<ModalState>(initialState);
   const modalsRef = useRef(modals);
   modalsRef.current = modals;
@@ -194,27 +197,22 @@ export const SecretsModalsProvider: React.FC<{ children: React.ReactNode }> = ({
     async (formData: ProviderData) => {
       setAddEditLoading(true, undefined);
 
-      try {
-        const addEditState = modalsRef.current.addEdit;
-        const existingId =
-          addEditState.isOpen && addEditState.mode === "edit" ? addEditState.editingProviderId : undefined;
-        const mode = addEditState.isOpen ? addEditState.mode : "add";
+      const addEditState = modalsRef.current.addEdit;
+      const existingId =
+        addEditState.isOpen && addEditState.mode === "edit" ? addEditState.editingProviderId : undefined;
+      const mode = addEditState.isOpen ? addEditState.mode : "add";
 
-        const config = toSecretProviderConfig(formData, existingId);
-        const result = await secretsManagerService.setProviderConfig(config);
+      const result = await (dispatch as Function)(saveProviderThunk({ formData, existingId, mode }));
 
-        if (result.type === "error") {
-          setAddEditLoading(false, result.error.message);
-          return;
-        }
-
-        toast.success(`Provider ${mode === "add" ? "added" : "updated"} successfully`);
-        setModals((prev) => ({ ...prev, addEdit: { isOpen: false } }));
-      } catch (error) {
-        handleAddEditError(error, "Failed to save provider");
+      if (saveProviderThunk.rejected.match(result)) {
+        setAddEditLoading(false, result.payload ?? "Failed to save provider");
+        return;
       }
+
+      toast.success(`Provider ${mode === "add" ? "added" : "updated"} successfully`);
+      setModals((prev) => ({ ...prev, addEdit: { isOpen: false } }));
     },
-    [setAddEditLoading, handleAddEditError]
+    [dispatch, setAddEditLoading]
   );
 
   const testConnection = useCallback(async () => {

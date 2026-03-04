@@ -287,8 +287,9 @@ const AppModeInitializer = () => {
   }, [appMode]);
 
   useEffect(() => {
+    // TODO@nafees: add loggedin check and pass actual user id
     if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
-      const initPromise = dispatch(initAndSubscribeSecretsManager());
+      const initPromise = dispatch(initAndSubscribeSecretsManager("dummy-user-id"));
 
       return () => {
         initPromise.abort();

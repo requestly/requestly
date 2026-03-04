@@ -17,5 +17,6 @@ export {
   fetchSecretProviders,
   refreshSecretsForProvider,
   getSecretsForProvider,
+  saveProvider,
 } from "./thunks";
 export type { SecretsManagerState, FetchStatus, PendingSecretEntry } from "./types";

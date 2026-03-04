@@ -17,8 +17,8 @@ const invokeMainEvent = <T = unknown>(channel: string, payload?: Record<string, 
 };
 
 export const secretsManagerService = {
-  init: (): Promise<SecretsVoidResult> => {
-    return invokeMainEvent("secretsManager:init");
+  init: (userId: string): Promise<SecretsVoidResult> => {
+    return invokeMainEvent("secretsManager:init", { userId });
   },
 
   subscribeToProvidersChange: (callback: (providers: SecretProviderMetadata[]) => void): void => {
@@ -69,6 +69,14 @@ export const secretsManagerService = {
 
   refreshSecrets: (providerId: string): Promise<SecretsResult<(SecretValue | null)[]>> => {
     return invokeMainEvent("secretsManager:refreshSecrets", { providerId });
+  },
+
+  removeSecretValue: (providerId: string, secretReference: SecretReference): Promise<SecretsVoidResult> => {
+    return invokeMainEvent("secretsManager:removeSecretValue", { providerId, secretReference });
+  },
+
+  removeSecretValues: (secrets: Array<{ providerId: string; ref: SecretReference }>): Promise<SecretsVoidResult> => {
+    return invokeMainEvent("secretsManager:removeSecretValues", { secrets });
   },
 };
 

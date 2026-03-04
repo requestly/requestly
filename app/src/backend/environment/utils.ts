@@ -109,8 +109,6 @@ const processTemplateString = <T extends string>(input: T, variables: Variables)
     const { wrappedTemplate, usedVariables } = collectAndEscapeVariablesFromTemplate(input, variables);
     const contextWithSecrets = { ...variables, secrets: secretVariables.getSecrets() };
 
-    console.log("!!!debug", "contextWithSecrets", { contextWithSecrets, usedVariables, wrappedTemplate });
-
     const renderedTemplate = variableResolver.resolve(wrappedTemplate, contextWithSecrets) as T; // since handlebars generic types resolve to any; not string
 
     return {
