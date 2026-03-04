@@ -1,6 +1,7 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useCallback, useMemo } from "react";
 import { Table, Tag, Button, Dropdown, Tooltip, Checkbox, Popover, Input } from "antd";
 import type { ColumnsType } from "antd/lib/table";
+import { useSelector, useDispatch } from "react-redux";
 import { AiOutlineEye } from "@react-icons/all-files/ai/AiOutlineEye";
 import { AiOutlineEyeInvisible } from "@react-icons/all-files/ai/AiOutlineEyeInvisible";
 import { AiOutlineInfoCircle } from "@react-icons/all-files/ai/AiOutlineInfoCircle";
@@ -8,13 +9,29 @@ import { MdOutlineEdit } from "@react-icons/all-files/md/MdOutlineEdit";
 import { RiDeleteBin6Line } from "@react-icons/all-files/ri/RiDeleteBin6Line";
 import { BsThreeDots } from "@react-icons/all-files/bs/BsThreeDots";
 import { FiPlus } from "@react-icons/all-files/fi/FiPlus";
-import { Secret, SecretsTableProps } from "../../ProviderDetails/types";
+import { AwsSecretValue, SecretProviderType } from "@requestly/shared/types/entities/secretsManager";
+import {
+  selectSecretsForSelectedProvider,
+  selectSelectedProviderId,
+  secretsManagerActions,
+  getSecretId,
+} from "features/apiClient/slices/secrets-manager";
+import { secretsManagerService } from "services/secretsManagerService";
+import { parseSecretKeyValues } from "../../utils/parseSecretKeyValues";
 import "./secretsTable.scss";
 
-const DRAFT_ID = "__draft__";
+const DRAFT_KEY = "__draft__";
 
-type EditDraft = { alias: string; arnSecretName: string; versionId: string };
-/** Inline input that sits flush inside a table cell */
+type EditDraft = { identifier: string; version: string };
+
+type AwsTableRow = AwsSecretValue & { key: string };
+type DraftTableRow = { key: typeof DRAFT_KEY; isDraft: true };
+type TableRow = AwsTableRow | DraftTableRow;
+
+function isDraftRow(row: TableRow): row is DraftTableRow {
+  return row.key === DRAFT_KEY;
+}
+
 const EditableCell: React.FC<{
   inputRef?: React.Ref<any>;
   value: string | undefined;
@@ -34,7 +51,6 @@ const EditableCell: React.FC<{
   />
 );
 
-/** Build a save/cancel dropdown menu */
 const makeInlineMenu = (onSave: () => void, onCancel: () => void) => ({
   items: [
     { key: "save", icon: <MdOutlineEdit />, label: "Save", onClick: onSave },
@@ -64,77 +80,125 @@ const ToggleColumnPopover: React.FC<{ onToggle: () => void; isVisible: boolean }
   </div>
 );
 
-const SecretsTable: React.FC<SecretsTableProps> = ({
-  secrets,
-  onToggleVisibility,
-  onEditSecret,
-  onDeleteSecret,
-  onAddSecret,
-  onViewKeyValues,
-}) => {
+interface SecretsTableProps {
+  onViewKeyValues?: (secretId: string) => void;
+}
+
+const SecretsTable: React.FC<SecretsTableProps> = ({ onViewKeyValues }) => {
+  const dispatch = useDispatch();
+  const secrets = useSelector(selectSecretsForSelectedProvider) as AwsSecretValue[];
+  const selectedProviderId = useSelector(selectSelectedProviderId);
+
   const [showVersionId, setShowVersionId] = useState(true);
   const [draftRow, setDraftRow] = useState<EditDraft | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editDraft, setEditDraft] = useState<EditDraft | null>(null);
-  const addAliasRef = useRef<any>(null);
-  const editAliasRef = useRef<any>(null);
+  const [visibleIds, setVisibleIds] = useState<Set<string>>(new Set());
+  const addIdentifierRef = useRef<any>(null);
+  const editIdentifierRef = useRef<any>(null);
+
+  const toggleVisibility = useCallback((id: string) => {
+    setVisibleIds((prev) => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  }, []);
 
   const handleAddClick = () => {
     setEditingId(null);
     setEditDraft(null);
-    setDraftRow({ alias: "", arnSecretName: "", versionId: "" });
-    setTimeout(() => addAliasRef.current?.focus(), 50);
+    setDraftRow({ identifier: "", version: "" });
+    setTimeout(() => addIdentifierRef.current?.focus(), 50);
   };
-  const handleSaveDraft = () => {
-    if (draftRow) {
-      onAddSecret(draftRow);
-      setDraftRow(null);
+
+  const handleSaveDraft = async () => {
+    if (!draftRow || !selectedProviderId) return;
+
+    const ref = {
+      type: SecretProviderType.AWS_SECRETS_MANAGER as const,
+      identifier: draftRow.identifier,
+      version: draftRow.version || undefined,
+    };
+
+    const result = await secretsManagerService.getSecretValue(selectedProviderId, ref);
+    if (result.type === "success" && result.data) {
+      dispatch(secretsManagerActions.upsertSecrets([result.data]));
     }
+    setDraftRow(null);
   };
+
   const handleCancelDraft = () => setDraftRow(null);
+
   const handleDraftChange = (field: keyof EditDraft, value: string) =>
     setDraftRow((prev) => prev && { ...prev, [field]: value });
+
   const handleDraftKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") handleSaveDraft();
     if (e.key === "Escape") handleCancelDraft();
   };
 
-  // ── Edit (existing row) actions ──
-  const handleStartEdit = (record: Secret) => {
+  const handleStartEdit = (record: AwsSecretValue) => {
     setDraftRow(null);
-    setEditingId(record.id);
-    setEditDraft({ alias: record.alias, arnSecretName: record.arnSecretName, versionId: record.versionId });
-    setTimeout(() => editAliasRef.current?.focus(), 50);
+    const id = getSecretId(record);
+    setEditingId(id);
+    setEditDraft({
+      identifier: record.secretReference.identifier,
+      version: record.secretReference.version ?? "",
+    });
+    setTimeout(() => editIdentifierRef.current?.focus(), 50);
   };
-  const handleSaveEdit = () => {
-    if (editingId && editDraft) {
-      onEditSecret(editingId, editDraft);
-      setEditingId(null);
-      setEditDraft(null);
+
+  const handleSaveEdit = async () => {
+    if (!editingId || !editDraft || !selectedProviderId) return;
+
+    dispatch(secretsManagerActions.removeSecret(editingId));
+
+    const ref = {
+      type: SecretProviderType.AWS_SECRETS_MANAGER as const,
+      identifier: editDraft.identifier,
+      version: editDraft.version || undefined,
+    };
+
+    const result = await secretsManagerService.getSecretValue(selectedProviderId, ref);
+    if (result.type === "success" && result.data) {
+      dispatch(secretsManagerActions.upsertSecrets([result.data]));
     }
+
+    setEditingId(null);
+    setEditDraft(null);
   };
+
   const handleCancelEdit = () => {
     setEditingId(null);
     setEditDraft(null);
   };
+
   const handleEditChange = (field: keyof EditDraft, value: string) =>
     setEditDraft((prev) => prev && { ...prev, [field]: value });
+
   const handleEditKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") handleSaveEdit();
     if (e.key === "Escape") handleCancelEdit();
   };
 
-  const renderEditableCell = (
-    text: string,
-    record: Secret,
-    field: keyof EditDraft,
-    placeholder: string,
-    inputRef?: React.Ref<any>
-  ) => {
-    if (record.id === DRAFT_ID) {
+  const handleDeleteSecret = (id: string) => {
+    dispatch(secretsManagerActions.removeSecret(id));
+  };
+
+  const dataSource: TableRow[] = useMemo(() => {
+    const rows: TableRow[] = secrets.map((s) => ({ ...s, key: getSecretId(s) }));
+    if (draftRow) {
+      rows.push({ key: DRAFT_KEY, isDraft: true });
+    }
+    return rows;
+  }, [secrets, draftRow]);
+
+  const renderEditableCell = (text: string | undefined, row: TableRow, field: keyof EditDraft, placeholder: string) => {
+    if (isDraftRow(row)) {
       return (
         <EditableCell
-          inputRef={field === "alias" ? addAliasRef : undefined}
+          inputRef={field === "identifier" ? addIdentifierRef : undefined}
           value={draftRow?.[field]}
           placeholder={placeholder}
           field={field}
@@ -143,10 +207,11 @@ const SecretsTable: React.FC<SecretsTableProps> = ({
         />
       );
     }
-    if (record.id === editingId) {
+    const rowId = row.key;
+    if (rowId === editingId) {
       return (
         <EditableCell
-          inputRef={field === "alias" ? editAliasRef : undefined}
+          inputRef={field === "identifier" ? editIdentifierRef : undefined}
           value={editDraft?.[field]}
           placeholder={placeholder}
           field={field}
@@ -157,60 +222,76 @@ const SecretsTable: React.FC<SecretsTableProps> = ({
     }
     return (
       <Tooltip title={text}>
-        <span className="cell-text truncate">{text}</span>
+        <span className="cell-text truncate">{text ?? ""}</span>
       </Tooltip>
     );
   };
 
-  const columns: ColumnsType<Secret> = [
+  const columns: ColumnsType<TableRow> = [
     {
-      title: <ColHeader label="Alias" tooltip="Name to reference this secret in requests" />,
-      dataIndex: "alias",
-      key: "alias",
+      title: <ColHeader label="Name" tooltip="Name to reference this secret in requests" />,
+      key: "name",
       width: "18%",
-      render: (text, record) => renderEditableCell(text, record, "alias", "Enter Alias"),
+      render: (_, row) => {
+        if (isDraftRow(row)) return renderEditableCell(undefined, row, "identifier", "Enter identifier");
+        return renderEditableCell(row.name ?? undefined, row, "identifier", "Enter identifier");
+      },
     },
     {
       title: <ColHeader label="ARN/Secret name" tooltip="AWS Secret Manager identifier (ARN or name)" />,
-      dataIndex: "arnSecretName",
-      key: "arnSecretName",
-      render: (text, record) => renderEditableCell(text, record, "arnSecretName", "Enter ARN/Secret name"),
+      key: "ARN",
+      render: (_, row) => {
+        if (isDraftRow(row)) return renderEditableCell(undefined, row, "identifier", "Enter ARN/Secret name");
+        return (
+          <Tooltip title={row.ARN}>
+            <span className="cell-text truncate">{row.ARN ?? ""}</span>
+          </Tooltip>
+        );
+      },
     },
     ...(showVersionId
-      ? [
+      ? ([
           {
             title: <ColHeader label="Version ID" tooltip="The version ID of the secret value" />,
-            dataIndex: "versionId",
             key: "versionId",
             width: "22%",
-            render: (text: string, record: Secret) =>
-              renderEditableCell(text, record, "versionId", "Version ID (optional)"),
+            render: (_: any, row: TableRow) => {
+              if (isDraftRow(row)) return renderEditableCell(undefined, row, "version", "Version ID (optional)");
+              return renderEditableCell(row.versionId ?? undefined, row, "version", "Version ID (optional)");
+            },
           },
-        ]
+        ] as ColumnsType<TableRow>)
       : []),
     {
       title: <ColHeader label="Secret" tooltip="Fetched secrets (plain text or key/value)" />,
-      dataIndex: "secretValue",
-      key: "secretValue",
-      render: (_: string, record: Secret) => {
-        if (record.id === DRAFT_ID) return null;
-        return record.tags && record.tags.length > 0 ? (
-          <div className="secret-tags" onClick={() => onViewKeyValues(record.id)} style={{ cursor: "pointer" }}>
-            {record.tags.map((tag) => (
-              <Tag key={tag} className="secret-tag">
-                {tag}
-              </Tag>
-            ))}
-          </div>
-        ) : (
+      key: "value",
+      render: (_: any, row: TableRow) => {
+        if (isDraftRow(row)) return null;
+        const id = row.key;
+        const keyValues = parseSecretKeyValues(row.value);
+
+        if (keyValues && keyValues.length > 0) {
+          return (
+            <div className="secret-tags" onClick={() => onViewKeyValues?.(id)} style={{ cursor: "pointer" }}>
+              {keyValues.map((kv) => (
+                <Tag key={kv.key} className="secret-tag">
+                  {kv.key}
+                </Tag>
+              ))}
+            </div>
+          );
+        }
+
+        const isVisible = visibleIds.has(id);
+        return (
           <div className="secret-value-row">
-            <span className="secret-dots">{record.isVisible ? record.secretValue : "••••••••••••"}</span>
+            <span className="secret-dots">{isVisible ? row.value ?? "" : "••••••••••••"}</span>
             <Button
               type="text"
               size="small"
               className="visibility-btn"
-              icon={record.isVisible ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
-              onClick={() => onToggleVisibility(record.id)}
+              icon={isVisible ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
+              onClick={() => toggleVisibility(id)}
             />
           </div>
         );
@@ -231,22 +312,31 @@ const SecretsTable: React.FC<SecretsTableProps> = ({
       key: "actions",
       width: "5%",
       align: "right" as const,
-      render: (_: any, record: Secret) => {
-        const isEditing = record.id === editingId;
-        const isDraft = record.id === DRAFT_ID;
-        const menu = isDraft
-          ? makeInlineMenu(handleSaveDraft, handleCancelDraft)
-          : isEditing
+      render: (_: any, row: TableRow) => {
+        if (isDraftRow(row)) {
+          return (
+            <Dropdown
+              menu={makeInlineMenu(handleSaveDraft, handleCancelDraft)}
+              trigger={["click"]}
+              placement="bottomRight"
+            >
+              <Button type="text" size="small" className="row-menu-btn" icon={<BsThreeDots />} />
+            </Dropdown>
+          );
+        }
+        const id = row.key;
+        const isEditing = id === editingId;
+        const menu = isEditing
           ? makeInlineMenu(handleSaveEdit, handleCancelEdit)
           : {
               items: [
-                { key: "edit", icon: <MdOutlineEdit />, label: "Edit", onClick: () => handleStartEdit(record) },
+                { key: "edit", icon: <MdOutlineEdit />, label: "Edit", onClick: () => handleStartEdit(row) },
                 {
                   key: "delete",
                   icon: <RiDeleteBin6Line />,
                   label: "Delete",
                   danger: true,
-                  onClick: () => onDeleteSecret(record.id),
+                  onClick: () => handleDeleteSecret(id),
                 },
               ],
             };
@@ -265,22 +355,17 @@ const SecretsTable: React.FC<SecretsTableProps> = ({
   ];
 
   return (
-    <Table
+    <Table<TableRow>
       className="secrets-antd-table"
       columns={columns}
-      dataSource={[
-        ...secrets.map((s) => ({ ...s, key: s.id })),
-        ...(draftRow
-          ? [{ id: DRAFT_ID, key: DRAFT_ID, alias: "", arnSecretName: "", versionId: "", secretValue: "" }]
-          : []),
-      ]}
+      dataSource={dataSource}
       pagination={false}
       size="small"
       bordered
       tableLayout="fixed"
-      rowClassName={(record) => {
-        if (record.id === DRAFT_ID) return "draft-row";
-        if (record.id === editingId) return "editing-row";
+      rowClassName={(row) => {
+        if (isDraftRow(row)) return "draft-row";
+        if (row.key === editingId) return "editing-row";
         return "";
       }}
       footer={() => (
