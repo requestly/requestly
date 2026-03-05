@@ -53,12 +53,13 @@ export const processRqImportData = (
   };
 
   const oldToNewIdMap: Record<string, string> = {};
+  const oldApiIdToNewApiId: Record<string, string> = {};
 
   collections.forEach((collection: RQAPI.CollectionRecord) => {
     const oldId = collection.id;
     const newId = apiClientRecordsRepository.generateCollectionId(
       collection.name,
-      oldToNewIdMap[collection.collectionId]
+      oldToNewIdMap[collection.collectionId ?? ""]
     );
     collection.id = newId;
     oldToNewIdMap[oldId] = newId;
@@ -73,8 +74,14 @@ export const processRqImportData = (
 
   apis.forEach((api: RQAPI.ApiRecord) => {
     const apiToImport = { ...api };
-    const newCollectionId = oldToNewIdMap[apiToImport.collectionId];
+    const newCollectionId = oldToNewIdMap[apiToImport.collectionId ?? ""] ?? apiToImport.collectionId ?? "";
     const updatedApi = { ...apiToImport, collectionId: newCollectionId };
+
+    // Generate a new ID for each API record so re-importing the same file creates new requests instead of overwriting
+    const oldApiId = updatedApi.id;
+    const newApiId = apiClientRecordsRepository.generateApiRecordId(newCollectionId);
+    updatedApi.id = newApiId;
+    oldApiIdToNewApiId[oldApiId] = newApiId;
 
     if (updatedApi.data.request?.headers?.length > 0) {
       updatedApi.data.request.headers = updatedApi.data.request.headers.map((header: KeyValuePair, index: number) => {
@@ -101,7 +108,11 @@ export const processRqImportData = (
     updatedApiRecordsToImport.apis.push(updatedApi);
   });
 
-  updatedApiRecordsToImport.examples.push(...examples);
+  // Map examples' parentRequestId to the new API ids so they link to the newly created requests
+  examples.forEach((example: RQAPI.ExampleApiRecord) => {
+    const newParentRequestId = oldApiIdToNewApiId[example.parentRequestId] ?? example.parentRequestId;
+    updatedApiRecordsToImport.examples.push({ ...example, parentRequestId: newParentRequestId });
+  });
 
   return {
     apis: updatedApiRecordsToImport.apis,
