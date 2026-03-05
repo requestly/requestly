@@ -152,7 +152,7 @@ export const ErrorFilesList: React.FC<{ updateErrorRecordsCount?: (value: number
 
   const handleDeleteErrorFile = useCallback(
     async (errorFile: ErroredRecord) => {
-      const result = await apiClientRecordsRepository.deleteRecords([errorFile.path]);
+      const result = await apiClientRecordsRepository.deleteRecords([errorFile.id]);
 
       if (result.success) {
         if (errorFile.type === FileType.ENVIRONMENT) {
