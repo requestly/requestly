@@ -4,12 +4,13 @@ import {
   SecretProviderType,
   SecretValue,
   AwsSecretValue,
+  SecretReference,
 } from "@requestly/shared/types/entities/secretsManager";
 import { secretsManagerService, toSecretProviderConfig } from "services/secretsManagerService";
 import { ProviderData } from "features/settings/secrets-manager/context/SecretsModalsContext";
 import { PendingSecretEntry } from "./types";
 import { selectAllSecrets, selectSelectedProviderId, selectAllSecretProviders } from "./selectors";
-import { secretsManagerActions } from "./slice";
+import { getSecretId, secretsManagerActions } from "./slice";
 import { secretVariables } from "lib/secret-variables";
 
 type RootState = { secretsManager: import("./types").SecretsManagerState };
@@ -53,11 +54,14 @@ export const refreshSecretsForProvider = createAsyncThunk<
     }));
 
     const pendingResult = await secretsManagerService.getSecretValues(refs);
+    console.log("!!!debug", "pendingResult", pendingResult);
     if (pendingResult.type === "error") {
       return rejectWithValue(pendingResult.error.message);
     }
     allSecrets.push(...pendingResult.data);
   }
+
+  console.log("!!!debug", "allSecrets", allSecrets);
 
   secretVariables.updateSourceFromSecrets(allSecrets as AwsSecretValue[]);
 
@@ -152,3 +156,16 @@ export const initAndSubscribeSecretsManager = createAsyncThunk<void, string, { r
     }
   }
 );
+
+export const deleteSecret = createAsyncThunk<
+  void,
+  { providerId: string; secretReference: SecretReference },
+  { rejectValue: string; state: RootState }
+>("secretsManager/deleteSecret", async ({ providerId, secretReference }, { dispatch, rejectWithValue }) => {
+  const result = await secretsManagerService.removeSecretValue(providerId, secretReference);
+  if (result.type === "error") {
+    return rejectWithValue(result.error.message);
+  }
+
+  dispatch(secretsManagerActions.removeSecret(getSecretId(secretReference)));
+});

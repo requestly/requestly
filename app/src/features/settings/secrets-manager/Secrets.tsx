@@ -49,7 +49,7 @@ const Secrets = () => {
     return () => window.removeEventListener("beforeunload", handleBeforeUnload);
   }, [hasPendingEntries]);
 
-  const activeSecret = secrets.find((s) => getSecretId(s) === keyValuesModal.secretId);
+  const activeSecret = secrets.find((s) => getSecretId(s.secretReference) === keyValuesModal.secretId);
   const activeKeyValues = parseSecretKeyValues(activeSecret?.value);
 
   if (providers.length === 0) {

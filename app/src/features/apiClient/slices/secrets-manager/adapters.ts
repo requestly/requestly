@@ -1,8 +1,8 @@
 import { createEntityAdapter } from "@reduxjs/toolkit";
-import { SecretProviderMetadata, SecretValue } from "@requestly/shared/types/entities/secretsManager";
+import { SecretProviderMetadata, SecretReference, SecretValue } from "@requestly/shared/types/entities/secretsManager";
 
-export function getSecretId(secret: SecretValue): string {
-  return `name:${secret.secretReference.identifier};version:${secret.secretReference.version ?? "latest"}`;
+export function getSecretId(secretReference: SecretReference): string {
+  return `name:${secretReference.identifier};version:${secretReference.version ?? "latest"}`;
 }
 
 export const providersAdapter = createEntityAdapter<SecretProviderMetadata>({
@@ -10,5 +10,5 @@ export const providersAdapter = createEntityAdapter<SecretProviderMetadata>({
 });
 
 export const secretsAdapter = createEntityAdapter<SecretValue>({
-  selectId: (value) => getSecretId(value),
+  selectId: (value) => getSecretId(value.secretReference),
 });

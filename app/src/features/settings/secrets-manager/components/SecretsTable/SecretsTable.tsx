@@ -2,13 +2,19 @@ import React, { useState, useCallback, useMemo } from "react";
 import { Table, Tag, Button, Dropdown, Tooltip, Checkbox, Popover, Input } from "antd";
 import type { ColumnsType } from "antd/lib/table";
 import { useSelector, useDispatch } from "react-redux";
+import { AppDispatch } from "store/types";
 import { AiOutlineEye } from "@react-icons/all-files/ai/AiOutlineEye";
 import { AiOutlineEyeInvisible } from "@react-icons/all-files/ai/AiOutlineEyeInvisible";
 import { AiOutlineInfoCircle } from "@react-icons/all-files/ai/AiOutlineInfoCircle";
 import { RiDeleteBin6Line } from "@react-icons/all-files/ri/RiDeleteBin6Line";
 import { BsThreeDots } from "@react-icons/all-files/bs/BsThreeDots";
 import { FiPlus } from "@react-icons/all-files/fi/FiPlus";
-import { AwsSecretValue } from "@requestly/shared/types/entities/secretsManager";
+import {
+  AwsSecretValue,
+  AwsSecretReference,
+  SecretProviderType,
+  SecretReference,
+} from "@requestly/shared/types/entities/secretsManager";
 import {
   selectSecretsForSelectedProvider,
   selectSelectedProviderId,
@@ -19,6 +25,7 @@ import {
 } from "features/apiClient/slices/secrets-manager";
 import { parseSecretKeyValues } from "../../utils/parseSecretKeyValues";
 import "./secretsTable.scss";
+import { deleteSecret } from "features/apiClient/slices/secrets-manager/thunks";
 
 const DRAFT_KEY_PREFIX = "__draft__";
 
@@ -26,9 +33,7 @@ type AwsTableRow = AwsSecretValue & { key: string; rowType: "fetched" };
 type DraftTableRow = {
   key: string;
   draftIndex: number;
-  alias: string;
-  identifier: string;
-  version?: string;
+  secretReference: AwsSecretReference;
   rowType: "draft";
 };
 type TableRow = AwsTableRow | DraftTableRow;
@@ -64,7 +69,7 @@ interface SecretsTableProps {
 }
 
 const SecretsTable: React.FC<SecretsTableProps> = ({ onViewKeyValues }) => {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const secrets = useSelector(selectSecretsForSelectedProvider) as AwsSecretValue[];
   const selectedProviderId = useSelector(selectSelectedProviderId);
   const pendingEntries = useSelector(selectPendingEntriesForSelectedProvider);
@@ -91,26 +96,54 @@ const SecretsTable: React.FC<SecretsTableProps> = ({ onViewKeyValues }) => {
     );
   };
 
-  const handleDraftChange = (index: number, field: "alias" | "identifier" | "version", value: string) => {
-    if (!selectedProviderId) return;
+  const handleRowChange = (row: TableRow, field: "alias" | "identifier" | "version", value: string) => {
+    if (!selectedProviderId) {
+      return;
+    }
 
     if (field === "alias" && value) {
-      const otherAliases = existingAliases.filter((_, i) => {
-        const secretCount = secrets.length;
-        return i < secretCount || i !== secretCount + index;
-      });
+      const currentAlias = row.secretReference.alias;
+      const otherAliases = existingAliases.filter((a) => a !== currentAlias);
       if (otherAliases.includes(value)) {
         return;
       }
     }
 
-    dispatch(
-      secretsManagerActions.updatePendingEntry({
-        providerId: selectedProviderId,
-        index,
-        entry: { [field]: value },
-      })
-    );
+    if (isDraftRow(row)) {
+      dispatch(
+        secretsManagerActions.updatePendingEntry({
+          providerId: selectedProviderId,
+          index: row.draftIndex,
+          entry: { [field]: value },
+        })
+      );
+      return;
+    }
+
+    const secretId = getSecretId(row.secretReference);
+
+    if (field === "alias") {
+      dispatch(
+        secretsManagerActions.unsafePatchSecret({
+          id: secretId,
+          patcher: (secret) => {
+            secret.secretReference.alias = value;
+          },
+        })
+      );
+    } else {
+      dispatch(secretsManagerActions.removeSecret(secretId));
+      dispatch(
+        secretsManagerActions.addPendingEntry({
+          providerId: selectedProviderId,
+          entry: {
+            alias: row.secretReference.alias,
+            identifier: field === "identifier" ? value : row.secretReference.identifier,
+            version: field === "version" ? value : row.secretReference.version,
+          },
+        })
+      );
+    }
   };
 
   const handleDeleteDraft = (index: number) => {
@@ -118,19 +151,27 @@ const SecretsTable: React.FC<SecretsTableProps> = ({ onViewKeyValues }) => {
     dispatch(secretsManagerActions.removePendingEntry({ providerId: selectedProviderId, index }));
   };
 
-  const handleDeleteSecret = (id: string) => {
-    dispatch(secretsManagerActions.removeSecret(id));
+  const handleDeleteSecret = (secretReference: SecretReference) => {
+    if (!selectedProviderId) return;
+    dispatch(deleteSecret({ providerId: selectedProviderId, secretReference }));
   };
 
   const dataSource: TableRow[] = useMemo(() => {
-    const rows: TableRow[] = secrets.map((s) => ({ ...s, key: getSecretId(s), rowType: "fetched" as const }));
+    const rows: TableRow[] = secrets.map((s) => ({
+      ...s,
+      key: getSecretId(s.secretReference),
+      rowType: "fetched" as const,
+    }));
     pendingEntries.forEach((entry, index) => {
       rows.push({
         key: `${DRAFT_KEY_PREFIX}${index}`,
         draftIndex: index,
-        alias: entry.alias,
-        identifier: entry.identifier,
-        version: entry.version,
+        secretReference: {
+          type: SecretProviderType.AWS_SECRETS_MANAGER,
+          alias: entry.alias,
+          identifier: entry.identifier,
+          version: entry.version,
+        },
         rowType: "draft",
       });
     });
@@ -143,22 +184,14 @@ const SecretsTable: React.FC<SecretsTableProps> = ({ onViewKeyValues }) => {
       key: "alias",
       width: "18%",
       render: (_, row) => {
-        if (isDraftRow(row)) {
-          return (
-            <Input
-              className="draft-cell-input"
-              value={row.alias}
-              placeholder="Enter alias"
-              size="small"
-              onChange={(e) => handleDraftChange(row.draftIndex, "alias", e.target.value)}
-            />
-          );
-        }
-        const alias = row.secretReference.alias;
         return (
-          <Tooltip title={alias}>
-            <span className="cell-text truncate">{alias ?? ""}</span>
-          </Tooltip>
+          <Input
+            className="draft-cell-input"
+            value={row.secretReference.alias}
+            placeholder="Enter alias"
+            size="small"
+            onChange={(e) => handleRowChange(row, "alias", e.target.value)}
+          />
         );
       },
     },
@@ -166,22 +199,14 @@ const SecretsTable: React.FC<SecretsTableProps> = ({ onViewKeyValues }) => {
       title: <ColHeader label="ARN/Secret name" tooltip="AWS Secret Manager identifier (ARN or name)" />,
       key: "ARN",
       render: (_, row) => {
-        if (isDraftRow(row)) {
-          return (
-            <Input
-              className="draft-cell-input"
-              value={row.identifier}
-              placeholder="Enter ARN/Secret name"
-              size="small"
-              onChange={(e) => handleDraftChange(row.draftIndex, "identifier", e.target.value)}
-            />
-          );
-        }
-        const identifier = row.secretReference.identifier;
         return (
-          <Tooltip title={identifier}>
-            <span className="cell-text truncate">{identifier ?? ""}</span>
-          </Tooltip>
+          <Input
+            className="draft-cell-input"
+            value={row.secretReference.identifier}
+            placeholder="Enter ARN/Secret name"
+            size="small"
+            onChange={(e) => handleRowChange(row, "identifier", e.target.value)}
+          />
         );
       },
     },
@@ -192,22 +217,14 @@ const SecretsTable: React.FC<SecretsTableProps> = ({ onViewKeyValues }) => {
             key: "versionId",
             width: "22%",
             render: (_: any, row: TableRow) => {
-              if (isDraftRow(row)) {
-                return (
-                  <Input
-                    className="draft-cell-input"
-                    value={row.version ?? ""}
-                    placeholder="Version ID (optional)"
-                    size="small"
-                    onChange={(e) => handleDraftChange(row.draftIndex, "version", e.target.value)}
-                  />
-                );
-              }
-              const versionId = row.versionId;
               return (
-                <Tooltip title={versionId}>
-                  <span className="cell-text truncate">{versionId ?? ""}</span>
-                </Tooltip>
+                <Input
+                  className="draft-cell-input"
+                  value={row.secretReference.version ?? ""}
+                  placeholder="Version ID (optional)"
+                  size="small"
+                  onChange={(e) => handleRowChange(row, "version", e.target.value)}
+                />
               );
             },
           },
@@ -266,28 +283,6 @@ const SecretsTable: React.FC<SecretsTableProps> = ({ onViewKeyValues }) => {
       width: "5%",
       align: "right" as const,
       render: (_: any, row: TableRow) => {
-        if (isDraftRow(row)) {
-          return (
-            <Dropdown
-              menu={{
-                items: [
-                  {
-                    key: "delete",
-                    icon: <RiDeleteBin6Line />,
-                    label: "Remove",
-                    danger: true,
-                    onClick: () => handleDeleteDraft(row.draftIndex),
-                  },
-                ],
-              }}
-              trigger={["click"]}
-              placement="bottomRight"
-            >
-              <Button type="text" size="small" className="row-menu-btn" icon={<BsThreeDots />} />
-            </Dropdown>
-          );
-        }
-        const id = row.key;
         return (
           <Dropdown
             menu={{
@@ -295,9 +290,15 @@ const SecretsTable: React.FC<SecretsTableProps> = ({ onViewKeyValues }) => {
                 {
                   key: "delete",
                   icon: <RiDeleteBin6Line />,
-                  label: "Delete",
+                  label: "Remove",
                   danger: true,
-                  onClick: () => handleDeleteSecret(id),
+                  onClick: () => {
+                    if (isDraftRow(row)) {
+                      handleDeleteDraft(row.draftIndex);
+                    } else {
+                      handleDeleteSecret(row.secretReference);
+                    }
+                  },
                 },
               ],
             }}

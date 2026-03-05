@@ -48,7 +48,9 @@ export const secretsManagerSlice = createSlice({
     setSecretsForProvider(state, action: PayloadAction<{ providerId: string; secrets: SecretValue[] }>) {
       const { providerId, secrets } = action.payload;
       const allSecrets = secretsAdapter.getSelectors().selectAll(state.secrets);
-      const idsToRemove = allSecrets.filter((s) => s.providerId === providerId).map((s) => getSecretId(s));
+      const idsToRemove = allSecrets
+        .filter((s) => s.providerId === providerId)
+        .map((s) => getSecretId(s.secretReference));
       secretsAdapter.removeMany(state.secrets, idsToRemove);
       secretsAdapter.upsertMany(state.secrets, secrets);
     },
@@ -108,7 +110,9 @@ export const secretsManagerSlice = createSlice({
         state.fetchStatus = "succeeded";
         const providerId = action.meta.arg.providerId;
         const allSecrets = secretsAdapter.getSelectors().selectAll(state.secrets);
-        const idsToRemove = allSecrets.filter((s) => s.providerId === providerId).map((s) => getSecretId(s));
+        const idsToRemove = allSecrets
+          .filter((s) => s.providerId === providerId)
+          .map((s) => getSecretId(s.secretReference));
         secretsAdapter.removeMany(state.secrets, idsToRemove);
         secretsAdapter.upsertMany(state.secrets, action.payload);
         delete state.pendingEntries[providerId];
@@ -123,7 +127,9 @@ export const secretsManagerSlice = createSlice({
         state.fetchStatus = "succeeded";
         const providerId = action.meta.arg;
         const allSecrets = secretsAdapter.getSelectors().selectAll(state.secrets);
-        const idsToRemove = allSecrets.filter((s) => s.providerId === providerId).map((s) => getSecretId(s));
+        const idsToRemove = allSecrets
+          .filter((s) => s.providerId === providerId)
+          .map((s) => getSecretId(s.secretReference));
         secretsAdapter.removeMany(state.secrets, idsToRemove);
         secretsAdapter.upsertMany(state.secrets, action.payload);
       })
