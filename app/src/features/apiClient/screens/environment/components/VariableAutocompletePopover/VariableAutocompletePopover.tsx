@@ -6,8 +6,8 @@ import {
   getHierarchicalAutocompleteItems,
 } from "features/apiClient/helpers/variableResolver/variableHelper";
 import { useCascadingNavigation } from "./hooks/useCascadingNavigation";
-import { LeafMainItem } from "./components/LeafMainItem";
-import { NamespaceMainItem } from "./components/NamespaceMainItem";
+import { LeafRootItem } from "./components/LeafRootItem";
+import { NamespaceRootItem } from "./components/NamespaceRootItem";
 import "./variableAutocompletePopover.scss";
 interface VariableAutocompleteProps {
   show: boolean;
@@ -73,7 +73,7 @@ export const VariableAutocompletePopover: React.FC<VariableAutocompleteProps> = 
                 dataSource={filteredVariables}
                 renderItem={(item, index) =>
                   item.isNamespace ? (
-                    <NamespaceMainItem
+                    <NamespaceRootItem
                       key={item.name}
                       item={item}
                       index={index}
@@ -90,7 +90,7 @@ export const VariableAutocompletePopover: React.FC<VariableAutocompleteProps> = 
                       onSubSubmenuHover={handleSubSubmenuHover}
                     />
                   ) : (
-                    <LeafMainItem
+                    <LeafRootItem
                       key={item.name}
                       item={item}
                       index={index}

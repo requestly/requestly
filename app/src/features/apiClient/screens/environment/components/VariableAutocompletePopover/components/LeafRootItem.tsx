@@ -1,9 +1,14 @@
+/**
+ * LeafRootItem — a leaf (terminal variable) item at the ROOT menu level.
+ *
+ * See NestedMenuContent.tsx for the full naming-convention reference.
+ */
 import React, { memo, useCallback } from "react";
 import { List } from "antd";
 import { AutocompleteItem } from "features/apiClient/helpers/variableResolver/variableHelper";
 import { VariableRowContent } from "./VariableRowContent";
 
-interface LeafMainItemProps {
+interface LeafRootItemProps {
   item: AutocompleteItem;
   index: number;
   isSelected: boolean;
@@ -11,7 +16,7 @@ interface LeafMainItemProps {
   onHover: (index: number) => void;
 }
 
-export const LeafMainItem = memo<LeafMainItemProps>(({ item, index, isSelected, onSelect, onHover }) => {
+export const LeafRootItem = memo<LeafRootItemProps>(({ item, index, isSelected, onSelect, onHover }) => {
   const handleMouseDown = useCallback(
     (e: React.MouseEvent) => {
       e.preventDefault();
@@ -38,4 +43,4 @@ export const LeafMainItem = memo<LeafMainItemProps>(({ item, index, isSelected, 
   );
 });
 
-LeafMainItem.displayName = "LeafMainItem";
+LeafRootItem.displayName = "LeafRootItem";
