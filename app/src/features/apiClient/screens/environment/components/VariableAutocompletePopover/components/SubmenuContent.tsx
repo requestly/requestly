@@ -7,7 +7,7 @@ import {
 } from "features/apiClient/helpers/variableResolver/variableHelper";
 import { VariableRowContent } from "./VariableRowContent";
 
-interface NamespaceSubmenuItemProps {
+interface NamespaceVariableMenuItemProps {
   item: AutocompleteItem;
   index: number;
   allVariables: Variables;
@@ -20,7 +20,7 @@ interface NamespaceSubmenuItemProps {
   onChildHover?: (index: number) => void;
 }
 
-export const NamespaceSubmenuItem = memo<NamespaceSubmenuItemProps>(function NamespaceSubmenuItem({
+export const NamespaceVariableMenuItem = memo<NamespaceVariableMenuItemProps>(function NamespaceSubmenuItem({
   item,
   index,
   allVariables,
@@ -70,7 +70,7 @@ export const NamespaceSubmenuItem = memo<NamespaceSubmenuItemProps>(function Nam
   );
 });
 
-NamespaceSubmenuItem.displayName = "NamespaceSubmenuItem";
+NamespaceVariableMenuItem.displayName = "NamespaceSubmenuItem";
 
 interface SubmenuContentProps {
   namespacePath: string;
@@ -125,7 +125,7 @@ export const SubmenuContent = memo<SubmenuContentProps>(function SubmenuContent(
         renderItem={(item, index) => {
           if (item.isNamespace) {
             return (
-              <NamespaceSubmenuItem
+              <NamespaceVariableMenuItem
                 key={item.name}
                 item={item}
                 index={index}

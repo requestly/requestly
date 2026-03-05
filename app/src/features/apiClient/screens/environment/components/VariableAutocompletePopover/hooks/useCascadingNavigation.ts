@@ -13,7 +13,7 @@ interface UseCascadingNavigationOptions {
   onClose?: () => void;
 }
 
-// Currently, only handles 2 levels of nesting. It is not optmized for handling multi levels of nesting
+// Currently, only handles 2 levels of nesting (main menu → submenu → sub-submenu). It is not optmized for handling multi levels of nesting
 export function useCascadingNavigation({
   show,
   filteredVariables,
@@ -21,25 +21,31 @@ export function useCascadingNavigation({
   onSelect,
   onClose,
 }: UseCascadingNavigationOptions) {
+  // selectedIndex: The index of the currently selected item in the main menu
+  // expandedMenu: The namespace and index of the currently expanded menu
+  // expandedSubMenu: The namespace and index of the currently expanded submenu
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const [expandedNamespace, setExpandedNamespace] = useState<string | null>(null);
-  const [submenuSelectedIndex, setSubmenuSelectedIndex] = useState(0);
-  const [expandedSubNamespace, setExpandedSubNamespace] = useState<string | null>(null);
-  const [subSubmenuSelectedIndex, setSubSubmenuSelectedIndex] = useState(0);
+  const [expandedMenu, setExpandedMenu] = useState<{ namespace: string | null; index: number }>({
+    namespace: null,
+    index: 0,
+  });
+  const [expandedSubMenu, setExpandedSubMenu] = useState<{ namespace: string | null; index: number }>({
+    namespace: null,
+    index: 0,
+  });
+
+  const { namespace: expandedNamespace, index: submenuSelectedIndex } = expandedMenu;
+  const { namespace: expandedSubNamespace, index: subSubmenuSelectedIndex } = expandedSubMenu;
 
   const stateRef = useRef({
     selectedIndex,
-    expandedNamespace,
-    submenuSelectedIndex,
-    expandedSubNamespace,
-    subSubmenuSelectedIndex,
+    expandedMenu,
+    expandedSubMenu,
   });
   stateRef.current = {
     selectedIndex,
-    expandedNamespace,
-    submenuSelectedIndex,
-    expandedSubNamespace,
-    subSubmenuSelectedIndex,
+    expandedMenu,
+    expandedSubMenu,
   };
 
   const filteredRef = useRef(filteredVariables);
@@ -51,36 +57,28 @@ export function useCascadingNavigation({
 
   const resetAll = useCallback(() => {
     setSelectedIndex(0);
-    setExpandedNamespace(null);
-    setSubmenuSelectedIndex(0);
-    setExpandedSubNamespace(null);
-    setSubSubmenuSelectedIndex(0);
+    setExpandedMenu({ namespace: null, index: 0 });
+    setExpandedSubMenu({ namespace: null, index: 0 });
   }, []);
 
   const updateSelectedIndex = useCallback((index: number) => {
     setSelectedIndex(index);
-    setExpandedNamespace(null);
-    setSubmenuSelectedIndex(0);
-    setExpandedSubNamespace(null);
-    setSubSubmenuSelectedIndex(0);
+    setExpandedMenu({ namespace: null, index: 0 });
+    setExpandedSubMenu({ namespace: null, index: 0 });
   }, []);
 
   const expandNamespace = useCallback((namespace: string | null) => {
-    setExpandedNamespace(namespace);
-    setSubmenuSelectedIndex(0);
-    setExpandedSubNamespace(null);
-    setSubSubmenuSelectedIndex(0);
+    setExpandedMenu({ namespace, index: 0 });
+    setExpandedSubMenu({ namespace: null, index: 0 });
   }, []);
 
   const updateSubmenuIndex = useCallback((index: number) => {
-    setSubmenuSelectedIndex(index);
-    setExpandedSubNamespace(null);
-    setSubSubmenuSelectedIndex(0);
+    setExpandedMenu((prev) => ({ ...prev, index }));
+    setExpandedSubMenu({ namespace: null, index: 0 });
   }, []);
 
   const expandSubNamespace = useCallback((namespace: string | null) => {
-    setExpandedSubNamespace(namespace);
-    setSubSubmenuSelectedIndex(0);
+    setExpandedSubMenu({ namespace, index: 0 });
   }, []);
 
   const [prevFilteredVars, setPrevFilteredVars] = useState(filteredVariables);
@@ -116,21 +114,21 @@ export function useCascadingNavigation({
     }
 
     const getActiveLevel = () => {
-      const { expandedNamespace, expandedSubNamespace } = stateRef.current;
+      const { expandedMenu, expandedSubMenu } = stateRef.current;
 
-      if (expandedNamespace && expandedSubNamespace) {
+      if (expandedMenu.namespace && expandedSubMenu.namespace) {
         return {
           items: subSubmenuItemsRef.current,
-          index: stateRef.current.subSubmenuSelectedIndex,
-          setIndex: (i: number) => setSubSubmenuSelectedIndex(i),
+          index: expandedSubMenu.index,
+          setIndex: (i: number) => setExpandedSubMenu((prev) => ({ ...prev, index: i })),
           expand: null,
           collapse: () => expandSubNamespace(null),
         };
       }
-      if (expandedNamespace) {
+      if (expandedMenu.namespace) {
         return {
           items: submenuItemsRef.current,
-          index: stateRef.current.submenuSelectedIndex,
+          index: expandedMenu.index,
           setIndex: (i: number) => updateSubmenuIndex(i),
           expand: (name: string) => expandSubNamespace(name),
           collapse: () => expandNamespace(null),
@@ -203,7 +201,7 @@ export function useCascadingNavigation({
   );
 
   const handleSubSubmenuHover = useCallback((index: number) => {
-    setSubSubmenuSelectedIndex(index);
+    setExpandedSubMenu((prev) => ({ ...prev, index }));
   }, []);
 
   return {
