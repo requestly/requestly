@@ -8,6 +8,7 @@ import { toast } from "utils/Toast";
 import { sessionStorage } from "utils/sessionStorage";
 import { SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY } from "../constants";
 import { EXPANDED_RECORD_IDS_UPDATED } from "../slices/exampleCollections";
+import { sanitizeExampleMultiPartFormBody } from "../screens/apiClient/utils";
 
 export const useSaveAsExample = (entity: BufferedHttpRecordEntity | BufferedGraphQLRecordEntity) => {
   const context = useApiClientFeatureContext();
@@ -21,9 +22,13 @@ export const useSaveAsExample = (entity: BufferedHttpRecordEntity | BufferedGrap
       const requestRecord = entity.getEntityFromState(context.store.getState());
       const { data, ...recordMeta } = requestRecord;
       const { examples: _examples, ...entryData } = data;
+      const sanitizedEntryData =
+        entryData?.type === RQAPI.ApiEntryType.HTTP
+          ? sanitizeExampleMultiPartFormBody(entryData as RQAPI.HttpApiEntry)
+          : entryData;
       const exampleRecordToCreate: RQAPI.ExampleApiRecord = {
         ...recordMeta,
-        data: entryData,
+        data: sanitizedEntryData,
         parentRequestId: entity.meta.referenceId,
         type: RQAPI.RecordType.EXAMPLE_API,
         collectionId: null,
