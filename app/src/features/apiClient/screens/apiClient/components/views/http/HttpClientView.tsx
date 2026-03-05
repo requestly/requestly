@@ -1,7 +1,7 @@
 import { SPAN_STATUS_ERROR, SPAN_STATUS_OK } from "@sentry/core";
 import * as Sentry from "@sentry/react";
 import { isExtensionInstalled } from "actions/ExtensionActions";
-import { notification, Select, Space } from "antd";
+import { notification, Select, Space, Tooltip } from "antd";
 import { Conditional } from "components/common/Conditional";
 import ExtensionDeactivationMessage from "components/misc/ExtensionDeactivationMessage";
 import { BottomSheetLayout, useBottomSheetContext } from "componentsV2/BottomSheet";
@@ -44,6 +44,7 @@ import {
   trackTestGenerationFailed,
   trackTestGenerationStarted,
 } from "modules/analytics/events/features/apiClient";
+import { trackDesktopAppPromoClicked } from "modules/analytics/events/common/onboarding";
 import { API_CLIENT } from "modules/analytics/events/features/constants";
 import React, { useCallback, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -62,6 +63,7 @@ import {
   getContentTypeFromResponseHeaders,
   getRequestTypeForAnalyticEvent,
   sanitizeEntry,
+  supportsRequestBodyForAllMethods,
 } from "../../../utils";
 import { ApiClientBreadCrumb, BreadcrumbType } from "../components/ApiClientBreadCrumb/ApiClientBreadCrumb";
 import { ClientCodeButton } from "../components/ClientCodeButton/ClientCodeButton";
@@ -137,8 +139,16 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
   const url = useApiClientSelector((s) => entity.getUrl(s));
   const contentType = useApiClientSelector((s) => entity.getContentType(s));
   const method = useApiClientSelector((s) => entity.getMethod(s));
+  const bodyLength = useApiClientSelector((s) => entity.getBody(s)?.length || 0);
   const name = useApiClientSelector((s) => entity.getName(s));
   const isNew = useApiClientSelector((s) => bufferAdapterSelectors.selectById(s.buffer, entity.id)?.isNew);
+
+  const METHODS_WITHOUT_BODY = [RequestMethod.GET, RequestMethod.HEAD];
+  const isNonBodyMethodWithBodyInNonDesktop =
+    METHODS_WITHOUT_BODY.includes(method) && bodyLength > 0 && !supportsRequestBodyForAllMethods(appMode);
+  const isMultipartInNonDesktop =
+    contentType === RequestContentType.MULTIPART_FORM && !supportsRequestBodyForAllMethods(appMode);
+  const isSendDisabledDueToDesktopOnly = isNonBodyMethodWithBodyInNonDesktop || isMultipartInNonDesktop;
 
   const saveBuffer = useSaveBuffer();
 
@@ -603,17 +613,48 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
                 onCurlImport={handleCurlImport}
               />
             </Space.Compact>
-            <RQButton
-              showHotKeyText
-              onClick={onSendButtonClick}
-              hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SEND_REQUEST!.hotKey}
-              type="primary"
-              className="text-bold"
-              enableHotKey={enableHotkey}
-              disabled={!url || (appMode === "EXTENSION" && contentType === RequestContentType.MULTIPART_FORM)}
+            <Tooltip
+              color="var(--requestly-color-black)"
+              title={
+                isSendDisabledDueToDesktopOnly ? (
+                  <div className="send-disabled-tooltip">
+                    <span>
+                      {isNonBodyMethodWithBodyInNonDesktop
+                        ? "Sending request body with this method requires the desktop app."
+                        : "Sending multipart/form-data request requires the desktop app."}
+                    </span>
+                    <RQButton
+                      size="small"
+                      onClick={() =>
+                        trackDesktopAppPromoClicked(
+                          isNonBodyMethodWithBodyInNonDesktop ? "request_body_send" : "multipart_form_data_send",
+                          "web_app"
+                        )
+                      }
+                      href="https://requestly.com/downloads/desktop/"
+                      target="_blank"
+                    >
+                      Download Requestly
+                    </RQButton>
+                  </div>
+                ) : null
+              }
+              placement="bottom"
             >
-              Send
-            </RQButton>
+              <>
+                <RQButton
+                  showHotKeyText
+                  onClick={onSendButtonClick}
+                  hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SEND_REQUEST!.hotKey}
+                  type="primary"
+                  className="text-bold"
+                  enableHotKey={enableHotkey && !isSendDisabledDueToDesktopOnly}
+                  disabled={!url || isSendDisabledDueToDesktopOnly}
+                >
+                  Send
+                </RQButton>
+              </>
+            </Tooltip>
 
             <Conditional condition={!openInModal}>
               <RBACButton
