@@ -302,27 +302,21 @@ const processRequestBody = (request: any): RequestBodyProcessingResult => {
 
   const { mode, raw, formdata, options, urlencoded, graphql } = request.body;
 
-  let result: RequestBodyProcessingResult;
   switch (mode) {
     case PostmanBodyMode.RAW:
-      result = processRawRequestBody(raw, options);
-      break;
+      return processRawRequestBody(raw, options);
     case PostmanBodyMode.FORMDATA:
-      result = processFormDataBody(formdata);
-      break;
+      return processFormDataBody(formdata);
     case PostmanBodyMode.URL_ENCODED:
-      result = processUrlEncodedBody(urlencoded);
-      break;
+      return processUrlEncodedBody(urlencoded);
     case PostmanBodyMode.GRAPHQL:
-      result = parseGraphQLBody(graphql);
-      return result;
+      return parseGraphQLBody(graphql);
     default:
-      result = {
+      return {
         requestBody: "",
         contentType: RequestContentType.RAW,
       };
   }
-  return result;
 };
 
 export const processRequestHeaders = (request: any): RequestHeadersProcessingResult => {
