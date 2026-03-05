@@ -270,12 +270,7 @@ export const generateKeyValuePairs = (
     for (const value of valueArray) {
       result.push({
         key: key || "",
-        value:
-          typeof value === "string"
-            ? value
-            : typeof value === "number" || typeof value === "boolean"
-            ? String(value)
-            : "",
+        value: value != null && typeof value !== "object" ? String(value) : "",
         id: Math.random(),
         isEnabled: true,
       });
