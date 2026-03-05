@@ -1,3 +1,4 @@
+import { AwsSecretValue } from "@requestly/shared/types/entities/secretsManager";
 import { VariableScope } from "../../backend/environment/types";
 import { SecretVariable } from "./types";
 
@@ -21,6 +22,20 @@ export class SecretVariablesService {
 
   setSource(source: SecretsSource): void {
     this.source = source;
+  }
+
+  private buildSourceFromAwsSecrets(secrets: AwsSecretValue[]): SecretVariable[] {
+    return secrets.map((secret) => ({
+      name: secret.secretReference.alias,
+      value: secret.value,
+      id: secret.secretReference.id,
+      scope: VariableScope.SECRETS,
+    }));
+  }
+
+  updateSourceFromSecrets(secrets: AwsSecretValue[]): void {
+    const tree = this.buildSourceFromAwsSecrets(secrets);
+    this.setSource(() => tree);
   }
 
   /**
@@ -64,6 +79,10 @@ export class SecretVariablesService {
 
   /**
    * Returns the secrets list entry for a given full path, or undefined.
+   *  @example
+   * getSecretsVariable("secrets:cities.newYork") // → { name: "cities.newYork", value: "New York", ... }
+   * getSecretsVariable("cities.newYork")          // → undefined (missing "secrets:" prefix)
+   * getSecretsVariable("secrets:nonExistent")     // → undefined (not found in source)
    */
   getSecretsVariable(name: string): SecretVariable | undefined {
     if (!name.startsWith(SECRETS_PREFIX)) {
