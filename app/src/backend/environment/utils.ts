@@ -107,9 +107,7 @@ const processObject = <T extends Record<string, any>>(input: T, variables: Varia
 const processTemplateString = <T extends string>(input: T, variables: Variables): RenderResult<T> => {
   try {
     const { wrappedTemplate, usedVariables } = collectAndEscapeVariablesFromTemplate(input, variables);
-    const contextWithSecrets = { ...variables, secrets: secretVariables.getSecrets() };
-
-    console.log("!!!debug", "contextWithSecrets", { contextWithSecrets, usedVariables, wrappedTemplate });
+    const contextWithSecrets = { ...variables, ...secretVariables.getFlatSecrets() };
 
     const renderedTemplate = variableResolver.resolve(wrappedTemplate, contextWithSecrets) as T; // since handlebars generic types resolve to any; not string
 
@@ -141,7 +139,7 @@ const isDynamicVariable = (varName: string): boolean => {
   return variableResolver.has(variableNameOnly);
 };
 
-/** Checks if a variable name is a valid secrets path (e.g. secrets.cities.chicago, leaf only). */
+/** Checks if a variable name is a valid secrets path (e.g. secrets:cities.chicago). */
 const isSecretsVariable = (varName: string): boolean => secretVariables.hasSecretsPath(varName);
 
 const collectAndEscapeVariablesFromTemplate = (
@@ -176,6 +174,12 @@ const collectAndEscapeVariablesFromTemplate = (
     // otherwise a.b gets parsed as nested object path
     // https://handlebarsjs.com/guide/expressions.html#literal-segments
     if (varName.includes(".") && isUserVariable) {
+      return `{{[${varName}]}}`;
+    }
+
+    // Secrets use "secrets:key" format which requires literal segment syntax
+    // so Handlebars does a flat key lookup instead of path traversal
+    if (isSecrets) {
       return `{{[${varName}]}}`;
     }
 
@@ -243,7 +247,7 @@ const resolveCompositeVariables = (variables: Variables): Variables => {
       delete resolutionContext[varName];
 
       const { wrappedTemplate } = collectAndEscapeVariablesFromTemplate(value, resolutionContext);
-      const contextWithSecrets = { ...resolutionContext, secrets: secretVariables.getSecrets() };
+      const contextWithSecrets = { ...resolutionContext, ...secretVariables.getFlatSecrets() };
       const renderedValue = variableResolver.resolve(wrappedTemplate, contextWithSecrets);
       resolved[varName] = renderedValue;
     } catch (e) {
