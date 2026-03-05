@@ -86,7 +86,6 @@ const notifyError = (message: string, description: string) => {
     description,
     placement: "bottomRight",
     className: "add-secrets-provider-notification",
-    duration: 0,
   });
 };
 
