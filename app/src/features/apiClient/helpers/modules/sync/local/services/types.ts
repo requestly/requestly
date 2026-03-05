@@ -94,6 +94,7 @@ export enum FileType {
 }
 
 export type ErroredRecord = {
+  id: string;
   name: string;
   path: string;
   error: string;

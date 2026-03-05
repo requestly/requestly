@@ -50,6 +50,7 @@ export const CreateEnvironmentPopup: React.FC = () => {
           source: new EnvironmentViewTabSource({
             id,
             title: name,
+            isNewTab: true,
             context: { id: context.workspaceId },
             isGlobal: false,
           }),

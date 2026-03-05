@@ -85,6 +85,10 @@ div.n-popup {
     overflow-y: auto;
     overflow-x: hidden;
 
+    &.dynamic-variable-view {
+      width: auto;
+    }
+
     .variable-info-property-container {
       display: flex;
       padding: 8px 12px 8px 12px;

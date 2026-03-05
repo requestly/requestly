@@ -66,8 +66,6 @@ export const RQBreadcrumb: React.FC<Props> = ({
       autoFocusRef.current = true;
       setIsEditRecord(true);
     }
-
-    return () => setIsEditRecord(false);
   }, [autoFocus]);
 
   const breadcrumbs: ({
