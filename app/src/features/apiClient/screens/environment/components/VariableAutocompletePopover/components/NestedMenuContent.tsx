@@ -1,3 +1,28 @@
+/**
+ * NestedMenuContent and its item components.
+ *
+ * Naming convention for all item components: {Type}{Depth}Item
+ *
+ *   Type:
+ *     Namespace — the item has children (a variable group / namespace path segment).
+ *                 Hovering or selecting it opens a deeper NestedMenuContent sub-panel.
+ *     Leaf      — the item is a terminal variable with no children.
+ *                 Selecting it inserts the variable into the editor.
+ *
+ *   Depth:
+ *     Root      — rendered directly inside the top-level VariableAutocompletePopover.
+ *     Nested    — rendered inside a NestedMenuContent sub-panel (level 2 and deeper).
+ *
+ * Component overview:
+ *   VariableAutocompletePopover  (root menu)
+ *     ├── NamespaceRootItem       (Namespace + Root)  → opens NestedMenuContent
+ *     │     └── NestedMenuContent
+ *     │           ├── NamespaceNestedItem  (Namespace + Nested, recursive)
+ *     │           │     └── NestedMenuContent
+ *     │           │           └── LeafNestedItem
+ *     │           └── LeafNestedItem       (Leaf + Nested)
+ *     └── LeafRootItem            (Leaf + Root)
+ */
 import React, { memo, useState, useCallback, useMemo } from "react";
 import { List, Popover } from "antd";
 import {
@@ -8,7 +33,50 @@ import {
 } from "features/apiClient/helpers/variableResolver/variableHelper";
 import { VariableRowContent } from "./VariableRowContent";
 
-interface NamespaceVariableMenuItemProps {
+// ---------------------------------------------------------------------------
+// LeafNestedItem — a terminal variable item inside a nested sub-panel.
+// ---------------------------------------------------------------------------
+
+interface LeafNestedItemProps {
+  item: AutocompleteItem;
+  index: number;
+  selectedIndex?: number;
+  onSelectLeaf: (name: string) => void;
+  onItemHover?: (index: number) => void;
+}
+
+const LeafNestedItem = memo<LeafNestedItemProps>(function LeafNestedItem({
+  item,
+  index,
+  selectedIndex,
+  onSelectLeaf,
+  onItemHover,
+}) {
+  return (
+    <List.Item
+      data-index={index}
+      className={`variable-autocomplete-item ${selectedIndex === index ? "selected" : ""}`}
+      onMouseDown={(e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        onSelectLeaf(item.name);
+      }}
+      onMouseEnter={() => onItemHover?.(index)}
+      style={{ cursor: "pointer" }}
+    >
+      <VariableRowContent item={item} />
+    </List.Item>
+  );
+});
+
+LeafNestedItem.displayName = "LeafNestedItem";
+
+// ---------------------------------------------------------------------------
+// NamespaceNestedItem — an expandable namespace item inside a nested sub-panel.
+// Opens a further NestedMenuContent panel on hover/expand.
+// ---------------------------------------------------------------------------
+
+interface NamespaceNestedItemProps {
   item: AutocompleteItem;
   index: number;
   allVariables: Variables;
@@ -21,7 +89,7 @@ interface NamespaceVariableMenuItemProps {
   onChildHover?: (index: number) => void;
 }
 
-export const NamespaceVariableMenuItem = memo<NamespaceVariableMenuItemProps>(function NamespaceSubmenuItem({
+export const NamespaceNestedItem = memo<NamespaceNestedItemProps>(function NamespaceNestedItem({
   item,
   index,
   allVariables,
@@ -45,7 +113,7 @@ export const NamespaceVariableMenuItem = memo<NamespaceVariableMenuItemProps>(fu
       overlayInnerStyle={{ padding: 0 }}
       destroyTooltipOnHide
       content={
-        <SubmenuContent
+        <NestedMenuContent
           namespacePath={item.name}
           allVariables={allVariables}
           onSelectLeaf={onSelectLeaf}
@@ -71,9 +139,14 @@ export const NamespaceVariableMenuItem = memo<NamespaceVariableMenuItemProps>(fu
   );
 });
 
-NamespaceVariableMenuItem.displayName = "NamespaceSubmenuItem";
+NamespaceNestedItem.displayName = "NamespaceNestedItem";
 
-interface SubmenuContentProps {
+// ---------------------------------------------------------------------------
+// NestedMenuContent — the sub-panel that renders a namespace's children.
+// Renders NamespaceNestedItem for groups and LeafNestedItem for variables.
+// ---------------------------------------------------------------------------
+
+interface NestedMenuContentProps {
   namespacePath: string;
   allVariables: Variables;
   onSelectLeaf: (name: string) => void;
@@ -85,7 +158,7 @@ interface SubmenuContentProps {
   onChildHover?: (index: number) => void;
 }
 
-export const SubmenuContent = memo<SubmenuContentProps>(function SubmenuContent({
+export const NestedMenuContent = memo<NestedMenuContentProps>(function NestedMenuContent({
   namespacePath,
   allVariables,
   onSelectLeaf,
@@ -126,7 +199,7 @@ export const SubmenuContent = memo<SubmenuContentProps>(function SubmenuContent(
         renderItem={(item, index) => {
           if (item.isNamespace) {
             return (
-              <NamespaceVariableMenuItem
+              <NamespaceNestedItem
                 key={item.name}
                 item={item}
                 index={index}
@@ -143,20 +216,14 @@ export const SubmenuContent = memo<SubmenuContentProps>(function SubmenuContent(
           }
 
           return (
-            <List.Item
+            <LeafNestedItem
               key={item.name}
-              data-index={index}
-              className={`variable-autocomplete-item ${selectedIndex === index ? "selected" : ""}`}
-              onMouseDown={(e: React.MouseEvent) => {
-                e.preventDefault();
-                e.stopPropagation();
-                onSelectLeaf(item.name);
-              }}
-              onMouseEnter={() => onItemHover?.(index)}
-              style={{ cursor: "pointer" }}
-            >
-              <VariableRowContent item={item} />
-            </List.Item>
+              item={item}
+              index={index}
+              selectedIndex={selectedIndex}
+              onSelectLeaf={onSelectLeaf}
+              onItemHover={onItemHover}
+            />
           );
         }}
       />
