@@ -106,7 +106,7 @@ export const processRqImportData = (
       updatedApi.data.request.body = (updatedApi.data.request.body as KeyValuePair[]).map(
         (item: KeyValuePair, index: number) => ({
           ...item,
-          value: typeof item.value === "string" ? item.value : "",
+          value: typeof item.value === "string" || Array.isArray(item.value) ? item.value : "",
           id: item.id ?? index,
         })
       );
