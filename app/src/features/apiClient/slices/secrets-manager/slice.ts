@@ -1,19 +1,30 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { SECRETS_MANAGER_SLICE_NAME } from "../common/constants";
-import { SecretProviderMetadata, SecretValue } from "@requestly/shared/types/entities/secretsManager";
-import { SecretsManagerState, PendingSecretEntry } from "./types";
-import { fetchSecretProviders, refreshSecretsForProvider, getSecretsForProvider } from "./thunks";
-import { providersAdapter, secretsAdapter, getSecretId } from "./adapters";
+import {
+  SecretProviderMetadata,
+  SecretProviderType,
+  SecretValue,
+  AwsSecretValue,
+} from "@requestly/shared/types/entities/secretsManager";
+import { SecretsManagerState } from "./types";
+import { fetchAndSaveSecretsForProvider, listSecrets } from "./thunks";
+import { providersAdapter, secretsAdapter } from "./adapters";
 
-export { providersAdapter, secretsAdapter, getSecretId } from "./adapters";
+export { providersAdapter, secretsAdapter } from "./adapters";
 
 const initialState: SecretsManagerState = {
   providers: providersAdapter.getInitialState(),
   secrets: secretsAdapter.getInitialState(),
-  pendingEntries: {},
+  isDirty: {},
   selectedProviderId: null,
   fetchStatus: "idle",
 };
+
+function removeSecretsForProvider(state: SecretsManagerState, providerId: string) {
+  const allSecrets = secretsAdapter.getSelectors().selectAll(state.secrets);
+  const idsToRemove = allSecrets.filter((s) => s.providerId === providerId).map((s) => s.secretReference.id);
+  secretsAdapter.removeMany(state.secrets, idsToRemove);
+}
 
 export const secretsManagerSlice = createSlice({
   name: SECRETS_MANAGER_SLICE_NAME,
@@ -47,12 +58,9 @@ export const secretsManagerSlice = createSlice({
     },
     setSecretsForProvider(state, action: PayloadAction<{ providerId: string; secrets: SecretValue[] }>) {
       const { providerId, secrets } = action.payload;
-      const allSecrets = secretsAdapter.getSelectors().selectAll(state.secrets);
-      const idsToRemove = allSecrets
-        .filter((s) => s.providerId === providerId)
-        .map((s) => getSecretId(s.secretReference));
-      secretsAdapter.removeMany(state.secrets, idsToRemove);
+      removeSecretsForProvider(state, providerId);
       secretsAdapter.upsertMany(state.secrets, secrets);
+      state.isDirty[providerId] = false;
     },
     removeSecret(state, action: PayloadAction<string>) {
       secretsAdapter.removeOne(state.secrets, action.payload);
@@ -60,80 +68,69 @@ export const secretsManagerSlice = createSlice({
     removeSecrets(state, action: PayloadAction<string[]>) {
       secretsAdapter.removeMany(state.secrets, action.payload);
     },
+
+    addSecretEntry(state, action: PayloadAction<{ providerId: string }>) {
+      const { providerId } = action.payload;
+      const stub: AwsSecretValue = {
+        type: SecretProviderType.AWS_SECRETS_MANAGER,
+        providerId,
+        secretReference: {
+          id: crypto.randomUUID(),
+          type: SecretProviderType.AWS_SECRETS_MANAGER,
+          alias: "",
+          identifier: "",
+        },
+        fetchedAt: 0,
+        name: "",
+        value: "",
+        ARN: "",
+        versionId: "",
+      };
+      secretsAdapter.addOne(state.secrets, stub);
+      state.isDirty[providerId] = true;
+    },
+
+    removeSecretEntry(state, action: PayloadAction<{ providerId: string; secretRefId: string }>) {
+      secretsAdapter.removeOne(state.secrets, action.payload.secretRefId);
+      state.isDirty[action.payload.providerId] = true;
+    },
+
     unsafePatchSecret(state, action: PayloadAction<{ id: string; patcher: (secret: SecretValue) => void }>) {
       const secret = state.secrets.entities[action.payload.id];
       if (secret) {
         action.payload.patcher(secret);
+        state.isDirty[secret.providerId] = true;
       }
-    },
-
-    addPendingEntry(state, action: PayloadAction<{ providerId: string; entry: PendingSecretEntry }>) {
-      const { providerId, entry } = action.payload;
-      if (!state.pendingEntries[providerId]) {
-        state.pendingEntries[providerId] = [];
-      }
-      state.pendingEntries[providerId].push(entry);
-    },
-    updatePendingEntry(
-      state,
-      action: PayloadAction<{ providerId: string; index: number; entry: Partial<PendingSecretEntry> }>
-    ) {
-      const { providerId, index, entry } = action.payload;
-      const entries = state.pendingEntries[providerId];
-      if (entries && entries[index]) {
-        Object.assign(entries[index], entry);
-      }
-    },
-    removePendingEntry(state, action: PayloadAction<{ providerId: string; index: number }>) {
-      const { providerId, index } = action.payload;
-      const entries = state.pendingEntries[providerId];
-      if (entries) {
-        entries.splice(index, 1);
-        if (entries.length === 0) {
-          delete state.pendingEntries[providerId];
-        }
-      }
-    },
-    clearPendingEntries(state, action: PayloadAction<{ providerId: string }>) {
-      delete state.pendingEntries[action.payload.providerId];
     },
   },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchSecretProviders.fulfilled, (state, action) => {
-        providersAdapter.setAll(state.providers, action.payload);
-      })
-      .addCase(refreshSecretsForProvider.pending, (state) => {
+      .addCase(fetchAndSaveSecretsForProvider.pending, (state) => {
         state.fetchStatus = "loading";
       })
-      .addCase(refreshSecretsForProvider.fulfilled, (state, action) => {
+      .addCase(fetchAndSaveSecretsForProvider.fulfilled, (state, action) => {
         state.fetchStatus = "succeeded";
-        const providerId = action.meta.arg.providerId;
-        const allSecrets = secretsAdapter.getSelectors().selectAll(state.secrets);
-        const idsToRemove = allSecrets
-          .filter((s) => s.providerId === providerId)
-          .map((s) => getSecretId(s.secretReference));
-        secretsAdapter.removeMany(state.secrets, idsToRemove);
+        const { providerId } = action.meta.arg;
+
+        removeSecretsForProvider(state, providerId);
         secretsAdapter.upsertMany(state.secrets, action.payload);
-        delete state.pendingEntries[providerId];
+        state.isDirty[providerId] = false;
       })
-      .addCase(refreshSecretsForProvider.rejected, (state) => {
+      .addCase(fetchAndSaveSecretsForProvider.rejected, (state) => {
         state.fetchStatus = "failed";
       })
-      .addCase(getSecretsForProvider.pending, (state) => {
+      .addCase(listSecrets.pending, (state) => {
         state.fetchStatus = "loading";
       })
-      .addCase(getSecretsForProvider.fulfilled, (state, action) => {
+      .addCase(listSecrets.fulfilled, (state, action) => {
         state.fetchStatus = "succeeded";
         const providerId = action.meta.arg;
-        const allSecrets = secretsAdapter.getSelectors().selectAll(state.secrets);
-        const idsToRemove = allSecrets
-          .filter((s) => s.providerId === providerId)
-          .map((s) => getSecretId(s.secretReference));
-        secretsAdapter.removeMany(state.secrets, idsToRemove);
+
+        removeSecretsForProvider(state, providerId);
         secretsAdapter.upsertMany(state.secrets, action.payload);
+        state.isDirty[providerId] = false;
       })
-      .addCase(getSecretsForProvider.rejected, (state) => {
+      .addCase(listSecrets.rejected, (state) => {
         state.fetchStatus = "failed";
       });
   },

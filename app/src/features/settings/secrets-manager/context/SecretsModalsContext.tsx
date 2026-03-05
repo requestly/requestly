@@ -6,7 +6,10 @@ import {
 import React, { createContext, useContext, useState, useCallback, useRef } from "react";
 import { useDispatch } from "react-redux";
 import { secretsManagerService, toSecretProviderConfig, toProviderData } from "services/secretsManagerService";
-import { saveProvider as saveProviderThunk } from "features/apiClient/slices/secrets-manager";
+import {
+  saveProvider as saveProviderThunk,
+  deleteProvider as deleteProviderThunk,
+} from "features/apiClient/slices/secrets-manager";
 import { toast } from "utils/Toast";
 import { AppDispatch } from "store/types";
 
@@ -261,17 +264,7 @@ export const SecretsModalsProvider: React.FC<{ children: React.ReactNode }> = ({
     });
 
     try {
-      const result = await secretsManagerService.removeProviderConfig(providerId);
-
-      if (result.type === "error") {
-        setModals((prev) => {
-          if (!prev.delete.isOpen) {
-            return prev;
-          }
-          return { ...prev, delete: { ...prev.delete, isLoading: false, error: result.error.message } };
-        });
-        return;
-      }
+      await dispatch(deleteProviderThunk(providerId));
 
       toast.success("Provider deleted successfully");
       setModals((prev) => ({ ...prev, delete: { isOpen: false } }));

@@ -7,8 +7,7 @@ import SecretKeysModal from "./modals/SecretKeysModal/Index";
 import {
   selectAllSecretProviders,
   selectSecretsForSelectedProvider,
-  selectHasPendingEntries,
-  getSecretId,
+  selectIsDirtyForSelectedProvider,
 } from "features/apiClient/slices/secrets-manager";
 import { AwsSecretValue } from "@requestly/shared/types/entities/secretsManager";
 import { parseSecretKeyValues } from "./utils/parseSecretKeyValues";
@@ -16,7 +15,7 @@ import { parseSecretKeyValues } from "./utils/parseSecretKeyValues";
 const Secrets = () => {
   const providers = useSelector(selectAllSecretProviders);
   const secrets = useSelector(selectSecretsForSelectedProvider) as AwsSecretValue[];
-  const hasPendingEntries = useSelector(selectHasPendingEntries);
+  const isDirty = useSelector(selectIsDirtyForSelectedProvider);
   const [keyValuesModal, setKeyValuesModal] = useState<{ open: boolean; secretId: string | null }>({
     open: false,
     secretId: null,
@@ -31,7 +30,7 @@ const Secrets = () => {
   }, []);
 
   unstable_useBlocker(() => {
-    if (hasPendingEntries) {
+    if (isDirty) {
       return !window.confirm("You have unfetched secrets. Discard changes?");
     }
     return false;
@@ -39,7 +38,7 @@ const Secrets = () => {
 
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (hasPendingEntries) {
+      if (isDirty) {
         e.preventDefault();
         e.returnValue = "You have unfetched secrets. Discard changes?";
       }
@@ -47,9 +46,9 @@ const Secrets = () => {
 
     window.addEventListener("beforeunload", handleBeforeUnload);
     return () => window.removeEventListener("beforeunload", handleBeforeUnload);
-  }, [hasPendingEntries]);
+  }, [isDirty]);
 
-  const activeSecret = secrets.find((s) => getSecretId(s.secretReference) === keyValuesModal.secretId);
+  const activeSecret = secrets.find((s) => s.secretReference.id === keyValuesModal.secretId);
   const activeKeyValues = parseSecretKeyValues(activeSecret?.value);
 
   if (providers.length === 0) {

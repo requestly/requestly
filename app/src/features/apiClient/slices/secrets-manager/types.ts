@@ -3,16 +3,10 @@ import { SecretProviderMetadata, SecretValue } from "@requestly/shared/types/ent
 
 export type FetchStatus = "idle" | "loading" | "succeeded" | "failed";
 
-export interface PendingSecretEntry {
-  alias: string;
-  identifier: string;
-  version?: string;
-}
-
 export interface SecretsManagerState {
   providers: EntityState<SecretProviderMetadata>;
   secrets: EntityState<SecretValue>;
-  pendingEntries: Record<string, PendingSecretEntry[]>;
+  isDirty: Record<string, boolean>;
   selectedProviderId: string | null;
   fetchStatus: FetchStatus;
 }

@@ -9,37 +9,21 @@ import { AiOutlineInfoCircle } from "@react-icons/all-files/ai/AiOutlineInfoCirc
 import { RiDeleteBin6Line } from "@react-icons/all-files/ri/RiDeleteBin6Line";
 import { BsThreeDots } from "@react-icons/all-files/bs/BsThreeDots";
 import { FiPlus } from "@react-icons/all-files/fi/FiPlus";
-import {
-  AwsSecretValue,
-  AwsSecretReference,
-  SecretProviderType,
-  SecretReference,
-} from "@requestly/shared/types/entities/secretsManager";
+import { AwsSecretValue } from "@requestly/shared/types/entities/secretsManager";
 import {
   selectSecretsForSelectedProvider,
   selectSelectedProviderId,
-  selectPendingEntriesForSelectedProvider,
   selectAllAliasesForProvider,
   secretsManagerActions,
-  getSecretId,
 } from "features/apiClient/slices/secrets-manager";
 import { parseSecretKeyValues } from "../../utils/parseSecretKeyValues";
 import "./secretsTable.scss";
 import { deleteSecret } from "features/apiClient/slices/secrets-manager/thunks";
 
-const DRAFT_KEY_PREFIX = "__draft__";
+type TableRow = AwsSecretValue & { key: string };
 
-type AwsTableRow = AwsSecretValue & { key: string; rowType: "fetched" };
-type DraftTableRow = {
-  key: string;
-  draftIndex: number;
-  secretReference: AwsSecretReference;
-  rowType: "draft";
-};
-type TableRow = AwsTableRow | DraftTableRow;
-
-function isDraftRow(row: TableRow): row is DraftTableRow {
-  return row.rowType === "draft";
+function isStubRow(row: TableRow): boolean {
+  return row.fetchedAt === 0;
 }
 
 const ColHeader: React.FC<{ label: string; tooltip: string }> = ({ label, tooltip }) => (
@@ -72,7 +56,6 @@ const SecretsTable: React.FC<SecretsTableProps> = ({ onViewKeyValues }) => {
   const dispatch = useDispatch<AppDispatch>();
   const secrets = useSelector(selectSecretsForSelectedProvider) as AwsSecretValue[];
   const selectedProviderId = useSelector(selectSelectedProviderId);
-  const pendingEntries = useSelector(selectPendingEntriesForSelectedProvider);
 
   const [showVersionId, setShowVersionId] = useState(false);
   const [visibleIds, setVisibleIds] = useState<Set<string>>(new Set());
@@ -91,92 +74,59 @@ const SecretsTable: React.FC<SecretsTableProps> = ({ onViewKeyValues }) => {
 
   const handleAddClick = () => {
     if (!selectedProviderId) return;
-    dispatch(
-      secretsManagerActions.addPendingEntry({ providerId: selectedProviderId, entry: { alias: "", identifier: "" } })
-    );
+    dispatch(secretsManagerActions.addSecretEntry({ providerId: selectedProviderId }));
   };
 
   const handleRowChange = (row: TableRow, field: "alias" | "identifier" | "version", value: string) => {
-    if (!selectedProviderId) {
-      return;
-    }
+    if (!selectedProviderId) return;
 
     if (field === "alias" && value) {
       const currentAlias = row.secretReference.alias;
-      const otherAliases = existingAliases.filter((a) => a !== currentAlias);
+      const otherAliases = existingAliases.filter((a: string) => a !== currentAlias);
       if (otherAliases.includes(value)) {
         return;
       }
     }
 
-    if (isDraftRow(row)) {
-      dispatch(
-        secretsManagerActions.updatePendingEntry({
-          providerId: selectedProviderId,
-          index: row.draftIndex,
-          entry: { [field]: value },
-        })
-      );
-      return;
-    }
+    const secretRefId = row.secretReference.id;
 
-    const secretId = getSecretId(row.secretReference);
-
-    if (field === "alias") {
-      dispatch(
-        secretsManagerActions.unsafePatchSecret({
-          id: secretId,
-          patcher: (secret) => {
+    dispatch(
+      secretsManagerActions.unsafePatchSecret({
+        id: secretRefId,
+        patcher: (secret) => {
+          if (field === "alias") {
             secret.secretReference.alias = value;
-          },
+          } else if (field === "identifier") {
+            (secret.secretReference as AwsSecretValue["secretReference"]).identifier = value;
+          } else if (field === "version") {
+            (secret.secretReference as AwsSecretValue["secretReference"]).version = value;
+          }
+        },
+      })
+    );
+  };
+
+  const handleDelete = (row: TableRow) => {
+    if (!selectedProviderId) return;
+
+    if (isStubRow(row)) {
+      dispatch(
+        secretsManagerActions.removeSecretEntry({
+          providerId: selectedProviderId,
+          secretRefId: row.secretReference.id,
         })
       );
     } else {
-      dispatch(secretsManagerActions.removeSecret(secretId));
-      dispatch(
-        secretsManagerActions.addPendingEntry({
-          providerId: selectedProviderId,
-          entry: {
-            alias: row.secretReference.alias,
-            identifier: field === "identifier" ? value : row.secretReference.identifier,
-            version: field === "version" ? value : row.secretReference.version,
-          },
-        })
-      );
+      dispatch(deleteSecret({ providerId: selectedProviderId, secretReference: row.secretReference }));
     }
   };
 
-  const handleDeleteDraft = (index: number) => {
-    if (!selectedProviderId) return;
-    dispatch(secretsManagerActions.removePendingEntry({ providerId: selectedProviderId, index }));
-  };
-
-  const handleDeleteSecret = (secretReference: SecretReference) => {
-    if (!selectedProviderId) return;
-    dispatch(deleteSecret({ providerId: selectedProviderId, secretReference }));
-  };
-
   const dataSource: TableRow[] = useMemo(() => {
-    const rows: TableRow[] = secrets.map((s) => ({
+    return secrets.map((s) => ({
       ...s,
-      key: getSecretId(s.secretReference),
-      rowType: "fetched" as const,
+      key: s.secretReference.id,
     }));
-    pendingEntries.forEach((entry, index) => {
-      rows.push({
-        key: `${DRAFT_KEY_PREFIX}${index}`,
-        draftIndex: index,
-        secretReference: {
-          type: SecretProviderType.AWS_SECRETS_MANAGER,
-          alias: entry.alias,
-          identifier: entry.identifier,
-          version: entry.version,
-        },
-        rowType: "draft",
-      });
-    });
-    return rows;
-  }, [secrets, pendingEntries]);
+  }, [secrets]);
 
   const columns: ColumnsType<TableRow> = [
     {
@@ -234,7 +184,7 @@ const SecretsTable: React.FC<SecretsTableProps> = ({ onViewKeyValues }) => {
       title: <ColHeader label="Secret" tooltip="Fetched secrets (plain text or key/value)" />,
       key: "value",
       render: (_: any, row: TableRow) => {
-        if (isDraftRow(row)) {
+        if (isStubRow(row)) {
           return null;
         }
         const id = row.key;
@@ -292,13 +242,7 @@ const SecretsTable: React.FC<SecretsTableProps> = ({ onViewKeyValues }) => {
                   icon: <RiDeleteBin6Line />,
                   label: "Remove",
                   danger: true,
-                  onClick: () => {
-                    if (isDraftRow(row)) {
-                      handleDeleteDraft(row.draftIndex);
-                    } else {
-                      handleDeleteSecret(row.secretReference);
-                    }
-                  },
+                  onClick: () => handleDelete(row),
                 },
               ],
             }}
@@ -321,10 +265,7 @@ const SecretsTable: React.FC<SecretsTableProps> = ({ onViewKeyValues }) => {
       size="small"
       bordered
       tableLayout="fixed"
-      rowClassName={(row) => {
-        if (isDraftRow(row)) return "draft-row";
-        return "";
-      }}
+      rowClassName={(row) => (isStubRow(row) ? "draft-row" : "")}
       footer={() => (
         <Button type="text" icon={<FiPlus />} className="add-secret-btn" onClick={handleAddClick}>
           Add

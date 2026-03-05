@@ -67,8 +67,15 @@ export const secretsManagerService = {
     return invokeMainEvent("secretsManager:getSecretValues", { secrets });
   },
 
-  refreshSecrets: (providerId: string): Promise<SecretsResult<(SecretValue | null)[]>> => {
-    return invokeMainEvent("secretsManager:refreshSecrets", { providerId });
+  fetchAndSaveSecrets: (
+    providerId: string,
+    secretRefs: SecretReference[]
+  ): Promise<SecretsResult<(SecretValue | null)[]>> => {
+    return invokeMainEvent("secretsManager:fetchAndSaveSecrets", { providerId, secretRefs });
+  },
+
+  listSecrets: (providerId: string): Promise<SecretsResult<SecretValue[]>> => {
+    return invokeMainEvent("secretsManager:listSecrets", { providerId });
   },
 
   removeSecretValue: (providerId: string, secretReference: SecretReference): Promise<SecretsVoidResult> => {
