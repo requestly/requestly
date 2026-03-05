@@ -256,7 +256,9 @@ export const supportsRequestBody = (method: RequestMethod): boolean => {
   return ![RequestMethod.GET, RequestMethod.HEAD].includes(method);
 };
 
-export const generateKeyValuePairs = (data: string | Record<string, string | string[]> = {}): KeyValuePair[] => {
+export const generateKeyValuePairs = (
+  data: string | Record<string, string | string[] | number | boolean | null | undefined> = {}
+): KeyValuePair[] => {
   const result: KeyValuePair[] = [];
   if (typeof data === "string") {
     data = {
@@ -268,7 +270,12 @@ export const generateKeyValuePairs = (data: string | Record<string, string | str
     for (const value of valueArray) {
       result.push({
         key: key || "",
-        value: typeof value === "string" ? value : "",
+        value:
+          typeof value === "string"
+            ? value
+            : typeof value === "number" || typeof value === "boolean"
+            ? String(value)
+            : "",
         id: Math.random(),
         isEnabled: true,
       });
