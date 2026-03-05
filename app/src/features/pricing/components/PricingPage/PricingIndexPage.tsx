@@ -32,9 +32,7 @@ export const PricingIndexPage = () => {
   const checkoutErrorMessage = searchParams.get("errorMsg");
   const [isErrorBannerClosed, setIsErrorBannerClosed] = useState(false);
 
-  const [activeProduct, setActiveProduct] = useState(
-    isSafariBrowser() ? PRICING.PRODUCTS.API_CLIENT : PRICING.PRODUCTS.HTTP_RULES
-  );
+  const [activeProduct, setActiveProduct] = useState(PRICING.PRODUCTS.API_CLIENT);
   const [duration, setDuration] = useState(PRICING.DURATION.ANNUALLY);
 
   const isCheckoutFailedEventSent = useRef(false);
