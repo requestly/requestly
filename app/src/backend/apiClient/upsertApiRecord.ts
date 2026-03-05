@@ -24,10 +24,12 @@ export function sanitizeRecord(record: Partial<RQAPI.ApiClientRecord>) {
       // Remove localValue from collection variables
       if (sanitizedRecord.data.variables) {
         sanitizedRecord.data.variables = Object.fromEntries(
-          Object.entries(sanitizedRecord.data.variables).map(([key, variable]) => {
-            const { localValue, ...rest } = variable;
-            return [key, rest];
-          })
+          Object.entries(sanitizedRecord.data.variables)
+            .filter(([key]) => key !== "")
+            .map(([key, variable]) => {
+              const { localValue, ...rest } = variable;
+              return [key, rest];
+            })
         );
       }
     }
