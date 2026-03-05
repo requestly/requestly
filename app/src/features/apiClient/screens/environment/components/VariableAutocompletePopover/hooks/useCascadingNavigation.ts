@@ -3,6 +3,7 @@ import {
   AutocompleteItem,
   Variables,
   getHierarchicalAutocompleteItems,
+  getChildSearchPrefix,
 } from "features/apiClient/helpers/variableResolver/variableHelper";
 
 interface UseCascadingNavigationOptions {
@@ -97,12 +98,12 @@ export function useCascadingNavigation({
   // ─── Derived submenu item lists ─────────────────────────────
   const submenuItems = useMemo(() => {
     if (!expandedNamespace) return [];
-    return getHierarchicalAutocompleteItems(allVariables, expandedNamespace + ".");
+    return getHierarchicalAutocompleteItems(allVariables, getChildSearchPrefix(expandedNamespace));
   }, [allVariables, expandedNamespace]);
 
   const subSubmenuItems = useMemo(() => {
     if (!expandedSubNamespace) return [];
-    return getHierarchicalAutocompleteItems(allVariables, expandedSubNamespace + ".");
+    return getHierarchicalAutocompleteItems(allVariables, getChildSearchPrefix(expandedSubNamespace));
   }, [allVariables, expandedSubNamespace]);
 
   submenuItemsRef.current = submenuItems;

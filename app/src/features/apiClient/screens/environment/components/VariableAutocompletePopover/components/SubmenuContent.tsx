@@ -4,6 +4,7 @@ import {
   AutocompleteItem,
   Variables,
   getHierarchicalAutocompleteItems,
+  getChildSearchPrefix,
 } from "features/apiClient/helpers/variableResolver/variableHelper";
 import { VariableRowContent } from "./VariableRowContent";
 
@@ -110,7 +111,7 @@ export const SubmenuContent = memo<SubmenuContentProps>(function SubmenuContent(
     [onExpandChild]
   );
 
-  const children = useMemo(() => getHierarchicalAutocompleteItems(allVariables, namespacePath + "."), [
+  const children = useMemo(() => getHierarchicalAutocompleteItems(allVariables, getChildSearchPrefix(namespacePath)), [
     allVariables,
     namespacePath,
   ]);
