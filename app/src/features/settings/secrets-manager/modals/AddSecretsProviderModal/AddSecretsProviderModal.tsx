@@ -1,5 +1,4 @@
 import { Modal, Tooltip } from "antd";
-import "./index.scss";
 import { RQButton } from "lib/design-system-v2/components";
 import NetworkPingIcon from "assets/icons/network-ping.svg?react";
 import { InputField } from "../../components/InputField/InputField";
@@ -9,8 +8,9 @@ import { InputPasswordField } from "../../components/InputField/InputPasswordFie
 import { InfoCircleOutlined } from "@ant-design/icons";
 import { ProviderData } from "../../context/SecretsModalsContext";
 import { SecretProviderType } from "@requestly/shared/types/entities/secretsManager";
+import "./addSecretsModal.scss";
 
-interface AddEditProviderModalProps {
+interface AddSecretsProviderModalProps {
   mode: "add" | "edit";
   open: boolean;
   providerData: ProviderData;
@@ -28,7 +28,7 @@ const errorSuffix = (error: string) => (
   </Tooltip>
 );
 
-export const AddEditProviderModal = ({
+export const AddSecretsProviderModal = ({
   mode,
   open,
   providerData,
@@ -38,7 +38,7 @@ export const AddEditProviderModal = ({
   onTestConnection,
   isLoading = false,
   error,
-}: AddEditProviderModalProps) => {
+}: AddSecretsProviderModalProps) => {
   const header = <p className="add-edit-provider-modal-header">{mode === "add" ? "Add provider" : "Edit provider"}</p>;
   const footer = (
     <div className="add-edit-provider-modal-footer">
@@ -78,7 +78,6 @@ export const AddEditProviderModal = ({
       destroyOnClose={true}
       className="add-edit-provider-modal"
       wrapClassName="add-edit-provider-modal-wrap"
-      zIndex={1050}
       onCancel={onClose}
       footer={footer}
     >
@@ -105,7 +104,7 @@ export const AddEditProviderModal = ({
           options={authMethodOptions}
           id="auth-method"
           value={providerData.authMethod}
-          handleFilterChange={(value: string) => onChange({ authMethod: value })}
+          handleFilterChange={(value: "manual" | "aws") => onChange({ authMethod: value })}
           disabled={isLoading}
         />
         <InputPasswordField

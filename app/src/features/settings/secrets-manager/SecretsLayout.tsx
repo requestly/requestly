@@ -7,8 +7,8 @@ import { Outlet, useNavigate } from "react-router-dom";
 import "./secrets.scss";
 import PATHS from "config/constants/sub/paths";
 import { useSecretsModals, DEFAULT_FORM_DATA } from "./context/SecretsModalsContext";
-import { AddEditProviderModal } from "./modals/AddEditProviderModal/Index";
 import DeleteProviderModal from "./modals/DeleteProviderModal/Index";
+import { AddSecretsProviderModal } from "./modals/AddSecretsProviderModal/AddSecretsProviderModal";
 
 // Made children optional since React Router will mostly use <Outlet />
 const SecretsLayout = ({ children }: { children?: React.ReactNode }) => {
@@ -41,27 +41,15 @@ const SecretsLayout = ({ children }: { children?: React.ReactNode }) => {
     if (!addEdit.isOpen) {
       return;
     }
-    try {
-      await saveProvider(addEdit.formData);
-    } catch (error) {
-      console.error("Failed to save provider:", error);
-    }
+    saveProvider(addEdit.formData);
   };
 
   const handleTestConnection = async () => {
-    try {
-      await testConnection();
-    } catch (error) {
-      console.error("Connection test failed:", error);
-    }
+    testConnection();
   };
 
   const handleDelete = async () => {
-    try {
-      await deleteProvider();
-    } catch (error) {
-      console.error("Failed to delete provider:", error);
-    }
+    deleteProvider();
   };
 
   return (
@@ -103,7 +91,7 @@ const SecretsLayout = ({ children }: { children?: React.ReactNode }) => {
       </section>
 
       {/* Global Modals - Available on all pages within this layout */}
-      <AddEditProviderModal
+      <AddSecretsProviderModal
         mode={addEdit.isOpen ? addEdit.mode : "add"}
         open={addEdit.isOpen}
         providerData={addEdit.isOpen ? addEdit.formData : DEFAULT_FORM_DATA}
@@ -112,7 +100,6 @@ const SecretsLayout = ({ children }: { children?: React.ReactNode }) => {
         onSave={handleSave}
         onTestConnection={handleTestConnection}
         isLoading={addEdit.isOpen ? addEdit.isLoading : false}
-        error={addEdit.isOpen ? addEdit.error : undefined}
       />
 
       <DeleteProviderModal
@@ -120,7 +107,6 @@ const SecretsLayout = ({ children }: { children?: React.ReactNode }) => {
         onClose={closeDeleteProviderModal}
         onDelete={handleDelete}
         isLoading={deleteModal.isOpen ? deleteModal.isLoading : false}
-        error={deleteModal.isOpen ? deleteModal.error : undefined}
         providerName={deleteModal.isOpen ? deleteModal.providerName : undefined}
       />
     </main>
