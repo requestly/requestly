@@ -11,7 +11,6 @@ import { MdOutlineDashboardCustomize } from "@react-icons/all-files/md/MdOutline
 import { BufferedGraphQLRecordEntity, BufferedHttpRecordEntity } from "features/apiClient/slices/entities";
 import { useApiClientFeatureContext } from "features/apiClient/slices";
 import { useSaveAsExample } from "features/apiClient/hooks/useSaveAsExample";
-import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
 
@@ -23,8 +22,6 @@ interface Props {
 
 const StatusLine: React.FC<Props> = ({ response, entity, isDraftMode }) => {
   const context = useApiClientFeatureContext();
-
-  const isLocalSyncEnabled = useCheckLocalSyncSupport();
 
   const { isSavingAsExample, handleSaveExample } = useSaveAsExample(entity);
 
@@ -69,7 +66,6 @@ const StatusLine: React.FC<Props> = ({ response, entity, isDraftMode }) => {
       />
       <PropertyRow className="api-response-status-row__time" name="Time" value={formattedTime} />
       {entityType === RQAPI.RecordType.API &&
-        !isLocalSyncEnabled &&
         !isDraftMode &&
         isFeatureCompatible(FEATURES.API_CLIENT_EXAMPLE_REQUESTS) && (
           <div className="api-response-status-row__save-button-wrapper">
