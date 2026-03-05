@@ -24,13 +24,13 @@ export const ErrorFileViewerModal = ({ isOpen, onClose, errorFile }: ErrorFileVi
 
   useEffect(() => {
     const fetchErrorFileData = async () => {
-      const result = await apiClientRecordsRepository.getRawFileData(errorFile.path);
+      const result = await apiClientRecordsRepository.getRawFileData(errorFile.id);
       if (result.success) {
         setFileContent(result.data);
       }
     };
     fetchErrorFileData();
-  }, [apiClientRecordsRepository, errorFile.path]);
+  }, [apiClientRecordsRepository, errorFile.id]);
 
   const handlePostSuccessfulWrite = useCallback(async () => {
     if (
@@ -62,7 +62,7 @@ export const ErrorFileViewerModal = ({ isOpen, onClose, errorFile }: ErrorFileVi
 
   const handleSave = async () => {
     try {
-      const result = await apiClientRecordsRepository.writeToRawFile(errorFile.path, fileContent, errorFile.type);
+      const result = await apiClientRecordsRepository.writeToRawFile(errorFile.id, fileContent, errorFile.type);
       if (!result.success) {
         throw new Error(result.message || "Failed to save error file");
       }

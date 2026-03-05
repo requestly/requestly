@@ -1,4 +1,6 @@
 import { UpdateSpec } from "dexie";
+import { NativeError } from "errors/NativeError";
+import { ErrorSeverity } from "errors/types";
 import { ApiClientLocalStoreMeta } from "../../interfaces";
 import { ApiClientLocalDb } from "./ApiClientLocalDb";
 import dbProvider from "./ApiClientLocalDbProvider";
@@ -17,50 +19,100 @@ export class ApiClientLocalDbQueryService<T> {
   }
 
   async getRecord(id: string) {
-    return this.getTable().get(id);
+    try {
+      return await this.getTable().get(id);
+    } catch (error: any) {
+      const e = new Error(error.message);
+      throw NativeError.fromError(e).setShowBoundary(true).setSeverity(ErrorSeverity.ERROR);
+    }
   }
 
   async getRecords() {
-    return this.getTable().toArray();
+    try {
+      return await this.getTable().toArray();
+    } catch (error: any) {
+      const e = new Error(error.message);
+      throw NativeError.fromError(e).setShowBoundary(true).setSeverity(ErrorSeverity.ERROR);
+    }
   }
 
   async updateRecord(id: string, record: T) {
-    return this.getTable().update(id, record as UpdateSpec<T>);
+    try {
+      return await this.getTable().update(id, record as UpdateSpec<T>);
+    } catch (error: any) {
+      const e = new Error(error.message);
+      throw NativeError.fromError(e).setShowBoundary(true).setSeverity(ErrorSeverity.ERROR);
+    }
   }
 
   async createRecord(record: T) {
-    return this.getTable().add(record);
+    try {
+      return await this.getTable().add(record);
+    } catch (error: any) {
+      const e = new Error(error.message);
+      throw NativeError.fromError(e).setShowBoundary(true).setSeverity(ErrorSeverity.ERROR);
+    }
   }
 
   async createBulkRecords(records: T[]) {
-    return this.getTable().bulkAdd(records);
+    try {
+      return await this.getTable().bulkAdd(records);
+    } catch (error: any) {
+      const e = new Error(error.message);
+      throw NativeError.fromError(e).setShowBoundary(true).setSeverity(ErrorSeverity.ERROR);
+    }
   }
 
   async updateRecords(updates: (Partial<T> & { id: string })[]) {
-    return this.getTable().bulkUpdate(
-      updates.map((update) => {
-        return {
-          key: update.id,
-          changes: update as UpdateSpec<T>,
-        };
-      })
-    );
+    try {
+      return await this.getTable().bulkUpdate(
+        updates.map((update) => {
+          return {
+            key: update.id,
+            changes: update as UpdateSpec<T>,
+          };
+        })
+      );
+    } catch (error: any) {
+      const e = new Error(error.message);
+      throw NativeError.fromError(e).setShowBoundary(true).setSeverity(ErrorSeverity.ERROR);
+    }
   }
 
   async deleteRecord(id: string) {
-    return this.getTable().delete(id);
+    try {
+      return await this.getTable().delete(id);
+    } catch (error: any) {
+      const e = new Error(error.message);
+      throw NativeError.fromError(e).setShowBoundary(true).setSeverity(ErrorSeverity.ERROR);
+    }
   }
 
   async deleteRecords(ids: string[]) {
-    return this.getTable().bulkDelete(ids);
+    try {
+      return await this.getTable().bulkDelete(ids);
+    } catch (error: any) {
+      const e = new Error(error.message);
+      throw NativeError.fromError(e).setShowBoundary(true).setSeverity(ErrorSeverity.ERROR);
+    }
   }
 
   async clearAllRecords() {
-    return this.getTable().clear();
+    try {
+      return await this.getTable().clear();
+    } catch (error: any) {
+      const e = new Error(error.message);
+      throw NativeError.fromError(e).setShowBoundary(true).setSeverity(ErrorSeverity.ERROR);
+    }
   }
 
   async getIsAllCleared() {
-    const count = await this.getTable().count();
-    return count === 0;
+    try {
+      const count = await this.getTable().count();
+      return count === 0;
+    } catch (error: any) {
+      const e = new Error(error.message);
+      throw NativeError.fromError(e).setShowBoundary(true).setSeverity(ErrorSeverity.ERROR);
+    }
   }
 }
