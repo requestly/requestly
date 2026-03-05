@@ -24,7 +24,11 @@ import { RequestViewTabSource } from "../../../../views/components/RequestView/r
 import { useDrag, useDrop } from "react-dnd";
 import { GrGraphQl } from "@react-icons/all-files/gr/GrGraphQl";
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
-import { isGraphQLApiRecord, isHttpApiRecord } from "features/apiClient/screens/apiClient/utils";
+import {
+  isGraphQLApiRecord,
+  isHttpApiRecord,
+  sanitizeExampleMultiPartFormBody,
+} from "features/apiClient/screens/apiClient/utils";
 import {
   ApiClientFeatureContext,
   useApiClientRepository,
@@ -295,9 +299,13 @@ export const RequestRow: React.FC<Props> = ({
         handleDropdownVisibleChange(false);
         const { data, ...recordMeta } = record;
         const { examples: _examples, ...entryData } = data;
+        const sanitizedEntryData =
+          entryData?.type === RQAPI.ApiEntryType.HTTP
+            ? sanitizeExampleMultiPartFormBody(entryData as RQAPI.HttpApiEntry)
+            : entryData;
         const exampleRecordToCreate: RQAPI.ExampleApiRecord = {
           ...recordMeta,
-          data: entryData,
+          data: sanitizedEntryData,
           type: RQAPI.RecordType.EXAMPLE_API,
           collectionId: null,
           parentRequestId: record.id,
