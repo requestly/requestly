@@ -47,10 +47,6 @@ export const selectIsDirtyForSelectedProvider = createSelector(
   }
 );
 
-export const selectAllAliasesForProvider = (state: RootState, providerId: string): string[] => {
-  const allSecrets = secretsAdapterSelectors.selectAll(state);
-  return allSecrets
-    .filter((s) => s.providerId === providerId)
-    .map((s) => s.secretReference.alias)
-    .filter(Boolean);
-};
+export const selectFetchErrors = createSelector(selectSecretsManagerSlice, (slice) => slice.fetchErrors);
+
+export const selectValidationErrors = createSelector(selectSecretsManagerSlice, (slice) => slice.validationErrors);

@@ -9,4 +9,6 @@ export interface SecretsManagerState {
   isDirty: Record<string, boolean>;
   selectedProviderId: string | null;
   fetchStatus: FetchStatus;
+  fetchErrors: Record<string, string>;
+  validationErrors: Record<string, { alias?: string; identifier?: string }>;
 }

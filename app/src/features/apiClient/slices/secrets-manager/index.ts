@@ -9,7 +9,8 @@ export {
   selectSecretsForSelectedProvider,
   selectLastFetchedForSelectedProvider,
   selectIsDirtyForSelectedProvider,
-  selectAllAliasesForProvider,
+  selectFetchErrors,
+  selectValidationErrors,
 } from "./selectors";
 export {
   initAndSubscribeSecretsManager,

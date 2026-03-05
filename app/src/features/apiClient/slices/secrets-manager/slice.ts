@@ -18,6 +18,8 @@ const initialState: SecretsManagerState = {
   isDirty: {},
   selectedProviderId: null,
   fetchStatus: "idle",
+  fetchErrors: {},
+  validationErrors: {},
 };
 
 function removeSecretsForProvider(state: SecretsManagerState, providerId: string) {
@@ -111,10 +113,18 @@ export const secretsManagerSlice = createSlice({
       .addCase(fetchAndSaveSecretsForProvider.fulfilled, (state, action) => {
         state.fetchStatus = "succeeded";
         const { providerId } = action.meta.arg;
+        const { secrets, errors, validationErrors } = action.payload;
 
         removeSecretsForProvider(state, providerId);
-        secretsAdapter.upsertMany(state.secrets, action.payload);
+        secretsAdapter.upsertMany(state.secrets, secrets);
         state.isDirty[providerId] = false;
+
+        const errorMap: Record<string, string> = {};
+        for (const err of errors) {
+          errorMap[err.secretRefId] = err.message;
+        }
+        state.fetchErrors = errorMap;
+        state.validationErrors = validationErrors;
       })
       .addCase(fetchAndSaveSecretsForProvider.rejected, (state) => {
         state.fetchStatus = "failed";
