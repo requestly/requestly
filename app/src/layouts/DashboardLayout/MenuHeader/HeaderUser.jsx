@@ -158,7 +158,7 @@ export default function HeaderUser() {
   return hideUserDropDown ? null : (
     <section>
       {user.loggedIn && user?.details?.profile ? (
-        <Row align="middle" gutter={4}>
+        <Row align="middle" gutter={4} wrap={false}>
           <Col>
             <Dropdown
               trigger={["click"]}
