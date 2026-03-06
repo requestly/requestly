@@ -8,6 +8,7 @@ import CheckCircleOutlined from "@ant-design/icons/lib/icons/CheckCircleOutlined
 import { RQButton } from "lib/design-system-v2/components/RQButton/RQButton";
 import FilterIcon from "assets/icons/filter-manage.svg?react";
 import "./index.scss";
+import { RevealableSecretField } from "componentsV2/RevealableSecretField/RevealableSecretField";
 
 export const SecretsVariableInfo: React.FC<{
   variable: SecretVariable;
@@ -17,10 +18,11 @@ export const SecretsVariableInfo: React.FC<{
   const providers = useSelector(selectAllSecretProviders);
   const activeProvider = selectedProviderId ? providers.find((p) => p.id === selectedProviderId) : null;
   // Parse the variable name to extract alias and key
-  // Format: secrets.{providerId}.{alias} or secrets.{providerId}.{alias}.{key}
-  const nameParts = variable.name.split(".");
-  const alias = nameParts[1] || "";
-  const key = nameParts[2] || "";
+  // Format: secrets:{alias} or secrets:{alias}.{key}
+  const withoutPrefix = variable.name.slice("secrets:".length); // "alias.key"
+  const dotIndex = withoutPrefix.indexOf(".");
+  const alias = dotIndex >= 0 ? withoutPrefix.slice(0, dotIndex) : withoutPrefix; // "alias"
+  const value = variable.value;
 
   const handleManageClick = () => {
     console.log("Manage clicked");
@@ -50,8 +52,10 @@ export const SecretsVariableInfo: React.FC<{
           <span className="secrets-info-value">{alias}</span>
         </div>
         <div className="secrets-info-row">
-          <span className="secrets-info-label">Key/value secret</span>
-          <span className="secrets-info-value">{key}</span>
+          <span className="secrets-info-label">Value</span>
+          <span className="secrets-info-value">
+            <RevealableSecretField value={value} isRevealable={true} />
+          </span>
         </div>
       </div>
     </div>
