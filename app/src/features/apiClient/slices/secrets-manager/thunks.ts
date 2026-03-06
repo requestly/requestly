@@ -12,10 +12,11 @@ import {
   selectAllSecrets,
   selectSelectedProviderId,
   selectAllSecretProviders,
-  selectSecretsForSelectedProvider,
+  selectSecretsByProviderId,
 } from "./selectors";
 import { secretsManagerActions } from "./slice";
 import { secretVariables } from "lib/secret-variables";
+import { SECRETS_MANAGER_SLICE_NAME } from "../common/constants";
 
 type RootState = { secretsManager: import("./types").SecretsManagerState };
 
@@ -64,12 +65,12 @@ export const fetchAndSaveSecretsForProvider = createAsyncThunk<
   { rejectValue: string; state: RootState }
 >("secretsManager/fetchAndSaveSecretsForProvider", async ({ providerId }, { getState, rejectWithValue }) => {
   const state = getState();
-  const allSecrets = selectAllSecrets(state).filter((s) => s.providerId === providerId);
-  const secretRefs = allSecrets.map((s) => s.secretReference);
+  const allProviderSecrets = selectSecretsByProviderId(state)(providerId);
+  const secretRefs = allProviderSecrets.map((s) => s.secretReference);
 
   // Frontend validation — runs before the IPC call
   const aliasCounts = new Map<string, number>();
-  for (const s of allSecrets) {
+  for (const s of allProviderSecrets) {
     const alias = (s.secretReference.alias ?? "").trim();
     if (alias) {
       aliasCounts.set(alias, (aliasCounts.get(alias) ?? 0) + 1);
@@ -77,7 +78,7 @@ export const fetchAndSaveSecretsForProvider = createAsyncThunk<
   }
 
   const validationMap: Record<string, { alias?: string; identifier?: string }> = {};
-  for (const s of allSecrets) {
+  for (const s of allProviderSecrets) {
     const refId = s.secretReference.id;
     const alias = (s.secretReference.alias ?? "").trim();
     const identifier = ((s as AwsSecretValue).secretReference.identifier ?? "").trim();
@@ -122,7 +123,7 @@ export const fetchAndSaveSecretsForProvider = createAsyncThunk<
   }
 
   const erroredRefIds = new Set([...Object.keys(validationMap), ...backendErrors.map((e) => e.secretRefId)]);
-  const originalErroredRows = allSecrets.filter((s) => erroredRefIds.has(s.secretReference.id));
+  const originalErroredRows = allProviderSecrets.filter((s) => erroredRefIds.has(s.secretReference.id));
   const allSecretsForRedux = [...secrets, ...originalErroredRows];
 
   secretVariables.updateSourceFromSecrets(secrets as AwsSecretValue[]);
@@ -235,7 +236,7 @@ export const deleteAllSecretsForProvider = createAsyncThunk<
   { rejectValue: string; state: RootState }
 >("secretsManager/deleteAllSecretsForProvider", async ({ providerId }, { dispatch, rejectWithValue, getState }) => {
   const state = getState();
-  const allSecrets = selectSecretsForSelectedProvider(state);
+  const allSecrets = selectSecretsByProviderId(state)(providerId);
 
   const secretsToDelete = allSecrets.filter((s) => s.providerId === providerId);
 
@@ -249,3 +250,14 @@ export const deleteAllSecretsForProvider = createAsyncThunk<
   const secrets = selectAllSecrets(state);
   secretVariables.updateSourceFromSecrets(secrets.filter((s) => s.providerId !== providerId) as AwsSecretValue[]);
 });
+
+export const revertDirtyChanges = createAsyncThunk(
+  `secretsManager/revertDirtyChanges`,
+  async (_, { dispatch, getState }) => {
+    const state = getState() as RootState;
+    const providerId = selectSelectedProviderId(state);
+    if (providerId) {
+      await dispatch(listSecrets(providerId));
+    }
+  }
+);

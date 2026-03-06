@@ -12,6 +12,7 @@ export {
   selectSelectedProviderId,
   selectFetchStatus,
   selectSecretsForSelectedProvider,
+  selectSecretsByProviderId,
   selectLastFetchedForSelectedProvider,
   selectIsDirtyForSelectedProvider,
   selectFetchErrors,

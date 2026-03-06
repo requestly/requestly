@@ -31,6 +31,10 @@ export const selectSecretsForSelectedProvider = createSelector(
   }
 );
 
+export const selectSecretsByProviderId = createSelector([selectAllSecrets], (secrets) => (providerId: string) => {
+  return secrets.filter((s) => s.providerId === providerId);
+});
+
 export const selectLastFetchedForSelectedProvider = createSelector([selectSecretsForSelectedProvider], (secrets) => {
   const fetched = secrets.filter((s) => s.fetchedAt > 0);
   if (fetched.length === 0) return null;
