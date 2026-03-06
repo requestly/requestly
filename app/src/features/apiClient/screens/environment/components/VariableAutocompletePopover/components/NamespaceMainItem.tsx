@@ -1,4 +1,4 @@
-import React, { memo, useState, useCallback } from "react";
+import { memo, useState, useCallback } from "react";
 import { List, Popover } from "antd";
 import { AutocompleteItem, Variables } from "features/apiClient/helpers/variableResolver/variableHelper";
 import { VariableRowContent } from "./VariableRowContent";

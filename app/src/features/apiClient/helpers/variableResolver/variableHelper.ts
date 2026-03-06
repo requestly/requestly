@@ -52,6 +52,12 @@ export function mergeAndParseAllVariables(scopedVariables?: ScopedVariables): Va
 }
 
 function matchFlatVariables(variables: Variables, search: string): AutocompleteItem[] {
+  // Skip showing non-secret variables when the search is for secrets
+  const isSecretsSearch = search.startsWith("secrets") && !search.includes(".");
+  if (isSecretsSearch) {
+    return [];
+  }
+
   return Object.entries(variables)
     .filter(([key, v]) => !checkIsSecretsVariable(v) && key.toLowerCase().includes(search))
     .map(([key, v]) => ({ name: key, displayName: key, variable: v, isNamespace: false }));
@@ -66,9 +72,49 @@ function matchFlatVariables(variables: Variables, search: string): AutocompleteI
  * drillable namespace entry.
  */
 function matchHierarchicalSecrets(variables: Variables, search: string): AutocompleteItem[] {
-  const lastDot = search.lastIndexOf(".");
-  const parentPath = lastDot >= 0 ? search.slice(0, lastDot + 1) : "";
-  const filterText = lastDot >= 0 ? search.slice(lastDot + 1) : search;
+  const normalizedSearch = search.toLowerCase();
+
+  // Skip the "secrets" namespace level - start from "secrets." directly
+  let parentPath = "";
+  let filterText = normalizedSearch;
+  let showOnlyNamespaces = false;
+
+  // Only show secrets if user types "secrets." with the dot
+  if (!normalizedSearch.startsWith("secrets.")) {
+    return [];
+  }
+
+  // Check if search is exactly "secrets."
+  const isSecretsRootLevel = normalizedSearch === "secrets.";
+
+  if (isSecretsRootLevel) {
+    // When user types "secrets.", show the first level providers directly
+    parentPath = "secrets.";
+    filterText = "";
+  } else {
+    const lastDot = normalizedSearch.lastIndexOf(".");
+
+    // If there's text after the last dot (incomplete path like "secrets.SEC-1.api_tok")
+    // we should show namespace items from the parent level, not leaf items
+    if (lastDot >= 0 && normalizedSearch.slice(lastDot + 1).length > 0) {
+      const secondLastDot = normalizedSearch.lastIndexOf(".", lastDot - 1);
+      if (secondLastDot >= 0) {
+        // Multi-level path with partial text: show namespace from parent level
+        parentPath = normalizedSearch.slice(0, secondLastDot + 1);
+        filterText = normalizedSearch.slice(secondLastDot + 1, lastDot);
+        showOnlyNamespaces = true;
+      } else {
+        // Two-level path with partial text (secrets.SEC-1.api_tok -> show from secrets.)
+        parentPath = "secrets.";
+        filterText = normalizedSearch.slice(8, lastDot); // after "secrets."
+        showOnlyNamespaces = true;
+      }
+    } else {
+      // Complete path with trailing dot or just the namespace itself
+      parentPath = lastDot >= 0 ? normalizedSearch.slice(0, lastDot + 1) : "";
+      filterText = lastDot >= 0 ? normalizedSearch.slice(lastDot + 1) : normalizedSearch;
+    }
+  }
 
   const items: AutocompleteItem[] = [];
   const seenNamespaces = new Set<string>();
@@ -103,9 +149,14 @@ function matchHierarchicalSecrets(variables: Variables, search: string): Autocom
       seenNamespaces.add(normalized);
     }
 
+    // If showOnlyNamespaces is true, skip leaf items
+    if (showOnlyNamespaces && !isNamespace) {
+      continue;
+    }
+
     items.push({
       name: entryName,
-      displayName: parentPath ? segment : entryName,
+      displayName: segment, // Always show just the segment, not the full path
       variable: isNamespace
         ? ({ name: entryName, value: "", id: entryName, scope: VariableScope.SECRETS } as SecretVariable)
         : variable,

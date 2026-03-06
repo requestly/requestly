@@ -8,7 +8,9 @@ import {
 import { useCascadingNavigation } from "./hooks/useCascadingNavigation";
 import { LeafMainItem } from "./components/LeafMainItem";
 import { NamespaceMainItem } from "./components/NamespaceMainItem";
+import { SPECIAL_VARIABLE_MODES } from "./variableModeConfig";
 import "./variableAutocompletePopover.scss";
+
 interface VariableAutocompleteProps {
   show: boolean;
   position: { x: number; y: number };
@@ -17,6 +19,10 @@ interface VariableAutocompleteProps {
   onSelect: (variableKey: string) => void;
   onClose?: () => void;
 }
+
+const SecretsDefaultFooter: React.FC = () => {
+  return <div className="secrets-hint-footer">Type &ldquo;secrets.&rdquo; to use secrets in requests</div>;
+};
 
 export const VariableAutocompletePopover: React.FC<VariableAutocompleteProps> = memo(
   ({ show, position, search, variables, onSelect, onClose }) => {
@@ -27,13 +33,33 @@ export const VariableAutocompletePopover: React.FC<VariableAutocompleteProps> = 
       onSelectRef.current = onSelect;
     }, [onSelect]);
 
+    // Detect active mode based on search prefix
+    const activeMode = useMemo(() => {
+      const normalizedSearch = (search ?? "").toLowerCase();
+      return Object.entries(SPECIAL_VARIABLE_MODES).find(([_, config]) =>
+        normalizedSearch.startsWith(config.prefix + ".")
+      );
+    }, [search]);
+
     const allVariables = useMemo(() => {
       return variables ? mergeAndParseAllVariables(variables) : {};
     }, [variables]);
 
+    // Filter variables based on active mode
     const filteredVariables = useMemo(() => {
-      return getHierarchicalAutocompleteItems(allVariables, search);
-    }, [allVariables, search]);
+      const items = getHierarchicalAutocompleteItems(allVariables, search);
+
+      if (activeMode) {
+        // In special mode: only show variables of that type
+        const [_, config] = activeMode;
+        return items.filter((item) => config.checkFunction(item.variable));
+      }
+
+      // In default mode: filter out all special variable types
+      return items.filter(
+        (item) => !Object.values(SPECIAL_VARIABLE_MODES).some((config) => config.checkFunction(item.variable))
+      );
+    }, [allVariables, search, activeMode]);
 
     const {
       selectedIndex,
@@ -57,52 +83,61 @@ export const VariableAutocompletePopover: React.FC<VariableAutocompleteProps> = 
       }
     }, [selectedIndex, show]);
 
+    const shouldShow = show && (filteredVariables.length > 0 || !!activeMode);
+
+    // Get the appropriate footer component
+    const FooterComponent = activeMode ? activeMode[1].FooterComponent : SecretsDefaultFooter;
+
     return (
       <Popover
-        open={show && filteredVariables.length > 0}
+        open={shouldShow}
         destroyTooltipOnHide
         trigger={[]}
         placement="bottomLeft"
         overlayClassName="variable-autocomplete-popup"
         overlayInnerStyle={{ padding: 0 }}
         content={
-          filteredVariables?.length > 0 ? (
+          <div>
             <div ref={listRef} className="autocomplete-scroll-container" style={{ maxHeight: 300, overflowY: "auto" }}>
-              <List
-                size="small"
-                dataSource={filteredVariables}
-                renderItem={(item, index) =>
-                  item.isNamespace ? (
-                    <NamespaceMainItem
-                      key={item.name}
-                      item={item}
-                      index={index}
-                      isSelected={index === selectedIndex}
-                      onSelect={(name) => onSelectRef.current(name)}
-                      onHover={setSelectedIndex}
-                      allVariables={allVariables}
-                      isKeyboardExpanded={expandedNamespace === item.name}
-                      submenuSelectedIndex={submenuSelectedIndex}
-                      onSubmenuHover={handleSubmenuHover}
-                      expandedSubNamespace={expandedNamespace === item.name ? expandedSubNamespace : null}
-                      onExpandSubNamespace={setExpandedSubNamespace}
-                      subSubmenuSelectedIndex={subSubmenuSelectedIndex}
-                      onSubSubmenuHover={handleSubSubmenuHover}
-                    />
-                  ) : (
-                    <LeafMainItem
-                      key={item.name}
-                      item={item}
-                      index={index}
-                      isSelected={index === selectedIndex}
-                      onSelect={(name) => onSelectRef.current(name)}
-                      onHover={setSelectedIndex}
-                    />
-                  )
-                }
-              />
+              {filteredVariables.length > 0 && (
+                <List
+                  size="small"
+                  dataSource={filteredVariables}
+                  renderItem={(item, index) =>
+                    item.isNamespace ? (
+                      <NamespaceMainItem
+                        key={item.name}
+                        item={item}
+                        index={index}
+                        isSelected={index === selectedIndex}
+                        onSelect={(name) => onSelectRef.current(name)}
+                        onHover={setSelectedIndex}
+                        allVariables={allVariables}
+                        isKeyboardExpanded={expandedNamespace === item.name}
+                        submenuSelectedIndex={submenuSelectedIndex}
+                        onSubmenuHover={handleSubmenuHover}
+                        expandedSubNamespace={expandedNamespace === item.name ? expandedSubNamespace : null}
+                        onExpandSubNamespace={setExpandedSubNamespace}
+                        subSubmenuSelectedIndex={subSubmenuSelectedIndex}
+                        onSubSubmenuHover={handleSubSubmenuHover}
+                      />
+                    ) : (
+                      <LeafMainItem
+                        key={item.name}
+                        item={item}
+                        index={index}
+                        isSelected={index === selectedIndex}
+                        onSelect={(name) => onSelectRef.current(name)}
+                        onHover={setSelectedIndex}
+                      />
+                    )
+                  }
+                />
+              )}
             </div>
-          ) : null
+
+            <FooterComponent onClose={onClose} />
+          </div>
         }
       >
         <span

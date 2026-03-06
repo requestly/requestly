@@ -64,7 +64,7 @@ export const NamespaceSubmenuItem = memo<NamespaceSubmenuItemProps>(function Nam
         onMouseEnter={() => onItemHover?.(index)}
         style={{ cursor: "pointer" }}
       >
-        <VariableRowContent item={item} />
+        <VariableRowContent item={item} hideIcon />
       </List.Item>
     </Popover>
   );
@@ -110,10 +110,10 @@ export const SubmenuContent = memo<SubmenuContentProps>(function SubmenuContent(
     [onExpandChild]
   );
 
-  const children = useMemo(() => getHierarchicalAutocompleteItems(allVariables, namespacePath + "."), [
-    allVariables,
-    namespacePath,
-  ]);
+  const children = useMemo(
+    () => getHierarchicalAutocompleteItems(allVariables, namespacePath + "."),
+    [allVariables, namespacePath]
+  );
 
   if (children.length === 0) return null;
 
@@ -154,7 +154,7 @@ export const SubmenuContent = memo<SubmenuContentProps>(function SubmenuContent(
               onMouseEnter={() => onItemHover?.(index)}
               style={{ cursor: "pointer" }}
             >
-              <VariableRowContent item={item} />
+              <VariableRowContent item={item} hideIcon />
             </List.Item>
           );
         }}
