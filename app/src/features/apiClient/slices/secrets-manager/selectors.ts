@@ -1,6 +1,6 @@
 import { createSelector } from "@reduxjs/toolkit";
 import { providersAdapter, secretsAdapter } from "./adapters";
-import { SecretsManagerState, PendingSecretEntry } from "./types";
+import { SecretsManagerState } from "./types";
 
 type RootState = { secretsManager: SecretsManagerState };
 
@@ -32,33 +32,25 @@ export const selectSecretsForSelectedProvider = createSelector(
 );
 
 export const selectLastFetchedForSelectedProvider = createSelector([selectSecretsForSelectedProvider], (secrets) => {
-  if (secrets.length === 0) return null;
-  return Math.max(...secrets.map((s) => s.fetchedAt));
+  const fetched = secrets.filter((s) => s.fetchedAt > 0);
+  if (fetched.length === 0) return null;
+  return Math.max(...fetched.map((s) => s.fetchedAt));
 });
 
-const selectAllPendingEntries = createSelector(selectSecretsManagerSlice, (slice) => slice.pendingEntries);
+const selectIsDirtyMap = createSelector(selectSecretsManagerSlice, (slice) => slice.isDirty);
 
-export const selectPendingEntriesForSelectedProvider = createSelector(
-  [selectAllPendingEntries, selectSelectedProviderId],
-  (pendingEntries, selectedProviderId): PendingSecretEntry[] => {
-    if (!selectedProviderId) return [];
-    return pendingEntries[selectedProviderId] ?? [];
+export const selectIsDirtyForSelectedProvider = createSelector(
+  [selectIsDirtyMap, selectSelectedProviderId],
+  (isDirty, selectedProviderId) => {
+    if (!selectedProviderId) return false;
+    return isDirty[selectedProviderId] ?? false;
   }
 );
 
-export const selectHasPendingEntries = createSelector([selectAllPendingEntries], (pendingEntries) => {
-  return Object.values(pendingEntries).some((entries) => entries.length > 0);
-});
-
 export const selectAllAliasesForProvider = (state: RootState, providerId: string): string[] => {
   const allSecrets = secretsAdapterSelectors.selectAll(state);
-  const secretAliases = allSecrets
+  return allSecrets
     .filter((s) => s.providerId === providerId)
     .map((s) => s.secretReference.alias)
     .filter(Boolean);
-
-  const pendingEntries = state.secretsManager.pendingEntries[providerId] ?? [];
-  const pendingAliases = pendingEntries.map((e) => e.alias).filter(Boolean);
-
-  return [...secretAliases, ...pendingAliases];
 };

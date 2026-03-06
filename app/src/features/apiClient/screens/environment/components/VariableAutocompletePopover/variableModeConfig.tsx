@@ -7,6 +7,7 @@ export interface VariableModeConfig {
   prefix: string;
   checkFunction: (variable: Variable) => boolean;
   FooterComponent: React.FC<{ onClose?: () => void }>;
+  separator: string;
 }
 
 export const SPECIAL_VARIABLE_MODES: Record<string, VariableModeConfig> = {
@@ -14,6 +15,7 @@ export const SPECIAL_VARIABLE_MODES: Record<string, VariableModeConfig> = {
     prefix: "secrets",
     checkFunction: checkIsSecretsVariable,
     FooterComponent: SecretsFooter,
+    separator: ":",
   },
   // Add new variable types here:
   // [VariableScope.VAULT]: {

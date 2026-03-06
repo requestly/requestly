@@ -64,57 +64,39 @@ function matchFlatVariables(variables: Variables, search: string): AutocompleteI
 }
 
 /**
- * Matches secret variables hierarchically using dot-separated paths.
+ * Returns the search prefix for drilling into a namespace's children.
+ * The top-level "secrets" namespace uses ":" as its separator (secrets:),
+ * while deeper levels use "." (secrets:cities.).
+ */
+export function getChildSearchPrefix(namespacePath: string): string {
+  return namespacePath === "secrets" ? "secrets:" : namespacePath + ".";
+}
+
+function findLastSeparator(s: string): number {
+  return Math.max(s.lastIndexOf("."), s.lastIndexOf(":"));
+}
+
+function findFirstSeparator(s: string): number {
+  const dot = s.indexOf(".");
+  const colon = s.indexOf(":");
+  if (dot === -1) return colon;
+  if (colon === -1) return dot;
+  return Math.min(dot, colon);
+}
+
+/**
+ * Matches secret variables hierarchically using colon and dot separators.
  *
- * Given search "secrets.cities.n", `parentPath` is "secrets.cities." and
- * `filterText` is "n". Only keys under that parent are considered, and only
- * the next path segment is exposed — deeper segments collapse into a
- * drillable namespace entry.
+ * Secret paths use "secrets:" as the first-level separator and "." for deeper
+ * levels: "secrets:cities.chicago". Given search "secrets:cities.",
+ * `parentPath` is "secrets:cities." and `filterText` is "". Only keys under
+ * that parent are considered, and only the next path segment is exposed --
+ * deeper segments collapse into a drillable namespace entry.
  */
 function matchHierarchicalSecrets(variables: Variables, search: string): AutocompleteItem[] {
-  const normalizedSearch = search.toLowerCase();
-
-  // Skip the "secrets" namespace level - start from "secrets." directly
-  let parentPath = "";
-  let filterText = normalizedSearch;
-  let showOnlyNamespaces = false;
-
-  // Only show secrets if user types "secrets." with the dot
-  if (!normalizedSearch.startsWith("secrets.")) {
-    return [];
-  }
-
-  // Check if search is exactly "secrets."
-  const isSecretsRootLevel = normalizedSearch === "secrets.";
-
-  if (isSecretsRootLevel) {
-    // When user types "secrets.", show the first level providers directly
-    parentPath = "secrets.";
-    filterText = "";
-  } else {
-    const lastDot = normalizedSearch.lastIndexOf(".");
-
-    // If there's text after the last dot (incomplete path like "secrets.SEC-1.api_tok")
-    // we should show namespace items from the parent level, not leaf items
-    if (lastDot >= 0 && normalizedSearch.slice(lastDot + 1).length > 0) {
-      const secondLastDot = normalizedSearch.lastIndexOf(".", lastDot - 1);
-      if (secondLastDot >= 0) {
-        // Multi-level path with partial text: show namespace from parent level
-        parentPath = normalizedSearch.slice(0, secondLastDot + 1);
-        filterText = normalizedSearch.slice(secondLastDot + 1, lastDot);
-        showOnlyNamespaces = true;
-      } else {
-        // Two-level path with partial text (secrets.SEC-1.api_tok -> show from secrets.)
-        parentPath = "secrets.";
-        filterText = normalizedSearch.slice(8, lastDot); // after "secrets."
-        showOnlyNamespaces = true;
-      }
-    } else {
-      // Complete path with trailing dot or just the namespace itself
-      parentPath = lastDot >= 0 ? normalizedSearch.slice(0, lastDot + 1) : "";
-      filterText = lastDot >= 0 ? normalizedSearch.slice(lastDot + 1) : normalizedSearch;
-    }
-  }
+  const lastSep = findLastSeparator(search);
+  const parentPath = lastSep >= 0 ? search.slice(0, lastSep + 1) : "";
+  const filterText = lastSep >= 0 ? search.slice(lastSep + 1) : search;
 
   const items: AutocompleteItem[] = [];
   const seenNamespaces = new Set<string>();
@@ -129,13 +111,13 @@ function matchHierarchicalSecrets(variables: Variables, search: string): Autocom
     }
 
     const remaining = key.slice(parentPath.length);
-    const nextDot = remaining.indexOf(".");
-    const isNamespace = nextDot >= 0;
-    // For key "secrets.cities.paris" with parentPath "secrets.":
+    const nextSep = findFirstSeparator(remaining);
+    const isNamespace = nextSep >= 0;
+    // For key "secrets:cities.paris" with parentPath "secrets:":
     //   segment   = "cities"          (the immediate child label shown in the dropdown)
-    //   entryName = "secrets.cities"  (the full path up to this level, used as the item key)
-    const segment = isNamespace ? remaining.slice(0, nextDot) : remaining;
-    const entryName = isNamespace ? key.slice(0, parentPath.length + nextDot) : key;
+    //   entryName = "secrets:cities"  (the full path up to this level, used as the item key)
+    const segment = isNamespace ? remaining.slice(0, nextSep) : remaining;
+    const entryName = isNamespace ? key.slice(0, parentPath.length + nextSep) : key;
 
     if (filterText && !segment.toLowerCase().includes(filterText)) {
       continue;
@@ -149,14 +131,9 @@ function matchHierarchicalSecrets(variables: Variables, search: string): Autocom
       seenNamespaces.add(normalized);
     }
 
-    // If showOnlyNamespaces is true, skip leaf items
-    if (showOnlyNamespaces && !isNamespace) {
-      continue;
-    }
-
     items.push({
       name: entryName,
-      displayName: segment, // Always show just the segment, not the full path
+      displayName: parentPath ? segment : entryName,
       variable: isNamespace
         ? ({ name: entryName, value: "", id: entryName, scope: VariableScope.SECRETS } as SecretVariable)
         : variable,
@@ -172,7 +149,7 @@ function matchHierarchicalSecrets(variables: Variables, search: string): Autocom
  *
  * Non-secret variables use simple substring matching.
  * Secret variables are grouped by the next path segment so that intermediate
- * namespaces (e.g. "secrets.cities") appear as drillable entries instead of
+ * namespaces (e.g. "secrets:cities") appear as drillable entries instead of
  * showing every fully-qualified leaf path at once.
  */
 export function getHierarchicalAutocompleteItems(allVariables: Variables, search: string): AutocompleteItem[] {

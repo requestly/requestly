@@ -1,67 +1,36 @@
-import { VariableScope } from "../../backend/environment/types";
-import { SecretVariable, SecretVariableTree } from "./types";
-import { getValueByPath, isResolvableLeaf, flattenToLeafPaths } from "./utils";
 import { AwsSecretValue } from "@requestly/shared/types/entities/secretsManager";
+import { VariableScope } from "../../backend/environment/types";
+import { parseSecretKeyValues } from "../../features/settings/secrets-manager/utils/parseSecretKeyValues";
+import { SecretVariable } from "./types";
 
-const SECRETS_PREFIX = "secrets.";
+const SECRETS_PREFIX = "secrets:";
 
-export type SecretsSource = () => SecretVariableTree;
-
-/**
- * Recursively transforms a SecretVariableTree into a plain object with just values.
- */
-function transformTreeToValues(tree: SecretVariableTree): Record<string, unknown> {
-  const result: Record<string, unknown> = {};
-
-  for (const [key, value] of Object.entries(tree)) {
-    if (value != null && typeof value === "object") {
-      if (isResolvableLeaf(value)) {
-        result[key] = (value as SecretVariable).value;
-      } else {
-        result[key] = transformTreeToValues(value as SecretVariableTree);
-      }
-    }
-  }
-
-  return result;
-}
+export type SecretsSource = () => SecretVariable[];
 
 export class SecretVariablesService {
-  private source: SecretsSource = () => ({});
+  private source: SecretsSource = () => [];
 
   setSource(source: SecretsSource): void {
     this.source = source;
   }
 
-  private buildSourceFromAwsSecrets(secrets: AwsSecretValue[]): SecretVariableTree {
-    const tree: SecretVariableTree = {};
-
-    for (const secret of secrets) {
+  private buildSourceFromAwsSecrets(secrets: AwsSecretValue[]): SecretVariable[] {
+    return secrets.flatMap((secret) => {
       const alias = secret.secretReference.alias;
-      if (!alias) continue;
+      const id = secret.secretReference.id;
+      const keyValues = parseSecretKeyValues(secret.value);
 
-      let parsed: Record<string, unknown> | null = null;
-      try {
-        const result = JSON.parse(secret.value);
-        if (result && typeof result === "object" && !Array.isArray(result)) {
-          parsed = result as Record<string, unknown>;
-        }
-      } catch {
-        // plain string secret
+      if (keyValues && keyValues.length > 0) {
+        return keyValues.map((kv) => ({
+          name: `${alias}.${kv.key}`,
+          value: kv.value,
+          id: `${id}.${kv.key}`,
+          scope: VariableScope.SECRETS,
+        }));
       }
 
-      if (parsed) {
-        const nested: { [key: string]: SecretVariable } = {};
-        for (const [k, v] of Object.entries(parsed)) {
-          nested[k] = { name: k, value: String(v), id: k, scope: VariableScope.SECRETS };
-        }
-        tree[alias] = nested;
-      } else {
-        tree[alias] = { name: alias, value: secret.value, id: alias, scope: VariableScope.SECRETS };
-      }
-    }
-
-    return tree;
+      return [{ name: alias, value: secret.value, id, scope: VariableScope.SECRETS }];
+    });
   }
 
   updateSourceFromSecrets(secrets: AwsSecretValue[]): void {
@@ -70,16 +39,17 @@ export class SecretVariablesService {
   }
 
   /**
-   * Returns the current secrets map. Used when building Handlebars context.
-   * Transforms SecretVariableTree into a simple nested object with just values.
+   * Returns a flat map of all secrets keyed by their full template path
+   * (e.g. { "secrets:apple": "red", "secrets:cities.chicago": "Chicago" }).
+   * Used when building the Handlebars resolution context.
    */
-  getSecrets(): Record<string, unknown> {
-    return transformTreeToValues(this.source());
+  getFlatSecrets(): Record<string, string> {
+    return Object.fromEntries(this.getSecretsList().map((v) => [v.name, v.value]));
   }
 
   /**
-   * Returns true only if fullPath is "secrets.xxx.yyy" and the path xxx.yyy
-   * exists and is a leaf value. Intermediate objects (e.g. secrets.cities) return false.
+   * Returns true if fullPath is "secrets:xxx" (or "secrets:xxx.yyy") and
+   * matches a known secret. E.g. "secrets:apple" -> true, "secrets:cities" -> false.
    */
   hasSecretsPath(fullPath: string): boolean {
     if (!fullPath.startsWith(SECRETS_PREFIX)) {
@@ -91,36 +61,40 @@ export class SecretVariablesService {
       return false;
     }
 
-    const value = getValueByPath(this.source(), path);
-    return isResolvableLeaf(value);
+    return this.source().some((v) => v.name === path);
   }
 
   /**
    * Lists all leaf secret paths for autocomplete/popover.
-   * Each name is the full template path (e.g. "secrets.cities.chicago").
+   * Each name is the full template path (e.g. "secrets:cities.chicago").
    */
   getSecretsList(): SecretVariable[] {
-    const entries = flattenToLeafPaths(this.source());
-    return entries.map((e) => ({
-      name: `${SECRETS_PREFIX}${e.name}`,
-      value: e.value,
-      id: `${SECRETS_PREFIX}${e.id}`,
+    return this.source().map((v) => ({
+      name: `${SECRETS_PREFIX}${v.name}`,
+      value: v.value,
+      id: `${SECRETS_PREFIX}${v.id}`,
       scope: VariableScope.SECRETS,
     }));
   }
 
   /**
    * Returns the secrets list entry for a given full path, or undefined.
+   *  @example
+   * getSecretsVariable("secrets:cities.newYork") // → { name: "cities.newYork", value: "New York", ... }
+   * getSecretsVariable("cities.newYork")          // → undefined (missing "secrets:" prefix)
+   * getSecretsVariable("secrets:nonExistent")     // → undefined (not found in source)
    */
   getSecretsVariable(name: string): SecretVariable | undefined {
-    if (!this.hasSecretsPath(name)) {
+    if (!name.startsWith(SECRETS_PREFIX)) {
       return undefined;
     }
 
     const path = name.slice(SECRETS_PREFIX.length);
-    const entries = flattenToLeafPaths(this.source());
+    if (!path) {
+      return undefined;
+    }
 
-    const found = entries.find((e) => e.name === path);
+    const found = this.source().find((v) => v.name === path);
     if (!found) {
       return undefined;
     }

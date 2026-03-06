@@ -1,10 +1,15 @@
-import { memo, useState, useCallback } from "react";
+/**
+ * NamespaceRootItem — a namespace (expandable) item at the ROOT menu level.
+ *
+ * See NestedMenuContent.tsx for the full naming-convention reference.
+ */
+import React, { useState, useCallback } from "react";
 import { List, Popover } from "antd";
 import { AutocompleteItem, Variables } from "features/apiClient/helpers/variableResolver/variableHelper";
 import { VariableRowContent } from "./VariableRowContent";
-import { SubmenuContent } from "./SubmenuContent";
+import { NestedMenuContent } from "./NestedMenuContent";
 
-interface NamespaceMainItemProps {
+interface NamespaceRootItemProps {
   item: AutocompleteItem;
   index: number;
   isSelected: boolean;
@@ -20,7 +25,7 @@ interface NamespaceMainItemProps {
   onSubSubmenuHover: (index: number) => void;
 }
 
-export const NamespaceMainItem = memo<NamespaceMainItemProps>(
+export const NamespaceRootItem = React.memo<NamespaceRootItemProps>(
   ({
     item,
     index,
@@ -52,7 +57,7 @@ export const NamespaceMainItem = memo<NamespaceMainItemProps>(
         overlayInnerStyle={{ padding: 0 }}
         destroyTooltipOnHide
         content={
-          <SubmenuContent
+          <NestedMenuContent
             namespacePath={item.name}
             allVariables={allVariables}
             onSelectLeaf={onSelect}
@@ -78,4 +83,4 @@ export const NamespaceMainItem = memo<NamespaceMainItemProps>(
   }
 );
 
-NamespaceMainItem.displayName = "NamespaceMainItem";
+NamespaceRootItem.displayName = "NamespaceRootItem";

@@ -6,10 +6,10 @@ import {
   getHierarchicalAutocompleteItems,
 } from "features/apiClient/helpers/variableResolver/variableHelper";
 import { useCascadingNavigation } from "./hooks/useCascadingNavigation";
-import { LeafMainItem } from "./components/LeafMainItem";
-import { NamespaceMainItem } from "./components/NamespaceMainItem";
-import { SPECIAL_VARIABLE_MODES } from "./variableModeConfig";
+import { LeafRootItem } from "./components/LeafRootItem";
+import { NamespaceRootItem } from "./components/NamespaceRootItem";
 import "./variableAutocompletePopover.scss";
+import { SPECIAL_VARIABLE_MODES } from "./variableModeConfig";
 
 interface VariableAutocompleteProps {
   show: boolean;
@@ -20,8 +20,12 @@ interface VariableAutocompleteProps {
   onClose?: () => void;
 }
 
-const SecretsDefaultFooter: React.FC = () => {
-  return <div className="secrets-hint-footer">Type &ldquo;secrets.&rdquo; to use secrets in requests</div>;
+const SecretsDefaultFooter: React.FC<{ onClose?: () => void }> = ({ onClose }) => {
+  return (
+    <div className="secrets-hint-footer" onClick={onClose}>
+      Type &ldquo;secrets:&rdquo; to use secrets in requests
+    </div>
+  );
 };
 
 export const VariableAutocompletePopover: React.FC<VariableAutocompleteProps> = memo(
@@ -37,7 +41,7 @@ export const VariableAutocompletePopover: React.FC<VariableAutocompleteProps> = 
     const activeMode = useMemo(() => {
       const normalizedSearch = (search ?? "").toLowerCase();
       return Object.entries(SPECIAL_VARIABLE_MODES).find(([_, config]) =>
-        normalizedSearch.startsWith(config.prefix + ".")
+        normalizedSearch.startsWith(config.prefix + config.separator)
       );
     }, [search]);
 
@@ -99,41 +103,39 @@ export const VariableAutocompletePopover: React.FC<VariableAutocompleteProps> = 
         content={
           <div>
             <div ref={listRef} className="autocomplete-scroll-container" style={{ maxHeight: 300, overflowY: "auto" }}>
-              {filteredVariables.length > 0 && (
-                <List
-                  size="small"
-                  dataSource={filteredVariables}
-                  renderItem={(item, index) =>
-                    item.isNamespace ? (
-                      <NamespaceMainItem
-                        key={item.name}
-                        item={item}
-                        index={index}
-                        isSelected={index === selectedIndex}
-                        onSelect={(name) => onSelectRef.current(name)}
-                        onHover={setSelectedIndex}
-                        allVariables={allVariables}
-                        isKeyboardExpanded={expandedNamespace === item.name}
-                        submenuSelectedIndex={submenuSelectedIndex}
-                        onSubmenuHover={handleSubmenuHover}
-                        expandedSubNamespace={expandedNamespace === item.name ? expandedSubNamespace : null}
-                        onExpandSubNamespace={setExpandedSubNamespace}
-                        subSubmenuSelectedIndex={subSubmenuSelectedIndex}
-                        onSubSubmenuHover={handleSubSubmenuHover}
-                      />
-                    ) : (
-                      <LeafMainItem
-                        key={item.name}
-                        item={item}
-                        index={index}
-                        isSelected={index === selectedIndex}
-                        onSelect={(name) => onSelectRef.current(name)}
-                        onHover={setSelectedIndex}
-                      />
-                    )
-                  }
-                />
-              )}
+              <List
+                size="small"
+                dataSource={filteredVariables}
+                renderItem={(item, index) =>
+                  item.isNamespace ? (
+                    <NamespaceRootItem
+                      key={item.name}
+                      item={item}
+                      index={index}
+                      isSelected={index === selectedIndex}
+                      onSelect={(name) => onSelectRef.current(name)}
+                      onHover={setSelectedIndex}
+                      allVariables={allVariables}
+                      isKeyboardExpanded={expandedNamespace === item.name}
+                      submenuSelectedIndex={submenuSelectedIndex}
+                      onSubmenuHover={handleSubmenuHover}
+                      expandedSubNamespace={expandedNamespace === item.name ? expandedSubNamespace : null}
+                      onExpandSubNamespace={setExpandedSubNamespace}
+                      subSubmenuSelectedIndex={subSubmenuSelectedIndex}
+                      onSubSubmenuHover={handleSubSubmenuHover}
+                    />
+                  ) : (
+                    <LeafRootItem
+                      key={item.name}
+                      item={item}
+                      index={index}
+                      isSelected={index === selectedIndex}
+                      onSelect={(name) => onSelectRef.current(name)}
+                      onHover={setSelectedIndex}
+                    />
+                  )
+                }
+              />
             </div>
 
             <FooterComponent onClose={onClose} />
