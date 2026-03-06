@@ -47,6 +47,8 @@ import { trackLocalSessionRecordingOpened } from "modules/analytics/events/featu
 import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 import { ApiClientImporterType } from "features/apiClient/types";
 import { clientStorageService } from "services/clientStorageService";
+import { initAndSubscribeSecretsManager } from "features/apiClient/slices/secrets-manager";
+import { secretsManagerService } from "services/secretsManagerService";
 
 let hasAppModeBeenSet = false;
 /**
@@ -283,6 +285,17 @@ const AppModeInitializer = () => {
       trackDesktopAppStartedEvent();
     }
   }, [appMode]);
+
+  useEffect(() => {
+    if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
+      const initPromise = dispatch(initAndSubscribeSecretsManager());
+
+      return () => {
+        initPromise.abort();
+        secretsManagerService.unsubscribeFromProvidersChange();
+      };
+    }
+  }, [appMode, dispatch]);
 
   useEffect(() => {
     if (
