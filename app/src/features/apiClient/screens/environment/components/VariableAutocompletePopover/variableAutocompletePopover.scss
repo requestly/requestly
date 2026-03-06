@@ -20,6 +20,12 @@
     display: none;
   }
 
+  &.variable-autocomplete-submenu {
+    .ant-popover-inner-content {
+      margin-top: 0;
+    }
+  }
+
   .variable-autocomplete-item {
     display: flex;
     padding: var(--space-3, 6px) !important;
