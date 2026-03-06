@@ -67,6 +67,10 @@ export abstract class ApiClientRecordEntity<
     return record.data.testResults;
   }
 
+  getType(state: ApiClientStoreState): RQAPI.RecordType {
+    return this.getEntityFromState(state).type;
+  }
+
   setTestResults(testResults?: TestResult[]): void {
     this.SETCOMMON({ data: { testResults } });
   }

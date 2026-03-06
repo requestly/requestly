@@ -11,18 +11,6 @@
     padding-bottom: 50px;
   }
 
-  .collection-panel.active {
-    & > .ant-collapse-header {
-      background: var(--requestly-color-white-t-20);
-      box-shadow: inset 2px 0px 0px 0px var(--requestly-color-primary);
-      transition: unset;
-
-      &:hover {
-        background: var(--requestly-color-white-t-20) !important;
-      }
-    }
-  }
-
   .collections-list-header {
     display: flex;
     align-items: center;
@@ -71,44 +59,25 @@
       }
     }
 
-    .request-row {
-      display: flex;
-      align-items: center;
-
-      a {
-        width: 100%;
-      }
-    }
-
-    .collection-row {
-      display: flex;
-      align-items: start;
-    }
-
     .empty-state-wrapper {
       margin: 2px 0;
     }
 
+    // Default styles for all list items
     .collections-list-item {
       width: 100%;
       display: flex;
       align-items: center;
-      gap: var(--requestly-space-3, 6px);
+      gap: var(--requestly-space-2, 4px);
       cursor: pointer;
-      padding: 2px 6px;
+      padding: 0;
       border-radius: 4px;
       color: var(--requestly-color-text-subtle);
       font-size: var(--requestly-font-size-sm, 13px);
       min-height: 26px;
 
+      &.request-with-examples-row,
       &.api {
-        height: 28px;
-        padding: var(--space-2, 4px);
-
-        .ant-checkbox-wrapper {
-          margin-left: 2px;
-        }
-
         .request-method {
           flex-shrink: 0;
           font-size: 8px;
@@ -136,9 +105,14 @@
           margin-left: auto;
           display: none;
         }
+      }
 
-        &:hover .request-options {
-          display: block;
+      &.api {
+        height: 28px;
+        padding: var(--space-2, 4px);
+
+        .ant-checkbox-wrapper {
+          margin-left: 2px;
         }
 
         &:hover,
@@ -154,6 +128,10 @@
           background: var(--requestly-color-white-t-20);
           box-shadow: inset 2px 0px 0px 0px var(--requestly-color-primary);
         }
+
+        &:hover .request-options {
+          display: block;
+        }
       }
 
       .collection-checkbox-container {
@@ -165,111 +143,8 @@
       }
 
       &.collection.ant-collapse {
-        padding: 0;
-
         &:hover .ant-collapse-item .ant-collapse-header .collection-name-container .visible {
           visibility: visible;
-        }
-      }
-
-      .ant-collapse-item {
-        width: 100%;
-
-        .ant-collapse-header {
-          height: 28px;
-          color: var(--requestly-color-text-default);
-        }
-
-        &.ant-collapse-item-active {
-          .ant-collapse-header {
-            color: var(--requestly-color-text-default);
-          }
-        }
-
-        .ant-collapse-header {
-          padding: 2px 4px;
-          border-radius: 4px;
-          user-select: none;
-          display: flex;
-          align-items: center;
-          gap: var(--requestly-space-2, 4px);
-          color: var(--requestly-color-text-subtle);
-
-          &-text {
-            overflow: hidden;
-          }
-
-          &:hover {
-            background: var(--requestly-color-white-t-10);
-          }
-
-          .ant-collapse-expand-icon {
-            cursor: pointer;
-
-            svg {
-              width: 20px;
-              height: 20px;
-              padding: 3px;
-              color: inherit;
-              margin: 0;
-            }
-
-            .collection-expand-icon {
-              &:hover {
-                background: var(--requestly-color-white-t-20);
-                border-radius: 4px;
-              }
-            }
-          }
-
-          .ant-collapse-header-text {
-            flex: auto;
-          }
-
-          .collection-name-container {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-          }
-
-          .collection-name {
-            overflow: hidden;
-            white-space: nowrap;
-            text-overflow: ellipsis;
-            font-style: normal;
-            color: var(--requestly-color-text-default);
-            font-size: var(--requestly-font-size-sm, 12px);
-            font-weight: var(--requestly-font-weight-medium);
-            font-weight: var(--requestly-font-weight-normal);
-            line-height: var(--line-height-xs, 15px);
-          }
-
-          .collection-options {
-            flex-shrink: 0;
-            margin-left: auto;
-            align-items: center;
-            gap: var(--space-1, 2px);
-            display: none;
-
-            svg {
-              color: var(--requestly-color-text-subtle);
-            }
-
-            &:hover,
-            &.active {
-              display: flex;
-            }
-          }
-        }
-
-        .ant-collapse-content-box {
-          margin-left: 13px;
-          padding: 1px 0px 0px 6px;
-          border-left: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.12));
-
-          &:hover {
-            border-left: 1px solid var(--requestly-color-white-t-20, rgba(255, 255, 255, 0.12));
-          }
         }
       }
     }
