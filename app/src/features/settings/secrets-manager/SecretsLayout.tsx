@@ -6,7 +6,7 @@ import ShieldLockIcon from "assets/icons/shield-lock.svg?react";
 import { Outlet, useNavigate } from "react-router-dom";
 import "./secrets.scss";
 import PATHS from "config/constants/sub/paths";
-import { useSecretsModals } from "./context/SecretsModalsContext";
+import { useSecretsModals, DEFAULT_FORM_DATA } from "./context/SecretsModalsContext";
 import { AddEditProviderModal } from "./modals/AddEditProviderModal/Index";
 import DeleteProviderModal from "./modals/DeleteProviderModal/Index";
 
@@ -24,7 +24,7 @@ const SecretsLayout = ({ children }: { children?: React.ReactNode }) => {
     updateAddEditFormData,
   } = useSecretsModals();
 
-  console.log(modals, "Current state of secrets modals");
+  const { addEdit, delete: deleteModal } = modals;
 
   const currentPath = window.location.pathname;
   const isOnManageProvidersPage = currentPath.includes(PATHS.SETTINGS.SECRETS.MANAGE_PROVIDERS);
@@ -34,13 +34,15 @@ const SecretsLayout = ({ children }: { children?: React.ReactNode }) => {
   };
 
   const handleFormChange = (updatedData: any) => {
-    console.log("Form data updated:", updatedData);
     updateAddEditFormData(updatedData);
   };
 
   const handleSave = async () => {
+    if (!addEdit.isOpen) {
+      return;
+    }
     try {
-      await saveProvider(modals.addEdit.formData || {});
+      await saveProvider(addEdit.formData);
     } catch (error) {
       console.error("Failed to save provider:", error);
     }
@@ -102,24 +104,24 @@ const SecretsLayout = ({ children }: { children?: React.ReactNode }) => {
 
       {/* Global Modals - Available on all pages within this layout */}
       <AddEditProviderModal
-        mode={modals.addEdit.mode}
-        open={modals.addEdit.isOpen}
-        providerData={modals.addEdit.formData}
+        mode={addEdit.isOpen ? addEdit.mode : "add"}
+        open={addEdit.isOpen}
+        providerData={addEdit.isOpen ? addEdit.formData : DEFAULT_FORM_DATA}
         onChange={handleFormChange}
         onClose={closeAddEditProviderModal}
         onSave={handleSave}
         onTestConnection={handleTestConnection}
-        isLoading={modals.addEdit.isLoading}
-        error={modals.addEdit.error}
+        isLoading={addEdit.isOpen ? addEdit.isLoading : false}
+        error={addEdit.isOpen ? addEdit.error : undefined}
       />
 
       <DeleteProviderModal
-        open={modals.delete.isOpen}
+        open={deleteModal.isOpen}
         onClose={closeDeleteProviderModal}
         onDelete={handleDelete}
-        isLoading={modals.delete.isLoading}
-        error={modals.delete.error}
-        providerName={modals.delete.selectedProviderName}
+        isLoading={deleteModal.isOpen ? deleteModal.isLoading : false}
+        error={deleteModal.isOpen ? deleteModal.error : undefined}
+        providerName={deleteModal.isOpen ? deleteModal.providerName : undefined}
       />
     </main>
   );

@@ -18,6 +18,7 @@ import { tabsReducerWithPersist, tabBufferMiddleware } from "componentsV2/Tabs/s
 import { tabCloseMiddleware } from "componentsV2/Tabs/slice/tabCloseMiddleware";
 import { exampleCollectionsReducerWithPersist } from "features/apiClient/slices/exampleCollections";
 import { eventsReducer } from "./slices/eventsStream/slice";
+import { secretsManagerReducer } from "features/apiClient/slices/secrets-manager/slice";
 
 export const reduxStore = configureStore({
   reducer: {
@@ -34,6 +35,7 @@ export const reduxStore = configureStore({
     [ReducerKeys.RUNTIME_VARIABLES]: runtimeVariablesReducerWithPersist,
     [ReducerKeys.EXAMPLE_COLLECTIONS]: exampleCollectionsReducerWithPersist,
     [ReducerKeys.EVENTS]: eventsReducer,
+    [ReducerKeys.SECRETS_MANAGER]: secretsManagerReducer,
   },
   middleware: (getDefaultMiddleware) => {
     // In development mode redux-toolkit will

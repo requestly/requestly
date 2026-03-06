@@ -5,9 +5,10 @@ interface SelectFieldProps {
   id?: string;
   value: string;
   label: ReactNode | string;
-  options: [];
-  handleFilterChange?: (options: []) => void;
+  options: any[];
+  handleFilterChange?: (value: string) => void;
   emptyState?: ReactNode;
+  disabled?: boolean;
 }
 
 export const SelectField: React.FC<SelectFieldProps> = ({
@@ -17,6 +18,7 @@ export const SelectField: React.FC<SelectFieldProps> = ({
   options,
   handleFilterChange,
   emptyState,
+  disabled,
 }) => {
   return (
     <div className="form-select-wrapper">
@@ -34,6 +36,7 @@ export const SelectField: React.FC<SelectFieldProps> = ({
         options={options}
         onChange={handleFilterChange}
         notFoundContent="No options available"
+        disabled={disabled}
       />
     </div>
   );
