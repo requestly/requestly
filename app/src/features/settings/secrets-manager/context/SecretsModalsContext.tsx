@@ -15,7 +15,7 @@ export interface ProviderData {
   secretKey: AWSSecretProviderConfig["credentials"]["secretAccessKey"];
   sessionToken?: AWSSecretProviderConfig["credentials"]["sessionToken"];
   region: AWSSecretProviderConfig["credentials"]["region"];
-  createdAt?: number;
+  createdAt?: SecretProviderConfig["createdAt"];
 }
 
 export const DEFAULT_FORM_DATA: ProviderData = {

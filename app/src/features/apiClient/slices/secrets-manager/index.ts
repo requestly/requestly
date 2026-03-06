@@ -1,4 +1,13 @@
-export { secretsManagerSlice, secretsManagerActions, secretsManagerReducer } from "./slice";
-export { selectAllSecretProviders, selectSecretProviderById, selectAllSecrets, selectSecretById } from "./selectors";
-export { initAndSubscribeSecretsManager, fetchSecretProviders } from "./thunks";
-export type { SecretsManagerState } from "./types";
+export { secretsManagerSlice, secretsManagerActions, secretsManagerReducer, getSecretId } from "./slice";
+export {
+  selectAllSecretProviders,
+  selectSecretProviderById,
+  selectAllSecrets,
+  selectSecretById,
+  selectSelectedProviderId,
+  selectFetchStatus,
+  selectSecretsForSelectedProvider,
+  selectLastFetchedForSelectedProvider,
+} from "./selectors";
+export { initAndSubscribeSecretsManager, fetchSecretProviders, fetchSecretsForProvider } from "./thunks";
+export type { SecretsManagerState, FetchStatus } from "./types";
