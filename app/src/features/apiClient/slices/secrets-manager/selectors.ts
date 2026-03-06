@@ -31,26 +31,18 @@ export const selectSecretsForSelectedProvider = createSelector(
   }
 );
 
+export const selectSecretsByProviderId = createSelector([selectAllSecrets], (secrets) => (providerId: string) => {
+  return secrets.filter((s) => s.providerId === providerId);
+});
+
 export const selectLastFetchedForSelectedProvider = createSelector([selectSecretsForSelectedProvider], (secrets) => {
   const fetched = secrets.filter((s) => s.fetchedAt > 0);
   if (fetched.length === 0) return null;
   return Math.max(...fetched.map((s) => s.fetchedAt));
 });
 
-const selectIsDirtyMap = createSelector(selectSecretsManagerSlice, (slice) => slice.isDirty);
+export const selectIsDirtyForSelectedProvider = createSelector(selectSecretsManagerSlice, (slice) => slice.isDirty);
 
-export const selectIsDirtyForSelectedProvider = createSelector(
-  [selectIsDirtyMap, selectSelectedProviderId],
-  (isDirty, selectedProviderId) => {
-    if (!selectedProviderId) return false;
-    return isDirty[selectedProviderId] ?? false;
-  }
-);
+export const selectFetchErrors = createSelector(selectSecretsManagerSlice, (slice) => slice.fetchErrors);
 
-export const selectAllAliasesForProvider = (state: RootState, providerId: string): string[] => {
-  const allSecrets = secretsAdapterSelectors.selectAll(state);
-  return allSecrets
-    .filter((s) => s.providerId === providerId)
-    .map((s) => s.secretReference.alias)
-    .filter(Boolean);
-};
+export const selectValidationErrors = createSelector(selectSecretsManagerSlice, (slice) => slice.validationErrors);

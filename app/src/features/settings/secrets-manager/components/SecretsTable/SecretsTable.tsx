@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from "react";
+import React, { useState, useCallback, useMemo, useEffect } from "react";
 import { Table, Tag, Button, Dropdown, Tooltip, Checkbox, Popover, Input } from "antd";
 import type { ColumnsType } from "antd/lib/table";
 import { useSelector, useDispatch } from "react-redux";
@@ -10,10 +10,12 @@ import { RiDeleteBin6Line } from "@react-icons/all-files/ri/RiDeleteBin6Line";
 import { BsThreeDots } from "@react-icons/all-files/bs/BsThreeDots";
 import { FiPlus } from "@react-icons/all-files/fi/FiPlus";
 import { AwsSecretValue } from "@requestly/shared/types/entities/secretsManager";
+import { InfoCircleOutlined } from "@ant-design/icons";
 import {
   selectSecretsForSelectedProvider,
   selectSelectedProviderId,
-  selectAllAliasesForProvider,
+  selectFetchErrors,
+  selectValidationErrors,
   secretsManagerActions,
 } from "features/apiClient/slices/secrets-manager";
 import { parseSecretKeyValues } from "../../utils/parseSecretKeyValues";
@@ -57,12 +59,17 @@ const SecretsTable: React.FC<SecretsTableProps> = ({ onViewKeyValues }) => {
   const secrets = useSelector(selectSecretsForSelectedProvider) as AwsSecretValue[];
   const selectedProviderId = useSelector(selectSelectedProviderId);
 
+  const fetchErrors = useSelector(selectFetchErrors);
+  const validationErrors = useSelector(selectValidationErrors);
+
   const [showVersionId, setShowVersionId] = useState(false);
   const [visibleIds, setVisibleIds] = useState<Set<string>>(new Set());
 
-  const existingAliases = useSelector((state: any) =>
-    selectedProviderId ? selectAllAliasesForProvider(state, selectedProviderId) : []
-  );
+  useEffect(() => {
+    if (secrets?.length === 0 && selectedProviderId) {
+      dispatch(secretsManagerActions.addSecretEntry({ providerId: selectedProviderId }));
+    }
+  }, [dispatch, secrets?.length, selectedProviderId]);
 
   const toggleVisibility = useCallback((id: string) => {
     setVisibleIds((prev) => {
@@ -73,20 +80,15 @@ const SecretsTable: React.FC<SecretsTableProps> = ({ onViewKeyValues }) => {
   }, []);
 
   const handleAddClick = () => {
-    if (!selectedProviderId) return;
+    if (!selectedProviderId) {
+      return;
+    }
+
     dispatch(secretsManagerActions.addSecretEntry({ providerId: selectedProviderId }));
   };
 
   const handleRowChange = (row: TableRow, field: "alias" | "identifier" | "version", value: string) => {
     if (!selectedProviderId) return;
-
-    if (field === "alias" && value) {
-      const currentAlias = row.secretReference.alias;
-      const otherAliases = existingAliases.filter((a: string) => a !== currentAlias);
-      if (otherAliases.includes(value)) {
-        return;
-      }
-    }
 
     const secretRefId = row.secretReference.id;
 
@@ -134,14 +136,22 @@ const SecretsTable: React.FC<SecretsTableProps> = ({ onViewKeyValues }) => {
       key: "alias",
       width: "18%",
       render: (_, row) => {
+        const aliasError = validationErrors[row.key]?.alias;
         return (
-          <Input
-            className="draft-cell-input"
-            value={row.secretReference.alias}
-            placeholder="Enter alias"
-            size="small"
-            onChange={(e) => handleRowChange(row, "alias", e.target.value)}
-          />
+          <div className="cell-input-with-error">
+            <Input
+              className="draft-cell-input"
+              value={row.secretReference.alias}
+              placeholder="Enter alias"
+              size="small"
+              onChange={(e) => handleRowChange(row, "alias", e.target.value)}
+            />
+            {aliasError && (
+              <Tooltip title={aliasError} placement="right" showArrow={false} overlayClassName="error-tooltip">
+                <InfoCircleOutlined className="secret-error-icon" />
+              </Tooltip>
+            )}
+          </div>
         );
       },
     },
@@ -149,14 +159,22 @@ const SecretsTable: React.FC<SecretsTableProps> = ({ onViewKeyValues }) => {
       title: <ColHeader label="ARN/Secret name" tooltip="AWS Secret Manager identifier (ARN or name)" />,
       key: "ARN",
       render: (_, row) => {
+        const identifierError = validationErrors[row.key]?.identifier;
         return (
-          <Input
-            className="draft-cell-input"
-            value={row.secretReference.identifier}
-            placeholder="Enter ARN/Secret name"
-            size="small"
-            onChange={(e) => handleRowChange(row, "identifier", e.target.value)}
-          />
+          <div className="cell-input-with-error">
+            <Input
+              className="draft-cell-input"
+              value={row.secretReference.identifier}
+              placeholder="Enter ARN/Secret name"
+              size="small"
+              onChange={(e) => handleRowChange(row, "identifier", e.target.value)}
+            />
+            {identifierError && (
+              <Tooltip title={identifierError} placement="right" showArrow={false} overlayClassName="error-tooltip">
+                <InfoCircleOutlined className="secret-error-icon" />
+              </Tooltip>
+            )}
+          </div>
         );
       },
     },
@@ -184,6 +202,17 @@ const SecretsTable: React.FC<SecretsTableProps> = ({ onViewKeyValues }) => {
       title: <ColHeader label="Secret" tooltip="Fetched secrets (plain text or key/value)" />,
       key: "value",
       render: (_: any, row: TableRow) => {
+        const error = fetchErrors[row.key];
+        if (error) {
+          return (
+            <Tooltip title={error} placement="right" showArrow={false} overlayClassName="error-tooltip">
+              <div className="secret-error-cell">
+                <InfoCircleOutlined className="secret-error-icon" />
+              </div>
+            </Tooltip>
+          );
+        }
+
         if (isStubRow(row)) {
           return null;
         }

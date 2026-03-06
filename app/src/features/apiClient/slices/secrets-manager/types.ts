@@ -6,7 +6,9 @@ export type FetchStatus = "idle" | "loading" | "succeeded" | "failed";
 export interface SecretsManagerState {
   providers: EntityState<SecretProviderMetadata>;
   secrets: EntityState<SecretValue>;
-  isDirty: Record<string, boolean>;
+  isDirty: boolean;
   selectedProviderId: string | null;
   fetchStatus: FetchStatus;
+  fetchErrors: Record<string, string>;
+  validationErrors: Record<string, { alias?: string; identifier?: string }>;
 }

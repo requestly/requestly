@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { AiOutlineQuestionCircle } from "@react-icons/all-files/ai/AiOutlineQuestionCircle";
 import { RQBreadcrumb, RQButton } from "lib/design-system-v2/components";
 import FilterIcon from "assets/icons/filter-manage.svg?react";
@@ -7,8 +7,8 @@ import { Outlet, useNavigate } from "react-router-dom";
 import "./secrets.scss";
 import PATHS from "config/constants/sub/paths";
 import { useSecretsModals, DEFAULT_FORM_DATA } from "./context/SecretsModalsContext";
-import { AddEditProviderModal } from "./modals/AddEditProviderModal/Index";
 import DeleteProviderModal from "./modals/DeleteProviderModal/Index";
+import { AddSecretsProviderModal } from "./modals/AddSecretsProviderModal/AddSecretsProviderModal";
 
 // Made children optional since React Router will mostly use <Outlet />
 const SecretsLayout = ({ children }: { children?: React.ReactNode }) => {
@@ -25,12 +25,14 @@ const SecretsLayout = ({ children }: { children?: React.ReactNode }) => {
   } = useSecretsModals();
 
   const { addEdit, delete: deleteModal } = modals;
+  const [isTestingConnection, setIsTestingConnection] = useState(false);
+  const [isSavingProvider, setIsSavingProvider] = useState(false);
 
   const currentPath = window.location.pathname;
-  const isOnManageProvidersPage = currentPath.includes(PATHS.SETTINGS.SECRETS.MANAGE_PROVIDERS);
+  const isOnManageProvidersPage = currentPath.includes(PATHS.SETTINGS.SECRETS.MANAGE_PROVIDERS.ABSOLUTE);
 
   const handleManageProvidersClick = () => {
-    navigate(PATHS.SETTINGS.SECRETS.MANAGE_PROVIDERS);
+    navigate(PATHS.SETTINGS.SECRETS.MANAGE_PROVIDERS.ABSOLUTE);
   };
 
   const handleFormChange = (updatedData: any) => {
@@ -41,27 +43,25 @@ const SecretsLayout = ({ children }: { children?: React.ReactNode }) => {
     if (!addEdit.isOpen) {
       return;
     }
+    setIsSavingProvider(true);
     try {
       await saveProvider(addEdit.formData);
-    } catch (error) {
-      console.error("Failed to save provider:", error);
+    } finally {
+      setIsSavingProvider(false);
     }
   };
 
   const handleTestConnection = async () => {
+    setIsTestingConnection(true);
     try {
       await testConnection();
-    } catch (error) {
-      console.error("Connection test failed:", error);
+    } finally {
+      setIsTestingConnection(false);
     }
   };
 
   const handleDelete = async () => {
-    try {
-      await deleteProvider();
-    } catch (error) {
-      console.error("Failed to delete provider:", error);
-    }
+    deleteProvider();
   };
 
   return (
@@ -103,7 +103,7 @@ const SecretsLayout = ({ children }: { children?: React.ReactNode }) => {
       </section>
 
       {/* Global Modals - Available on all pages within this layout */}
-      <AddEditProviderModal
+      <AddSecretsProviderModal
         mode={addEdit.isOpen ? addEdit.mode : "add"}
         open={addEdit.isOpen}
         providerData={addEdit.isOpen ? addEdit.formData : DEFAULT_FORM_DATA}
@@ -111,8 +111,9 @@ const SecretsLayout = ({ children }: { children?: React.ReactNode }) => {
         onClose={closeAddEditProviderModal}
         onSave={handleSave}
         onTestConnection={handleTestConnection}
-        isLoading={addEdit.isOpen ? addEdit.isLoading : false}
-        error={addEdit.isOpen ? addEdit.error : undefined}
+        isFetchingConfig={addEdit.isOpen ? addEdit.isFetchingConfig : false}
+        isTestingConnection={isTestingConnection}
+        isSavingProvider={isSavingProvider}
       />
 
       <DeleteProviderModal
@@ -120,7 +121,6 @@ const SecretsLayout = ({ children }: { children?: React.ReactNode }) => {
         onClose={closeDeleteProviderModal}
         onDelete={handleDelete}
         isLoading={deleteModal.isOpen ? deleteModal.isLoading : false}
-        error={deleteModal.isOpen ? deleteModal.error : undefined}
         providerName={deleteModal.isOpen ? deleteModal.providerName : undefined}
       />
     </main>
