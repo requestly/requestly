@@ -33,11 +33,16 @@ export interface EnvironmentInterface<Meta extends Record<string, any>> {
 export interface ApiClientRecordsInterface<Meta extends Record<string, any>> {
   meta: Meta;
   getAllRecords(): RQAPI.RecordsPromise;
+  getAllExamples(
+    recordIds: string[]
+  ): Promise<{ success: boolean; data: { examples: RQAPI.ExampleApiRecord[]; failedRecordIds?: string[] } }>;
   getRecord(recordId: string): RQAPI.ApiClientRecordPromise;
-  createRecord(record: Partial<RQAPI.ApiRecord>): RQAPI.ApiClientRecordPromise;
+  createRecord(record: Partial<RQAPI.ApiClientRecord>): RQAPI.ApiClientRecordPromise;
   createCollection(record: Partial<RQAPI.CollectionRecord>): RQAPI.ApiClientRecordPromise;
   createRecordWithId(record: Partial<RQAPI.ApiClientRecord>, id: string): RQAPI.ApiClientRecordPromise;
+  createExampleRequest(parentRequestId: string, example: RQAPI.ExampleApiRecord): RQAPI.ApiClientRecordPromise;
   updateRecord(record: Partial<Omit<RQAPI.ApiClientRecord, "id">>, id: string): RQAPI.ApiClientRecordPromise;
+  updateExampleRequest(example: RQAPI.ExampleApiRecord): RQAPI.ApiClientRecordPromise;
   deleteRecords(recordIds: string[]): Promise<{ success: boolean; message?: string }>;
   deleteCollections(ids: string[]): Promise<{ success: boolean; data: unknown; message?: string }>;
   setCollectionVariables(
@@ -96,6 +101,7 @@ export interface ApiClientRecordsInterface<Meta extends Record<string, any>> {
     collectionId: RQAPI.ApiClientRecord["collectionId"],
     runResult: RunResult
   ): ResponsePromise<SavedRunResult>;
+  deleteExamples(exampleRecords: RQAPI.ExampleApiRecord[]): Promise<{ success: boolean; message?: string }>;
 }
 
 export enum RepoType {
