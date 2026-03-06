@@ -7,12 +7,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { useGraphQLIntrospection } from "features/apiClient/hooks/useGraphQLIntrospection";
 import { useGraphQLRecordStore } from "features/apiClient/hooks/useGraphQLRecordStore";
 import { useDebounce } from "hooks/useDebounce";
-import { RBACButton, RevertViewModeChangesAlert, RoleBasedComponent } from "features/rbac";
+import { RevertViewModeChangesAlert, RoleBasedComponent } from "features/rbac";
 import { Conditional } from "components/common/Conditional";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { notification, Space } from "antd";
 import { ApiClientBreadCrumb, BreadcrumbType } from "../components/ApiClientBreadCrumb/ApiClientBreadCrumb";
-import { KEYBOARD_SHORTCUTS } from "../../../../../../../constants/keyboardShortcuts";
 import { BottomSheetLayout, useBottomSheetContext } from "componentsV2/BottomSheet";
 import { BottomSheetPlacement, SheetLayout } from "componentsV2/BottomSheet/types";
 import { GraphQLRequestTabs } from "./components/GraphQLRequestTabs/GraphQLRequestTabs";
@@ -36,7 +35,11 @@ import {
 } from "modules/analytics/events/features/apiClient";
 import { extractOperationNames } from "./utils";
 import ErrorBoundary from "features/apiClient/components/ErrorBoundary/ErrorBoundary";
-import { getContentTypeFromResponseHeaders, getRequestTypeForAnalyticEvent } from "../../../utils";
+import {
+  getContentTypeFromResponseHeaders,
+  getEmptyDraftApiRecord,
+  getRequestTypeForAnalyticEvent,
+} from "../../../utils";
 import { useGraphQLRequestExecutor } from "features/apiClient/hooks/requestExecutors/useGraphQLRequestExecutor";
 import { isExtensionInstalled } from "actions/ExtensionActions";
 import { isDesktopMode } from "utils/AppUtils";
@@ -55,6 +58,7 @@ import {
   ApiClientStore,
   bufferActions,
   bufferAdapterSelectors,
+  selectRecordById,
   useApiClientRepository,
   useApiClientStore,
 } from "features/apiClient/slices";
@@ -64,6 +68,11 @@ import { useHostContext } from "hooks/useHostContext";
 import { sanitizeKeyValuePairs } from "../../../utils";
 import { GraphQLRecordProvider } from "features/apiClient/store/apiRecord/graphqlRecord/GraphQLRecordContextProvider";
 import { GenericApiClientOverride } from "../../../clientView/GenericApiClient";
+import { SaveRequestButton } from "../components/SaveRequestButton/SaveRequestButton";
+import { MdArrowOutward } from "@react-icons/all-files/md/MdArrowOutward";
+import { DraftRequestContainerTabSource } from "../components/DraftRequestContainer/draftRequestContainerTabSource";
+import { useTabActions } from "componentsV2/Tabs/slice";
+import { RQButton } from "lib/design-system-v2/components";
 
 function getEntry(entity: BufferedGraphQLRecordEntity, store: ApiClientStore) {
   return entity.getEntityFromState(store.getState()).data;
@@ -73,6 +82,7 @@ export type GraphQLClientViewProps = {
   entity: BufferedGraphQLRecordEntity;
   override?: GenericApiClientOverride;
   openInModal?: boolean;
+  isDraftMode?: boolean;
   notifyApiRequestFinished: (apiEntry: RQAPI.GraphQLApiEntry) => void;
 };
 
@@ -81,6 +91,7 @@ const GraphQLClientView: React.FC<GraphQLClientViewProps> = ({
   notifyApiRequestFinished,
   entity,
   override,
+  isDraftMode = false,
 }) => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
@@ -90,6 +101,7 @@ const GraphQLClientView: React.FC<GraphQLClientViewProps> = ({
   const repositories = useApiClientRepository();
 
   const { getIsActive } = useHostContext();
+  const { openBufferedTab } = useTabActions();
 
   const hasUnsavedChanges = useIsBufferDirty({
     type: "bufferId",
@@ -99,6 +111,7 @@ const GraphQLClientView: React.FC<GraphQLClientViewProps> = ({
   const url = useApiClientSelector((s) => entity.getUrl(s));
   const name = useApiClientSelector((s) => entity.getName(s) || "Untitled request");
   const isNew = useApiClientSelector((s) => bufferAdapterSelectors.selectById(s.buffer, entity.id)?.isNew) ?? false;
+  const isExample = useApiClientSelector((s) => entity.getType(s) === RQAPI.RecordType.EXAMPLE_API);
 
   const introspectionData = useGraphQLRecordStore((state) => state.introspectionData);
 
@@ -258,7 +271,10 @@ const GraphQLClientView: React.FC<GraphQLClientViewProps> = ({
         },
         async save(record, repositories) {
           if (override?.onSaveClick) {
-            return override.onSaveClick.save(record, repositories) as Promise<RQAPI.GraphQLApiRecord>;
+            return override.onSaveClick.save(
+              record as RQAPI.GraphQLApiRecord,
+              repositories
+            ) as Promise<RQAPI.GraphQLApiRecord>;
           }
           const result = await repositories.apiClientRecordsRepository.updateRecord(record, record.id);
           if (!result.success) {
@@ -282,7 +298,7 @@ const GraphQLClientView: React.FC<GraphQLClientViewProps> = ({
             auth_type: result.data?.auth?.currentAuthType,
             type: RQAPI.ApiEntryType.GRAPHQL,
           });
-          override?.onSaveClick?.onSuccess(result);
+          override?.onSaveClick?.onSuccess(result as RQAPI.GraphQLApiRecord);
         },
         onError(e) {
           notification.error({
@@ -299,9 +315,12 @@ const GraphQLClientView: React.FC<GraphQLClientViewProps> = ({
 
   const handleRecordNameUpdate = useCallback(
     async (newName: string) => {
-      const record = lodash.cloneDeep(entity.getEntityFromState(store.getState()));
+      const record = lodash.cloneDeep(entity.getEntityFromState(store.getState())) as RQAPI.ApiClientRecord;
       record.name = newName;
-      const result = await repositories.apiClientRecordsRepository.updateRecord(record, entity.meta.referenceId);
+      const result =
+        record.type === RQAPI.RecordType.EXAMPLE_API
+          ? await repositories.apiClientRecordsRepository.updateExampleRequest(record)
+          : await repositories.apiClientRecordsRepository.updateRecord(record, entity.meta.referenceId);
       if (!result.success) {
         notification.error({
           message: "Could not rename request",
@@ -424,6 +443,33 @@ const GraphQLClientView: React.FC<GraphQLClientViewProps> = ({
     setIsRequestCancelled(true);
   }, [graphQLRequestExecutor]);
 
+  const handleUseAsTemplate = useCallback(() => {
+    const record = entity.getEntityFromState(store.getState());
+    const exampleData = { ...record.data };
+
+    if (record.type === RQAPI.RecordType.EXAMPLE_API) {
+      const parentRecord = selectRecordById(store.getState(), record.parentRequestId);
+      if (parentRecord?.data) {
+        if (parentRecord.data.auth) {
+          exampleData.auth = parentRecord.data.auth;
+        }
+        if (parentRecord.data.scripts) {
+          exampleData.scripts = parentRecord.data.scripts;
+        }
+      }
+    }
+
+    openBufferedTab({
+      isNew: true,
+      preview: false,
+      source: new DraftRequestContainerTabSource({
+        apiEntryType: RQAPI.ApiEntryType.GRAPHQL,
+        context: {},
+        emptyRecord: getEmptyDraftApiRecord(RQAPI.ApiEntryType.GRAPHQL, exampleData),
+      }),
+    });
+  }, [entity, store, openBufferedTab]);
+
   return (
     <div className="api-client-view gql-client-view">
       <div className="api-client-header-container">
@@ -447,7 +493,7 @@ const GraphQLClientView: React.FC<GraphQLClientViewProps> = ({
               openInModal={openInModal}
               name={name}
               autoFocus={isNew}
-              isDraft={!!isNew}
+              isDraft={isDraftMode}
               onBlur={(newName) => {
                 if (override?.handleNameChange) {
                   override.handleNameChange(newName);
@@ -475,23 +521,24 @@ const GraphQLClientView: React.FC<GraphQLClientViewProps> = ({
                 onUrlChange={handleUrlChange}
               />
             </Space.Compact>
-            <SendQueryButton entity={entity} disabled={!url} loading={isSending} onSendClick={handleSend} />
+            {isExample ? (
+              <RQButton type="primary" className="api-client-use-as-template-button" onClick={handleUseAsTemplate}>
+                Use as template <MdArrowOutward />
+              </RQButton>
+            ) : (
+              <SendQueryButton entity={entity} disabled={!url} loading={isSending} onSendClick={handleSend} />
+            )}
 
-            <Conditional condition={!openInModal}>
-              <RBACButton
-                disabled={!hasUnsavedChanges}
-                permission="create"
-                resource="api_client_request"
-                showHotKeyText
-                hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SAVE_REQUEST!.hotKey}
-                onClick={onSaveButtonClick}
-                loading={isRequestSaving}
-                tooltipTitle="Saving is not allowed in view-only mode. You can update and view changes but cannot save them."
-                enableHotKey={enableHotkey}
-              >
-                Save
-              </RBACButton>
-            </Conditional>
+            <SaveRequestButton
+              disabled={!hasUnsavedChanges}
+              loading={isRequestSaving}
+              hidden={openInModal}
+              enableHotkey={enableHotkey}
+              onClick={onSaveButtonClick}
+              entity={entity}
+              isExample={isExample}
+              isDraft={isDraftMode}
+            />
           </div>
         </div>
       </div>
@@ -506,6 +553,7 @@ const GraphQLClientView: React.FC<GraphQLClientViewProps> = ({
             isFailed={isRequestFailed}
             isLongRequest={false}
             isRequestCancelled={isRequestCancelled}
+            isDraftMode={isDraftMode}
             onCancelRequest={handleCancelRequest}
             handleTestResultRefresh={handleTestResultRefresh}
             error={error}

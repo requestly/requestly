@@ -6,12 +6,12 @@ import { ApiClientRecordEntity } from "./api-client-record-entity";
 import { ApiClientEntityType } from "./types";
 import { ApiClientEntityMeta } from "./base";
 
-export class HttpRecordEntity<M extends ApiClientEntityMeta = ApiClientEntityMeta> extends ApiClientRecordEntity<
-  RQAPI.HttpApiRecord,
-  M
-> {
+export class HttpRecordEntity<
+  M extends ApiClientEntityMeta = ApiClientEntityMeta,
+  R extends RQAPI.HttpApiRecord | RQAPI.HttpExampleApiRecord = RQAPI.HttpApiRecord
+> extends ApiClientRecordEntity<R, M> {
   readonly type = ApiClientEntityType.HTTP_RECORD;
-  getEntityFromState(state: ApiClientStoreState): RQAPI.HttpApiRecord {
+  getEntityFromState(state: ApiClientStoreState): R {
     const record = selectRecordById(state, this.meta.id);
     if (record?.type !== RQAPI.RecordType.API) {
       throw new InvalidEntityShape({
@@ -28,7 +28,7 @@ export class HttpRecordEntity<M extends ApiClientEntityMeta = ApiClientEntityMet
         foundType: entryType,
       });
     }
-    return record as RQAPI.HttpApiRecord;
+    return record as R;
   }
 
   getRequest(state: ApiClientStoreState) {
@@ -92,7 +92,7 @@ export class HttpRecordEntity<M extends ApiClientEntityMeta = ApiClientEntityMet
     });
   }
 
-  addNewPathVariable(state: RQAPI.HttpApiRecord, key: string) {
+  addNewPathVariable(state: R, key: string) {
     if (!state.data.request.pathVariables) {
       state.data.request.pathVariables = [];
     }
@@ -106,7 +106,7 @@ export class HttpRecordEntity<M extends ApiClientEntityMeta = ApiClientEntityMet
     });
   }
 
-  deletePathVariable(state: RQAPI.HttpApiRecord, key: string) {
+  deletePathVariable(state: R, key: string) {
     const existingPathVariables = state.data.request.pathVariables;
     if (!existingPathVariables) {
       return;
@@ -137,11 +137,11 @@ export class HttpRecordEntity<M extends ApiClientEntityMeta = ApiClientEntityMet
   }
 
   setUrl(url: string): void {
-    this.SET({ data: { request: { url } } });
+    this.SETCOMMON({ data: { request: { url } } });
   }
 
   setIncludeCredentials(includeCredentials: boolean) {
-    this.SET({
+    this.SETCOMMON({
       data: {
         request: {
           includeCredentials,
@@ -151,35 +151,35 @@ export class HttpRecordEntity<M extends ApiClientEntityMeta = ApiClientEntityMet
   }
 
   setMethod(method: RequestMethod): void {
-    this.SET({ data: { request: { method } } });
+    this.SETCOMMON({ data: { request: { method } } });
   }
 
   setHeaders(headers: KeyValuePair[]): void {
-    this.SET({ data: { request: { headers } } });
+    this.SETCOMMON({ data: { request: { headers } } });
   }
 
   setQueryParams(queryParams: KeyValuePair[]): void {
-    this.SET({ data: { request: { queryParams } } });
+    this.SETCOMMON({ data: { request: { queryParams } } });
   }
 
   setBody(body: RQAPI.RequestBody): void {
-    this.SET({ data: { request: { body } } });
+    this.SETCOMMON({ data: { request: { body } } });
   }
 
   setContentType(contentType: RequestContentType): void {
-    this.SET({ data: { request: { contentType } } });
+    this.SETCOMMON({ data: { request: { contentType } } });
   }
 
   setPathVariables(pathVariables: RQAPI.PathVariable[]): void {
-    this.SET({ data: { request: { pathVariables } } });
+    this.SETCOMMON({ data: { request: { pathVariables } } });
   }
 
   deleteUrl(): void {
-    this.DELETE({ data: { request: { url: null } } });
+    this.DELETECOMMON({ data: { request: { url: null } } });
   }
 
   deleteBody(): void {
-    this.DELETE({ data: { request: { body: null } } });
+    this.DELETECOMMON({ data: { request: { body: null } } });
   }
 
   deleteHeader(predicate: (header: KeyValuePair) => boolean): void {
