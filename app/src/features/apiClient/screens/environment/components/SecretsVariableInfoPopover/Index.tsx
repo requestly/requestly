@@ -1,3 +1,4 @@
+import React from "react";
 import { SecretVariable } from "lib/secret-variables/types";
 import { selectSelectedProviderId, selectAllSecretProviders } from "features/apiClient/slices/secrets-manager";
 import { useNavigate } from "react-router-dom";
