@@ -16,7 +16,6 @@ import {
 } from "./selectors";
 import { secretsManagerActions } from "./slice";
 import { secretVariables } from "lib/secret-variables";
-import { SECRETS_MANAGER_SLICE_NAME } from "../common/constants";
 
 type RootState = { secretsManager: import("./types").SecretsManagerState };
 
