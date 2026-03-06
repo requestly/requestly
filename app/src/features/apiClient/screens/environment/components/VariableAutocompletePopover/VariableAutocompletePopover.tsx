@@ -10,6 +10,7 @@ import { LeafRootItem } from "./components/LeafRootItem";
 import { NamespaceRootItem } from "./components/NamespaceRootItem";
 import "./variableAutocompletePopover.scss";
 import { SPECIAL_VARIABLE_MODES } from "./variableModeConfig";
+import AutoCompleteSecretEmptyState from "./components/EmptyStates";
 
 interface VariableAutocompleteProps {
   show: boolean;
@@ -92,6 +93,10 @@ export const VariableAutocompletePopover: React.FC<VariableAutocompleteProps> = 
     // Get the appropriate footer component
     const FooterComponent = activeMode ? activeMode[1].FooterComponent : SecretsDefaultFooter;
 
+    // Custom empty state for secrets mode
+    const emptyState =
+      activeMode && filteredVariables.length === 0 ? <AutoCompleteSecretEmptyState onClose={onClose} /> : null;
+
     return (
       <Popover
         open={shouldShow}
@@ -101,45 +106,51 @@ export const VariableAutocompletePopover: React.FC<VariableAutocompleteProps> = 
         overlayClassName="variable-autocomplete-popup"
         overlayInnerStyle={{ padding: 0 }}
         content={
-          <div>
-            <div ref={listRef} className="autocomplete-scroll-container" style={{ maxHeight: 300, overflowY: "auto" }}>
-              <List
-                size="small"
-                dataSource={filteredVariables}
-                renderItem={(item, index) =>
-                  item.isNamespace ? (
-                    <NamespaceRootItem
-                      key={item.name}
-                      item={item}
-                      index={index}
-                      isSelected={index === selectedIndex}
-                      onSelect={(name) => onSelectRef.current(name)}
-                      onHover={setSelectedIndex}
-                      allVariables={allVariables}
-                      isKeyboardExpanded={expandedNamespace === item.name}
-                      submenuSelectedIndex={submenuSelectedIndex}
-                      onSubmenuHover={handleSubmenuHover}
-                      expandedSubNamespace={expandedNamespace === item.name ? expandedSubNamespace : null}
-                      onExpandSubNamespace={setExpandedSubNamespace}
-                      subSubmenuSelectedIndex={subSubmenuSelectedIndex}
-                      onSubSubmenuHover={handleSubSubmenuHover}
-                    />
-                  ) : (
-                    <LeafRootItem
-                      key={item.name}
-                      item={item}
-                      index={index}
-                      isSelected={index === selectedIndex}
-                      onSelect={(name) => onSelectRef.current(name)}
-                      onHover={setSelectedIndex}
-                    />
-                  )
-                }
-              />
-            </div>
+          emptyState || (
+            <div>
+              <div
+                ref={listRef}
+                className="autocomplete-scroll-container"
+                style={{ maxHeight: 300, overflowY: "auto" }}
+              >
+                <List
+                  size="small"
+                  dataSource={filteredVariables}
+                  renderItem={(item, index) =>
+                    item.isNamespace ? (
+                      <NamespaceRootItem
+                        key={item.name}
+                        item={item}
+                        index={index}
+                        isSelected={index === selectedIndex}
+                        onSelect={(name) => onSelectRef.current(name)}
+                        onHover={setSelectedIndex}
+                        allVariables={allVariables}
+                        isKeyboardExpanded={expandedNamespace === item.name}
+                        submenuSelectedIndex={submenuSelectedIndex}
+                        onSubmenuHover={handleSubmenuHover}
+                        expandedSubNamespace={expandedNamespace === item.name ? expandedSubNamespace : null}
+                        onExpandSubNamespace={setExpandedSubNamespace}
+                        subSubmenuSelectedIndex={subSubmenuSelectedIndex}
+                        onSubSubmenuHover={handleSubSubmenuHover}
+                      />
+                    ) : (
+                      <LeafRootItem
+                        key={item.name}
+                        item={item}
+                        index={index}
+                        isSelected={index === selectedIndex}
+                        onSelect={(name) => onSelectRef.current(name)}
+                        onHover={setSelectedIndex}
+                      />
+                    )
+                  }
+                />
+              </div>
 
-            <FooterComponent onClose={onClose} />
-          </div>
+              <FooterComponent onClose={onClose} />
+            </div>
+          )
         }
       >
         <span
