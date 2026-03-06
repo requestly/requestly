@@ -29,10 +29,10 @@ const SecretsLayout = ({ children }: { children?: React.ReactNode }) => {
   const [isSavingProvider, setIsSavingProvider] = useState(false);
 
   const currentPath = window.location.pathname;
-  const isOnManageProvidersPage = currentPath.includes(PATHS.SETTINGS.SECRETS.MANAGE_PROVIDERS);
+  const isOnManageProvidersPage = currentPath.includes(PATHS.SETTINGS.SECRETS.MANAGE_PROVIDERS.ABSOLUTE);
 
   const handleManageProvidersClick = () => {
-    navigate(PATHS.SETTINGS.SECRETS.MANAGE_PROVIDERS);
+    navigate(PATHS.SETTINGS.SECRETS.MANAGE_PROVIDERS.ABSOLUTE);
   };
 
   const handleFormChange = (updatedData: any) => {

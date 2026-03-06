@@ -3,7 +3,7 @@
  *
  * See NestedMenuContent.tsx for the full naming-convention reference.
  */
-import React, { memo, useState, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import { List, Popover } from "antd";
 import { AutocompleteItem, Variables } from "features/apiClient/helpers/variableResolver/variableHelper";
 import { VariableRowContent } from "./VariableRowContent";
@@ -25,7 +25,7 @@ interface NamespaceRootItemProps {
   onSubSubmenuHover: (index: number) => void;
 }
 
-export const NamespaceRootItem = memo<NamespaceRootItemProps>(
+export const NamespaceRootItem = React.memo<NamespaceRootItemProps>(
   ({
     item,
     index,

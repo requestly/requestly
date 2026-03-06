@@ -54,6 +54,7 @@ const LeafNestedItem = memo<LeafNestedItemProps>(function LeafNestedItem({
 }) {
   return (
     <List.Item
+      key={item.name}
       data-index={index}
       className={`variable-autocomplete-item ${selectedIndex === index ? "selected" : ""}`}
       onMouseDown={(e: React.MouseEvent) => {
@@ -64,7 +65,7 @@ const LeafNestedItem = memo<LeafNestedItemProps>(function LeafNestedItem({
       onMouseEnter={() => onItemHover?.(index)}
       style={{ cursor: "pointer" }}
     >
-      <VariableRowContent item={item} />
+      <VariableRowContent item={item} hideIcon />
     </List.Item>
   );
 });
@@ -133,7 +134,7 @@ export const NamespaceNestedItem = memo<NamespaceNestedItemProps>(function Names
         onMouseEnter={() => onItemHover?.(index)}
         style={{ cursor: "pointer" }}
       >
-        <VariableRowContent item={item} />
+        <VariableRowContent item={item} hideIcon />
       </List.Item>
     </Popover>
   );

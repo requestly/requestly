@@ -25,6 +25,7 @@ import {
   checkIsSecretsVariable,
 } from "features/apiClient/helpers/variableResolver/variableHelper";
 import { SecretVariable } from "lib/secret-variables/types";
+import { SecretsVariableInfo } from "features/apiClient/screens/environment/components/SecretsVariableInfoPopover/Index";
 
 type VariableData = ScopedVariable[0];
 
@@ -241,24 +242,6 @@ function getValueStrings(variable: VariableData) {
     isPersisted: makeRenderable(variable.isPersisted ?? true),
   };
 }
-
-const SecretsVariableInfo: React.FC<{
-  variable: SecretVariable;
-}> = ({ variable }) => (
-  <div className="variable-info-property-container">
-    <span>{getScopeIcon(variable.scope)}</span>
-    <span className="variable-header-info-separator" />
-    <div className="variable-info-header-name">{variable.name}</div>
-    <div className="variable-info-content-container">
-      <div className="variable-info-content">
-        <div className="variable-info-title">{InfoFieldLabel.INITIAL_VALUE}</div>
-        <div className="variable-info-value">
-          <span className="value-content">{variable.value}</span>
-        </div>
-      </div>
-    </div>
-  </div>
-);
 
 const VariableInfo: React.FC<{
   params: {
