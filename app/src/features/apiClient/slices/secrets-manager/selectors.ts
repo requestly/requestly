@@ -37,15 +37,7 @@ export const selectLastFetchedForSelectedProvider = createSelector([selectSecret
   return Math.max(...fetched.map((s) => s.fetchedAt));
 });
 
-const selectIsDirtyMap = createSelector(selectSecretsManagerSlice, (slice) => slice.isDirty);
-
-export const selectIsDirtyForSelectedProvider = createSelector(
-  [selectIsDirtyMap, selectSelectedProviderId],
-  (isDirty, selectedProviderId) => {
-    if (!selectedProviderId) return false;
-    return isDirty[selectedProviderId] ?? false;
-  }
-);
+export const selectIsDirtyForSelectedProvider = createSelector(selectSecretsManagerSlice, (slice) => slice.isDirty);
 
 export const selectFetchErrors = createSelector(selectSecretsManagerSlice, (slice) => slice.fetchErrors);
 
