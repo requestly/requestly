@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from "react";
+import React, { useState, useCallback, useMemo, useEffect } from "react";
 import { Table, Tag, Button, Dropdown, Tooltip, Checkbox, Popover, Input } from "antd";
 import type { ColumnsType } from "antd/lib/table";
 import { useSelector, useDispatch } from "react-redux";
@@ -65,6 +65,12 @@ const SecretsTable: React.FC<SecretsTableProps> = ({ onViewKeyValues }) => {
   const [showVersionId, setShowVersionId] = useState(false);
   const [visibleIds, setVisibleIds] = useState<Set<string>>(new Set());
 
+  useEffect(() => {
+    if (secrets?.length === 0 && selectedProviderId) {
+      dispatch(secretsManagerActions.addSecretEntry({ providerId: selectedProviderId }));
+    }
+  }, [dispatch, secrets?.length, selectedProviderId]);
+
   const toggleVisibility = useCallback((id: string) => {
     setVisibleIds((prev) => {
       const next = new Set(prev);
@@ -74,7 +80,10 @@ const SecretsTable: React.FC<SecretsTableProps> = ({ onViewKeyValues }) => {
   }, []);
 
   const handleAddClick = () => {
-    if (!selectedProviderId) return;
+    if (!selectedProviderId) {
+      return;
+    }
+
     dispatch(secretsManagerActions.addSecretEntry({ providerId: selectedProviderId }));
   };
 

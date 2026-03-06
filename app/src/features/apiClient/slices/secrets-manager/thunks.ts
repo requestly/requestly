@@ -16,6 +16,7 @@ import {
 } from "./selectors";
 import { secretsManagerActions } from "./slice";
 import { secretVariables } from "lib/secret-variables";
+import { SECRETS_MANAGER_SLICE_NAME } from "../common/constants";
 
 type RootState = { secretsManager: import("./types").SecretsManagerState };
 
@@ -249,3 +250,14 @@ export const deleteAllSecretsForProvider = createAsyncThunk<
   const secrets = selectAllSecrets(state);
   secretVariables.updateSourceFromSecrets(secrets.filter((s) => s.providerId !== providerId) as AwsSecretValue[]);
 });
+
+export const revertDirtyChanges = createAsyncThunk(
+  `secretsManager/revertDirtyChanges`,
+  async (_, { dispatch, getState }) => {
+    const state = getState() as RootState;
+    const providerId = selectSelectedProviderId(state);
+    if (providerId) {
+      await dispatch(listSecrets(providerId));
+    }
+  }
+);
