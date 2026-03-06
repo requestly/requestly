@@ -8,7 +8,12 @@ import {
 import { notification } from "antd";
 import { secretsManagerService, toSecretProviderConfig, SecretFetchError } from "services/secretsManagerService";
 import { ProviderData } from "features/settings/secrets-manager/context/SecretsModalsContext";
-import { selectAllSecrets, selectSelectedProviderId, selectAllSecretProviders } from "./selectors";
+import {
+  selectAllSecrets,
+  selectSelectedProviderId,
+  selectAllSecretProviders,
+  selectSecretsForSelectedProvider,
+} from "./selectors";
 import { secretsManagerActions } from "./slice";
 import { secretVariables } from "lib/secret-variables";
 
@@ -195,6 +200,9 @@ export const deleteProvider = createAsyncThunk<void, string, { rejectValue: stri
     const state = getState();
     const providers = selectAllSecretProviders(state);
     const nextProvider = providers.find((p) => p.id !== providerId);
+
+    dispatch(deleteAllSecretsForProvider({ providerId }));
+
     if (nextProvider) {
       dispatch(secretsManagerActions.setSelectedProviderId(nextProvider.id));
     } else {
@@ -214,4 +222,25 @@ export const deleteSecret = createAsyncThunk<
   }
 
   dispatch(secretsManagerActions.removeSecret(secretReference.id));
+});
+
+export const deleteAllSecretsForProvider = createAsyncThunk<
+  void,
+  { providerId: string },
+  { rejectValue: string; state: RootState }
+>("secretsManager/deleteAllSecretsForProvider", async ({ providerId }, { dispatch, rejectWithValue, getState }) => {
+  const state = getState();
+  const allSecrets = selectSecretsForSelectedProvider(state);
+
+  const secretsToDelete = allSecrets.filter((s) => s.providerId === providerId);
+
+  const secretRefsToDelete = secretsToDelete.map((s) => s.secretReference);
+  const result = await secretsManagerService.removeSecretValues(secretRefsToDelete.map((ref) => ({ providerId, ref })));
+  if (result.type === "error") {
+    return rejectWithValue(result.error.message);
+  }
+  dispatch(secretsManagerActions.removeSecrets(secretRefsToDelete.map((s) => s.id)));
+
+  const secrets = selectAllSecrets(state);
+  secretVariables.updateSourceFromSecrets(secrets.filter((s) => s.providerId !== providerId) as AwsSecretValue[]);
 });

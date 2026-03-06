@@ -9,7 +9,10 @@ export interface SecretKeyValue {
  * or null if it's a plain string / array / primitive.
  */
 export function parseSecretKeyValues(value: string | undefined): SecretKeyValue[] | null {
-  if (!value) return null;
+  if (!value) {
+    return null;
+  }
+
   try {
     const parsed = JSON.parse(value);
     if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
