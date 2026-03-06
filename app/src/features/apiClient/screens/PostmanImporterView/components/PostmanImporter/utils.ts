@@ -239,7 +239,7 @@ const processRawRequestBody = (raw: string, options: any): RequestBodyProcessing
   const contentType = getContentTypeForRawBody(options?.raw?.language);
 
   return {
-    requestBody: raw,
+    requestBody: typeof raw === "string" ? raw : "",
     contentType,
   };
 };
@@ -250,7 +250,14 @@ const processFormDataBody = (formdata: any[]): RequestBodyProcessingResult => {
       formdata?.map((formData: { key: string; value?: any; src?: any; type: "file" | "text" }) => ({
         id: Date.now(),
         key: formData.key,
-        value: formData.type === "file" ? formData.src : formData.value,
+        value:
+          formData.type === "file"
+            ? typeof formData.src === "string"
+              ? formData.src
+              : ""
+            : typeof formData.value === "string"
+            ? formData.value
+            : "",
         isEnabled: true,
         type: formData.type,
       })) || [],
@@ -265,7 +272,7 @@ const processUrlEncodedBody = (urlencoded: any[]): RequestBodyProcessingResult =
     requestBody: urlencoded.map((data: { key: string; value: string }) => ({
       id: Date.now() + Math.random(),
       key: data?.key || "",
-      value: data?.value || "",
+      value: typeof data?.value === "string" ? data.value : "",
       isEnabled: true,
     })),
     contentType,
@@ -321,7 +328,7 @@ export const processRequestHeaders = (request: any): RequestHeadersProcessingRes
       ) => ({
         id: index,
         key: header.key,
-        value: header.value,
+        value: typeof header.value === "string" ? header.value : "",
         isEnabled: !header?.disabled,
         description: header?.description || "",
         dataType: getInferredKeyValueDataType(header.value),
