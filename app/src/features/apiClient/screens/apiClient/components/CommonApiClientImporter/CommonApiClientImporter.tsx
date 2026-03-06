@@ -193,8 +193,8 @@ export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = (
               const updatedData = { ...apiRecord.data };
 
               // Check if examples exist, and if so, map over them to update the parent/collection IDs
-              if ((updatedData as any).examples && Array.isArray((updatedData as any).examples)) {
-                (updatedData as any).examples = (updatedData as any).examples.map((example: any) => ({
+              if (updatedData.examples && Array.isArray(updatedData.examples)) {
+                updatedData.examples = updatedData.examples.map((example: any) => ({
                   ...example,
                   id: apiClientRecordsRepository.generateApiRecordId(newCollectionId),
                   parentRequestId: newApiId,
@@ -265,11 +265,11 @@ export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = (
           allRequests.push(req);
 
           // Extract examples so they can be written to the DB separately using createExampleRequest
-          if (req.data && (req.data as any).examples && Array.isArray((req.data as any).examples)) {
-            allExamples.push(...(req.data as any).examples);
+          if (req.data && req.data.examples && Array.isArray(req.data.examples)) {
+            allExamples.push(...req.data.examples);
 
             // Delete the nested array so we don't save duplicate data inside the parent API DB document
-            delete (req.data as any).examples;
+            delete req.data.examples;
           }
         });
       });
