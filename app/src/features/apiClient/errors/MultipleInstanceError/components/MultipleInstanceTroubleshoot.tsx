@@ -1,6 +1,6 @@
 import React from "react";
 import { MultipleInstanceError } from "../MultipleInstanceError";
-
+import "./MultipleInstanceTroubleshoot.scss";
 interface Props {
   error: MultipleInstanceError;
 }
