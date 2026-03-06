@@ -28,7 +28,12 @@ export const fetchSecretProviders = createAsyncThunk<SecretProviderMetadata[], v
       return rejectWithValue(result.error.message);
     }
 
-    dispatch(secretsManagerActions.setAllProviders(result.data));
+    if (result.data.length > 0) {
+      dispatch(secretsManagerActions.setAllProviders(result.data));
+    } else {
+      dispatch(secretsManagerActions.setAllProviders([]));
+      dispatch(secretsManagerActions.setSelectedProviderId(null));
+    }
 
     return result.data;
   }
