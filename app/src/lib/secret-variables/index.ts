@@ -1,5 +1,6 @@
 import { AwsSecretValue } from "@requestly/shared/types/entities/secretsManager";
 import { VariableScope } from "../../backend/environment/types";
+import { parseSecretKeyValues } from "../../features/settings/secrets-manager/utils/parseSecretKeyValues";
 import { SecretVariable } from "./types";
 
 const SECRETS_PREFIX = "secrets:";
@@ -14,12 +15,22 @@ export class SecretVariablesService {
   }
 
   private buildSourceFromAwsSecrets(secrets: AwsSecretValue[]): SecretVariable[] {
-    return secrets.map((secret) => ({
-      name: secret.secretReference.alias,
-      value: secret.value,
-      id: secret.secretReference.id,
-      scope: VariableScope.SECRETS,
-    }));
+    return secrets.flatMap((secret) => {
+      const alias = secret.secretReference.alias;
+      const id = secret.secretReference.id;
+      const keyValues = parseSecretKeyValues(secret.value);
+
+      if (keyValues && keyValues.length > 0) {
+        return keyValues.map((kv) => ({
+          name: `${alias}.${kv.key}`,
+          value: kv.value,
+          id: `${id}.${kv.key}`,
+          scope: VariableScope.SECRETS,
+        }));
+      }
+
+      return [{ name: alias, value: secret.value, id, scope: VariableScope.SECRETS }];
+    });
   }
 
   updateSourceFromSecrets(secrets: AwsSecretValue[]): void {
