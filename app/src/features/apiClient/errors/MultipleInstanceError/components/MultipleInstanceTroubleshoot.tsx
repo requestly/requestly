@@ -1,8 +1,8 @@
 import React from "react";
-import { FsAccessError } from "features/apiClient/errors/FsError/FsAccessError/FsAccessError";
+import { MultipleInstanceError } from "../MultipleInstanceError";
 
 interface Props {
-  error: FsAccessError;
+  error: MultipleInstanceError;
 }
 
 export const MultipleInstanceTroubleshoot: React.FC<Props> = ({ error }) => {
