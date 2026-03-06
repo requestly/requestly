@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { unstable_useBlocker } from "react-router-dom";
 import NoProvidersEmptyState from "./NoProviderEmptyState";
 import ProviderDetails from "./ProviderDetails";
@@ -9,10 +9,13 @@ import {
   selectSecretsForSelectedProvider,
   selectIsDirtyForSelectedProvider,
 } from "features/apiClient/slices/secrets-manager";
+import { revertDirtyChanges } from "features/apiClient/slices/secrets-manager/thunks";
 import { AwsSecretValue } from "@requestly/shared/types/entities/secretsManager";
 import { parseSecretKeyValues } from "./utils/parseSecretKeyValues";
+import { AppDispatch } from "store/types";
 
 const Secrets = () => {
+  const dispatch = useDispatch<AppDispatch>();
   const providers = useSelector(selectAllSecretProviders);
   const secrets = useSelector(selectSecretsForSelectedProvider) as AwsSecretValue[];
   const isDirty = useSelector(selectIsDirtyForSelectedProvider);
@@ -29,24 +32,19 @@ const Secrets = () => {
     setKeyValuesModal({ open: false, secretId: null });
   }, []);
 
-  unstable_useBlocker(() => {
-    if (isDirty) {
-      return !window.confirm("You have unfetched secrets. Discard changes?");
-    }
-    return false;
-  });
+  const blocker = unstable_useBlocker(useCallback(() => isDirty, [isDirty]));
 
   useEffect(() => {
-    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (isDirty) {
-        e.preventDefault();
-        e.returnValue = "You have unfetched secrets. Discard changes?";
+    if (blocker.state === "blocked") {
+      const shouldDiscard = window.confirm("You have unfetched secrets. Discard changes?");
+      if (shouldDiscard) {
+        dispatch(revertDirtyChanges()).then(() => blocker.proceed());
+      } else {
+        blocker.reset();
       }
-    };
-
-    window.addEventListener("beforeunload", handleBeforeUnload);
-    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
-  }, [isDirty]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [blocker.state]);
 
   const activeSecret = secrets.find((s) => s.secretReference.id === keyValuesModal.secretId);
   const activeKeyValues = parseSecretKeyValues(activeSecret?.value);

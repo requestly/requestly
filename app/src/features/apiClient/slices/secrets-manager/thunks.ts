@@ -5,16 +5,18 @@ import {
   AwsSecretValue,
   SecretReference,
 } from "@requestly/shared/types/entities/secretsManager";
-import { secretsManagerService, toSecretProviderConfig } from "services/secretsManagerService";
+import { notification } from "antd";
+import { secretsManagerService, toSecretProviderConfig, SecretFetchError } from "services/secretsManagerService";
 import { ProviderData } from "features/settings/secrets-manager/context/SecretsModalsContext";
 import {
   selectAllSecrets,
   selectSelectedProviderId,
   selectAllSecretProviders,
-  selectSecretsForSelectedProvider,
+  selectSecretsByProviderId,
 } from "./selectors";
 import { secretsManagerActions } from "./slice";
 import { secretVariables } from "lib/secret-variables";
+import { SECRETS_MANAGER_SLICE_NAME } from "../common/constants";
 
 type RootState = { secretsManager: import("./types").SecretsManagerState };
 
@@ -54,25 +56,78 @@ export const listSecrets = createAsyncThunk<SecretValue[], string, { rejectValue
 );
 
 export const fetchAndSaveSecretsForProvider = createAsyncThunk<
-  SecretValue[],
+  {
+    secrets: SecretValue[];
+    errors: SecretFetchError[];
+    validationErrors: Record<string, { alias?: string; identifier?: string }>;
+  },
   { providerId: string },
   { rejectValue: string; state: RootState }
 >("secretsManager/fetchAndSaveSecretsForProvider", async ({ providerId }, { getState, rejectWithValue }) => {
   const state = getState();
-  const allSecrets = selectAllSecrets(state).filter((s) => s.providerId === providerId);
-  const secretRefs = allSecrets.map((s) => s.secretReference);
+  const allProviderSecrets = selectSecretsByProviderId(state)(providerId);
+  const secretRefs = allProviderSecrets.map((s) => s.secretReference);
 
-  const fetchAndSaveSecretsResult = await secretsManagerService.fetchAndSaveSecrets(providerId, secretRefs);
+  // Frontend validation — runs before the IPC call
+  const aliasCounts = new Map<string, number>();
+  for (const s of allProviderSecrets) {
+    const alias = (s.secretReference.alias ?? "").trim();
+    if (alias) {
+      aliasCounts.set(alias, (aliasCounts.get(alias) ?? 0) + 1);
+    }
+  }
+
+  const validationMap: Record<string, { alias?: string; identifier?: string }> = {};
+  for (const s of allProviderSecrets) {
+    const refId = s.secretReference.id;
+    const alias = (s.secretReference.alias ?? "").trim();
+    const identifier = ((s as AwsSecretValue).secretReference.identifier ?? "").trim();
+
+    if (!alias) {
+      validationMap[refId] = { ...validationMap[refId], alias: "Alias is required" };
+    } else if ((aliasCounts.get(alias) ?? 0) > 1) {
+      validationMap[refId] = { ...validationMap[refId], alias: `Alias "${alias}" is duplicated` };
+    }
+
+    if (!identifier) {
+      validationMap[refId] = { ...validationMap[refId], identifier: "ARN/Secret name is required" };
+    }
+  }
+
+  const invalidRefIds = new Set(Object.keys(validationMap));
+  const validRefs = secretRefs.filter((ref) => !invalidRefIds.has(ref.id));
+
+  const fetchAndSaveSecretsResult = await secretsManagerService.fetchAndSaveSecrets(providerId, validRefs);
   if (fetchAndSaveSecretsResult.type === "error") {
     return rejectWithValue(fetchAndSaveSecretsResult.error.message);
   }
 
-  const fetchedSecrets = fetchAndSaveSecretsResult.data.filter((s): s is SecretValue => s !== null);
+  const { secrets, errors: backendErrors } = fetchAndSaveSecretsResult.data;
 
-  // Redux state updation is done in the extraReducers of the slice
+  const totalErrorCount = Object.keys(validationMap).length + backendErrors.length;
+  if (totalErrorCount > 0) {
+    const firstBackendError = backendErrors[0];
+    const firstValidationEntry = Object.entries(validationMap)[0];
+    const singleErrorMessage =
+      totalErrorCount === 1
+        ? firstBackendError?.message ?? firstValidationEntry?.[1]?.alias ?? firstValidationEntry?.[1]?.identifier
+        : undefined;
 
-  secretVariables.updateSourceFromSecrets(fetchedSecrets as AwsSecretValue[]);
-  return fetchedSecrets;
+    notification.warn({
+      message: "Some secrets failed to fetch",
+      description:
+        singleErrorMessage ?? `${totalErrorCount} secrets failed to fetch. Hover the error icon for details.`,
+      placement: "bottomRight",
+      className: "add-secrets-provider-notification",
+    });
+  }
+
+  const erroredRefIds = new Set([...Object.keys(validationMap), ...backendErrors.map((e) => e.secretRefId)]);
+  const originalErroredRows = allProviderSecrets.filter((s) => erroredRefIds.has(s.secretReference.id));
+  const allSecretsForRedux = [...secrets, ...originalErroredRows];
+
+  secretVariables.updateSourceFromSecrets(secrets as AwsSecretValue[]);
+  return { secrets: allSecretsForRedux, errors: backendErrors, validationErrors: validationMap };
 });
 
 export const saveProvider = createAsyncThunk<
@@ -181,7 +236,7 @@ export const deleteAllSecretsForProvider = createAsyncThunk<
   { rejectValue: string; state: RootState }
 >("secretsManager/deleteAllSecretsForProvider", async ({ providerId }, { dispatch, rejectWithValue, getState }) => {
   const state = getState();
-  const allSecrets = selectSecretsForSelectedProvider(state);
+  const allSecrets = selectSecretsByProviderId(state)(providerId);
 
   const secretsToDelete = allSecrets.filter((s) => s.providerId === providerId);
 
@@ -195,3 +250,14 @@ export const deleteAllSecretsForProvider = createAsyncThunk<
   const secrets = selectAllSecrets(state);
   secretVariables.updateSourceFromSecrets(secrets.filter((s) => s.providerId !== providerId) as AwsSecretValue[]);
 });
+
+export const revertDirtyChanges = createAsyncThunk(
+  `secretsManager/revertDirtyChanges`,
+  async (_, { dispatch, getState }) => {
+    const state = getState() as RootState;
+    const providerId = selectSelectedProviderId(state);
+    if (providerId) {
+      await dispatch(listSecrets(providerId));
+    }
+  }
+);

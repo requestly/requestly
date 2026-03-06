@@ -12,6 +12,16 @@ import { ProviderData } from "features/settings/secrets-manager/context/SecretsM
 type SecretsResult<T> = { type: "success"; data: T } | { type: "error"; error: { code: string; message: string } };
 type SecretsVoidResult = { type: "success" } | { type: "error"; error: { code: string; message: string } };
 
+export interface SecretFetchError {
+  secretRefId: string;
+  message: string;
+}
+
+export interface FetchSecretsResultData {
+  secrets: SecretValue[];
+  errors: SecretFetchError[];
+}
+
 const invokeMainEvent = <T = unknown>(channel: string, payload?: Record<string, unknown>): Promise<T> => {
   return window.RQ.DESKTOP.SERVICES.IPC.invokeEventInMain(channel, payload);
 };
@@ -70,7 +80,7 @@ export const secretsManagerService = {
   fetchAndSaveSecrets: (
     providerId: string,
     secretRefs: SecretReference[]
-  ): Promise<SecretsResult<(SecretValue | null)[]>> => {
+  ): Promise<SecretsResult<FetchSecretsResultData>> => {
     return invokeMainEvent("secretsManager:fetchAndSaveSecrets", { providerId, secretRefs });
   },
 
