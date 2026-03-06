@@ -24,7 +24,7 @@ export const SecretsVariableInfo: React.FC<{
 
   const handleManageClick = () => {
     console.log("Manage clicked");
-    navigate(PATHS.SETTINGS.SECRETS.MANAGE_PROVIDERS);
+    navigate(PATHS.SETTINGS.SECRETS.MANAGE_PROVIDERS.ABSOLUTE);
   };
 
   return (
