@@ -1,7 +1,7 @@
 import { ApiClientLocalMeta, ApiClientRecordsInterface } from "../../interfaces";
 import { RQAPI } from "features/apiClient/types";
 import { fsManagerServiceAdapterProvider } from "services/fsManagerServiceAdapter";
-import { API, APIEntity, ApiRequestDetails, FileSystemResult, FileType } from "./types";
+import { API, APIEntity, ApiRequestDetails, ExampleAPI, FileSystemResult, FileType } from "./types";
 import { parseEntityVariables, parseFsId, parseNativeId } from "../../utils";
 import { v4 as uuidv4 } from "uuid";
 import { EnvironmentVariables } from "backend/environment/types";
@@ -10,6 +10,7 @@ import { ResponsePromise } from "backend/types";
 import { SavedRunConfig } from "features/apiClient/slices/runConfig/types";
 import { RunResult, SavedRunResult } from "features/apiClient/slices/common/runResults";
 import { apiRecordsRankingManager } from "features/apiClient/helpers/RankingManager";
+import { getDefaultAuth } from "features/apiClient/screens/apiClient/components/views/components/request/components/AuthorizationView/defaults";
 
 export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiClientLocalMeta> {
   meta: ApiClientLocalMeta;
@@ -71,6 +72,29 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
           },
         };
         return collection;
+      } else if (e.type === "example_api") {
+        const exampleApi: RQAPI.ExampleApiRecord = {
+          id: parseFsId(e.id),
+          parentRequestId: e.parentRequestId,
+          collectionId: null,
+          type: RQAPI.RecordType.EXAMPLE_API,
+          createdTs: Date.now(),
+          updatedTs: Date.now(),
+          name: e.data.name,
+          ownerId: this.meta.rootPath,
+          deleted: false,
+          createdBy: "local",
+          updatedBy: "local",
+          rank: e.data.rank,
+          data: {
+            type: e.data.request.type,
+            request: this.parseApiRequestDetails(e.data.request),
+            scripts: e.data.request.scripts,
+            auth: e.data.request.auth,
+            response: e.data.response,
+          } as RQAPI.ApiEntry,
+        };
+        return exampleApi;
       } else {
         const api: RQAPI.ApiRecord = {
           id: parseFsId(e.id),
@@ -159,6 +183,20 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
         };
       }
     }
+  }
+
+  private parseExampleApiRecordRequest(record: RQAPI.ExampleApiRecord): ExampleAPI["data"] {
+    return {
+      name: record.name || "Untitled example",
+      rank: record.rank,
+      request: {
+        ...record.data.request,
+        type: record.data.type,
+        scripts: record.data.scripts ?? { postResponse: "", preRequest: "" },
+        auth: getDefaultAuth(false),
+      } as ApiRequestDetails,
+      response: record.data.response,
+    };
   }
 
   generateApiRecordId() {
@@ -762,7 +800,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
   async getAllExamples(
     recordIds: string[]
   ): Promise<{ success: boolean; data: { examples: RQAPI.ExampleApiRecord[]; failedRecordIds?: string[] } }> {
-    // TODO: Implement this, will be a dummy implementation for local ws
+    // Dummy implementation for local sync. Examples are fetched synchronously with getAllRecords method.
     return {
       success: true,
       data: {
@@ -773,22 +811,63 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
   }
 
   async createExampleRequest(parentRequestId: string, example: RQAPI.ExampleApiRecord): RQAPI.ApiClientRecordPromise {
+    const service = await this.getAdapter();
+    const result = await service.createExampleRequest(parentRequestId, {
+      ...this.parseExampleApiRecordRequest(example),
+    });
+    if (result.type === "error") {
+      return {
+        success: false,
+        data: null,
+        message: result.error.message,
+      };
+    }
+    const [parsedExample] = this.parseAPIEntities([result.content]);
     return {
       success: true,
-      data: example,
+      data: parsedExample,
     };
   }
+
   async updateExampleRequest(example: RQAPI.ExampleApiRecord): RQAPI.ApiClientRecordPromise {
+    const service = await this.getAdapter();
+
+    const result = await service.updateExampleRequest(
+      example.parentRequestId,
+      example.id,
+      this.parseExampleApiRecordRequest(example)
+    );
+
+    if (result.type === "error") {
+      return {
+        success: false,
+        data: null,
+        message: result.error.message,
+      };
+    }
+
+    const [parsedExample] = this.parseAPIEntities([result.content]);
     return {
       success: true,
-      data: example,
+      data: parsedExample,
     };
   }
 
   async deleteExamples(exampleRecords: RQAPI.ExampleApiRecord[]): Promise<{ success: boolean; message?: string }> {
+    const service = await this.getAdapter();
+
+    for (const example of exampleRecords) {
+      const result = await service.deleteExampleRequest(example.parentRequestId, example.id);
+      if (result.type === "error") {
+        return {
+          success: false,
+          message: result.error.message,
+        };
+      }
+    }
+
     return {
       success: true,
-      message: "Not implemented",
     };
   }
 }

@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Modal } from "antd";
 import { RQAPI } from "features/apiClient/types";
-// import { MdOutlineFileDownload } from "@react-icons/all-files/md/MdOutlineFileDownload";
 import { getFormattedDate } from "utils/DateTimeUtils";
 import "./apiClientExportModal.scss";
 import fileDownload from "js-file-download";
@@ -51,6 +50,15 @@ export const ApiClientExportModal: React.FC<ExportModalProps> = ({ isOpen, onClo
     exportType === "collection" ? { records: [] } : exportType === "environment" ? { environments: [] } : {}
   );
   const [fileInfo, setFileInfo] = useState<{ label: string; type: string }>({ label: "", type: "" });
+  /**
+   * Ensure examples array exists (backward compatibility)
+   */
+  const normalizeRecord = useCallback((record: RQAPI.ApiClientRecord) => {
+    if (record.type === RQAPI.RecordType.API && !(record.data as any).examples) {
+      (record.data as any).examples = [];
+    }
+    return record;
+  }, []);
 
   const handleExport = useCallback(() => {
     const dataToExport = { schema_version: COLLECTIONS_SCHEMA_VERSION, ...exportData };
@@ -67,34 +75,57 @@ export const ApiClientExportModal: React.FC<ExportModalProps> = ({ isOpen, onClo
     }
   }, [exportData, onClose, fileInfo.label, exportType]);
 
-  const sanitizeRecord = (record: RQAPI.ApiClientRecord): ExportRecord =>
-    omit(record, ["createdBy", "updatedBy", "ownerId", "createdTs", "updatedTs"]);
+  const sanitizeRecord = useCallback(
+    (record: RQAPI.ApiClientRecord): ExportRecord =>
+      omit(normalizeRecord(record), ["createdBy", "updatedBy", "ownerId", "createdTs", "updatedTs"]),
+    [normalizeRecord]
+  );
 
-  const sanitizeRecords = useCallback((collection: RQAPI.CollectionRecord): ExportRecord[] => {
-    const records: ExportRecord[] = [];
+  const sanitizeRecords = useCallback(
+    (collection: RQAPI.CollectionRecord): ExportRecord[] => {
+      const records: ExportRecord[] = [];
 
-    // Add the collection itself (without children)
-    records.push(sanitizeRecord({ ...collection, data: omit(collection.data, "children") }) as RQAPI.CollectionRecord);
+      // Add the collection itself (without children)
+      records.push(
+        sanitizeRecord({ ...collection, data: omit(collection.data, "children") }) as RQAPI.CollectionRecord
+      );
 
-    // Recursively process children
-    if (collection.data.children) {
-      collection.data.children.forEach((record: RQAPI.ApiClientRecord) => {
-        if (record.type === RQAPI.RecordType.API) {
-          records.push(sanitizeRecord(record) as ExportRecord);
-        } else {
-          records.push(...sanitizeRecords(record as RQAPI.CollectionRecord));
-        }
-      });
-    }
+      // Recursively process children
+      if (collection.data.children) {
+        collection.data.children.forEach((record: RQAPI.ApiClientRecord) => {
+          if (record.type === RQAPI.RecordType.API) {
+            const apiRecord = normalizeRecord(record) as RQAPI.ApiRecord;
+            const examples = apiRecord.data.examples ?? [];
+            // Push the API request without nested examples (flat)
+            records.push(
+              sanitizeRecord({
+                ...apiRecord,
+                data: omit(apiRecord.data, "examples") as RQAPI.ApiEntry,
+              })
+            );
+            // Push each example as a separate flat record
+            examples.forEach((example) => {
+              records.push(sanitizeRecord(example) as ExportRecord);
+            });
+          } else {
+            records.push(...sanitizeRecords(record as RQAPI.CollectionRecord));
+          }
+        });
+      }
 
-    return records;
-  }, []);
+      return records;
+    },
+    [normalizeRecord, sanitizeRecord]
+  );
 
   const processEnvironments = useCallback((environments: EnvironmentData[]): EnvironmentData[] => {
     return environments.map((env) => {
       const updatedVariables = Object.keys(env.variables).reduce((acc, key) => {
-        const { localValue, ...rest } = env.variables[key];
-        acc[key] = rest;
+        const variable = env.variables[key];
+        if (variable) {
+          const { localValue, ...rest } = variable;
+          acc[key] = rest;
+        }
         return acc;
       }, {} as typeof env.variables);
 
@@ -111,6 +142,19 @@ export const ApiClientExportModal: React.FC<ExportModalProps> = ({ isOpen, onClo
       recordsToBeExported.forEach((record) => {
         if (isApiCollection(record)) {
           recordsToExport.push(...sanitizeRecords(record));
+        } else if (record.type === RQAPI.RecordType.API) {
+          const apiRecord = normalizeRecord(record);
+          const examples = (apiRecord.data as RQAPI.ApiEntry).examples ?? [];
+          recordsToExport.push({
+            ...sanitizeRecord({
+              ...apiRecord,
+              data: omit(apiRecord.data, "examples") as RQAPI.ApiEntry,
+            } as RQAPI.ApiRecord),
+            collectionId: "",
+          });
+          examples.forEach((example) => {
+            recordsToExport.push({ ...sanitizeRecord(example), collectionId: "" });
+          });
         } else {
           recordsToExport.push({ ...sanitizeRecord(record), collectionId: "" });
         }
@@ -130,6 +174,8 @@ export const ApiClientExportModal: React.FC<ExportModalProps> = ({ isOpen, onClo
     sanitizeRecords,
     exportType,
     processEnvironments,
+    sanitizeRecord,
+    normalizeRecord,
   ]);
 
   useEffect(() => {
@@ -141,11 +187,11 @@ export const ApiClientExportModal: React.FC<ExportModalProps> = ({ isOpen, onClo
 
   useEffect(() => {
     if (exportType === "collection") {
-      setFileInfo({ label: recordsToBeExported.length > 1 ? "Collections" : "Collection", type: "COL" });
+      setFileInfo({ label: "Collections", type: "COL" });
     } else if (exportType === "environment") {
-      setFileInfo({ label: environments.length > 1 ? "Environments" : "Environment", type: "ENV" });
+      setFileInfo({ label: "Environments", type: "ENV" });
     }
-  }, [exportType, setFileInfo, recordsToBeExported.length, environments.length]);
+  }, [exportType, recordsToBeExported.length, environments.length, recordsToBeExported]);
 
   return (
     <Modal
@@ -170,7 +216,9 @@ export const ApiClientExportModal: React.FC<ExportModalProps> = ({ isOpen, onClo
             <div className="export-details-item">
               <span className="export-details-item-label">{fileInfo.label}: </span>
               <span className="export-details-item-value">
-                {exportType === "environment" ? environments.length : recordsToBeExported?.length}
+                {exportType === "environment"
+                  ? environments.length
+                  : recordsToBeExported.filter((record) => isApiCollection(record)).length}
               </span>
             </div>
           </div>
