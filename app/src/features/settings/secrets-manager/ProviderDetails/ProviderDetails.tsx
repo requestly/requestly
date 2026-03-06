@@ -10,6 +10,7 @@ import {
   selectSelectedProviderId,
   selectLastFetchedForSelectedProvider,
   selectFetchStatus,
+  selectIsDirtyForSelectedProvider,
   secretsManagerActions,
   fetchAndSaveSecretsForProvider,
   listSecrets,
@@ -37,6 +38,7 @@ const ProviderDetails: React.FC<ProviderDetailsProps> = ({ onViewKeyValues }) =>
   const selectedProviderId = useSelector(selectSelectedProviderId);
   const lastFetchedTimestamp = useSelector(selectLastFetchedForSelectedProvider);
   const fetchStatus = useSelector(selectFetchStatus);
+  const isDirty = useSelector(selectIsDirtyForSelectedProvider);
 
   const isFetching = fetchStatus === "loading";
   const lastFetched = useMemo(() => (lastFetchedTimestamp ? formatRelativeTime(lastFetchedTimestamp) : null), [
@@ -84,8 +86,13 @@ const ProviderDetails: React.FC<ProviderDetailsProps> = ({ onViewKeyValues }) =>
         </div>
 
         <div className="header-right">
-          {lastFetched && <span className="last-fetched">Last fetched: {lastFetched}</span>}
+          {isDirty ? (
+            <span className="last-fetched">Changes not fetched</span>
+          ) : (
+            lastFetched && <span className="last-fetched">Last fetched: {lastFetched}</span>
+          )}
           <RQButton type="primary" loading={isFetching} onClick={handleFetchSecrets} className="fetch-secrets-btn">
+            {isDirty && <span className="unsaved-dot" />}
             Fetch secrets
           </RQButton>
         </div>

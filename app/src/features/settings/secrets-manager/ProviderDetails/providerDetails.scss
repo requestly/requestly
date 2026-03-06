@@ -85,6 +85,18 @@
 
       .fetch-secrets-btn {
         height: 24px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+
+        .unsaved-dot {
+          width: 6px;
+          height: 6px;
+          border-radius: 50%;
+          background-color: #fff;
+          display: inline-block;
+          flex-shrink: 0;
+        }
       }
     }
   }

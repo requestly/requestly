@@ -9,13 +9,15 @@ import {
 import { SecretsManagerState } from "./types";
 import { fetchAndSaveSecretsForProvider, listSecrets } from "./thunks";
 import { providersAdapter, secretsAdapter } from "./adapters";
+import persistReducer from "redux-persist/es/persistReducer";
+import storage from "redux-persist/lib/storage";
 
 export { providersAdapter, secretsAdapter } from "./adapters";
 
 const initialState: SecretsManagerState = {
   providers: providersAdapter.getInitialState(),
   secrets: secretsAdapter.getInitialState(),
-  isDirty: {},
+  isDirty: false,
   selectedProviderId: null,
   fetchStatus: "idle",
   fetchErrors: {},
@@ -53,6 +55,7 @@ export const secretsManagerSlice = createSlice({
 
     setSelectedProviderId(state, action: PayloadAction<string | null>) {
       state.selectedProviderId = action.payload;
+      state.isDirty = false;
     },
 
     upsertSecrets(state, action: PayloadAction<SecretValue[]>) {
@@ -62,7 +65,7 @@ export const secretsManagerSlice = createSlice({
       const { providerId, secrets } = action.payload;
       removeSecretsForProvider(state, providerId);
       secretsAdapter.upsertMany(state.secrets, secrets);
-      state.isDirty[providerId] = false;
+      state.isDirty = false;
     },
     removeSecret(state, action: PayloadAction<string>) {
       secretsAdapter.removeOne(state.secrets, action.payload);
@@ -89,19 +92,19 @@ export const secretsManagerSlice = createSlice({
         versionId: "",
       };
       secretsAdapter.addOne(state.secrets, stub);
-      state.isDirty[providerId] = true;
+      state.isDirty = true;
     },
 
     removeSecretEntry(state, action: PayloadAction<{ providerId: string; secretRefId: string }>) {
       secretsAdapter.removeOne(state.secrets, action.payload.secretRefId);
-      state.isDirty[action.payload.providerId] = true;
+      state.isDirty = true;
     },
 
     unsafePatchSecret(state, action: PayloadAction<{ id: string; patcher: (secret: SecretValue) => void }>) {
       const secret = state.secrets.entities[action.payload.id];
       if (secret) {
         action.payload.patcher(secret);
-        state.isDirty[secret.providerId] = true;
+        state.isDirty = true;
       }
     },
   },
@@ -117,7 +120,7 @@ export const secretsManagerSlice = createSlice({
 
         removeSecretsForProvider(state, providerId);
         secretsAdapter.upsertMany(state.secrets, secrets);
-        state.isDirty[providerId] = false;
+        state.isDirty = false;
 
         const errorMap: Record<string, string> = {};
         for (const err of errors) {
@@ -138,7 +141,7 @@ export const secretsManagerSlice = createSlice({
 
         removeSecretsForProvider(state, providerId);
         secretsAdapter.upsertMany(state.secrets, action.payload);
-        state.isDirty[providerId] = false;
+        state.isDirty = false;
       })
       .addCase(listSecrets.rejected, (state) => {
         state.fetchStatus = "failed";
@@ -148,3 +151,14 @@ export const secretsManagerSlice = createSlice({
 
 export const secretsManagerActions = secretsManagerSlice.actions;
 export const secretsManagerReducer = secretsManagerSlice.reducer;
+
+const secretsManagerPersistConfig = {
+  key: "secrets_manager",
+  storage,
+  whitelist: ["selectedProviderId"],
+};
+
+export const secretsManagerReducerWithPersist = persistReducer(
+  secretsManagerPersistConfig,
+  secretsManagerSlice.reducer
+);

@@ -1,4 +1,9 @@
-export { secretsManagerSlice, secretsManagerActions, secretsManagerReducer } from "./slice";
+export {
+  secretsManagerSlice,
+  secretsManagerActions,
+  secretsManagerReducer,
+  secretsManagerReducerWithPersist,
+} from "./slice";
 export {
   selectAllSecretProviders,
   selectSecretProviderById,
