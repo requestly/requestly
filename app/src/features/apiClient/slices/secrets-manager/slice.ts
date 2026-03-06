@@ -9,6 +9,8 @@ import {
 import { SecretsManagerState } from "./types";
 import { fetchAndSaveSecretsForProvider, listSecrets } from "./thunks";
 import { providersAdapter, secretsAdapter } from "./adapters";
+import persistReducer from "redux-persist/es/persistReducer";
+import storage from "redux-persist/lib/storage";
 
 export { providersAdapter, secretsAdapter } from "./adapters";
 
@@ -149,3 +151,14 @@ export const secretsManagerSlice = createSlice({
 
 export const secretsManagerActions = secretsManagerSlice.actions;
 export const secretsManagerReducer = secretsManagerSlice.reducer;
+
+const secretsManagerPersistConfig = {
+  key: "secrets_manager",
+  storage,
+  whitelist: ["selectedProviderId"],
+};
+
+export const secretsManagerReducerWithPersist = persistReducer(
+  secretsManagerPersistConfig,
+  secretsManagerSlice.reducer
+);
