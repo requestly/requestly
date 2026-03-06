@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { AiOutlineQuestionCircle } from "@react-icons/all-files/ai/AiOutlineQuestionCircle";
 import { RQBreadcrumb, RQButton } from "lib/design-system-v2/components";
 import FilterIcon from "assets/icons/filter-manage.svg?react";
@@ -25,6 +25,8 @@ const SecretsLayout = ({ children }: { children?: React.ReactNode }) => {
   } = useSecretsModals();
 
   const { addEdit, delete: deleteModal } = modals;
+  const [isTestingConnection, setIsTestingConnection] = useState(false);
+  const [isSavingProvider, setIsSavingProvider] = useState(false);
 
   const currentPath = window.location.pathname;
   const isOnManageProvidersPage = currentPath.includes(PATHS.SETTINGS.SECRETS.MANAGE_PROVIDERS);
@@ -41,11 +43,21 @@ const SecretsLayout = ({ children }: { children?: React.ReactNode }) => {
     if (!addEdit.isOpen) {
       return;
     }
-    saveProvider(addEdit.formData);
+    setIsSavingProvider(true);
+    try {
+      await saveProvider(addEdit.formData);
+    } finally {
+      setIsSavingProvider(false);
+    }
   };
 
   const handleTestConnection = async () => {
-    testConnection();
+    setIsTestingConnection(true);
+    try {
+      await testConnection();
+    } finally {
+      setIsTestingConnection(false);
+    }
   };
 
   const handleDelete = async () => {
@@ -99,7 +111,9 @@ const SecretsLayout = ({ children }: { children?: React.ReactNode }) => {
         onClose={closeAddEditProviderModal}
         onSave={handleSave}
         onTestConnection={handleTestConnection}
-        isLoading={addEdit.isOpen ? addEdit.isLoading : false}
+        isFetchingConfig={addEdit.isOpen ? addEdit.isFetchingConfig : false}
+        isTestingConnection={isTestingConnection}
+        isSavingProvider={isSavingProvider}
       />
 
       <DeleteProviderModal

@@ -41,7 +41,7 @@ type AddEditModalState =
       mode: "add" | "edit";
       editingProviderId?: string;
       formData: ProviderData;
-      isLoading: boolean;
+      isFetchingConfig: boolean;
     };
 
 type DeleteModalState =
@@ -102,7 +102,7 @@ export const SecretsModalsProvider: React.FC<{ children: React.ReactNode }> = ({
         isOpen: true,
         mode: "add",
         formData: { ...DEFAULT_FORM_DATA },
-        isLoading: false,
+        isFetchingConfig: false,
       },
     }));
   }, []);
@@ -115,7 +115,7 @@ export const SecretsModalsProvider: React.FC<{ children: React.ReactNode }> = ({
         mode: "edit",
         editingProviderId: providerId,
         formData: { ...DEFAULT_FORM_DATA },
-        isLoading: true,
+        isFetchingConfig: true,
       },
     }));
 
@@ -143,7 +143,7 @@ export const SecretsModalsProvider: React.FC<{ children: React.ReactNode }> = ({
             mode: "edit",
             editingProviderId: providerId,
             formData: { ...data },
-            isLoading: false,
+            isFetchingConfig: false,
           },
         };
       });
@@ -190,13 +190,6 @@ export const SecretsModalsProvider: React.FC<{ children: React.ReactNode }> = ({
     setModals((prev) => ({ ...prev, delete: { isOpen: false } }));
   }, []);
 
-  const setAddEditLoading = useCallback((isLoading: boolean, error?: string) => {
-    setModals((prev) => {
-      if (!prev.addEdit.isOpen) return prev;
-      return { ...prev, addEdit: { ...prev.addEdit, isLoading, error } };
-    });
-  }, []);
-
   const saveProvider = useCallback(
     async (formData: ProviderData) => {
       const addEditState = modalsRef.current.addEdit;
@@ -214,12 +207,10 @@ export const SecretsModalsProvider: React.FC<{ children: React.ReactNode }> = ({
       toast.success(`Provider ${mode === "add" ? "added" : "updated"} successfully and is now active`);
       setModals((prev) => ({ ...prev, addEdit: { isOpen: false } }));
     },
-    [dispatch, setAddEditLoading]
+    [dispatch]
   );
 
   const testConnection = useCallback(async () => {
-    setAddEditLoading(true, undefined);
-
     try {
       const addEditState = modalsRef.current.addEdit;
       if (!addEditState.isOpen) {
@@ -240,12 +231,10 @@ export const SecretsModalsProvider: React.FC<{ children: React.ReactNode }> = ({
       } else {
         notifyError(`Connection test failed`, "Please check your credentials.");
       }
-
-      setAddEditLoading(false, result.data ? undefined : "Connection test failed");
     } catch (error) {
       notifyError(`Connection test failed`, error instanceof Error ? error.message : "Connection test failed");
     }
-  }, [setAddEditLoading]);
+  }, []);
 
   const deleteProvider = useCallback(async () => {
     const deleteState = modalsRef.current.delete;
@@ -270,7 +259,7 @@ export const SecretsModalsProvider: React.FC<{ children: React.ReactNode }> = ({
       const errorMessage = error instanceof Error ? error.message : "Failed to delete provider";
       notifyError(`Failed to delete provider`, errorMessage);
     }
-  }, []);
+  }, [dispatch]);
 
   const value: SecretsModalsContextValue = {
     modals,
