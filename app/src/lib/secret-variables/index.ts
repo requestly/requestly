@@ -14,6 +14,7 @@ export class SecretVariablesService {
   }
 
   private buildSourceFromAwsSecrets(secrets: AwsSecretValue[]): SecretVariable[] {
+    // would be fixed in subsequent PRs
     return secrets.map((secret) => ({
       name: secret.secretReference.alias,
       value: secret.value,
