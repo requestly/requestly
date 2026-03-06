@@ -8,6 +8,8 @@ import { GraphQLScripts } from "./components/GraphQLAuthView/GraphQLScripts";
 import { RQButton } from "lib/design-system/components";
 import { MdOutlineBallot } from "@react-icons/all-files/md/MdOutlineBallot";
 import { BufferedGraphQLRecordEntity } from "features/apiClient/slices/entities";
+import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
+import { RQAPI } from "features/apiClient/types";
 
 enum GraphQLRequestTab {
   QUERY = "query",
@@ -31,6 +33,8 @@ export const GraphQLRequestTabs: React.FC<Props> = ({
   focusPostResponseScriptEditor,
   scriptEditorVersion,
 }) => {
+  const entityType = useApiClientSelector((s) => entity.getType(s));
+
   const tabItems = useMemo(() => {
     return [
       {
@@ -53,24 +57,35 @@ export const GraphQLRequestTabs: React.FC<Props> = ({
           </div>
         ),
       },
-      {
-        key: GraphQLRequestTab.AUTHORIZATION,
-        label: <RequestTabLabel label="Authorization" />,
-        children: <GraphQLAuthView entity={entity} />,
-      },
-      {
-        key: GraphQLRequestTab.SCRIPTS,
-        label: <RequestTabLabel label="Scripts" />,
-        children: (
-          <GraphQLScripts
-            key={`${scriptEditorVersion}`}
-            entity={entity}
-            focusPostResponse={focusPostResponseScriptEditor}
-          />
-        ),
-      },
+      ...(entityType === RQAPI.RecordType.API
+        ? [
+            {
+              key: GraphQLRequestTab.AUTHORIZATION,
+              label: <RequestTabLabel label="Authorization" />,
+              children: <GraphQLAuthView entity={entity} />,
+            },
+            {
+              key: GraphQLRequestTab.SCRIPTS,
+              label: <RequestTabLabel label="Scripts" />,
+              children: (
+                <GraphQLScripts
+                  key={`${scriptEditorVersion}`}
+                  entity={entity}
+                  focusPostResponse={focusPostResponseScriptEditor}
+                />
+              ),
+            },
+          ]
+        : []),
     ];
-  }, [entity, setIsSchemaBuilderOpen, isSchemaBuilderOpen, scriptEditorVersion, focusPostResponseScriptEditor]);
+  }, [
+    entity,
+    isSchemaBuilderOpen,
+    setIsSchemaBuilderOpen,
+    entityType,
+    scriptEditorVersion,
+    focusPostResponseScriptEditor,
+  ]);
   return (
     <div style={{ position: "relative", height: "100%", overflow: "hidden" }}>
       <ApiClientRequestTabs
