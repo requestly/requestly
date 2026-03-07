@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo, useEffect } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import { Table, Tag, Button, Dropdown, Tooltip, Checkbox, Popover, Input } from "antd";
 import type { ColumnsType } from "antd/lib/table";
 import { useSelector, useDispatch } from "react-redux";
@@ -22,6 +22,7 @@ import { parseSecretKeyValues } from "../../utils/parseSecretKeyValues";
 import "./secretsTable.scss";
 import { deleteSecret } from "features/apiClient/slices/secrets-manager/thunks";
 import clsx from "clsx";
+import { RQButton } from "lib/design-system-v2/components/RQButton/RQButton";
 
 type TableRow = AwsSecretValue & { key: string };
 
@@ -65,12 +66,6 @@ const SecretsTable: React.FC<SecretsTableProps> = ({ onViewKeyValues }) => {
 
   const [showVersionId, setShowVersionId] = useState(false);
   const [visibleIds, setVisibleIds] = useState<Set<string>>(new Set());
-
-  useEffect(() => {
-    if (secrets?.length === 0 && selectedProviderId) {
-      dispatch(secretsManagerActions.addSecretEntry({ providerId: selectedProviderId }));
-    }
-  }, [dispatch, secrets?.length, selectedProviderId]);
 
   const toggleVisibility = useCallback((id: string) => {
     setVisibleIds((prev) => {
@@ -297,10 +292,13 @@ const SecretsTable: React.FC<SecretsTableProps> = ({ onViewKeyValues }) => {
       tableLayout="fixed"
       rowClassName={(row) => (isStubRow(row) ? "draft-row" : "")}
       footer={() => (
-        <Button type="text" icon={<FiPlus />} className="add-secret-btn" onClick={handleAddClick}>
+        <RQButton type="transparent" icon={<FiPlus />} className="add-secret-btn" onClick={handleAddClick}>
           Add
-        </Button>
+        </RQButton>
       )}
+      locale={{
+        emptyText: () => null,
+      }}
     />
   );
 };
