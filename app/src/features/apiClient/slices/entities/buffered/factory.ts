@@ -6,7 +6,6 @@ import { BufferedEnvironmentEntity, BufferedGlobalEnvironmentEntity } from "./en
 import { BufferedRuntimeVariablesEntity } from "./runtime-variables";
 import { BufferedCollectionRecordEntity } from "./collection";
 import { BufferedRunConfigEntity } from "./runConfig";
-import { BufferedSecretProviderEntity, BufferedSecretValueEntity } from "./secretsManager";
 import type { ApiClientEntity, ApiClientEntityMeta } from "../base";
 
 export type BufferedApiClientEntityMeta = ApiClientEntityMeta & { referenceId: string } & (
@@ -37,10 +36,6 @@ export namespace BufferedEntityFactory {
     ? BufferedCollectionRecordEntity
     : T extends ApiClientEntityType.RUN_CONFIG
     ? BufferedRunConfigEntity
-    : T extends ApiClientEntityType.SECRET_PROVIDER
-    ? BufferedSecretProviderEntity
-    : T extends ApiClientEntityType.SECRET_VALUE
-    ? BufferedSecretValueEntity
     : never;
 
   export function from<T extends ApiClientEntityType>(
@@ -65,10 +60,6 @@ export namespace BufferedEntityFactory {
           return new BufferedCollectionRecordEntity(dispatch, meta);
         case ApiClientEntityType.RUN_CONFIG:
           return new BufferedRunConfigEntity(dispatch, meta);
-        case ApiClientEntityType.SECRET_PROVIDER:
-          return new BufferedSecretProviderEntity(dispatch, meta);
-        case ApiClientEntityType.SECRET_VALUE:
-          return new BufferedSecretValueEntity(dispatch, meta);
       }
     })() as EntityTypeMap<T>;
 
