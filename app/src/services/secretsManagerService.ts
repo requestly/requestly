@@ -12,13 +12,23 @@ import { ProviderData } from "features/settings/secrets-manager/context/SecretsM
 type SecretsResult<T> = { type: "success"; data: T } | { type: "error"; error: { code: string; message: string } };
 type SecretsVoidResult = { type: "success" } | { type: "error"; error: { code: string; message: string } };
 
+export interface SecretFetchError {
+  secretRefId: string;
+  message: string;
+}
+
+export interface FetchSecretsResultData {
+  secrets: SecretValue[];
+  errors: SecretFetchError[];
+}
+
 const invokeMainEvent = <T = unknown>(channel: string, payload?: Record<string, unknown>): Promise<T> => {
   return window.RQ.DESKTOP.SERVICES.IPC.invokeEventInMain(channel, payload);
 };
 
 export const secretsManagerService = {
-  init: (): Promise<SecretsVoidResult> => {
-    return invokeMainEvent("secretsManager:init");
+  init: (userId: string): Promise<SecretsVoidResult> => {
+    return invokeMainEvent("secretsManager:init", { userId });
   },
 
   subscribeToProvidersChange: (callback: (providers: SecretProviderMetadata[]) => void): void => {
@@ -67,8 +77,23 @@ export const secretsManagerService = {
     return invokeMainEvent("secretsManager:getSecretValues", { secrets });
   },
 
-  refreshSecrets: (providerId: string): Promise<SecretsResult<(SecretValue | null)[]>> => {
-    return invokeMainEvent("secretsManager:refreshSecrets", { providerId });
+  fetchAndSaveSecrets: (
+    providerId: string,
+    secretRefs: SecretReference[]
+  ): Promise<SecretsResult<FetchSecretsResultData>> => {
+    return invokeMainEvent("secretsManager:fetchAndSaveSecrets", { providerId, secretRefs });
+  },
+
+  listSecrets: (providerId: string): Promise<SecretsResult<SecretValue[]>> => {
+    return invokeMainEvent("secretsManager:listSecrets", { providerId });
+  },
+
+  removeSecretValue: (providerId: string, secretReference: SecretReference): Promise<SecretsVoidResult> => {
+    return invokeMainEvent("secretsManager:removeSecretValue", { providerId, secretReference });
+  },
+
+  removeSecretValues: (secrets: Array<{ providerId: string; ref: SecretReference }>): Promise<SecretsVoidResult> => {
+    return invokeMainEvent("secretsManager:removeSecretValues", { secrets });
   },
 };
 

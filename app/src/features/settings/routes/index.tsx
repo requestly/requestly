@@ -36,29 +36,30 @@ export const settingRoutes: RouteObject[] = [
         path: PATHS.SETTINGS.DESKTOP_SETTINGS.RELATIVE,
         element: <DesktopSettings />,
       },
-      // Desktop-only Secrets route
-      ...(isDesktopMode()
-        ? [
-            {
-              path: PATHS.SETTINGS.SECRETS.RELATIVE,
-              element: (
-                <SecretsModalsProvider>
-                  <SecretsLayout />
-                </SecretsModalsProvider>
-              ),
-              children: [
+
+      {
+        path: PATHS.SETTINGS.SECRETS.RELATIVE,
+        element: (
+          <SecretsModalsProvider>
+            <SecretsLayout />
+          </SecretsModalsProvider>
+        ),
+        children: [
+          {
+            index: true,
+            element: <Secrets />,
+          },
+          ...(isDesktopMode()
+            ? [
                 {
-                  index: true,
-                  element: <Secrets />,
-                },
-                {
-                  path: PATHS.SETTINGS.SECRETS.MANAGE_PROVIDERS, // This is a nested route for managing providers
+                  path: PATHS.SETTINGS.SECRETS.MANAGE_PROVIDERS.RELATIVE, // This is a nested route for managing providers
                   element: <ManageProviders />,
                 },
-              ],
-            },
-          ]
-        : []),
+              ]
+            : []),
+        ],
+      },
+
       {
         path: PATHS.SETTINGS.SESSION_BOOK.RELATIVE,
         element: (

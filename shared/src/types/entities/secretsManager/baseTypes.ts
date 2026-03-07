@@ -25,5 +25,7 @@ export interface ProviderConfig<T extends SecretProviderType, C> {
  * @template T - The provider type
  */
 export interface SecretReference<T extends SecretProviderType> {
+  id: string;
   type: T;
+  alias: string;
 }

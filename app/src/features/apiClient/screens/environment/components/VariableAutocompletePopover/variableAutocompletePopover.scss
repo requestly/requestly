@@ -4,16 +4,20 @@
     display: flex;
     width: 240px !important;
     max-height: 400px !important;
-    padding: var(--space-3, 6px);
+    padding: var(--space-2, 4px);
     flex-direction: column;
     align-items: flex-start;
-    gap: var(--space-1, 2px);
+    gap: 0;
     border-radius: 4px;
     border: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
     background: var(--requestly-color-surface-1, #282828);
     box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.16);
     overflow-y: auto;
     overflow-x: hidden;
+
+    ::-webkit-scrollbar {
+      display: none;
+    }
   }
 
   .ant-popover-arrow {
@@ -21,16 +25,24 @@
   }
 
   &.variable-autocomplete-submenu {
-    .ant-popover-inner-content {
+    width: 140px !important;
+    margin-left: -10px !important;
+    .ant-popover-inner {
       margin-top: 0;
+      width: 140px !important;
+      margin-left: -10px !important;
+
+      .variable-autocomplete-item {
+        width: 130px !important;
+      }
     }
   }
 
   .variable-autocomplete-item {
     display: flex;
-    padding: var(--space-3, 6px) !important;
+    padding: var(--space-3, 6px) var(--space-2, 4px) !important;
     flex-direction: row;
-    width: 225px;
+    width: 230px !important;
     border-bottom: none !important;
     justify-content: space-between;
     border-radius: 4px;
@@ -94,6 +106,94 @@
       white-space: nowrap !important;
       max-width: 160px;
       flex-shrink: 1;
+    }
+  }
+}
+
+.secrets-hint-footer {
+  padding: var(--space-3, 6px) var(--space-2, 4px);
+  color: var(--requestly-color-text-subtle, rgba(255, 255, 255, 0.45));
+  font-family: var(--font-family-default, Inter);
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 16px;
+  border-top: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
+  margin-top: var(--space-2, 4px);
+}
+
+.secrets-autocomplete-footer {
+  width: 230px !important;
+  border-top: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
+  margin-top: var(--space-2, 4px);
+  padding-top: var(--space-2, 4px);
+
+  .secrets-add-alias-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3, 6px);
+    padding: var(--space-3, 6px) var(--space-2, 4px);
+    margin: 0;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.15s ease;
+    color: var(--requestly-color-text-subtle, #bbb);
+    font-family: var(--font-family-default, Inter);
+    font-size: var(--font-size-xs, 11px);
+    font-style: normal;
+    font-weight: 400;
+    line-height: 17px; /* 154.545% */
+
+    &:hover {
+      background-color: var(--requestly-color-white-t-10);
+    }
+
+    .add-alias-icon {
+      font-size: 12px;
+      font-weight: 400;
+    }
+  }
+
+  .secrets-active-instance {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 4px;
+    padding: var(--space-3, 6px) var(--space-2, 4px);
+    margin: 0;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.15s ease;
+
+    &:hover {
+      background-color: var(--requestly-color-white-t-10);
+    }
+
+    .active-instance-label {
+      color: var(--requeslty-color-text-subtle, #bbb);
+      font-family: var(--font-family-default, Inter);
+      font-size: var(--font-size-xs, 11px);
+      font-style: normal;
+      font-weight: 500;
+      line-height: 17px; /* 154.545% */
+
+      .active-instance-name {
+        color: var(--requestly-color-text-default, #fff);
+        text-align: center;
+        font-family: var(--font-family-default, Inter);
+        font-size: var(--font-size-xs, 11px);
+        font-style: normal;
+        font-weight: 400;
+        line-height: 17px;
+      }
+    }
+
+    .active-instance-link-icon {
+      color: var(--alias-tokens-color-text-subtle, #bbb);
+      text-align: center;
+      font-family: "Material Symbols Outlined";
+      font-size: 12px;
+      font-style: normal;
+      font-weight: 400;
     }
   }
 }

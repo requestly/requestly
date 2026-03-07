@@ -1,5 +1,5 @@
 import { createSelector } from "@reduxjs/toolkit";
-import { providersAdapter, secretsAdapter } from "./slice";
+import { providersAdapter, secretsAdapter } from "./adapters";
 import { SecretsManagerState } from "./types";
 
 type RootState = { secretsManager: SecretsManagerState };
@@ -31,7 +31,18 @@ export const selectSecretsForSelectedProvider = createSelector(
   }
 );
 
-export const selectLastFetchedForSelectedProvider = createSelector([selectSecretsForSelectedProvider], (secrets) => {
-  if (secrets.length === 0) return null;
-  return Math.max(...secrets.map((s) => s.fetchedAt));
+export const selectSecretsByProviderId = createSelector([selectAllSecrets], (secrets) => (providerId: string) => {
+  return secrets.filter((s) => s.providerId === providerId);
 });
+
+export const selectLastFetchedForSelectedProvider = createSelector([selectSecretsForSelectedProvider], (secrets) => {
+  const fetched = secrets.filter((s) => s.fetchedAt > 0);
+  if (fetched.length === 0) return null;
+  return Math.max(...fetched.map((s) => s.fetchedAt));
+});
+
+export const selectIsDirtyForSelectedProvider = createSelector(selectSecretsManagerSlice, (slice) => slice.isDirty);
+
+export const selectFetchErrors = createSelector(selectSecretsManagerSlice, (slice) => slice.fetchErrors);
+
+export const selectValidationErrors = createSelector(selectSecretsManagerSlice, (slice) => slice.validationErrors);

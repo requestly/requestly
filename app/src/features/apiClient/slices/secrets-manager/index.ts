@@ -1,4 +1,9 @@
-export { secretsManagerSlice, secretsManagerActions, secretsManagerReducer, getSecretId } from "./slice";
+export {
+  secretsManagerSlice,
+  secretsManagerActions,
+  secretsManagerReducer,
+  secretsManagerReducerWithPersist,
+} from "./slice";
 export {
   selectAllSecretProviders,
   selectSecretProviderById,
@@ -7,7 +12,19 @@ export {
   selectSelectedProviderId,
   selectFetchStatus,
   selectSecretsForSelectedProvider,
+  selectSecretsByProviderId,
   selectLastFetchedForSelectedProvider,
+  selectIsDirtyForSelectedProvider,
+  selectFetchErrors,
+  selectValidationErrors,
 } from "./selectors";
-export { initAndSubscribeSecretsManager, fetchSecretProviders, fetchSecretsForProvider } from "./thunks";
+export {
+  initAndSubscribeSecretsManager,
+  fetchSecretProviders,
+  fetchAndSaveSecretsForProvider,
+  saveProvider,
+  deleteProvider,
+  deleteSecret,
+  listSecrets,
+} from "./thunks";
 export type { SecretsManagerState, FetchStatus } from "./types";

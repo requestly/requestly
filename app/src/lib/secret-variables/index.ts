@@ -1,37 +1,36 @@
 import { AwsSecretValue } from "@requestly/shared/types/entities/secretsManager";
 import { VariableScope } from "../../backend/environment/types";
+import { parseSecretKeyValues } from "../../features/settings/secrets-manager/utils/parseSecretKeyValues";
 import { SecretVariable } from "./types";
 
 const SECRETS_PREFIX = "secrets:";
 
 export type SecretsSource = () => SecretVariable[];
 
-function defaultSource(): SecretVariable[] {
-  return [
-    { name: "apple", value: "red", id: "apple", scope: VariableScope.SECRETS },
-    { name: "banana", value: "yellow", id: "banana", scope: VariableScope.SECRETS },
-    { name: "cherry", value: "red", id: "cherry", scope: VariableScope.SECRETS },
-    { name: "cities.newYork", value: "New York", id: "cities.newYork", scope: VariableScope.SECRETS },
-    { name: "cities.losAngeles", value: "Los Angeles", id: "cities.losAngeles", scope: VariableScope.SECRETS },
-    { name: "cities.chicago", value: "Chicago", id: "cities.chicago", scope: VariableScope.SECRETS },
-  ];
-}
-
 export class SecretVariablesService {
-  private source: SecretsSource = defaultSource;
+  private source: SecretsSource = () => [];
 
   setSource(source: SecretsSource): void {
     this.source = source;
   }
 
   private buildSourceFromAwsSecrets(secrets: AwsSecretValue[]): SecretVariable[] {
-    // would be fixed in subsequent PRs
-    return secrets.map((secret) => ({
-      name: secret.secretReference.alias,
-      value: secret.value,
-      id: secret.secretReference.id,
-      scope: VariableScope.SECRETS,
-    }));
+    return secrets.flatMap((secret) => {
+      const alias = secret.secretReference.alias;
+      const id = secret.secretReference.id;
+      const keyValues = parseSecretKeyValues(secret.value);
+
+      if (keyValues && keyValues.length > 0) {
+        return keyValues.map((kv) => ({
+          name: `${alias}.${kv.key}`,
+          value: kv.value,
+          id: `${id}.${kv.key}`,
+          scope: VariableScope.SECRETS,
+        }));
+      }
+
+      return [{ name: alias, value: secret.value, id, scope: VariableScope.SECRETS }];
+    });
   }
 
   updateSourceFromSecrets(secrets: AwsSecretValue[]): void {

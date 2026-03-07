@@ -10,8 +10,6 @@ export enum ApiClientEntityType {
   RUNTIME_VARIABLES = "runtime_variables",
   RUN_CONFIG = "run_config",
   LIVE_RUN_RESULT = "live_run_result",
-  SECRET_PROVIDER = "secret_provider",
-  SECRET_VALUE = "secret_value",
 }
 
 export type { DeepPartial, DeepPartialWithNull };

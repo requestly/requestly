@@ -7,7 +7,6 @@ export { HttpRecordEntity } from "./http";
 export { GraphQLRecordEntity } from "./graphql";
 export { EnvironmentEntity, GlobalEnvironmentEntity } from "./environment";
 export { LiveRunResultEntity } from "./liveRunResult";
-export { SecretProviderEntity, SecretValueEntity } from "./secretsManager";
 
 export { EntityFactory } from "./factory";
 
@@ -26,10 +25,4 @@ export {
   useHasBuffer,
 } from "./hooks";
 
-export {
-  BufferedEntityFactory,
-  BufferedHttpRecordEntity,
-  BufferedGraphQLRecordEntity,
-  BufferedSecretProviderEntity,
-  BufferedSecretValueEntity,
-} from "./buffered";
+export { BufferedEntityFactory, BufferedHttpRecordEntity, BufferedGraphQLRecordEntity } from "./buffered";

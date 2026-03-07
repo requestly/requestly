@@ -1,16 +1,17 @@
 import { Modal, Tooltip } from "antd";
-import "./index.scss";
 import { RQButton } from "lib/design-system-v2/components";
 import NetworkPingIcon from "assets/icons/network-ping.svg?react";
 import { InputField } from "../../components/InputField/InputField";
 import { SelectField } from "../../components/SelectField/Index";
+import { AutoCompleteField } from "../../components/AutoCompleteField/Index";
 import { authMethodOptions, regionsList, secretManagerOptions } from "../../consts/dropdownOptions";
 import { InputPasswordField } from "../../components/InputField/InputPasswordField";
 import { InfoCircleOutlined } from "@ant-design/icons";
 import { ProviderData } from "../../context/SecretsModalsContext";
 import { SecretProviderType } from "@requestly/shared/types/entities/secretsManager";
+import "./addSecretsModal.scss";
 
-interface AddEditProviderModalProps {
+interface AddSecretsProviderModalProps {
   mode: "add" | "edit";
   open: boolean;
   providerData: ProviderData;
@@ -18,7 +19,9 @@ interface AddEditProviderModalProps {
   onClose: () => void;
   onSave: () => void | Promise<void>;
   onTestConnection: () => void | Promise<void>;
-  isLoading?: boolean;
+  isFetchingConfig?: boolean;
+  isTestingConnection?: boolean;
+  isSavingProvider?: boolean;
   error?: string;
 }
 
@@ -28,7 +31,7 @@ const errorSuffix = (error: string) => (
   </Tooltip>
 );
 
-export const AddEditProviderModal = ({
+export const AddSecretsProviderModal = ({
   mode,
   open,
   providerData,
@@ -36,35 +39,51 @@ export const AddEditProviderModal = ({
   onClose,
   onSave,
   onTestConnection,
-  isLoading = false,
+  isFetchingConfig = false,
+  isTestingConnection = false,
+  isSavingProvider = false,
   error,
-}: AddEditProviderModalProps) => {
+}: AddSecretsProviderModalProps) => {
+  const isFormValid = Boolean(
+    providerData.instanceName.trim() &&
+      providerData.accessKey.trim() &&
+      providerData.secretKey.trim() &&
+      providerData.region
+  );
+
+  const isBusy = isTestingConnection || isSavingProvider;
+  const disabledTooltip = !isFormValid ? "Please fill all required fields" : "";
+
   const header = <p className="add-edit-provider-modal-header">{mode === "add" ? "Add provider" : "Edit provider"}</p>;
   const footer = (
     <div className="add-edit-provider-modal-footer">
-      <RQButton
-        type="secondary"
-        className="test-connection-button"
-        onClick={onTestConnection}
-        icon={<NetworkPingIcon />}
-        loading={isLoading}
-        disabled={isLoading}
-      >
-        Test connection
-      </RQButton>
+      <Tooltip title={disabledTooltip}>
+        <RQButton
+          type="transparent"
+          className="test-connection-button"
+          onClick={onTestConnection}
+          icon={<NetworkPingIcon />}
+          loading={isTestingConnection}
+          disabled={!isFormValid || isBusy}
+        >
+          Test connection
+        </RQButton>
+      </Tooltip>
       <div className="footer-right-section">
-        <RQButton type="secondary" className="cancel-button" onClick={onClose} disabled={isLoading}>
+        <RQButton type="secondary" className="cancel-button" onClick={onClose} disabled={isBusy}>
           Cancel
         </RQButton>
-        <RQButton
-          type="secondary"
-          className="add-provider-button"
-          onClick={onSave}
-          loading={isLoading}
-          disabled={isLoading}
-        >
-          {mode === "add" ? "Add provider" : "Save changes"}
-        </RQButton>
+        <Tooltip title={disabledTooltip}>
+          <RQButton
+            type="secondary"
+            className="add-provider-button"
+            onClick={onSave}
+            loading={isSavingProvider}
+            disabled={!isFormValid || isBusy}
+          >
+            {mode === "add" ? "Add provider" : "Save changes"}
+          </RQButton>
+        </Tooltip>
       </div>
     </div>
   );
@@ -78,7 +97,6 @@ export const AddEditProviderModal = ({
       destroyOnClose={true}
       className="add-edit-provider-modal"
       wrapClassName="add-edit-provider-modal-wrap"
-      zIndex={1050}
       onCancel={onClose}
       footer={footer}
     >
@@ -90,7 +108,7 @@ export const AddEditProviderModal = ({
           onValueChange={(value) => onChange({ instanceName: value })}
           status={error ? "error" : undefined}
           suffix={error ? errorSuffix(error) : undefined}
-          disabled={isLoading}
+          disabled={isFetchingConfig || isSavingProvider}
         />
         <SelectField
           label="Secret manager"
@@ -98,44 +116,44 @@ export const AddEditProviderModal = ({
           value={providerData.secretManagerType}
           options={secretManagerOptions}
           handleFilterChange={(value: string) => onChange({ secretManagerType: value as SecretProviderType })}
-          disabled={isLoading}
+          disabled={isFetchingConfig || isSavingProvider}
         />
         <SelectField
           label="Auth method"
           options={authMethodOptions}
           id="auth-method"
           value={providerData.authMethod}
-          handleFilterChange={(value: string) => onChange({ authMethod: value })}
-          disabled={isLoading}
+          handleFilterChange={(value: "manual" | "aws") => onChange({ authMethod: value })}
+          disabled={isFetchingConfig || isSavingProvider}
         />
         <InputPasswordField
           label="Access key"
           id="access-key"
           value={providerData.accessKey}
           onValueChange={(value) => onChange({ accessKey: value })}
-          disabled={isLoading}
+          disabled={isFetchingConfig || isSavingProvider}
         />
         <InputPasswordField
           label="Secret key"
           id="secret-key"
           value={providerData.secretKey}
           onValueChange={(value) => onChange({ secretKey: value })}
-          disabled={isLoading}
+          disabled={isFetchingConfig || isSavingProvider}
         />
         <InputPasswordField
           label="Session token"
           id="session-token"
           value={providerData.sessionToken || ""}
           onValueChange={(value) => onChange({ sessionToken: value })}
-          disabled={isLoading}
+          disabled={isFetchingConfig || isSavingProvider}
         />
-        <SelectField
+        <AutoCompleteField
           label="Region"
           options={regionsList}
           id="region"
           value={providerData.region}
           handleFilterChange={(value: string) => onChange({ region: value })}
-          disabled={isLoading}
+          disabled={isFetchingConfig || isSavingProvider}
         />
       </div>
     </Modal>

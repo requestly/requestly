@@ -1,4 +1,4 @@
-import { createSlice, createEntityAdapter, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { SECRETS_MANAGER_SLICE_NAME } from "../common/constants";
 import {
   SecretProviderMetadata,
@@ -7,72 +7,28 @@ import {
   AwsSecretValue,
 } from "@requestly/shared/types/entities/secretsManager";
 import { SecretsManagerState } from "./types";
-import { fetchSecretProviders, fetchSecretsForProvider } from "./thunks";
+import { fetchAndSaveSecretsForProvider, listSecrets } from "./thunks";
+import { providersAdapter, secretsAdapter } from "./adapters";
+import persistReducer from "redux-persist/es/persistReducer";
+import storage from "redux-persist/lib/storage";
 
-export const providersAdapter = createEntityAdapter<SecretProviderMetadata>({
-  selectId: (provider) => provider.id,
-});
-
-export const secretsAdapter = createEntityAdapter<SecretValue>({
-  selectId: (value) => getSecretId(value),
-});
-
-export function getSecretId(secret: SecretValue): string {
-  return `name:${secret.secretReference.identifier};version:${secret.secretReference.version ?? "latest"}`;
-}
-
-// TODO: Remove sample data once real provider/secret flows are fully wired
-const SAMPLE_PROVIDER_ID = "sample-provider-staging";
-
-const SAMPLE_PROVIDER: SecretProviderMetadata = {
-  id: SAMPLE_PROVIDER_ID,
-  type: SecretProviderType.AWS_SECRETS_MANAGER,
-  name: "Staging",
-  createdAt: Date.now(),
-  updatedAt: Date.now(),
-};
-
-const SAMPLE_SECRETS: AwsSecretValue[] = [
-  {
-    type: SecretProviderType.AWS_SECRETS_MANAGER,
-    providerId: SAMPLE_PROVIDER_ID,
-    secretReference: {
-      type: SecretProviderType.AWS_SECRETS_MANAGER,
-      identifier: "mysecret-a1b2",
-      version: "3sf3re-8er5-4er6-wer7-wereryy38",
-    },
-    fetchedAt: Date.now(),
-    name: "DB_PASSWORD",
-    value: "sk_test_supersecretpassword",
-    ARN: "arn:aws:secretsmanager:us-west-2:123456789012:secret:mysecret-a1b2",
-    versionId: "3sf3re-8er5-4er6-wer7-wereryy38",
-  },
-  {
-    type: SecretProviderType.AWS_SECRETS_MANAGER,
-    providerId: SAMPLE_PROVIDER_ID,
-    secretReference: {
-      type: SecretProviderType.AWS_SECRETS_MANAGER,
-      identifier: "stripe-keys",
-    },
-    fetchedAt: Date.now(),
-    name: "STRIPE_API_KEY",
-    value: '{"api_key":"sk_live_1234567890abcdef","web_sec":"whsec_abcdefghijklmnop"}',
-    ARN: "arn:aws:secretsmanager:us-east-1:123456789:secret:stripe-keys",
-    versionId: "",
-  },
-];
-// END TODO: Remove sample data
-
-// TODO: Remove sample data seeding
-const seededProviders = providersAdapter.setAll(providersAdapter.getInitialState(), [SAMPLE_PROVIDER]);
-const seededSecrets = secretsAdapter.setAll(secretsAdapter.getInitialState(), SAMPLE_SECRETS);
+export { providersAdapter, secretsAdapter } from "./adapters";
 
 const initialState: SecretsManagerState = {
-  providers: seededProviders,
-  secrets: seededSecrets,
-  selectedProviderId: SAMPLE_PROVIDER_ID,
+  providers: providersAdapter.getInitialState(),
+  secrets: secretsAdapter.getInitialState(),
+  isDirty: false,
+  selectedProviderId: null,
   fetchStatus: "idle",
+  fetchErrors: {},
+  validationErrors: {},
 };
+
+function removeSecretsForProvider(state: SecretsManagerState, providerId: string) {
+  const allSecrets = secretsAdapter.getSelectors().selectAll(state.secrets);
+  const idsToRemove = allSecrets.filter((s) => s.providerId === providerId).map((s) => s.secretReference.id);
+  secretsAdapter.removeMany(state.secrets, idsToRemove);
+}
 
 export const secretsManagerSlice = createSlice({
   name: SECRETS_MANAGER_SLICE_NAME,
@@ -99,10 +55,17 @@ export const secretsManagerSlice = createSlice({
 
     setSelectedProviderId(state, action: PayloadAction<string | null>) {
       state.selectedProviderId = action.payload;
+      state.isDirty = false;
     },
 
     upsertSecrets(state, action: PayloadAction<SecretValue[]>) {
       secretsAdapter.upsertMany(state.secrets, action.payload);
+    },
+    setSecretsForProvider(state, action: PayloadAction<{ providerId: string; secrets: SecretValue[] }>) {
+      const { providerId, secrets } = action.payload;
+      removeSecretsForProvider(state, providerId);
+      secretsAdapter.upsertMany(state.secrets, secrets);
+      state.isDirty = false;
     },
     removeSecret(state, action: PayloadAction<string>) {
       secretsAdapter.removeOne(state.secrets, action.payload);
@@ -110,26 +73,77 @@ export const secretsManagerSlice = createSlice({
     removeSecrets(state, action: PayloadAction<string[]>) {
       secretsAdapter.removeMany(state.secrets, action.payload);
     },
+
+    addSecretEntry(state, action: PayloadAction<{ providerId: string }>) {
+      const { providerId } = action.payload;
+      const stub: AwsSecretValue = {
+        type: SecretProviderType.AWS_SECRETS_MANAGER,
+        providerId,
+        secretReference: {
+          id: crypto.randomUUID(),
+          type: SecretProviderType.AWS_SECRETS_MANAGER,
+          alias: "",
+          identifier: "",
+        },
+        fetchedAt: 0,
+        name: "",
+        value: "",
+        ARN: "",
+        versionId: "",
+      };
+      secretsAdapter.addOne(state.secrets, stub);
+      state.isDirty = true;
+    },
+
+    removeSecretEntry(state, action: PayloadAction<{ providerId: string; secretRefId: string }>) {
+      secretsAdapter.removeOne(state.secrets, action.payload.secretRefId);
+      state.isDirty = true;
+    },
+
     unsafePatchSecret(state, action: PayloadAction<{ id: string; patcher: (secret: SecretValue) => void }>) {
       const secret = state.secrets.entities[action.payload.id];
       if (secret) {
         action.payload.patcher(secret);
+        state.isDirty = true;
       }
     },
   },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchSecretProviders.fulfilled, (state, action) => {
-        providersAdapter.setAll(state.providers, action.payload);
-      })
-      .addCase(fetchSecretsForProvider.pending, (state) => {
+      .addCase(fetchAndSaveSecretsForProvider.pending, (state) => {
         state.fetchStatus = "loading";
       })
-      .addCase(fetchSecretsForProvider.fulfilled, (state, action) => {
+      .addCase(fetchAndSaveSecretsForProvider.fulfilled, (state, action) => {
         state.fetchStatus = "succeeded";
-        secretsAdapter.upsertMany(state.secrets, action.payload);
+        const { providerId } = action.meta.arg;
+        const { secrets, errors, validationErrors } = action.payload;
+
+        removeSecretsForProvider(state, providerId);
+        secretsAdapter.upsertMany(state.secrets, secrets);
+        state.isDirty = false;
+
+        const errorMap: Record<string, string> = {};
+        for (const err of errors) {
+          errorMap[err.secretRefId] = err.message;
+        }
+        state.fetchErrors = errorMap;
+        state.validationErrors = validationErrors;
       })
-      .addCase(fetchSecretsForProvider.rejected, (state) => {
+      .addCase(fetchAndSaveSecretsForProvider.rejected, (state) => {
+        state.fetchStatus = "failed";
+      })
+      .addCase(listSecrets.pending, (state) => {
+        state.fetchStatus = "loading";
+      })
+      .addCase(listSecrets.fulfilled, (state, action) => {
+        state.fetchStatus = "succeeded";
+        const providerId = action.meta.arg;
+
+        removeSecretsForProvider(state, providerId);
+        secretsAdapter.upsertMany(state.secrets, action.payload);
+        state.isDirty = false;
+      })
+      .addCase(listSecrets.rejected, (state) => {
         state.fetchStatus = "failed";
       });
   },
@@ -137,3 +151,14 @@ export const secretsManagerSlice = createSlice({
 
 export const secretsManagerActions = secretsManagerSlice.actions;
 export const secretsManagerReducer = secretsManagerSlice.reducer;
+
+const secretsManagerPersistConfig = {
+  key: "secrets_manager",
+  storage,
+  whitelist: ["selectedProviderId"],
+};
+
+export const secretsManagerReducerWithPersist = persistReducer(
+  secretsManagerPersistConfig,
+  secretsManagerSlice.reducer
+);

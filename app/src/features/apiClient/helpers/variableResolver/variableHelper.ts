@@ -52,6 +52,8 @@ export function mergeAndParseAllVariables(scopedVariables?: ScopedVariables): Va
 }
 
 function matchFlatVariables(variables: Variables, search: string): AutocompleteItem[] {
+  // Skip showing non-secret variables when the search is for secrets
+
   return Object.entries(variables)
     .filter(([key, v]) => !checkIsSecretsVariable(v) && key.toLowerCase().includes(search))
     .map(([key, v]) => ({ name: key, displayName: key, variable: v, isNamespace: false }));

@@ -10,8 +10,10 @@ import {
   selectSelectedProviderId,
   selectLastFetchedForSelectedProvider,
   selectFetchStatus,
+  selectIsDirtyForSelectedProvider,
   secretsManagerActions,
-  fetchSecretsForProvider,
+  fetchAndSaveSecretsForProvider,
+  listSecrets,
 } from "features/apiClient/slices/secrets-manager";
 
 const { Option } = Select;
@@ -36,6 +38,7 @@ const ProviderDetails: React.FC<ProviderDetailsProps> = ({ onViewKeyValues }) =>
   const selectedProviderId = useSelector(selectSelectedProviderId);
   const lastFetchedTimestamp = useSelector(selectLastFetchedForSelectedProvider);
   const fetchStatus = useSelector(selectFetchStatus);
+  const isDirty = useSelector(selectIsDirtyForSelectedProvider);
 
   const isFetching = fetchStatus === "loading";
   const lastFetched = useMemo(() => (lastFetchedTimestamp ? formatRelativeTime(lastFetchedTimestamp) : null), [
@@ -45,13 +48,14 @@ const ProviderDetails: React.FC<ProviderDetailsProps> = ({ onViewKeyValues }) =>
   const handleInstanceChange = useCallback(
     (providerId: string) => {
       dispatch(secretsManagerActions.setSelectedProviderId(providerId));
+      dispatch(listSecrets(providerId) as any);
     },
     [dispatch]
   );
 
   const handleFetchSecrets = useCallback(() => {
     if (selectedProviderId) {
-      dispatch(fetchSecretsForProvider(selectedProviderId) as any);
+      dispatch(fetchAndSaveSecretsForProvider({ providerId: selectedProviderId }) as any);
     }
   }, [dispatch, selectedProviderId]);
 
@@ -82,8 +86,13 @@ const ProviderDetails: React.FC<ProviderDetailsProps> = ({ onViewKeyValues }) =>
         </div>
 
         <div className="header-right">
-          {lastFetched && <span className="last-fetched">Last fetched: {lastFetched}</span>}
+          {isDirty ? (
+            <span className="last-fetched">Changes not fetched</span>
+          ) : (
+            lastFetched && <span className="last-fetched">Last fetched: {lastFetched}</span>
+          )}
           <RQButton type="primary" loading={isFetching} onClick={handleFetchSecrets} className="fetch-secrets-btn">
+            {isDirty && <span className="unsaved-dot" />}
             Fetch secrets
           </RQButton>
         </div>
