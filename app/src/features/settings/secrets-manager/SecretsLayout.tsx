@@ -9,6 +9,11 @@ import PATHS from "config/constants/sub/paths";
 import { useSecretsModals, DEFAULT_FORM_DATA } from "./context/SecretsModalsContext";
 import DeleteProviderModal from "./modals/DeleteProviderModal/Index";
 import { AddSecretsProviderModal } from "./modals/AddSecretsProviderModal/AddSecretsProviderModal";
+import { isDesktopMode } from "utils/AppUtils";
+import { useSelector } from "react-redux";
+import { selectAllSecretProviders } from "features/apiClient/slices/secrets-manager";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
+import { PRICING } from "features/pricing";
 
 // Made children optional since React Router will mostly use <Outlet />
 const SecretsLayout = ({ children }: { children?: React.ReactNode }) => {
@@ -30,6 +35,8 @@ const SecretsLayout = ({ children }: { children?: React.ReactNode }) => {
 
   const currentPath = window.location.pathname;
   const isOnManageProvidersPage = currentPath.includes(PATHS.SETTINGS.SECRETS.MANAGE_PROVIDERS.ABSOLUTE);
+
+  const providersList = useSelector(selectAllSecretProviders);
 
   const handleManageProvidersClick = () => {
     navigate(PATHS.SETTINGS.SECRETS.MANAGE_PROVIDERS.ABSOLUTE);
@@ -64,6 +71,19 @@ const SecretsLayout = ({ children }: { children?: React.ReactNode }) => {
     deleteProvider();
   };
 
+  const onWebApp = !isDesktopMode();
+  const user = useSelector(getUserAuthDetails);
+  const isUserProfessional = [
+    PRICING.PLAN_NAMES.PROFESSIONAL,
+    PRICING.PLAN_NAMES.ENTERPRISE,
+    PRICING.PLAN_NAMES.PROFESSIONAL_ENTERPRISE,
+    PRICING.PLAN_NAMES.API_CLIENT_ENTERPRISE,
+    PRICING.PLAN_NAMES.API_CLIENT_PROFESSIONAL,
+  ].includes(user?.details?.planDetails?.planName || "");
+
+  const hideAddProviderButton = onWebApp || providersList.length === 0 || !isUserProfessional;
+  const hideManageProvidersButton =
+    isOnManageProvidersPage || onWebApp || providersList.length === 0 || !isUserProfessional;
   return (
     <main className="secrets-page-container">
       <section className="secrets-content-container">
@@ -90,11 +110,11 @@ const SecretsLayout = ({ children }: { children?: React.ReactNode }) => {
               type="transparent"
               icon={<FilterIcon />}
               onClick={handleManageProvidersClick}
-              hidden={isOnManageProvidersPage}
+              hidden={hideManageProvidersButton}
             >
               Manage providers
             </RQButton>
-            <RQButton type="secondary" onClick={openAddProviderModal}>
+            <RQButton type="secondary" onClick={openAddProviderModal} hidden={hideAddProviderButton}>
               Add provider
             </RQButton>
           </div>
