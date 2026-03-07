@@ -3,6 +3,7 @@ import { RQButton } from "lib/design-system-v2/components";
 import NetworkPingIcon from "assets/icons/network-ping.svg?react";
 import { InputField } from "../../components/InputField/InputField";
 import { SelectField } from "../../components/SelectField/Index";
+import { AutoCompleteField } from "../../components/AutoCompleteField/Index";
 import { authMethodOptions, regionsList, secretManagerOptions } from "../../consts/dropdownOptions";
 import { InputPasswordField } from "../../components/InputField/InputPasswordField";
 import { InfoCircleOutlined } from "@ant-design/icons";
@@ -146,7 +147,7 @@ export const AddSecretsProviderModal = ({
           onValueChange={(value) => onChange({ sessionToken: value })}
           disabled={isFetchingConfig || isSavingProvider}
         />
-        <SelectField
+        <AutoCompleteField
           label="Region"
           options={regionsList}
           id="region"

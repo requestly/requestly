@@ -1,20 +1,18 @@
 .variable-info-popover {
-  width: 280px;
-
   .secrets-variable-info-container {
     display: flex;
-    width: 280px;
+    width: 300px;
     flex-direction: column;
     gap: var(--space-2, 4px);
-    padding-right: 0px;
 
     .secrets-variable-header {
       display: flex;
+      width: 300px;
       align-items: center;
       justify-content: space-between;
       padding: var(--space-3, 6px) var(--space-4, 8px);
       border-bottom: 1px solid var(--requestly-color-white-t-10);
-      width: 280px;
+      padding-right: 0px;
 
       .secrets-provider-info {
         display: flex;
@@ -57,6 +55,9 @@
       .secrets-info-row {
         display: flex;
         flex-direction: row;
+        display: grid;
+        grid-template-columns: auto auto;
+        column-gap: 30px;
 
         .secrets-info-label {
           overflow: hidden;
@@ -66,8 +67,7 @@
           font-size: var(--font-size-sm, 12px);
           font-style: normal;
           font-weight: 400;
-          line-height: 18px; /* 150% */
-          width: 120px;
+          line-height: 18px;
         }
 
         .secrets-info-value {
@@ -78,7 +78,7 @@
           font-size: var(--font-size-sm, 12px);
           font-style: normal;
           font-weight: 400;
-          line-height: 18px; /* 150% */
+          line-height: 18px;
         }
       }
     }
