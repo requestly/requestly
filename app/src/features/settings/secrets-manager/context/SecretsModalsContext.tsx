@@ -4,13 +4,20 @@ import {
   SecretProviderType,
 } from "@requestly/shared/types/entities/secretsManager";
 import React, { createContext, useContext, useState, useCallback, useRef } from "react";
+import { useDispatch } from "react-redux";
 import { secretsManagerService, toSecretProviderConfig, toProviderData } from "services/secretsManagerService";
+import {
+  saveProvider as saveProviderThunk,
+  deleteProvider as deleteProviderThunk,
+} from "features/apiClient/slices/secrets-manager";
 import { toast } from "utils/Toast";
+import { AppDispatch } from "store/types";
+import { notification } from "antd";
 
 export interface ProviderData {
   instanceName: SecretProviderConfig["name"];
   secretManagerType: SecretProviderConfig["type"];
-  authMethod: "manual";
+  authMethod: "manual" | "aws";
   accessKey: AWSSecretProviderConfig["credentials"]["accessKeyId"];
   secretKey: AWSSecretProviderConfig["credentials"]["secretAccessKey"];
   sessionToken?: AWSSecretProviderConfig["credentials"]["sessionToken"];
@@ -34,8 +41,7 @@ type AddEditModalState =
       mode: "add" | "edit";
       editingProviderId?: string;
       formData: ProviderData;
-      isLoading: boolean;
-      error?: string;
+      isFetchingConfig: boolean;
     };
 
 type DeleteModalState =
@@ -45,7 +51,6 @@ type DeleteModalState =
       providerId: string;
       providerName: string;
       isLoading: boolean;
-      error?: string;
     };
 
 interface ModalState {
@@ -75,7 +80,17 @@ const initialState: ModalState = {
 
 const SecretsModalsContext = createContext<SecretsModalsContextValue | undefined>(undefined);
 
+const notifyError = (message: string, description: string) => {
+  notification.warn({
+    message,
+    description,
+    placement: "bottomRight",
+    className: "add-secrets-provider-notification",
+  });
+};
+
 export const SecretsModalsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const dispatch = useDispatch<AppDispatch>();
   const [modals, setModals] = useState<ModalState>(initialState);
   const modalsRef = useRef(modals);
   modalsRef.current = modals;
@@ -87,7 +102,7 @@ export const SecretsModalsProvider: React.FC<{ children: React.ReactNode }> = ({
         isOpen: true,
         mode: "add",
         formData: { ...DEFAULT_FORM_DATA },
-        isLoading: false,
+        isFetchingConfig: false,
       },
     }));
   }, []);
@@ -100,7 +115,7 @@ export const SecretsModalsProvider: React.FC<{ children: React.ReactNode }> = ({
         mode: "edit",
         editingProviderId: providerId,
         formData: { ...DEFAULT_FORM_DATA },
-        isLoading: true,
+        isFetchingConfig: true,
       },
     }));
 
@@ -128,7 +143,7 @@ export const SecretsModalsProvider: React.FC<{ children: React.ReactNode }> = ({
             mode: "edit",
             editingProviderId: providerId,
             formData: { ...data },
-            isLoading: false,
+            isFetchingConfig: false,
           },
         };
       });
@@ -175,51 +190,27 @@ export const SecretsModalsProvider: React.FC<{ children: React.ReactNode }> = ({
     setModals((prev) => ({ ...prev, delete: { isOpen: false } }));
   }, []);
 
-  const setAddEditLoading = useCallback((isLoading: boolean, error?: string) => {
-    setModals((prev) => {
-      if (!prev.addEdit.isOpen) return prev;
-      return { ...prev, addEdit: { ...prev.addEdit, isLoading, error } };
-    });
-  }, []);
-
-  const handleAddEditError = useCallback(
-    (error: unknown, defaultMessage: string) => {
-      const errorMessage = error instanceof Error ? error.message : defaultMessage;
-      setAddEditLoading(false, errorMessage);
-    },
-    [setAddEditLoading]
-  );
-
   const saveProvider = useCallback(
     async (formData: ProviderData) => {
-      setAddEditLoading(true, undefined);
+      const addEditState = modalsRef.current.addEdit;
+      const existingId =
+        addEditState.isOpen && addEditState.mode === "edit" ? addEditState.editingProviderId : undefined;
+      const mode = addEditState.isOpen ? addEditState.mode : "add";
 
-      try {
-        const addEditState = modalsRef.current.addEdit;
-        const existingId =
-          addEditState.isOpen && addEditState.mode === "edit" ? addEditState.editingProviderId : undefined;
-        const mode = addEditState.isOpen ? addEditState.mode : "add";
+      const result = await dispatch(saveProviderThunk({ formData, existingId, mode }));
 
-        const config = toSecretProviderConfig(formData, existingId);
-        const result = await secretsManagerService.setProviderConfig(config);
-
-        if (result.type === "error") {
-          setAddEditLoading(false, result.error.message);
-          return;
-        }
-
-        toast.success(`Provider ${mode === "add" ? "added" : "updated"} successfully`);
-        setModals((prev) => ({ ...prev, addEdit: { isOpen: false } }));
-      } catch (error) {
-        handleAddEditError(error, "Failed to save provider");
+      if (saveProviderThunk.rejected.match(result)) {
+        notifyError(`Failed to save provider`, result.payload ?? "Failed to save provider");
+        return;
       }
+
+      toast.success(`Provider ${mode === "add" ? "added" : "updated"} successfully and is now active`);
+      setModals((prev) => ({ ...prev, addEdit: { isOpen: false } }));
     },
-    [setAddEditLoading, handleAddEditError]
+    [dispatch]
   );
 
   const testConnection = useCallback(async () => {
-    setAddEditLoading(true, undefined);
-
     try {
       const addEditState = modalsRef.current.addEdit;
       if (!addEditState.isOpen) {
@@ -231,21 +222,19 @@ export const SecretsModalsProvider: React.FC<{ children: React.ReactNode }> = ({
       const result = await secretsManagerService.testConnectionWithConfig(config);
 
       if (result.type === "error") {
-        setAddEditLoading(false, result.error.message);
+        notifyError(`Connection test failed`, result.error.message);
         return;
       }
 
       if (result.data) {
         toast.success("Connection successful");
       } else {
-        toast.error("Connection failed. Please check your credentials.");
+        notifyError(`Connection test failed`, "Please check your credentials.");
       }
-
-      setAddEditLoading(false, result.data ? undefined : "Connection test failed");
     } catch (error) {
-      handleAddEditError(error, "Connection test failed");
+      notifyError(`Connection test failed`, error instanceof Error ? error.message : "Connection test failed");
     }
-  }, [setAddEditLoading, handleAddEditError]);
+  }, []);
 
   const deleteProvider = useCallback(async () => {
     const deleteState = modalsRef.current.delete;
@@ -262,30 +251,15 @@ export const SecretsModalsProvider: React.FC<{ children: React.ReactNode }> = ({
     });
 
     try {
-      const result = await secretsManagerService.removeProviderConfig(providerId);
-
-      if (result.type === "error") {
-        setModals((prev) => {
-          if (!prev.delete.isOpen) {
-            return prev;
-          }
-          return { ...prev, delete: { ...prev.delete, isLoading: false, error: result.error.message } };
-        });
-        return;
-      }
+      await dispatch(deleteProviderThunk(providerId));
 
       toast.success("Provider deleted successfully");
       setModals((prev) => ({ ...prev, delete: { isOpen: false } }));
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "Failed to delete provider";
-      setModals((prev) => {
-        if (!prev.delete.isOpen) {
-          return prev;
-        }
-        return { ...prev, delete: { ...prev.delete, isLoading: false, error: errorMessage } };
-      });
+      notifyError(`Failed to delete provider`, errorMessage);
     }
-  }, []);
+  }, [dispatch]);
 
   const value: SecretsModalsContextValue = {
     modals,

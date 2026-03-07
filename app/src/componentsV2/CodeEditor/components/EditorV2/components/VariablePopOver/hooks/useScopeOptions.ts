@@ -3,7 +3,7 @@ import React from "react";
 import { VariableScope } from "backend/environment/types";
 import type { ScopeOption } from "../types";
 import { MdOutlineCategory } from "@react-icons/all-files/md/MdOutlineCategory";
-import { MdLock } from "@react-icons/all-files/md/MdLock";
+import ShieldLockIcon from "assets/icons/shield-lock.svg?react";
 import { BiNote } from "@react-icons/all-files/bi/BiNote";
 import { BsGlobeCentralSouthAsia } from "@react-icons/all-files/bs/BsGlobeCentralSouthAsia";
 import { MdHorizontalSplit } from "@react-icons/all-files/md/MdHorizontalSplit";
@@ -89,7 +89,7 @@ export const getScopeIcon = (
       );
     case VariableScope.SECRETS:
       return createIconWithWrapper(
-        MdLock,
+        ShieldLockIcon,
         "var(--requestly-color-text-subtle)",
         showBackgroundColor ? "var(--requestly-color-surface-2)" : "transparent",
         showText ? "SECRETS" : undefined

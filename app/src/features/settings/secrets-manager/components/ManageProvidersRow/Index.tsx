@@ -8,12 +8,13 @@ import GreenTickIcon from "assets/icons/green-tick.svg?react";
 import { useSecretsModals } from "../../context/SecretsModalsContext";
 import { SecretProviderType } from "@requestly/shared/types/entities/secretsManager";
 import { mapProviderTypeToDisplayString } from "services/secretsManagerService";
+import { selectSecretsByProviderId } from "features/apiClient/slices/secrets-manager/selectors";
+import { useSelector } from "react-redux";
 
 interface ManageProvidersRowProps {
   providerId: string;
   providerName: string;
   providerType: SecretProviderType;
-  secretsCount?: number;
   isActive?: boolean;
 }
 
@@ -21,7 +22,6 @@ const ManageProvidersRow: React.FC<ManageProvidersRowProps> = ({
   providerId,
   providerName,
   providerType,
-  secretsCount = 0,
   isActive = true,
 }) => {
   const { openEditProviderModal, openDeleteProviderModal } = useSecretsModals();
@@ -33,6 +33,8 @@ const ManageProvidersRow: React.FC<ManageProvidersRowProps> = ({
   const handleDelete = () => {
     openDeleteProviderModal(providerId, providerName);
   };
+
+  const secretsCount = useSelector(selectSecretsByProviderId)(providerId).length;
 
   return (
     <Row className="manage-providers-row">
