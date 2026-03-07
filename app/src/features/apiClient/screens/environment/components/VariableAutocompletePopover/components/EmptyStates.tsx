@@ -16,7 +16,13 @@ interface SecretsEmptyStateProps {
 const AutoCompleteSecretEmptyState: React.FC<SecretsEmptyStateProps> = ({ onClose }) => {
   const providers = useSelector(selectAllSecretProviders);
   const user = useSelector(getUserAuthDetails);
-  const isUserProfessional = user?.details?.planDetails?.planName === PRICING.PLAN_NAMES.PROFESSIONAL;
+  const isUserProfessional = [
+    PRICING.PLAN_NAMES.PROFESSIONAL,
+    PRICING.PLAN_NAMES.ENTERPRISE,
+    PRICING.PLAN_NAMES.PROFESSIONAL_ENTERPRISE,
+    PRICING.PLAN_NAMES.API_CLIENT_ENTERPRISE,
+    PRICING.PLAN_NAMES.API_CLIENT_PROFESSIONAL,
+  ].includes(user?.details?.planDetails?.planName || "");
   const navigate = useNavigate();
   const selectedProviderId = useSelector(selectSelectedProviderId);
   const activeProvider = selectedProviderId ? providers.find((p) => p.id === selectedProviderId) : null;
