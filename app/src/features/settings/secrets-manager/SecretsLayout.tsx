@@ -13,6 +13,7 @@ import { isDesktopMode } from "utils/AppUtils";
 import { useSelector } from "react-redux";
 import { selectAllSecretProviders } from "features/apiClient/slices/secrets-manager";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
+import { PRICING } from "features/pricing";
 
 // Made children optional since React Router will mostly use <Outlet />
 const SecretsLayout = ({ children }: { children?: React.ReactNode }) => {
@@ -72,7 +73,13 @@ const SecretsLayout = ({ children }: { children?: React.ReactNode }) => {
 
   const onWebApp = !isDesktopMode();
   const user = useSelector(getUserAuthDetails);
-  const isUserProfessional = user?.details?.planDetails?.planName === "Professional";
+  const isUserProfessional = [
+    PRICING.PLAN_NAMES.PROFESSIONAL,
+    PRICING.PLAN_NAMES.ENTERPRISE,
+    PRICING.PLAN_NAMES.PROFESSIONAL_ENTERPRISE,
+    PRICING.PLAN_NAMES.API_CLIENT_ENTERPRISE,
+    PRICING.PLAN_NAMES.API_CLIENT_PROFESSIONAL,
+  ].includes(user?.details?.planDetails?.planName || "");
 
   const hideAddProviderButton = onWebApp || providersList.length === 0 || !isUserProfessional;
   const hideManageProvidersButton =
