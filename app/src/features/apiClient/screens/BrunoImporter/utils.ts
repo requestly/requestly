@@ -66,7 +66,7 @@ const processParams = (params: Bruno.Param[]) => {
     params?.map((param, index) => ({
       id: index,
       key: param.name,
-      value: param.value,
+      value: param.value != null && typeof param.value !== "object" ? String(param.value) : "",
       isEnabled: param.enabled ?? true,
     })) || []
   );
