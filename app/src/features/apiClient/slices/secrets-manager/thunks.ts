@@ -20,25 +20,35 @@ import { SECRETS_MANAGER_SLICE_NAME } from "../common/constants";
 
 type RootState = { secretsManager: import("./types").SecretsManagerState };
 
-export const fetchSecretProviders = createAsyncThunk<SecretProviderMetadata[], void, { rejectValue: string }>(
-  `${SECRETS_MANAGER_SLICE_NAME}/fetchProviders`,
-  async (_, { rejectWithValue, dispatch }) => {
-    const result = await secretsManagerService.listProviders();
+export const fetchSecretProviders = createAsyncThunk<
+  SecretProviderMetadata[],
+  void,
+  { rejectValue: string; state: RootState }
+>(`${SECRETS_MANAGER_SLICE_NAME}/fetchProviders`, async (_, { rejectWithValue, dispatch, getState }) => {
+  const result = await secretsManagerService.listProviders();
 
-    if (result.type === "error") {
-      return rejectWithValue(result.error.message);
-    }
+  console.log("!!!debug", "result", result);
 
-    if (result.data.length > 0) {
-      dispatch(secretsManagerActions.setAllProviders(result.data));
-    } else {
-      dispatch(secretsManagerActions.setAllProviders([]));
-      dispatch(secretsManagerActions.setSelectedProviderId(null));
-    }
-
-    return result.data;
+  if (result.type === "error") {
+    return rejectWithValue(result.error.message);
   }
-);
+
+  if (result.data.length > 0) {
+    dispatch(secretsManagerActions.setAllProviders(result.data));
+    const state = getState();
+    const activeProviderId = selectSelectedProviderId(state);
+
+    if (!activeProviderId || !result.data.some((p) => p.id === activeProviderId)) {
+      const firstProvider = result.data[0]!;
+      dispatch(secretsManagerActions.setSelectedProviderId(firstProvider.id));
+    }
+  } else {
+    dispatch(secretsManagerActions.setAllProviders([]));
+    dispatch(secretsManagerActions.setSelectedProviderId(null));
+  }
+
+  return result.data;
+});
 
 export const listSecrets = createAsyncThunk<SecretValue[], string, { rejectValue: string; state: RootState }>(
   `${SECRETS_MANAGER_SLICE_NAME}/listSecrets`,
@@ -156,6 +166,7 @@ export const initAndSubscribeSecretsManager = createAsyncThunk<void, string, { r
   `${SECRETS_MANAGER_SLICE_NAME}/init`,
   async (userId, { dispatch, getState, rejectWithValue, signal }) => {
     console.log("!!!debug", "initAndSubscribeSecretsManager", userId);
+    isSubscriptionRegistered = false;
     const initResult = await secretsManagerService.init(userId);
 
     if (initResult.type === "error") {
@@ -180,16 +191,7 @@ export const initAndSubscribeSecretsManager = createAsyncThunk<void, string, { r
     }
 
     const state = getState();
-    let activeProviderId = selectSelectedProviderId(state);
-
-    if (!activeProviderId) {
-      const providers = selectAllSecretProviders(state);
-      const firstProvider = providers[0];
-      if (firstProvider) {
-        activeProviderId = firstProvider.id;
-        dispatch(secretsManagerActions.setSelectedProviderId(activeProviderId));
-      }
-    }
+    const activeProviderId = selectSelectedProviderId(state);
 
     if (activeProviderId) {
       console.log("!!!debug", "initAndSubscribeSecretsManager", "listSecrets", activeProviderId);
