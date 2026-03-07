@@ -18,6 +18,7 @@ import { useSecretsModals } from "./context/SecretsModalsContext";
 import { isDesktopMode } from "utils/AppUtils";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import PATHS from "config/constants/sub/paths";
+import { PRICING } from "features/pricing";
 
 const Secrets = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -31,7 +32,13 @@ const Secrets = () => {
   });
 
   const user = useSelector(getUserAuthDetails);
-  const isUserProfessional = user?.details?.planDetails?.planName === "Professional";
+  const isUserProfessional = [
+    PRICING.PLAN_NAMES.PROFESSIONAL,
+    PRICING.PLAN_NAMES.ENTERPRISE,
+    PRICING.PLAN_NAMES.PROFESSIONAL_ENTERPRISE,
+    PRICING.PLAN_NAMES.API_CLIENT_ENTERPRISE,
+    PRICING.PLAN_NAMES.API_CLIENT_PROFESSIONAL,
+  ].includes(user?.details?.planDetails?.planName || "");
 
   const handleViewKeyValues = useCallback((secretId: string) => {
     setKeyValuesModal({ open: true, secretId });
