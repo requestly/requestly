@@ -21,6 +21,7 @@ import {
 import { parseSecretKeyValues } from "../../utils/parseSecretKeyValues";
 import "./secretsTable.scss";
 import { deleteSecret } from "features/apiClient/slices/secrets-manager/thunks";
+import clsx from "clsx";
 
 type TableRow = AwsSecretValue & { key: string };
 
@@ -138,7 +139,7 @@ const SecretsTable: React.FC<SecretsTableProps> = ({ onViewKeyValues }) => {
       render: (_, row) => {
         const aliasError = validationErrors[row.key]?.alias;
         return (
-          <div className="cell-input-with-error">
+          <div className={clsx("cell-input-with-error", aliasError && "error-cell")}>
             <Input
               className="draft-cell-input"
               value={row.secretReference.alias}
@@ -161,7 +162,7 @@ const SecretsTable: React.FC<SecretsTableProps> = ({ onViewKeyValues }) => {
       render: (_, row) => {
         const identifierError = validationErrors[row.key]?.identifier;
         return (
-          <div className="cell-input-with-error">
+          <div className={clsx("cell-input-with-error", identifierError && "error-cell")}>
             <Input
               className="draft-cell-input"
               value={row.secretReference.identifier}
@@ -206,7 +207,7 @@ const SecretsTable: React.FC<SecretsTableProps> = ({ onViewKeyValues }) => {
         if (error) {
           return (
             <Tooltip title={error} placement="right" showArrow={false} overlayClassName="error-tooltip">
-              <div className="secret-error-cell">
+              <div className={clsx("secret-error-cell", error && "error-cell")}>
                 <InfoCircleOutlined className="secret-error-icon" />
               </div>
             </Tooltip>
