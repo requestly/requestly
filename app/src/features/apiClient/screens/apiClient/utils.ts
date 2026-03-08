@@ -278,7 +278,9 @@ export const supportsRequestBodyForAllMethods = (appMode: string): boolean => {
   return appMode === CONSTANTS.APP_MODES.DESKTOP;
 };
 
-export const generateKeyValuePairs = (data: string | Record<string, string | string[]> = {}): KeyValuePair[] => {
+export const generateKeyValuePairs = (
+  data: string | Record<string, string | string[] | number | boolean | null | undefined> = {}
+): KeyValuePair[] => {
   const result: KeyValuePair[] = [];
   if (typeof data === "string") {
     data = {
@@ -290,7 +292,7 @@ export const generateKeyValuePairs = (data: string | Record<string, string | str
     for (const value of valueArray) {
       result.push({
         key: key || "",
-        value,
+        value: value != null && typeof value !== "object" ? String(value) : "",
         id: Math.random(),
         isEnabled: true,
       });
