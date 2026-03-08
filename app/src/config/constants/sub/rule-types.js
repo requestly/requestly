@@ -15,7 +15,7 @@ const getSourceFormat = () => ({
 
 const modifyResponseDefaultCode = () => {
   let value =
-    "function modifyResponse(args) {\n  const {method, url, response, responseType, requestHeaders, requestData, responseJSON} = args;\n  // Change response below depending upon request attributes received in args\n  \n  return response;\n}";
+    "function modifyResponse(args) {\n  const {method, url, response, responseType, requestHeaders, requestData, responseJSON} = args;\n  // Change response below depending upon request attributes received in args\n  // To modify status code dynamically, set args.statusCode = <status_code>;\n  \n  return response;\n}";
 
   if (isFeatureCompatible(FEATURES.ASYNC_MODIFY_RESPONSE_BODY)) {
     value = "async " + value;

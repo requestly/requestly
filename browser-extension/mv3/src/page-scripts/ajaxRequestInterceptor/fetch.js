@@ -176,6 +176,7 @@ export const initFetchInterceptor = (debug) => {
             responseType,
             response: fetchedResponseData,
             responseJSON: fetchedResponseDataAsJson,
+            responseStatusCode: fetchedResponse.status,
           };
         }
 
@@ -211,7 +212,8 @@ export const initFetchInterceptor = (debug) => {
       });
 
       // For network failures, fetchedResponse is undefined but we still return customResponse with status=200
-      const finalStatusCode = parseInt(responseModification.statusCode || fetchedResponse?.status) || 200;
+      const dynamicStatusCode = responseModification.type === "code" ? evaluatorArgs.statusCode : undefined;
+      const finalStatusCode = parseInt(dynamicStatusCode || responseModification.statusCode || fetchedResponse?.status) || 200;
       const requiresNullResponseBody = [204, 205, 304].includes(finalStatusCode);
 
       return new Response(requiresNullResponseBody ? null : new Blob([customResponse]), {
