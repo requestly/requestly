@@ -27,8 +27,6 @@ export const fetchSecretProviders = createAsyncThunk<
 >(`${SECRETS_MANAGER_SLICE_NAME}/fetchProviders`, async (_, { rejectWithValue, dispatch, getState }) => {
   const result = await secretsManagerService.listProviders();
 
-  console.log("!!!debug", "result", result);
-
   if (result.type === "error") {
     return rejectWithValue(result.error.message);
   }
@@ -162,7 +160,7 @@ export const saveProvider = createAsyncThunk<
     return rejectWithValue(result.error.message);
   }
 
-  await dispatch(fetchSecretProviders());
+  await dispatch(fetchSecretProviders()).unwrap();
   dispatch(secretsManagerActions.setSelectedProviderId(config.id));
 
   return config.id;
@@ -172,7 +170,6 @@ let isSubscriptionRegistered = false;
 export const initAndSubscribeSecretsManager = createAsyncThunk<void, string, { rejectValue: string; state: RootState }>(
   `${SECRETS_MANAGER_SLICE_NAME}/init`,
   async (userId, { dispatch, getState, rejectWithValue, signal }) => {
-    console.log("!!!debug", "initAndSubscribeSecretsManager", userId);
     isSubscriptionRegistered = false;
     const initResult = await secretsManagerService.init(userId);
 
@@ -191,7 +188,7 @@ export const initAndSubscribeSecretsManager = createAsyncThunk<void, string, { r
       });
     }
 
-    await dispatch(fetchSecretProviders());
+    await dispatch(fetchSecretProviders()).unwrap();
 
     if (signal.aborted) {
       return;
@@ -201,8 +198,7 @@ export const initAndSubscribeSecretsManager = createAsyncThunk<void, string, { r
     const activeProviderId = selectSelectedProviderId(state);
 
     if (activeProviderId) {
-      console.log("!!!debug", "initAndSubscribeSecretsManager", "listSecrets", activeProviderId);
-      await dispatch(listSecrets(activeProviderId));
+      await dispatch(listSecrets(activeProviderId)).unwrap();
     }
   }
 );
@@ -219,10 +215,11 @@ export const deleteProvider = createAsyncThunk<void, string, { rejectValue: stri
     const providers = selectAllSecretProviders(state);
     const nextProvider = providers.find((p) => p.id !== providerId);
 
-    dispatch(deleteAllSecretsForProvider({ providerId }));
+    dispatch(deleteAllSecretsForProvider({ providerId })).unwrap();
 
     if (nextProvider) {
       dispatch(secretsManagerActions.setSelectedProviderId(nextProvider.id));
+      await dispatch(listSecrets(nextProvider.id)).unwrap();
     } else {
       dispatch(secretsManagerActions.setSelectedProviderId(null));
     }
@@ -266,8 +263,7 @@ export const deleteAllSecretsForProvider = createAsyncThunk<
     }
     dispatch(secretsManagerActions.removeSecrets(secretRefsToDelete.map((s) => s.id)));
 
-    const secrets = selectAllSecrets(state);
-    secretVariables.updateSourceFromSecrets(secrets.filter((s) => s.providerId !== providerId) as AwsSecretValue[]);
+    secretVariables.updateSourceFromSecrets([]);
   }
 );
 
