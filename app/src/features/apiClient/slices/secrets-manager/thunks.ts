@@ -160,7 +160,7 @@ export const saveProvider = createAsyncThunk<
     return rejectWithValue(result.error.message);
   }
 
-  await dispatch(fetchSecretProviders());
+  await dispatch(fetchSecretProviders()).unwrap();
   dispatch(secretsManagerActions.setSelectedProviderId(config.id));
 
   return config.id;
@@ -188,7 +188,7 @@ export const initAndSubscribeSecretsManager = createAsyncThunk<void, string, { r
       });
     }
 
-    await dispatch(fetchSecretProviders());
+    await dispatch(fetchSecretProviders()).unwrap();
 
     if (signal.aborted) {
       return;
@@ -198,7 +198,7 @@ export const initAndSubscribeSecretsManager = createAsyncThunk<void, string, { r
     const activeProviderId = selectSelectedProviderId(state);
 
     if (activeProviderId) {
-      await dispatch(listSecrets(activeProviderId));
+      await dispatch(listSecrets(activeProviderId)).unwrap();
     }
   }
 );
@@ -215,7 +215,7 @@ export const deleteProvider = createAsyncThunk<void, string, { rejectValue: stri
     const providers = selectAllSecretProviders(state);
     const nextProvider = providers.find((p) => p.id !== providerId);
 
-    dispatch(deleteAllSecretsForProvider({ providerId }));
+    dispatch(deleteAllSecretsForProvider({ providerId })).unwrap();
 
     if (nextProvider) {
       dispatch(secretsManagerActions.setSelectedProviderId(nextProvider.id));
