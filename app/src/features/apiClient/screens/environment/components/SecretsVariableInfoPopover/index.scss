@@ -55,9 +55,7 @@
       .secrets-info-row {
         display: flex;
         flex-direction: row;
-        display: grid;
-        grid-template-columns: auto auto;
-        column-gap: 30px;
+        gap: 10px;
 
         .secrets-info-label {
           overflow: hidden;
@@ -68,6 +66,7 @@
           font-style: normal;
           font-weight: 400;
           line-height: 18px;
+          width: 70px;
         }
 
         .secrets-info-value {
