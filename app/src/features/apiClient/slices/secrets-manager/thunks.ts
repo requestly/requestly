@@ -219,6 +219,7 @@ export const deleteProvider = createAsyncThunk<void, string, { rejectValue: stri
 
     if (nextProvider) {
       dispatch(secretsManagerActions.setSelectedProviderId(nextProvider.id));
+      await dispatch(listSecrets(nextProvider.id)).unwrap();
     } else {
       dispatch(secretsManagerActions.setSelectedProviderId(null));
     }
@@ -262,8 +263,7 @@ export const deleteAllSecretsForProvider = createAsyncThunk<
     }
     dispatch(secretsManagerActions.removeSecrets(secretRefsToDelete.map((s) => s.id)));
 
-    const secrets = selectAllSecrets(state);
-    secretVariables.updateSourceFromSecrets(secrets.filter((s) => s.providerId !== providerId) as AwsSecretValue[]);
+    secretVariables.updateSourceFromSecrets([]);
   }
 );
 
