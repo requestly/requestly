@@ -201,11 +201,11 @@ const SecretsTable: React.FC<SecretsTableProps> = ({ onViewKeyValues }) => {
         const error = fetchErrors[row.key];
         if (error) {
           return (
-            <Tooltip title={error} placement="right" showArrow={false} overlayClassName="error-tooltip">
-              <div className={clsx("secret-error-cell", error && "error-cell")}>
+            <div className={clsx("secret-error-cell", error && "error-cell")}>
+              <Tooltip title={error} placement="right" showArrow={false} overlayClassName="error-tooltip">
                 <MdErrorOutline className="secret-error-icon" />
-              </div>
-            </Tooltip>
+              </Tooltip>
+            </div>
           );
         }
 
