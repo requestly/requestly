@@ -50,6 +50,7 @@ import { clientStorageService } from "services/clientStorageService";
 import { initAndSubscribeSecretsManager } from "features/apiClient/slices/secrets-manager";
 import { secretsManagerService } from "services/secretsManagerService";
 import { PRICING } from "features/pricing";
+import { secretVariables } from "lib/secret-variables";
 
 let hasAppModeBeenSet = false;
 /**
@@ -301,6 +302,7 @@ const AppModeInitializer = () => {
       return () => {
         initPromise.abort();
         secretsManagerService.unsubscribeFromProvidersChange();
+        secretVariables.updateSourceFromSecrets([]);
       };
     }
   }, [appMode, dispatch, user?.details?.planDetails?.planName, user?.details?.profile?.uid, user?.loggedIn]);
