@@ -14,6 +14,7 @@ import { useSelector } from "react-redux";
 import { selectAllSecretProviders } from "features/apiClient/slices/secrets-manager";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { PRICING } from "features/pricing";
+import LINKS from "config/constants/sub/links";
 
 // Made children optional since React Router will mostly use <Outlet />
 const SecretsLayout = ({ children }: { children?: React.ReactNode }) => {
@@ -71,6 +72,10 @@ const SecretsLayout = ({ children }: { children?: React.ReactNode }) => {
     deleteProvider();
   };
 
+  const handleHelp = (e: React.MouseEvent) => {
+    window.open(LINKS.REQUESTLY_SECRETS_DOCS, "_blank", "noopener,noreferrer");
+  };
+
   const onWebApp = !isDesktopMode();
   const user = useSelector(getUserAuthDetails);
   const isUserProfessional = [
@@ -103,7 +108,7 @@ const SecretsLayout = ({ children }: { children?: React.ReactNode }) => {
             <span className="secrets-text">{isOnManageProvidersPage ? "Manage Providers" : "Secrets"}</span>
           </div>
           <div className="header-right-section">
-            <RQButton icon={<AiOutlineQuestionCircle />} type="transparent">
+            <RQButton icon={<AiOutlineQuestionCircle />} type="transparent" onClick={handleHelp}>
               Help
             </RQButton>
             <RQButton

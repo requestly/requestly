@@ -62,6 +62,7 @@ export const AutoCompleteField: React.FC<AutoCompleteFieldProps> = ({
         filterOption={filterOption || defaultFilterOption}
         disabled={disabled}
         notFoundContent="No options available"
+        popupClassName="form-autocomplete-dropdown"
       />
     </div>
   );

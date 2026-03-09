@@ -58,7 +58,7 @@ const AutoCompleteSecretEmptyState: React.FC<SecretsEmptyStateProps> = ({ onClos
   const handleLearnMore = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    window.open(LINKS.REQUESTLY_DOCS, "_blank", "noopener,noreferrer");
+    window.open(LINKS.REQUESTLY_SECRETS_DOCS, "_blank", "noopener,noreferrer");
   };
 
   if (!isUserProfessional) {

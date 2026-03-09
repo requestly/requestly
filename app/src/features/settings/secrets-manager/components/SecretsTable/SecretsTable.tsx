@@ -40,10 +40,10 @@ const ColHeader: React.FC<{ label: string; tooltip: string }> = ({ label, toolti
 );
 
 const ToggleColumnPopover: React.FC<{ onToggle: () => void; isVisible: boolean }> = ({ onToggle, isVisible }) => (
-  <div className="toggle-column-popover" onClick={onToggle}>
+  <div className="toggle-column-popover">
     <p className="show-columns-text">Show columns</p>
     <div className="version-id-checkbox">
-      <Checkbox checked={isVisible} className="checkbox" />
+      <Checkbox checked={isVisible} className="checkbox" onChange={() => onToggle()} />
       <span className="col-name">Version ID</span>
       <Tooltip title="The version ID of the secret value">
         <AiOutlineInfoCircle className="col-info-icon" />
@@ -201,11 +201,11 @@ const SecretsTable: React.FC<SecretsTableProps> = ({ onViewKeyValues }) => {
         const error = fetchErrors[row.key];
         if (error) {
           return (
-            <Tooltip title={error} placement="right" showArrow={false} overlayClassName="error-tooltip">
-              <div className={clsx("secret-error-cell", error && "error-cell")}>
+            <div className={clsx("secret-error-cell", error && "error-cell")}>
+              <Tooltip title={error} placement="right" showArrow={false} overlayClassName="error-tooltip">
                 <MdErrorOutline className="secret-error-icon" />
-              </div>
-            </Tooltip>
+              </Tooltip>
+            </div>
           );
         }
 
@@ -217,7 +217,22 @@ const SecretsTable: React.FC<SecretsTableProps> = ({ onViewKeyValues }) => {
 
         if (keyValues && keyValues.length > 0) {
           return (
-            <div className="secret-tags" onClick={() => onViewKeyValues?.(id)} style={{ cursor: "pointer" }}>
+            <div
+              className="secret-tags"
+              role="button"
+              tabIndex={0}
+              aria-label={`View key-value pairs for secret ${
+                row.secretReference.alias || row.secretReference.identifier || id
+              }`}
+              onClick={() => onViewKeyValues?.(id)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  onViewKeyValues?.(id);
+                }
+              }}
+              style={{ cursor: "pointer" }}
+            >
               {keyValues.map((kv) => (
                 <Tag key={kv.key} className="secret-tag">
                   {kv.key}
@@ -236,6 +251,8 @@ const SecretsTable: React.FC<SecretsTableProps> = ({ onViewKeyValues }) => {
               size="small"
               className="visibility-btn"
               icon={isVisible ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
+              aria-label={isVisible ? "Hide secret value" : "Show secret value"}
+              aria-pressed={isVisible}
               onClick={() => toggleVisibility(id)}
             />
           </div>
@@ -251,7 +268,13 @@ const SecretsTable: React.FC<SecretsTableProps> = ({ onViewKeyValues }) => {
           destroyTooltipOnHide
           content={<ToggleColumnPopover onToggle={() => setShowVersionId((v) => !v)} isVisible={showVersionId} />}
         >
-          <Button type="text" size="small" className="show-columns-btn" icon={<BsThreeDots />} />
+          <Button
+            type="text"
+            size="small"
+            className="show-columns-btn"
+            icon={<BsThreeDots />}
+            aria-label="Show or hide columns"
+          />
         </Popover>
       ),
       key: "actions",
@@ -274,7 +297,15 @@ const SecretsTable: React.FC<SecretsTableProps> = ({ onViewKeyValues }) => {
             trigger={["click"]}
             placement="bottomRight"
           >
-            <Button type="text" size="small" className="row-menu-btn" icon={<BsThreeDots />} />
+            <Button
+              type="text"
+              size="small"
+              className="row-menu-btn"
+              icon={<BsThreeDots />}
+              aria-label={`Actions for secret ${
+                row.secretReference.alias || row.secretReference.identifier || row.key
+              }`}
+            />
           </Dropdown>
         );
       },

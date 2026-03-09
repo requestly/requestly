@@ -24,7 +24,9 @@ export const SecretsVariableInfo: React.FC<{
   const alias = dotIndex >= 0 ? withoutPrefix.slice(0, dotIndex) : withoutPrefix; // "alias"
   const value = variable.value;
 
-  const handleManageClick = () => {
+  const handleManageClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
     navigate(PATHS.SETTINGS.SECRETS.MANAGE_PROVIDERS.ABSOLUTE);
   };
 
@@ -39,7 +41,7 @@ export const SecretsVariableInfo: React.FC<{
           type="transparent"
           size="small"
           icon={<FilterIcon className="filter-icon" />}
-          onMouseDown={handleManageClick}
+          onClick={handleManageClick}
           className="manage-button"
         >
           Manage
