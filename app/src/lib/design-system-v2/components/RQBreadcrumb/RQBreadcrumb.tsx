@@ -66,8 +66,6 @@ export const RQBreadcrumb: React.FC<Props> = ({
       autoFocusRef.current = true;
       setIsEditRecord(true);
     }
-
-    return () => setIsEditRecord(false);
   }, [autoFocus]);
 
   const breadcrumbs: ({
@@ -94,11 +92,13 @@ export const RQBreadcrumb: React.FC<Props> = ({
 
   const handleOnBlur = () => {
     setIsEditRecord(false);
-    onBlur?.(name);
 
-    if (!name) {
+    if (!name?.trim()) {
       setName(recordName);
+      return;
     }
+
+    onBlur?.(name);
   };
 
   const handleRecordNameEditClick = () => {
