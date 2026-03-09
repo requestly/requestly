@@ -17,6 +17,7 @@ import {
 import { secretsManagerActions } from "./slice";
 import { secretVariables } from "lib/secret-variables";
 import { SECRETS_MANAGER_SLICE_NAME } from "../common/constants";
+import { toast } from "utils/Toast";
 
 type RootState = { secretsManager: import("./types").SecretsManagerState };
 
@@ -59,6 +60,7 @@ export const listSecrets = createAsyncThunk<SecretValue[], string, { rejectValue
     // Redux state updation is done in the extraReducers of the slice
 
     secretVariables.updateSourceFromSecrets(result.data as AwsSecretValue[]);
+    toast.success("Successfully fetched secrets");
     return result.data;
   }
 );
@@ -137,6 +139,8 @@ export const fetchAndSaveSecretsForProvider = createAsyncThunk<
         placement: "bottomRight",
         className: "add-secrets-provider-notification",
       });
+    } else {
+      toast.success("Successfully fetched secrets");
     }
 
     const erroredRefIds = new Set([...Object.keys(validationMap), ...backendErrors.map((e) => e.secretRefId)]);
@@ -218,6 +222,11 @@ export const deleteProvider = createAsyncThunk<void, string, { rejectValue: stri
     dispatch(deleteAllSecretsForProvider({ providerId })).unwrap();
 
     if (nextProvider) {
+      notification.info({
+        message: `"${nextProvider.name}" is now active`,
+        description: "Fetch secrets to continue using them in requests",
+        placement: "bottomRight",
+      });
       dispatch(secretsManagerActions.setSelectedProviderId(nextProvider.id));
       await dispatch(listSecrets(nextProvider.id)).unwrap();
     } else {
@@ -237,7 +246,7 @@ export const deleteSecret = createAsyncThunk<
     if (result.type === "error") {
       return rejectWithValue(result.error.message);
     }
-
+    toast.success("Secret deleted");
     dispatch(secretsManagerActions.removeSecret(secretReference.id));
   }
 );

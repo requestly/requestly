@@ -253,7 +253,7 @@ export const SecretsModalsProvider: React.FC<{ children: React.ReactNode }> = ({
     try {
       await dispatch(deleteProviderThunk(providerId));
 
-      toast.success("Provider deleted successfully");
+      toast.success(`"${deleteState.providerName}" deleted`);
       setModals((prev) => ({ ...prev, delete: { isOpen: false } }));
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "Failed to delete provider";

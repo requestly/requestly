@@ -23,6 +23,7 @@ import "./secretsTable.scss";
 import { deleteSecret } from "features/apiClient/slices/secrets-manager/thunks";
 import clsx from "clsx";
 import { RQButton } from "lib/design-system-v2/components/RQButton/RQButton";
+import { RQTooltip } from "lib/design-system-v2/components/RQTooltip/RQTooltip";
 
 type TableRow = AwsSecretValue & { key: string };
 
@@ -33,9 +34,9 @@ function isStubRow(row: TableRow): boolean {
 const ColHeader: React.FC<{ label: string; tooltip: string }> = ({ label, tooltip }) => (
   <span className="col-header">
     {label}
-    <Tooltip title={tooltip}>
+    <RQTooltip title={tooltip} showArrow={false}>
       <AiOutlineInfoCircle className="col-info-icon" />
-    </Tooltip>
+    </RQTooltip>
   </span>
 );
 
@@ -45,9 +46,9 @@ const ToggleColumnPopover: React.FC<{ onToggle: () => void; isVisible: boolean }
     <div className="version-id-checkbox">
       <Checkbox checked={isVisible} className="checkbox" onChange={() => onToggle()} />
       <span className="col-name">Version ID</span>
-      <Tooltip title="The version ID of the secret value">
+      <RQTooltip title="Optional, leave blank to fetch latest ID" showArrow={false}>
         <AiOutlineInfoCircle className="col-info-icon" />
-      </Tooltip>
+      </RQTooltip>
     </div>
   </div>
 );
@@ -128,7 +129,7 @@ const SecretsTable: React.FC<SecretsTableProps> = ({ onViewKeyValues }) => {
 
   const columns: ColumnsType<TableRow> = [
     {
-      title: <ColHeader label="Alias" tooltip="Key to reference this secret in requests via {{secret:ALIAS}}" />,
+      title: <ColHeader label="Alias" tooltip="Name to reference this secret in requests" />,
       key: "alias",
       width: "18%",
       render: (_, row) => {
@@ -177,7 +178,7 @@ const SecretsTable: React.FC<SecretsTableProps> = ({ onViewKeyValues }) => {
     ...(showVersionId
       ? [
           {
-            title: <ColHeader label="Version ID" tooltip="The version ID of the secret value" />,
+            title: <ColHeader label="Version ID" tooltip="Optional, leave blank to fetch latest ID" />,
             key: "versionId",
             width: "22%",
             render: (_: any, row: TableRow) => {
