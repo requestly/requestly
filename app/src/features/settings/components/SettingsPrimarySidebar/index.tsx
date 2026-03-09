@@ -34,7 +34,7 @@ export const SettingsPrimarySidebar: React.FC = () => {
     () => [
       {
         id: "my_accounts",
-        name: "Accounts",
+        name: "Account",
         icon: <MdOutlineAccountBox />,
         children: [
           {
