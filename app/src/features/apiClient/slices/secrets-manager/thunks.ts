@@ -78,11 +78,19 @@ export const fetchAndSaveSecretsForProvider = createAsyncThunk<
   async ({ providerId }, { getState, rejectWithValue }) => {
     const state = getState();
     const allProviderSecrets = selectSecretsByProviderId(state)(providerId);
-    const secretRefs = allProviderSecrets.map((s) => s.secretReference);
+
+    // Rows where both alias and identifier are empty are silently ignored
+    const nonBlankSecrets = allProviderSecrets.filter((s) => {
+      const alias = (s.secretReference.alias ?? "").trim();
+      const identifier = ((s as AwsSecretValue).secretReference.identifier ?? "").trim();
+      return alias !== "" || identifier !== "";
+    });
+
+    const secretRefs = nonBlankSecrets.map((s) => s.secretReference);
 
     // Frontend validation — runs before the IPC call
     const aliasCounts = new Map<string, number>();
-    for (const s of allProviderSecrets) {
+    for (const s of nonBlankSecrets) {
       const alias = (s.secretReference.alias ?? "").trim();
       if (alias) {
         aliasCounts.set(alias, (aliasCounts.get(alias) ?? 0) + 1);
@@ -90,7 +98,7 @@ export const fetchAndSaveSecretsForProvider = createAsyncThunk<
     }
 
     const validationMap: Record<string, { alias?: string; identifier?: string }> = {};
-    for (const s of allProviderSecrets) {
+    for (const s of nonBlankSecrets) {
       const refId = s.secretReference.id;
       const alias = (s.secretReference.alias ?? "").trim();
       const identifier = ((s as AwsSecretValue).secretReference.identifier ?? "").trim();
@@ -127,15 +135,14 @@ export const fetchAndSaveSecretsForProvider = createAsyncThunk<
 
       notification.warn({
         message: "Some secrets failed to fetch",
-        description:
-          singleErrorMessage ?? `${totalErrorCount} secrets failed to fetch. Hover the error icon for details.`,
+        description: singleErrorMessage ?? `${totalErrorCount} secrets failed to fetch.`,
         placement: "bottomRight",
         className: "add-secrets-provider-notification",
       });
     }
 
     const erroredRefIds = new Set([...Object.keys(validationMap), ...backendErrors.map((e) => e.secretRefId)]);
-    const originalErroredRows = allProviderSecrets.filter((s) => erroredRefIds.has(s.secretReference.id));
+    const originalErroredRows = nonBlankSecrets.filter((s) => erroredRefIds.has(s.secretReference.id));
     const allSecretsForRedux = [...secrets, ...originalErroredRows];
 
     secretVariables.updateSourceFromSecrets(secrets as AwsSecretValue[]);
