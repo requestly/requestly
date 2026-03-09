@@ -5,6 +5,7 @@ import { ApiClientLocalStoreMeta } from "../../interfaces";
 import { ApiClientLocalDb } from "./ApiClientLocalDb";
 import dbProvider from "./ApiClientLocalDbProvider";
 import { ApiClientLocalDbTable } from "./types";
+import { MultipleInstanceError } from "features/apiClient/errors/MultipleInstanceError/MultipleInstanceError";
 
 export class ApiClientLocalDbQueryService<T> {
   private dbInstance: ApiClientLocalDb;
@@ -22,97 +23,58 @@ export class ApiClientLocalDbQueryService<T> {
     try {
       return await this.getTable().get(id);
     } catch (error: any) {
+      if (error.name === "DatabaseClosedError") {
+        throw new MultipleInstanceError(
+          "Multiple instances of Requestly are running. Please close other instances to continue.",
+          "DatabaseClosedError"
+        );
+      }
       const e = new Error(error.message);
       throw NativeError.fromError(e).setShowBoundary(true).setSeverity(ErrorSeverity.ERROR);
     }
   }
 
   async getRecords() {
-    try {
-      return await this.getTable().toArray();
-    } catch (error: any) {
-      const e = new Error(error.message);
-      throw NativeError.fromError(e).setShowBoundary(true).setSeverity(ErrorSeverity.ERROR);
-    }
+    return await this.getTable().toArray();
   }
 
   async updateRecord(id: string, record: T) {
-    try {
-      return await this.getTable().update(id, record as UpdateSpec<T>);
-    } catch (error: any) {
-      const e = new Error(error.message);
-      throw NativeError.fromError(e).setShowBoundary(true).setSeverity(ErrorSeverity.ERROR);
-    }
+    return await this.getTable().update(id, record as UpdateSpec<T>);
   }
 
   async createRecord(record: T) {
-    try {
-      return await this.getTable().add(record);
-    } catch (error: any) {
-      const e = new Error(error.message);
-      throw NativeError.fromError(e).setShowBoundary(true).setSeverity(ErrorSeverity.ERROR);
-    }
+    return await this.getTable().add(record);
   }
 
   async createBulkRecords(records: T[]) {
-    try {
-      return await this.getTable().bulkAdd(records);
-    } catch (error: any) {
-      const e = new Error(error.message);
-      throw NativeError.fromError(e).setShowBoundary(true).setSeverity(ErrorSeverity.ERROR);
-    }
+    return await this.getTable().bulkAdd(records);
   }
 
   async updateRecords(updates: (Partial<T> & { id: string })[]) {
-    try {
-      return await this.getTable().bulkUpdate(
-        updates.map((update) => {
-          return {
-            key: update.id,
-            changes: update as UpdateSpec<T>,
-          };
-        })
-      );
-    } catch (error: any) {
-      const e = new Error(error.message);
-      throw NativeError.fromError(e).setShowBoundary(true).setSeverity(ErrorSeverity.ERROR);
-    }
+    return await this.getTable().bulkUpdate(
+      updates.map((update) => {
+        return {
+          key: update.id,
+          changes: update as UpdateSpec<T>,
+        };
+      })
+    );
   }
 
   async deleteRecord(id: string) {
-    try {
-      return await this.getTable().delete(id);
-    } catch (error: any) {
-      const e = new Error(error.message);
-      throw NativeError.fromError(e).setShowBoundary(true).setSeverity(ErrorSeverity.ERROR);
-    }
+    return await this.getTable().delete(id);
   }
 
   async deleteRecords(ids: string[]) {
-    try {
-      return await this.getTable().bulkDelete(ids);
-    } catch (error: any) {
-      const e = new Error(error.message);
-      throw NativeError.fromError(e).setShowBoundary(true).setSeverity(ErrorSeverity.ERROR);
-    }
+    return await this.getTable().bulkDelete(ids);
   }
 
   async clearAllRecords() {
-    try {
-      return await this.getTable().clear();
-    } catch (error: any) {
-      const e = new Error(error.message);
-      throw NativeError.fromError(e).setShowBoundary(true).setSeverity(ErrorSeverity.ERROR);
-    }
+    return await this.getTable().clear();
   }
 
   async getIsAllCleared() {
-    try {
-      const count = await this.getTable().count();
-      return count === 0;
-    } catch (error: any) {
-      const e = new Error(error.message);
-      throw NativeError.fromError(e).setShowBoundary(true).setSeverity(ErrorSeverity.ERROR);
-    }
+    const count = await this.getTable().count();
+    return count === 0;
   }
 }
