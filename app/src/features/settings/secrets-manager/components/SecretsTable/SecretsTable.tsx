@@ -10,7 +10,7 @@ import { RiDeleteBin6Line } from "@react-icons/all-files/ri/RiDeleteBin6Line";
 import { BsThreeDots } from "@react-icons/all-files/bs/BsThreeDots";
 import { FiPlus } from "@react-icons/all-files/fi/FiPlus";
 import { AwsSecretValue } from "@requestly/shared/types/entities/secretsManager";
-import { InfoCircleOutlined } from "@ant-design/icons";
+import { MdErrorOutline } from "@react-icons/all-files/md/MdErrorOutline";
 import {
   selectSecretsForSelectedProvider,
   selectSelectedProviderId,
@@ -144,7 +144,7 @@ const SecretsTable: React.FC<SecretsTableProps> = ({ onViewKeyValues }) => {
             />
             {aliasError && (
               <Tooltip title={aliasError} placement="right" showArrow={false} overlayClassName="error-tooltip">
-                <InfoCircleOutlined className="secret-error-icon" />
+                <MdErrorOutline className="secret-error-icon" />
               </Tooltip>
             )}
           </div>
@@ -167,7 +167,7 @@ const SecretsTable: React.FC<SecretsTableProps> = ({ onViewKeyValues }) => {
             />
             {identifierError && (
               <Tooltip title={identifierError} placement="right" showArrow={false} overlayClassName="error-tooltip">
-                <InfoCircleOutlined className="secret-error-icon" />
+                <MdErrorOutline className="secret-error-icon" />
               </Tooltip>
             )}
           </div>
@@ -203,7 +203,7 @@ const SecretsTable: React.FC<SecretsTableProps> = ({ onViewKeyValues }) => {
           return (
             <Tooltip title={error} placement="right" showArrow={false} overlayClassName="error-tooltip">
               <div className={clsx("secret-error-cell", error && "error-cell")}>
-                <InfoCircleOutlined className="secret-error-icon" />
+                <MdErrorOutline className="secret-error-icon" />
               </div>
             </Tooltip>
           );
