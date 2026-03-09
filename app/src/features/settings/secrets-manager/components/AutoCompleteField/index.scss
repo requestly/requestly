@@ -54,7 +54,7 @@
   }
 }
 
-.ant-select-dropdown {
+.ant-select-dropdown.form-autocomplete-dropdown {
   .ant-select-item-option {
     display: flex;
     padding: var(--space-4, 8px) var(--space-5, 12px);
@@ -75,6 +75,14 @@
 
     &.ant-select-item-option-active {
       background-color: var(--requestly-color-surface-1) !important;
+    }
+
+    .ant-select-item-option-content {
+      color: var(--alias-tokens-color-text-default, #fff);
+      font-family: var(--font-family-default, Inter);
+      font-size: var(--font-size-xs, 11px);
+      font-style: normal;
+      font-weight: 400;
     }
   }
 

@@ -88,7 +88,7 @@ export const VariableAutocompletePopover: React.FC<VariableAutocompleteProps> = 
       }
     }, [selectedIndex, show]);
 
-    const shouldShow = show && (filteredVariables.length > 0 || !!activeMode);
+    const shouldShow = show && filteredVariables.length > 0;
 
     // Get the appropriate footer component
     const FooterComponent = activeMode ? activeMode[1].FooterComponent : SecretsDefaultFooter;

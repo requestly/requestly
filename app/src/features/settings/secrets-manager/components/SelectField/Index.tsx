@@ -37,6 +37,7 @@ export const SelectField: React.FC<SelectFieldProps> = ({
         onChange={handleFilterChange}
         notFoundContent="No options available"
         disabled={disabled}
+        popupClassName="form-select-dropdown"
       />
     </div>
   );

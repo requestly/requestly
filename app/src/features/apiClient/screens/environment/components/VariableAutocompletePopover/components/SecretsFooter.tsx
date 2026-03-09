@@ -15,14 +15,14 @@ export const SecretsFooter: React.FC<SecretsFooterProps> = ({ onClose }) => {
   const providers = useSelector(selectAllSecretProviders);
   const activeProvider = selectedProviderId ? providers.find((p) => p.id === selectedProviderId) : null;
 
-  const handleAddAlias = (e: React.MouseEvent) => {
+  const handleAddAlias = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
     navigate(PATHS.SETTINGS.SECRETS.ABSOLUTE);
     onClose?.();
   };
 
-  const handleOpenSecrets = (e: React.MouseEvent) => {
+  const handleOpenSecrets = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
     navigate(PATHS.SETTINGS.SECRETS.ABSOLUTE);

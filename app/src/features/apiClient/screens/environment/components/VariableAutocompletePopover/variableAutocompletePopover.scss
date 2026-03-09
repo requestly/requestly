@@ -25,15 +25,14 @@
   }
 
   &.variable-autocomplete-submenu {
-    width: 140px !important;
-    margin-left: -10px !important;
+    width: 144px !important;
     .ant-popover-inner {
-      margin-top: 0;
-      width: 140px !important;
+      margin-top: 10px !important;
       margin-left: -10px !important;
+      width: 144px !important;
 
       .variable-autocomplete-item {
-        width: 130px !important;
+        width: 135px !important;
       }
     }
   }
