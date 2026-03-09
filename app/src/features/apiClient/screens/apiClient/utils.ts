@@ -277,7 +277,9 @@ export const supportsRequestBodyForAllMethods = (appMode: string): boolean => {
   return appMode === CONSTANTS.APP_MODES.DESKTOP;
 };
 
-export const generateKeyValuePairs = (data: string | Record<string, string | string[]> = {}): KeyValuePair[] => {
+export const generateKeyValuePairs = (
+  data: string | Record<string, string | string[] | number | boolean | null | undefined> = {}
+): KeyValuePair[] => {
   const result: KeyValuePair[] = [];
   if (typeof data === "string") {
     data = {
@@ -289,7 +291,7 @@ export const generateKeyValuePairs = (data: string | Record<string, string | str
     for (const value of valueArray) {
       result.push({
         key: key || "",
-        value,
+        value: value != null && typeof value !== "object" ? String(value) : "",
         id: Math.random(),
         isEnabled: true,
       });
@@ -660,16 +662,18 @@ export const extractQueryParams = (inputString: string) => {
   return queryParams;
 };
 
-export const queryParamsToURLString = (queryParams: KeyValuePair[], inputString: string) => {
+export const queryParamsToURLString = (queryParams: KeyValuePair[], inputString: string, shouldEncode = false) => {
   const baseUrl = split(inputString, "?")[0];
   const enabledParams = queryParams.filter((param) => param.isEnabled ?? true);
 
   const queryString = enabledParams
     .map(({ key, value }) => {
-      if (value === undefined || value === "") {
-        return key;
+      const encodedKey = shouldEncode ? encodeURIComponent(key) : key;
+      if (value === undefined || value === "" || value === null) {
+        return encodedKey;
       } else {
-        return `${key}=${value}`;
+        const encodedValue = shouldEncode ? encodeURIComponent(value) : value;
+        return `${encodedKey}=${encodedValue}`;
       }
     })
     .filter(Boolean)
