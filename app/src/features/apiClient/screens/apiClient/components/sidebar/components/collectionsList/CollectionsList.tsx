@@ -465,6 +465,8 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
                     handleRecordsToBeDeleted={handleRecordsToBeDeleted}
                     onItemClick={handleItemClick}
                     bulkActionOptions={{ showSelection, selectedRecords, recordsSelectionHandler, setShowSelection }}
+                    expandedRecordIds={expandedRecordIds}
+                    setExpandedRecordIds={setExpandedRecordIds}
                   />
                 );
               })}

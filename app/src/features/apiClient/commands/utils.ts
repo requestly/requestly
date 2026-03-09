@@ -193,6 +193,9 @@ export function getAllRecords(records: RQAPI.ApiClientRecord[]): RQAPI.ApiClient
       if (isApiCollection(record) && record.data.children) {
         stack.push(...record.data.children);
       }
+      if (isApiRequest(record) && record.data.examples?.length) {
+        stack.push(...record.data.examples);
+      }
     }
   }
 
