@@ -73,7 +73,7 @@ const SettingsPrimarySidebar: React.FC = () => {
         gutter={6}
         className="settings-primary-sidebar-back-btn"
         onClick={() => {
-          if (redirectUrl.current) {
+          if (redirectUrl.current && !redirectUrl.current.includes("/settings")) {
             navigate(redirectUrl.current);
             return;
           }
