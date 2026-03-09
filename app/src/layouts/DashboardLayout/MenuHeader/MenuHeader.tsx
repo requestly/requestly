@@ -103,7 +103,11 @@ export const MenuHeader = () => {
         </div>
 
         <div className="app-primary-header__right-section">
-          <RQButton type="transparent" icon={<Settings />} onClick={() => redirectToSettings(navigate)} />
+          <RQButton
+            type="transparent"
+            icon={<Settings />}
+            onClick={() => redirectToSettings(navigate, window.location.pathname, "header")}
+          />
           <HeaderUser />
         </div>
       </div>
