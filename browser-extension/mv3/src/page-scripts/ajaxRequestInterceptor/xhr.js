@@ -105,9 +105,10 @@ export const initXhrInterceptor = (debug) => {
         const contentType = this.getResponseHeader("content-type");
 
         let customResponse;
+        let evaluatorArgs;
 
         if (responseModification.type === "code") {
-          const evaluatorArgs = {
+          evaluatorArgs = {
             method: this._method,
             url: this._requestURL,
             requestHeaders: this._requestHeaders,
