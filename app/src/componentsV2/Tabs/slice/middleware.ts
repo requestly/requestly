@@ -23,6 +23,7 @@ import { reduxStore } from "store";
 import { openBufferedTab } from "./actions";
 import { closeTab, closeAllTabs } from "./thunks";
 import { HistoryViewTabSource } from "features/apiClient/screens/apiClient/components/views/components/request/HistoryView/historyViewTabSource";
+import { ExampleViewTabSource } from "features/apiClient/screens/apiClient/components/views/components/ExampleRequestView/exampleViewTabSource";
 
 export interface GetEntityDataFromTabSourceState {
   records: {
@@ -43,6 +44,7 @@ export function getEntityDataFromTabSource(
 
   const isDraftRequest = source instanceof DraftRequestContainerTabSource;
   const isRequest = source instanceof RequestViewTabSource;
+  const isExample = source instanceof ExampleViewTabSource;
   const isCollection = source instanceof CollectionViewTabSource;
   const isEnvironment = source instanceof EnvironmentViewTabSource;
   const isRuntimeVariables = source instanceof RuntimeVariablesViewTabSource;
@@ -81,6 +83,27 @@ export function getEntityDataFromTabSource(
       entityType,
       entityId,
       data: record,
+    };
+  }
+
+  if (isExample) {
+    const record = apiRecordsAdapter.getSelectors().selectById(state.records.records, sourceId);
+
+    if (!record || record.type !== RQAPI.RecordType.EXAMPLE_API) {
+      throw new EntityNotFound(sourceId, source.type);
+    }
+
+    const exampleRecord = record as RQAPI.ExampleApiRecord;
+
+    const entityType =
+      exampleRecord.data?.type === RQAPI.ApiEntryType.GRAPHQL
+        ? ApiClientEntityType.GRAPHQL_RECORD
+        : ApiClientEntityType.HTTP_RECORD;
+
+    return {
+      entityType,
+      entityId: sourceId,
+      data: exampleRecord,
     };
   }
 

@@ -17,13 +17,14 @@ import { ApiClientWarningPanel } from "../../errors/ApiClientWarningPanel/ApiCli
 import "./apiclientBottomSheet.scss";
 import { ApiClientLargeFileLoader } from "../../../../clientView/components/response/LargeFileLoadingPlaceholder";
 import { BottomSheetTabLabel } from "componentsV2/BottomSheet/components/BottomSheetLayout/components/BottomSheetTabLabel/BottomSheetTabLabel";
-import { GraphQLRecordEntity, HttpRecordEntity } from "features/apiClient/slices/entities";
+import { BufferedGraphQLRecordEntity, BufferedHttpRecordEntity } from "features/apiClient/slices/entities";
 import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
 import { hasTests } from "features/apiClient/helpers/testGeneration/buildPostResponseTests";
 
 interface Props {
-  entity: HttpRecordEntity | GraphQLRecordEntity;
+  entity: BufferedHttpRecordEntity | BufferedGraphQLRecordEntity;
   onGenerateTests?: () => void;
+  isDraftMode: boolean;
   isGeneratingTests?: boolean;
   isLoading: boolean;
   isLongRequest?: boolean;
@@ -45,6 +46,7 @@ const BOTTOM_SHEET_TAB_KEYS = {
 
 export const ApiClientBottomSheet: React.FC<Props> = ({
   entity,
+  isDraftMode,
   onGenerateTests,
   isGeneratingTests = false,
   isLoading,
@@ -61,6 +63,7 @@ export const ApiClientBottomSheet: React.FC<Props> = ({
   const response = useApiClientSelector((s) => entity.getResponse(s));
   const postResponseScript = useApiClientSelector((s) => entity.getPostResponseScript(s));
   const testResults = useApiClientSelector((s) => entity.getTestResults(s));
+  const isExample = useApiClientSelector((s) => entity.getType(s) === RQAPI.RecordType.EXAMPLE_API);
 
   const canGenerateTests = useMemo(() => {
     const responseExists = Boolean(postResponseScript);
@@ -112,25 +115,30 @@ export const ApiClientBottomSheet: React.FC<Props> = ({
         ),
         children: <ResponseHeaders headers={response?.headers} />,
       },
-      {
-        key: BOTTOM_SHEET_TAB_KEYS.TEST_RESULTS,
-        label: (
-          <BottomSheetTabLabel label="Test results">
-            <span className="bottom-sheet-tab">
-              <span>Test results {testResultsStats}</span>
-            </span>
-          </BottomSheetTabLabel>
-        ),
-        children: (
-          <TestsView
-            testResults={testResults}
-            handleTestResultRefresh={handleTestResultRefresh}
-            onGenerateTests={onGenerateTests}
-            isGeneratingTests={isGeneratingTests}
-            canGenerateTests={canGenerateTests}
-          />
-        ),
-      },
+      ...(!isExample
+        ? [
+            {
+              key: BOTTOM_SHEET_TAB_KEYS.TEST_RESULTS,
+              label: (
+                <BottomSheetTabLabel label="Test results">
+                  <span className="bottom-sheet-tab">
+                    <span>Tests {testResultsStats}</span>
+                  </span>
+                </BottomSheetTabLabel>
+              ),
+
+              children: (
+                <TestsView
+                  testResults={testResults}
+                  handleTestResultRefresh={handleTestResultRefresh}
+                  onGenerateTests={onGenerateTests}
+                  isGeneratingTests={isGeneratingTests}
+                  canGenerateTests={canGenerateTests}
+                />
+              ),
+            },
+          ]
+        : []),
     ];
 
     if (isLongRequest) {
@@ -202,6 +210,7 @@ export const ApiClientBottomSheet: React.FC<Props> = ({
     canGenerateTests,
     isGeneratingTests,
     onGenerateTests,
+    isExample,
   ]);
 
   return (
@@ -213,7 +222,9 @@ export const ApiClientBottomSheet: React.FC<Props> = ({
       <div className="api-client-sheet-panel">
         <BottomSheet
           items={bottomSheetTabItems}
-          tabBarExtraContent={!isLoading && <StatusLine response={response} />}
+          tabBarExtraContent={
+            !isLoading && <StatusLine isDraftMode={isDraftMode} response={response} entity={entity} />
+          }
         />
       </div>
     </div>

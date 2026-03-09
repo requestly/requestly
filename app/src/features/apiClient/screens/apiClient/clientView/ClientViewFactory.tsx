@@ -10,9 +10,10 @@ interface Props {
   handleRequestFinished: (entry: RQAPI.ApiEntry) => void;
   isOpenInModal?: boolean;
   override?: GenericApiClientOverride;
+  isDraftMode?: boolean;
 }
 
-export const ClientViewFactory = ({ entity, handleRequestFinished, isOpenInModal, override }: Props) => {
+export const ClientViewFactory = ({ entity, handleRequestFinished, isOpenInModal, override, isDraftMode }: Props) => {
   if (entity.type === ApiClientEntityType.HTTP_RECORD) {
     return (
       <HttpClientView
@@ -20,6 +21,7 @@ export const ClientViewFactory = ({ entity, handleRequestFinished, isOpenInModal
         notifyApiRequestFinished={handleRequestFinished}
         openInModal={isOpenInModal}
         override={override as HttpClientViewProps["override"]}
+        isDraftMode={isDraftMode}
       />
     );
   }
@@ -31,6 +33,7 @@ export const ClientViewFactory = ({ entity, handleRequestFinished, isOpenInModal
         notifyApiRequestFinished={handleRequestFinished}
         openInModal={isOpenInModal}
         override={override as GraphQLClientViewProps["override"]}
+        isDraftMode={isDraftMode}
       />
     );
   }

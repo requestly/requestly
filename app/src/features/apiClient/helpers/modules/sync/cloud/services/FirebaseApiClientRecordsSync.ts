@@ -5,10 +5,12 @@ import {
   upsertApiRecord,
   batchCreateApiRecordsWithExistingId,
   batchUpsertApiRecords,
+  getExamplesForApiRecords,
   getRunConfig as getRunConfigFromFirebase,
   upsertRunConfig as upsertRunConfigFromFirebase,
   getRunResults as getRunResultsFromFirebase,
   addRunResult as addRunResultToFirebase,
+  createExample,
 } from "backend/apiClient";
 import { ApiClientCloudMeta, ApiClientRecordsInterface } from "../../interfaces";
 import { batchWrite, generateDocumentId, getOwnerId } from "backend/utils";
@@ -25,6 +27,8 @@ import { SavedRunConfig } from "features/apiClient/slices/runConfig/types";
 import { SentryCustomSpan } from "utils/sentry";
 import { captureException } from "backend/apiClient/utils";
 import { apiRecordsRankingManager } from "features/apiClient/helpers/RankingManager";
+import { updateExample } from "backend/apiClient/updateExample";
+import { deleteExamples } from "backend/apiClient/deleteExamples";
 
 export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<ApiClientCloudMeta> {
   meta: ApiClientCloudMeta;
@@ -289,6 +293,44 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
     runResult: RunResult
   ): ResponsePromise<SavedRunResult> {
     const result = await addRunResultToFirebase(collectionId, runResult);
+    return result;
+  }
+
+  async getAllExamples(
+    recordIds: string[]
+  ): Promise<{ success: boolean; data: { examples: RQAPI.ExampleApiRecord[]; failedRecordIds?: string[] } }> {
+    const result = await getExamplesForApiRecords(this.getPrimaryId(), recordIds);
+
+    if (!result.success) {
+      return {
+        success: false,
+        data: {
+          examples: [],
+        },
+      };
+    }
+
+    return {
+      success: true,
+      data: {
+        examples: result.data,
+        failedRecordIds: result.failedRecordIds,
+      },
+    };
+  }
+
+  async createExampleRequest(parentRequestId: string, example: RQAPI.ExampleApiRecord): RQAPI.ApiClientRecordPromise {
+    const result = await createExample(this.meta.uid, parentRequestId, example, this.meta.teamId);
+    return result;
+  }
+
+  async updateExampleRequest(example: RQAPI.ExampleApiRecord): RQAPI.ApiClientRecordPromise {
+    const result = await updateExample(this.meta.uid, example, this.meta.teamId);
+    return result;
+  }
+
+  async deleteExamples(exampleRecords: RQAPI.ExampleApiRecord[]): Promise<{ success: boolean; message?: string }> {
+    const result = await deleteExamples(this.meta.uid, exampleRecords);
     return result;
   }
 }

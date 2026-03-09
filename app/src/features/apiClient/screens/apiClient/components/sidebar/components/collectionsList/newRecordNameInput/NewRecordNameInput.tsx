@@ -40,18 +40,34 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({ recordTo
     const result =
       record.type === RQAPI.RecordType.API
         ? await apiClientRecordsRepository.updateRecord(record, record.id)
-        : await apiClientRecordsRepository.renameCollection(record.id, record?.name);
+        : record.type === RQAPI.RecordType.COLLECTION
+        ? await apiClientRecordsRepository.renameCollection(record.id, record?.name)
+        : await apiClientRecordsRepository.updateExampleRequest(record);
 
     if (result.success) {
       onSaveRecord(result.data);
 
-      if (recordType === RQAPI.RecordType.API) {
+      if (recordType === RQAPI.RecordType.API || recordType === RQAPI.RecordType.EXAMPLE_API) {
         trackRequestRenamed("api_client_sidebar");
       } else {
         trackCollectionRenamed();
       }
 
-      const toastSuccessMessage = recordType === RQAPI.RecordType.API ? "Request updated!" : "Collection updated!";
+      let toastSuccessMessage;
+      switch (recordType) {
+        case RQAPI.RecordType.API:
+          toastSuccessMessage = "Request updated!";
+          break;
+        case RQAPI.RecordType.COLLECTION:
+          toastSuccessMessage = "Collection updated!";
+          break;
+        case RQAPI.RecordType.EXAMPLE_API:
+          toastSuccessMessage = "Example updated!";
+          break;
+        default:
+          toastSuccessMessage = "Record updated!";
+          break;
+      }
       toast.success(toastSuccessMessage);
     } else {
       toast.error(result?.message || "Something went wrong!");

@@ -12,7 +12,7 @@ import { ApiClientRepositoryInterface } from "features/apiClient/helpers/modules
 export type GenericApiClientOverride = {
   handleNameChange?: (name: string) => Promise<void>;
   onSaveClick?: {
-    save: (record: RQAPI.ApiRecord, repositories: ApiClientRepositoryInterface) => Promise<RQAPI.ApiRecord>;
+    save: (record: RQAPI.ApiRecord, repositories: ApiClientRepositoryInterface) => Promise<RQAPI.ApiRecord> | void;
     onSuccess: (record: RQAPI.ApiRecord) => void;
     skipMarkSaved?: boolean;
   };
@@ -23,10 +23,11 @@ type Props = {
   override?: GenericApiClientOverride;
   handleAppRequestFinished: (entry: RQAPI.ApiEntry) => void;
   isOpenInModal?: boolean;
+  isDraftMode?: boolean;
 };
 
 export const GenericApiClient: React.FC<Props> = React.memo(
-  ({ entity, override, handleAppRequestFinished, isOpenInModal = false }) => {
+  ({ entity, override, handleAppRequestFinished, isOpenInModal = false, isDraftMode = false }) => {
     return (
       <BottomSheetProvider context={BottomSheetFeatureContext.API_CLIENT}>
         <div className="api-client-container-content">
@@ -37,6 +38,7 @@ export const GenericApiClient: React.FC<Props> = React.memo(
                 handleRequestFinished={handleAppRequestFinished}
                 override={override}
                 isOpenInModal={isOpenInModal}
+                isDraftMode={isDraftMode}
               />
             </AISessionProvider>
           </AutogenerateProvider>

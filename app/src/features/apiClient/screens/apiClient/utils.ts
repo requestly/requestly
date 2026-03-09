@@ -177,9 +177,9 @@ export const getEmptyApiEntry = (apiEntryType: RQAPI.ApiEntryType, request?: RQA
   }
 };
 
-export const getEmptyDraftApiRecord = (apiEntryType: RQAPI.ApiEntryType, request?: RQAPI.Request): RQAPI.ApiRecord => {
+export const getEmptyDraftApiRecord = (apiEntryType: RQAPI.ApiEntryType, entry?: RQAPI.ApiEntry): RQAPI.ApiRecord => {
   return {
-    data: getEmptyApiEntry(apiEntryType),
+    data: entry ?? getEmptyApiEntry(apiEntryType),
     type: RQAPI.RecordType.API,
     id: "",
     name: DEFAULT_REQUEST_NAME,
@@ -230,6 +230,30 @@ export const sanitizeEntry = (entry: RQAPI.HttpApiEntry, removeInvalidPairs = tr
 };
 
 /**
+ * Clears file-type key-value pair values in multipart form body.
+ * Use when saving/creating an example so the example does not store file references.
+ */
+export const sanitizeExampleMultiPartFormBody = (entryData: RQAPI.HttpApiEntry): RQAPI.HttpApiEntry => {
+  const request = entryData?.request;
+  if (!request || request.contentType !== RequestContentType.MULTIPART_FORM || !Array.isArray(request.body)) {
+    return entryData;
+  }
+  const clearedMultipartFormBody = request.body.map((pair) => {
+    if (pair.type === FormDropDownOptions.FILE) {
+      return { ...pair, value: [] };
+    }
+    return pair;
+  }) as RQAPI.MultipartFormBody;
+  return {
+    ...entryData,
+    request: {
+      ...request,
+      body: clearedMultipartFormBody,
+    },
+  };
+};
+
+/**
  * generic sanitization fx for keyValuePairs (form & multipartform)
  */
 export const sanitizeKeyValuePairs = <T extends KeyValuePair>(keyValuePairs: T[], removeInvalidPairs = true): T[] => {
@@ -254,7 +278,9 @@ export const supportsRequestBodyForAllMethods = (appMode: string): boolean => {
   return appMode === CONSTANTS.APP_MODES.DESKTOP;
 };
 
-export const generateKeyValuePairs = (data: string | Record<string, string | string[]> = {}): KeyValuePair[] => {
+export const generateKeyValuePairs = (
+  data: string | Record<string, string | string[] | number | boolean | null | undefined> = {}
+): KeyValuePair[] => {
   const result: KeyValuePair[] = [];
   if (typeof data === "string") {
     data = {
@@ -266,7 +292,7 @@ export const generateKeyValuePairs = (data: string | Record<string, string | str
     for (const value of valueArray) {
       result.push({
         key: key || "",
-        value,
+        value: value != null && typeof value !== "object" ? String(value) : "",
         id: Math.random(),
         isEnabled: true,
       });
@@ -512,12 +538,19 @@ export const sortRecords = (records: RQAPI.ApiClientRecord[]) => {
 };
 
 const sortNestedRecords = (records: RQAPI.ApiClientRecord[]) => {
+  // TODO: Fix this
   records.forEach((record) => {
     if (isApiCollection(record)) {
       record.data.children = sortRecords(record.data.children ?? []);
       sortNestedRecords(record.data.children);
+    } else if (isApiRequest(record) && record.data.examples?.length) {
+      record.data.examples = apiRecordsRankingManager.sort(record.data.examples) as RQAPI.ExampleApiRecord[];
     }
   });
+};
+
+export const isExampleApiRecord = (record: RQAPI.ApiClientRecord): record is RQAPI.ExampleApiRecord => {
+  return record.type === RQAPI.RecordType.EXAMPLE_API;
 };
 
 export const convertFlatRecordsToNestedRecords = (records: RQAPI.ApiClientRecord[]) => {
@@ -532,11 +565,28 @@ export const convertFlatRecordsToNestedRecords = (records: RQAPI.ApiClientRecord
         data: { ...record.data, children: [] },
       };
     } else if (isApiRequest(record)) {
-      recordsMap[record.id] = record;
+      recordsMap[record.id] = {
+        ...record,
+        data: { ...record.data, examples: [] },
+      };
+    }
+  });
+
+  // Attach example records to their parent requests
+  recordsCopy.forEach((record) => {
+    if (isExampleApiRecord(record)) {
+      const parentRequest = recordsMap[record.parentRequestId] as RQAPI.ApiRecord | undefined;
+      if (parentRequest && isApiRequest(parentRequest)) {
+        if (!parentRequest.data.examples) {
+          parentRequest.data.examples = [];
+        }
+        parentRequest.data.examples.push(record);
+      }
     }
   });
 
   recordsCopy.forEach((record) => {
+    if (isExampleApiRecord(record)) return;
     const recordState = recordsMap[record.id];
     const parentNode = recordsMap[record.collectionId as string] as RQAPI.CollectionRecord;
     if (parentNode) {
@@ -567,7 +617,7 @@ export const createBlankApiRecord = (
     newRecord.data = getEmptyApiEntry(entryType ?? RQAPI.ApiEntryType.HTTP);
     newRecord.deleted = false;
     newRecord.collectionId = collectionId;
-    const rank = apiRecordsRankingManager.getRanksForNewApis(context, collectionId, [newRecord])[0];
+    const rank = apiRecordsRankingManager.getRanksForNewApiRecords(context, collectionId, [newRecord])[0];
     if (rank) {
       newRecord.rank = rank;
     }
@@ -613,16 +663,18 @@ export const extractQueryParams = (inputString: string) => {
   return queryParams;
 };
 
-export const queryParamsToURLString = (queryParams: KeyValuePair[], inputString: string) => {
+export const queryParamsToURLString = (queryParams: KeyValuePair[], inputString: string, shouldEncode = false) => {
   const baseUrl = split(inputString, "?")[0];
   const enabledParams = queryParams.filter((param) => param.isEnabled ?? true);
 
   const queryString = enabledParams
     .map(({ key, value }) => {
-      if (value === undefined || value === "") {
-        return key;
+      const encodedKey = shouldEncode ? encodeURIComponent(key) : key;
+      if (value === undefined || value === "" || value === null) {
+        return encodedKey;
       } else {
-        return `${key}=${value}`;
+        const encodedValue = shouldEncode ? encodeURIComponent(value) : value;
+        return `${encodedKey}=${encodedValue}`;
       }
     })
     .filter(Boolean)
@@ -651,11 +703,18 @@ export const filterRecordsBySearch = (
       }
       childrenMap.get(record.collectionId)?.add(record.id);
     }
+    if (isExampleApiRecord(record)) {
+      parentMap.set(record.id, record.parentRequestId);
+      if (!childrenMap.has(record.parentRequestId)) {
+        childrenMap.set(record.parentRequestId, new Set());
+      }
+      childrenMap.get(record.parentRequestId)?.add(record.id);
+    }
   });
 
-  // Add all children records of a collection
-  const addChildrenRecords = (collectionId: string) => {
-    const children = childrenMap.get(collectionId) || new Set();
+  // Add all children records of a collection or request
+  const addChildrenRecords = (recordId: string) => {
+    const children = childrenMap.get(recordId) || new Set();
     children.forEach((childId) => {
       matchingRecords.add(childId);
       if (childrenMap.has(childId)) {
@@ -664,12 +723,12 @@ export const filterRecordsBySearch = (
     });
   };
 
-  // Add all parent collections of a record
-  const addParentCollections = (recordId: string) => {
+  // Add all parent collections/requests of a record
+  const addParents = (recordId: string) => {
     const parentId = parentMap.get(recordId);
     if (parentId) {
       matchingRecords.add(parentId);
-      addParentCollections(parentId);
+      addParents(parentId);
     }
   };
 
@@ -678,16 +737,16 @@ export const filterRecordsBySearch = (
     if (record.name.toLowerCase().includes(search)) {
       matchingRecords.add(record.id);
 
-      // If collection matches, add all children records
-      if (isApiCollection(record)) {
+      // If collection or request matches, add all children records
+      if (isApiCollection(record) || isApiRequest(record)) {
         addChildrenRecords(record.id);
       }
     }
   });
 
-  // Second pass: add parent collections
+  // Second pass: add parents
   matchingRecords.forEach((id) => {
-    addParentCollections(id);
+    addParents(id);
   });
 
   return records.filter((record) => matchingRecords.has(record.id));
@@ -810,6 +869,7 @@ export const processRecordsForDuplication = (
   context: ApiClientFeatureContext
 ) => {
   const recordsToDuplicate: RQAPI.ApiClientRecord[] = [];
+  const examplesToDuplicate: Array<{ parentRequestId: string; example: RQAPI.ExampleApiRecord }> = [];
   const queue: RQAPI.ApiClientRecord[] = [...recordsToProcess];
 
   while (queue.length > 0) {
@@ -835,23 +895,33 @@ export const processRecordsForDuplication = (
         );
         queue.push(...childrenToDuplicate);
       }
-    } else {
+    } else if (record.type === RQAPI.RecordType.API) {
+      const newId = apiClientRecordsRepository.generateApiRecordId(record.collectionId ?? undefined);
+      const { examples = [], ...requestData } = record.data;
       const requestToDuplicate: RQAPI.ApiClientRecord = Object.assign({}, record, {
-        id: apiClientRecordsRepository.generateApiRecordId(record.collectionId ?? undefined),
+        id: newId,
         name: `(Copy) ${record.name}`,
+        data: requestData,
       });
       // Set rank for the duplicated request
-      requestToDuplicate.rank = apiRecordsRankingManager.getRankForDuplicatedApi(
+      requestToDuplicate.rank = apiRecordsRankingManager.getRankForDuplicatedRecord(
         context,
         record,
         record.collectionId ?? ""
       );
 
       recordsToDuplicate.push(requestToDuplicate);
+
+      // Collect examples associated with this request for duplication
+      if (examples.length) {
+        for (const example of examples) {
+          examplesToDuplicate.push({ parentRequestId: newId, example });
+        }
+      }
     }
   }
 
-  return recordsToDuplicate;
+  return { recordsToDuplicate, examplesToDuplicate };
 };
 
 export const resolveAuth = (
