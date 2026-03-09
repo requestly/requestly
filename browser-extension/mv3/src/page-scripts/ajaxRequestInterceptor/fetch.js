@@ -151,6 +151,8 @@ export const initFetchInterceptor = (debug) => {
       let customResponse;
       const responseModification = responseRule.pairs[0].response;
 
+      let evaluatorArgs;
+
       if (responseModification.type === "code") {
         const requestHeaders =
           request.headers &&
@@ -159,7 +161,7 @@ export const initFetchInterceptor = (debug) => {
             return obj;
           }, {});
 
-        let evaluatorArgs = {
+        evaluatorArgs = {
           method,
           url,
           requestHeaders,

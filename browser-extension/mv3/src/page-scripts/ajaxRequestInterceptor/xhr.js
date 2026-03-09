@@ -116,16 +116,12 @@ export const initXhrInterceptor = (debug) => {
             responseType: contentType,
             response: this.response,
             responseJSON: jsonifyValidJSONString(this.response, true),
-            responseStatusCode: this.status,
+            responseStatusCode: this._rqResponseStatus ?? this.status,
           };
 
           customResponse = getFunctionFromCode(responseModification.value, "response")(evaluatorArgs);
         } else {
           customResponse = responseModification.value;
-        }
-
-        if (typeof customResponse === "undefined") {
-          return;
         }
 
         // Convert customResponse back to rawText
@@ -140,6 +136,10 @@ export const initXhrInterceptor = (debug) => {
           if (!isNaN(dynamicStatusCode)) {
             this._rqResponseStatus = dynamicStatusCode;
           }
+        }
+
+        if (typeof customResponse === "undefined") {
+          return;
         }
 
         debug && console.log("[RQ]", "Rule Applied - customResponse", { customResponse, responseType, contentType });
