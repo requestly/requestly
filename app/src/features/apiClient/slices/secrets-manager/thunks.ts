@@ -27,8 +27,6 @@ export const fetchSecretProviders = createAsyncThunk<
 >(`${SECRETS_MANAGER_SLICE_NAME}/fetchProviders`, async (_, { rejectWithValue, dispatch, getState }) => {
   const result = await secretsManagerService.listProviders();
 
-  console.log("!!!debug", "result", result);
-
   if (result.type === "error") {
     return rejectWithValue(result.error.message);
   }
@@ -172,7 +170,6 @@ let isSubscriptionRegistered = false;
 export const initAndSubscribeSecretsManager = createAsyncThunk<void, string, { rejectValue: string; state: RootState }>(
   `${SECRETS_MANAGER_SLICE_NAME}/init`,
   async (userId, { dispatch, getState, rejectWithValue, signal }) => {
-    console.log("!!!debug", "initAndSubscribeSecretsManager", userId);
     isSubscriptionRegistered = false;
     const initResult = await secretsManagerService.init(userId);
 
@@ -201,7 +198,6 @@ export const initAndSubscribeSecretsManager = createAsyncThunk<void, string, { r
     const activeProviderId = selectSelectedProviderId(state);
 
     if (activeProviderId) {
-      console.log("!!!debug", "initAndSubscribeSecretsManager", "listSecrets", activeProviderId);
       await dispatch(listSecrets(activeProviderId));
     }
   }
