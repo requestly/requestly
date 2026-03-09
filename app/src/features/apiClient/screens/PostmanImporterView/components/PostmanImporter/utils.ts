@@ -447,7 +447,7 @@ const createApiRecord = (
     request.url?.query?.map((query: any, index: number) => ({
       id: index,
       key: query.key,
-      value: query.value,
+      value: query.value != null && typeof query.value !== "object" ? String(query.value) : "",
       isEnabled: query?.disabled !== true,
       description: query.description || "",
       dataType: getInferredKeyValueDataType(query.value),
