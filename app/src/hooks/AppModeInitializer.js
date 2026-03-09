@@ -378,7 +378,12 @@ const AppModeInitializer = () => {
           source: payload.source,
         };
 
-        navigate(PATHS.API_CLIENT.ABSOLUTE, { state: navigationState });
+        // Using setTimeout to ensure that this runs after the current call stack is cleared
+        // This allows the redirection by useRootPathRedirector to happen first
+        // Other useRootPathRedirector triggers navigation and deletes the navigation state passed here
+        setTimeout(() => {
+          navigate(PATHS.API_CLIENT.ABSOLUTE, { state: navigationState });
+        }, 0);
 
         return {
           received: true,
