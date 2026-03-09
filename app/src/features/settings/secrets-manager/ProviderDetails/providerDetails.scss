@@ -107,3 +107,43 @@
     margin: 0;
   }
 }
+
+.instance-select-dropdown.ant-select-dropdown {
+  .check-circle-icon {
+    color: var(--requestly-color-text-subtle, #bbb);
+  }
+  .ant-select-item-option {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4, 8px);
+    align-self: stretch;
+    border-radius: 4px;
+
+    &:hover {
+      background: var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
+    }
+    .ant-select-item-option-content {
+      color: var(--requestly-color-text-default, #fff);
+      font-family: var(--font-family-default, Inter);
+      font-size: var(--font-size-xs, 11px);
+      font-style: normal;
+      font-weight: 400;
+    }
+  }
+
+  .ant-select-item-option-disabled > .ant-select-item-option-content {
+    color: var(--requestly-color-text-subtle, #bbb);
+    font-family: var(--font-family-default, Inter);
+    font-size: var(--font-size-xs, 11px);
+    font-style: normal;
+    font-weight: 400;
+  }
+
+  .ant-select-item-empty {
+    color: var(--requestly-color-text-subtle, #bbb);
+    font-family: var(--font-family-default, Inter);
+    font-size: var(--font-size-xs, 11px);
+    font-style: normal;
+    font-weight: 400;
+  }
+}

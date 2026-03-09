@@ -6,7 +6,7 @@ import PATHS from "config/constants/sub/paths";
 import { useSelector } from "react-redux";
 import CheckCircleOutlined from "@ant-design/icons/lib/icons/CheckCircleOutlined";
 import { RQButton } from "lib/design-system-v2/components/RQButton/RQButton";
-import FilterIcon from "assets/icons/filter-manage.svg?react";
+import { LuSlidersHorizontal } from "@react-icons/all-files/lu/LuSlidersHorizontal";
 import "./index.scss";
 import { RevealableSecretField } from "componentsV2/RevealableSecretField/RevealableSecretField";
 
@@ -40,7 +40,7 @@ export const SecretsVariableInfo: React.FC<{
         <RQButton
           type="transparent"
           size="small"
-          icon={<FilterIcon className="filter-icon" />}
+          icon={<LuSlidersHorizontal className="filter-icon" />}
           onClick={handleManageClick}
           className="manage-button"
         >
