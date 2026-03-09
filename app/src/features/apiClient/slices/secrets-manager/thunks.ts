@@ -8,12 +8,7 @@ import {
 import { notification } from "antd";
 import { secretsManagerService, toSecretProviderConfig, SecretFetchError } from "services/secretsManagerService";
 import { ProviderData } from "features/settings/secrets-manager/context/SecretsModalsContext";
-import {
-  selectAllSecrets,
-  selectSelectedProviderId,
-  selectAllSecretProviders,
-  selectSecretsByProviderId,
-} from "./selectors";
+import { selectSelectedProviderId, selectAllSecretProviders, selectSecretsByProviderId } from "./selectors";
 import { secretsManagerActions } from "./slice";
 import { secretVariables } from "lib/secret-variables";
 import { SECRETS_MANAGER_SLICE_NAME } from "../common/constants";
@@ -40,10 +35,12 @@ export const fetchSecretProviders = createAsyncThunk<
     if (!activeProviderId || !result.data.some((p) => p.id === activeProviderId)) {
       const firstProvider = result.data[0]!;
       dispatch(secretsManagerActions.setSelectedProviderId(firstProvider.id));
+      await dispatch(listSecrets(firstProvider.id)).unwrap();
     }
   } else {
     dispatch(secretsManagerActions.setAllProviders([]));
     dispatch(secretsManagerActions.setSelectedProviderId(null));
+    secretVariables.updateSourceFromSecrets([]);
   }
 
   return result.data;
