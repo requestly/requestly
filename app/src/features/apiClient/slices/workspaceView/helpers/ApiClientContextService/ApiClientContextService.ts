@@ -18,7 +18,7 @@ import {
 } from "../ApiClientContextRegistry/ApiClientContextRegistry";
 import { configureStore, EntityState } from "@reduxjs/toolkit";
 import { apiRecordsSlice } from "features/apiClient/slices/apiRecords";
-import { forceRefreshRecords } from "features/apiClient/slices/apiRecords/thunks";
+import { forceRefreshRecords, getExamplesForApiRecords } from "features/apiClient/slices/apiRecords/thunks";
 import { forceRefreshEnvironments } from "features/apiClient/slices/environments/thunks";
 import { WorkspaceInfo } from "../../types";
 import persistStore from "redux-persist/es/persistStore";
@@ -453,6 +453,21 @@ class ApiClientContextService {
 
     const ctx: ApiClientFeatureContext = { workspaceId, store, repositories: repo };
     this.contextRegistry.addContext(ctx, currentCtxVersion);
+
+    const apiRecordIds = result.apiClientRecords.records
+      .filter((r) => r.type === RQAPI.RecordType.API)
+      .map((r) => r.id);
+
+    if (!apiRecordIds.length) {
+      return;
+    }
+
+    store.dispatch(
+      getExamplesForApiRecords({
+        apiRecordIds,
+        repository: repo.apiClientRecordsRepository,
+      }) as any
+    );
   }
 
   async refreshContext(workspaceId: ApiClientFeatureContext["workspaceId"]): Promise<void> {

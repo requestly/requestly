@@ -17,6 +17,7 @@ import "./singleWorkspaceSidebar.scss";
 import { MdOutlineSpaceDashboard } from "@react-icons/all-files/md/MdOutlineSpaceDashboard";
 import { RuntimeVariables } from "features/apiClient/screens/environment/components/RuntimeVariables/runtimevariables";
 import { ApiClientFeatureContext, useApiClientFeatureContext, useApiClientRepository } from "features/apiClient/slices";
+import { ErrorFilesList } from "../components/ErrorFilesList/ErrorFileslist";
 
 interface Props {}
 
@@ -253,7 +254,7 @@ export const SingleWorkspaceSidebar: React.FC<Props> = () => {
             onChange={handleActiveTabChange}
           />
         </div>
-        {/* <ErrorFilesList /> */}
+        <ErrorFilesList />
       </div>
 
       {isDeleteModalOpen ? (
