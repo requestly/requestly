@@ -16,7 +16,6 @@
     opacity: 0.8;
   }
 
-  justify-content: flex-start;
   svg {
     width: 14px;
     height: 14px;
@@ -68,24 +67,6 @@
   font-size: var(--requestly-font-size-md, 14px);
   font-weight: 400;
 }
-
-// .settings-primary-sidebar-section-link {
-//   display: flex;
-//   align-items: center;
-//   color: var(--requestly-color-text-default) !important;
-//   font-size: var(--requestly-font-size-md, 14px);
-//   font-weight: 400;
-//   padding: 8px 8px;
-//   border-radius: 4px;
-//   text-decoration: none;
-//   margin-bottom: 4px;
-//   transition: background-color 0.2s;
-//   min-height: 32px;
-
-//   &:hover {
-//     background-color: var(--requestly-color-white-t-5);
-//   }
-// }
 
 .settings-primary-sidebar-section-active-link {
   background-color: var(--requestly-color-white-t-10);
