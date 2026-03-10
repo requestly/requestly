@@ -12,7 +12,7 @@ import {
   trackExportCollectionsClicked,
 } from "modules/analytics/events/features/apiClient";
 import { MdOutlineIosShare } from "@react-icons/all-files/md/MdOutlineIosShare";
-import { postmanCollectionExporter } from "alternative-importers-beta";
+import { postmanCollectionExporter } from "@requestly/alternative-importers";
 import { apiRecordsRankingManager } from "features/apiClient/helpers/RankingManager";
 
 interface PostmanExportModalProps {
