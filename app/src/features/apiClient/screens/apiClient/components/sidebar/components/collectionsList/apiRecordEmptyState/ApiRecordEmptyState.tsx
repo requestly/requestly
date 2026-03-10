@@ -63,7 +63,6 @@ export const ApiRecordEmptyState: React.FC<Props> = ({ record, disabled, message
     () => ({
       accept: [RQAPI.RecordType.API, RQAPI.RecordType.COLLECTION],
       drop: (item: DraggableApiRecord, monitor) => {
-        console.log("Dropped item:", item);
         const isOverCurrent = monitor.isOver({ shallow: true });
         if (!isOverCurrent) return;
         handleRecordDrop(item, context.workspaceId);
