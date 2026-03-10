@@ -68,22 +68,25 @@ const SettingsPrimarySidebar: React.FC = () => {
 
   return (
     <Col className="settings-primary-sidebar">
-      <Row align="middle" gutter={6}>
+      <Row
+        align="middle"
+        gutter={6}
+        className="settings-primary-sidebar-back-btn"
+        onClick={() => {
+          if (redirectUrl.current && !redirectUrl.current.includes("/settings")) {
+            navigate(redirectUrl.current);
+            return;
+          }
+          if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) redirectToTraffic(navigate);
+          else navigate(APP_CONSTANTS.PATHS.HOME.ABSOLUTE);
+        }}
+      >
         <Col>
-          <IoMdArrowBack
-            className="settings-primary-sidebar-title-icon"
-            onClick={() => {
-              if (redirectUrl.current) {
-                navigate(redirectUrl.current);
-                return;
-              }
-              if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) redirectToTraffic(navigate);
-              else navigate(APP_CONSTANTS.PATHS.HOME.ABSOLUTE);
-            }}
-          />
+          <IoMdArrowBack className="settings-primary-sidebar-title-icon" />
         </Col>
-        <Col className="settings-primary-sidebar-title">Settings</Col>
+        <Col className="settings-primary-sidebar-back-label">Back</Col>
       </Row>
+      <div className="settings-primary-sidebar-title">Settings</div>
 
       <Col className="mt-16">
         {sidebarItems.map((item) => {
