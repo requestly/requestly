@@ -19,48 +19,72 @@ interface UseScopeOptionsResult {
 const createIconWithWrapper = (
   IconComponent: React.ComponentType<{ style?: React.CSSProperties }>,
   iconColor: string,
-  bgColor = "transparent"
+  bgColor: string = "transparent",
+  text?: string
 ) => {
   return React.createElement(
     "div",
     {
       style: {
-        width: "20px",
-        height: "16px",
-        display: "flex",
+        display: "inline-flex",
         alignItems: "center",
-        justifyContent: "center",
+        gap: "4px",
+        padding: "0 6px",
+        height: "16px",
         backgroundColor: bgColor,
         borderRadius: "4px",
+        fontSize: "10px",
+        lineHeight: 1,
+        whiteSpace: "nowrap",
       },
     },
     React.createElement(IconComponent, {
-      style: { color: iconColor, height: "12px", width: "12px" },
-    })
+      style: {
+        color: iconColor,
+        height: "12px",
+        width: "12px",
+        flexShrink: 0,
+      },
+    }),
+    text ? React.createElement("span", { style: { color: iconColor } }, text) : null
   );
 };
 
-export const getScopeIcon = (scope: VariableScope): React.ReactNode => {
+export const getScopeIcon = (
+  scope: VariableScope,
+  config?: {
+    showBackgroundColor?: boolean;
+    showText?: boolean;
+  }
+): React.ReactNode => {
+  const { showBackgroundColor = true, showText = false } = config ?? {};
+
   switch (scope) {
     case VariableScope.ENVIRONMENT:
       return createIconWithWrapper(
         MdHorizontalSplit,
         "var(--requestly-color-primary-text)",
-        "var(--requestly-color-primary-darker)"
+        showBackgroundColor ? "var(--requestly-color-primary-darker)" : "transparent"
       );
     case VariableScope.COLLECTION:
-      return createIconWithWrapper(BiNote, "var(--requestly-color-text-subtle)", "var(--requestly-color-surface-2)");
+      return createIconWithWrapper(
+        BiNote,
+        "var(--requestly-color-text-subtle)",
+        showBackgroundColor ? "var(--requestly-color-surface-2)" : "transparent"
+      );
     case VariableScope.GLOBAL:
+    case VariableScope.DYNAMIC:
       return createIconWithWrapper(
         BsGlobeCentralSouthAsia,
         "var(--requestly-color-success-text)",
-        "var(--requestly-color-success-darker)"
+        showBackgroundColor ? "var(--requestly-color-success-darker)" : "transparent",
+        scope === VariableScope.DYNAMIC && showText ? "DYNAMIC" : undefined
       );
     case VariableScope.RUNTIME:
       return createIconWithWrapper(
         MdOutlineCategory,
-        "var(--requestly-color-text-subtle)",
-        "var(--requestly-color-warning-darker)"
+        "var(--requestly-color-warning-dark)",
+        showBackgroundColor ? "var(--requestly-color-warning-darker)" : "transparent"
       );
     default:
       return null;
