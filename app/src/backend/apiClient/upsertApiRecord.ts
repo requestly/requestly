@@ -21,16 +21,30 @@ export function sanitizeRecord(record: Partial<RQAPI.ApiClientRecord>) {
     if (sanitizedRecord.data) {
       delete sanitizedRecord.data.children;
 
-      // Remove localValue from collection variables
+      // Remove localValue and drop entries with empty keys (from entry or value.key)
       if (sanitizedRecord.data.variables) {
         sanitizedRecord.data.variables = Object.fromEntries(
           Object.entries(sanitizedRecord.data.variables)
-            .filter(([key]) => key !== "")
-            .map(([key, variable]) => {
-              const { localValue, ...rest } = variable;
-              return [key, rest];
+            .map(([entryKey, variable]) => {
+              const entryKeyTrimmed = (entryKey || "").trim();
+              const valueKeyTrimmed = (variable?.key || "").toString().trim();
+              const finalKey = entryKeyTrimmed || valueKeyTrimmed;
+
+              if (!finalKey) {
+                return null; // will be filtered out
+              }
+
+              const { localValue, key: _ignored, ...rest } = variable;
+              return [finalKey, rest];
             })
+            .filter((pair): pair is [string, any] => Array.isArray(pair))
         );
+
+        if (Array.isArray(sanitizedRecord.data.variablesOrder)) {
+          sanitizedRecord.data.variablesOrder = sanitizedRecord.data.variablesOrder
+            .map((k) => (k || "").trim())
+            .filter((k) => k && sanitizedRecord.data?.variables[k]);
+        }
       }
     }
   }
