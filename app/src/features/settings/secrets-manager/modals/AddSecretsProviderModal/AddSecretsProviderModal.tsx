@@ -25,6 +25,12 @@ interface AddSecretsProviderModalProps {
   error?: string;
 }
 
+const optionalTitle = (label: string) => (
+  <span className="element-label">
+    {label} <span className="optional-label">(optional)</span>
+  </span>
+);
+
 const errorSuffix = (error: string) => (
   <Tooltip title={error} placement="right" showArrow={false} overlayClassName="error-tooltip">
     <InfoCircleOutlined className="info-icon" />
@@ -141,7 +147,7 @@ export const AddSecretsProviderModal = ({
           disabled={isFetchingConfig || isSavingProvider}
         />
         <InputPasswordField
-          label="Session token"
+          label={optionalTitle("Session token")}
           id="session-token"
           value={providerData.sessionToken || ""}
           onValueChange={(value) => onChange({ sessionToken: value })}

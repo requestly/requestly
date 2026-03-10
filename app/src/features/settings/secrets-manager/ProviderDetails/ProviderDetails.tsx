@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { AiOutlineCheckCircle } from "@react-icons/all-files/ai/AiOutlineCheckCircle";
 import SecretsTable from "../components/SecretsTable/SecretsTable";
 import "./providerDetails.scss";
-import { RQButton } from "lib/design-system-v2/components";
+import { RQButton, RQTooltip } from "lib/design-system-v2/components";
 import {
   selectAllSecretProviders,
   selectSelectedProviderId,
@@ -14,7 +14,9 @@ import {
   secretsManagerActions,
   fetchAndSaveSecretsForProvider,
   listSecrets,
+  selectSecretsForSelectedProvider,
 } from "features/apiClient/slices/secrets-manager";
+import { CheckCircleOutlined } from "@ant-design/icons";
 
 const { Option } = Select;
 
@@ -39,6 +41,7 @@ const ProviderDetails: React.FC<ProviderDetailsProps> = ({ onViewKeyValues }) =>
   const lastFetchedTimestamp = useSelector(selectLastFetchedForSelectedProvider);
   const fetchStatus = useSelector(selectFetchStatus);
   const isDirty = useSelector(selectIsDirtyForSelectedProvider);
+  const secrets = useSelector(selectSecretsForSelectedProvider);
 
   const isFetching = fetchStatus === "loading";
   const lastFetched = useMemo(() => (lastFetchedTimestamp ? formatRelativeTime(lastFetchedTimestamp) : null), [
@@ -69,6 +72,8 @@ const ProviderDetails: React.FC<ProviderDetailsProps> = ({ onViewKeyValues }) =>
             className="instance-select"
             size="small"
             dropdownMatchSelectWidth={false}
+            popupClassName="instance-select-dropdown"
+            menuItemSelectedIcon={<CheckCircleOutlined className="check-circle-icon" />}
           >
             {providers.map((provider) => (
               <Option key={provider.id} value={provider.id}>
@@ -78,10 +83,16 @@ const ProviderDetails: React.FC<ProviderDetailsProps> = ({ onViewKeyValues }) =>
           </Select>
 
           {selectedProviderId && (
-            <span className="active-instance-badge">
-              <AiOutlineCheckCircle className="active-icon" />
-              Active instance
-            </span>
+            <RQTooltip
+              title="Secrets used in requests will be resolved from this provider"
+              showArrow={false}
+              placement="topLeft"
+            >
+              <span className="active-instance-badge">
+                <AiOutlineCheckCircle className="active-icon" />
+                Active instance
+              </span>
+            </RQTooltip>
           )}
         </div>
 
@@ -91,7 +102,13 @@ const ProviderDetails: React.FC<ProviderDetailsProps> = ({ onViewKeyValues }) =>
           ) : (
             lastFetched && <span className="last-fetched">Last fetched: {lastFetched}</span>
           )}
-          <RQButton type="primary" loading={isFetching} onClick={handleFetchSecrets} className="fetch-secrets-btn">
+          <RQButton
+            type="primary"
+            loading={isFetching}
+            onClick={handleFetchSecrets}
+            className="fetch-secrets-btn"
+            disabled={secrets?.length === 0}
+          >
             {isDirty && <span className="unsaved-dot" />}
             Fetch secrets
           </RQButton>
