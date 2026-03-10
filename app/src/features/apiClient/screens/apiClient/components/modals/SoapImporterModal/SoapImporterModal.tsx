@@ -3,7 +3,7 @@ import { Modal, Spin } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
 import { CommonApiClientImporter, ImportFile } from "../../CommonApiClientImporter/CommonApiClientImporter";
 import { ApiClientImporterMethod } from "alternative-importers-beta-sd";
-import { ApiClientImporterType } from "@requestly/shared/types/entities/apiClient";
+import { ApiClientImporterType } from "shared-beta-sd/types/entities/apiClient";
 import { useWsdlFetcher } from "../../../../../hooks/useWsdlFetcher";
 import { WsdlFetchError } from "../../../../../errors/SoapImportError/SoapImportError";
 import { SoapSuccessfulParseView } from "./SoapSuccessfulParseView";
