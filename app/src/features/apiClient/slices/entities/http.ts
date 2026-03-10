@@ -188,7 +188,12 @@ export class HttpRecordEntity<
     });
   }
 
-  setResponse(response: RQAPI.HttpResponse): void {
+  setResponse(response: RQAPI.HttpResponse | null): void {
+    if (response === null) {
+      this.DELETECOMMON({ data: { response: null } });
+      return;
+    }
+
     this.SETCOMMON({ data: { response } });
   }
 
