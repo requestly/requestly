@@ -22,12 +22,26 @@ const initialState: SecretsManagerState = {
   fetchStatus: "idle",
   fetchErrors: {},
   validationErrors: {},
+  editedSecretIds: new Set(),
 };
 
 function removeSecretsForProvider(state: SecretsManagerState, providerId: string) {
   const allSecrets = secretsAdapter.getSelectors().selectAll(state.secrets);
   const idsToRemove = allSecrets.filter((s) => s.providerId === providerId).map((s) => s.secretReference.id);
   secretsAdapter.removeMany(state.secrets, idsToRemove);
+}
+
+function hasUnsavedChanges(state: SecretsManagerState, providerId: string): boolean {
+  const allSecrets = secretsAdapter.getSelectors().selectAll(state.secrets);
+  const providerSecrets = allSecrets.filter((s) => s.providerId === providerId);
+
+  // Check if there are any stub rows (newly added but not fetched)
+  const hasStubRows = providerSecrets.some((s) => s.fetchedAt === 0);
+
+  // Check if there are any edited fetched rows for this provider
+  const hasEditedRows = providerSecrets.some((s) => state.editedSecretIds.has(s.secretReference.id));
+
+  return hasStubRows || hasEditedRows;
 }
 
 export const secretsManagerSlice = createSlice({
@@ -56,6 +70,7 @@ export const secretsManagerSlice = createSlice({
     setSelectedProviderId(state, action: PayloadAction<string | null>) {
       state.selectedProviderId = action.payload;
       state.isDirty = false;
+      state.editedSecretIds.clear();
     },
 
     upsertSecrets(state, action: PayloadAction<SecretValue[]>) {
@@ -66,9 +81,19 @@ export const secretsManagerSlice = createSlice({
       removeSecretsForProvider(state, providerId);
       secretsAdapter.upsertMany(state.secrets, secrets);
       state.isDirty = false;
+      state.editedSecretIds.clear();
     },
     removeSecret(state, action: PayloadAction<string>) {
+      const secretToRemove = state.secrets.entities[action.payload];
+      const providerId = secretToRemove?.providerId;
+
       secretsAdapter.removeOne(state.secrets, action.payload);
+      state.editedSecretIds.delete(action.payload);
+
+      // Recalculate isDirty if we know the provider
+      if (providerId) {
+        state.isDirty = hasUnsavedChanges(state, providerId);
+      }
     },
     removeSecrets(state, action: PayloadAction<string[]>) {
       secretsAdapter.removeMany(state.secrets, action.payload);
@@ -97,13 +122,22 @@ export const secretsManagerSlice = createSlice({
 
     removeSecretEntry(state, action: PayloadAction<{ providerId: string; secretRefId: string }>) {
       secretsAdapter.removeOne(state.secrets, action.payload.secretRefId);
-      state.isDirty = true;
+      state.editedSecretIds.delete(action.payload.secretRefId);
+
+      // Recalculate isDirty based on whether there are any unsaved changes remaining
+      state.isDirty = hasUnsavedChanges(state, action.payload.providerId);
     },
 
     unsafePatchSecret(state, action: PayloadAction<{ id: string; patcher: (secret: SecretValue) => void }>) {
       const secret = state.secrets.entities[action.payload.id];
       if (secret) {
         action.payload.patcher(secret);
+
+        // Track edited fetched rows (not stub rows)
+        if (secret.fetchedAt > 0) {
+          state.editedSecretIds.add(action.payload.id);
+        }
+
         state.isDirty = true;
       }
     },
@@ -121,6 +155,7 @@ export const secretsManagerSlice = createSlice({
         removeSecretsForProvider(state, providerId);
         secretsAdapter.upsertMany(state.secrets, secrets);
         state.isDirty = false;
+        state.editedSecretIds.clear();
 
         const errorMap: Record<string, string> = {};
         for (const err of errors) {
@@ -142,6 +177,7 @@ export const secretsManagerSlice = createSlice({
         removeSecretsForProvider(state, providerId);
         secretsAdapter.upsertMany(state.secrets, action.payload);
         state.isDirty = false;
+        state.editedSecretIds.clear();
       })
       .addCase(listSecrets.rejected, (state) => {
         state.fetchStatus = "failed";

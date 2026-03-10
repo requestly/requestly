@@ -11,4 +11,5 @@ export interface SecretsManagerState {
   fetchStatus: FetchStatus;
   fetchErrors: Record<string, string>;
   validationErrors: Record<string, { alias?: string; identifier?: string }>;
+  editedSecretIds: Set<string>; // Track IDs of fetched secrets that have been edited
 }
