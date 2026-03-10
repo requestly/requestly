@@ -57,7 +57,6 @@ export const listSecrets = createAsyncThunk<SecretValue[], string, { rejectValue
     // Redux state updation is done in the extraReducers of the slice
 
     secretVariables.updateSourceFromSecrets(result.data as AwsSecretValue[]);
-    toast.success("Successfully fetched secrets");
     return result.data;
   }
 );
@@ -238,13 +237,21 @@ export const deleteSecret = createAsyncThunk<
   { rejectValue: string; state: RootState }
 >(
   `${SECRETS_MANAGER_SLICE_NAME}/deleteSecret`,
-  async ({ providerId, secretReference }, { dispatch, rejectWithValue }) => {
+  async ({ providerId, secretReference }, { dispatch, rejectWithValue, getState }) => {
     const result = await secretsManagerService.removeSecretValue(providerId, secretReference);
     if (result.type === "error") {
       return rejectWithValue(result.error.message);
     }
-    toast.success("Secret deleted");
     dispatch(secretsManagerActions.removeSecret(secretReference.id));
+    toast.success("Secret deleted");
+
+    const state = getState();
+    const secretsForProvider = selectSecretsByProviderId(state)(providerId);
+    if (secretsForProvider.length === 0) {
+      secretVariables.updateSourceFromSecrets([]);
+    } else {
+      secretVariables.updateSourceFromSecrets(secretsForProvider as AwsSecretValue[]);
+    }
   }
 );
 
