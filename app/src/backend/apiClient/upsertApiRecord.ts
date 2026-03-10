@@ -26,6 +26,9 @@ export function sanitizeRecord(record: Partial<RQAPI.ApiClientRecord>) {
         sanitizedRecord.data.variables = Object.fromEntries(
           Object.entries(sanitizedRecord.data.variables)
             .map(([entryKey, variable]) => {
+              if (!variable) {
+                return null;
+              }
               const entryKeyTrimmed = (entryKey || "").trim();
               const valueKeyTrimmed = (variable?.key || "").toString().trim();
               const finalKey = entryKeyTrimmed || valueKeyTrimmed;
