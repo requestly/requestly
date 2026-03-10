@@ -20,7 +20,7 @@ import { ApiClientSidebarTabKey } from "../../SingleWorkspaceSidebar/SingleWorks
 import { SiOpenapiinitiative } from "@react-icons/all-files/si/SiOpenapiinitiative";
 import { LuCodeXml } from "@react-icons/all-files/lu/LuCodeXml";
 import { CommonApiClientImportModal } from "../../../modals/CommonApiClientImportModal/CommonApiClientImportModal";
-import { ApiClientImporterMethod, openApiImporter, soapImporter } from "@requestly/alternative-importers";
+import { ApiClientImporterMethod, openApiImporter, soapImporter } from "alternative-importers-beta-sd";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { ApiClientViewMode, useViewMode } from "features/apiClient/slices";
 import { EnvironmentSwitcher } from "./components/environmentSwitcher/EnvironmentSwitcher";
