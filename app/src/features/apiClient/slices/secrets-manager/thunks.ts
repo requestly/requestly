@@ -57,7 +57,6 @@ export const listSecrets = createAsyncThunk<SecretValue[], string, { rejectValue
     // Redux state updation is done in the extraReducers of the slice
 
     secretVariables.updateSourceFromSecrets(result.data as AwsSecretValue[]);
-    toast.success("Successfully fetched secrets");
     return result.data;
   }
 );
