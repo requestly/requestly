@@ -22,7 +22,7 @@ const ManageProvidersRow: React.FC<ManageProvidersRowProps> = ({
   providerId,
   providerName,
   providerType,
-  isActive = true,
+  isActive = false,
 }) => {
   const { openEditProviderModal, openDeleteProviderModal } = useSecretsModals();
 
