@@ -2,7 +2,7 @@ import React, { useMemo, useState } from "react";
 import { Select, Row, Tooltip } from "antd";
 import { RQButton } from "lib/design-system-v2/components";
 import { cloneDeep } from "lodash";
-import { RQAPI } from "shared-beta-sd/types/entities/apiClient";
+import { RQAPI } from "@requestly/shared/types/entities/apiClient";
 import { SuccessfulParseViewProps } from "../../CommonApiClientImporter/components/SuccessfulParseView";
 import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
 import { AiOutlineQuestionCircle } from "@react-icons/all-files/ai/AiOutlineQuestionCircle";
