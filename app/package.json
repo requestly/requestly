@@ -78,6 +78,7 @@
     "@readme/httpsnippet": "^11.0.0",
     "@reduxjs/toolkit": "^1.9.0",
     "@requestly/alternative-importers": "^0.1.0",
+    "alternative-importers-beta-sd": "0.1.2",
     "@requestly/mock-server": "0.1.6",
     "@requestly/requestly-core": "file:..",
     "@requestly/shared": "^1.0.9",
