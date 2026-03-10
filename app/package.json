@@ -80,7 +80,7 @@
     "@requestly/alternative-importers": "^0.1.0",
     "@requestly/mock-server": "0.1.6",
     "@requestly/requestly-core": "file:..",
-    "@requestly/shared": "^1.0.9",
+    "@requestly/shared": "file:../shared",
     "@sentry/core": "^10.32.1",
     "@sentry/react": "^10.32.1",
     "@stripe/react-stripe-js": "^2.3.0",
