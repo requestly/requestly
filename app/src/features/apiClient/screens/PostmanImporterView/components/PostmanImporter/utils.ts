@@ -367,10 +367,35 @@ const createExampleApiRecord = (
       dataType: getInferredKeyValueDataType(q.value),
     })) ?? [];
 
-  const { requestBody, contentType } = request
-    ? processRequestBody(request)
-    : { requestBody: "", contentType: RequestContentType.RAW };
   const { headers } = request ? processRequestHeaders(request) : { headers: [] };
+
+  const isGraphQLExample = request?.body?.mode === PostmanBodyMode.GRAPHQL && request?.body?.graphql;
+
+  const requestData = isGraphQLExample
+    ? (() => {
+        const { operation, variables, operationName } = processRequestBody(request) as GraphQLBody;
+        return {
+          url: typeof request?.url === "string" ? request.url : request?.url?.raw ?? "",
+          headers,
+          operation,
+          variables,
+          ...(operationName ? { operationName } : {}),
+        };
+      })()
+    : (() => {
+        const { requestBody, contentType } = request
+          ? (processRequestBody(request) as HttpRequestBody)
+          : { requestBody: "", contentType: RequestContentType.RAW };
+        return {
+          url: typeof request?.url === "string" ? request.url : request?.url?.raw ?? "",
+          method: request?.method || RequestMethod.GET,
+          queryParams,
+          headers,
+          body: requestBody,
+          bodyContainer: createBodyContainer({ contentType, body: requestBody }),
+          contentType,
+        };
+      })();
 
   return {
     id: apiClientRecordsRepository.generateApiRecordId(parentCollectionId),
@@ -380,16 +405,8 @@ const createExampleApiRecord = (
     type: RQAPI.RecordType.EXAMPLE_API,
     deleted: false,
     data: {
-      type: request.body?.mode === PostmanBodyMode.GRAPHQL ? RQAPI.ApiEntryType.GRAPHQL : RQAPI.ApiEntryType.HTTP,
-      request: {
-        url: typeof request?.url === "string" ? request.url : request?.url?.raw ?? "",
-        method: request?.method || RequestMethod.GET,
-        queryParams,
-        headers,
-        body: requestBody,
-        bodyContainer: createBodyContainer({ contentType, body: requestBody }),
-        contentType,
-      },
+      type: isGraphQLExample ? RQAPI.ApiEntryType.GRAPHQL : RQAPI.ApiEntryType.HTTP,
+      request: requestData,
       response,
       auth: request
         ? processAuthorizationOptions(request.auth, parentCollectionId)
