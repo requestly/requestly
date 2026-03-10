@@ -4,7 +4,7 @@ import { HiOutlineExternalLink } from "@react-icons/all-files/hi/HiOutlineExtern
 import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
 import { Col, Tooltip } from "antd";
 import { RQAPI, ApiClientImporterType, EnvironmentData } from "@requestly/shared/types/entities/apiClient";
-import { ApiClientImporterMethod } from "@requestly/alternative-importers";
+import { ApiClientImporterMethod } from "alternative-importers-beta-sd";
 import { toast } from "utils/Toast";
 import {
   apiRecordsActions,
