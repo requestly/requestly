@@ -34,7 +34,7 @@ export const SettingsPrimarySidebar: React.FC = () => {
     () => [
       {
         id: "my_accounts",
-        name: "Accounts",
+        name: "Account",
         icon: <MdOutlineAccountBox />,
         children: [
           {
@@ -120,22 +120,25 @@ export const SettingsPrimarySidebar: React.FC = () => {
     <Col
       className={`settings-primary-sidebar ${appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? "app-mode-desktop" : ""}`}
     >
-      <Row align="middle" gutter={6}>
+      <Row
+        align="middle"
+        gutter={6}
+        className="settings-primary-sidebar-back-btn"
+        onClick={() => {
+          if (redirectUrl.current && !redirectUrl.current.includes("/settings")) {
+            navigate(redirectUrl.current);
+            return;
+          }
+          if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) redirectToTraffic(navigate);
+          else navigate(APP_CONSTANTS.PATHS.HOME.ABSOLUTE);
+        }}
+      >
         <Col>
-          <IoMdArrowBack
-            className="settings-primary-sidebar-title-icon"
-            onClick={() => {
-              if (redirectUrl.current) {
-                navigate(redirectUrl.current);
-                return;
-              }
-              if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) redirectToTraffic(navigate);
-              else navigate(APP_CONSTANTS.PATHS.HOME.ABSOLUTE);
-            }}
-          />
+          <IoMdArrowBack className="settings-primary-sidebar-title-icon" />
         </Col>
-        <Col className="settings-primary-sidebar-title">Settings</Col>
+        <Col className="settings-primary-sidebar-back-label">Back</Col>
       </Row>
+      <Row className="settings-primary-sidebar-title">Settings</Row>
 
       <Col className="mt-16">
         {sidebarItems.map((item) => {

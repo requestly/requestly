@@ -1,26 +1,73 @@
 .settings-primary-sidebar {
-  width: 184px;
-  padding: 12px;
+  width: 220px;
+  padding: 16px;
   background: var(--requestly-color-surface-0);
   border-right: 1px solid var(--requestly-color-white-t-10);
   height: 100vh;
 }
 
+.settings-primary-sidebar-back-btn {
+  cursor: pointer;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+
+  &:hover {
+    opacity: 0.8;
+  }
+
+  svg {
+    width: 14px;
+    height: 14px;
+    display: block;
+  }
+}
+
 .settings-primary-sidebar-title-icon {
-  margin-top: 5px;
-  color: var(--white);
-  font-size: 1.25rem;
-  height: 1.25rem;
+  color: var(--requestly-color-neutral-300);
+  font-size: var(--requestly-font-size-sm, 16px);
   cursor: pointer;
 }
 
-.settings-primary-sidebar-title {
-  color: var(--white);
-  font-size: 1rem;
-  font-weight: 500;
-  letter-spacing: 0.5px;
+.settings-primary-sidebar-back-label {
+  color: var(--requestly-color-neutral-300);
+  font-size: var(--requestly-font-size-md, 14px);
+  font-weight: 400;
 }
 
-.settings-primary-sidebar-section:not(:first-child) {
-  margin-top: 1rem;
+.settings-primary-sidebar-title {
+  color: var(--requestly-color-text-default);
+  font-size: var(--requestly-font-size-lg, 16px);
+  font-weight: 400;
+  margin-bottom: 16px;
+}
+
+.settings-primary-sidebar-section-header-icon {
+  color: var(--requestly-color-text-placeholder);
+  display: flex;
+  align-items: center;
+  padding-bottom: 6px;
+  svg {
+    width: 16px;
+    height: 16px;
+    color: currentColor;
+    fill: currentColor;
+    stroke: currentColor;
+  }
+}
+
+.settings-primary-sidebar .settings-primary-sidebar-section-header-icon svg {
+  color: var(--requestly-color-text-placeholder);
+  fill: currentColor;
+  stroke: currentColor;
+}
+
+.settings-primary-sidebar-section-header-title {
+  color: var(--requestly-color-text-placeholder);
+  font-size: var(--requestly-font-size-md, 14px);
+  font-weight: 400;
+}
+
+.settings-primary-sidebar-section-active-link {
+  background-color: var(--requestly-color-white-t-10);
 }

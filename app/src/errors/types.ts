@@ -7,6 +7,7 @@ export enum ErrorCode {
   WorkspacePathAlreadyInUse = "workspace_path_already_in_use",
   NotFound = "not_found",
   UNKNOWN = "unknown",
+  MultipleInstancesRunning = "multiple_instances_running",
 }
 
 // Contains the value from Sentry.SeverityLevel
