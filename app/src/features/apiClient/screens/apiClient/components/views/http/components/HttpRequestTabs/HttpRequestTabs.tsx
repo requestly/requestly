@@ -2,11 +2,13 @@ import { useFeatureValue } from "@growthbook/growthbook-react";
 import { Checkbox } from "antd";
 import { Conditional } from "components/common/Conditional";
 import FEATURES from "config/constants/sub/features";
-import { sanitizeKeyValuePairs, supportsRequestBody } from "features/apiClient/screens/apiClient/utils";
+import { sanitizeKeyValuePairs, supportsRequestBodyForAllMethods } from "features/apiClient/screens/apiClient/utils";
 import { BufferedHttpRecordEntity } from "features/apiClient/slices/entities";
 import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
-import { RQAPI } from "features/apiClient/types";
+import { RequestMethod, RQAPI } from "features/apiClient/types";
 import React, { useMemo } from "react";
+import { useSelector } from "react-redux";
+import { getAppMode } from "store/selectors";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import { ApiClientRequestTabs } from "../../../components/request/components/ApiClientRequestTabs/ApiClientRequestTabs";
 import { RequestTabLabel } from "../../../components/request/components/ApiClientRequestTabs/components/RequestTabLabel/RequestTabLabel";
@@ -16,6 +18,7 @@ import { QueryParamsTable } from "../../../components/request/components/QueryPa
 import RequestBody from "../../../components/request/RequestBody";
 import { ScriptEditor } from "../../../components/Scripts/components/ScriptEditor/ScriptEditor";
 import { PathVariableTable } from "../PathVariableTable";
+import RequestBodyRedirectScreen from "../../../../clientView/components/RequestBodyRedirectScreen";
 
 export enum RequestTab {
   QUERY_PARAMS = "query_params",
@@ -41,6 +44,7 @@ const HttpRequestTabs: React.FC<Props> = ({
   scriptEditorVersion,
 }) => {
   const showCredentialsCheckbox = useFeatureValue("api-client-include-credentials", false);
+  const appMode = useSelector(getAppMode);
 
   const queryParams = useApiClientSelector((s) => entity.getQueryParams(s));
   const pathVariables = useApiClientSelector((s) => entity.getPathVariables(s));
@@ -49,10 +53,14 @@ const HttpRequestTabs: React.FC<Props> = ({
   const headersLength = useApiClientSelector((s) => sanitizeKeyValuePairs(entity.getHeaders(s)).length);
   const auth = useApiClientSelector((s) => entity.getAuth(s));
   const isRootLevelRecord = useApiClientSelector((s) => !!entity.getCollectionId(s));
+  const entityType = useApiClientSelector((s) => entity.getType(s));
 
   const requestEntry = useApiClientSelector((s) => entity.getEntityFromState(s).data);
 
-  const isRequestBodySupported = supportsRequestBody(method);
+  const METHODS_WITHOUT_BODY = [RequestMethod.GET, RequestMethod.HEAD];
+  const supportsRequestBody = supportsRequestBodyForAllMethods(appMode);
+  const needsDesktopForBody = METHODS_WITHOUT_BODY.includes(method);
+  const canHaveRequestBody = supportsRequestBody || !needsDesktopForBody;
   const hasScriptError = error?.type === RQAPI.ApiClientErrorType.SCRIPT;
 
   const items = useMemo(() => {
@@ -70,60 +78,64 @@ const HttpRequestTabs: React.FC<Props> = ({
       },
       {
         key: RequestTab.BODY,
-        label: <RequestTabLabel label="Body" count={bodyLength ? 1 : 0} showDot={isRequestBodySupported} />,
-        children: <RequestBody entity={entity} />,
-        disabled: !isRequestBodySupported,
+        label: <RequestTabLabel label="Body" count={bodyLength ? 1 : 0} showDot={canHaveRequestBody} />,
+        children: !canHaveRequestBody ? <RequestBodyRedirectScreen method={method} /> : <RequestBody entity={entity} />,
       },
       {
         key: RequestTab.HEADERS,
         label: <RequestTabLabel label="Headers" count={headersLength} />,
         children: <HeadersTable entity={entity} />,
       },
-      {
-        key: RequestTab.AUTHORIZATION,
-        label: <RequestTabLabel label="Authorization" />,
-        children: (
-          <AuthorizationView
-            recordId={entity.meta.referenceId}
-            defaults={auth}
-            onAuthUpdate={handleAuthChange}
-            isRootLevelRecord={isRootLevelRecord}
-          />
-        ),
-      },
-      {
-        key: RequestTab.SCRIPTS,
-        label: (
-          <RequestTabLabel
-            label="Scripts"
-            dotIndicator={hasScriptError ? "error" : "success"}
-            showDot={true}
-            count={requestEntry.scripts?.postResponse?.length || requestEntry.scripts?.preRequest?.length}
-          />
-        ),
-        children: (
-          <ScriptEditor
-            key={`${scriptEditorVersion}`}
-            requestId={entity.meta.referenceId}
-            entry={requestEntry}
-            onScriptsChange={(scripts) => {
-              if (!scripts) {
-                return;
-              }
-              entity.setScripts(scripts);
-            }}
-            aiTestsExcutionCallback={(testResults) => entity.setTestResults(testResults)}
-            focusPostResponse={focusPostResponseScriptEditor ?? false}
-          />
-        ),
-      },
+      ...(entityType === RQAPI.RecordType.API
+        ? [
+            {
+              key: RequestTab.AUTHORIZATION,
+              label: <RequestTabLabel label="Authorization" />,
+              children: (
+                <AuthorizationView
+                  recordId={entity.meta.referenceId}
+                  defaults={auth}
+                  onAuthUpdate={handleAuthChange}
+                  isRootLevelRecord={isRootLevelRecord}
+                />
+              ),
+            },
+            {
+              key: RequestTab.SCRIPTS,
+              label: (
+                <RequestTabLabel
+                  label="Scripts"
+                  dotIndicator={hasScriptError ? "error" : "success"}
+                  showDot={true}
+                  count={requestEntry.scripts?.postResponse?.length || requestEntry.scripts?.preRequest?.length}
+                />
+              ),
+              children: (
+                <ScriptEditor
+                  key={`${scriptEditorVersion}`}
+                  requestId={entity.meta.referenceId}
+                  entry={requestEntry}
+                  onScriptsChange={(scripts) => {
+                    if (!scripts) {
+                      return;
+                    }
+                    entity.setScripts(scripts);
+                  }}
+                  aiTestsExcutionCallback={(testResults) => entity.setTestResults(testResults)}
+                  focusPostResponse={focusPostResponseScriptEditor ?? false}
+                />
+              ),
+            },
+          ]
+        : []),
     ];
   }, [
+    entityType,
     queryParams.length,
     pathVariables?.length,
     entity,
     bodyLength,
-    isRequestBodySupported,
+    canHaveRequestBody,
     headersLength,
     auth,
     handleAuthChange,
