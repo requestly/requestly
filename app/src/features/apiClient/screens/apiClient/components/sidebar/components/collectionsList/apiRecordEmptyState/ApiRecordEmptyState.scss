@@ -1,0 +1,10 @@
+.api-record-empty-state-container {
+  border-radius: 4px;
+  border: 1px solid transparent;
+  transition: background 0.15s ease, border-color 0.15s ease;
+
+  &.drop-target {
+    background: #004eeb33;
+    border-color: var(--requestly-color-primary-600);
+  }
+}
