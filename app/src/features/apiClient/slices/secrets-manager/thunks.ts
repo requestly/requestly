@@ -242,8 +242,8 @@ export const deleteSecret = createAsyncThunk<
     if (result.type === "error") {
       return rejectWithValue(result.error.message);
     }
-    toast.success("Secret deleted");
     dispatch(secretsManagerActions.removeSecret(secretReference.id));
+    toast.success("Secret deleted");
 
     const state = getState();
     const secretsForProvider = selectSecretsByProviderId(state)(providerId);
