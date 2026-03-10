@@ -9,7 +9,7 @@ export class MultipleInstanceError extends RenderableError {
     this.addContext({
       path,
     });
-    this.severity = ErrorSeverity.ERROR;
+    this.severity = ErrorSeverity.FATAL;
   }
 
   static from(message: string, path: string) {
