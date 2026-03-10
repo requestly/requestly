@@ -92,10 +92,14 @@ export const deleteRecords = createAsyncThunk<
 
     const recordsDeletionResult = await repository.deleteRecords(apiRecordIds);
     const collectionsDeletionResult = await repository.deleteCollections(collectionRecordIds);
+    const exampleRecordsDeletionResult = await repository.deleteExamples(exampleRecords as RQAPI.ExampleApiRecord[]);
 
-    if (!recordsDeletionResult.success || !collectionsDeletionResult.success) {
+    if (!recordsDeletionResult.success || !collectionsDeletionResult.success || !exampleRecordsDeletionResult.success) {
       return rejectWithValue(
-        recordsDeletionResult.message ?? collectionsDeletionResult.message ?? "Failed to delete records"
+        recordsDeletionResult.message ??
+          collectionsDeletionResult.message ??
+          exampleRecordsDeletionResult.message ??
+          "Failed to delete records"
       );
     }
 
