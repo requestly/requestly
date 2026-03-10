@@ -1,5 +1,5 @@
 {
-  "name": "shared-beta-sd",
+  "name": "@requestly/shared",
   "version": "1.0.9",
   "description": "",
   "engines": {

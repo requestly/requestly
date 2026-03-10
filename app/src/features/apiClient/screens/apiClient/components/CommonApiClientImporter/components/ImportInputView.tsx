@@ -13,7 +13,7 @@ import { isExtensionInstalled } from "actions/ExtensionActions";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { trackImportParsed, trackImportParseFailed } from "modules/analytics/events/features/apiClient";
 import { RQAPI, EnvironmentData, ApiClientImporterType } from "@requestly/shared/types/entities/apiClient";
-import { ApiClientImporterMethod } from "alternative-importers-beta-sd";
+import { ApiClientImporterMethod } from "@requestly/alternative-importers";
 
 export interface ImportFile {
   content: string;
