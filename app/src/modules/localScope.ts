@@ -2,7 +2,7 @@ import { ExecutionContext } from "features/apiClient/helpers/httpRequestExecutor
 
 export type LocalScopeInitialState = Pick<
   ExecutionContext,
-  "collectionVariables" | "environment" | "global" | "request" | "response" | "variables"
+  "collectionVariables" | "environment" | "global" | "request" | "response" | "variables" | "secrets"
 >;
 
 export class LocalScope {

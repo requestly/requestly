@@ -8,7 +8,7 @@ import {
   TestFunction,
   TestResult,
 } from "./types";
-import { VariableScope } from "./variableScope";
+import { SecretVariable, VariableScope } from "./variableScope";
 import { RQAPI } from "features/apiClient/types";
 import { expect } from "chai";
 import { Options as AjvOptions } from "ajv";
@@ -59,6 +59,7 @@ export class RQ implements SandboxAPI {
   public variables: VariableScope;
   public globals: VariableScope;
   public collectionVariables: VariableScope;
+  public secrets: VariableScope;
   public expect: Chai.ExpectStatic;
   public test: TestFunction;
   public iterationData: IterationData;
@@ -88,6 +89,7 @@ export class RQ implements SandboxAPI {
     this.globals = new VariableScope(localScope, "global");
     this.collectionVariables = new VariableScope(localScope, "collectionVariables");
     this.variables = new VariableScope(localScope, "variables");
+    this.secrets = new SecretVariable(localScope);
     this.expect = expect;
     this.test = this.createTestObject();
     this.request = this.createRequestObject(localScope.get("request"));
