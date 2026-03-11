@@ -6,7 +6,7 @@ import {
   SecretValue,
   AwsSecretValue,
 } from "@requestly/shared/types/entities/secretsManager";
-import { SecretsManagerState } from "./types";
+import { SecretSnapshot, SecretsManagerState } from "./types";
 import { fetchAndSaveSecretsForProvider, listSecrets } from "./thunks";
 import { providersAdapter, secretsAdapter } from "./adapters";
 import persistReducer from "redux-persist/es/persistReducer";
@@ -17,12 +17,11 @@ export { providersAdapter, secretsAdapter } from "./adapters";
 const initialState: SecretsManagerState = {
   providers: providersAdapter.getInitialState(),
   secrets: secretsAdapter.getInitialState(),
-  isDirty: false,
   selectedProviderId: null,
   fetchStatus: "idle",
   fetchErrors: {},
   validationErrors: {},
-  editedSecretIds: new Set(),
+  secretsSnapshot: {},
 };
 
 function removeSecretsForProvider(state: SecretsManagerState, providerId: string) {
@@ -31,17 +30,19 @@ function removeSecretsForProvider(state: SecretsManagerState, providerId: string
   secretsAdapter.removeMany(state.secrets, idsToRemove);
 }
 
-function hasUnsavedChanges(state: SecretsManagerState, providerId: string): boolean {
+function captureSnapshot(state: SecretsManagerState, providerId: string): Record<string, SecretSnapshot> {
   const allSecrets = secretsAdapter.getSelectors().selectAll(state.secrets);
   const providerSecrets = allSecrets.filter((s) => s.providerId === providerId);
-
-  // Check if there are any stub rows (newly added but not fetched)
-  const hasStubRows = providerSecrets.some((s) => s.fetchedAt === 0);
-
-  // Check if there are any edited fetched rows for this provider
-  const hasEditedRows = providerSecrets.some((s) => state.editedSecretIds.has(s.secretReference.id));
-
-  return hasStubRows || hasEditedRows;
+  const snapshot: Record<string, SecretSnapshot> = {};
+  for (const s of providerSecrets) {
+    const ref = s.secretReference as AwsSecretValue["secretReference"];
+    snapshot[s.secretReference.id] = {
+      alias: s.secretReference.alias,
+      identifier: ref.identifier ?? "",
+      version: String(ref.version ?? ""),
+    };
+  }
+  return snapshot;
 }
 
 export const secretsManagerSlice = createSlice({
@@ -69,8 +70,7 @@ export const secretsManagerSlice = createSlice({
 
     setSelectedProviderId(state, action: PayloadAction<string | null>) {
       state.selectedProviderId = action.payload;
-      state.isDirty = false;
-      state.editedSecretIds.clear();
+      state.secretsSnapshot = {};
     },
 
     upsertSecrets(state, action: PayloadAction<SecretValue[]>) {
@@ -80,20 +80,10 @@ export const secretsManagerSlice = createSlice({
       const { providerId, secrets } = action.payload;
       removeSecretsForProvider(state, providerId);
       secretsAdapter.upsertMany(state.secrets, secrets);
-      state.isDirty = false;
-      state.editedSecretIds.clear();
+      state.secretsSnapshot = captureSnapshot(state, providerId);
     },
     removeSecret(state, action: PayloadAction<string>) {
-      const secretToRemove = state.secrets.entities[action.payload];
-      const providerId = secretToRemove?.providerId;
-
       secretsAdapter.removeOne(state.secrets, action.payload);
-      state.editedSecretIds.delete(action.payload);
-
-      // Recalculate isDirty if we know the provider
-      if (providerId) {
-        state.isDirty = hasUnsavedChanges(state, providerId);
-      }
     },
     removeSecrets(state, action: PayloadAction<string[]>) {
       secretsAdapter.removeMany(state.secrets, action.payload);
@@ -117,28 +107,36 @@ export const secretsManagerSlice = createSlice({
         versionId: "",
       };
       secretsAdapter.addOne(state.secrets, stub);
-      state.isDirty = true;
+    },
+
+    addSecretEntryWithId(state, action: PayloadAction<{ providerId: string; secretRefId: string }>) {
+      const { providerId, secretRefId } = action.payload;
+      const stub: AwsSecretValue = {
+        type: SecretProviderType.AWS_SECRETS_MANAGER,
+        providerId,
+        secretReference: {
+          id: secretRefId,
+          type: SecretProviderType.AWS_SECRETS_MANAGER,
+          alias: "",
+          identifier: "",
+        },
+        fetchedAt: 0,
+        name: "",
+        value: "",
+        ARN: "",
+        versionId: "",
+      };
+      secretsAdapter.addOne(state.secrets, stub);
     },
 
     removeSecretEntry(state, action: PayloadAction<{ providerId: string; secretRefId: string }>) {
       secretsAdapter.removeOne(state.secrets, action.payload.secretRefId);
-      state.editedSecretIds.delete(action.payload.secretRefId);
-
-      // Recalculate isDirty based on whether there are any unsaved changes remaining
-      state.isDirty = hasUnsavedChanges(state, action.payload.providerId);
     },
 
     unsafePatchSecret(state, action: PayloadAction<{ id: string; patcher: (secret: SecretValue) => void }>) {
       const secret = state.secrets.entities[action.payload.id];
       if (secret) {
         action.payload.patcher(secret);
-
-        // Track edited fetched rows (not stub rows)
-        if (secret.fetchedAt > 0) {
-          state.editedSecretIds.add(action.payload.id);
-        }
-
-        state.isDirty = true;
       }
     },
   },
@@ -154,8 +152,7 @@ export const secretsManagerSlice = createSlice({
 
         removeSecretsForProvider(state, providerId);
         secretsAdapter.upsertMany(state.secrets, secrets);
-        state.isDirty = false;
-        state.editedSecretIds.clear();
+        state.secretsSnapshot = captureSnapshot(state, providerId);
 
         const errorMap: Record<string, string> = {};
         for (const err of errors) {
@@ -176,8 +173,7 @@ export const secretsManagerSlice = createSlice({
 
         removeSecretsForProvider(state, providerId);
         secretsAdapter.upsertMany(state.secrets, action.payload);
-        state.isDirty = false;
-        state.editedSecretIds.clear();
+        state.secretsSnapshot = captureSnapshot(state, providerId);
       })
       .addCase(listSecrets.rejected, (state) => {
         state.fetchStatus = "failed";

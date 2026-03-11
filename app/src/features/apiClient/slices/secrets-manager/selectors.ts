@@ -1,6 +1,7 @@
 import { createSelector } from "@reduxjs/toolkit";
 import { providersAdapter, secretsAdapter } from "./adapters";
 import { SecretsManagerState } from "./types";
+import { AwsSecretValue } from "@requestly/shared/types/entities/secretsManager";
 
 type RootState = { secretsManager: SecretsManagerState };
 
@@ -41,7 +42,50 @@ export const selectLastFetchedForSelectedProvider = createSelector([selectSecret
   return Math.max(...fetched.map((s) => s.fetchedAt));
 });
 
-export const selectIsDirtyForSelectedProvider = createSelector(selectSecretsManagerSlice, (slice) => slice.isDirty);
+const selectSecretsSnapshot = createSelector(selectSecretsManagerSlice, (slice) => slice.secretsSnapshot);
+
+export const selectIsDirtyForSelectedProvider = createSelector(
+  [selectSecretsForSelectedProvider, selectSecretsSnapshot],
+  (secrets, snapshot) => {
+    // Filter out empty stub rows — they don't count as changes
+    const meaningfulSecrets = secrets.filter((s) => {
+      const ref = s.secretReference as AwsSecretValue["secretReference"];
+      const alias = (s.secretReference.alias ?? "").trim();
+      const identifier = (ref.identifier ?? "").trim();
+      return alias !== "" || identifier !== "";
+    });
+
+    const snapshotIds = new Set(Object.keys(snapshot));
+    const currentIds = new Set(meaningfulSecrets.map((s) => s.secretReference.id));
+
+    // Any new meaningful secret not in snapshot = dirty
+    for (const id of currentIds) {
+      if (!snapshotIds.has(id)) return true;
+    }
+
+    // Any snapshot entry not in current meaningful secrets = dirty (was deleted)
+    for (const id of snapshotIds) {
+      if (!currentIds.has(id)) return true;
+    }
+
+    // Compare fields for each matching ID
+    for (const secret of meaningfulSecrets) {
+      const snap = snapshot[secret.secretReference.id];
+      if (!snap) return true;
+
+      const ref = secret.secretReference as AwsSecretValue["secretReference"];
+      if (
+        ref.alias !== snap.alias ||
+        ref.identifier !== snap.identifier ||
+        String(ref.version ?? "") !== snap.version
+      ) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+);
 
 export const selectFetchErrors = createSelector(selectSecretsManagerSlice, (slice) => slice.fetchErrors);
 
