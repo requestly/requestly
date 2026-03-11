@@ -102,16 +102,24 @@ const ProviderDetails: React.FC<ProviderDetailsProps> = ({ onViewKeyValues }) =>
           ) : (
             lastFetched && <span className="last-fetched">Last fetched: {lastFetched}</span>
           )}
-          <RQButton
-            type="primary"
-            loading={isFetching}
-            onClick={handleFetchSecrets}
-            className="fetch-secrets-btn"
-            disabled={secrets?.length === 0}
+          <RQTooltip
+            title={secrets?.length === 0 ? "Enter Alias and ARN/Secret name to fetch" : ""}
+            showArrow={false}
+            placement="topLeft"
           >
-            {isDirty && !isFetching && <span className="unsaved-dot" />}
-            {!isFetching && "Fetch secrets"}
-          </RQButton>
+            <span>
+              <RQButton
+                type="primary"
+                loading={isFetching}
+                onClick={handleFetchSecrets}
+                className="fetch-secrets-btn"
+                disabled={secrets?.length === 0}
+              >
+                {isDirty && !isFetching && <span className="unsaved-dot" />}
+                {!isFetching && "Fetch secrets"}
+              </RQButton>
+            </span>
+          </RQTooltip>
         </div>
       </div>
 

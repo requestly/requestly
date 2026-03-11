@@ -1,5 +1,5 @@
 import { Modal, Tooltip } from "antd";
-import { RQButton } from "lib/design-system-v2/components";
+import { RQButton, RQTooltip } from "lib/design-system-v2/components";
 import NetworkPingIcon from "assets/icons/network-ping.svg?react";
 import { InputField } from "../../components/InputField/InputField";
 import { SelectField } from "../../components/SelectField/Index";
@@ -58,38 +58,50 @@ export const AddSecretsProviderModal = ({
   );
 
   const isBusy = isTestingConnection || isSavingProvider;
-  const disabledTooltip = !isFormValid ? "Please fill all required fields" : "";
+  const isTestConnectionDisabled = !isFormValid || isBusy;
 
   const header = <p className="add-edit-provider-modal-header">{mode === "add" ? "Add provider" : "Edit provider"}</p>;
   const footer = (
     <div className="add-edit-provider-modal-footer">
-      <Tooltip title={disabledTooltip}>
-        <RQButton
-          type="transparent"
-          className="test-connection-button"
-          onClick={onTestConnection}
-          icon={<NetworkPingIcon />}
-          loading={isTestingConnection}
-          disabled={!isFormValid || isBusy}
-        >
-          Test connection
-        </RQButton>
-      </Tooltip>
+      <RQTooltip
+        title={isTestConnectionDisabled ? "Fill all required fields to test connection" : ""}
+        showArrow={false}
+        placement="topRight"
+      >
+        <span>
+          <RQButton
+            type="transparent"
+            className="test-connection-button"
+            onClick={onTestConnection}
+            icon={<NetworkPingIcon />}
+            loading={isTestingConnection}
+            disabled={isTestConnectionDisabled}
+          >
+            Test connection
+          </RQButton>
+        </span>
+      </RQTooltip>
       <div className="footer-right-section">
         <RQButton type="secondary" className="cancel-button" onClick={onClose} disabled={isBusy}>
           Cancel
         </RQButton>
-        <Tooltip title={disabledTooltip}>
-          <RQButton
-            type="secondary"
-            className="add-provider-button"
-            onClick={onSave}
-            loading={isSavingProvider}
-            disabled={!isFormValid || isBusy}
-          >
-            {mode === "add" ? "Add provider" : "Save changes"}
-          </RQButton>
-        </Tooltip>
+        <RQTooltip
+          title={isTestConnectionDisabled ? "Test connection successfully before adding provider" : ""}
+          showArrow={false}
+          placement="topLeft"
+        >
+          <span>
+            <RQButton
+              type="secondary"
+              className="add-provider-button"
+              onClick={onSave}
+              loading={isSavingProvider}
+              disabled={isTestConnectionDisabled || isSavingProvider}
+            >
+              {mode === "add" ? "Add provider" : "Save changes"}
+            </RQButton>
+          </span>
+        </RQTooltip>
       </div>
     </div>
   );
