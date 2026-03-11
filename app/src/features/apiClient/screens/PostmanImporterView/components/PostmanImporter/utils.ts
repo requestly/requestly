@@ -331,6 +331,90 @@ export const processRequestHeaders = (request: any): RequestHeadersProcessingRes
   return { headers };
 };
 
+const createExampleApiRecord = (
+  exampleResponse: any,
+  parentRequestId: string,
+  parentCollectionId: string,
+  apiClientRecordsRepository: ApiClientRecordsInterface<Record<string, any>>
+): Partial<RQAPI.ExampleApiRecord> => {
+  const responseHeaders =
+    exampleResponse?.header?.map((header: any, i: number) => ({
+      id: i,
+      key: header.key,
+      value: header.value,
+      isEnabled: !header?.disabled,
+      description: header?.description || "",
+      dataType: getInferredKeyValueDataType(header.value),
+    })) ?? [];
+
+  const response: RQAPI.Response = {
+    body: exampleResponse?.body ?? "",
+    headers: responseHeaders,
+    status: parseInt(exampleResponse?.code) || 200,
+    statusText: exampleResponse?.status ?? "",
+    time: 0,
+    redirectedUrl: "",
+  };
+
+  const request = exampleResponse?.originalRequest;
+  const queryParams =
+    request?.url?.query?.map((q: any, i: number) => ({
+      id: i,
+      key: q.key,
+      value: q.value,
+      isEnabled: q?.disabled !== true,
+      description: q?.description || "",
+      dataType: getInferredKeyValueDataType(q.value),
+    })) ?? [];
+
+  const { headers } = request ? processRequestHeaders(request) : { headers: [] };
+
+  const isGraphQLExample = request?.body?.mode === PostmanBodyMode.GRAPHQL && request?.body?.graphql;
+
+  const requestData = isGraphQLExample
+    ? (() => {
+        const { operation, variables, operationName } = processRequestBody(request) as GraphQLBody;
+        return {
+          url: typeof request?.url === "string" ? request.url : request?.url?.raw ?? "",
+          headers,
+          operation,
+          variables,
+          ...(operationName ? { operationName } : {}),
+        };
+      })()
+    : (() => {
+        const { requestBody, contentType } = request
+          ? (processRequestBody(request) as HttpRequestBody)
+          : { requestBody: "", contentType: RequestContentType.RAW };
+        return {
+          url: typeof request?.url === "string" ? request.url : request?.url?.raw ?? "",
+          method: request?.method || RequestMethod.GET,
+          queryParams,
+          headers,
+          body: requestBody,
+          bodyContainer: createBodyContainer({ contentType, body: requestBody }),
+          contentType,
+        };
+      })();
+
+  return {
+    id: apiClientRecordsRepository.generateApiRecordId(parentCollectionId),
+    parentRequestId,
+    collectionId: parentCollectionId,
+    name: exampleResponse.name || "Example Response",
+    type: RQAPI.RecordType.EXAMPLE_API,
+    deleted: false,
+    data: {
+      type: isGraphQLExample ? RQAPI.ApiEntryType.GRAPHQL : RQAPI.ApiEntryType.HTTP,
+      request: requestData,
+      response,
+      auth: request
+        ? processAuthorizationOptions(request.auth, parentCollectionId)
+        : { currentAuthType: "INHERIT", authConfigStore: {} },
+      scripts: { preRequest: "", postResponse: "" },
+    },
+  } as RQAPI.ExampleApiRecord;
+};
 const createGraphQLApiRecord = (
   item: any,
   parentCollectionId: string,
@@ -601,7 +685,11 @@ export const detectUnsupportedFeatures = (fileContent: any): string[] => {
 export const processPostmanCollectionData = (
   fileContent: any,
   apiClientRecordsRepository: ApiClientRecordsInterface<Record<string, any>>
-): { collections: Partial<RQAPI.CollectionRecord>[]; apis: Partial<RQAPI.ApiRecord>[] } => {
+): {
+  collections: Partial<RQAPI.CollectionRecord>[];
+  apis: Partial<RQAPI.ApiRecord>[];
+  examples: Partial<RQAPI.ExampleApiRecord>[];
+} => {
   if (!fileContent.info?.name) {
     throw new Error("Invalid collection file: missing name");
   }
@@ -610,6 +698,7 @@ export const processPostmanCollectionData = (
     const result = {
       collections: [] as Partial<RQAPI.CollectionRecord>[],
       apis: [] as Partial<RQAPI.ApiRecord>[],
+      examples: [] as Partial<RQAPI.ExampleApiRecord>[],
     };
 
     items.forEach((item) => {
@@ -634,12 +723,26 @@ export const processPostmanCollectionData = (
         const subItems = processItems(item.item, subCollection.id);
         result.collections.push(...subItems.collections);
         result.apis.push(...subItems.apis);
+        result.examples.push(...subItems.examples);
       } else if (item.request) {
         const data =
           item.request.body?.mode === PostmanBodyMode.GRAPHQL && item.request.body?.graphql
             ? createGraphQLApiRecord(item, parentCollectionId, apiClientRecordsRepository)
             : createApiRecord(item, parentCollectionId, apiClientRecordsRepository);
         result.apis.push(data);
+
+        // Process examples/responses if they exist (use same record id as parent for examples)
+        if (item.response && item.response.length > 0 && data.id) {
+          item.response.forEach((exampleResponse: any) => {
+            const exampleRecord = createExampleApiRecord(
+              exampleResponse,
+              data.id as string,
+              parentCollectionId,
+              apiClientRecordsRepository
+            );
+            result.examples.push(exampleRecord);
+          });
+        }
       }
     });
 
@@ -667,6 +770,7 @@ export const processPostmanCollectionData = (
       api.rank = ranks[index];
       return api;
     }),
+    examples: processedItems.examples,
   };
 };
 

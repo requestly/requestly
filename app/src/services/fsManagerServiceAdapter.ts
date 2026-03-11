@@ -7,11 +7,13 @@ import {
   ErroredRecord,
   FileType,
   FileSystemResult,
+  ExampleAPI,
 } from "features/apiClient/helpers/modules/sync/local/services/types";
 import BackgroundServiceAdapter, { rpc, rpcWithRetry } from "./DesktopBackgroundService";
 import { EnvironmentData, EnvironmentVariables } from "backend/environment/types";
 import { RQAPI } from "features/apiClient/types";
 import { FsAccessError } from "features/apiClient/errors/FsError/FsAccessError/FsAccessError";
+import { getNormalizedPath } from "features/apiClient/helpers/modules/sync/utils";
 import { ErrorCode } from "errors/types";
 import { Mutex, MutexInterface, withTimeout } from "async-mutex";
 
@@ -43,7 +45,7 @@ function FsErrorHandler(_target: any, _key: string, descriptor: PropertyDescript
 
 export class FsManagerServiceAdapter extends BackgroundServiceAdapter {
   constructor(rootPath: string) {
-    super(`local_sync: ${rootPath}`);
+    super(`local_sync: ${getNormalizedPath(rootPath)}`);
     // if (!isFeatureCompatible(FEATURES.LOCAL_FILE_SYNC)) {
     //   throw new Error("LocalFileSync is not supported in the current version of the app");
     // }
@@ -175,6 +177,27 @@ export class FsManagerServiceAdapter extends BackgroundServiceAdapter {
       FileSystemResult<RQAPI.ApiClientRecord>
     >;
   }
+
+  @FsErrorHandler
+  async createExampleRequest(parentRequestId: string, example: ExampleAPI["data"]) {
+    return this.invokeProcedureInBG("createExampleRequest", parentRequestId, example) as Promise<
+      FileSystemResult<ExampleAPI>
+    >;
+  }
+
+  @FsErrorHandler
+  async updateExampleRequest(parentRequestId: string, exampleId: string, example: ExampleAPI["data"]) {
+    return this.invokeProcedureInBG("updateExampleRequest", parentRequestId, exampleId, example) as Promise<
+      FileSystemResult<ExampleAPI>
+    >;
+  }
+
+  @FsErrorHandler
+  async deleteExampleRequest(parentRequestId: string, exampleId: string) {
+    return this.invokeProcedureInBG("deleteExampleRequest", parentRequestId, exampleId) as Promise<
+      FileSystemResult<void>
+    >;
+  }
 }
 
 class FsManagerServiceAdapterProvider {
@@ -185,14 +208,15 @@ class FsManagerServiceAdapterProvider {
   }
 
   async get(rootPath: string): Promise<FsManagerServiceAdapter> {
-    let lock = this.lockMap.get(rootPath);
+    const normalizedRootPath = getNormalizedPath(rootPath);
+    let lock = this.lockMap.get(normalizedRootPath);
     if (!lock) {
       lock = withTimeout(new Mutex(), 40 * 1000);
-      this.lockMap.set(rootPath, lock);
+      this.lockMap.set(normalizedRootPath, lock);
     }
     await lock.acquire();
 
-    const fsManagerServiceAdapter = this.cache.get(rootPath);
+    const fsManagerServiceAdapter = this.cache.get(normalizedRootPath);
 
     if (fsManagerServiceAdapter) {
       console.log("got provider from cache");
@@ -201,10 +225,10 @@ class FsManagerServiceAdapterProvider {
     }
     try {
       // console.log(`calling build for rootPath=${rootPath}`, Date.now());
-      await buildFsManager(rootPath);
+      await buildFsManager(normalizedRootPath);
       // console.log(`received build for rootPath=${rootPath}`, Date.now());
-      const service = new FsManagerServiceAdapter(rootPath);
-      this.cache.set(rootPath, service);
+      const service = new FsManagerServiceAdapter(normalizedRootPath);
+      this.cache.set(normalizedRootPath, service);
       return service;
     } catch (e) {
       const isAccessIssue = (arg: any) => typeof arg === "string" && arg.includes("EACCES:");
@@ -265,7 +289,7 @@ export const reloadFsManager = (rootPath: string) => {
       method: "reload",
       timeout: 1000,
     },
-    rootPath
+    getNormalizedPath(rootPath)
   ) as Promise<void>;
 };
 export function createWorkspaceFolder(name: string, path: string) {
