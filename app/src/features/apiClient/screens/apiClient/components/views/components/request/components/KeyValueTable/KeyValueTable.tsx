@@ -159,7 +159,7 @@ export const KeyValueTable: React.FC<React.PropsWithChildren<KeyValueTableProps>
       {
         title: "Key",
         dataIndex: "key",
-        width: isDescriptionVisible ? "30%" : "50%",
+        width: isDescriptionVisible ? "40%" : "50%",
         editable: true,
         className: "kv-col-border-right",
         onCell: (record: KeyValuePair) => ({
@@ -177,7 +177,7 @@ export const KeyValueTable: React.FC<React.PropsWithChildren<KeyValueTableProps>
         title: "Value",
         dataIndex: "value",
         editable: true,
-        width: isDescriptionVisible ? "30%" : "50%",
+        width: isDescriptionVisible ? "40%" : "50%",
         className: "kv-col-border-right",
         onCell: (record: KeyValuePair) => ({
           record,
@@ -195,8 +195,9 @@ export const KeyValueTable: React.FC<React.PropsWithChildren<KeyValueTableProps>
         ? {
             title: "Type",
             dataIndex: "dataType",
-            width: isDescriptionVisible ? 110 : 120,
+            width: isDescriptionVisible ? "30%" : "40%",
             editable: true,
+            className: isDescriptionVisible ? "kv-col-border-right" : undefined,
             onCell: (record: KeyValuePair) => ({
               record,
               editable: true,
@@ -211,7 +212,7 @@ export const KeyValueTable: React.FC<React.PropsWithChildren<KeyValueTableProps>
         ? {
             title: "Description",
             dataIndex: "description",
-            width: "40%",
+            width: "45%",
             editable: true,
             onCell: (record: KeyValuePair) => ({
               record,
@@ -224,7 +225,7 @@ export const KeyValueTable: React.FC<React.PropsWithChildren<KeyValueTableProps>
           }
         : null,
       {
-        width: "50px",
+        width: "90px",
         fixed: "right",
         title: () =>
           isDataTypeVisible &&
