@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/react";
 import { EntityId, TreeIndices } from "../types";
 
 /**
@@ -7,7 +8,26 @@ import { EntityId, TreeIndices } from "../types";
 export function getParentChain(id: EntityId, childToParent: Record<EntityId, EntityId | null>): EntityId[] {
   const result: EntityId[] = [];
 
+  const visited = new Set<EntityId>();
+
   const traverse = (currentId: EntityId): void => {
+    if (visited.has(currentId)) {
+      Sentry.captureException(new Error("Cycle detected in apiClient getParentChain traversal"), {
+        tags: {
+          feature: "api-client",
+          util: "treeUtils.getParentChain",
+        },
+        extra: {
+          startId: id,
+          currentId,
+          partialChain: [...result],
+        },
+      });
+      return;
+    }
+
+    visited.add(currentId);
+
     const parent = childToParent[currentId];
     // Use != null to handle both null and undefined, and avoid issues with falsy IDs
     if (parent != null) {
@@ -26,7 +46,26 @@ export function getParentChain(id: EntityId, childToParent: Record<EntityId, Ent
 export function getAllDescendants(id: EntityId, parentToChildren: Record<EntityId, EntityId[]>): EntityId[] {
   const result: EntityId[] = [];
 
+  const visited = new Set<EntityId>();
+
   const traverse = (currentId: EntityId): void => {
+    if (visited.has(currentId)) {
+      Sentry.captureException(new Error("Cycle detected in apiClient getAllDescendants traversal"), {
+        tags: {
+          feature: "api-client",
+          util: "treeUtils.getAllDescendants",
+        },
+        extra: {
+          startId: id,
+          currentId,
+          partialDescendants: [...result],
+        },
+      });
+      return;
+    }
+
+    visited.add(currentId);
+
     const children = parentToChildren[currentId] ?? [];
     result.push(...children);
     children.forEach(traverse);
