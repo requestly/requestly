@@ -10,11 +10,13 @@ export interface VariableModeConfig {
   separator: string;
 }
 
+const SecretsFooterComponent = () => <SecretsFooter showAddAlias={false} />;
+
 export const SPECIAL_VARIABLE_MODES: Record<string, VariableModeConfig> = {
   [VariableScope.SECRETS]: {
     prefix: "secrets",
     checkFunction: checkIsSecretsVariable,
-    FooterComponent: SecretsFooter,
+    FooterComponent: SecretsFooterComponent,
     separator: ":",
   },
   // Add new variable types here:
