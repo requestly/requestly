@@ -230,75 +230,79 @@ export const ExampleRow: React.FC<Props> = ({ record, isReadOnly, handleRecordsT
   }
 
   return (
-    <div
-      className={clsx("example-row-wrapper", {
-        "example-drop-before": dropPosition === "before",
-        "example-drop-after": dropPosition === "after",
-      })}
-      ref={(node) => {
-        exampleRowRef.current = node;
-        drag(node);
-        drop(node);
-      }}
-      style={{ opacity: isDragging ? 0.5 : 1 }}
-    >
-      <DeleteApiRecordModal
-        open={isDeleteModalOpen}
-        onClose={() => setIsDeleteModalOpen(false)}
-        getRecordsToDelete={getRecordsToDelete}
-      />
+    <>
+      {isDeleteModalOpen && (
+        <DeleteApiRecordModal
+          open={isDeleteModalOpen}
+          onClose={() => setIsDeleteModalOpen(false)}
+          getRecordsToDelete={getRecordsToDelete}
+        />
+      )}
       <div
-        className={`collections-list-item api example-row ${record.id === activeTabSourceId ? "active" : ""}`}
-        onClick={() => {
-          openBufferedTab({
-            source: new ExampleViewTabSource({
-              id: record.id,
-              apiEntryDetails: record,
-              title: record.name || "Example",
-              context: {
-                id: context.workspaceId,
-              },
-            }),
-          });
+        className={clsx("example-row-wrapper", {
+          "example-drop-before": dropPosition === "before",
+          "example-drop-after": dropPosition === "after",
+        })}
+        ref={(node) => {
+          exampleRowRef.current = node;
+          drag(node);
+          drop(node);
         }}
+        style={{ opacity: isDragging ? 0.5 : 1 }}
       >
-        <div style={{ width: 8 }} />
-        <MdOutlineDashboard className="example-row-icon" />
-        <Typography.Text
-          ellipsis={{
-            tooltip: {
-              title: record.name || "Example",
-              placement: "right",
-              color: "#000",
-              mouseEnterDelay: 0.5,
-            },
+        <div
+          className={`collections-list-item api example-row ${record.id === activeTabSourceId ? "active" : ""}`}
+          onClick={() => {
+            openBufferedTab({
+              source: new ExampleViewTabSource({
+                id: record.id,
+                apiEntryDetails: record,
+                title: record.name || "Example",
+                context: {
+                  id: context.workspaceId,
+                },
+              }),
+            });
           }}
-          className="request-url example-row-name"
         >
-          {record.name || "Example"}
-        </Typography.Text>
+          <div style={{ width: 8 }} />
+          <MdOutlineDashboard className="example-row-icon" />
+          <Typography.Text
+            ellipsis={{
+              tooltip: {
+                title: record.name || "Example",
+                placement: "right",
+                color: "#000",
+                mouseEnterDelay: 0.5,
+              },
+            }}
+            className="request-url example-row-name"
+          >
+            {record.name || "Example"}
+          </Typography.Text>
 
-        <Conditional condition={!isReadOnly}>
-          <div className={`request-options ${isDropdownVisible ? "active" : ""}`}>
-            <Dropdown
-              trigger={["click"]}
-              menu={{ items: exampleOptions }}
-              placement="bottomRight"
-              open={isDropdownVisible}
-              onOpenChange={setIsDropdownVisible}
-            >
-              <RQButton
-                onClick={(e) => {
-                  e.stopPropagation();
-                }}
-                size="small"
-                type="transparent"
-                icon={<MdOutlineMoreHoriz />}
-              />
-            </Dropdown>
-          </div>
-        </Conditional>
+          <Conditional condition={!isReadOnly}>
+            <div className={`request-options ${isDropdownVisible ? "active" : ""}`}>
+              <Dropdown
+                trigger={["click"]}
+                menu={{ items: exampleOptions }}
+                placement="bottomRight"
+                open={isDropdownVisible}
+                onOpenChange={setIsDropdownVisible}
+              >
+                <RQButton
+                  onClick={(e) => {
+                    e.stopPropagation();
+                  }}
+                  size="small"
+                  type="transparent"
+                  icon={<MdOutlineMoreHoriz />}
+                />
+              </Dropdown>
+            </div>
+          </Conditional>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
