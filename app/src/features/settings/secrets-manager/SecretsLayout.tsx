@@ -8,6 +8,7 @@ import "./secrets.scss";
 import PATHS from "config/constants/sub/paths";
 import { useSecretsModals, DEFAULT_FORM_DATA } from "./context/SecretsModalsContext";
 import DeleteProviderModal from "./modals/DeleteProviderModal/Index";
+import DeleteSecretModal from "./modals/DeleteSecretModal/Index";
 import { AddSecretsProviderModal } from "./modals/AddSecretsProviderModal/AddSecretsProviderModal";
 import { isDesktopMode } from "utils/AppUtils";
 import { useSelector } from "react-redux";
@@ -28,9 +29,11 @@ const SecretsLayout = ({ children }: { children?: React.ReactNode }) => {
     testConnection,
     deleteProvider,
     updateAddEditFormData,
+    closeDeleteSecretModal,
+    deleteSecretConfirmed,
   } = useSecretsModals();
 
-  const { addEdit, delete: deleteModal } = modals;
+  const { addEdit, delete: deleteModal, deleteSecret: deleteSecretModal } = modals;
   const [isTestingConnection, setIsTestingConnection] = useState(false);
   const [isSavingProvider, setIsSavingProvider] = useState(false);
 
@@ -70,6 +73,10 @@ const SecretsLayout = ({ children }: { children?: React.ReactNode }) => {
 
   const handleDelete = async () => {
     deleteProvider();
+  };
+
+  const handleDeleteSecret = async () => {
+    deleteSecretConfirmed();
   };
 
   const handleHelp = (e: React.MouseEvent) => {
@@ -147,6 +154,14 @@ const SecretsLayout = ({ children }: { children?: React.ReactNode }) => {
         onDelete={handleDelete}
         isLoading={deleteModal.isOpen ? deleteModal.isLoading : false}
         providerName={deleteModal.isOpen ? deleteModal.providerName : undefined}
+      />
+
+      <DeleteSecretModal
+        open={deleteSecretModal.isOpen}
+        onClose={closeDeleteSecretModal}
+        onDelete={handleDeleteSecret}
+        isLoading={deleteSecretModal.isOpen ? deleteSecretModal.isLoading : false}
+        secretAlias={deleteSecretModal.isOpen ? deleteSecretModal.secretAlias : undefined}
       />
     </main>
   );
