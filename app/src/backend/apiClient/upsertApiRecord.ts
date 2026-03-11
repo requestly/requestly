@@ -43,6 +43,7 @@ export function sanitizeRecord(record: Partial<RQAPI.ApiClientRecord>) {
             .filter((pair): pair is [string, any] => Array.isArray(pair))
         );
 
+        // Keep variablesOrder aligned with sanitized variables
         if (Array.isArray(sanitizedRecord.data.variablesOrder)) {
           sanitizedRecord.data.variablesOrder = sanitizedRecord.data.variablesOrder
             .map((k) => (k || "").trim())
