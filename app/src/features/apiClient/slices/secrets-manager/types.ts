@@ -3,13 +3,18 @@ import { SecretProviderMetadata, SecretValue } from "@requestly/shared/types/ent
 
 export type FetchStatus = "idle" | "loading" | "succeeded" | "failed";
 
+export interface SecretSnapshot {
+  alias: string;
+  identifier: string;
+  version: string;
+}
+
 export interface SecretsManagerState {
   providers: EntityState<SecretProviderMetadata>;
   secrets: EntityState<SecretValue>;
-  isDirty: boolean;
   selectedProviderId: string | null;
   fetchStatus: FetchStatus;
   fetchErrors: Record<string, string>;
   validationErrors: Record<string, { alias?: string; identifier?: string }>;
-  editedSecretIds: Set<string>; // Track IDs of fetched secrets that have been edited
+  secretsSnapshot: Record<string, SecretSnapshot>;
 }
