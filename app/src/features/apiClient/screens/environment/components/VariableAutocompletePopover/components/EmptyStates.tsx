@@ -81,7 +81,7 @@ const AutoCompleteSecretEmptyState: React.FC<SecretsEmptyStateProps> = ({ onClos
     );
   }
 
-  return <SecretsFooter showAddAlias={false} />;
+  return <SecretsFooter showAddAlias={true} />;
 };
 
 export default AutoCompleteSecretEmptyState;

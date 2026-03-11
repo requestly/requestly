@@ -34,10 +34,11 @@ export const SecretsFooter: React.FC<SecretsFooterProps> = ({ onClose, showAddAl
   return (
     <div className="secrets-autocomplete-footer">
       {showAddAlias && (
-        <div className="secrets-no-provider-message">
-          <span className="no-provider-text">No aliases configured</span>
+        <div className="secrets-no-alias-message">
+          <span className="no-alias-text">No aliases configured</span>
         </div>
       )}
+      <div className="border-line" />
       <div className="secrets-add-alias-row" onMouseDown={handleAddAlias}>
         <PlusOutlined className="add-alias-icon" />
         <span>Add alias</span>
