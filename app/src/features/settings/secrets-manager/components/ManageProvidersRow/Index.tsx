@@ -36,6 +36,8 @@ const ManageProvidersRow: React.FC<ManageProvidersRowProps> = ({
 
   const secretsCount = useSelector(selectSecretsByProviderId)(providerId).length;
 
+  const secretsLabel = secretsCount === 1 ? "secret" : "secrets";
+
   return (
     <Row className="manage-providers-row">
       <Col xs={12} sm={12} md={12} lg={12} xl={12} className="manage-providers-col1">
@@ -52,7 +54,9 @@ const ManageProvidersRow: React.FC<ManageProvidersRowProps> = ({
         </div>
       </Col>
       <Col xs={4} sm={4} md={4} lg={4} xl={4} className="manage-providers-col2">
-        <span className="provider-secrets-count">{secretsCount} secrets</span>
+        <span className="provider-secrets-count">
+          {secretsCount} {secretsLabel}
+        </span>
       </Col>
       <Col xs={8} sm={8} md={8} lg={8} xl={8} className="manage-providers-col3">
         <div className="provider-actions">
