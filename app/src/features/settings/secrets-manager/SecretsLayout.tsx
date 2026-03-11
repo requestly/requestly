@@ -111,11 +111,11 @@ const SecretsLayout = ({ children }: { children?: React.ReactNode }) => {
         )}
         <div className="header-container">
           <div className="header-left-section">
-            {!isOnManageProvidersPage && <ShieldLockIcon />}
+            {!isOnManageProvidersPage && <ShieldLockIcon className="shield-icon" />}
             <span className="secrets-text">{isOnManageProvidersPage ? "Manage Providers" : "Secrets"}</span>
           </div>
           <div className="header-right-section">
-            <RQButton icon={<AiOutlineQuestionCircle />} type="transparent" onClick={handleHelp}>
+            <RQButton icon={<AiOutlineQuestionCircle className="help-icon" />} type="transparent" onClick={handleHelp}>
               Help
             </RQButton>
             <RQButton
