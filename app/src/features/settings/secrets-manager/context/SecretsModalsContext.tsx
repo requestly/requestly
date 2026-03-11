@@ -9,6 +9,7 @@ import { secretsManagerService, toSecretProviderConfig, toProviderData } from "s
 import {
   saveProvider as saveProviderThunk,
   deleteProvider as deleteProviderThunk,
+  deleteSecret,
 } from "features/apiClient/slices/secrets-manager";
 import { toast } from "utils/Toast";
 import { AppDispatch } from "store/types";
@@ -53,9 +54,20 @@ type DeleteModalState =
       isLoading: boolean;
     };
 
+type DeleteSecretModalState =
+  | { isOpen: false }
+  | {
+      isOpen: true;
+      providerId: string;
+      secretReference: any;
+      secretAlias: string;
+      isLoading: boolean;
+    };
+
 interface ModalState {
   addEdit: AddEditModalState;
   delete: DeleteModalState;
+  deleteSecret: DeleteSecretModalState;
 }
 
 interface SecretsModalsContextValue {
@@ -71,11 +83,16 @@ interface SecretsModalsContextValue {
   openDeleteProviderModal: (providerId: string, providerName: string) => void;
   closeDeleteProviderModal: () => void;
   deleteProvider: () => Promise<void>;
+
+  openDeleteSecretModal: (providerId: string, secretReference: any, secretAlias: string) => void;
+  closeDeleteSecretModal: () => void;
+  deleteSecretConfirmed: () => Promise<void>;
 }
 
 const initialState: ModalState = {
   addEdit: { isOpen: false },
   delete: { isOpen: false },
+  deleteSecret: { isOpen: false },
 };
 
 const SecretsModalsContext = createContext<SecretsModalsContextValue | undefined>(undefined);
@@ -261,6 +278,53 @@ export const SecretsModalsProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }, [dispatch]);
 
+  const openDeleteSecretModal = useCallback((providerId: string, secretReference: any, secretAlias: string) => {
+    setModals((prev) => ({
+      ...prev,
+      deleteSecret: {
+        isOpen: true,
+        providerId,
+        secretReference,
+        secretAlias,
+        isLoading: false,
+      },
+    }));
+  }, []);
+
+  const closeDeleteSecretModal = useCallback(() => {
+    setModals((prev) => ({ ...prev, deleteSecret: { isOpen: false } }));
+  }, []);
+
+  const deleteSecretConfirmed = useCallback(async () => {
+    const deleteSecretState = modalsRef.current.deleteSecret;
+    if (!deleteSecretState.isOpen) {
+      return;
+    }
+
+    const { providerId, secretReference } = deleteSecretState;
+
+    setModals((prev) => {
+      if (!prev.deleteSecret.isOpen) {
+        return prev;
+      }
+      return { ...prev, deleteSecret: { ...prev.deleteSecret, isLoading: true } };
+    });
+
+    try {
+      await dispatch(deleteSecret({ providerId, secretReference }));
+      setModals((prev) => ({ ...prev, deleteSecret: { isOpen: false } }));
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Failed to delete secret";
+      notifyError(`Failed to delete secret`, errorMessage);
+      setModals((prev) => {
+        if (!prev.deleteSecret.isOpen) {
+          return prev;
+        }
+        return { ...prev, deleteSecret: { ...prev.deleteSecret, isLoading: false } };
+      });
+    }
+  }, [dispatch]);
+
   const value: SecretsModalsContextValue = {
     modals,
     openAddProviderModal,
@@ -272,6 +336,9 @@ export const SecretsModalsProvider: React.FC<{ children: React.ReactNode }> = ({
     openDeleteProviderModal,
     closeDeleteProviderModal,
     deleteProvider,
+    openDeleteSecretModal,
+    closeDeleteSecretModal,
+    deleteSecretConfirmed,
   };
 
   return <SecretsModalsContext.Provider value={value}>{children}</SecretsModalsContext.Provider>;
