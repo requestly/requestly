@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import clsx from "clsx";
 import { Col, Layout, Row, Switch } from "antd";
 import HeaderUser from "layouts/DashboardLayout/MenuHeader/HeaderUser";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -51,7 +52,7 @@ export const PricingIndexPage = () => {
   }, [isBrowserStackIntegrationOn, checkoutErrorMessage]);
 
   return (
-    <div className={`pricing-page-wrapper ${isDesktopApp ? "desktop-app" : ""}`}>
+    <div className={clsx("pricing-page-wrapper", { "desktop-app": isDesktopApp })}>
       <div className="pricing-page-container">
         {checkoutErrorMessage && !isErrorBannerClosed && (
           <div className="pricing-page-error-message-banner">
