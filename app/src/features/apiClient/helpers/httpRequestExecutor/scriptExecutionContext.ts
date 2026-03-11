@@ -54,6 +54,7 @@ export class ScriptExecutionContext {
     // Currently only overriding iterationData because all other scopes are handled during initial context build from context but
     // iterationData needs to be updated from scope
     this.context.iterationData = (variablesByScope[VariableScope.DATA_FILE] || {}) as EnvironmentVariables;
+    this.context.secrets = this.buildSecretVariables();
 
     this.isMutated = false;
   }
@@ -100,21 +101,9 @@ export class ScriptExecutionContext {
     }, {} as Record<string, Record<string, VariableData>>);
   }
 
-  private getVariablesByScope(recordId: string) {
-    return this.convertScopedVariablesToRecord(this.getScopedVariables(recordId));
-  }
-
-  private buildExecutionContext(): ExecutionContext {
-    const variablesByScope = this.getVariablesByScope(this.recordId);
-    const globalVariables = (variablesByScope[VariableScope.GLOBAL] || {}) as EnvironmentVariables;
-    const collectionVariables = (variablesByScope[VariableScope.COLLECTION] || {}) as EnvironmentVariables;
-    const environmentVariables = (variablesByScope[VariableScope.ENVIRONMENT] || {}) as EnvironmentVariables;
-    const variables = (variablesByScope[VariableScope.RUNTIME] || {}) as EnvironmentVariables;
-    const iterationData = (variablesByScope[VariableScope.DATA_FILE] || {}) as EnvironmentVariables;
-
-    // Build secrets from secretVariables service
+  private buildSecretVariables(): EnvironmentVariables {
     const secretsList = secretVariables.getSecretsList();
-    const secrets = secretsList.reduce((acc, secret, index) => {
+    return secretsList.reduce((acc, secret, index) => {
       // Remove the "secrets:" prefix for the execution context
       const keyWithoutPrefix = secret.name.replace(/^secrets:/, "");
       acc[keyWithoutPrefix] = {
@@ -126,6 +115,20 @@ export class ScriptExecutionContext {
       };
       return acc;
     }, {} as EnvironmentVariables);
+  }
+
+  private getVariablesByScope(recordId: string) {
+    return this.convertScopedVariablesToRecord(this.getScopedVariables(recordId));
+  }
+
+  private buildExecutionContext(): ExecutionContext {
+    const variablesByScope = this.getVariablesByScope(this.recordId);
+    const globalVariables = (variablesByScope[VariableScope.GLOBAL] || {}) as EnvironmentVariables;
+    const collectionVariables = (variablesByScope[VariableScope.COLLECTION] || {}) as EnvironmentVariables;
+    const environmentVariables = (variablesByScope[VariableScope.ENVIRONMENT] || {}) as EnvironmentVariables;
+    const variables = (variablesByScope[VariableScope.RUNTIME] || {}) as EnvironmentVariables;
+    const iterationData = (variablesByScope[VariableScope.DATA_FILE] || {}) as EnvironmentVariables;
+    const secrets = this.buildSecretVariables();
 
     const baseExecutionContext: BaseExecutionContext = {
       global: globalVariables,
