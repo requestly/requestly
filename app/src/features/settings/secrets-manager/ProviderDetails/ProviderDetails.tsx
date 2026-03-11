@@ -109,8 +109,8 @@ const ProviderDetails: React.FC<ProviderDetailsProps> = ({ onViewKeyValues }) =>
             className="fetch-secrets-btn"
             disabled={secrets?.length === 0}
           >
-            {isDirty && <span className="unsaved-dot" />}
-            Fetch secrets
+            {isDirty && !isFetching && <span className="unsaved-dot" />}
+            {!isFetching && "Fetch secrets"}
           </RQButton>
         </div>
       </div>
