@@ -364,10 +364,7 @@ export const CollectionRow: React.FC<Props> = ({
   const [{ isOver }, drop] = useDrop(
     () => ({
       accept: [RQAPI.RecordType.API, RQAPI.RecordType.COLLECTION],
-      drop: (item: DraggableApiRecord, monitor) => {
-        const isOverCurrent = monitor.isOver({ shallow: true });
-        if (!isOverCurrent) return;
-
+      drop: (item: DraggableApiRecord) => {
         if (item.record.id === record.id) return;
         setIsCollectionRowLoading(true);
         handleRecordDrop(item, workspaceId);
