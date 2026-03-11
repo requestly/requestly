@@ -4,12 +4,14 @@ import { useNavigate } from "react-router-dom";
 import { PlusOutlined, ExportOutlined } from "@ant-design/icons";
 import { selectSelectedProviderId, selectAllSecretProviders } from "features/apiClient/slices/secrets-manager";
 import PATHS from "config/constants/sub/paths";
+import "./emptyStates.scss";
 
 interface SecretsFooterProps {
   onClose?: () => void;
+  showAddAlias?: boolean;
 }
 
-export const SecretsFooter: React.FC<SecretsFooterProps> = ({ onClose }) => {
+export const SecretsFooter: React.FC<SecretsFooterProps> = ({ onClose, showAddAlias = false }) => {
   const navigate = useNavigate();
   const selectedProviderId = useSelector(selectSelectedProviderId);
   const providers = useSelector(selectAllSecretProviders);
@@ -31,15 +33,22 @@ export const SecretsFooter: React.FC<SecretsFooterProps> = ({ onClose }) => {
 
   return (
     <div className="secrets-autocomplete-footer">
+      {showAddAlias && (
+        <div className="secrets-no-provider-message">
+          <span className="no-provider-text">No aliases configured</span>
+        </div>
+      )}
       <div className="secrets-add-alias-row" onMouseDown={handleAddAlias}>
         <PlusOutlined className="add-alias-icon" />
         <span>Add alias</span>
       </div>
       {activeProvider && (
-        <div className="secrets-active-instance" onMouseDown={handleOpenSecrets}>
+        <div className="secrets-active-instance">
           <span className="active-instance-label">
             Active instance:&nbsp;
-            <span className="active-instance-name">{activeProvider.name}</span>
+            <span className="active-instance-name" onMouseDown={handleOpenSecrets}>
+              {activeProvider.name}
+            </span>
           </span>
           <ExportOutlined className="active-instance-link-icon" />
         </div>

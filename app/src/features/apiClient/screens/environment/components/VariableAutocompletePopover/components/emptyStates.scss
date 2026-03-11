@@ -1,4 +1,9 @@
 .secrets-autocomplete-footer {
+  width: 230px !important;
+  border-top: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
+  margin-top: var(--space-2, 4px);
+  padding-top: var(--space-2, 4px);
+
   .secrets-no-provider-message {
     padding: var(--space-2, 4px) var(--space-5, 12px) 10px;
     border-bottom: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
@@ -35,5 +40,76 @@
     font-style: normal;
     font-weight: 400;
     line-height: 17px;
+  }
+
+  .secrets-add-alias-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-6, 12px);
+    padding: var(--space-4, 8px);
+    margin: 0;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.15s ease;
+    color: var(--requestly-color-text-subtle, #bbb);
+    font-family: var(--font-family-default, Inter);
+    font-size: var(--font-size-xs, 11px);
+    font-style: normal;
+    font-weight: 400;
+    line-height: 17px;
+
+    &:hover {
+      background-color: var(--requestly-color-white-t-10);
+    }
+
+    .add-alias-icon {
+      font-size: 12px;
+      font-weight: 400;
+      margin-left: 2px;
+    }
+  }
+
+  .secrets-active-instance {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 4px;
+    padding: var(--space-4, 8px);
+    margin: 0;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.15s ease;
+
+    &:hover {
+      background-color: var(--requestly-color-white-t-10);
+    }
+
+    .active-instance-label {
+      color: var(--requeslty-color-text-subtle, #bbb);
+      font-family: var(--font-family-default, Inter);
+      font-size: var(--font-size-xs, 11px);
+      font-style: normal;
+      font-weight: 500;
+      line-height: 17px; /* 154.545% */
+
+      .active-instance-name {
+        color: var(--requestly-color-text-default, #fff);
+        text-align: center;
+        font-family: var(--font-family-default, Inter);
+        font-size: var(--font-size-xs, 11px);
+        font-style: normal;
+        font-weight: 400;
+        line-height: 17px;
+      }
+    }
+
+    .active-instance-link-icon {
+      color: var(--alias-tokens-color-text-subtle, #bbb);
+      text-align: center;
+      font-family: "Material Symbols Outlined";
+      font-size: 12px;
+      font-style: normal;
+      font-weight: 400;
+    }
   }
 }
