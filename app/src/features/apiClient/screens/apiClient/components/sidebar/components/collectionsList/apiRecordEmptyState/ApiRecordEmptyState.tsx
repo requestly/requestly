@@ -65,7 +65,11 @@ export const ApiRecordEmptyState: React.FC<Props> = ({ record, disabled, message
       drop: (item: DraggableApiRecord, monitor) => {
         const isOverCurrent = monitor.isOver({ shallow: true });
         if (!isOverCurrent) return;
-        handleRecordDrop(item, context.workspaceId);
+        // If nested inside a parent collection, let the parent CollectionRow's drop handler handle it
+        if (record) return;
+        handleRecordDrop(item, context.workspaceId).finally(() => {
+          (item as any).onDropComplete?.();
+        });
       },
       collect: (monitor) => ({
         isOver: monitor.isOver({ shallow: true }),
