@@ -23,6 +23,7 @@ import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
 import { getRankForDroppedExample } from "features/apiClient/helpers/RankingManager/utils";
 import { apiRecordsRankingManager } from "features/apiClient/helpers/RankingManager";
+import { DeleteApiRecordModal } from "../../../../modals";
 import clsx from "clsx";
 import "./ExampleRow.scss";
 
@@ -35,6 +36,7 @@ interface Props {
 export const ExampleRow: React.FC<Props> = ({ record, isReadOnly, handleRecordsToBeDeleted }) => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [dropPosition, setDropPosition] = useState<"before" | "after" | null>(null);
   const dropPositionRef = useRef<"before" | "after" | null>(null);
   const exampleRowRef = useRef<HTMLDivElement>(null);
@@ -203,11 +205,16 @@ export const ExampleRow: React.FC<Props> = ({ record, isReadOnly, handleRecordsT
         onClick: (itemInfo) => {
           itemInfo.domEvent?.stopPropagation?.();
           setIsDropdownVisible(false);
-          handleRecordsToBeDeleted([record], context);
+          setIsDeleteModalOpen(true);
         },
       },
     ];
-  }, [handleDuplicateExample, handleRecordsToBeDeleted, record, context]);
+  }, [handleDuplicateExample]);
+
+  const getRecordsToDelete = useCallback(() => [{ context, records: [record] as RQAPI.ApiClientRecord[] }], [
+    context,
+    record,
+  ]);
 
   if (isEditMode) {
     return (
@@ -235,6 +242,11 @@ export const ExampleRow: React.FC<Props> = ({ record, isReadOnly, handleRecordsT
       }}
       style={{ opacity: isDragging ? 0.5 : 1 }}
     >
+      <DeleteApiRecordModal
+        open={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        getRecordsToDelete={getRecordsToDelete}
+      />
       <div
         className={`collections-list-item api example-row ${record.id === activeTabSourceId ? "active" : ""}`}
         onClick={() => {
