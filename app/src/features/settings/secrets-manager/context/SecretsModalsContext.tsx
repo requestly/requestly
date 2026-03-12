@@ -239,17 +239,17 @@ export const SecretsModalsProvider: React.FC<{ children: React.ReactNode }> = ({
       const result = await secretsManagerService.testConnectionWithConfig(config);
 
       if (result.type === "error") {
-        notifyError(`Connection test failed`, result.error.message);
+        notifyError(`Connection failed`, result.error.message);
         return;
       }
 
       if (result.data) {
         toast.success("Connection successful");
       } else {
-        notifyError(`Connection test failed`, "Please check your credentials.");
+        notifyError(`Connection failed`, "Please check your credentials.");
       }
     } catch (error) {
-      notifyError(`Connection test failed`, error instanceof Error ? error.message : "Connection test failed");
+      notifyError(`Connection failed`, error instanceof Error ? error.message : "Failed to test connection");
     }
   }, []);
 
