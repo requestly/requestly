@@ -25,21 +25,11 @@ export function sanitizeRecord(record: Partial<RQAPI.ApiClientRecord>) {
       if (sanitizedRecord.data.variables) {
         sanitizedRecord.data.variables = Object.fromEntries(
           Object.entries(sanitizedRecord.data.variables)
+            .filter(([entryKey, variable]) => !!variable && !!(entryKey || "").trim())
             .map(([entryKey, variable]) => {
-              if (!variable) {
-                return null;
-              }
-              const entryKeyTrimmed = (entryKey || "").trim();
-              const finalKey = entryKeyTrimmed;
-
-              if (!finalKey) {
-                return null; // will be filtered out
-              }
-
-              const { localValue, key: _ignored, ...rest } = variable;
-              return [finalKey, rest];
+              const { localValue, key, ...rest } = variable;
+              return [entryKey.trim(), rest];
             })
-            .filter((pair): pair is [string, any] => Array.isArray(pair))
         );
 
         // Keep variablesOrder aligned with sanitized variables
