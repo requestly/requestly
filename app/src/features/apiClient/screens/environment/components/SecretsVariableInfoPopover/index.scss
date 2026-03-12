@@ -32,11 +32,17 @@
         }
       }
 
-      .manage-button {
+      .manage-button.ant-btn {
         height: 24px;
         font-size: var(--requestly-font-size-xs);
         color: var(--requestly-color-text-subtle, #bbb);
         border-radius: 4px !important;
+        margin-right: 4px;
+
+        &:hover {
+          background-color: var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06)) !important;
+          color: var(--requestly-color-text-default) !important;
+        }
       }
     }
 
