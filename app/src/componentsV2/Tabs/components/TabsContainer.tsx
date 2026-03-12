@@ -202,7 +202,7 @@ export const TabsContainer: React.FC = () => {
     const hasUnsavedChanges = getHasAnyUnsavedChanges();
     if (hasUnsavedChanges) {
       const shouldDiscardChanges = window.confirm("Discard changes? Changes you made will not be saved.");
-      window?.RQ?.DESKTOP?.SERVICES?.IPC?.invokeEventInMain?.("focus-webcontent");
+      setTimeout(() => window.dispatchEvent(new FocusEvent("focus")), 0);
       return !shouldDiscardChanges;
     }
 
@@ -212,7 +212,7 @@ export const TabsContainer: React.FC = () => {
       const shouldDiscardChanges = window.confirm(
         firstWorkflow?.cancelWarning || "Discard changes? Changes you made will not be saved."
       );
-      window?.RQ?.DESKTOP?.SERVICES?.IPC?.invokeEventInMain?.("focus-webcontent");
+      setTimeout(() => window.dispatchEvent(new FocusEvent("focus")), 0);
 
       return !shouldDiscardChanges;
     }
