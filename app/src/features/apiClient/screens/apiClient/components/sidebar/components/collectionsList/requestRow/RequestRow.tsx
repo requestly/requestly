@@ -251,8 +251,12 @@ export const RequestRow: React.FC<Props> = ({
       // Generate rank for the duplicated request to place it immediately after the original
       const rank = apiRecordsRankingManager.getRankForDuplicatedRecord(context, record, record.collectionId ?? "");
 
+      // Strip examples from data so createRecord never receives them (local workspace stores examples in-file separately)
+      const { examples: _examples, ...requestData } = record.data;
+
       const newRecord: Omit<RQAPI.ApiRecord, "id"> = {
         ...rest,
+        data: requestData,
         name: `(Copy) ${record.name || record.data.request?.url}`,
         rank, // Set the calculated rank
       };
@@ -264,17 +268,17 @@ export const RequestRow: React.FC<Props> = ({
         const newRequestId = result.data.id;
         const examples = record.data.examples ?? [];
         if (examples.length > 0) {
-          await Promise.all(
-            examples.map((example) =>
-              context.store.dispatch(
+          for (const example of examples) {
+            await context.store
+              .dispatch(
                 createExampleRequest({
                   parentRequestId: newRequestId,
                   example: { ...example, parentRequestId: newRequestId },
                   repository: context.repositories.apiClientRecordsRepository,
                 }) as any
               )
-            )
-          );
+              .unwrap();
+          }
         }
 
         onSaveRecord(result.data, "open");

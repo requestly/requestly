@@ -186,6 +186,22 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
   }
 
   private parseExampleApiRecordRequest(record: RQAPI.ExampleApiRecord): ExampleAPI["data"] {
+    if (!record?.data?.request) {
+      return {
+        name: record?.name || "Untitled example",
+        rank: record?.rank,
+        request: {
+          type: RQAPI.ApiEntryType.HTTP,
+          url: "",
+          method: "GET" as const,
+          headers: [],
+          queryParams: [],
+          auth: getDefaultAuth(false),
+          scripts: { postResponse: "", preRequest: "" },
+        } as ApiRequestDetails,
+        response: record?.data?.response ?? null,
+      };
+    }
     return {
       name: record.name || "Untitled example",
       rank: record.rank,
