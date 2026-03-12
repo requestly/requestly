@@ -19,6 +19,7 @@ function checkTabUnsavedChanges(tab: TabState): boolean {
   const hasUnsavedChanges = getIsTabDirty(tab);
   if (hasUnsavedChanges) {
     const canClose = window.confirm("Discard changes? Changes you made will not be saved.");
+    window.focus();
     return canClose;
   }
   return true;
@@ -52,6 +53,7 @@ export const closeTab = createAsyncThunk<
         const firstWorkflow = tab.activeWorkflows.values().next().value as ActiveWorkflow;
         if (firstWorkflow) {
           const canClose = window.confirm(firstWorkflow.cancelWarning || "Close this tab?");
+          window.focus();
           if (!canClose) {
             return rejectWithValue("User cancelled tab close due to active workflow");
           }
@@ -110,6 +112,7 @@ export const closeAllTabs = createAsyncThunk<
         const canClose = window.confirm(
           firstWorkflow.cancelWarning || "Close all tabs? Some operations are still running."
         );
+        window.focus();
 
         if (!canClose) {
           return rejectWithValue("User cancelled close all tabs due to active workflow");
