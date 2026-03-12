@@ -30,8 +30,7 @@ export function sanitizeRecord(record: Partial<RQAPI.ApiClientRecord>) {
                 return null;
               }
               const entryKeyTrimmed = (entryKey || "").trim();
-              const valueKeyTrimmed = (variable?.key || "").toString().trim();
-              const finalKey = entryKeyTrimmed || valueKeyTrimmed;
+              const finalKey = entryKeyTrimmed;
 
               if (!finalKey) {
                 return null; // will be filtered out
