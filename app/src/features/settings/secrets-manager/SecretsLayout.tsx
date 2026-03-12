@@ -27,6 +27,7 @@ const SecretsLayout = ({ children }: { children?: React.ReactNode }) => {
     closeDeleteProviderModal,
     saveProvider,
     testConnection,
+    resetConnectionStatus,
     deleteProvider,
     updateAddEditFormData,
     closeDeleteSecretModal,
@@ -143,9 +144,11 @@ const SecretsLayout = ({ children }: { children?: React.ReactNode }) => {
         onClose={closeAddEditProviderModal}
         onSave={handleSave}
         onTestConnection={handleTestConnection}
+        onResetConnectionStatus={resetConnectionStatus}
         isFetchingConfig={addEdit.isOpen ? addEdit.isFetchingConfig : false}
         isTestingConnection={isTestingConnection}
         isSavingProvider={isSavingProvider}
+        connectionStatus={addEdit.isOpen ? addEdit.connectionStatus : "untested"}
       />
 
       <DeleteProviderModal

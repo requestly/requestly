@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { Modal, Tooltip } from "antd";
 import { RQButton, RQTooltip } from "lib/design-system-v2/components";
 import NetworkPingIcon from "assets/icons/network-ping.svg?react";
@@ -6,7 +7,7 @@ import { SelectField } from "../../components/SelectField/Index";
 import { AutoCompleteField } from "../../components/AutoCompleteField/Index";
 import { authMethodOptions, regionsList, secretManagerOptions } from "../../consts/dropdownOptions";
 import { InputPasswordField } from "../../components/InputField/InputPasswordField";
-import { InfoCircleOutlined } from "@ant-design/icons";
+import { CheckOutlined, CloseOutlined, InfoCircleOutlined } from "@ant-design/icons";
 import { ProviderData } from "../../context/SecretsModalsContext";
 import { SecretProviderType } from "@requestly/shared/types/entities/secretsManager";
 import "./addSecretsModal.scss";
@@ -19,9 +20,11 @@ interface AddSecretsProviderModalProps {
   onClose: () => void;
   onSave: () => void | Promise<void>;
   onTestConnection: () => void | Promise<void>;
+  onResetConnectionStatus?: () => void;
   isFetchingConfig?: boolean;
   isTestingConnection?: boolean;
   isSavingProvider?: boolean;
+  connectionStatus?: "untested" | "testing" | "success" | "failed";
   error?: string;
 }
 
@@ -30,6 +33,27 @@ const optionalTitle = (label: string) => (
     {label} <span className="optional-label">(optional)</span>
   </span>
 );
+
+const testConnectionLabel = (label: string) => {
+  switch (label) {
+    case "testing":
+      return "Testing connection";
+    case "success":
+      return (
+        <>
+          <CheckOutlined className="green-tick-icon" /> Connection successful
+        </>
+      );
+    case "failed":
+      return (
+        <>
+          <CloseOutlined className="red-cross-icon " /> Connection failed
+        </>
+      );
+    default:
+      return "Test connection";
+  }
+};
 
 const errorSuffix = (error: string) => (
   <Tooltip title={error} placement="right" showArrow={false} overlayClassName="error-tooltip">
@@ -45,11 +69,31 @@ export const AddSecretsProviderModal = ({
   onClose,
   onSave,
   onTestConnection,
+  onResetConnectionStatus,
   isFetchingConfig = false,
   isTestingConnection = false,
   isSavingProvider = false,
+  connectionStatus = "untested",
   error,
 }: AddSecretsProviderModalProps) => {
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Auto-reset connection status after 5 seconds of success or failure
+  useEffect(() => {
+    if (connectionStatus === "success" || connectionStatus === "failed") {
+      timeoutRef.current = setTimeout(() => {
+        onResetConnectionStatus?.();
+      }, 5000);
+    }
+
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+    };
+  }, [connectionStatus, onResetConnectionStatus]);
+
   const isFormValid = Boolean(
     providerData.instanceName.trim() &&
       providerData.accessKey.trim() &&
@@ -73,11 +117,11 @@ export const AddSecretsProviderModal = ({
             type="transparent"
             className="test-connection-button"
             onClick={onTestConnection}
-            icon={<NetworkPingIcon />}
+            icon={connectionStatus === "untested" ? <NetworkPingIcon /> : undefined}
             loading={isTestingConnection}
             disabled={isTestConnectionDisabled}
           >
-            Test connection
+            {testConnectionLabel(connectionStatus)}
           </RQButton>
         </span>
       </RQTooltip>
