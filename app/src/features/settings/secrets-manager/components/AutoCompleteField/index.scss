@@ -45,6 +45,15 @@
       input {
         color: var(--requestly-color-text-default, #fff) !important;
       }
+
+      .ant-select-selection-placeholder {
+        color: var(--alias-tokens-color-text-placeholder, #8f8f8f);
+        font-family: var(--font-family-default, Inter);
+        font-size: var(--font-size-sm, 12px);
+        font-style: normal;
+        font-weight: 400;
+        line-height: 18px;
+      }
     }
 
     &.ant-select-focused .ant-select-selector {
