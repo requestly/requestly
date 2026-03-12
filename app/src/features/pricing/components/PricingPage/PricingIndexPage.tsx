@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import clsx from "clsx";
 import { Col, Layout, Row, Switch } from "antd";
 import HeaderUser from "layouts/DashboardLayout/MenuHeader/HeaderUser";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -23,6 +24,8 @@ import { useIsBrowserStackIntegrationOn } from "hooks/useIsBrowserStackIntegrati
 import { MdOutlineInfo } from "@react-icons/all-files/md/MdOutlineInfo";
 import { MdOutlineClose } from "@react-icons/all-files/md/MdOutlineClose";
 import { trackCheckoutFailedEvent } from "modules/analytics/events/misc/business/checkout";
+import { getAppDetails } from "utils/AppUtils";
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import "./pricingIndexPage.scss";
 
 export const PricingIndexPage = () => {
@@ -37,6 +40,8 @@ export const PricingIndexPage = () => {
   );
   const [duration, setDuration] = useState(PRICING.DURATION.ANNUALLY);
 
+  const isDesktopApp = getAppDetails().app_mode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP;
+
   const isCheckoutFailedEventSent = useRef(false);
 
   useEffect(() => {
@@ -47,7 +52,7 @@ export const PricingIndexPage = () => {
   }, [isBrowserStackIntegrationOn, checkoutErrorMessage]);
 
   return (
-    <div className="pricing-page-wrapper">
+    <div className={clsx("pricing-page-wrapper", { "desktop-app": isDesktopApp })}>
       <div className="pricing-page-container">
         {checkoutErrorMessage && !isErrorBannerClosed && (
           <div className="pricing-page-error-message-banner">
