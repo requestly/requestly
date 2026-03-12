@@ -3,25 +3,25 @@ import { RQModal } from "lib/design-system/components";
 import { RQButton } from "lib/design-system-v2/components";
 import "./index.scss";
 
-interface DeleteProviderModalProps {
+interface DeleteSecretModalProps {
   open: boolean;
   onClose: () => void;
   onDelete?: () => void | Promise<void>;
   isLoading?: boolean;
   error?: string;
-  providerName?: string;
+  secretAlias?: string;
 }
 
-const DeleteProviderModal: React.FC<DeleteProviderModalProps> = ({
+const DeleteSecretModal: React.FC<DeleteSecretModalProps> = ({
   open,
   onClose,
   onDelete,
   isLoading = false,
   error,
-  providerName,
+  secretAlias,
 }) => {
-  const header = "Delete provider instance?";
-  const description = `Deleting "${providerName}" instance will remove all associated secrets. Are you sure?`;
+  const header = "Delete secret?";
+  const description = `Are you sure you want to delete "${secretAlias}"? This action cannot be undone.`;
 
   return (
     <RQModal
@@ -30,7 +30,7 @@ const DeleteProviderModal: React.FC<DeleteProviderModalProps> = ({
       closable={false}
       maskClosable={false}
       destroyOnClose={true}
-      className="delete-provider-modal"
+      className="delete-secret-modal"
       onCancel={onClose}
     >
       <img width={32} height={32} src={"/assets/media/common/delete.svg"} alt="Delete" className="icon" />
@@ -50,4 +50,4 @@ const DeleteProviderModal: React.FC<DeleteProviderModalProps> = ({
   );
 };
 
-export default DeleteProviderModal;
+export default DeleteSecretModal;
