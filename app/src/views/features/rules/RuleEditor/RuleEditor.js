@@ -80,7 +80,7 @@ const RuleEditor = (props) => {
   }, [isCurrentlySelectedRuleHasUnsavedChanges]);
 
   unstable_usePrompt({
-    message: "Discard changes? Changes you made may not be saved.",
+    message: "Discard changes? Ajinkya Ajinkya Ajinkya Changes you made may not be saved.",
     when: isCurrentlySelectedRuleHasUnsavedChanges && !isWorkspaceSwitchConfirmationActive,
   });
 

@@ -149,7 +149,7 @@ export const useWorkspaceSwitcher = () => {
 
       dispatch(globalActions.updateIsWorkspaceSwitchConfirmationActive(true));
       Modal.confirm({
-        title: "Discard changes?",
+        title: "Discard changes? Ajinkya Ajinkya Ajinkya",
         icon: <ExclamationCircleFilled />,
         content: "Changes you made on a rule may not be saved.",
         okText: "Switch",
