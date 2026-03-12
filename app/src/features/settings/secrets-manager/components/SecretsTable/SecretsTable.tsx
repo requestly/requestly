@@ -304,7 +304,7 @@ const SecretsTable: React.FC<SecretsTableProps> = ({ onViewKeyValues }) => {
                 {
                   key: "delete",
                   icon: <RiDeleteBin6Line />,
-                  label: "Remove",
+                  label: "Delete",
                   danger: true,
                   onClick: () => handleDelete(row),
                 },
