@@ -47,20 +47,25 @@ export function getImmediateChildren(id: EntityId, parentToChildren: Record<Enti
  * Builds tree indices from a flat array of records.
  * Creates efficient O(1) lookups for parent-child relationships.
  */
-export function buildTreeIndices<T extends { id: EntityId; collectionId: EntityId | null }>(records: T[]): TreeIndices {
+export function buildTreeIndices<T extends { id: EntityId; collectionId: EntityId | null; parentRequestId?: EntityId }>(
+  records: T[]
+): TreeIndices {
   const childToParent: Record<EntityId, EntityId | null> = {};
   const parentToChildren: Record<EntityId, EntityId[]> = {};
   const rootIds: EntityId[] = [];
 
   for (const record of records) {
-    childToParent[record.id] = record.collectionId;
+    // For example records, use parentRequestId as the parent
+    // Otherwise, use collectionId for collection hierarchy
+    const parentId = record.parentRequestId ?? record.collectionId;
+    childToParent[record.id] = parentId ?? null;
 
     // Use != null to handle both null and undefined
-    if (record.collectionId != null) {
-      if (!parentToChildren[record.collectionId]) {
-        parentToChildren[record.collectionId] = [];
+    if (parentId != null) {
+      if (!parentToChildren[parentId]) {
+        parentToChildren[parentId] = [];
       }
-      parentToChildren[record.collectionId].push(record.id);
+      parentToChildren[parentId].push(record.id);
     } else {
       rootIds.push(record.id);
     }

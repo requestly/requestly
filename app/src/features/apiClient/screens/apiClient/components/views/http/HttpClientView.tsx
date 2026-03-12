@@ -1,7 +1,7 @@
 import { SPAN_STATUS_ERROR, SPAN_STATUS_OK } from "@sentry/core";
 import * as Sentry from "@sentry/react";
 import { isExtensionInstalled } from "actions/ExtensionActions";
-import { notification, Select, Space } from "antd";
+import { notification, Select, Space, Tooltip } from "antd";
 import { Conditional } from "components/common/Conditional";
 import ExtensionDeactivationMessage from "components/misc/ExtensionDeactivationMessage";
 import { BottomSheetLayout, useBottomSheetContext } from "componentsV2/BottomSheet";
@@ -21,13 +21,14 @@ import {
   ApiClientStore,
   bufferActions,
   bufferAdapterSelectors,
+  selectRecordById,
   useApiClientRepository,
   useApiClientStore,
 } from "features/apiClient/slices";
 import { useSaveBuffer } from "features/apiClient/slices/buffer/hooks";
 import { BufferedHttpRecordEntity, useIsBufferDirty } from "features/apiClient/slices/entities";
 import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
-import { RBACButton, RevertViewModeChangesAlert, RoleBasedComponent } from "features/rbac";
+import { RevertViewModeChangesAlert, RoleBasedComponent } from "features/rbac";
 import { useDeepLinkState } from "hooks";
 import { useHostContext } from "hooks/useHostContext";
 import { RQButton } from "lib/design-system-v2/components";
@@ -44,6 +45,7 @@ import {
   trackTestGenerationFailed,
   trackTestGenerationStarted,
 } from "modules/analytics/events/features/apiClient";
+import { trackDesktopAppPromoClicked } from "modules/analytics/events/common/onboarding";
 import { API_CLIENT } from "modules/analytics/events/features/constants";
 import React, { useCallback, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -60,8 +62,10 @@ import { RequestContentType, RequestMethod, RQAPI } from "../../../../../types";
 import {
   checkForLargeFiles,
   getContentTypeFromResponseHeaders,
+  getEmptyDraftApiRecord,
   getRequestTypeForAnalyticEvent,
   sanitizeEntry,
+  supportsRequestBodyForAllMethods,
 } from "../../../utils";
 import { ApiClientBreadCrumb, BreadcrumbType } from "../components/ApiClientBreadCrumb/ApiClientBreadCrumb";
 import { ClientCodeButton } from "../components/ClientCodeButton/ClientCodeButton";
@@ -69,8 +73,11 @@ import { Authorization } from "../components/request/components/AuthorizationVie
 import { ApiClientBottomSheet } from "../components/response/ApiClientBottomSheet/ApiClientBottomSheet";
 import HttpApiClientUrl from "./components/HttpClientUrl/HttpClientUrl";
 import HttpRequestTabs, { RequestTab } from "./components/HttpRequestTabs/HttpRequestTabs";
+import { SaveRequestButton } from "../components/SaveRequestButton/SaveRequestButton";
+import { MdArrowOutward } from "@react-icons/all-files/md/MdArrowOutward";
+import { DraftRequestContainerTabSource } from "../components/DraftRequestContainer/draftRequestContainerTabSource";
+import { useTabActions } from "componentsV2/Tabs/slice";
 import "./httpClientView.scss";
-import { apiRecordsRankingManager } from "features/apiClient/helpers/RankingManager";
 
 function getEntry(entity: BufferedHttpRecordEntity, store: ApiClientStore) {
   return entity.getEntityFromState(store.getState()).data;
@@ -92,6 +99,7 @@ export type HttpClientViewProps = {
   };
   openInModal?: boolean;
   notifyApiRequestFinished: (apiEntry: RQAPI.HttpApiEntry) => void;
+  isDraftMode?: boolean;
 };
 
 const HttpClientView: React.FC<HttpClientViewProps> = ({
@@ -99,6 +107,7 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
   notifyApiRequestFinished,
   entity,
   override,
+  isDraftMode = false,
 }) => {
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
@@ -110,6 +119,7 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
   const { toggleBottomSheet, sheetPlacement } = useBottomSheetContext();
 
   const { getIsActive } = useHostContext();
+  const { openBufferedTab } = useTabActions();
 
   const { apiClientRecordsRepository, repoType } = useApiClientRepository();
 
@@ -137,8 +147,17 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
   const url = useApiClientSelector((s) => entity.getUrl(s));
   const contentType = useApiClientSelector((s) => entity.getContentType(s));
   const method = useApiClientSelector((s) => entity.getMethod(s));
+  const bodyLength = useApiClientSelector((s) => entity.getBody(s)?.length || 0);
   const name = useApiClientSelector((s) => entity.getName(s));
   const isNew = useApiClientSelector((s) => bufferAdapterSelectors.selectById(s.buffer, entity.id)?.isNew);
+  const isExample = useApiClientSelector((s) => entity.getType(s) === RQAPI.RecordType.EXAMPLE_API);
+
+  const METHODS_WITHOUT_BODY = [RequestMethod.GET, RequestMethod.HEAD];
+  const isNonBodyMethodWithBodyInNonDesktop =
+    METHODS_WITHOUT_BODY.includes(method) && bodyLength > 0 && !supportsRequestBodyForAllMethods(appMode);
+  const isMultipartInNonDesktop =
+    contentType === RequestContentType.MULTIPART_FORM && !supportsRequestBodyForAllMethods(appMode);
+  const isSendDisabledDueToDesktopOnly = isNonBodyMethodWithBodyInNonDesktop || isMultipartInNonDesktop;
 
   const saveBuffer = useSaveBuffer();
 
@@ -376,9 +395,13 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
 
   const handleRecordNameUpdate = useCallback(
     async (name: string) => {
-      const record = lodash.cloneDeep(entity.getEntityFromState(store.getState()));
+      // FIX: current record type arch does not have proper intersection between ApiRecord and ExampleApiRecord
+      const record = lodash.cloneDeep(entity.getEntityFromState(store.getState())) as RQAPI.ApiClientRecord;
       record.name = name;
-      const result = await apiClientRecordsRepository.updateRecord(record, entity.meta.referenceId);
+      const result =
+        record.type === RQAPI.RecordType.EXAMPLE_API
+          ? await apiClientRecordsRepository.updateExampleRequest(record)
+          : await apiClientRecordsRepository.updateRecord(record, entity.meta.referenceId);
       if (!result.success) {
         notification.error({
           message: "Could not rename record",
@@ -436,7 +459,7 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
             },
             async save(record, repositories) {
               if (override?.onSaveClick) {
-                return override.onSaveClick.save(record, repositories);
+                return override.onSaveClick.save(record as RQAPI.HttpApiRecord, repositories);
               }
               const result = await repositories.apiClientRecordsRepository.updateRecord(record, record.id);
               if (!result.success) {
@@ -455,7 +478,7 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
             },
             onSuccess(result) {
               toast.success("Request saved!");
-              override?.onSaveClick?.onSuccess(result);
+              override?.onSaveClick?.onSuccess(result as RQAPI.HttpApiRecord);
               trackRequestSaved({
                 src: "api_client_view",
                 has_scripts: Boolean(result.data.scripts?.preRequest),
@@ -542,6 +565,33 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
     [entity]
   );
 
+  const handleUseAsTemplate = useCallback(() => {
+    const record = entity.getEntityFromState(store.getState());
+    const exampleData = { ...record.data };
+
+    if (record.type === RQAPI.RecordType.EXAMPLE_API) {
+      const parentRecord = selectRecordById(store.getState(), record.parentRequestId);
+      if (parentRecord?.data) {
+        if (parentRecord.data.auth) {
+          exampleData.auth = parentRecord.data.auth;
+        }
+        if (parentRecord.data.scripts) {
+          exampleData.scripts = parentRecord.data.scripts;
+        }
+      }
+    }
+
+    openBufferedTab({
+      isNew: true,
+      preview: false,
+      source: new DraftRequestContainerTabSource({
+        apiEntryType: RQAPI.ApiEntryType.HTTP,
+        context: {},
+        emptyRecord: getEmptyDraftApiRecord(RQAPI.ApiEntryType.HTTP, exampleData),
+      }),
+    });
+  }, [entity, store, openBufferedTab]);
+
   const enableHotkey = getIsActive();
 
   return isExtensionEnabled ? (
@@ -562,7 +612,7 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
         <div className="api-client-header-container__header">
           <div className="api-client-breadcrumb-container">
             <ApiClientBreadCrumb
-              isDraft={!!isNew}
+              isDraft={isDraftMode}
               id={entity.meta.referenceId}
               openInModal={openInModal}
               placeholder="Untitled request"
@@ -603,35 +653,67 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
                 onCurlImport={handleCurlImport}
               />
             </Space.Compact>
-            <RQButton
-              showHotKeyText
-              onClick={onSendButtonClick}
-              hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SEND_REQUEST!.hotKey}
-              type="primary"
-              className="text-bold"
-              enableHotKey={enableHotkey}
-              disabled={!url || (appMode === "EXTENSION" && contentType === RequestContentType.MULTIPART_FORM)}
-            >
-              Send
-            </RQButton>
-
-            <Conditional condition={!openInModal}>
-              <RBACButton
-                disabled={
-                  !hasUnsavedChanges || (appMode === "EXTENSION" && contentType === RequestContentType.MULTIPART_FORM)
+            {isExample ? (
+              <RQButton type="primary" className="api-client-use-as-template-button" onClick={handleUseAsTemplate}>
+                Use as template <MdArrowOutward />
+              </RQButton>
+            ) : (
+              <Tooltip
+                color="var(--requestly-color-black)"
+                title={
+                  isSendDisabledDueToDesktopOnly ? (
+                    <div className="send-disabled-tooltip">
+                      <span>
+                        {isNonBodyMethodWithBodyInNonDesktop
+                          ? "Sending request body with this method requires the desktop app."
+                          : "Sending multipart/form-data request requires the desktop app."}
+                      </span>
+                      <RQButton
+                        size="small"
+                        onClick={() =>
+                          trackDesktopAppPromoClicked(
+                            isNonBodyMethodWithBodyInNonDesktop ? "request_body_send" : "multipart_form_data_send",
+                            "web_app"
+                          )
+                        }
+                        href="https://requestly.com/downloads/desktop/"
+                        target="_blank"
+                      >
+                        Download Requestly
+                      </RQButton>
+                    </div>
+                  ) : null
                 }
-                permission="create"
-                resource="api_client_request"
-                showHotKeyText
-                hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SAVE_REQUEST!.hotKey}
-                onClick={onSaveButtonClick}
-                loading={isRequestSaving}
-                tooltipTitle="Saving is not allowed in view-only mode. You can update and view changes but cannot save them."
-                enableHotKey={enableHotkey}
+                placement="bottom"
               >
-                Save
-              </RBACButton>
-            </Conditional>
+                <>
+                  <RQButton
+                    showHotKeyText
+                    onClick={onSendButtonClick}
+                    hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SEND_REQUEST!.hotKey}
+                    type="primary"
+                    className="text-bold"
+                    enableHotKey={enableHotkey && !isSendDisabledDueToDesktopOnly}
+                    disabled={!url || isSendDisabledDueToDesktopOnly}
+                  >
+                    Send
+                  </RQButton>
+                </>
+              </Tooltip>
+            )}
+
+            <SaveRequestButton
+              hidden={openInModal}
+              disabled={
+                !hasUnsavedChanges || (appMode === "EXTENSION" && contentType === RequestContentType.MULTIPART_FORM)
+              }
+              loading={isRequestSaving}
+              enableHotkey={enableHotkey}
+              onClick={onSaveButtonClick}
+              entity={entity}
+              isExample={isExample}
+              isDraft={isDraftMode}
+            />
           </div>
         </div>
       </div>
@@ -646,6 +728,7 @@ const HttpClientView: React.FC<HttpClientViewProps> = ({
             isFailed={isFailed}
             isLongRequest={isLongRequest}
             isRequestCancelled={isRequestCancelled}
+            isDraftMode={isDraftMode}
             onCancelRequest={handleCancelRequest}
             handleTestResultRefresh={handleTestResultRefresh}
             error={error}
