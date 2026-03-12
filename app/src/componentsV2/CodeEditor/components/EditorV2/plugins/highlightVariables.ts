@@ -41,8 +41,7 @@ export const highlightVariablesPlugin = (setters: VariableSetters, variables: Sc
           const endIndex = match.index + match[0].length;
 
           const variable = match[0].slice(2, -2).trim(); // Extract the variable name
-          const parts = variable.split(/\s+/);
-          const variableName = parts.length > 0 && parts[0] ? parts[0] : variable; // Extract variable name without parameters
+          const variableName = variable.startsWith("$") ? variable.split(/\s+/)[0] || variable : variable;
 
           this.variablePositions.push({
             start: startIndex,
@@ -81,7 +80,7 @@ export const highlightVariablesPlugin = (setters: VariableSetters, variables: Sc
             const coords = this.view.coordsAtPos(hoveredVar.start);
 
             if (coords) {
-              const variable = token.slice(2, -2);
+              const variable = token.slice(2, -2).trim();
               setters.handleSetVariable(variable);
               setters.setPopupPosition({
                 x: coords.left,
