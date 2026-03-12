@@ -6,12 +6,11 @@ import { MdHorizontalSplit } from "@react-icons/all-files/md/MdHorizontalSplit";
 import { Row } from "antd";
 import { RQButton } from "lib/design-system-v2/components";
 
-export interface SuccessfulParseViewProps {
+interface SuccessfulParseViewProps {
   collectionsData: RQAPI.CollectionRecord[];
   environmentsData: EnvironmentData[];
   isLoading: boolean;
-  handleImportData: (collections?: RQAPI.CollectionRecord[], environments?: EnvironmentData[]) => void;
-  onBack?: () => void;
+  handleImportData: () => void;
 }
 
 export const SuccessfulParseView: React.FC<SuccessfulParseViewProps> = ({
@@ -45,7 +44,7 @@ export const SuccessfulParseView: React.FC<SuccessfulParseViewProps> = ({
         ) : null}
       </div>
       <Row justify="end" className="importer-actions-row">
-        <RQButton type="primary" loading={isLoading} onClick={() => handleImportData()}>
+        <RQButton type="primary" loading={isLoading} onClick={handleImportData}>
           Import
         </RQButton>
       </Row>
