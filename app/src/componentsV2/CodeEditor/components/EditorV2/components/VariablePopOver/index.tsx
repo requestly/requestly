@@ -68,7 +68,9 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
   const isNoopContext = workspaceId === NoopContextId;
 
   // Extract base variable name for dynamic variables with arguments (e.g., "$randomInt 0 100" -> "$randomInt")
-  const baseVariableName = hoveredVariable.split(" ")[0] || hoveredVariable;
+  const baseVariableName = hoveredVariable.startsWith("$")
+    ? hoveredVariable.split(" ")[0] || hoveredVariable
+    : hoveredVariable;
   const variableData = getVariable(baseVariableName, variables);
 
   const [currentView, setCurrentView] = useState<PopoverView>(() => {

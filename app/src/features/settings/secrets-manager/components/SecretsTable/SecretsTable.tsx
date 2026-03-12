@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo, useRef } from "react";
+import React, { useState, useCallback, useMemo, useEffect } from "react";
 import { Table, Tag, Button, Dropdown, Tooltip, Checkbox, Popover, Input } from "antd";
 import type { ColumnsType } from "antd/lib/table";
 import { useSelector, useDispatch } from "react-redux";
@@ -9,7 +9,7 @@ import { AiOutlineInfoCircle } from "@react-icons/all-files/ai/AiOutlineInfoCirc
 import { RiDeleteBin6Line } from "@react-icons/all-files/ri/RiDeleteBin6Line";
 import { BsThreeDots } from "@react-icons/all-files/bs/BsThreeDots";
 import { FiPlus } from "@react-icons/all-files/fi/FiPlus";
-import { AwsSecretValue, SecretProviderType } from "@requestly/shared/types/entities/secretsManager";
+import { AwsSecretValue } from "@requestly/shared/types/entities/secretsManager";
 import { MdErrorOutline } from "@react-icons/all-files/md/MdErrorOutline";
 import {
   selectSecretsForSelectedProvider,
@@ -69,7 +69,12 @@ const SecretsTable: React.FC<SecretsTableProps> = ({ onViewKeyValues }) => {
   const [showVersionId, setShowVersionId] = useState(false);
   const [visibleIds, setVisibleIds] = useState<Set<string>>(new Set());
 
-  const emptyRowIdRef = useRef<string>(crypto.randomUUID());
+  // Auto-create a real Redux row when there are no secrets for the selected provider
+  useEffect(() => {
+    if (secrets.length === 0 && selectedProviderId) {
+      dispatch(secretsManagerActions.addSecretEntry({ providerId: selectedProviderId }));
+    }
+  }, [secrets.length, selectedProviderId, dispatch]);
 
   const toggleVisibility = useCallback((id: string) => {
     setVisibleIds((prev) => {
@@ -78,13 +83,6 @@ const SecretsTable: React.FC<SecretsTableProps> = ({ onViewKeyValues }) => {
       return next;
     });
   }, []);
-
-  const isPhantomRow = useCallback(
-    (row: TableRow) => {
-      return !secrets.some((s) => s.secretReference.id === row.secretReference.id);
-    },
-    [secrets]
-  );
 
   const handleAddClick = () => {
     if (!selectedProviderId) {
@@ -98,11 +96,6 @@ const SecretsTable: React.FC<SecretsTableProps> = ({ onViewKeyValues }) => {
     if (!selectedProviderId) return;
 
     const secretRefId = row.secretReference.id;
-
-    // If this is a phantom row (not in Redux yet), materialize it first
-    if (isPhantomRow(row)) {
-      dispatch(secretsManagerActions.addSecretEntryWithId({ providerId: selectedProviderId, secretRefId }));
-    }
 
     dispatch(
       secretsManagerActions.unsafePatchSecret({
@@ -137,34 +130,11 @@ const SecretsTable: React.FC<SecretsTableProps> = ({ onViewKeyValues }) => {
   };
 
   const dataSource: TableRow[] = useMemo(() => {
-    const rows = secrets.map((s) => ({
+    return secrets.map((s) => ({
       ...s,
       key: s.secretReference.id,
     }));
-    if (rows.length === 0) {
-      // Always show at least 1 row — phantom row not in Redux
-      const phantomRow: TableRow = {
-        type: SecretProviderType.AWS_SECRETS_MANAGER,
-        providerId: selectedProviderId ?? "",
-        secretReference: {
-          id: emptyRowIdRef.current,
-          type: SecretProviderType.AWS_SECRETS_MANAGER,
-          alias: "",
-          identifier: "",
-        },
-        fetchedAt: 0,
-        name: "",
-        value: "",
-        ARN: "",
-        versionId: "",
-        key: emptyRowIdRef.current,
-      };
-      return [phantomRow];
-    }
-    // Regenerate the ID for next time we go back to zero
-    emptyRowIdRef.current = crypto.randomUUID();
-    return rows;
-  }, [secrets, selectedProviderId]);
+  }, [secrets]);
 
   const columns: ColumnsType<TableRow> = [
     {
