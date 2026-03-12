@@ -52,7 +52,7 @@ export const selectIsDirtyForSelectedProvider = createSelector(
       const ref = s.secretReference as AwsSecretValue["secretReference"];
       const alias = (s.secretReference.alias ?? "").trim();
       const identifier = (ref.identifier ?? "").trim();
-      return alias !== "" || identifier !== "";
+      return alias !== "" && identifier !== "";
     });
 
     const snapshotIds = new Set(Object.keys(snapshot));
