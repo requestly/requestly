@@ -21,7 +21,17 @@
       font-weight: 400;
       line-height: 17px;
       cursor: pointer;
+      margin-right: 4px;
     }
+  }
+
+  .active-instance-link-icon {
+    color: var(--requestly-color-text-subtle, #bbb);
+    text-align: center;
+    font-family: "Material Symbols Outlined";
+    font-size: 9px;
+    font-style: normal;
+    font-weight: 400;
   }
 
   .border-line {
@@ -108,15 +118,6 @@
         font-weight: 400;
         line-height: 17px;
       }
-    }
-
-    .active-instance-link-icon {
-      color: var(--alias-tokens-color-text-subtle, #bbb);
-      text-align: center;
-      font-family: "Material Symbols Outlined";
-      font-size: 12px;
-      font-style: normal;
-      font-weight: 400;
     }
   }
 }
