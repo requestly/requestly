@@ -21,7 +21,7 @@ const DeleteProviderModal: React.FC<DeleteProviderModalProps> = ({
   providerName,
 }) => {
   const header = "Delete provider instance?";
-  const description = `Deleting "${providerName}" will remove all associated secrets. Are you sure?`;
+  const description = `Deleting "${providerName}" instance will remove all associated secrets. Are you sure?`;
 
   return (
     <RQModal
