@@ -172,6 +172,7 @@ export const AddSecretsProviderModal = ({
           value={providerData.region}
           handleFilterChange={(value: string) => onChange({ region: value })}
           disabled={isFetchingConfig || isSavingProvider}
+          placeholder="Select region"
         />
       </div>
     </Modal>
