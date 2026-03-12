@@ -201,10 +201,8 @@ export const TabsContainer: React.FC = () => {
 
     const hasUnsavedChanges = getHasAnyUnsavedChanges();
     if (hasUnsavedChanges) {
-      const shouldDiscardChanges = window.confirm(
-        "Discard changes? Ajinkya Ajinkya Ajinkya Changes you made will not be saved."
-      );
-      window.focus();
+      const shouldDiscardChanges = window.confirm("Discard changes? Changes you made will not be saved.");
+      window?.RQ?.DESKTOP?.SERVICES?.IPC?.invokeEventInMain?.("focus-webcontent");
       return !shouldDiscardChanges;
     }
 
@@ -212,9 +210,9 @@ export const TabsContainer: React.FC = () => {
     if (tabWithWorkflow) {
       const firstWorkflow = tabWithWorkflow?.activeWorkflows.values().next().value;
       const shouldDiscardChanges = window.confirm(
-        firstWorkflow?.cancelWarning || "Discard changes? Ajinkya ajinkya ajinkya Changes you made will not be saved."
+        firstWorkflow?.cancelWarning || "Discard changes? Changes you made will not be saved."
       );
-      window.focus();
+      window?.RQ?.DESKTOP?.SERVICES?.IPC?.invokeEventInMain?.("focus-webcontent");
 
       return !shouldDiscardChanges;
     }
