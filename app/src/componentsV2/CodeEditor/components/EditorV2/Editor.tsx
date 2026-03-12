@@ -224,6 +224,25 @@ const Editor: React.FC<EditorProps> = ({
     }
   }, [autoFocus, isEditorInitialized, onFocus]);
 
+  // In desktop Electron on Windows, native dialogs (like window.confirm) can leave
+  // CodeMirror's internal input state in a bad state where backspace works but
+  // new characters do not. As a safety net, allow other parts of the app to
+  // request that all editors forcibly re-focus themselves.
+  useEffect(() => {
+    const handler = () => {
+      if (editorRef.current?.view) {
+        // Blur then re-focus to fully reset input state
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore - dom is a private property but safe to use here
+        editorRef.current.view.dom.blur?.();
+        editorRef.current.view.focus();
+      }
+    };
+
+    window.addEventListener("rq-reset-editor-focus", handler);
+    return () => window.removeEventListener("rq-reset-editor-focus", handler);
+  }, []);
+
   // Reinitializing the fullscreen editor
   useEffect(() => {
     isDefaultPrettificationDone.current = false;

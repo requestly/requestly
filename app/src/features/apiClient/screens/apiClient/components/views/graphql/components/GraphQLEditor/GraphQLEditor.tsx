@@ -160,7 +160,14 @@ export const GraphQLEditor: React.FC<EditorProps> = (props) => {
       parent: editorRef.current,
     });
 
+    const resetHandler = () => {
+      viewRef.current?.focus();
+    };
+
+    window.addEventListener("rq-reset-editor-focus", resetHandler);
+
     return () => {
+      window.removeEventListener("rq-reset-editor-focus", resetHandler);
       viewRef.current?.destroy();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
