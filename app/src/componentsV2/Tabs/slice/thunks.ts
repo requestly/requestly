@@ -19,15 +19,11 @@ function checkTabUnsavedChanges(tab: TabState): boolean {
   const hasUnsavedChanges = getIsTabDirty(tab);
   if (hasUnsavedChanges) {
     const canClose = window.confirm("Discard changes? Changes you made will not be saved.");
-    // On Windows Electron, the native confirm dialog causes the browser to emit a
-    // `blur` event on `window`, which makes CodeMirror set contenteditable="false"
-    // on its input element. When the dialog closes, no corresponding `focus` event
-    // fires (the BrowserWindow already has OS focus), so CodeMirror never restores
-    // contenteditable="true". Result: backspace works (keydown still fires) but
-    // typing new characters doesn't (requires contenteditable="true").
-    // Dispatching a synthetic `focus` event on `window` triggers CodeMirror's
-    // internal window-focus handler, which restores the editor to a usable state.
-    setTimeout(() => window.dispatchEvent(new FocusEvent("focus")), 0);
+    // After native dialogs on Windows Electron, CodeMirror editors can end up in
+    // a state where backspace works but new characters cannot be typed. Ask all
+    // editors to forcibly re-focus themselves to reset their internal input
+    // state.
+    window.dispatchEvent(new Event("rq-reset-editor-focus"));
     return canClose;
   }
   return true;
@@ -61,7 +57,7 @@ export const closeTab = createAsyncThunk<
         const firstWorkflow = tab.activeWorkflows.values().next().value as ActiveWorkflow;
         if (firstWorkflow) {
           const canClose = window.confirm(firstWorkflow.cancelWarning || "Close this tab?");
-          setTimeout(() => window.dispatchEvent(new FocusEvent("focus")), 0);
+          window.dispatchEvent(new Event("rq-reset-editor-focus"));
           if (!canClose) {
             return rejectWithValue("User cancelled tab close due to active workflow");
           }
@@ -120,7 +116,7 @@ export const closeAllTabs = createAsyncThunk<
         const canClose = window.confirm(
           firstWorkflow.cancelWarning || "Close all tabs? Some operations are still running."
         );
-        setTimeout(() => window.dispatchEvent(new FocusEvent("focus")), 0);
+        window.dispatchEvent(new Event("rq-reset-editor-focus"));
 
         if (!canClose) {
           return rejectWithValue("User cancelled close all tabs due to active workflow");

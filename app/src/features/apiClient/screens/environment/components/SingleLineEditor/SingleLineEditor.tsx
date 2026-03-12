@@ -164,7 +164,14 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
       }),
     });
 
+    const resetHandler = () => {
+      editorViewRef.current?.focus();
+    };
+
+    window.addEventListener("rq-reset-editor-focus", resetHandler);
+
     return () => {
+      window.removeEventListener("rq-reset-editor-focus", resetHandler);
       editorViewRef.current?.destroy();
       editorViewRef.current = null;
     };
