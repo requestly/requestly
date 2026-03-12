@@ -109,26 +109,6 @@ export const secretsManagerSlice = createSlice({
       secretsAdapter.addOne(state.secrets, stub);
     },
 
-    addSecretEntryWithId(state, action: PayloadAction<{ providerId: string; secretRefId: string }>) {
-      const { providerId, secretRefId } = action.payload;
-      const stub: AwsSecretValue = {
-        type: SecretProviderType.AWS_SECRETS_MANAGER,
-        providerId,
-        secretReference: {
-          id: secretRefId,
-          type: SecretProviderType.AWS_SECRETS_MANAGER,
-          alias: "",
-          identifier: "",
-        },
-        fetchedAt: 0,
-        name: "",
-        value: "",
-        ARN: "",
-        versionId: "",
-      };
-      secretsAdapter.addOne(state.secrets, stub);
-    },
-
     removeSecretEntry(state, action: PayloadAction<{ providerId: string; secretRefId: string }>) {
       secretsAdapter.removeOne(state.secrets, action.payload.secretRefId);
     },

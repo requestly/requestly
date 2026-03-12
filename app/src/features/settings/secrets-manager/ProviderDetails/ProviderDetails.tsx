@@ -14,7 +14,6 @@ import {
   secretsManagerActions,
   fetchAndSaveSecretsForProvider,
   listSecrets,
-  selectSecretsForSelectedProvider,
 } from "features/apiClient/slices/secrets-manager";
 import { CheckCircleOutlined } from "@ant-design/icons";
 
@@ -41,7 +40,6 @@ const ProviderDetails: React.FC<ProviderDetailsProps> = ({ onViewKeyValues }) =>
   const lastFetchedTimestamp = useSelector(selectLastFetchedForSelectedProvider);
   const fetchStatus = useSelector(selectFetchStatus);
   const isDirty = useSelector(selectIsDirtyForSelectedProvider);
-  const secrets = useSelector(selectSecretsForSelectedProvider);
 
   const isFetching = fetchStatus === "loading";
   const lastFetched = useMemo(() => (lastFetchedTimestamp ? formatRelativeTime(lastFetchedTimestamp) : null), [
@@ -107,7 +105,7 @@ const ProviderDetails: React.FC<ProviderDetailsProps> = ({ onViewKeyValues }) =>
             loading={isFetching}
             onClick={handleFetchSecrets}
             className="fetch-secrets-btn"
-            disabled={secrets?.length === 0}
+            disabled={!isDirty}
           >
             {isDirty && !isFetching && <span className="unsaved-dot" />}
             {!isFetching && "Fetch secrets"}
