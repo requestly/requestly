@@ -134,7 +134,7 @@ const escapeMatchFromHandlebars = (match: string) => {
  * Extracts the variable name (first word) to handle arguments.
  */
 const isDynamicVariable = (varName: string): boolean => {
-  if (!varName) return false;
+  if (!varName || !varName.startsWith("$")) return false;
   const [variableNameOnly = ""] = varName.split(" ");
   return variableResolver.has(variableNameOnly);
 };
@@ -309,7 +309,10 @@ export const extractVariableNameFromStringIfExists = (string: string) => {
   return matches.map((match) => {
     const fullMatch = match[1]?.trim() ?? "";
     // Extract just the variable name (first word) in case of arguments like "$randomInt 1 100"
-    const [variableName = ""] = fullMatch.split(" ");
-    return variableName;
+    if (fullMatch.startsWith("$")) {
+      const [variableName = ""] = fullMatch.split(" ");
+      return variableName;
+    }
+    return fullMatch;
   });
 };
