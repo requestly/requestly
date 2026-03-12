@@ -18,7 +18,7 @@ function cleanupTabActiveWorkflows(tab: TabState) {
 function checkTabUnsavedChanges(tab: TabState): boolean {
   const hasUnsavedChanges = getIsTabDirty(tab);
   if (hasUnsavedChanges) {
-    const canClose = window.confirm("Discard changes? Changes you made will not be saved.");
+    const canClose = window.confirm("Discard changes? Ajinkya Ajinkya Ajinkya Changes you made will not be saved.");
     window.focus();
     return canClose;
   }
