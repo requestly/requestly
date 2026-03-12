@@ -21,7 +21,7 @@ const DeleteSecretModal: React.FC<DeleteSecretModalProps> = ({
   secretAlias,
 }) => {
   const header = "Delete secret?";
-  const description = `Are you sure you want to delete "${secretAlias}"? This action cannot be undone.`;
+  const description = `Deleting "${secretAlias}" will prevent this secret from resolving in requests. Are you sure?`;
 
   return (
     <RQModal

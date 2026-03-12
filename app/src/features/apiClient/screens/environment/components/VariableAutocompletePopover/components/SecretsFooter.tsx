@@ -1,7 +1,7 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { PlusOutlined, ExportOutlined } from "@ant-design/icons";
+import { PlusOutlined } from "@ant-design/icons";
 import { selectSelectedProviderId, selectAllSecretProviders } from "features/apiClient/slices/secrets-manager";
 import PATHS from "config/constants/sub/paths";
 import "./emptyStates.scss";
@@ -51,7 +51,6 @@ export const SecretsFooter: React.FC<SecretsFooterProps> = ({ onClose, showAddAl
               {activeProvider.name}
             </span>
           </span>
-          <ExportOutlined className="active-instance-link-icon" />
         </div>
       )}
     </div>

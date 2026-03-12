@@ -43,6 +43,7 @@ type AddEditModalState =
       editingProviderId?: string;
       formData: ProviderData;
       isFetchingConfig: boolean;
+      connectionStatus: "untested" | "testing" | "success" | "failed";
     };
 
 type DeleteModalState =
@@ -79,6 +80,7 @@ interface SecretsModalsContextValue {
   updateAddEditFormData: (formData: Partial<ProviderData>) => void;
   saveProvider: (formData: ProviderData) => Promise<void>;
   testConnection: () => Promise<void>;
+  resetConnectionStatus: () => void;
 
   openDeleteProviderModal: (providerId: string, providerName: string) => void;
   closeDeleteProviderModal: () => void;
@@ -120,6 +122,7 @@ export const SecretsModalsProvider: React.FC<{ children: React.ReactNode }> = ({
         mode: "add",
         formData: { ...DEFAULT_FORM_DATA },
         isFetchingConfig: false,
+        connectionStatus: "untested",
       },
     }));
   }, []);
@@ -133,6 +136,7 @@ export const SecretsModalsProvider: React.FC<{ children: React.ReactNode }> = ({
         editingProviderId: providerId,
         formData: { ...DEFAULT_FORM_DATA },
         isFetchingConfig: true,
+        connectionStatus: "untested",
       },
     }));
 
@@ -161,6 +165,7 @@ export const SecretsModalsProvider: React.FC<{ children: React.ReactNode }> = ({
             editingProviderId: providerId,
             formData: { ...data },
             isFetchingConfig: false,
+            connectionStatus: "untested",
           },
         };
       });
@@ -186,6 +191,7 @@ export const SecretsModalsProvider: React.FC<{ children: React.ReactNode }> = ({
           ...prev.addEdit,
           formData: { ...prev.addEdit.formData, ...formData },
           error: undefined,
+          connectionStatus: "untested",
         },
       };
     });
@@ -234,23 +240,69 @@ export const SecretsModalsProvider: React.FC<{ children: React.ReactNode }> = ({
         return;
       }
 
+      setModals((prev) => {
+        if (!prev.addEdit.isOpen) return prev;
+        return {
+          ...prev,
+          addEdit: { ...prev.addEdit, connectionStatus: "testing" },
+        };
+      });
+
       const existingId = addEditState.mode === "edit" ? addEditState.editingProviderId : undefined;
       const config = toSecretProviderConfig(addEditState.formData, existingId);
       const result = await secretsManagerService.testConnectionWithConfig(config);
 
       if (result.type === "error") {
+        setModals((prev) => {
+          if (!prev.addEdit.isOpen) return prev;
+          return {
+            ...prev,
+            addEdit: { ...prev.addEdit, connectionStatus: "failed" },
+          };
+        });
         notifyError(`Connection test failed`, result.error.message);
         return;
       }
 
       if (result.data) {
+        setModals((prev) => {
+          if (!prev.addEdit.isOpen) return prev;
+          return {
+            ...prev,
+            addEdit: { ...prev.addEdit, connectionStatus: "success" },
+          };
+        });
         toast.success("Connection successful");
       } else {
+        setModals((prev) => {
+          if (!prev.addEdit.isOpen) return prev;
+          return {
+            ...prev,
+            addEdit: { ...prev.addEdit, connectionStatus: "failed" },
+          };
+        });
         notifyError(`Connection test failed`, "Please check your credentials.");
       }
     } catch (error) {
+      setModals((prev) => {
+        if (!prev.addEdit.isOpen) return prev;
+        return {
+          ...prev,
+          addEdit: { ...prev.addEdit, connectionStatus: "failed" },
+        };
+      });
       notifyError(`Connection test failed`, error instanceof Error ? error.message : "Connection test failed");
     }
+  }, []);
+
+  const resetConnectionStatus = useCallback(() => {
+    setModals((prev) => {
+      if (!prev.addEdit.isOpen) return prev;
+      return {
+        ...prev,
+        addEdit: { ...prev.addEdit, connectionStatus: "untested" },
+      };
+    });
   }, []);
 
   const deleteProvider = useCallback(async () => {
@@ -333,6 +385,7 @@ export const SecretsModalsProvider: React.FC<{ children: React.ReactNode }> = ({
     updateAddEditFormData,
     saveProvider,
     testConnection,
+    resetConnectionStatus,
     openDeleteProviderModal,
     closeDeleteProviderModal,
     deleteProvider,

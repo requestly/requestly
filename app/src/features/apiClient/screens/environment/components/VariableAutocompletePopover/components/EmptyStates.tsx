@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import "./emptyStates.scss";
 import { SecretsFooter } from "./SecretsFooter";
+import ExportOutlined from "@ant-design/icons/lib/icons/ExportOutlined";
 
 interface SecretsEmptyStateProps {
   onClose?: () => void;
@@ -54,10 +55,12 @@ const AutoCompleteSecretEmptyState: React.FC<SecretsEmptyStateProps> = ({ onClos
             <span className="learn-more" onMouseDown={handleLearnMore}>
               Learn more
             </span>
+            <ExportOutlined className="active-instance-link-icon" />
           </span>
         </div>
         <div className="secrets-upgrade-button" onMouseDown={handleUpgradePlan}>
           <span>Upgrade plan</span>
+          <ExportOutlined className="active-instance-link-icon" />
         </div>
       </div>
     );
