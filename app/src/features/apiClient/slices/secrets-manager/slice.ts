@@ -84,9 +84,13 @@ export const secretsManagerSlice = createSlice({
     },
     removeSecret(state, action: PayloadAction<string>) {
       secretsAdapter.removeOne(state.secrets, action.payload);
+      delete state.secretsSnapshot[action.payload];
     },
     removeSecrets(state, action: PayloadAction<string[]>) {
       secretsAdapter.removeMany(state.secrets, action.payload);
+      for (const id of action.payload) {
+        delete state.secretsSnapshot[id];
+      }
     },
 
     addSecretEntry(state, action: PayloadAction<{ providerId: string }>) {
