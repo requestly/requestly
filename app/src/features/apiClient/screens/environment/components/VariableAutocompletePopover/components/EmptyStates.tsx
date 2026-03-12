@@ -1,13 +1,13 @@
 import React from "react";
 import LINKS from "config/constants/sub/links";
 import PATHS from "config/constants/sub/paths";
-import { selectAllSecretProviders, selectSelectedProviderId } from "features/apiClient/slices/secrets-manager";
+import { selectAllSecretProviders } from "features/apiClient/slices/secrets-manager";
 import { PRICING } from "features/pricing";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import "./emptyStates.scss";
-import { ExportOutlined, PlusOutlined } from "@ant-design/icons";
+import { SecretsFooter } from "./SecretsFooter";
 
 interface SecretsEmptyStateProps {
   onClose?: () => void;
@@ -24,22 +24,6 @@ const AutoCompleteSecretEmptyState: React.FC<SecretsEmptyStateProps> = ({ onClos
     PRICING.PLAN_NAMES.API_CLIENT_PROFESSIONAL,
   ].includes(user?.details?.planDetails?.planName || "");
   const navigate = useNavigate();
-  const selectedProviderId = useSelector(selectSelectedProviderId);
-  const activeProvider = selectedProviderId ? providers.find((p) => p.id === selectedProviderId) : null;
-
-  const handleAddAlias = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    navigate(PATHS.SETTINGS.SECRETS.ABSOLUTE);
-    onClose?.();
-  };
-
-  const handleOpenSecrets = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    navigate(PATHS.SETTINGS.SECRETS.ABSOLUTE);
-    onClose?.();
-  };
 
   const handleAddProvider = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -97,26 +81,7 @@ const AutoCompleteSecretEmptyState: React.FC<SecretsEmptyStateProps> = ({ onClos
     );
   }
 
-  return (
-    <div className="secrets-autocomplete-footer">
-      <div className="secrets-no-provider-message">
-        <span className="no-provider-text">No aliases configured</span>
-      </div>
-      <div className="secrets-add-alias-row" onClick={handleAddAlias}>
-        <PlusOutlined className="add-alias-icon" />
-        <span>Add alias</span>
-      </div>
-      {activeProvider && (
-        <div className="secrets-active-instance" onClick={handleOpenSecrets}>
-          <span className="active-instance-label">
-            Active instance:&nbsp;
-            <span className="active-instance-name">{activeProvider.name}</span>
-          </span>
-          <ExportOutlined className="active-instance-link-icon" />
-        </div>
-      )}
-    </div>
-  );
+  return <SecretsFooter showAddAlias={true} />;
 };
 
 export default AutoCompleteSecretEmptyState;

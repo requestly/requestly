@@ -103,8 +103,8 @@
   }
 
   .usage-instructions {
-    color: var(--requestly-color-text-subtle, #bbb);
-    font-size: 12px;
+    color: var(--requestly-color-text-placeholder, #8f8f8f);
+    font-size: 11px;
     margin: 0;
   }
 }
@@ -146,5 +146,11 @@
     font-size: var(--font-size-xs, 11px);
     font-style: normal;
     font-weight: 400;
+  }
+}
+
+.instance-select {
+  .ant-select-selector {
+    background: none !important;
   }
 }

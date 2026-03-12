@@ -20,10 +20,10 @@ import {
 } from "features/apiClient/slices/secrets-manager";
 import { parseSecretKeyValues } from "../../utils/parseSecretKeyValues";
 import "./secretsTable.scss";
-import { deleteSecret } from "features/apiClient/slices/secrets-manager/thunks";
 import clsx from "clsx";
 import { RQButton } from "lib/design-system-v2/components/RQButton/RQButton";
 import { RQTooltip } from "lib/design-system-v2/components/RQTooltip/RQTooltip";
+import { useSecretsModals } from "../../context/SecretsModalsContext";
 
 type TableRow = AwsSecretValue & { key: string };
 
@@ -61,6 +61,7 @@ const SecretsTable: React.FC<SecretsTableProps> = ({ onViewKeyValues }) => {
   const dispatch = useDispatch<AppDispatch>();
   const secrets = useSelector(selectSecretsForSelectedProvider) as AwsSecretValue[];
   const selectedProviderId = useSelector(selectSelectedProviderId);
+  const { openDeleteSecretModal } = useSecretsModals();
 
   const fetchErrors = useSelector(selectFetchErrors);
   const validationErrors = useSelector(selectValidationErrors);
@@ -123,7 +124,8 @@ const SecretsTable: React.FC<SecretsTableProps> = ({ onViewKeyValues }) => {
         })
       );
     } else {
-      dispatch(deleteSecret({ providerId: selectedProviderId, secretReference: row.secretReference }));
+      const secretAlias = row.secretReference.alias || row.secretReference.identifier || "this secret";
+      openDeleteSecretModal(selectedProviderId, row.secretReference, secretAlias);
     }
   };
 
@@ -302,7 +304,7 @@ const SecretsTable: React.FC<SecretsTableProps> = ({ onViewKeyValues }) => {
                 {
                   key: "delete",
                   icon: <RiDeleteBin6Line />,
-                  label: "Remove",
+                  label: "Delete",
                   danger: true,
                   onClick: () => handleDelete(row),
                 },

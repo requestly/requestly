@@ -7,9 +7,6 @@
   justify-content: space-between;
   align-items: center;
   border-radius: 4px 4px 0 0;
-  &:hover {
-    background: var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.1));
-  }
 
   .manage-providers-col1 {
     .provider-details-block {
