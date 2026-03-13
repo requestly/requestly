@@ -18,6 +18,7 @@ interface RequestBotProps {
 export const RequestBot: React.FC<RequestBotProps> = ({ isOpen, onClose, modelType = "app" }) => {
   const isOptedforAIFeatures = useSelector(getIsOptedforAIFeatures);
   const [userHasConsented, setUserHasConsented] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -31,11 +32,16 @@ export const RequestBot: React.FC<RequestBotProps> = ({ isOpen, onClose, modelTy
   const modelConfig = MODELS[modelType] ?? MODELS.app;
 
   useEffect(() => {
+    if (shouldShowBot) {
+      setIsVisible(true);
+      closeButtonRef.current?.focus();
+    }
+  }, [shouldShowBot]);
+
+  useEffect(() => {
     if (!shouldShowBot) {
       return;
     }
-
-    closeButtonRef.current?.focus();
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
@@ -67,7 +73,12 @@ export const RequestBot: React.FC<RequestBotProps> = ({ isOpen, onClose, modelTy
         className="request-bot-layer"
         style={{
           pointerEvents: shouldShowBot ? "auto" : "none",
-          visibility: shouldShowBot ? "visible" : "hidden",
+          visibility: isVisible ? "visible" : "hidden",
+        }}
+        onAnimationComplete={() => {
+          if (!shouldShowBot) {
+            setIsVisible(false);
+          }
         }}
       >
         <m.button
