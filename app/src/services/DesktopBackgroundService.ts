@@ -1,3 +1,4 @@
+import { traceIPC } from "utils/TracingIPC";
 const IPC_TIMEOUT = 15000;
 
 class TimoutError extends Error {
@@ -22,7 +23,8 @@ export function rpc(
       reject(new TimoutError(method));
     }, timeout || IPC_TIMEOUT);
 
-    window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG(`${namespace}-${method}`, args)
+    traceIPC
+      .invokeEventInBG(`${namespace}-${method}`, args)
       .then((res: any) => {
         if (res.success) {
           resolve(res.data);
