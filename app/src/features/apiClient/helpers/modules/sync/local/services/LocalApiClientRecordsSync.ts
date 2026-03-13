@@ -698,6 +698,27 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
     };
   }
 
+  async excludeErrorFile(filePath: string): Promise<{ success: boolean; message?: string }> {
+    const adapter = await this.getAdapter();
+    if (!adapter) {
+      return {
+        success: false,
+        message: "Failed to get filesystem adapter",
+      };
+    }
+
+    const result = await adapter.excludeFile(filePath);
+
+    if (result.type === "success") {
+      return { success: true };
+    }
+
+    return {
+      success: false,
+      message: result.error.message || "Failed to exclude file",
+    };
+  }
+
   async batchCreateCollectionRunDetails(
     details: {
       collectionId: RQAPI.CollectionRecord["id"];
