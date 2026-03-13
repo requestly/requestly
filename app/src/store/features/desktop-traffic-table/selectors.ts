@@ -22,3 +22,7 @@ export const getAllFilters = (state: RootState) => {
 export const getIsInterceptionPaused = (state: RootState) => {
   return state[storeKey].isInterceptionPaused;
 };
+
+export const selectSelectedLogId = (state: RootState) => {
+  return state[storeKey].selectedLogId;
+};
