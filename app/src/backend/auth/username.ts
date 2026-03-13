@@ -35,6 +35,12 @@ export const updateUsername = async (uid: string, newUsername: string): Promise<
         currentUsername = userDoc.data()?.username;
       }
 
+      // This code will not allow the user to update the same previous username: reduces the transaction
+      // If an user tries to update to the same username, the transaction exits early and performs no writes.
+      if (currentUsername === newUsername) {
+        return; // nothing to update
+      }
+
       // Check current username belongs to user
       if (currentUsername) {
         const currentUsernameDoc = await transaction.get(doc(db, "usernames", currentUsername));
