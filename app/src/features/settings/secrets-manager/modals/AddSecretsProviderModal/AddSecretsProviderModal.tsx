@@ -34,27 +34,6 @@ const optionalTitle = (label: string) => (
   </span>
 );
 
-const testConnectionLabel = (label: string) => {
-  switch (label) {
-    case "testing":
-      return "Testing connection";
-    case "success":
-      return (
-        <>
-          <CheckOutlined className="green-tick-icon" /> Connection successful
-        </>
-      );
-    case "failed":
-      return (
-        <>
-          <CloseOutlined className="red-cross-icon " /> Connection failed
-        </>
-      );
-    default:
-      return "Test connection";
-  }
-};
-
 const errorSuffix = (error: string) => (
   <Tooltip title={error} placement="right" showArrow={false} overlayClassName="error-tooltip">
     <InfoCircleOutlined className="info-icon" />
@@ -107,32 +86,48 @@ export const AddSecretsProviderModal = ({
   const header = <p className="add-edit-provider-modal-header">{mode === "add" ? "Add provider" : "Edit provider"}</p>;
   const footer = (
     <div className="add-edit-provider-modal-footer">
-      <RQTooltip
-        title={isTestConnectionDisabled ? "Fill all required fields to test connection" : ""}
-        showArrow={false}
-        placement="topRight"
-      >
-        <span>
-          <RQButton
-            type="transparent"
-            className="test-connection-button"
-            onClick={onTestConnection}
-            icon={connectionStatus === "untested" ? <NetworkPingIcon /> : undefined}
-            loading={isTestingConnection}
-            disabled={isTestConnectionDisabled}
-          >
-            {testConnectionLabel(connectionStatus)}
-          </RQButton>
-        </span>
-      </RQTooltip>
+      {connectionStatus === "success" || connectionStatus === "failed" ? (
+        <div className={`connection-status ${connectionStatus === "success" ? "success" : "failed"}`}>
+          {connectionStatus === "success" ? (
+            <span className="status-text">
+              <CheckOutlined className="green-tick-icon" /> Connection successful
+            </span>
+          ) : (
+            <span className="status-text">
+              <CloseOutlined className="red-cross-icon" /> Connection failed
+            </span>
+          )}
+        </div>
+      ) : (
+        <RQTooltip
+          title="Fill all required fields to test connection"
+          showArrow={false}
+          placement="topRight"
+          {...(!isTestConnectionDisabled && { open: false })}
+        >
+          <span>
+            <RQButton
+              type="transparent"
+              className="test-connection-button"
+              onClick={onTestConnection}
+              icon={connectionStatus === "untested" ? <NetworkPingIcon /> : undefined}
+              loading={isTestingConnection}
+              disabled={isTestConnectionDisabled}
+            >
+              {connectionStatus === "testing" ? "Testing connection" : "Test connection"}
+            </RQButton>
+          </span>
+        </RQTooltip>
+      )}
       <div className="footer-right-section">
         <RQButton type="secondary" className="cancel-button" onClick={onClose} disabled={isBusy}>
           Cancel
         </RQButton>
         <RQTooltip
-          title={isTestConnectionDisabled ? "Test connection successfully before adding provider" : ""}
+          title="Fill all required fields to add provider"
           showArrow={false}
           placement="topLeft"
+          {...(!(isTestConnectionDisabled && connectionStatus !== "success") && { open: false })}
         >
           <span>
             <RQButton
