@@ -60,6 +60,8 @@
     }
 
     &.collection-row {
+      display: table-row;
+
       .add-mock-btn {
         display: none;
         align-items: center;

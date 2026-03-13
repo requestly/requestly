@@ -35,7 +35,18 @@ export class ApiClientLocalDbQueryService<T> {
   }
 
   async getRecords() {
-    return await this.getTable().toArray();
+    try {
+      return await this.getTable().toArray();
+    } catch (error: any) {
+      if (error.name === "DatabaseClosedError") {
+        throw new MultipleInstanceError(
+          "Multiple instances of Requestly are running. Please close other instances to continue.",
+          "DatabaseClosedError"
+        );
+      }
+      const e = new Error(error.message);
+      throw NativeError.fromError(e).setShowBoundary(true).setSeverity(ErrorSeverity.ERROR);
+    }
   }
 
   async updateRecord(id: string, record: T) {

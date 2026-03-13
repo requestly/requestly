@@ -26,6 +26,7 @@ import {
 } from "features/apiClient/helpers/variableResolver/variableHelper";
 import { SecretVariable } from "lib/secret-variables/types";
 import { SecretsVariableInfo } from "features/apiClient/screens/environment/components/SecretsVariableInfoPopover/Index";
+import SecretVariableNotFound from "./components/SecretVariableNotFound";
 
 type VariableData = ScopedVariable[0];
 
@@ -76,6 +77,8 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
   const [currentView, setCurrentView] = useState<PopoverView>(() => {
     return variableData ? PopoverView.VARIABLE_INFO : PopoverView.NOT_FOUND;
   });
+
+  const hoveredOnUnDeclaredSecretVariable = !variableData && hoveredVariable?.startsWith("secrets:");
 
   const transitionToView = useCallback(
     (nextView: PopoverView) => {
@@ -154,11 +157,17 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
 
       case PopoverView.NOT_FOUND: {
         return (
-          <VariableNotFound
-            isNoopContext={isNoopContext}
-            onSwitchEnvironment={handleSwitchEnvironment}
-            onCreateClick={handleCreateClick}
-          />
+          <>
+            {hoveredOnUnDeclaredSecretVariable ? (
+              <SecretVariableNotFound />
+            ) : (
+              <VariableNotFound
+                isNoopContext={isNoopContext}
+                onSwitchEnvironment={handleSwitchEnvironment}
+                onCreateClick={handleCreateClick}
+              />
+            )}
+          </>
         );
       }
 
