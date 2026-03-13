@@ -83,6 +83,9 @@ export const AddSecretsProviderModal = ({
   const isBusy = isTestingConnection || isSavingProvider;
   const isTestConnectionDisabled = !isFormValid || isBusy;
 
+  const isTestConnectionTooltipDisabled = isTestConnectionDisabled && connectionStatus === "untested";
+  const isSavingProviderDisabled = isTestConnectionDisabled || isSavingProvider;
+
   const header = <p className="add-edit-provider-modal-header">{mode === "add" ? "Add provider" : "Edit provider"}</p>;
   const footer = (
     <div className="add-edit-provider-modal-footer">
@@ -100,10 +103,11 @@ export const AddSecretsProviderModal = ({
         </div>
       ) : (
         <RQTooltip
-          title="Fill all required fields to test connection"
+          title={isTestConnectionTooltipDisabled ? "Fill all required fields to test connection" : ""}
           showArrow={false}
           placement="topRight"
-          {...(!isTestConnectionDisabled && { open: false })}
+          destroyTooltipOnHide
+          mouseLeaveDelay={0}
         >
           <span>
             <RQButton
@@ -124,10 +128,11 @@ export const AddSecretsProviderModal = ({
           Cancel
         </RQButton>
         <RQTooltip
-          title="Fill all required fields to add provider"
+          title={isSavingProviderDisabled ? "Fill all required fields to add provider" : null}
           showArrow={false}
           placement="topLeft"
-          {...(!(isTestConnectionDisabled && connectionStatus !== "success") && { open: false })}
+          destroyTooltipOnHide
+          mouseLeaveDelay={0}
         >
           <span>
             <RQButton
@@ -135,7 +140,7 @@ export const AddSecretsProviderModal = ({
               className="add-provider-button"
               onClick={onSave}
               loading={isSavingProvider}
-              disabled={isTestConnectionDisabled || isSavingProvider}
+              disabled={isSavingProviderDisabled}
             >
               {mode === "add" ? "Add provider" : "Save changes"}
             </RQButton>
