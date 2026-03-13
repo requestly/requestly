@@ -79,15 +79,17 @@ export const initXhrInterceptor = (debug) => {
 
       if (this.readyState === this.HEADERS_RECEIVED) {
         // For network failures, responseStatus=0 but we still return customResponse with status=200
-        const responseStatus = parseInt(responseModification.statusCode || this.status) || 200;
-        const responseStatusText = responseModification.statusText || this.statusText;
+        this._rqResponseStatus = parseInt(responseModification.statusCode || this.status) || 200;
+        this._rqResponseStatusText = responseModification.statusText || this.statusText;
 
         Object.defineProperties(actualXhr, {
           status: {
-            get: () => responseStatus,
+            get: () => this._rqResponseStatus,
+            configurable: true,
           },
           statusText: {
-            get: () => responseStatusText,
+            get: () => this._rqResponseStatusText,
+            configurable: true,
           },
           getResponseHeader: {
             value: this.getResponseHeader.bind(this),
@@ -103,9 +105,10 @@ export const initXhrInterceptor = (debug) => {
         const contentType = this.getResponseHeader("content-type");
 
         let customResponse;
+        let evaluatorArgs;
 
         if (responseModification.type === "code") {
-          const evaluatorArgs = {
+          evaluatorArgs = {
             method: this._method,
             url: this._requestURL,
             requestHeaders: this._requestHeaders,
@@ -113,6 +116,7 @@ export const initXhrInterceptor = (debug) => {
             responseType: contentType,
             response: this.response,
             responseJSON: jsonifyValidJSONString(this.response, true),
+            responseStatusCode: this._rqResponseStatus ?? this.status,
           };
 
           customResponse = getFunctionFromCode(responseModification.value, "response")(evaluatorArgs);
@@ -120,14 +124,22 @@ export const initXhrInterceptor = (debug) => {
           customResponse = responseModification.value;
         }
 
-        if (typeof customResponse === "undefined") {
-          return;
-        }
-
         // Convert customResponse back to rawText
         // response.value is String and evaluator method might return string/object
         if (isPromise(customResponse)) {
           customResponse = await customResponse;
+        }
+
+        // Update status code if dynamically set via args.statusCode in modifyResponse
+        if (responseModification.type === "code" && evaluatorArgs.statusCode != null) {
+          const dynamicStatusCode = parseInt(evaluatorArgs.statusCode);
+          if (!isNaN(dynamicStatusCode)) {
+            this._rqResponseStatus = dynamicStatusCode;
+          }
+        }
+
+        if (typeof customResponse === "undefined") {
+          return;
         }
 
         debug && console.log("[RQ]", "Rule Applied - customResponse", { customResponse, responseType, contentType });

@@ -45,8 +45,9 @@ const testResponseRule = async (testScenarioData: ResponseRuleTestScenarioData &
   for (const expectedResponseModification of testScenarioData.expectedResponseModifications) {
     const interceptedResponse = interceptedResponses[expectedResponseModification.testUrl];
     expect(interceptedResponse).toBeDefined();
-    //To be debugged why getting status code to be 0 for modified responses
-    // expect(interceptedResponse.status).toBe(parseInt(expectedResponseModification.expectedStatusCode as string) ?? 200);
+    if (expectedResponseModification.expectedStatusCode) {
+      expect(interceptedResponse.status).toBe(parseInt(expectedResponseModification.expectedStatusCode as string));
+    }
 
     const expectedResponseBody =
       typeof expectedResponseModification.expectedResponseBody === "string"
@@ -79,6 +80,21 @@ const initScript = () => {
         false
       );
       originalOpen.call(this, method, url, async, user, pass);
+    };
+
+    const originalFetch = window.fetch;
+    //@ts-ignore
+    window.fetch = async function (...args) {
+      const response = await originalFetch.apply(this, args);
+      const clonedResponse = response.clone();
+      const url = typeof args[0] === "string" ? args[0] : args[0].url;
+
+      if (!interceptedResponses[url]) {
+        const responseText = await clonedResponse.text();
+        interceptedResponses[url] = { response: responseText, status: response.status };
+      }
+
+      return response;
     };
 
     //@ts-ignore

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dynamic Status Code Test - Requestly</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; max-width: 800px; margin: 40px auto; padding: 20px; }
+    h1 { color: #333; }
+    .test { background: #f5f5f5; border-radius: 8px; padding: 16px; margin: 16px 0; }
+    .test h3 { margin-top: 0; }
+    .result { padding: 8px 12px; border-radius: 4px; margin-top: 8px; font-family: monospace; }
+    .pass { background: #d4edda; color: #155724; }
+    .fail { background: #f8d7da; color: #721c24; }
+    .pending { background: #fff3cd; color: #856404; }
+    button { background: #3c89e8; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 14px; margin: 4px; }
+    button:hover { background: #2a6fc7; }
+    .instructions { background: #e7f3ff; padding: 16px; border-radius: 8px; margin-bottom: 20px; }
+    .instructions code { background: #d0e8ff; padding: 2px 6px; border-radius: 3px; }
+    pre { background: #2d2d2d; color: #f8f8f2; padding: 12px; border-radius: 6px; overflow-x: auto; font-size: 13px; }
+  </style>
+</head>
+<body>
+  <h1>Dynamic Status Code Test</h1>
+
+  <div class="instructions">
+    <h3>Setup Instructions:</h3>
+    <ol>
+      <li>Load the built extension from <code>browser-extension/mv3/dist/</code> in <code>chrome://extensions</code></li>
+      <li>Create a <strong>Modify Response</strong> rule in Requestly with:
+        <ul>
+          <li>URL Contains: <code>httpbin.org</code></li>
+          <li>Response Type: <strong>Dynamic (JavaScript)</strong></li>
+          <li>Code:</li>
+        </ul>
+        <pre>function modifyResponse(args) {
+  const {method, url, requestData, responseJSON} = args;
+
+  // Dynamically set status code based on URL path
+  if (url.includes("/status/")) {
+    args.statusCode = 403;
+    return {"error": "Forbidden", "dynamic": true};
+  }
+
+  args.statusCode = 201;
+  return {"message": "Created dynamically", "originalUrl": url};
+}</pre>
+      </li>
+      <li>Click the test buttons below</li>
+    </ol>
+  </div>
+
+  <div class="test">
+    <h3>Test 1: XHR with dynamic status code 403</h3>
+    <p>Makes XHR to <code>httpbin.org/status/200</code>. Expects status <strong>403</strong> (set via args.statusCode)</p>
+    <button onclick="runXHRTest403()">Run XHR Test (expect 403)</button>
+    <div id="xhr-403-result" class="result pending">Click to run...</div>
+  </div>
+
+  <div class="test">
+    <h3>Test 2: Fetch with dynamic status code 403</h3>
+    <p>Makes fetch to <code>httpbin.org/status/200</code>. Expects status <strong>403</strong> (set via args.statusCode)</p>
+    <button onclick="runFetchTest403()">Run Fetch Test (expect 403)</button>
+    <div id="fetch-403-result" class="result pending">Click to run...</div>
+  </div>
+
+  <div class="test">
+    <h3>Test 3: XHR with dynamic status code 201</h3>
+    <p>Makes XHR to <code>httpbin.org/get</code>. Expects status <strong>201</strong> (set via args.statusCode)</p>
+    <button onclick="runXHRTest201()">Run XHR Test (expect 201)</button>
+    <div id="xhr-201-result" class="result pending">Click to run...</div>
+  </div>
+
+  <div class="test">
+    <h3>Test 4: Fetch with dynamic status code 201</h3>
+    <p>Makes fetch to <code>httpbin.org/get</code>. Expects status <strong>201</strong> (set via args.statusCode)</p>
+    <button onclick="runFetchTest201()">Run Fetch Test (expect 201)</button>
+    <div id="fetch-201-result" class="result pending">Click to run...</div>
+  </div>
+
+  <div style="margin-top: 20px;">
+    <button onclick="runAllTests()">Run All Tests</button>
+  </div>
+
+  <script>
+    function showResult(elementId, status, response, expectedStatus) {
+      const el = document.getElementById(elementId);
+      const passed = status === expectedStatus;
+      el.className = 'result ' + (passed ? 'pass' : 'fail');
+      el.innerHTML = `<strong>${passed ? 'PASS' : 'FAIL'}</strong> | ` +
+        `Status: <strong>${status}</strong> (expected ${expectedStatus}) | ` +
+        `Body: ${typeof response === 'string' ? response.substring(0, 200) : JSON.stringify(response).substring(0, 200)}`;
+    }
+
+    function runXHRTest403() {
+      const el = document.getElementById('xhr-403-result');
+      el.className = 'result pending';
+      el.textContent = 'Running...';
+
+      const xhr = new XMLHttpRequest();
+      xhr.open('GET', 'https://httpbin.org/status/200');
+      xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4) {
+          showResult('xhr-403-result', xhr.status, xhr.response, 403);
+        }
+      };
+      xhr.send();
+    }
+
+    function runFetchTest403() {
+      const el = document.getElementById('fetch-403-result');
+      el.className = 'result pending';
+      el.textContent = 'Running...';
+
+      fetch('https://httpbin.org/status/200')
+        .then(async res => {
+          const body = await res.text();
+          showResult('fetch-403-result', res.status, body, 403);
+        })
+        .catch(err => {
+          el.className = 'result fail';
+          el.textContent = 'ERROR: ' + err.message;
+        });
+    }
+
+    function runXHRTest201() {
+      const el = document.getElementById('xhr-201-result');
+      el.className = 'result pending';
+      el.textContent = 'Running...';
+
+      const xhr = new XMLHttpRequest();
+      xhr.open('GET', 'https://httpbin.org/get');
+      xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4) {
+          showResult('xhr-201-result', xhr.status, xhr.response, 201);
+        }
+      };
+      xhr.send();
+    }
+
+    function runFetchTest201() {
+      const el = document.getElementById('fetch-201-result');
+      el.className = 'result pending';
+      el.textContent = 'Running...';
+
+      fetch('https://httpbin.org/get')
+        .then(async res => {
+          const body = await res.text();
+          showResult('fetch-201-result', res.status, body, 201);
+        })
+        .catch(err => {
+          el.className = 'result fail';
+          el.textContent = 'ERROR: ' + err.message;
+        });
+    }
+
+    function runAllTests() {
+      runXHRTest403();
+      runFetchTest403();
+      runXHRTest201();
+      runFetchTest201();
+    }
+  </script>
+</body>
+</html>

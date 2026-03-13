@@ -250,6 +250,72 @@
     "schemaVersion": "3.0.0",
     "status": "Active"
   },
+  "Response_DynamicStatusCode_XHR": {
+    "createdBy": "test",
+    "creationDate": 1721631222828,
+    "currentOwner": "test",
+    "description": "Dynamic status code via args.statusCode (XHR)",
+    "groupId": "",
+    "id": "Response_DynamicStatusCode_XHR",
+    "isSample": false,
+    "lastModifiedBy": "test",
+    "modificationDate": 1721631245411,
+    "name": "Dynamic Status Code - XHR",
+    "objectType": "rule",
+    "pairs": [
+      {
+        "id": "dsc01",
+        "response": {
+          "resourceType": "restApi",
+          "statusCode": "",
+          "type": "code",
+          "value": "function modifyResponse(args) {\n  const {method, url, response, responseType, requestHeaders, requestData, responseJSON} = args;\n  args.statusCode = 403;\n  return {\"error\": \"Forbidden\"};\n}"
+        },
+        "source": {
+          "filters": [],
+          "key": "Url",
+          "operator": "Contains",
+          "value": "https://requestly.tech/api/mockv2/dynamic_status_code"
+        }
+      }
+    ],
+    "ruleType": "Response",
+    "schemaVersion": "3.0.0",
+    "status": "Active"
+  },
+  "Response_DynamicStatusCode_Fetch": {
+    "createdBy": "test",
+    "creationDate": 1721631222828,
+    "currentOwner": "test",
+    "description": "Dynamic status code via args.statusCode (Fetch)",
+    "groupId": "",
+    "id": "Response_DynamicStatusCode_Fetch",
+    "isSample": false,
+    "lastModifiedBy": "test",
+    "modificationDate": 1721631245411,
+    "name": "Dynamic Status Code - Fetch",
+    "objectType": "rule",
+    "pairs": [
+      {
+        "id": "dsc02",
+        "response": {
+          "resourceType": "restApi",
+          "statusCode": "",
+          "type": "code",
+          "value": "function modifyResponse(args) {\n  const {method, url, response, responseType, requestHeaders, requestData, responseJSON} = args;\n  args.statusCode = 404;\n  return {\"error\": \"Not Found\"};\n}"
+        },
+        "source": {
+          "filters": [],
+          "key": "Url",
+          "operator": "Contains",
+          "value": "https://requestly.tech/api/mockv2/dynamic_status_fetch"
+        }
+      }
+    ],
+    "ruleType": "Response",
+    "schemaVersion": "3.0.0",
+    "status": "Active"
+  },
   "Response_8": {
     "createdBy": "BZCVNattZfUeqe0t78mwgxC5cQx1",
     "creationDate": 1724666497201,

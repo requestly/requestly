@@ -108,6 +108,39 @@ const testScenarios: ResponseRuleTestScenarioData[] = [
       },
     ],
   },
+  {
+    description: "XHR dynamic status code via args.statusCode",
+    ruleIds: ["Response_DynamicStatusCode_XHR"],
+    testPageURL: "https://example.com/",
+    pageActions: () => {
+      const xhr = new XMLHttpRequest();
+      xhr.open("GET", "https://requestly.tech/api/mockv2/dynamic_status_code");
+      xhr.setRequestHeader("content-type", "application/json");
+      xhr.send();
+    },
+    expectedResponseModifications: [
+      {
+        testUrl: "https://requestly.tech/api/mockv2/dynamic_status_code",
+        expectedResponseBody: { error: "Forbidden" },
+        expectedStatusCode: "403",
+      },
+    ],
+  },
+  {
+    description: "Fetch dynamic status code via args.statusCode",
+    ruleIds: ["Response_DynamicStatusCode_Fetch"],
+    testPageURL: "https://example.com/",
+    pageActions: () => {
+      fetch("https://requestly.tech/api/mockv2/dynamic_status_fetch");
+    },
+    expectedResponseModifications: [
+      {
+        testUrl: "https://requestly.tech/api/mockv2/dynamic_status_fetch",
+        expectedResponseBody: { error: "Not Found" },
+        expectedStatusCode: "404",
+      },
+    ],
+  },
 ];
 
 export default testScenarios;
