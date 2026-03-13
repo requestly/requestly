@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo } from "react";
-import { Select, Tooltip } from "antd";
+import { Select } from "antd";
 import { useSelector, useDispatch } from "react-redux";
 import { AiOutlineCheckCircle } from "@react-icons/all-files/ai/AiOutlineCheckCircle";
 import SecretsTable from "../components/SecretsTable/SecretsTable";
@@ -100,8 +100,8 @@ const ProviderDetails: React.FC<ProviderDetailsProps> = ({ onViewKeyValues }) =>
           ) : (
             lastFetched && <span className="last-fetched">Last fetched: {lastFetched}</span>
           )}
-          <Tooltip
-            title={"Enter Alias and ARN/Secret name to fetch"}
+          <RQTooltip
+            title={!isDirty ? "Enter Alias and ARN/Secret name to fetch" : null}
             showArrow={false}
             placement="topLeft"
             destroyTooltipOnHide
@@ -109,7 +109,7 @@ const ProviderDetails: React.FC<ProviderDetailsProps> = ({ onViewKeyValues }) =>
             destroyTooltipOnHide
             mouseLeaveDelay={0}
           >
-            <div style={{ display: "inline-block" }}>
+            <span>
               <RQButton
                 type="primary"
                 loading={isFetching}
@@ -120,8 +120,8 @@ const ProviderDetails: React.FC<ProviderDetailsProps> = ({ onViewKeyValues }) =>
                 {isDirty && !isFetching && <span className="unsaved-dot" />}
                 {!isFetching && "Fetch secrets"}
               </RQButton>
-            </div>
-          </Tooltip>
+            </span>
+          </RQTooltip>
         </div>
       </div>
 
