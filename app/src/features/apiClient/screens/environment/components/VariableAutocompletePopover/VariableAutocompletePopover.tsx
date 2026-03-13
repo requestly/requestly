@@ -108,45 +108,48 @@ export const VariableAutocompletePopover: React.FC<VariableAutocompleteProps> = 
         content={
           emptyState || (
             <div>
-              <div
-                ref={listRef}
-                className="autocomplete-scroll-container"
-                style={{ maxHeight: 300, overflowY: "auto" }}
-              >
-                <List
-                  size="small"
-                  dataSource={filteredVariables}
-                  renderItem={(item, index) =>
-                    item.isNamespace ? (
-                      <NamespaceRootItem
-                        key={item.name}
-                        item={item}
-                        index={index}
-                        isSelected={index === selectedIndex}
-                        onSelect={(name) => onSelectRef.current(name)}
-                        onHover={setSelectedIndex}
-                        allVariables={allVariables}
-                        isKeyboardExpanded={expandedNamespace === item.name}
-                        submenuSelectedIndex={submenuSelectedIndex}
-                        onSubmenuHover={handleSubmenuHover}
-                        expandedSubNamespace={expandedNamespace === item.name ? expandedSubNamespace : null}
-                        onExpandSubNamespace={setExpandedSubNamespace}
-                        subSubmenuSelectedIndex={subSubmenuSelectedIndex}
-                        onSubSubmenuHover={handleSubSubmenuHover}
-                      />
-                    ) : (
-                      <LeafRootItem
-                        key={item.name}
-                        item={item}
-                        index={index}
-                        isSelected={index === selectedIndex}
-                        onSelect={(name) => onSelectRef.current(name)}
-                        onHover={setSelectedIndex}
-                      />
-                    )
-                  }
-                />
-              </div>
+              {filteredVariables.length > 0 && (
+                <div
+                  ref={listRef}
+                  className="autocomplete-scroll-container"
+                  style={{ maxHeight: 300, overflowY: "auto" }}
+                >
+                  <List
+                    size="small"
+                    dataSource={filteredVariables}
+                    locale={{ emptyText: null }}
+                    renderItem={(item, index) =>
+                      item.isNamespace ? (
+                        <NamespaceRootItem
+                          key={item.name}
+                          item={item}
+                          index={index}
+                          isSelected={index === selectedIndex}
+                          onSelect={(name) => onSelectRef.current(name)}
+                          onHover={setSelectedIndex}
+                          allVariables={allVariables}
+                          isKeyboardExpanded={expandedNamespace === item.name}
+                          submenuSelectedIndex={submenuSelectedIndex}
+                          onSubmenuHover={handleSubmenuHover}
+                          expandedSubNamespace={expandedNamespace === item.name ? expandedSubNamespace : null}
+                          onExpandSubNamespace={setExpandedSubNamespace}
+                          subSubmenuSelectedIndex={subSubmenuSelectedIndex}
+                          onSubSubmenuHover={handleSubSubmenuHover}
+                        />
+                      ) : (
+                        <LeafRootItem
+                          key={item.name}
+                          item={item}
+                          index={index}
+                          isSelected={index === selectedIndex}
+                          onSelect={(name) => onSelectRef.current(name)}
+                          onHover={setSelectedIndex}
+                        />
+                      )
+                    }
+                  />
+                </div>
+              )}
 
               <FooterComponent onClose={onClose} />
             </div>
