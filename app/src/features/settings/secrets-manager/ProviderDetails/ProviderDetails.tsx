@@ -106,6 +106,8 @@ const ProviderDetails: React.FC<ProviderDetailsProps> = ({ onViewKeyValues }) =>
             placement="topLeft"
             destroyTooltipOnHide
             mouseLeaveDelay={0}
+            destroyTooltipOnHide
+            mouseLeaveDelay={0}
           >
             <div style={{ display: "inline-block" }}>
               <RQButton
