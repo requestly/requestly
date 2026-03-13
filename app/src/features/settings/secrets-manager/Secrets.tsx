@@ -1,7 +1,7 @@
 import React from "react";
 import { useState, useCallback, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { unstable_useBlocker, useNavigate } from "react-router-dom";
+import { unstable_useBlocker } from "react-router-dom";
 import NoProvidersEmptyState from "./ProviderEmptyScreen";
 import ProviderDetails from "./ProviderDetails";
 import SecretKeysModal from "./modals/SecretKeysModal/Index";
@@ -17,12 +17,11 @@ import { AppDispatch } from "store/types";
 import { useSecretsModals } from "./context/SecretsModalsContext";
 import { isDesktopMode } from "utils/AppUtils";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import PATHS from "config/constants/sub/paths";
+import { globalActions } from "store/slices/global/slice";
 import { PRICING } from "features/pricing";
 
 const Secrets = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const navigate = useNavigate();
   const providers = useSelector(selectAllSecretProviders);
   const secrets = useSelector(selectSecretsForSelectedProvider) as AwsSecretValue[];
   const isDirty = useSelector(selectIsDirtyForSelectedProvider);
@@ -52,7 +51,9 @@ const Secrets = () => {
 
   useEffect(() => {
     if (blocker.state === "blocked") {
-      const shouldDiscard = window.confirm("You have unfetched secrets. Discard changes?");
+      const shouldDiscard = window.confirm(
+        " Unfetched secrets detected. Proceeding will discard these changes and revert to your last fetched state. Exit anyway?"
+      );
       if (shouldDiscard) {
         dispatch(revertDirtyChanges()).then(() => blocker.proceed());
       } else {
@@ -72,7 +73,13 @@ const Secrets = () => {
   };
 
   const handleUpgradePlan = (e: React.MouseEvent) => {
-    navigate(PATHS.PRICING.ABSOLUTE);
+    dispatch(
+      globalActions.toggleActiveModal({
+        modalName: "pricingModal",
+        newValue: true,
+        newProps: { product: PRICING.PRODUCTS.API_CLIENT, source: "secrets_manager" },
+      })
+    );
   };
 
   if (!isDesktopMode()) {
