@@ -101,9 +101,11 @@ const ProviderDetails: React.FC<ProviderDetailsProps> = ({ onViewKeyValues }) =>
             lastFetched && <span className="last-fetched">Last fetched: {lastFetched}</span>
           )}
           <RQTooltip
-            title={!isDirty ? "Enter Alias and ARN/Secret name to fetch" : ""}
+            title={!isDirty ? "Enter Alias and ARN/Secret name to fetch" : null}
             showArrow={false}
             placement="topLeft"
+            destroyTooltipOnHide
+            mouseLeaveDelay={0}
           >
             <span>
               <RQButton
