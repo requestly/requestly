@@ -26,6 +26,7 @@ interface PricingModalProps {
   planDuration?: string;
   source: string;
   quantity?: number;
+  product?: string;
 }
 
 export const PricingModal: React.FC<PricingModalProps> = ({
@@ -36,6 +37,7 @@ export const PricingModal: React.FC<PricingModalProps> = ({
   title = "Upgrade your plan to get the most out of Requestly",
   quantity = 1,
   source,
+  product,
 }) => {
   const dispatch = useDispatch();
 
@@ -48,7 +50,7 @@ export const PricingModal: React.FC<PricingModalProps> = ({
   const [isTableScrollable, setIsTableScrollable] = useState(false);
   const [isCheckoutCompleted, setIsCheckoutCompleted] = useState(false);
   const [activeProduct, setActiveProduct] = useState(
-    isSafariBrowser() ? PRICING.PRODUCTS.API_CLIENT : PRICING.PRODUCTS.HTTP_RULES
+    product || (isSafariBrowser() ? PRICING.PRODUCTS.API_CLIENT : PRICING.PRODUCTS.HTTP_RULES)
   );
 
   const tableRef = useRef(null);

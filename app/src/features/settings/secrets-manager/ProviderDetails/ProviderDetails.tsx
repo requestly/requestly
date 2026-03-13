@@ -124,7 +124,7 @@ const ProviderDetails: React.FC<ProviderDetailsProps> = ({ onViewKeyValues }) =>
       <SecretsTable onViewKeyValues={onViewKeyValues} />
 
       <p className="usage-instructions">
-        {`Use in requests: {{secret:ALIAS_NAME}}. For key/value secrets: {{secret:ALIAS_NAME.KEY_NAME}}.`}
+        {`Use in requests: {{secrets:ALIAS_NAME}}. For key/value secrets: {{secrets:ALIAS_NAME.KEY_NAME}}.`}
       </p>
     </div>
   );
