@@ -95,7 +95,7 @@
     }
   }
 
-  .rc-virtual-list-holder-inner {
-    gap: var(--space-1, 2px);
+  .ant-select-item + .ant-select-item {
+    margin-top: var(--space-1, 2px);
   }
 }

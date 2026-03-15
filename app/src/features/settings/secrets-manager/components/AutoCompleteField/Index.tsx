@@ -63,6 +63,7 @@ export const AutoCompleteField: React.FC<AutoCompleteFieldProps> = ({
         disabled={disabled}
         notFoundContent="No options available"
         popupClassName="form-autocomplete-dropdown"
+        listHeight={256}
       />
     </div>
   );
