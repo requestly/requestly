@@ -27,7 +27,7 @@ export const SecretsVariableInfo: React.FC<{
   const handleManageClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     e.stopPropagation();
-    navigate(PATHS.SETTINGS.SECRETS.RELATIVE);
+    navigate(PATHS.SETTINGS.SECRETS.RELATIVE, { state: { redirectUrl: window.location.pathname } });
   };
 
   return (
