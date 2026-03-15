@@ -108,6 +108,7 @@ export const AddSecretsProviderModal = ({
           placement="topRight"
           destroyTooltipOnHide
           mouseLeaveDelay={0}
+          getPopupContainer={(trigger) => trigger.parentElement || document.body}
         >
           <span>
             <RQButton
@@ -133,6 +134,7 @@ export const AddSecretsProviderModal = ({
           placement="topLeft"
           destroyTooltipOnHide
           mouseLeaveDelay={0}
+          getPopupContainer={(trigger) => trigger.parentElement || document.body}
         >
           <span>
             <RQButton

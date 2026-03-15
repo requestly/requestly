@@ -106,8 +106,7 @@ const ProviderDetails: React.FC<ProviderDetailsProps> = ({ onViewKeyValues }) =>
             placement="topLeft"
             destroyTooltipOnHide
             mouseLeaveDelay={0}
-            destroyTooltipOnHide
-            mouseLeaveDelay={0}
+            getPopupContainer={(trigger) => trigger.parentElement || document.body}
           >
             <span>
               <RQButton
