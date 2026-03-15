@@ -162,12 +162,14 @@ const SecretsTable: React.FC<SecretsTableProps> = ({ onViewKeyValues }) => {
       },
     },
     {
-      title: <ColHeader label="ARN/Secret name" tooltip="AWS Secret Manager identifier (ARN or name)" />,
+      title: <ColHeader label="ARN/Secret name" tooltip="AWS Secrets Manager identifier (ARN or name)" />,
       key: "ARN",
       render: (_, row) => {
         const identifierError = validationErrors[row.key]?.identifier;
+        const fetchError = fetchErrors[row.key];
+        const hasError = identifierError || fetchError;
         return (
-          <div className={clsx("cell-input-with-error", identifierError && "error-cell")}>
+          <div className={clsx("cell-input-with-error", hasError && "error-cell")}>
             <Input
               className="draft-cell-input"
               value={row.secretReference.identifier}
@@ -175,8 +177,13 @@ const SecretsTable: React.FC<SecretsTableProps> = ({ onViewKeyValues }) => {
               size="small"
               onChange={(e) => handleRowChange(row, "identifier", e.target.value)}
             />
-            {identifierError && (
-              <Tooltip title={identifierError} placement="right" showArrow={false} overlayClassName="error-tooltip">
+            {hasError && (
+              <Tooltip
+                title={identifierError || fetchError}
+                placement="right"
+                showArrow={false}
+                overlayClassName="error-tooltip"
+              >
                 <MdErrorOutline className="secret-error-icon" />
               </Tooltip>
             )}
@@ -208,15 +215,8 @@ const SecretsTable: React.FC<SecretsTableProps> = ({ onViewKeyValues }) => {
       title: <ColHeader label="Secret" tooltip="Fetched secrets (plain text or key/value)" />,
       key: "value",
       render: (_: any, row: TableRow) => {
-        const error = fetchErrors[row.key];
-        if (error) {
-          return (
-            <div className={clsx("secret-error-cell", error && "error-cell")}>
-              <Tooltip title={error} placement="right" showArrow={false} overlayClassName="error-tooltip">
-                <MdErrorOutline className="secret-error-icon" />
-              </Tooltip>
-            </div>
-          );
+        if (fetchErrors[row.key]) {
+          return null;
         }
 
         if (isStubRow(row)) {
