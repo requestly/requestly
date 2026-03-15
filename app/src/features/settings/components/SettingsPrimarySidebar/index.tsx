@@ -61,6 +61,11 @@ export const SettingsPrimarySidebar: React.FC = () => {
             ishidden: appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP,
           },
           {
+            id: "secrets",
+            name: "Secrets",
+            path: PATHS.SETTINGS.SECRETS.RELATIVE,
+          },
+          {
             id: "sessionBook",
             name: "SessionBook",
             path: PATHS.SETTINGS.SESSION_BOOK.RELATIVE,

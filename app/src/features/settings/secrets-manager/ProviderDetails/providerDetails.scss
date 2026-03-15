@@ -1,0 +1,161 @@
+.provider-details-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 8px;
+  margin-top: 24px;
+
+  .provider-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+
+      .instance-select {
+        min-width: 0px;
+
+        .ant-select-selector {
+          display: flex;
+          height: 24px;
+          padding: 0 var(--space-2, 4px) 0 var(--space-3, 6px);
+          gap: 8px;
+          border-radius: 4px;
+          border: 1px solid var(--requestly-color-white-t-20, rgba(255, 255, 255, 0.12)) !important;
+          background-color: none;
+          color: var(--alias-tokens-color-text-default, #fff);
+          text-align: center;
+          font-family: var(--font-family-default, Inter);
+          font-size: var(--font-size-xs, 11px);
+          font-style: normal;
+          font-weight: 400;
+        }
+
+        .ant-select-arrow {
+          color: var(--alias-tokens-color-text-subtle, #bbb);
+          text-align: center;
+          font-family: "Material Symbols Outlined";
+          font-size: 10px;
+          font-style: normal;
+          font-weight: 400;
+          line-height: 16px;
+        }
+
+        &.ant-select-focused .ant-select-selector {
+          border-color: var(--requestly-color-white-t-20, rgba(255, 255, 255, 0.3)) !important;
+          box-shadow: none !important;
+        }
+      }
+
+      .active-instance-badge {
+        color: var(--requestly-color-text-subtle, #bbb);
+        display: inline-flex;
+        align-items: center;
+        font-family: var(--font-family-default, Inter);
+        font-size: var(--font-size-xs, 11px);
+        font-style: normal;
+        font-weight: 400;
+        line-height: 17px;
+        gap: 4px;
+
+        .active-icon {
+          color: var(--requestly-color-success-text, #6fdaa6);
+          font-size: 15px;
+          flex-shrink: 0;
+        }
+      }
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+
+      .last-fetched {
+        color: var(--requestly-color-text-subtle, #bbb);
+        font-family: var(--font-family-default, Inter);
+        font-size: var(--font-size-xs, 11px);
+        font-style: normal;
+        font-weight: 400;
+        line-height: 17px;
+      }
+
+      .fetch-secrets-btn {
+        height: 24px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        min-width: 88px;
+
+        &.ant-btn-disabled,
+        &[disabled] {
+          pointer-events: none;
+        }
+
+        .unsaved-dot {
+          width: 6px;
+          height: 6px;
+          border-radius: 50%;
+          background-color: #fff;
+          display: inline-block;
+          flex-shrink: 0;
+        }
+      }
+    }
+  }
+
+  .usage-instructions {
+    color: var(--requestly-color-text-placeholder, #8f8f8f);
+    font-size: 11px;
+    margin: 0;
+  }
+}
+
+.instance-select-dropdown.ant-select-dropdown {
+  .check-circle-icon {
+    color: var(--requestly-color-text-subtle, #bbb);
+  }
+  .ant-select-item-option {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4, 8px);
+    align-self: stretch;
+    border-radius: 4px;
+
+    &:hover {
+      background: var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
+    }
+    .ant-select-item-option-content {
+      color: var(--requestly-color-text-default, #fff);
+      font-family: var(--font-family-default, Inter);
+      font-size: var(--font-size-xs, 11px);
+      font-style: normal;
+      font-weight: 400;
+    }
+  }
+
+  .ant-select-item-option-disabled > .ant-select-item-option-content {
+    color: var(--requestly-color-text-subtle, #bbb);
+    font-family: var(--font-family-default, Inter);
+    font-size: var(--font-size-xs, 11px);
+    font-style: normal;
+    font-weight: 400;
+  }
+
+  .ant-select-item-empty {
+    color: var(--requestly-color-text-subtle, #bbb);
+    font-family: var(--font-family-default, Inter);
+    font-size: var(--font-size-xs, 11px);
+    font-style: normal;
+    font-weight: 400;
+  }
+}
+
+.instance-select {
+  .ant-select-selector {
+    background: none !important;
+  }
+}
