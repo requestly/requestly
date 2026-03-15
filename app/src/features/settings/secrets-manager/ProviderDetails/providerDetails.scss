@@ -90,6 +90,11 @@
         gap: 6px;
         min-width: 88px;
 
+        &.ant-btn-disabled,
+        &[disabled] {
+          pointer-events: none;
+        }
+
         .unsaved-dot {
           width: 6px;
           height: 6px;
