@@ -6,7 +6,17 @@
   padding: var(--space-4, 8px) var(--space-5, 12px);
   justify-content: space-between;
   align-items: center;
-  border-radius: 4px 4px 0 0;
+  border-radius: 0;
+  margin-top: -1px;
+
+  &:first-child {
+    margin-top: 0;
+    border-radius: 4px 4px 0 0;
+  }
+
+  &:last-child {
+    border-radius: 0 0 4px 4px;
+  }
 
   .manage-providers-col1 {
     .provider-details-block {
