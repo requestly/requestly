@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo, useEffect } from "react";
+import React, { useState, useCallback, useMemo, useEffect, useRef, useLayoutEffect } from "react";
 import { Table, Tag, Button, Dropdown, Tooltip, Checkbox, Popover, Input } from "antd";
 import type { ColumnsType } from "antd/lib/table";
 import { useSelector, useDispatch } from "react-redux";
@@ -52,6 +52,77 @@ const ToggleColumnPopover: React.FC<{ onToggle: () => void; isVisible: boolean }
     </div>
   </div>
 );
+
+const SecretTags: React.FC<{
+  keyValues: { key: string }[];
+  onClick?: () => void;
+  ariaLabel: string;
+}> = ({ keyValues, onClick, ariaLabel }) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [visibleCount, setVisibleCount] = useState(keyValues.length);
+
+  useLayoutEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    // Reset to show all so we can measure
+    setVisibleCount(keyValues.length);
+
+    // Use rAF to measure after render
+    requestAnimationFrame(() => {
+      const children = Array.from(container.children) as HTMLElement[];
+      if (children.length === 0) return;
+
+      const containerRight = container.getBoundingClientRect().right;
+      // Reserve space for the "+N" badge (~36px)
+      const overflowBadgeWidth = 36;
+      let fitCount = 0;
+
+      for (let i = 0; i < children.length; i++) {
+        const child = children[i];
+        if (child.classList.contains("secret-tags-overflow")) continue;
+        const childRight = child.getBoundingClientRect().right;
+        const remaining = keyValues.length - (i + 1);
+        const reservedSpace = remaining > 0 ? overflowBadgeWidth : 0;
+        if (childRight + reservedSpace > containerRight) break;
+        fitCount++;
+      }
+
+      if (fitCount < keyValues.length && fitCount > 0) {
+        setVisibleCount(fitCount);
+      } else if (fitCount === 0) {
+        setVisibleCount(1); // Always show at least one
+      }
+    });
+  }, [keyValues]);
+
+  const hiddenCount = keyValues.length - visibleCount;
+
+  return (
+    <div
+      className="secret-tags"
+      ref={containerRef}
+      role="button"
+      tabIndex={0}
+      aria-label={ariaLabel}
+      onClick={onClick}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onClick?.();
+        }
+      }}
+      style={{ cursor: "pointer" }}
+    >
+      {keyValues.slice(0, visibleCount).map((kv) => (
+        <Tag key={kv.key} className="secret-tag">
+          {kv.key}
+        </Tag>
+      ))}
+      {hiddenCount > 0 && <span className="secret-tags-overflow">+{hiddenCount}</span>}
+    </div>
+  );
+};
 
 interface SecretsTableProps {
   onViewKeyValues?: (secretId: string) => void;
@@ -227,28 +298,13 @@ const SecretsTable: React.FC<SecretsTableProps> = ({ onViewKeyValues }) => {
 
         if (keyValues && keyValues.length > 0) {
           return (
-            <div
-              className="secret-tags"
-              role="button"
-              tabIndex={0}
-              aria-label={`View key-value pairs for secret ${
+            <SecretTags
+              keyValues={keyValues}
+              ariaLabel={`View key-value pairs for secret ${
                 row.secretReference.alias || row.secretReference.identifier || id
               }`}
               onClick={() => onViewKeyValues?.(id)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  e.preventDefault();
-                  onViewKeyValues?.(id);
-                }
-              }}
-              style={{ cursor: "pointer" }}
-            >
-              {keyValues.map((kv) => (
-                <Tag key={kv.key} className="secret-tag">
-                  {kv.key}
-                </Tag>
-              ))}
-            </div>
+            />
           );
         }
 
