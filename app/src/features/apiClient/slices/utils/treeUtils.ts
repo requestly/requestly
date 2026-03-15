@@ -1,4 +1,5 @@
-import * as Sentry from "@sentry/react";
+import { NativeError } from "../../../../errors/NativeError";
+import { ErrorSeverity } from "../../../../errors/types";
 import { EntityId, TreeIndices } from "../types";
 
 /**
@@ -12,18 +13,16 @@ export function getParentChain(id: EntityId, childToParent: Record<EntityId, Ent
 
   const traverse = (currentId: EntityId): void => {
     if (visited.has(currentId)) {
-      Sentry.captureException(new Error("Cycle detected in apiClient getParentChain traversal"), {
-        tags: {
+      throw new NativeError("Cycle detected in apiClient getParentChain traversal")
+        .setShowBoundary(true)
+        .setSeverity(ErrorSeverity.ERROR)
+        .addContext({
           feature: "api-client",
           util: "treeUtils.getParentChain",
-        },
-        extra: {
           startId: id,
           currentId,
           partialChain: [...result],
-        },
-      });
-      return;
+        });
     }
 
     visited.add(currentId);
@@ -50,18 +49,15 @@ export function getAllDescendants(id: EntityId, parentToChildren: Record<EntityI
 
   const traverse = (currentId: EntityId): void => {
     if (visited.has(currentId)) {
-      Sentry.captureException(new Error("Cycle detected in apiClient getAllDescendants traversal"), {
-        tags: {
+      throw new NativeError("Cycle detected in apiClient getAllDescendants traversal")
+        .setSeverity(ErrorSeverity.ERROR)
+        .addContext({
           feature: "api-client",
           util: "treeUtils.getAllDescendants",
-        },
-        extra: {
           startId: id,
           currentId,
           partialDescendants: [...result],
-        },
-      });
-      return;
+        });
     }
 
     visited.add(currentId);
