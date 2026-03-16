@@ -14,6 +14,67 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { trackImportParsed, trackImportParseFailed } from "modules/analytics/events/features/apiClient";
 import { RQAPI, EnvironmentData, ApiClientImporterType } from "@requestly/shared/types/entities/apiClient";
 import { ApiClientImporterMethod } from "@requestly/alternative-importers";
+import { FormDropDownOptions, RequestContentType } from "features/apiClient/types";
+
+function fixMultipartFormEntries(entries: RQAPI.FormDataKeyValuePair[]): RQAPI.FormDataKeyValuePair[] {
+  return entries.map((entry) => {
+    if (entry.type !== undefined) {
+      return entry;
+    }
+    const isFileEntry = Array.isArray(entry.value);
+    return {
+      ...entry,
+      type: isFileEntry ? FormDropDownOptions.FILE : FormDropDownOptions.TEXT,
+    };
+  });
+}
+
+function fixCollectionMultipartEntries(collection: RQAPI.CollectionRecord): RQAPI.CollectionRecord {
+  if (!collection.data?.children) {
+    return collection;
+  }
+
+  const fixedChildren = collection.data.children.map((child) => {
+    if (child.type === RQAPI.RecordType.COLLECTION) {
+      return fixCollectionMultipartEntries(child as RQAPI.CollectionRecord);
+    }
+    if (child.type === RQAPI.RecordType.API) {
+      const apiRecord = child as RQAPI.ApiRecord;
+      if (apiRecord.data?.type === RQAPI.ApiEntryType.HTTP) {
+        const httpEntry = apiRecord.data as RQAPI.HttpApiEntry;
+        if (
+          httpEntry.request?.contentType === RequestContentType.MULTIPART_FORM &&
+          Array.isArray(httpEntry.request.body)
+        ) {
+          const fixedBody = fixMultipartFormEntries(httpEntry.request.body as RQAPI.FormDataKeyValuePair[]);
+          return {
+            ...apiRecord,
+            data: {
+              ...httpEntry,
+              request: {
+                ...httpEntry.request,
+                body: fixedBody,
+                bodyContainer: {
+                  ...httpEntry.request.bodyContainer,
+                  multipartForm: fixedBody,
+                },
+              },
+            },
+          } as RQAPI.ApiRecord;
+        }
+      }
+    }
+    return child;
+  });
+
+  return {
+    ...collection,
+    data: {
+      ...collection.data,
+      children: fixedChildren,
+    },
+  };
+}
 
 export interface ImportFile {
   content: string;
@@ -116,7 +177,7 @@ export const ImportInputView: React.FC<ImportInputViewProps> = ({
             results.forEach((result) => {
               if (result.status === "fulfilled") {
                 if (result.value.data?.collection) {
-                  processedResults.collections.push(result.value.data.collection);
+                  processedResults.collections.push(fixCollectionMultipartEntries(result.value.data.collection));
                 }
                 if (result.value.data?.environments) {
                   processedResults.environments.push(...result.value.data.environments);
