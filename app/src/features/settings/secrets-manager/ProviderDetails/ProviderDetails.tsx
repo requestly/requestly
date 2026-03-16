@@ -56,7 +56,7 @@ const ProviderDetails: React.FC<ProviderDetailsProps> = ({ onViewKeyValues }) =>
 
   const handleFetchSecrets = useCallback(() => {
     if (selectedProviderId) {
-      dispatch(fetchAndSaveSecretsForProvider({ providerId: selectedProviderId }) as any);
+      dispatch(fetchAndSaveSecretsForProvider({ providerId: selectedProviderId, triggeredBy: "user_action" }) as any);
     }
   }, [dispatch, selectedProviderId]);
 

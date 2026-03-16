@@ -8,11 +8,24 @@ import {
 import { notification } from "antd";
 import { secretsManagerService, toSecretProviderConfig, SecretFetchError } from "services/secretsManagerService";
 import { ProviderData } from "features/settings/secrets-manager/context/SecretsModalsContext";
-import { selectSelectedProviderId, selectAllSecretProviders, selectSecretsByProviderId } from "./selectors";
+import {
+  selectSelectedProviderId,
+  selectAllSecretProviders,
+  selectSecretsByProviderId,
+  selectSecretProviderById,
+} from "./selectors";
 import { secretsManagerActions } from "./slice";
 import { secretVariables } from "lib/secret-variables";
 import { SECRETS_MANAGER_SLICE_NAME } from "../common/constants";
 import { toast } from "utils/Toast";
+import {
+  trackSecretManagerProviderAdded,
+  trackSecretManagerProviderAddFailed,
+  trackSecretManagerSecretsFetched,
+  trackSecretManagerSecretsFetchFailed,
+  trackSecretManagerProviderDeleted,
+  mapProviderTypeToAnalytics,
+} from "features/settings/secrets-manager/analytics";
 
 type RootState = { secretsManager: import("./types").SecretsManagerState };
 
@@ -67,13 +80,15 @@ export const fetchAndSaveSecretsForProvider = createAsyncThunk<
     errors: SecretFetchError[];
     validationErrors: Record<string, { alias?: string; identifier?: string }>;
   },
-  { providerId: string },
+  { providerId: string; triggeredBy: "user_action" | "auto_refresh" },
   { rejectValue: string; state: RootState }
 >(
   `${SECRETS_MANAGER_SLICE_NAME}/fetchAndSaveSecretsForProvider`,
-  async ({ providerId }, { getState, rejectWithValue }) => {
+  async ({ providerId, triggeredBy }, { getState, rejectWithValue }) => {
     const state = getState();
     const allProviderSecrets = selectSecretsByProviderId(state)(providerId);
+    const provider = selectSecretProviderById(state, providerId);
+    const providerType = provider ? mapProviderTypeToAnalytics(provider.type) : "aws_secrets_manager";
 
     // Rows where both alias and identifier are empty are silently ignored
     const nonBlankSecrets = allProviderSecrets.filter((s) => {
@@ -113,8 +128,16 @@ export const fetchAndSaveSecretsForProvider = createAsyncThunk<
     const invalidRefIds = new Set(Object.keys(validationMap));
     const validRefs = secretRefs.filter((ref) => !invalidRefIds.has(ref.id));
 
+    const fetchStartTime = Date.now();
     const fetchAndSaveSecretsResult = await secretsManagerService.fetchAndSaveSecrets(providerId, validRefs);
     if (fetchAndSaveSecretsResult.type === "error") {
+      trackSecretManagerSecretsFetchFailed(
+        providerType,
+        fetchAndSaveSecretsResult.error.code,
+        fetchAndSaveSecretsResult.error.message,
+        triggeredBy
+      );
+
       return rejectWithValue(fetchAndSaveSecretsResult.error.message);
     }
 
@@ -144,6 +167,12 @@ export const fetchAndSaveSecretsForProvider = createAsyncThunk<
     const allSecretsForRedux = [...secrets, ...originalErroredRows];
 
     secretVariables.updateSourceFromSecrets(secrets as AwsSecretValue[]);
+
+    const fetchDurationMs = Date.now() - fetchStartTime;
+    if (totalErrorCount === 0) {
+      trackSecretManagerSecretsFetched(providerType, secrets.length, fetchDurationMs, triggeredBy);
+    }
+
     return { secrets: allSecretsForRedux, errors: backendErrors, validationErrors: validationMap };
   }
 );
@@ -152,19 +181,32 @@ export const saveProvider = createAsyncThunk<
   string,
   { formData: ProviderData; existingId?: string; mode: "add" | "edit" },
   { rejectValue: string; state: RootState }
->(`${SECRETS_MANAGER_SLICE_NAME}/saveProvider`, async ({ formData, existingId }, { dispatch, rejectWithValue }) => {
-  const config = toSecretProviderConfig(formData, existingId);
+>(
+  `${SECRETS_MANAGER_SLICE_NAME}/saveProvider`,
+  async ({ formData, existingId, mode }, { dispatch, rejectWithValue }) => {
+    const config = toSecretProviderConfig(formData, existingId);
 
-  const result = await secretsManagerService.setProviderConfig(config);
-  if (result.type === "error") {
-    return rejectWithValue(result.error.message);
+    const result = await secretsManagerService.setProviderConfig(config);
+    if (result.type === "error") {
+      trackSecretManagerProviderAddFailed(
+        mapProviderTypeToAnalytics(formData.secretManagerType),
+        result.error.code,
+        result.error.message,
+        "save"
+      );
+      return rejectWithValue(result.error.message);
+    }
+
+    await dispatch(fetchSecretProviders()).unwrap();
+    dispatch(secretsManagerActions.setSelectedProviderId(config.id));
+
+    if (mode === "add") {
+      trackSecretManagerProviderAdded(mapProviderTypeToAnalytics(formData.secretManagerType), formData.instanceName, 0);
+    }
+
+    return config.id;
   }
-
-  await dispatch(fetchSecretProviders()).unwrap();
-  dispatch(secretsManagerActions.setSelectedProviderId(config.id));
-
-  return config.id;
-});
+);
 
 let isSubscriptionRegistered = false;
 export const initAndSubscribeSecretsManager = createAsyncThunk<void, string, { rejectValue: string; state: RootState }>(
@@ -206,12 +248,17 @@ export const initAndSubscribeSecretsManager = createAsyncThunk<void, string, { r
 export const deleteProvider = createAsyncThunk<void, string, { rejectValue: string; state: RootState }>(
   `${SECRETS_MANAGER_SLICE_NAME}/deleteProvider`,
   async (providerId, { dispatch, rejectWithValue, getState }) => {
+    const state = getState();
+    const provider = selectSecretProviderById(state, providerId);
+    const providerType = provider ? mapProviderTypeToAnalytics(provider.type) : "aws_secrets_manager";
+    const secretsCount = selectSecretsByProviderId(state)(providerId).length;
+
     const result = await secretsManagerService.removeProviderConfig(providerId);
     if (result.type === "error") {
       return rejectWithValue(result.error.message);
     }
     dispatch(secretsManagerActions.removeProvider(providerId));
-    const state = getState();
+    trackSecretManagerProviderDeleted(providerType, secretsCount);
     const providers = selectAllSecretProviders(state);
     const nextProvider = providers.find((p) => p.id !== providerId);
 
