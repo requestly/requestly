@@ -26,6 +26,7 @@ import { RQAPI } from "features/apiClient/types";
 import { useMatchedTabSource } from "../hooks/useMatchedTabSource";
 import { getHasActiveWorkflows, getHasAnyUnsavedChanges } from "../slice/utils";
 import { ActiveWorkflowModal } from "./ActiveWorkflowModal/ActiveWorkflowModal";
+import { showEditorFreezeHelpIfDesktop } from "../utils/editorFreezeHelp";
 
 interface BufferedTabLabelProps {
   tab: BufferModeTab;
@@ -202,6 +203,9 @@ export const TabsContainer: React.FC = () => {
     const hasUnsavedChanges = getHasAnyUnsavedChanges();
     if (hasUnsavedChanges) {
       const shouldDiscardChanges = window.confirm("Discard changes? Changes you made will not be saved.");
+      if (!shouldDiscardChanges) {
+        showEditorFreezeHelpIfDesktop();
+      }
       return !shouldDiscardChanges;
     }
 
@@ -211,6 +215,10 @@ export const TabsContainer: React.FC = () => {
       const shouldDiscardChanges = window.confirm(
         firstWorkflow?.cancelWarning || "Discard changes? Changes you made will not be saved."
       );
+
+      if (!shouldDiscardChanges) {
+        showEditorFreezeHelpIfDesktop();
+      }
 
       return !shouldDiscardChanges;
     }
