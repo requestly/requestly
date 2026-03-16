@@ -513,14 +513,14 @@ div.n-popup {
       width: 100% !important;
       border-radius: 4px;
 
-      &:hover {
-        background-color: var(--requestly-color-white-t-10);
-      }
-
       .active-instance-name {
         color: var(--requestly-color-text-default, #fff);
         font-weight: 400;
         line-height: 17px;
+
+        &:hover {
+          text-decoration: underline;
+        }
       }
     }
   }
