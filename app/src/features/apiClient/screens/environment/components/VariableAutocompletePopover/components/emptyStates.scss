@@ -97,10 +97,6 @@
     border-radius: 4px;
     transition: background-color 0.15s ease;
 
-    &:hover {
-      background-color: var(--requestly-color-white-t-10);
-    }
-
     .active-instance-label {
       color: var(--requeslty-color-text-subtle, #bbb);
       font-family: var(--font-family-default, Inter);
@@ -117,6 +113,9 @@
         font-style: normal;
         font-weight: 400;
         line-height: 17px;
+        &:hover {
+          text-decoration: underline;
+        }
       }
     }
   }
