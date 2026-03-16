@@ -158,7 +158,7 @@ export const MultiEditableCell: React.FC<React.PropsWithChildren<EditableCellPro
                     label: "File",
                   },
                 ]}
-                defaultValue={record?.type ?? FormDropDownOptions.TEXT}
+                value={record?.type ?? FormDropDownOptions.TEXT}
                 onChange={(value) => {
                   //clear the value if type is changed to file, because earlier value remains there
                   const newValue: string | RQAPI.MultipartFileValue[] = value === FormDropDownOptions.FILE ? [] : "";
@@ -170,6 +170,7 @@ export const MultiEditableCell: React.FC<React.PropsWithChildren<EditableCellPro
 
             {(dataIndex === "key" || (dataIndex === "value" && record.type === FormDropDownOptions.TEXT)) && (
               <SingleLineEditor
+                key={dataIndex === "value" ? `value-${record.type ?? "text"}` : undefined}
                 className={`key-value-table-input ${
                   record.isEnabled === false ? "key-value-table-input-disabled" : ""
                 }`}
