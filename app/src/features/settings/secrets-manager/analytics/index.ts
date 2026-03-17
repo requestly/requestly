@@ -1,25 +1,11 @@
 import { trackEvent } from "modules/analytics";
-import { SecretProviderType } from "@requestly/shared/types/entities/secretsManager";
 import { SECRETS_MANAGER } from "../consts/events";
 import { isDesktopMode } from "utils/AppUtils";
 
-type AnalyticsProviderType = "aws_secrets_manager" | "hashicorp_vault" | "azure_key_vault" | "gcp_secret_manager";
+type AnalyticsProviderType = "aws_secrets_manager";
 type AnalyticsPlatform = "web" | "desktop";
 
 const getPlatform = (): AnalyticsPlatform => (isDesktopMode() ? "desktop" : "web");
-
-export const mapProviderTypeToAnalytics = (type: SecretProviderType): AnalyticsProviderType => {
-  switch (type) {
-    case SecretProviderType.AWS_SECRETS_MANAGER:
-      return "aws_secrets_manager";
-    case SecretProviderType.HASHICORP_VAULT:
-      return "hashicorp_vault";
-    // When azure_key_vault / gcp_secret_manager are added to SecretProviderType,
-    // add their cases here so the mapping stays explicit.
-    default:
-      return type as AnalyticsProviderType;
-  }
-};
 
 export const trackSecretManagerProviderAddClicked = (source: "provider_list" | "onboarding" | "settings_page") => {
   trackEvent(SECRETS_MANAGER.ADD_PROVIDER_CLICKED, { source, platform: getPlatform() });

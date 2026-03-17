@@ -8,12 +8,7 @@ import {
 import { notification } from "antd";
 import { secretsManagerService, toSecretProviderConfig, SecretFetchError } from "services/secretsManagerService";
 import { ProviderData } from "features/settings/secrets-manager/context/SecretsModalsContext";
-import {
-  selectSelectedProviderId,
-  selectAllSecretProviders,
-  selectSecretsByProviderId,
-  selectSecretProviderById,
-} from "./selectors";
+import { selectSelectedProviderId, selectAllSecretProviders, selectSecretsByProviderId } from "./selectors";
 import { secretsManagerActions } from "./slice";
 import { secretVariables } from "lib/secret-variables";
 import { SECRETS_MANAGER_SLICE_NAME } from "../common/constants";
@@ -24,7 +19,6 @@ import {
   trackSecretManagerSecretsFetched,
   trackSecretManagerSecretsFetchFailed,
   trackSecretManagerProviderDeleted,
-  mapProviderTypeToAnalytics,
 } from "features/settings/secrets-manager/analytics";
 
 type RootState = { secretsManager: import("./types").SecretsManagerState };
@@ -80,15 +74,14 @@ export const fetchAndSaveSecretsForProvider = createAsyncThunk<
     errors: SecretFetchError[];
     validationErrors: Record<string, { alias?: string; identifier?: string }>;
   },
-  { providerId: string; triggeredBy: "user_action" | "auto_refresh" },
+  { providerId: string },
   { rejectValue: string; state: RootState }
 >(
   `${SECRETS_MANAGER_SLICE_NAME}/fetchAndSaveSecretsForProvider`,
-  async ({ providerId, triggeredBy }, { getState, rejectWithValue }) => {
+  async ({ providerId }, { getState, rejectWithValue }) => {
     const state = getState();
     const allProviderSecrets = selectSecretsByProviderId(state)(providerId);
-    const provider = selectSecretProviderById(state, providerId);
-    const providerType = provider ? mapProviderTypeToAnalytics(provider.type) : "aws_secrets_manager";
+    const providerType = "aws_secrets_manager";
 
     // Rows where both alias and identifier are empty are silently ignored
     const nonBlankSecrets = allProviderSecrets.filter((s) => {
@@ -135,7 +128,7 @@ export const fetchAndSaveSecretsForProvider = createAsyncThunk<
         providerType,
         fetchAndSaveSecretsResult.error.code,
         fetchAndSaveSecretsResult.error.message,
-        triggeredBy
+        "user_action"
       );
 
       return rejectWithValue(fetchAndSaveSecretsResult.error.message);
@@ -170,7 +163,7 @@ export const fetchAndSaveSecretsForProvider = createAsyncThunk<
 
     const fetchDurationMs = Date.now() - fetchStartTime;
     if (totalErrorCount === 0) {
-      trackSecretManagerSecretsFetched(providerType, secrets.length, fetchDurationMs, triggeredBy);
+      trackSecretManagerSecretsFetched(providerType, secrets.length, fetchDurationMs, "user_action");
     }
 
     return { secrets: allSecretsForRedux, errors: backendErrors, validationErrors: validationMap };
@@ -188,12 +181,7 @@ export const saveProvider = createAsyncThunk<
 
     const result = await secretsManagerService.setProviderConfig(config);
     if (result.type === "error") {
-      trackSecretManagerProviderAddFailed(
-        mapProviderTypeToAnalytics(formData.secretManagerType),
-        result.error.code,
-        result.error.message,
-        "save"
-      );
+      trackSecretManagerProviderAddFailed("aws_secrets_manager", result.error.code, result.error.message, "save");
       return rejectWithValue(result.error.message);
     }
 
@@ -201,7 +189,7 @@ export const saveProvider = createAsyncThunk<
     dispatch(secretsManagerActions.setSelectedProviderId(config.id));
 
     if (mode === "add") {
-      trackSecretManagerProviderAdded(mapProviderTypeToAnalytics(formData.secretManagerType), formData.instanceName, 0);
+      trackSecretManagerProviderAdded("aws_secrets_manager", formData.instanceName, 0);
     }
 
     return config.id;
@@ -249,8 +237,7 @@ export const deleteProvider = createAsyncThunk<void, string, { rejectValue: stri
   `${SECRETS_MANAGER_SLICE_NAME}/deleteProvider`,
   async (providerId, { dispatch, rejectWithValue, getState }) => {
     const state = getState();
-    const provider = selectSecretProviderById(state, providerId);
-    const providerType = provider ? mapProviderTypeToAnalytics(provider.type) : "aws_secrets_manager";
+    const providerType = "aws_secrets_manager";
     const secretsCount = selectSecretsByProviderId(state)(providerId).length;
 
     const result = await secretsManagerService.removeProviderConfig(providerId);
