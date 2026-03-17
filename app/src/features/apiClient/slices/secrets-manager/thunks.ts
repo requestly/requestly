@@ -4,6 +4,7 @@ import {
   SecretValue,
   AwsSecretValue,
   SecretReference,
+  SecretProviderType,
 } from "@requestly/shared/types/entities/secretsManager";
 import { notification } from "antd";
 import { secretsManagerService, toSecretProviderConfig, SecretFetchError } from "services/secretsManagerService";
@@ -13,6 +14,13 @@ import { secretsManagerActions } from "./slice";
 import { secretVariables } from "lib/secret-variables";
 import { SECRETS_MANAGER_SLICE_NAME } from "../common/constants";
 import { toast } from "utils/Toast";
+import {
+  trackSecretManagerProviderAdded,
+  trackSecretManagerProviderAddFailed,
+  trackSecretManagerSecretsFetched,
+  trackSecretManagerSecretsFetchFailed,
+  trackSecretManagerProviderDeleted,
+} from "features/settings/secrets-manager/analytics";
 
 type RootState = { secretsManager: import("./types").SecretsManagerState };
 
@@ -74,6 +82,7 @@ export const fetchAndSaveSecretsForProvider = createAsyncThunk<
   async ({ providerId }, { getState, rejectWithValue }) => {
     const state = getState();
     const allProviderSecrets = selectSecretsByProviderId(state)(providerId);
+    const providerType = SecretProviderType.AWS_SECRETS_MANAGER;
 
     // Rows where both alias and identifier are empty are silently ignored
     const nonBlankSecrets = allProviderSecrets.filter((s) => {
@@ -113,8 +122,16 @@ export const fetchAndSaveSecretsForProvider = createAsyncThunk<
     const invalidRefIds = new Set(Object.keys(validationMap));
     const validRefs = secretRefs.filter((ref) => !invalidRefIds.has(ref.id));
 
+    const fetchStartTime = Date.now();
     const fetchAndSaveSecretsResult = await secretsManagerService.fetchAndSaveSecrets(providerId, validRefs);
     if (fetchAndSaveSecretsResult.type === "error") {
+      trackSecretManagerSecretsFetchFailed(
+        providerType,
+        fetchAndSaveSecretsResult.error.code,
+        fetchAndSaveSecretsResult.error.message,
+        "user_action"
+      );
+
       return rejectWithValue(fetchAndSaveSecretsResult.error.message);
     }
 
@@ -144,6 +161,12 @@ export const fetchAndSaveSecretsForProvider = createAsyncThunk<
     const allSecretsForRedux = [...secrets, ...originalErroredRows];
 
     secretVariables.updateSourceFromSecrets(secrets as AwsSecretValue[]);
+
+    const fetchDurationMs = Date.now() - fetchStartTime;
+    if (totalErrorCount === 0) {
+      trackSecretManagerSecretsFetched(providerType, secrets.length, fetchDurationMs, "user_action");
+    }
+
     return { secrets: allSecretsForRedux, errors: backendErrors, validationErrors: validationMap };
   }
 );
@@ -152,19 +175,32 @@ export const saveProvider = createAsyncThunk<
   string,
   { formData: ProviderData; existingId?: string; mode: "add" | "edit" },
   { rejectValue: string; state: RootState }
->(`${SECRETS_MANAGER_SLICE_NAME}/saveProvider`, async ({ formData, existingId }, { dispatch, rejectWithValue }) => {
-  const config = toSecretProviderConfig(formData, existingId);
+>(
+  `${SECRETS_MANAGER_SLICE_NAME}/saveProvider`,
+  async ({ formData, existingId, mode }, { dispatch, rejectWithValue }) => {
+    const config = toSecretProviderConfig(formData, existingId);
 
-  const result = await secretsManagerService.setProviderConfig(config);
-  if (result.type === "error") {
-    return rejectWithValue(result.error.message);
+    const result = await secretsManagerService.setProviderConfig(config);
+    if (result.type === "error") {
+      trackSecretManagerProviderAddFailed(
+        SecretProviderType.AWS_SECRETS_MANAGER,
+        result.error.code,
+        result.error.message,
+        "save"
+      );
+      return rejectWithValue(result.error.message);
+    }
+
+    await dispatch(fetchSecretProviders()).unwrap();
+    dispatch(secretsManagerActions.setSelectedProviderId(config.id));
+
+    if (mode === "add") {
+      trackSecretManagerProviderAdded(SecretProviderType.AWS_SECRETS_MANAGER, formData.instanceName, 0);
+    }
+
+    return config.id;
   }
-
-  await dispatch(fetchSecretProviders()).unwrap();
-  dispatch(secretsManagerActions.setSelectedProviderId(config.id));
-
-  return config.id;
-});
+);
 
 let isSubscriptionRegistered = false;
 export const initAndSubscribeSecretsManager = createAsyncThunk<void, string, { rejectValue: string; state: RootState }>(
@@ -206,12 +242,16 @@ export const initAndSubscribeSecretsManager = createAsyncThunk<void, string, { r
 export const deleteProvider = createAsyncThunk<void, string, { rejectValue: string; state: RootState }>(
   `${SECRETS_MANAGER_SLICE_NAME}/deleteProvider`,
   async (providerId, { dispatch, rejectWithValue, getState }) => {
+    const state = getState();
+    const providerType = SecretProviderType.AWS_SECRETS_MANAGER;
+    const secretsCount = selectSecretsByProviderId(state)(providerId).length;
+
     const result = await secretsManagerService.removeProviderConfig(providerId);
     if (result.type === "error") {
       return rejectWithValue(result.error.message);
     }
     dispatch(secretsManagerActions.removeProvider(providerId));
-    const state = getState();
+    trackSecretManagerProviderDeleted(providerType, secretsCount);
     const providers = selectAllSecretProviders(state);
     const nextProvider = providers.find((p) => p.id !== providerId);
 
