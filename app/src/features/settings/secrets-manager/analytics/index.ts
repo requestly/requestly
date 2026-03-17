@@ -1,8 +1,9 @@
 import { trackEvent } from "modules/analytics";
 import { SECRETS_MANAGER } from "../consts/events";
 import { isDesktopMode } from "utils/AppUtils";
+import { SecretProviderType } from "@requestly/shared/types/entities/secretsManager";
 
-type AnalyticsProviderType = "aws_secrets_manager";
+type AnalyticsProviderType = SecretProviderType;
 type AnalyticsPlatform = "web" | "desktop";
 
 const getPlatform = (): AnalyticsPlatform => (isDesktopMode() ? "desktop" : "web");
