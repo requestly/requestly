@@ -4,6 +4,7 @@ import {
   SecretValue,
   AwsSecretValue,
   SecretReference,
+  SecretProviderType,
 } from "@requestly/shared/types/entities/secretsManager";
 import { notification } from "antd";
 import { secretsManagerService, toSecretProviderConfig, SecretFetchError } from "services/secretsManagerService";
@@ -81,7 +82,7 @@ export const fetchAndSaveSecretsForProvider = createAsyncThunk<
   async ({ providerId }, { getState, rejectWithValue }) => {
     const state = getState();
     const allProviderSecrets = selectSecretsByProviderId(state)(providerId);
-    const providerType = "aws_secrets_manager";
+    const providerType = SecretProviderType.AWS_SECRETS_MANAGER;
 
     // Rows where both alias and identifier are empty are silently ignored
     const nonBlankSecrets = allProviderSecrets.filter((s) => {
@@ -181,7 +182,12 @@ export const saveProvider = createAsyncThunk<
 
     const result = await secretsManagerService.setProviderConfig(config);
     if (result.type === "error") {
-      trackSecretManagerProviderAddFailed("aws_secrets_manager", result.error.code, result.error.message, "save");
+      trackSecretManagerProviderAddFailed(
+        SecretProviderType.AWS_SECRETS_MANAGER,
+        result.error.code,
+        result.error.message,
+        "save"
+      );
       return rejectWithValue(result.error.message);
     }
 
@@ -189,7 +195,7 @@ export const saveProvider = createAsyncThunk<
     dispatch(secretsManagerActions.setSelectedProviderId(config.id));
 
     if (mode === "add") {
-      trackSecretManagerProviderAdded("aws_secrets_manager", formData.instanceName, 0);
+      trackSecretManagerProviderAdded(SecretProviderType.AWS_SECRETS_MANAGER, formData.instanceName, 0);
     }
 
     return config.id;
@@ -237,7 +243,7 @@ export const deleteProvider = createAsyncThunk<void, string, { rejectValue: stri
   `${SECRETS_MANAGER_SLICE_NAME}/deleteProvider`,
   async (providerId, { dispatch, rejectWithValue, getState }) => {
     const state = getState();
-    const providerType = "aws_secrets_manager";
+    const providerType = SecretProviderType.AWS_SECRETS_MANAGER;
     const secretsCount = selectSecretsByProviderId(state)(providerId).length;
 
     const result = await secretsManagerService.removeProviderConfig(providerId);
