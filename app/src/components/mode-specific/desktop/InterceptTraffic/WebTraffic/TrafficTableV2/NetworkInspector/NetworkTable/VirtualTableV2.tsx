@@ -23,6 +23,7 @@ const VirtualTableV2: React.FC<Props> = ({ logs = [], header, renderLogRow, sele
   const [isScrollToBottomEnabled, setIsScrollToBottomEnabled] = useState(true);
   const mounted = useRef(false);
   const parentRef = useRef<HTMLDivElement>(null);
+  const isProgrammaticScrollRef = useRef(false);
 
   // https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollHeight#determine_if_an_element_has_been_totally_scrolled
   const isListAtBottom = useCallback(() => {
@@ -47,6 +48,7 @@ const VirtualTableV2: React.FC<Props> = ({ logs = [], header, renderLogRow, sele
     getScrollElement: () => parentRef.current,
     estimateSize: () => ITEM_SIZE,
     onChange: (virtualizer) => {
+      if (isProgrammaticScrollRef.current) return;
       requestAnimationFrame(() => {
         const isScrollToBottomEnabled = isListAtBottom();
         setIsScrollToBottomEnabled(isScrollToBottomEnabled);
@@ -65,7 +67,16 @@ const VirtualTableV2: React.FC<Props> = ({ logs = [], header, renderLogRow, sele
   const paddingBottom = items.length > 0 ? rowVirtualizer.getTotalSize() - items[items.length - 1].end : 0;
 
   const scrollToBottom = useCallback(() => {
-    if (logs.length > 0) rowVirtualizer.scrollToIndex(logs.length - 1, { align: "start" });
+    if (logs.length > 0) {
+      isProgrammaticScrollRef.current = true;
+      rowVirtualizer.scrollToIndex(logs.length - 1, { align: "start" });
+      // Allow two animation frames for the DOM to settle before re-enabling onChange checks
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          isProgrammaticScrollRef.current = false;
+        });
+      });
+    }
     // rowVirtualizer.scrollToOffset(rowVirtualizer.getTotalSize(), { align: "start" });
   }, [logs.length, rowVirtualizer]);
 
