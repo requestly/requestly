@@ -14,11 +14,7 @@ import {
 import { toast } from "utils/Toast";
 import { AppDispatch } from "store/types";
 import { notification } from "antd";
-import {
-  trackSecretManagerProviderAddClicked,
-  trackSecretManagerProviderConnectionTested,
-  mapProviderTypeToAnalytics,
-} from "../analytics";
+import { trackSecretManagerProviderAddClicked, trackSecretManagerProviderConnectionTested } from "../analytics";
 
 export interface ProviderData {
   instanceName: SecretProviderConfig["name"];
@@ -268,12 +264,7 @@ export const SecretsModalsProvider: React.FC<{ children: React.ReactNode }> = ({
             addEdit: { ...prev.addEdit, connectionStatus: "failed" },
           };
         });
-        trackSecretManagerProviderConnectionTested(
-          mapProviderTypeToAnalytics(addEditState.formData.secretManagerType),
-          "failed",
-          responseTimeMs,
-          result.error.code
-        );
+        trackSecretManagerProviderConnectionTested("aws_secrets_manager", "failed", responseTimeMs, result.error.code);
         notifyError(`Connection test failed`, result.error.message);
         return;
       }
@@ -286,11 +277,7 @@ export const SecretsModalsProvider: React.FC<{ children: React.ReactNode }> = ({
             addEdit: { ...prev.addEdit, connectionStatus: "success" },
           };
         });
-        trackSecretManagerProviderConnectionTested(
-          mapProviderTypeToAnalytics(addEditState.formData.secretManagerType),
-          "success",
-          responseTimeMs
-        );
+        trackSecretManagerProviderConnectionTested("aws_secrets_manager", "success", responseTimeMs);
         toast.success("Connection successful");
       } else {
         setModals((prev) => {
@@ -300,12 +287,7 @@ export const SecretsModalsProvider: React.FC<{ children: React.ReactNode }> = ({
             addEdit: { ...prev.addEdit, connectionStatus: "failed" },
           };
         });
-        trackSecretManagerProviderConnectionTested(
-          mapProviderTypeToAnalytics(addEditState.formData.secretManagerType),
-          "failed",
-          responseTimeMs,
-          "UNKNOWN_ERROR"
-        );
+        trackSecretManagerProviderConnectionTested("aws_secrets_manager", "failed", responseTimeMs, "UNKNOWN_ERROR");
         notifyError(`Connection test failed`, "Please check your credentials.");
       }
     } catch (error) {
