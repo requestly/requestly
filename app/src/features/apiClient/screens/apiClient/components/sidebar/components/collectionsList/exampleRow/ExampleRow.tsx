@@ -23,6 +23,7 @@ import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
 import { getRankForDroppedExample } from "features/apiClient/helpers/RankingManager/utils";
 import { apiRecordsRankingManager } from "features/apiClient/helpers/RankingManager";
+import { DeleteApiRecordModal } from "../../../../modals";
 import clsx from "clsx";
 import "./ExampleRow.scss";
 
@@ -35,6 +36,7 @@ interface Props {
 export const ExampleRow: React.FC<Props> = ({ record, isReadOnly, handleRecordsToBeDeleted }) => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [dropPosition, setDropPosition] = useState<"before" | "after" | null>(null);
   const dropPositionRef = useRef<"before" | "after" | null>(null);
   const exampleRowRef = useRef<HTMLDivElement>(null);
@@ -203,11 +205,16 @@ export const ExampleRow: React.FC<Props> = ({ record, isReadOnly, handleRecordsT
         onClick: (itemInfo) => {
           itemInfo.domEvent?.stopPropagation?.();
           setIsDropdownVisible(false);
-          handleRecordsToBeDeleted([record], context);
+          setIsDeleteModalOpen(true);
         },
       },
     ];
-  }, [handleDuplicateExample, handleRecordsToBeDeleted, record, context]);
+  }, [handleDuplicateExample]);
+
+  const getRecordsToDelete = useCallback(() => [{ context, records: [record] as RQAPI.ApiClientRecord[] }], [
+    context,
+    record,
+  ]);
 
   if (isEditMode) {
     return (
@@ -223,70 +230,79 @@ export const ExampleRow: React.FC<Props> = ({ record, isReadOnly, handleRecordsT
   }
 
   return (
-    <div
-      className={clsx("example-row-wrapper", {
-        "example-drop-before": dropPosition === "before",
-        "example-drop-after": dropPosition === "after",
-      })}
-      ref={(node) => {
-        exampleRowRef.current = node;
-        drag(node);
-        drop(node);
-      }}
-      style={{ opacity: isDragging ? 0.5 : 1 }}
-    >
+    <>
+      {isDeleteModalOpen && (
+        <DeleteApiRecordModal
+          open={isDeleteModalOpen}
+          onClose={() => setIsDeleteModalOpen(false)}
+          getRecordsToDelete={getRecordsToDelete}
+        />
+      )}
       <div
-        className={`collections-list-item api example-row ${record.id === activeTabSourceId ? "active" : ""}`}
-        onClick={() => {
-          openBufferedTab({
-            source: new ExampleViewTabSource({
-              id: record.id,
-              apiEntryDetails: record,
-              title: record.name || "Example",
-              context: {
-                id: context.workspaceId,
-              },
-            }),
-          });
+        className={clsx("example-row-wrapper", {
+          "example-drop-before": dropPosition === "before",
+          "example-drop-after": dropPosition === "after",
+        })}
+        ref={(node) => {
+          exampleRowRef.current = node;
+          drag(node);
+          drop(node);
         }}
+        style={{ opacity: isDragging ? 0.5 : 1 }}
       >
-        <div style={{ width: 8 }} />
-        <MdOutlineDashboard className="example-row-icon" />
-        <Typography.Text
-          ellipsis={{
-            tooltip: {
-              title: record.name || "Example",
-              placement: "right",
-              color: "#000",
-              mouseEnterDelay: 0.5,
-            },
+        <div
+          className={`collections-list-item api example-row ${record.id === activeTabSourceId ? "active" : ""}`}
+          onClick={() => {
+            openBufferedTab({
+              source: new ExampleViewTabSource({
+                id: record.id,
+                apiEntryDetails: record,
+                title: record.name || "Example",
+                context: {
+                  id: context.workspaceId,
+                },
+              }),
+            });
           }}
-          className="request-url example-row-name"
         >
-          {record.name || "Example"}
-        </Typography.Text>
+          <div style={{ width: 8 }} />
+          <MdOutlineDashboard className="example-row-icon" />
+          <Typography.Text
+            ellipsis={{
+              tooltip: {
+                title: record.name || "Example",
+                placement: "right",
+                color: "#000",
+                mouseEnterDelay: 0.5,
+              },
+            }}
+            className="request-url example-row-name"
+          >
+            {record.name || "Example"}
+          </Typography.Text>
 
-        <Conditional condition={!isReadOnly}>
-          <div className={`request-options ${isDropdownVisible ? "active" : ""}`}>
-            <Dropdown
-              trigger={["click"]}
-              menu={{ items: exampleOptions }}
-              placement="bottomRight"
-              open={isDropdownVisible}
-              onOpenChange={setIsDropdownVisible}
-            >
-              <RQButton
-                onClick={(e) => {
-                  e.stopPropagation();
-                }}
-                size="small"
-                type="transparent"
-                icon={<MdOutlineMoreHoriz />}
-              />
-            </Dropdown>
-          </div>
-        </Conditional>
+          <Conditional condition={!isReadOnly}>
+            <div className={`request-options ${isDropdownVisible ? "active" : ""}`}>
+              <Dropdown
+                trigger={["click"]}
+                menu={{ items: exampleOptions }}
+                placement="bottomRight"
+                open={isDropdownVisible}
+                onOpenChange={setIsDropdownVisible}
+              >
+                <RQButton
+                  onClick={(e) => {
+                    e.stopPropagation();
+                  }}
+                  size="small"
+                  type="transparent"
+                  icon={<MdOutlineMoreHoriz />}
+                />
+              </Dropdown>
+            </div>
+          </Conditional>
+        </div>
       </div>
-    </div>
+    </>
   );
 };

@@ -11,7 +11,8 @@ import { MdOutlineDashboardCustomize } from "@react-icons/all-files/md/MdOutline
 import { BufferedGraphQLRecordEntity, BufferedHttpRecordEntity } from "features/apiClient/slices/entities";
 import { useApiClientFeatureContext } from "features/apiClient/slices";
 import { useSaveAsExample } from "features/apiClient/hooks/useSaveAsExample";
-import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import FEATURES from "config/constants/sub/features";
 
 interface Props {
   isDraftMode: boolean;
@@ -21,8 +22,6 @@ interface Props {
 
 const StatusLine: React.FC<Props> = ({ response, entity, isDraftMode }) => {
   const context = useApiClientFeatureContext();
-
-  const isLocalSyncEnabled = useCheckLocalSyncSupport();
 
   const { isSavingAsExample, handleSaveExample } = useSaveAsExample(entity);
 
@@ -66,21 +65,23 @@ const StatusLine: React.FC<Props> = ({ response, entity, isDraftMode }) => {
         value={<NetworkStatusField status={response.status} />}
       />
       <PropertyRow className="api-response-status-row__time" name="Time" value={formattedTime} />
-      {entityType === RQAPI.RecordType.API && !isLocalSyncEnabled && !isDraftMode && (
-        <div className="api-response-status-row__save-button-wrapper">
-          <Tooltip title="Save the current request and response as an example." placement="bottom" color="#000">
-            <RQButton
-              size="small"
-              type="transparent"
-              icon={<MdOutlineDashboardCustomize />}
-              onClick={handleSaveExample}
-              loading={isSavingAsExample}
-            >
-              Save
-            </RQButton>
-          </Tooltip>
-        </div>
-      )}
+      {entityType === RQAPI.RecordType.API &&
+        !isDraftMode &&
+        isFeatureCompatible(FEATURES.API_CLIENT_EXAMPLE_REQUESTS) && (
+          <div className="api-response-status-row__save-button-wrapper">
+            <Tooltip title="Save the current request and response as an example." placement="bottom" color="#000">
+              <RQButton
+                size="small"
+                type="transparent"
+                icon={<MdOutlineDashboardCustomize />}
+                onClick={handleSaveExample}
+                loading={isSavingAsExample}
+              >
+                Save
+              </RQButton>
+            </Tooltip>
+          </div>
+        )}
     </Space>
   );
 };

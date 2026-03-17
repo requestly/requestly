@@ -34,6 +34,8 @@ export interface CommonApiClientImporterProps {
   renderLoadingView?: () => React.ReactNode;
 }
 
+const BATCH_SIZE = 25;
+
 export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = ({
   productName,
   supportedFileTypes,
@@ -107,10 +109,25 @@ export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = (
             } else if (child.type === RQAPI.RecordType.API) {
               const apiRecord = child as RQAPI.ApiRecord;
               const newApiId = apiClientRecordsRepository.generateApiRecordId(newCollectionId);
+
+              // Clone the data object so we can modify the examples
+              const updatedData = { ...apiRecord.data };
+
+              // Check if examples exist, and if so, map over them to update the parent/collection IDs
+              if (updatedData.examples && Array.isArray(updatedData.examples)) {
+                updatedData.examples = updatedData.examples.map((example: any) => ({
+                  ...example,
+                  id: apiClientRecordsRepository.generateApiRecordId(newCollectionId),
+                  parentRequestId: newApiId,
+                  collectionId: newCollectionId,
+                }));
+              }
+
               const updatedApiRecord = {
                 ...apiRecord,
                 id: newApiId,
                 collectionId: newCollectionId,
+                data: updatedData,
               };
               requests.push(updatedApiRecord);
             }
@@ -163,11 +180,22 @@ export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = (
   const createAllRequests = useCallback(
     async (collectionToRequestsMap: Map<string, RQAPI.ApiRecord[]>) => {
       const allRequests: RQAPI.ApiRecord[] = [];
+      const allExamples: RQAPI.ExampleApiRecord[] = [];
       collectionToRequestsMap.forEach((requests) => {
-        allRequests.push(...requests);
+        requests.forEach((req) => {
+          allRequests.push(req);
+
+          // Extract examples so they can be written to the DB separately using createExampleRequest
+          if (req.data && req.data.examples && Array.isArray(req.data.examples)) {
+            allExamples.push(...req.data.examples);
+
+            // Delete the nested array so we don't save duplicate data inside the parent API DB document
+            delete req.data.examples;
+          }
+        });
       });
 
-      if (allRequests.length === 0) {
+      if (allRequests.length === 0 && allExamples.length === 0) {
         return { successfulRequests: [], failedCount: 0 };
       }
 
@@ -177,10 +205,34 @@ export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = (
       });
 
       try {
-        const createdRequests = await apiClientRecordsRepository.batchWriteApiRecords(allRequests);
-        return { successfulRequests: createdRequests, failedCount: 0 };
+        // 1. Write the Parent Requests natively
+        let createdRequests: any[] = [];
+        if (allRequests.length > 0) {
+          createdRequests = await apiClientRecordsRepository.batchWriteApiRecords(allRequests);
+        }
+
+        // 2. Write the Examples using the designated repository method from PR #4408
+        const createdExamples: RQAPI.ExampleApiRecord[] = [];
+
+        const handleExampleWrites = async (example: RQAPI.ExampleApiRecord) => {
+          try {
+            const newExample = await apiClientRecordsRepository.createExampleRequest(example.parentRequestId, example);
+            if (newExample?.success && newExample.data) {
+              createdExamples.push(newExample.data as RQAPI.ExampleApiRecord);
+            }
+          } catch (error) {
+            console.error("Error importing Example:", error);
+          }
+        };
+
+        if (allExamples.length > 0) {
+          await apiClientRecordsRepository.batchWriteApiEntities(BATCH_SIZE, allExamples, handleExampleWrites);
+        }
+
+        // Return both requests and examples to update Redux seamlessly
+        return { successfulRequests: [...createdRequests, ...createdExamples], failedCount: 0 };
       } catch (error) {
-        return { successfulRequests: [], failedCount: allRequests.length };
+        return { successfulRequests: [], failedCount: allRequests.length + allExamples.length };
       }
     },
     [apiClientRecordsRepository]
