@@ -255,6 +255,7 @@ export const SecretsModalsProvider: React.FC<{ children: React.ReactNode }> = ({
       const startTime = Date.now();
       const result = await secretsManagerService.testConnectionWithConfig(config);
       const responseTimeMs = Date.now() - startTime;
+      const providerType = SecretProviderType.AWS_SECRETS_MANAGER;
 
       if (result.type === "error") {
         setModals((prev) => {
@@ -264,7 +265,7 @@ export const SecretsModalsProvider: React.FC<{ children: React.ReactNode }> = ({
             addEdit: { ...prev.addEdit, connectionStatus: "failed" },
           };
         });
-        trackSecretManagerProviderConnectionTested("aws_secrets_manager", "failed", responseTimeMs, result.error.code);
+        trackSecretManagerProviderConnectionTested(providerType, "failed", responseTimeMs, result.error.code);
         notifyError(`Connection test failed`, result.error.message);
         return;
       }
@@ -277,7 +278,7 @@ export const SecretsModalsProvider: React.FC<{ children: React.ReactNode }> = ({
             addEdit: { ...prev.addEdit, connectionStatus: "success" },
           };
         });
-        trackSecretManagerProviderConnectionTested("aws_secrets_manager", "success", responseTimeMs);
+        trackSecretManagerProviderConnectionTested(providerType, "success", responseTimeMs);
         toast.success("Connection successful");
       } else {
         setModals((prev) => {
@@ -287,7 +288,7 @@ export const SecretsModalsProvider: React.FC<{ children: React.ReactNode }> = ({
             addEdit: { ...prev.addEdit, connectionStatus: "failed" },
           };
         });
-        trackSecretManagerProviderConnectionTested("aws_secrets_manager", "failed", responseTimeMs, "UNKNOWN_ERROR");
+        trackSecretManagerProviderConnectionTested(providerType, "failed", responseTimeMs, "UNKNOWN_ERROR");
         notifyError(`Connection test failed`, "Please check your credentials.");
       }
     } catch (error) {

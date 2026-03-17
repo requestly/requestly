@@ -1,7 +1,7 @@
 import { trackEvent } from "modules/analytics";
+import { SecretProviderType } from "@requestly/shared/types/entities/secretsManager";
 import { SECRETS_MANAGER } from "../consts/events";
 import { isDesktopMode } from "utils/AppUtils";
-import { SecretProviderType } from "@requestly/shared/types/entities/secretsManager";
 
 type AnalyticsProviderType = SecretProviderType;
 type AnalyticsPlatform = "web" | "desktop";
