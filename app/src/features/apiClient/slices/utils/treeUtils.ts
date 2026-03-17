@@ -1,3 +1,5 @@
+import { NativeError } from "../../../../errors/NativeError";
+import { ErrorSeverity } from "../../../../errors/types";
 import { EntityId, TreeIndices } from "../types";
 
 /**
@@ -7,7 +9,24 @@ import { EntityId, TreeIndices } from "../types";
 export function getParentChain(id: EntityId, childToParent: Record<EntityId, EntityId | null>): EntityId[] {
   const result: EntityId[] = [];
 
+  const visited = new Set<EntityId>();
+
   const traverse = (currentId: EntityId): void => {
+    if (visited.has(currentId)) {
+      throw new NativeError("Cycle detected in apiClient getParentChain traversal")
+        .setShowBoundary(true)
+        .setSeverity(ErrorSeverity.ERROR)
+        .addContext({
+          feature: "api-client",
+          util: "treeUtils.getParentChain",
+          startId: id,
+          currentId,
+          partialChain: [...result],
+        });
+    }
+
+    visited.add(currentId);
+
     const parent = childToParent[currentId];
     // Use != null to handle both null and undefined, and avoid issues with falsy IDs
     if (parent != null) {
@@ -26,7 +45,23 @@ export function getParentChain(id: EntityId, childToParent: Record<EntityId, Ent
 export function getAllDescendants(id: EntityId, parentToChildren: Record<EntityId, EntityId[]>): EntityId[] {
   const result: EntityId[] = [];
 
+  const visited = new Set<EntityId>();
+
   const traverse = (currentId: EntityId): void => {
+    if (visited.has(currentId)) {
+      throw new NativeError("Cycle detected in apiClient getAllDescendants traversal")
+        .setSeverity(ErrorSeverity.ERROR)
+        .addContext({
+          feature: "api-client",
+          util: "treeUtils.getAllDescendants",
+          startId: id,
+          currentId,
+          partialDescendants: [...result],
+        });
+    }
+
+    visited.add(currentId);
+
     const children = parentToChildren[currentId] ?? [];
     result.push(...children);
     children.forEach(traverse);
