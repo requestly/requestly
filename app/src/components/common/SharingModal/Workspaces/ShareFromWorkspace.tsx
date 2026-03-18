@@ -98,18 +98,21 @@ export const ShareFromWorkspace: React.FC<Props> = ({
     [appMode, onRulesShared, selectedRules, activeWorkspace, setPostShareViewData]
   );
 
-  const handleCopyToPrivateWorkspace = useCallback(() => {
+  const handleCopyToPrivateWorkspace = useCallback(async () => {
     setIsLoading(true);
-    // null workspaceId signals the sync layer to use the individual (private) sync path
-    duplicateRulesToTargetWorkspace(appMode, null, selectedRules).then(() => {
-      setIsLoading(false);
+    try {
+      // null workspaceId signals the sync layer to use the individual (private) sync path
+      await duplicateRulesToTargetWorkspace(appMode, null, selectedRules);
       trackSharingModalRulesDuplicated("team_to_private", selectedRules.length);
       setPostShareViewData({
         type: WorkspaceSharingTypes.PRIVATE_WORKSPACE,
       });
-
       onRulesShared();
-    });
+    } catch (e) {
+      toast.error("Failed to copy rules to private workspace. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   }, [appMode, onRulesShared, selectedRules, setPostShareViewData]);
 
   return (
