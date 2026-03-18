@@ -127,7 +127,11 @@ const SecretsLayout = ({ children }: { children?: React.ReactNode }) => {
             >
               Manage providers
             </RQButton>
-            <RQButton type="secondary" onClick={openAddProviderModal} hidden={hideAddProviderButton}>
+            <RQButton
+              type="secondary"
+              onClick={() => openAddProviderModal("provider_list")}
+              hidden={hideAddProviderButton}
+            >
               Add provider
             </RQButton>
           </div>
