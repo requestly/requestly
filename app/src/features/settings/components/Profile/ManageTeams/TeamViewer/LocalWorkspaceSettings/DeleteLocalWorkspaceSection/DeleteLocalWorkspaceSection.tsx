@@ -14,9 +14,13 @@ import { redirectToRules } from "utils/RedirectionUtils";
 import { toast } from "utils/Toast";
 import DeleteWorkspaceModal from "../../TeamSettings/DeleteWorkspaceModal";
 import "./deleteLocalWorkspaceSection.scss";
-
 import { clearCurrentlyActiveWorkspace } from "actions/TeamWorkspaceActions";
-import { useWorkspaceViewActions } from "features/apiClient/slices";
+import {
+  ApiClientViewMode,
+  useGetAllSelectedWorkspaces,
+  useViewMode,
+  useWorkspaceViewActions,
+} from "features/apiClient/slices";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { FAKE_LOGGED_OUT_WORKSPACE_ID } from "features/apiClient/slices/common/constants";
 
@@ -30,6 +34,8 @@ export const DeleteLocalWorkspaceSection: React.FC = () => {
   const currentWorkspace = useSelector(getWorkspaceById(workspaceId));
   const user = useSelector(getUserAuthDetails);
   const { switchContext } = useWorkspaceViewActions();
+  const viewMode = useViewMode();
+  const selectedWorkspaces = useGetAllSelectedWorkspaces();
 
   const [deleteDirectory, setDeleteDirectory] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -90,21 +96,26 @@ export const DeleteLocalWorkspaceSection: React.FC = () => {
         }
       }
 
-      await clearCurrentlyActiveWorkspace(dispatch, appMode);
+      const isDeletedWorkspaceSelectedInMultiView =
+        viewMode === ApiClientViewMode.MULTI && selectedWorkspaces.some((workspace) => workspace.id === workspaceId);
 
-      const userId = user?.details?.profile?.uid;
-      await switchContext({
-        workspace: userId
-          ? {
-              id: dummyPersonalWorkspace.id,
-              meta: { type: WorkspaceType.PERSONAL },
-            }
-          : {
-              id: FAKE_LOGGED_OUT_WORKSPACE_ID,
-              meta: { type: WorkspaceType.LOCAL_STORAGE },
-            },
-        userId,
-      });
+      if (isDeletedWorkspaceSelectedInMultiView) {
+        await clearCurrentlyActiveWorkspace(dispatch, appMode);
+
+        const userId = user?.details?.profile?.uid;
+        await switchContext({
+          workspace: userId
+            ? {
+                id: dummyPersonalWorkspace.id,
+                meta: { type: WorkspaceType.PERSONAL },
+              }
+            : {
+                id: FAKE_LOGGED_OUT_WORKSPACE_ID,
+                meta: { type: WorkspaceType.LOCAL_STORAGE },
+              },
+          userId,
+        });
+      }
       if (hadPermissionIssue) {
         toast.info("Workspace deleted, but failed to delete files. Please retry or delete manually.");
       } else {
@@ -132,6 +143,8 @@ export const DeleteLocalWorkspaceSection: React.FC = () => {
     isDeleting,
     location?.state?.previousPath,
     deleteDirectory,
+    viewMode,
+    selectedWorkspaces,
     refreshAndNavigate,
     dispatch,
     appMode,
