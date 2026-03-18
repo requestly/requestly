@@ -16,11 +16,52 @@ import { RQAPI, EnvironmentData, ApiClientImporterType } from "@requestly/shared
 import { ApiClientImporterMethod } from "@requestly/alternative-importers";
 import { FormDropDownOptions, RequestContentType } from "features/apiClient/types";
 
-function fixMultipartFormEntries(entries: RQAPI.FormDataKeyValuePair[]): RQAPI.FormDataKeyValuePair[] {
+/**
+ * Extracts multipart field metadata from a raw OpenAPI spec (JSON or YAML-like JSON).
+ * Returns a map of fieldName -> { isFile, value } derived from the schema.
+ */
+function extractMultipartFieldMetaFromSpec(fileContent: string): Map<string, { isFile: boolean; value: string }> {
+  const fieldMeta = new Map<string, { isFile: boolean; value: string }>();
+  try {
+    const spec = JSON.parse(fileContent);
+    const paths = spec?.paths ?? {};
+    Object.values(paths).forEach((pathItem: any) => {
+      Object.values(pathItem ?? {}).forEach((operation: any) => {
+        if (!operation || typeof operation !== "object") return;
+        const content = operation?.requestBody?.content ?? {};
+        const multipartSchema = content["multipart/form-data"]?.schema ?? content["multipart/mixed"]?.schema;
+        if (!multipartSchema?.properties) return;
+        Object.entries(multipartSchema.properties).forEach(([fieldName, propSchema]: [string, any]) => {
+          const isFile = propSchema?.format === "binary" || propSchema?.format === "base64";
+          const value = isFile ? "" : String(propSchema?.example ?? propSchema?.default ?? "");
+          fieldMeta.set(fieldName, { isFile, value });
+        });
+      });
+    });
+  } catch {
+    // Not JSON or unparseable — fieldMeta stays empty, fallback logic will apply
+  }
+  return fieldMeta;
+}
+
+function fixMultipartFormEntries(
+  entries: RQAPI.FormDataKeyValuePair[],
+  fieldMeta: Map<string, { isFile: boolean; value: string }>
+): RQAPI.FormDataKeyValuePair[] {
   return entries.map((entry) => {
-    if (entry.type !== undefined) {
+    // If type is already correctly set, keep it
+    if (entry.type !== undefined && Array.isArray(entry.value) === (entry.type === FormDropDownOptions.FILE)) {
       return entry;
     }
+    const meta = fieldMeta.get(entry.key);
+    if (meta) {
+      return {
+        ...entry,
+        type: meta.isFile ? FormDropDownOptions.FILE : FormDropDownOptions.TEXT,
+        value: meta.isFile ? ([] as RQAPI.MultipartFileValue[]) : meta.value,
+      };
+    }
+    // Fallback: infer from value shape (works if type wasn't set but value was correctly set)
     const isFileEntry = Array.isArray(entry.value);
     return {
       ...entry,
@@ -29,14 +70,17 @@ function fixMultipartFormEntries(entries: RQAPI.FormDataKeyValuePair[]): RQAPI.F
   });
 }
 
-function fixCollectionMultipartEntries(collection: RQAPI.CollectionRecord): RQAPI.CollectionRecord {
+function fixCollectionMultipartEntries(
+  collection: RQAPI.CollectionRecord,
+  fieldMeta: Map<string, { isFile: boolean; value: string }>
+): RQAPI.CollectionRecord {
   if (!collection.data?.children) {
     return collection;
   }
 
   const fixedChildren = collection.data.children.map((child) => {
     if (child.type === RQAPI.RecordType.COLLECTION) {
-      return fixCollectionMultipartEntries(child as RQAPI.CollectionRecord);
+      return fixCollectionMultipartEntries(child as RQAPI.CollectionRecord, fieldMeta);
     }
     if (child.type === RQAPI.RecordType.API) {
       const apiRecord = child as RQAPI.ApiRecord;
@@ -46,7 +90,7 @@ function fixCollectionMultipartEntries(collection: RQAPI.CollectionRecord): RQAP
           httpEntry.request?.contentType === RequestContentType.MULTIPART_FORM &&
           Array.isArray(httpEntry.request.body)
         ) {
-          const fixedBody = fixMultipartFormEntries(httpEntry.request.body as RQAPI.FormDataKeyValuePair[]);
+          const fixedBody = fixMultipartFormEntries(httpEntry.request.body as RQAPI.FormDataKeyValuePair[], fieldMeta);
           return {
             ...apiRecord,
             data: {
@@ -174,10 +218,21 @@ export const ImportInputView: React.FC<ImportInputViewProps> = ({
               environments: [],
             };
 
+            // Build a combined field-meta map from all file contents so we can
+            // correctly assign type/value for multipart fields that the npm
+            // importer fails to populate (it always emits value:"", no type).
+            const combinedFieldMeta = filesToProcess.reduce((acc, file) => {
+              const meta = extractMultipartFieldMetaFromSpec(file.content);
+              meta.forEach((v, k) => acc.set(k, v));
+              return acc;
+            }, new Map<string, { isFile: boolean; value: string }>());
+
             results.forEach((result) => {
               if (result.status === "fulfilled") {
                 if (result.value.data?.collection) {
-                  processedResults.collections.push(fixCollectionMultipartEntries(result.value.data.collection));
+                  processedResults.collections.push(
+                    fixCollectionMultipartEntries(result.value.data.collection, combinedFieldMeta)
+                  );
                 }
                 if (result.value.data?.environments) {
                   processedResults.environments.push(...result.value.data.environments);
