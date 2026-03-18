@@ -76,7 +76,8 @@ export function useVariableScopeAdapter(
         entity: { variables: entity.variables },
         entityId: entity.id,
         saveVariablesToRepository: async (variables: EnvironmentVariables) => {
-          await repositories.environmentVariablesRepository.updateEnvironment(GLOBAL_ENVIRONMENT_ID, { variables });
+          const globalEnvId = repositories.environmentVariablesRepository.getGlobalEnvironmentId();
+          await repositories.environmentVariablesRepository.updateEnvironment(globalEnvId, { variables });
         },
         scopeDisplayName: "Global",
         store: workspaceStore,
