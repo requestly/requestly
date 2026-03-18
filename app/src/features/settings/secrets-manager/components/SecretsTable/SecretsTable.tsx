@@ -61,6 +61,10 @@ const SecretTags: React.FC<{
   const containerRef = useRef<HTMLDivElement>(null);
   const [visibleCount, setVisibleCount] = useState(keyValues.length);
 
+  // Stable string key so the effect only re-runs when key contents actually change,
+  // not on every parent re-render (e.g. toggling the eye icon on a different row).
+  const keyValuesKey = keyValues?.map((kv) => kv?.key)?.join("\0");
+
   useLayoutEffect(() => {
     const container = containerRef.current;
     if (!container) return;
@@ -94,7 +98,7 @@ const SecretTags: React.FC<{
         setVisibleCount(1); // Always show at least one
       }
     });
-  }, [keyValues]);
+  }, [keyValuesKey]);
 
   const hiddenCount = keyValues.length - visibleCount;
 
