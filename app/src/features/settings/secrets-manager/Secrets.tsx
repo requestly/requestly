@@ -1,4 +1,3 @@
-import React from "react";
 import { useState, useCallback, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { unstable_useBlocker } from "react-router-dom";
@@ -19,6 +18,9 @@ import { isDesktopMode } from "utils/AppUtils";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { globalActions } from "store/slices/global/slice";
 import { PRICING } from "features/pricing";
+import { trackPricingModalPlansViewed } from "features/pricing/analytics";
+import { trackDesktopAppPromoClicked } from "modules/analytics/events/common/onboarding";
+import { SECRETS_MANAGER } from "./consts/events";
 
 const Secrets = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -69,10 +71,12 @@ const Secrets = () => {
   const { openAddProviderModal } = useSecretsModals();
 
   const handleDownloadRequestly = () => {
+    trackDesktopAppPromoClicked(SECRETS_MANAGER.SOURCE, "web_app");
     window.open("https://requestly.com/downloads/desktop/", "_blank", "noopener,noreferrer");
   };
 
-  const handleUpgradePlan = (e: React.MouseEvent) => {
+  const handleUpgradePlan = () => {
+    trackPricingModalPlansViewed(SECRETS_MANAGER.SOURCE);
     dispatch(
       globalActions.toggleActiveModal({
         modalName: "pricingModal",
@@ -121,7 +125,7 @@ const Secrets = () => {
         description="Add provider to securely fetch your secrets and use them in API requests. Secrets are never synced to
           Requestly Cloud."
         ctaText="Add provider"
-        onCtaClick={openAddProviderModal}
+        onCtaClick={() => openAddProviderModal("onboarding")}
       />
     );
   }
