@@ -69,7 +69,20 @@ export type EnvironmentEntity = {
   variables?: VariableEntity;
 };
 
-export type APIEntity = Collection | API;
+export type ExampleAPI = {
+  id: string;
+  type: "example_api";
+  collectionId: null;
+  parentRequestId: string;
+  data: {
+    name: string;
+    rank?: string;
+    request: ApiRequestDetails;
+    response: RQAPI.Response;
+  };
+};
+
+export type APIEntity = Collection | API | ExampleAPI;
 
 export enum FileType {
   API = "api",

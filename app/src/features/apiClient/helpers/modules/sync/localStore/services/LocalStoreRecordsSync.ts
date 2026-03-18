@@ -508,7 +508,7 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
   async getAllExamples(
     recordIds: string[]
   ): Promise<{ success: boolean; data: { examples: RQAPI.ExampleApiRecord[]; failedRecordIds?: string[] } }> {
-    // TODO: Implement this, will be a dummy implementation for local store
+    // Dummy implementation for local store. Examples are fetched with getAllRecords method.
     return {
       success: true,
       data: {

@@ -233,6 +233,8 @@ export const ContextualCollectionsList: React.FC<Props> = ({
                     key={record.id}
                     record={record}
                     isReadOnly={!isValidPermission}
+                    expandedRecordIds={expandedRecordIds}
+                    setExpandedRecordIds={setExpandedRecordIds}
                     bulkActionOptions={{
                       showSelection,
                       selectedRecords,
