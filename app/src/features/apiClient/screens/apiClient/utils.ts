@@ -38,6 +38,7 @@ import { getBoundary, parse as multipartParser } from "parse-multipart-data";
 import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 import { apiRecordsRankingManager } from "features/apiClient/helpers/RankingManager";
 import { TreeIndices } from "features/apiClient/slices";
+import { isSSLVerificationEnabled } from "features/settings/components/GlobalSettings/components/SSLVerification";
 
 const createAbortError = (signal: AbortSignal) => {
   if (signal && signal.reason === AbortReason.USER_CANCELLED) {
@@ -86,6 +87,8 @@ export const makeRequest = async (
           signal?.removeEventListener("abort", abortListener);
         });
     } else if (appMode === CONSTANTS.APP_MODES.DESKTOP) {
+      // Inject the global SSL verification preference for desktop API requests
+      request.sslVerificationDisabled = !isSSLVerificationEnabled();
       getAPIResponseViaProxy(request)
         .then((result: ResponseOrError) => {
           if (!result) {

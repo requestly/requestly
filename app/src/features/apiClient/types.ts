@@ -171,6 +171,7 @@ export namespace RQAPI {
     bodyContainer?: RequestBodyContainer;
     contentType?: RequestContentType;
     includeCredentials?: boolean;
+    sslVerificationDisabled?: boolean;
   };
 
   export type HttpResponse = {

@@ -15,6 +15,7 @@ import { BlockList } from "./components/BlockListSettings/BlockListSettings";
 import { SafariLimitedSupportView } from "componentsV2/SafariExtension/SafariLimitedSupportView";
 import { PopupConfig } from "./components/PopupConfig/PopupConfig";
 import { AIConsentSetting } from "./components/AIConsentSetting/AIConsentSetting";
+import SSLVerification from "./components/SSLVerification";
 
 export const GlobalSettings = () => {
   const user = useSelector(getUserAuthDetails);
@@ -46,6 +47,7 @@ export const GlobalSettings = () => {
           {user?.loggedIn ? <DataCollection /> : null}
         </div>
         <AIConsentSetting />
+        <SSLVerification />
         {appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION && isImplicitTestThisRuleCompatible ? (
           <ImplicitRuleTesting />
         ) : null}
