@@ -9,10 +9,13 @@ import { SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY } from "features/apiClient/cons
 import { useRBAC } from "features/rbac";
 import { useAllRecords, useChildToParent } from "features/apiClient/slices/apiRecords/apiRecords.hooks";
 import { getRecordIdsToBeExpanded, isApiCollection } from "features/apiClient/screens/apiClient/utils";
-import { CollectionRow } from "../../../components/collectionsList/collectionRow/CollectionRow";
+import { CollectionRow, DraggableApiRecord } from "../../../components/collectionsList/collectionRow/CollectionRow";
 import { SidebarPlaceholderItem } from "../../../components/SidebarPlaceholderItem/SidebarPlaceholderItem";
 import { RequestRow } from "../../../components/collectionsList/requestRow/RequestRow";
 import { ApiRecordEmptyState } from "../../../components/collectionsList/apiRecordEmptyState/ApiRecordEmptyState";
+import { useDrop } from "react-dnd";
+import { handleRecordDrop } from "../../../components/collectionsList/utils/handleRecordDrop";
+import { useWorkspaceId } from "features/apiClient/common/WorkspaceProvider";
 
 import {
   getRecordsToExpandBySearchValue,
@@ -191,10 +194,46 @@ export const ContextualCollectionsList: React.FC<Props> = ({
     }
   }, [selectAll, handleRecordSelection, context.workspaceId, searchValue]);
 
+  const workspaceId = useWorkspaceId();
+
+  const handleRecordDropToTopLevel = useCallback(
+    async (item: DraggableApiRecord) => {
+      await handleRecordDrop(item, workspaceId, { targetCollectionId: "" });
+    },
+    [workspaceId]
+  );
+
+  const [{ isOver, canDrop }, topLevelDrop] = useDrop(
+    () => ({
+      accept: [RQAPI.RecordType.API, RQAPI.RecordType.COLLECTION],
+      drop: (item: DraggableApiRecord, monitor) => {
+        const isOverCurrent = monitor.isOver({ shallow: true });
+        if (!isOverCurrent) return;
+        const isCrossWorkspaceDrop = item.workspaceId !== workspaceId;
+        // For cross-workspace, only allow API requests (not collections)
+        if (isCrossWorkspaceDrop && item.record.type === RQAPI.RecordType.COLLECTION) return;
+        if (isCrossWorkspaceDrop || item.record.collectionId) {
+          handleRecordDropToTopLevel(item);
+        }
+      },
+      canDrop: (item: DraggableApiRecord) => {
+        const isCrossWorkspaceDrop = item.workspaceId !== workspaceId;
+        // For cross-workspace, only allow API requests (not collections)
+        if (isCrossWorkspaceDrop && item.record.type === RQAPI.RecordType.COLLECTION) return false;
+        return isCrossWorkspaceDrop || !!item.record.collectionId;
+      },
+      collect: (monitor) => ({
+        isOver: monitor.isOver({ shallow: true }),
+        canDrop: monitor.canDrop(),
+      }),
+    }),
+    [handleRecordDropToTopLevel, workspaceId]
+  );
+
   return (
     <>
       <div className={`collections-list-container ${showSelection ? "selection-enabled" : ""}`}>
-        <div className="collections-list-content">
+        <div ref={topLevelDrop} className={`collections-list-content ${isOver && canDrop ? "drop-target-active" : ""}`}>
           {updatedRecords.count > 0 ? (
             <div className="collections-list">
               {updatedRecords.collections.map((record) => {
@@ -250,6 +289,7 @@ export const ContextualCollectionsList: React.FC<Props> = ({
                   <SidebarPlaceholderItem name="New Request" />
                 </div>
               )}
+              <div className={`top-level-drop-zone ${isOver && canDrop ? "active" : ""}`} />
             </div>
           ) : (
             <ApiRecordEmptyState

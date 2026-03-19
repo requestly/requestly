@@ -36,14 +36,8 @@ import { ExampleCollectionsNudge } from "../ExampleCollectionsNudge/ExampleColle
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import APP_CONSTANTS from "config/constants";
-import {
-  duplicateRecords,
-  useAllRecords,
-  useApiClientRepository,
-  useChildToParent,
-  moveRecords,
-  getApiClientFeatureContext,
-} from "features/apiClient/slices";
+import { notification } from "antd";
+import { duplicateRecords, useAllRecords, useApiClientRepository, useChildToParent } from "features/apiClient/slices";
 import { useApiClientDispatch } from "features/apiClient/slices/hooks/base.hooks";
 import { EXPANDED_RECORD_IDS_UPDATED } from "features/apiClient/slices/exampleCollections";
 import { ErrorSeverity } from "errors/types";
@@ -427,15 +421,19 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
       drop: (item: DraggableApiRecord, monitor) => {
         const isOverCurrent = monitor.isOver({ shallow: true });
         if (!isOverCurrent) return;
-
-        // Only handle drop if item is from a collection (collectionId is not empty)
-        if (item.record.collectionId) {
+        const isCrossWorkspaceDrop = item.workspaceId !== workspaceId;
+        if (isCrossWorkspaceDrop && item.record.type === RQAPI.RecordType.COLLECTION) return;
+        if (isCrossWorkspaceDrop || item.record.collectionId) {
           handleRecordDropToTopLevel(item, workspaceId || null);
         }
       },
       canDrop: (item: DraggableApiRecord) => {
-        // Can drop if the item is currently in a collection (moving it to top-level)
-        return !!item.record.collectionId;
+        // Allow drop from a different workspace (cross-workspace move), or
+        // if item is currently in a collection (moving it to top-level within same workspace)
+        const isCrossWorkspaceDrop = item.workspaceId !== workspaceId;
+        // For cross-workspace, only allow API requests (not collections)
+        if (isCrossWorkspaceDrop && item.record.type === RQAPI.RecordType.COLLECTION) return false;
+        return isCrossWorkspaceDrop || !!item.record.collectionId;
       },
       collect: (monitor) => ({
         isOver: monitor.isOver({ shallow: true }),

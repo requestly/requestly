@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
-import { Checkbox, Dropdown, MenuProps, Skeleton, Typography, notification } from "antd";
+import { Checkbox, Dropdown, MenuProps, Skeleton, Typography } from "antd";
 import { RQAPI } from "features/apiClient/types";
 import { RQAPI as SharedRQAPI } from "@requestly/shared/types/entities/apiClient";
 import { RQButton } from "lib/design-system-v2/components";
@@ -275,6 +275,10 @@ export const CollectionRow: React.FC<Props> = ({
 
   const checkCanDropItem = useCallback(
     (item: DraggableApiRecord): boolean => {
+      if (item.workspaceId !== workspaceId && item.record.type === RQAPI.RecordType.COLLECTION) {
+        return false;
+      }
+
       if (item.record.id === record.id) {
         return false;
       }

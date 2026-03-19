@@ -29,17 +29,25 @@ export const handleRecordDrop = async (
     const sourceContext = getApiClientFeatureContext(item.workspaceId);
     if (!sourceContext) return;
 
+    const isCrossWorkspace = dropWorkspaceId && dropWorkspaceId !== item.workspaceId;
+
     const destination = {
       workspaceId: dropWorkspaceId,
       collectionId: options.targetCollectionId,
     };
+
+    const repository = isCrossWorkspace
+      ? getApiClientFeatureContext(dropWorkspaceId)?.repositories.apiClientRecordsRepository
+      : sourceContext.repositories.apiClientRecordsRepository;
+
+    if (!repository) return;
 
     await sourceContext.store
       .dispatch(
         moveRecords({
           recordsToMove: [item.record],
           collectionId: destination.collectionId,
-          repository: sourceContext.repositories.apiClientRecordsRepository,
+          repository,
           sourceWorkspaceId: item.workspaceId,
           destinationWorkspaceId: destination.workspaceId,
         }) as any
