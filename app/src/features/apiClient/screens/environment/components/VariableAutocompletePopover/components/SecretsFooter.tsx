@@ -5,6 +5,8 @@ import { PlusOutlined } from "@ant-design/icons";
 import { selectSelectedProviderId, selectAllSecretProviders } from "features/apiClient/slices/secrets-manager";
 import PATHS from "config/constants/sub/paths";
 import "./emptyStates.scss";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import FEATURES from "config/constants/sub/features";
 
 interface SecretsFooterProps {
   onClose?: () => void;
@@ -16,6 +18,10 @@ export const SecretsFooter: React.FC<SecretsFooterProps> = ({ onClose, showAddAl
   const selectedProviderId = useSelector(selectSelectedProviderId);
   const providers = useSelector(selectAllSecretProviders);
   const activeProvider = selectedProviderId ? providers.find((p) => p.id === selectedProviderId) : null;
+
+  if (!isFeatureCompatible(FEATURES.SECRETS_MANAGER)) {
+    return null;
+  }
 
   const handleAddAlias = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();

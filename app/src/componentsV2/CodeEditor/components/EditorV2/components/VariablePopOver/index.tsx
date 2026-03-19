@@ -27,6 +27,8 @@ import {
 import { SecretVariable } from "lib/secret-variables/types";
 import { SecretsVariableInfo } from "features/apiClient/screens/environment/components/SecretsVariableInfoPopover/Index";
 import SecretVariableNotFound from "./components/SecretVariableNotFound";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import FEATURES from "config/constants/sub/features";
 
 type VariableData = ScopedVariable[0];
 
@@ -78,7 +80,8 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
     return variableData ? PopoverView.VARIABLE_INFO : PopoverView.NOT_FOUND;
   });
 
-  const hoveredOnUnDeclaredSecretVariable = !variableData && hoveredVariable?.startsWith("secrets:");
+  const hoveredOnUnDeclaredSecretVariable =
+    !variableData && hoveredVariable?.startsWith("secrets:") && isFeatureCompatible(FEATURES.SECRETS_MANAGER);
 
   const transitionToView = useCallback(
     (nextView: PopoverView) => {
@@ -127,7 +130,8 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
   }, [transitionToView, onClose, onPinChange]);
 
   const isDynamicVariable: boolean = !!variableData && checkIsDynamicVariable(variableData);
-  const isSecretsVariable: boolean = !!variableData && checkIsSecretsVariable(variableData);
+  const isSecretsVariable: boolean =
+    !!variableData && checkIsSecretsVariable(variableData) && isFeatureCompatible(FEATURES.SECRETS_MANAGER);
 
   const popoverContent = (() => {
     switch (currentView) {
