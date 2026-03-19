@@ -6,12 +6,18 @@ import {
 import React from "react";
 import { useSelector } from "react-redux/es/hooks/useSelector";
 import { useNavigate } from "react-router-dom";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import FEATURES from "config/constants/sub/features";
 
 const SecretVariableNotFound: React.FC = () => {
   const navigate = useNavigate();
   const selectedProviderId = useSelector(selectSelectedProviderId);
   const providers = useSelector(selectAllSecretProviders);
   const activeProvider = selectedProviderId ? providers.find((p) => p.id === selectedProviderId) : null;
+
+  if (!isFeatureCompatible(FEATURES.SECRETS_MANAGER)) {
+    return null;
+  }
 
   const handleOpenSecrets = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();

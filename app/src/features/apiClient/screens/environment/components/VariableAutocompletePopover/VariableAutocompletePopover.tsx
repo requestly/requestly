@@ -11,6 +11,8 @@ import { NamespaceRootItem } from "./components/NamespaceRootItem";
 import "./variableAutocompletePopover.scss";
 import { SPECIAL_VARIABLE_MODES } from "./variableModeConfig";
 import AutoCompleteSecretEmptyState from "./components/EmptyStates";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import FEATURES from "config/constants/sub/features";
 
 interface VariableAutocompleteProps {
   show: boolean;
@@ -22,6 +24,10 @@ interface VariableAutocompleteProps {
 }
 
 const SecretsDefaultFooter: React.FC<{ onClose?: () => void }> = ({ onClose }) => {
+  if (!isFeatureCompatible(FEATURES.SECRETS_MANAGER)) {
+    return null;
+  }
+
   return (
     <div className="secrets-hint-footer" onClick={onClose}>
       Type &ldquo;secrets:&rdquo; to use secrets in requests

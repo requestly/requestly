@@ -22,6 +22,7 @@ import ManageProviders from "../secrets-manager/ManageProviders/Index";
 import { SecretsModalsProvider } from "../secrets-manager/context/SecretsModalsContext";
 
 const isSessionsNewSettingsPageCompatible = isFeatureCompatible(FEATURES.SESSION_ONBOARDING);
+const isSecretsManagerCompatible = isFeatureCompatible(FEATURES.SECRETS_MANAGER);
 
 export const settingRoutes: RouteObject[] = [
   {
@@ -37,28 +38,32 @@ export const settingRoutes: RouteObject[] = [
         element: <DesktopSettings />,
       },
 
-      {
-        path: PATHS.SETTINGS.SECRETS.RELATIVE,
-        element: (
-          <SecretsModalsProvider>
-            <SecretsLayout />
-          </SecretsModalsProvider>
-        ),
-        children: [
-          {
-            index: true,
-            element: <Secrets />,
-          },
-          ...(isDesktopMode()
-            ? [
+      ...(isSecretsManagerCompatible
+        ? [
+            {
+              path: PATHS.SETTINGS.SECRETS.RELATIVE,
+              element: (
+                <SecretsModalsProvider>
+                  <SecretsLayout />
+                </SecretsModalsProvider>
+              ),
+              children: [
                 {
-                  path: PATHS.SETTINGS.SECRETS.MANAGE_PROVIDERS.RELATIVE, // This is a nested route for managing providers
-                  element: <ManageProviders />,
+                  index: true,
+                  element: <Secrets />,
                 },
-              ]
-            : []),
-        ],
-      },
+                ...(isDesktopMode()
+                  ? [
+                      {
+                        path: PATHS.SETTINGS.SECRETS.MANAGE_PROVIDERS.RELATIVE, // This is a nested route for managing providers
+                        element: <ManageProviders />,
+                      },
+                    ]
+                  : []),
+              ],
+            },
+          ]
+        : []),
 
       {
         path: PATHS.SETTINGS.SESSION_BOOK.RELATIVE,
