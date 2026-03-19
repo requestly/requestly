@@ -158,7 +158,7 @@ export const MultiEditableCell: React.FC<React.PropsWithChildren<EditableCellPro
                     label: "File",
                   },
                 ]}
-                value={record?.type ?? FormDropDownOptions.TEXT}
+                defaultValue={record?.type ?? FormDropDownOptions.TEXT}
                 onChange={(value) => {
                   //clear the value if type is changed to file, because earlier value remains there
                   const newValue: string | RQAPI.MultipartFileValue[] = value === FormDropDownOptions.FILE ? [] : "";
