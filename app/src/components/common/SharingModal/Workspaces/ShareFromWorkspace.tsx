@@ -81,19 +81,23 @@ export const ShareFromWorkspace: React.FC<Props> = ({
   }, [memberEmails, onRulesShared, activeWorkspace, setPostShareViewData, billingTeams]);
 
   const handleTransferToOtherWorkspace = useCallback(
-    (teamData: Workspace) => {
+    async (teamData: Workspace) => {
       setIsLoading(true);
-      duplicateRulesToTargetWorkspace(appMode, teamData.id!, selectedRules).then(() => {
-        setIsLoading(false);
+      try {
+        await duplicateRulesToTargetWorkspace(appMode, teamData.id!, selectedRules);
         trackSharingModalRulesDuplicated("team", selectedRules.length);
         setPostShareViewData({
           type: WorkspaceSharingTypes.EXISTING_WORKSPACE,
           targetTeamData: teamData,
           sourceTeamData: activeWorkspace,
         });
-
         onRulesShared();
-      });
+      } catch (e) {
+        console.error("Failed to transfer rules to workspace:", e);
+        toast.error("Failed to transfer rules to workspace. Please try again.");
+      } finally {
+        setIsLoading(false);
+      }
     },
     [appMode, onRulesShared, selectedRules, activeWorkspace, setPostShareViewData]
   );
@@ -109,6 +113,7 @@ export const ShareFromWorkspace: React.FC<Props> = ({
       });
       onRulesShared();
     } catch (e) {
+      console.error("Failed to copy rules to private workspace:", e);
       toast.error("Failed to copy rules to private workspace. Please try again.");
     } finally {
       setIsLoading(false);
