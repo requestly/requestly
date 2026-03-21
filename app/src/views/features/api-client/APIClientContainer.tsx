@@ -1,4 +1,5 @@
 import React, { useCallback, useState } from "react";
+import { message } from "antd";
 import APIClientSidebar from "./sidebar/APIClientSidebar";
 import APIClientView from "./client-view/APIClientView";
 import { RQAPI } from "./types";
@@ -10,6 +11,10 @@ import {
   trackNewRequestClicked,
 } from "modules/analytics/events/features/apiClient";
 import ImportRequestModal from "./ImportRequestModal";
+import {
+  exportCollectionRunResults,
+  downloadRunResults,
+} from "./runResultsExport";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
 import InstallExtensionCTA from "components/misc/InstallExtensionCTA";
@@ -56,6 +61,16 @@ const APIClientContainer: React.FC<Props> = () => {
     [history]
   );
 
+  const onExportRunResults = useCallback(async () => {
+    const result = await exportCollectionRunResults();
+    if (result.success && result.data) {
+      downloadRunResults(result.data);
+      message.success("Run results exported");
+    } else {
+      message.warning(result.error ?? "Export failed");
+    }
+  }, []);
+
   return (
     <div className="api-client-container">
       {isFeatureCompatible(FEATURES.API_CLIENT) ? (
@@ -66,6 +81,7 @@ const APIClientContainer: React.FC<Props> = () => {
             clearHistory={clearHistory}
             onNewClick={onNewClick}
             onImportClick={onImportClick}
+            onExportRunResults={onExportRunResults}
           />
           <APIClientView apiEntry={selectedEntry} notifyApiRequestFinished={addToHistory} />
           <ImportRequestModal

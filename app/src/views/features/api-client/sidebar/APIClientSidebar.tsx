@@ -2,7 +2,12 @@ import React, { useCallback } from "react";
 import placeholderImage from "../../../../assets/images/illustrations/empty-sheets-dark.svg";
 import { Button, Timeline, Typography } from "antd";
 import { RQAPI } from "../types";
-import { ClearOutlined, CodeOutlined, PlusCircleOutlined } from "@ant-design/icons";
+import {
+  ClearOutlined,
+  CodeOutlined,
+  DownloadOutlined,
+  PlusCircleOutlined,
+} from "@ant-design/icons";
 import { trackRequestSelectedFromHistory } from "modules/analytics/events/features/apiClient";
 import REQUEST_METHOD_COLORS from "constants/requestMethodColors";
 import "./apiClientSidebar.scss";
@@ -15,6 +20,7 @@ interface Props {
   clearHistory: () => void;
   onNewClick: () => void;
   onImportClick: () => void;
+  onExportRunResults: () => void;
 }
 
 const APIClientSidebar: React.FC<Props> = ({
@@ -23,6 +29,7 @@ const APIClientSidebar: React.FC<Props> = ({
   clearHistory,
   onNewClick,
   onImportClick,
+  onExportRunResults,
 }) => {
   const onHistoryLinkClick = useCallback(
     (index: number) => {
@@ -46,6 +53,14 @@ const APIClientSidebar: React.FC<Props> = ({
           </Button>
         </div>
         <div>
+          <Button
+            type="text"
+            size="small"
+            onClick={onExportRunResults}
+            icon={<DownloadOutlined />}
+          >
+            Export run results
+          </Button>
           {history?.length ? (
             <Button type="text" size="small" onClick={clearHistory} icon={<ClearOutlined />}>
               Clear history
