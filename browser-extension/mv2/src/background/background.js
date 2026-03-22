@@ -1355,7 +1355,7 @@ BG.Methods.getAPIResponse = async (apiRequest) => {
   let body = apiRequest.body;
   let url = apiRequest.url;
 
-  if (apiRequest?.queryParams.length) {
+  if (apiRequest?.queryParams?.length) {
     const urlObj = new URL(apiRequest.url);
     const searchParams = new URLSearchParams(urlObj.search);
     apiRequest.queryParams.forEach(({ key, value }) => {
@@ -1365,8 +1365,11 @@ BG.Methods.getAPIResponse = async (apiRequest) => {
     url = urlObj.toString();
   }
 
-  apiRequest?.headers.forEach(({ key, value }) => {
-    headers.append(key, value);
+  const requestHeaders = apiRequest?.headers || [];
+  requestHeaders.forEach(({ key, value }) => {
+    if (key != null && String(key).length > 0) {
+      headers.append(key, value != null ? String(value) : "");
+    }
   });
 
   if (!["GET", "HEAD"].includes(method) && apiRequest.contentType === "application/x-www-form-urlencoded") {
@@ -1377,9 +1380,20 @@ BG.Methods.getAPIResponse = async (apiRequest) => {
     body = new URLSearchParams(formData);
   }
 
+  if (["GET", "HEAD"].includes(method)) {
+    body = null;
+  } else if (body === undefined || body === null || body === "") {
+    body = undefined;
+  }
+
+  const fetchInit = { method, headers, credentials: "omit" };
+  if (body !== undefined && body !== null) {
+    fetchInit.body = body;
+  }
+
   try {
     const requestStartTime = performance.now();
-    const response = await fetch(url, { method, headers, body, credentials: "omit" });
+    const response = await fetch(url, fetchInit);
     const responseTime = performance.now() - requestStartTime;
 
     const responseHeaders = [];
