@@ -5,17 +5,10 @@ import { useSelector } from "react-redux";
 import { getAppMode } from "store/selectors";
 
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import APP_CONSTANTS from "config/constants";
-import { isFeatureCompatible } from "utils/CompatibilityUtils";
 
 export const SSL_VERIFICATION_STORAGE_KEY = "sslVerificationEnabled";
 
-const isSSLVerificationCompatible = isFeatureCompatible(APP_CONSTANTS.FEATURES.ENABLE_SSL_VALIDATION);
-
 export const isSSLVerificationEnabled = (): boolean => {
-  if (!isSSLVerificationCompatible) {
-    return true; // Default to enabled if the feature is not compatible
-  }
   const storedValue = localStorage.getItem(SSL_VERIFICATION_STORAGE_KEY);
   // Default is true (SSL verification enabled)
   return storedValue === null ? true : storedValue === "true";

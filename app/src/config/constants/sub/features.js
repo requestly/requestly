@@ -112,6 +112,4 @@ FEATURES.API_CLIENT_RECORDS_REORDERING = "api_client_records_reordering";
 FEATURES.ONBOARDING_V2 = "onboarding_v2";
 FEATURES.DESKTOP_BETA_PREVIEW_URL_CONFIGURATION = "desktop_beta_preview_url_configuration";
 
-FEATURES.ENABLE_SSL_VALIDATION = "enable_ssl_validation";
-
 export default FEATURES;
