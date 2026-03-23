@@ -1,10 +1,11 @@
 import { getScopedVariables, Scope, ScopedVariables } from "../variableResolver/variable-resolver";
-import { EnvironmentVariables, VariableScope } from "backend/environment/types";
+import { EnvironmentVariables, VariableScope, EnvironmentVariableType } from "backend/environment/types";
 import { RQAPI } from "features/apiClient/types";
 import { isEmpty } from "lodash";
 import { ApiClientFeatureContext, selectRecordById } from "features/apiClient/slices";
 import { reduxStore } from "store";
 import { VariableData } from "@requestly/shared/types/entities/apiClient";
+import { secretVariables } from "lib/secret-variables";
 
 export type BaseExecutionContext = {
   global: EnvironmentVariables;
@@ -12,6 +13,7 @@ export type BaseExecutionContext = {
   environment: EnvironmentVariables;
   variables: EnvironmentVariables;
   iterationData: EnvironmentVariables;
+  secrets: EnvironmentVariables;
 };
 
 export type ExecutionContext = BaseExecutionContext & {
@@ -52,6 +54,7 @@ export class ScriptExecutionContext {
     // Currently only overriding iterationData because all other scopes are handled during initial context build from context but
     // iterationData needs to be updated from scope
     this.context.iterationData = (variablesByScope[VariableScope.DATA_FILE] || {}) as EnvironmentVariables;
+    this.context.secrets = this.buildSecretVariables();
 
     this.isMutated = false;
   }
@@ -98,6 +101,22 @@ export class ScriptExecutionContext {
     }, {} as Record<string, Record<string, VariableData>>);
   }
 
+  private buildSecretVariables(): EnvironmentVariables {
+    const secretsList = secretVariables.getSecretsList();
+    return secretsList.reduce((acc, secret, index) => {
+      // Remove the "secrets:" prefix for the execution context
+      const keyWithoutPrefix = secret.name.replace(/^secrets:/, "");
+      acc[keyWithoutPrefix] = {
+        id: index,
+        localValue: secret.value,
+        syncValue: secret.value,
+        type: EnvironmentVariableType.Secret,
+        isPersisted: true,
+      };
+      return acc;
+    }, {} as EnvironmentVariables);
+  }
+
   private getVariablesByScope(recordId: string) {
     return this.convertScopedVariablesToRecord(this.getScopedVariables(recordId));
   }
@@ -109,6 +128,7 @@ export class ScriptExecutionContext {
     const environmentVariables = (variablesByScope[VariableScope.ENVIRONMENT] || {}) as EnvironmentVariables;
     const variables = (variablesByScope[VariableScope.RUNTIME] || {}) as EnvironmentVariables;
     const iterationData = (variablesByScope[VariableScope.DATA_FILE] || {}) as EnvironmentVariables;
+    const secrets = this.buildSecretVariables();
 
     const baseExecutionContext: BaseExecutionContext = {
       global: globalVariables,
@@ -116,6 +136,7 @@ export class ScriptExecutionContext {
       environment: environmentVariables,
       variables,
       iterationData,
+      secrets,
     };
 
     return {
@@ -130,6 +151,7 @@ export class ScriptExecutionContext {
     this.context.collectionVariables = snapshot.collectionVariables;
     this.context.environment = snapshot.environment;
     this.context.variables = snapshot.variables;
+    this.context.secrets = snapshot.secrets;
 
     this.context.request = snapshot.request;
     if (snapshot.response) {
@@ -148,6 +170,7 @@ export class ScriptExecutionContext {
       environment: this.context.environment,
       variables: this.context.variables,
       iterationData: this.context.iterationData,
+      secrets: this.context.secrets,
     };
   }
 
