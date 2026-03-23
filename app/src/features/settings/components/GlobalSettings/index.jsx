@@ -52,7 +52,7 @@ export const GlobalSettings = () => {
           {user?.loggedIn ? <DataCollection /> : null}
         </div>
         <AIConsentSetting />
-        {!isSSLVerificationCompatible && <SSLVerification />}
+        {isSSLVerificationCompatible && <SSLVerification />}
         {appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION && isImplicitTestThisRuleCompatible ? (
           <ImplicitRuleTesting />
         ) : null}
