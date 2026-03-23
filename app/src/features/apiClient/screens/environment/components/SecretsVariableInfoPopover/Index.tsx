@@ -9,6 +9,8 @@ import { RQButton } from "lib/design-system-v2/components/RQButton/RQButton";
 import { LuSlidersHorizontal } from "@react-icons/all-files/lu/LuSlidersHorizontal";
 import "./index.scss";
 import { RevealableSecretField } from "componentsV2/RevealableSecretField/RevealableSecretField";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import FEATURES from "config/constants/sub/features";
 
 export const SecretsVariableInfo: React.FC<{
   variable: SecretVariable;
@@ -17,6 +19,10 @@ export const SecretsVariableInfo: React.FC<{
   const selectedProviderId = useSelector(selectSelectedProviderId);
   const providers = useSelector(selectAllSecretProviders);
   const activeProvider = selectedProviderId ? providers.find((p) => p.id === selectedProviderId) : null;
+
+  if (!isFeatureCompatible(FEATURES.SECRETS_MANAGER)) {
+    return null;
+  }
   // Parse the variable name to extract alias and key
   // Format: secrets:{alias} or secrets:{alias}.{key}
   const withoutPrefix = variable.name.slice("secrets:".length); // "alias.key"

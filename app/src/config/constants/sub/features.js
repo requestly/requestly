@@ -111,5 +111,6 @@ FEATURES.API_CLIENT_RECORDS_REORDERING = "api_client_records_reordering";
 
 FEATURES.ONBOARDING_V2 = "onboarding_v2";
 FEATURES.DESKTOP_BETA_PREVIEW_URL_CONFIGURATION = "desktop_beta_preview_url_configuration";
+FEATURES.SECRETS_MANAGER = "secrets_manager";
 
 export default FEATURES;

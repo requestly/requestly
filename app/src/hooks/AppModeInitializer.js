@@ -296,7 +296,12 @@ const AppModeInitializer = () => {
       PRICING.PLAN_NAMES.API_CLIENT_ENTERPRISE,
       PRICING.PLAN_NAMES.API_CLIENT_PROFESSIONAL,
     ].includes(user?.details?.planDetails?.planName || "");
-    if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP && user?.loggedIn && isUserProfessional) {
+    if (
+      appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP &&
+      user?.loggedIn &&
+      isUserProfessional &&
+      isFeatureCompatible(FEATURES.SECRETS_MANAGER)
+    ) {
       const initPromise = dispatch(initAndSubscribeSecretsManager(user?.details?.profile?.uid));
 
       return () => {

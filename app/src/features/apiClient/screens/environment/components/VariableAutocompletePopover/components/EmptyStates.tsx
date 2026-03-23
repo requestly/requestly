@@ -9,6 +9,8 @@ import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import "./emptyStates.scss";
 import { SecretsFooter } from "./SecretsFooter";
 import ExportOutlined from "@ant-design/icons/lib/icons/ExportOutlined";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import FEATURES from "config/constants/sub/features";
 
 interface SecretsEmptyStateProps {
   onClose?: () => void;
@@ -17,6 +19,9 @@ interface SecretsEmptyStateProps {
 const AutoCompleteSecretEmptyState: React.FC<SecretsEmptyStateProps> = ({ onClose }) => {
   const providers = useSelector(selectAllSecretProviders);
   const user = useSelector(getUserAuthDetails);
+  const navigate = useNavigate();
+  const isSecretsManagerCompatible = isFeatureCompatible(FEATURES.SECRETS_MANAGER);
+
   const isUserProfessional = [
     PRICING.PLAN_NAMES.PROFESSIONAL,
     PRICING.PLAN_NAMES.ENTERPRISE,
@@ -24,7 +29,10 @@ const AutoCompleteSecretEmptyState: React.FC<SecretsEmptyStateProps> = ({ onClos
     PRICING.PLAN_NAMES.API_CLIENT_ENTERPRISE,
     PRICING.PLAN_NAMES.API_CLIENT_PROFESSIONAL,
   ].includes(user?.details?.planDetails?.planName || "");
-  const navigate = useNavigate();
+
+  if (!isSecretsManagerCompatible) {
+    return null;
+  }
 
   const handleAddProvider = (e: React.MouseEvent) => {
     e.preventDefault();
