@@ -170,6 +170,7 @@ export const MultiEditableCell: React.FC<React.PropsWithChildren<EditableCellPro
 
             {(dataIndex === "key" || (dataIndex === "value" && record.type === FormDropDownOptions.TEXT)) && (
               <SingleLineEditor
+                key={`${dataIndex}-${record.id}-${record.type ?? FormDropDownOptions.TEXT}`}
                 className={`key-value-table-input ${
                   record.isEnabled === false ? "key-value-table-input-disabled" : ""
                 }`}
