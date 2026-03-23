@@ -12,6 +12,7 @@ import {
   getApiClientFeatureContext,
   useApiClientRepository,
 } from "features/apiClient/slices";
+import { LocalApiClientRecordsSync } from "features/apiClient/helpers/modules/sync/local/services/LocalApiClientRecordsSync";
 import { trackImportFailed, trackImportSuccess } from "modules/analytics/events/features/apiClient";
 import "./commonApiClientImporter.scss";
 import { SuccessfulParseView, SuccessfulParseViewProps } from "./components/SuccessfulParseView";
@@ -59,8 +60,31 @@ export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = (
     setEnvironmentsData([]);
   };
 
+  const isLocalFileSystem = apiClientRecordsRepository instanceof LocalApiClientRecordsSync;
+
   const handleImportEnvironments = useCallback(
     async (environments: EnvironmentData[]) => {
+      // For local file system workspaces, create environments sequentially to avoid
+      // IPC reply-channel race conditions (all calls share the same channel name).
+      if (isLocalFileSystem) {
+        const results: PromiseSettledResult<true>[] = [];
+        for (const environment of environments) {
+          try {
+            await dispatch(
+              createEnvironment({
+                name: environment.name,
+                variables: environment.variables,
+                repository: environmentVariablesRepository,
+              }) as any
+            ).unwrap();
+            results.push({ status: "fulfilled", value: true });
+          } catch (error) {
+            results.push({ status: "rejected", reason: error });
+          }
+        }
+        return results;
+      }
+
       const importPromises = environments.map(async (environment) => {
         await dispatch(
           createEnvironment({
@@ -74,7 +98,7 @@ export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = (
       const results = await Promise.allSettled(importPromises);
       return results;
     },
-    [dispatch, environmentVariablesRepository]
+    [dispatch, environmentVariablesRepository, isLocalFileSystem]
   );
 
   //flatten a single root collection and create mapping
