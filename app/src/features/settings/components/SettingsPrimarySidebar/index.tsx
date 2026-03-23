@@ -16,6 +16,8 @@ import { trackAppSettingsSidebarClicked } from "features/settings/analytics";
 import "./index.scss";
 import { isCompanyEmail } from "utils/mailCheckerUtils";
 import { getAvailableBillingTeams } from "store/features/billing/selectors";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import FEATURES from "config/constants/sub/features";
 
 const { PATHS } = APP_CONSTANTS;
 
@@ -59,6 +61,12 @@ export const SettingsPrimarySidebar: React.FC = () => {
             name: "Desktop settings",
             path: PATHS.SETTINGS.DESKTOP_SETTINGS.RELATIVE,
             ishidden: appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP,
+          },
+          {
+            id: "secrets",
+            name: "Secrets",
+            path: PATHS.SETTINGS.SECRETS.RELATIVE,
+            ishidden: !isFeatureCompatible(FEATURES.SECRETS_MANAGER),
           },
           {
             id: "sessionBook",

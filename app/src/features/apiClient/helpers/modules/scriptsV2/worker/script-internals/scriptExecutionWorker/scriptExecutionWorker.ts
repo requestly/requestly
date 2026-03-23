@@ -54,6 +54,7 @@ export class ScriptExecutionWorker implements ScriptExecutionWorkerInterface {
       request: executionContext.request,
       response: executionContext.response,
       variables: executionContext.variables,
+      secrets: executionContext.secrets,
     };
     this.localScope = new LocalScope(localScopeInitialState);
     this.executionMetadata = executionMetadata;

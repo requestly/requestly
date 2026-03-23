@@ -14,9 +14,11 @@ import {
   API_CLIENT_RUNNER_CONFIG_SLICE_NAME,
   API_CLIENT_LIVE_RUN_RESULTS_SLICE_NAME,
   API_CLIENT_RUN_HISTORY_SLICE_NAME,
+  SECRETS_MANAGER_SLICE_NAME,
 } from "features/apiClient/slices/common/constants";
 import { LiveRunResultsSliceState } from "features/apiClient/slices/liveRunResults/slice";
 import { RunHistorySliceState } from "features/apiClient/slices/runHistory/slice";
+import { SecretsManagerState } from "features/apiClient/slices/secrets-manager/types";
 
 export interface ApiClientStoreState {
   [API_CLIENT_RECORDS_SLICE_NAME]: ApiRecordsState;
@@ -26,6 +28,7 @@ export interface ApiClientStoreState {
   [API_CLIENT_RUNNER_CONFIG_SLICE_NAME]: RunnerConfigState;
   [API_CLIENT_LIVE_RUN_RESULTS_SLICE_NAME]: LiveRunResultsSliceState;
   [API_CLIENT_RUN_HISTORY_SLICE_NAME]: RunHistorySliceState;
+  [SECRETS_MANAGER_SLICE_NAME]: SecretsManagerState;
 }
 
 export type ApiClientStore = Store<ApiClientStoreState>;

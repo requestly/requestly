@@ -19,7 +19,16 @@ import { NoopContextId } from "features/apiClient/commands/utils";
 import { createPortal } from "react-dom";
 import { DynamicVariableInfoPopover } from "features/apiClient/screens/environment/components/DynamicVariableInfoPopover/DynamicVariableInfoPopover";
 import { DynamicVariable } from "lib/dynamic-variables/types";
-import { getVariable, checkIsDynamicVariable } from "features/apiClient/helpers/variableResolver/variableHelper";
+import {
+  getVariable,
+  checkIsDynamicVariable,
+  checkIsSecretsVariable,
+} from "features/apiClient/helpers/variableResolver/variableHelper";
+import { SecretVariable } from "lib/secret-variables/types";
+import { SecretsVariableInfo } from "features/apiClient/screens/environment/components/SecretsVariableInfoPopover/Index";
+import SecretVariableNotFound from "./components/SecretVariableNotFound";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import FEATURES from "config/constants/sub/features";
 
 type VariableData = ScopedVariable[0];
 
@@ -62,12 +71,17 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
   const isNoopContext = workspaceId === NoopContextId;
 
   // Extract base variable name for dynamic variables with arguments (e.g., "$randomInt 0 100" -> "$randomInt")
-  const baseVariableName = hoveredVariable.split(" ")[0] || hoveredVariable;
+  const baseVariableName = hoveredVariable.startsWith("$")
+    ? hoveredVariable.split(" ")[0] || hoveredVariable
+    : hoveredVariable;
   const variableData = getVariable(baseVariableName, variables);
 
   const [currentView, setCurrentView] = useState<PopoverView>(() => {
     return variableData ? PopoverView.VARIABLE_INFO : PopoverView.NOT_FOUND;
   });
+
+  const hoveredOnUnDeclaredSecretVariable =
+    !variableData && hoveredVariable?.startsWith("secrets:") && isFeatureCompatible(FEATURES.SECRETS_MANAGER);
 
   const transitionToView = useCallback(
     (nextView: PopoverView) => {
@@ -116,6 +130,8 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
   }, [transitionToView, onClose, onPinChange]);
 
   const isDynamicVariable: boolean = !!variableData && checkIsDynamicVariable(variableData);
+  const isSecretsVariable: boolean =
+    !!variableData && checkIsSecretsVariable(variableData) && isFeatureCompatible(FEATURES.SECRETS_MANAGER);
 
   const popoverContent = (() => {
     switch (currentView) {
@@ -125,31 +141,37 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
 
       case PopoverView.VARIABLE_INFO: {
         if (!variableData) return null;
+        if (isDynamicVariable) {
+          return <DynamicVariableInfoPopover variable={variableData as DynamicVariable} showIconHeader />;
+        }
+        if (isSecretsVariable) {
+          return <SecretsVariableInfo variable={variableData as SecretVariable} />;
+        }
         return (
-          <>
-            {isDynamicVariable ? (
-              <DynamicVariableInfoPopover variable={variableData as DynamicVariable} showIconHeader />
-            ) : (
-              <VariableInfo
-                params={{
-                  name: hoveredVariable,
-                  variable: variableData as ScopedVariable,
-                }}
-                onEditClick={handleEditClick}
-                isNoopContext={isNoopContext}
-              />
-            )}
-          </>
+          <VariableInfo
+            params={{
+              name: hoveredVariable,
+              variable: variableData as ScopedVariable,
+            }}
+            onEditClick={handleEditClick}
+            isNoopContext={isNoopContext}
+          />
         );
       }
 
       case PopoverView.NOT_FOUND: {
         return (
-          <VariableNotFound
-            isNoopContext={isNoopContext}
-            onSwitchEnvironment={handleSwitchEnvironment}
-            onCreateClick={handleCreateClick}
-          />
+          <>
+            {hoveredOnUnDeclaredSecretVariable ? (
+              <SecretVariableNotFound />
+            ) : (
+              <VariableNotFound
+                isNoopContext={isNoopContext}
+                onSwitchEnvironment={handleSwitchEnvironment}
+                onCreateClick={handleCreateClick}
+              />
+            )}
+          </>
         );
       }
 
@@ -158,7 +180,7 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
       }
 
       case PopoverView.EDIT_FORM: {
-        if (!variableData) return null;
+        if (!variableData || isSecretsVariable) return null;
         const [variable, source] = variableData as ScopedVariable;
         return (
           <EditVariableView

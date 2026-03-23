@@ -142,6 +142,9 @@ const processScripts = (item: any) => {
       }
     );
 
+    // Replace pm.vault with rq.secrets (before general pm. replacement)
+    script = script.replace(/pm\.vault\./g, "rq.secrets.");
+
     // General pm. → rq. replacement (for other methods)
     script = script.replace(/pm\./g, "rq.");
 
