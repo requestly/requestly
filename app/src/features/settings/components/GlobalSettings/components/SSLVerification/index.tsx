@@ -15,10 +15,15 @@ export const isSSLVerificationEnabled = (): boolean => {
 };
 
 const persistSSLPreferenceToMainProcess = (enabled: boolean) => {
-  window?.RQ?.DESKTOP?.SERVICES?.IPC?.invokeEventInMain("rq-storage:storage-action", {
+  const invokeEventInMain = window?.RQ?.DESKTOP?.SERVICES?.IPC?.invokeEventInMain;
+  if (!invokeEventInMain) {
+    console.warn("IPC invokeEventInMain is not available. Cannot persist SSL verification preference to main process.");
+    return;
+  }
+  invokeEventInMain("rq-storage:storage-action", {
     type: "USER_PREFERENCE:UPDATE_SSL_VERIFICATION",
     payload: { data: { isSslVerificationEnabled: enabled } },
-  }).catch((error: any) => {
+  }).catch((error: unknown) => {
     console.warn("Failed to persist SSL verification preference to main process", error);
   });
 };
