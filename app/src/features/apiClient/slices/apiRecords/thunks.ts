@@ -89,30 +89,45 @@ export const deleteRecords = createAsyncThunk<
     const [collectionRecords, exampleRecords] = partition(nonApiRecords, isApiCollection);
     const apiRecordIds = apiRecords.map((record) => record.id);
     const collectionRecordIds = collectionRecords.map((record) => record.id);
-
-    const recordsDeletionResult = await repository.deleteRecords(apiRecordIds);
-    const collectionsDeletionResult = await repository.deleteCollections(collectionRecordIds);
-    const exampleRecordsDeletionResult = await repository.deleteExamples(exampleRecords as RQAPI.ExampleApiRecord[]);
-
-    if (!recordsDeletionResult.success || !collectionsDeletionResult.success || !exampleRecordsDeletionResult.success) {
-      return rejectWithValue(
-        recordsDeletionResult.message ??
-          collectionsDeletionResult.message ??
-          exampleRecordsDeletionResult.message ??
-          "Failed to delete records"
-      );
-    }
-
     const exampleRecordIds = exampleRecords.map((record) => record.id);
-    dispatch(apiRecordsActions.recordsDeleted([...apiRecordIds, ...collectionRecordIds, ...exampleRecordIds]));
 
-    return {
-      recordsDeletionResult,
-      collectionsDeletionResult,
-      deletedApiRecords: apiRecords as RQAPI.ApiRecord[],
-      deletedCollectionRecords: collectionRecords as RQAPI.CollectionRecord[],
-      deletedExampleRecords: exampleRecords as RQAPI.ExampleApiRecord[],
-    };
+    // Optimistically remove from store immediately for instant UI feedback
+    const allRecordIds = [...apiRecordIds, ...collectionRecordIds, ...exampleRecordIds];
+    dispatch(apiRecordsActions.recordsDeleted(allRecordIds));
+
+    try {
+      const recordsDeletionResult = await repository.deleteRecords(apiRecordIds);
+      const collectionsDeletionResult = await repository.deleteCollections(collectionRecordIds);
+      const exampleRecordsDeletionResult = await repository.deleteExamples(exampleRecords as RQAPI.ExampleApiRecord[]);
+
+      if (
+        !recordsDeletionResult.success ||
+        !collectionsDeletionResult.success ||
+        !exampleRecordsDeletionResult.success
+      ) {
+        // Restore records on failure
+        dispatch(apiRecordsActions.upsertRecords(recordsToBeDeleted));
+
+        return rejectWithValue(
+          recordsDeletionResult.message ??
+            collectionsDeletionResult.message ??
+            exampleRecordsDeletionResult.message ??
+            "Failed to delete records"
+        );
+      }
+
+      return {
+        recordsDeletionResult,
+        collectionsDeletionResult,
+        deletedApiRecords: apiRecords as RQAPI.ApiRecord[],
+        deletedCollectionRecords: collectionRecords as RQAPI.CollectionRecord[],
+        deletedExampleRecords: exampleRecords as RQAPI.ExampleApiRecord[],
+      };
+    } catch (error) {
+      // Restore records on exception
+      dispatch(apiRecordsActions.upsertRecords(recordsToBeDeleted));
+      throw error;
+    }
   },
   {
     condition: async ({ records }) => {
