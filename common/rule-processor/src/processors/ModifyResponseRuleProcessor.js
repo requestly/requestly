@@ -12,8 +12,12 @@ class ModifyResponseRuleProcessor {
     const resultingUrl = RuleHelper.matchUrlWithRulePair(pair, requestURL, details);
     if (resultingUrl === null) return null;
 
-    if (!pair.response || !pair.response.type || !pair.response.value) return null;
+    // Allow rules that only modify status code without requiring response body
+    // Don't return null if response exists (even without type)
+    if (!pair.response) return null;
 
+    // At least one of: response value, status code, or serveWithoutRequest must be specified
+    if (!pair.response.value && !pair.response.statusCode && !pair.response.serveWithoutRequest) return null;
     return {
       action: "modify_response",
       response: isResponseTypeLocalFile ? resultingUrl : pair.response.value,

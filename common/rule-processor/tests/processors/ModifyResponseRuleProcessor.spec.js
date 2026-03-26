@@ -54,4 +54,27 @@ describe("ModifyResponseRuleProcessor:", function () {
     expect(response).not.toBeNull();
     expect(response.statusCode).toEqual("202");
   });
+
+  it("should allow modifying only status code without response body", function () {
+    modifyResponseRule.pairs[0].response.value = "";
+    modifyResponseRule.pairs[0].response.statusCode = "404";
+    const response = ModifyResponseRuleProcessor.process({
+      rule: modifyResponseRule,
+      requestURL: URL_SOURCES.TESTHEADERS,
+    });
+    expect(response).not.toBeNull();
+    expect(response.statusCode).toEqual("404");
+    expect(response.response).toEqual("");
+  });
+
+  it("should return null when no response value, status code, or serveWithoutRequest is specified", function () {
+    modifyResponseRule.pairs[0].response.value = "";
+    modifyResponseRule.pairs[0].response.statusCode = "";
+    modifyResponseRule.pairs[0].response.serveWithoutRequest = false;
+    const response = ModifyResponseRuleProcessor.process({
+      rule: modifyResponseRule,
+      requestURL: URL_SOURCES.TESTHEADERS,
+    });
+    expect(response).toBeNull();
+  });
 });
