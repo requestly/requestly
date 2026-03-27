@@ -1,11 +1,11 @@
-import React, { useMemo, useRef, useState } from "react";
-import { Badge, Collapse, Spin, Tabs } from "antd";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Badge, Collapse, Spin, Tabs, Typography } from "antd";
 import {
   CurrentlyExecutingRequest,
   LiveRunResult,
   RequestExecutionResult,
   RunResult,
-} from "features/apiClient/store/collectionRunResult/runResult.store";
+} from "features/apiClient/slices/common/runResults/types";
 import { getAllTestSummary, getRunMetrics, TestSummary } from "features/apiClient/store/collectionRunResult/utils";
 import { TestResultItem } from "../../../../../../response/TestsView/components/TestResult/TestResult";
 import { RQAPI } from "features/apiClient/types";
@@ -14,18 +14,21 @@ import {
   HttpMethodIcon,
 } from "features/apiClient/screens/apiClient/components/sidebar/components/collectionsList/requestRow/RequestRow";
 import { EmptyState } from "../../EmptyState/EmptyState";
-import { useRunResultStore } from "../../../run.context";
 import { LoadingOutlined } from "@ant-design/icons";
 import { MdOutlineArrowForwardIos } from "@react-icons/all-files/md/MdOutlineArrowForwardIos";
-import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
-import { RequestViewTabSource } from "../../../../../../RequestView/requestViewTabSource";
-import { useApiClientFeatureContext } from "features/apiClient/contexts/meta";
 import "./runResultContainer.scss";
 import { getFormattedStartTime, getFormattedTime } from "../utils";
 import { MdOutlineWarningAmber } from "@react-icons/all-files/md/MdOutlineWarningAmber";
-import { RQTooltip } from "lib/design-system-v2/components";
 import { useVirtualizer } from "@tanstack/react-virtual";
-import NetworkStatusField from "components/misc/NetworkStatusField";
+import { useWorkspaceId } from "features/apiClient/common/WorkspaceProvider";
+import { useCollectionView } from "../../../../../collectionView.context";
+import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
+import { selectLiveRunResultCurrentlyExecutingRequest } from "features/apiClient/slices/liveRunResults/selectors";
+import { RunResultDetailedView } from "../RunResultDetailedView/RunResultDetailedView";
+import { RequestDetailsHeader } from "./RequestDetailsHeader";
+import Split from "react-split";
+import { getEventByExecutionId } from "store/slices/eventsStream/selectors";
+import { useSelector } from "react-redux/es/hooks/useSelector";
 
 enum RunResultTabKey {
   ALL = "all",
@@ -85,82 +88,60 @@ const RunningRequestPlaceholder: React.FC<{
 
 const TestDetails: React.FC<{
   requestExecutionResult: RequestExecutionResult;
-}> = React.memo(({ requestExecutionResult }) => {
-  const context = useApiClientFeatureContext();
-  const [openTab] = useTabServiceWithSelector((s) => [s.openTab]);
+  onDetailsClick: (result: RequestExecutionResult) => void;
+  selectedRequestExId?: string;
+}> = React.memo(({ requestExecutionResult, onDetailsClick, selectedRequestExId }) => {
+  const workspaceId = useWorkspaceId();
 
-  const responseDetails = useMemo(() => {
-    return (
-      <div className="response-details">
-        <span className="response-time">{Math.round(requestExecutionResult.entry.responseTime)}ms</span>
-        {requestExecutionResult.entry.statusCode ? (
-          <NetworkStatusField
-            status={requestExecutionResult.entry.statusCode}
-            statusText={requestExecutionResult.entry.statusText}
-          />
-        ) : null}
-      </div>
-    );
-  }, [
-    requestExecutionResult.entry.responseTime,
-    requestExecutionResult.entry.statusCode,
-    requestExecutionResult.entry.statusText,
-  ]);
+  const events = useSelector((state) =>
+    requestExecutionResult?.executionId ? getEventByExecutionId(requestExecutionResult.executionId)(state as any) : []
+  );
+  const requestEvent = useMemo(() => events.find((e) => e.data.type === "REQUEST"), [events]);
 
-  const requestNameDetails = useMemo(() => {
-    return (
-      <>
-        <span className="collection-name" title={requestExecutionResult.collectionName}>
-          {requestExecutionResult.collectionName} /
-        </span>
-        <span
-          className="request-name"
-          title={requestExecutionResult.recordName}
-          onClick={() => {
-            openTab(
-              new RequestViewTabSource({
-                id: requestExecutionResult.recordId,
-                title: requestExecutionResult.recordName,
-                context: {
-                  id: context.id,
-                },
-              })
-            );
-          }}
-        >
-          {requestExecutionResult.recordName}
-        </span>
-      </>
-    );
-  }, [
-    context.id,
-    openTab,
-    requestExecutionResult.collectionName,
-    requestExecutionResult.recordId,
-    requestExecutionResult.recordName,
-  ]);
+  const requestUrl = useMemo(() => {
+    if (!requestEvent) return null;
+    const request = requestEvent.data.payload as RQAPI.Request;
+    if (request.url) {
+      return request.url;
+    }
+    return null;
+  }, [requestEvent]);
 
+  const isSelected = selectedRequestExId === requestExecutionResult?.executionId;
   return (
-    <div className="test-details-container">
-      <div className="request-details">
-        <span className="icon">
-          {requestExecutionResult.entry.type === RQAPI.ApiEntryType.GRAPHQL ? (
-            <GraphQlIcon />
-          ) : (
-            <HttpMethodIcon method={requestExecutionResult.entry.method} />
-          )}
-        </span>
-        {requestNameDetails}
-        {responseDetails}
-      </div>
+    <div
+      className={`test-details-container ${isSelected ? "selected" : ""}`}
+      onClick={() => onDetailsClick(requestExecutionResult)}
+    >
+      <RequestDetailsHeader
+        requestExecutionResult={requestExecutionResult}
+        workspaceId={workspaceId || null}
+        clickable={true}
+        showFullPath={true}
+      />
+      {requestUrl && (
+        <div className="request-url">
+          <span className="url-text" title={requestUrl}>
+            {requestUrl}
+          </span>
+        </div>
+      )}
 
       {requestExecutionResult.status?.value === RQAPI.ExecutionStatus["ERROR"] ? (
-        <RQTooltip title={requestExecutionResult.status.error.message || "Something went wrong!"}>
-          <div className="execution-error-message">
-            <MdOutlineWarningAmber />
-            <span className="message">{requestExecutionResult.status.error.message || "Something went wrong!"}</span>
-          </div>
-        </RQTooltip>
+        <div className="execution-error-message">
+          <MdOutlineWarningAmber />
+          <Typography.Paragraph
+            className="message"
+            ellipsis={{
+              tooltip: {
+                title: requestExecutionResult.status.error.message || "Something went wrong!",
+                overlayClassName: "rq-tooltip",
+              },
+            }}
+          >
+            {requestExecutionResult.status.error.message || "Something went wrong!"}
+          </Typography.Paragraph>
+        </div>
       ) : requestExecutionResult?.testResults?.length === 0 ? (
         <div className="no-test-found-message">
           <i>No test found</i>
@@ -180,19 +161,20 @@ const TestResultList: React.FC<{
   tabKey: RunResultTabKey;
   results: TestSummary;
   totalIterationCount?: number;
-}> = ({ tabKey, results, totalIterationCount }) => {
-  const [currentlyExecutingRequest] = useRunResultStore((s) => [s.currentlyExecutingRequest]);
+  onDetailsClick: (result: RequestExecutionResult) => void;
+  selectedRequestExId?: string;
+}> = ({ tabKey, results, totalIterationCount, onDetailsClick, selectedRequestExId }) => {
+  const { collectionId } = useCollectionView();
+  const currentlyExecutingRequest = useApiClientSelector((state) =>
+    selectLiveRunResultCurrentlyExecutingRequest(state, collectionId)
+  );
+
   const parentRef = useRef<HTMLDivElement>(null);
   const resultsToShow = useMemo(() => Array.from(results), [results]);
 
-  // Initialize with all iterations expanded by default
   const [expandedKeys, setExpandedKeys] = useState<Set<number>>(() => {
-    if (!totalIterationCount) {
-      return new Set(resultsToShow.map(([iteration]) => iteration));
-    } else {
-      // fill the set with iteration numbers from 1 to totalIterationCount
-      return new Set(new Array(totalIterationCount).fill(0).map((_, idx) => idx + 1));
-    }
+    const iterationCount = totalIterationCount || resultsToShow.length;
+    return new Set(Array.from({ length: iterationCount }, (_, idx) => idx + 1));
   });
 
   const currentRunningRequest = currentlyExecutingRequest ? (
@@ -228,11 +210,18 @@ const TestResultList: React.FC<{
   }
 
   // For single iteration, render without virtualization
-  if (results.size === 1) {
+  if (results.size === 1 && resultsToShow[0]) {
     return (
       <div className="tests-results-view-container">
         {resultsToShow[0][1].map(({ requestExecutionResult }) => {
-          return <TestDetails key={requestExecutionResult.recordId} requestExecutionResult={requestExecutionResult} />;
+          return (
+            <TestDetails
+              key={requestExecutionResult.recordId}
+              requestExecutionResult={requestExecutionResult}
+              onDetailsClick={onDetailsClick}
+              selectedRequestExId={selectedRequestExId}
+            />
+          );
         })}
         {currentRunningRequest}
       </div>
@@ -252,7 +241,10 @@ const TestResultList: React.FC<{
         }}
       >
         {items.map((virtualItem) => {
-          const [iteration, details] = resultsToShow[virtualItem.index];
+          const result = resultsToShow[virtualItem.index];
+          if (!result) return null;
+
+          const [iteration, details] = result;
           const isCurrentIteration = iteration === currentlyExecutingRequest?.iteration;
 
           return (
@@ -283,6 +275,8 @@ const TestResultList: React.FC<{
                     <TestDetails
                       key={requestExecutionResult.recordId}
                       requestExecutionResult={requestExecutionResult}
+                      onDetailsClick={onDetailsClick}
+                      selectedRequestExId={selectedRequestExId}
                     />
                   ))}
                   {isCurrentIteration ? currentRunningRequest : null}
@@ -303,7 +297,19 @@ const TestResultTabTitle: React.FC<{ title: string; count: number; loading?: boo
 }) => {
   return (
     <div className="test-result-tab-title">
-      <span className="title">{title}</span> <Badge size="small" count={loading ? "..." : count} />
+      <span className={`title ${title?.toLowerCase()}`}>{title}</span>{" "}
+      <Badge size="small" count={loading ? "..." : count} className={`${title?.toLowerCase()}`} />
+    </div>
+  );
+};
+
+export const EmptyRunResultContainer: React.FC = () => {
+  return (
+    <div className="run-result-view-details">
+      <EmptyState
+        title="No test result found"
+        description="Please add test cases in scripts tab and run them to see results."
+      />
     </div>
   );
 };
@@ -313,8 +319,25 @@ export const RunResultContainer: React.FC<{
   result: LiveRunResult | RunResult;
   running?: boolean;
   totalIterationCount?: number;
-}> = ({ ranAt, result, running = false, totalIterationCount }) => {
+  isDetailedViewOpen?: boolean;
+  onToggleDetailedView?: (open: boolean) => void;
+}> = ({ ranAt, result, running = false, totalIterationCount, isDetailedViewOpen, onToggleDetailedView }) => {
   const [activeTab, setActiveTab] = useState<RunResultTabKey>(RunResultTabKey.ALL);
+  const [selectedRequest, setSelectedRequest] = useState<RequestExecutionResult | null>(null);
+  const [userHasInteracted, setUserHasInteracted] = useState(false);
+  const workspaceId = useWorkspaceId() || null;
+
+  // Derive showDetailedView from selectedRequest and isDetailedViewOpen
+  const showDetailedView = selectedRequest !== null && isDetailedViewOpen !== false;
+
+  // Sync local state when parent's isDetailedViewOpen changes
+  useEffect(() => {
+    if (isDetailedViewOpen === false) {
+      setSelectedRequest(null);
+      setUserHasInteracted(false);
+      setActiveTab(RunResultTabKey.ALL);
+    }
+  }, [isDetailedViewOpen]);
 
   const metrics = useMemo(() => {
     return getRunMetrics(result.iterations);
@@ -323,6 +346,69 @@ export const RunResultContainer: React.FC<{
   const summary = useMemo(() => {
     return getAllTestSummary(result.iterations);
   }, [result.iterations]);
+
+  // Get the current tab's results
+  const getCurrentTabResults = (tab: RunResultTabKey) => {
+    switch (tab) {
+      case RunResultTabKey.ALL:
+        return summary.totalTests;
+      case RunResultTabKey.PASSED:
+        return summary.successTests;
+      case RunResultTabKey.FAILED:
+        return summary.failedTests;
+      case RunResultTabKey.SKIPPED:
+        return summary.skippedTests;
+      default:
+        return new Map();
+    }
+  };
+
+  // Auto-select first result when tab changes (only if user has previously interacted)
+  const handleTabChange = (newTab: RunResultTabKey) => {
+    setActiveTab(newTab);
+
+    if (!userHasInteracted) return;
+
+    const tabResults = getCurrentTabResults(newTab);
+
+    if (tabResults.size === 0) {
+      setSelectedRequest(null);
+    } else {
+      // Select first result from the first iteration
+      const firstIterationResults = Array.from(tabResults.values())[0];
+      if (firstIterationResults && firstIterationResults.length > 0) {
+        const firstResult = firstIterationResults[0]?.requestExecutionResult;
+        if (firstResult) {
+          setSelectedRequest(firstResult);
+          onToggleDetailedView?.(true);
+        }
+      }
+    }
+  };
+
+  // Calculate split sizes based on whether a request is selected
+  const splitSizes = useMemo(() => {
+    return showDetailedView && selectedRequest ? [50, 50] : [100, 0];
+  }, [showDetailedView, selectedRequest]);
+
+  const minSplitSizes = useMemo(() => {
+    return showDetailedView && selectedRequest ? [500, 500] : [500, 0];
+  }, [showDetailedView, selectedRequest]);
+
+  const handleDetailsClick = useCallback(
+    (requestResult: RequestExecutionResult) => {
+      setSelectedRequest(requestResult);
+      setUserHasInteracted(true);
+      onToggleDetailedView?.(true);
+    },
+    [onToggleDetailedView]
+  );
+
+  const handlePanelClose = () => {
+    setSelectedRequest(null);
+    setUserHasInteracted(false);
+    onToggleDetailedView?.(false);
+  };
 
   const runMetrics = useMemo(() => {
     const { totalDuration, avgResponseTime } = metrics;
@@ -343,6 +429,32 @@ export const RunResultContainer: React.FC<{
     ];
   }, [metrics, ranAt]);
 
+  const headerBreadcrumb = useMemo(() => {
+    if (!selectedRequest) return null;
+
+    return (
+      <RequestDetailsHeader
+        requestExecutionResult={selectedRequest}
+        workspaceId={workspaceId}
+        clickable={false}
+        showFullPath={false}
+        showNetworkDetails={false}
+        breadCrumbSeperator="/"
+      />
+    );
+  }, [selectedRequest, workspaceId]);
+
+  const MetricsHeader = () => (
+    <div className="result-header">
+      {runMetrics.map((data, index) => (
+        <div key={index} className="run-metric">
+          <span className="label">{data.label}:</span>
+          <span className="value">{data.value}</span>
+        </div>
+      ))}
+    </div>
+  );
+
   const tabItems = useMemo(() => {
     return [
       {
@@ -353,6 +465,8 @@ export const RunResultContainer: React.FC<{
             tabKey={RunResultTabKey.ALL}
             results={summary.totalTests}
             totalIterationCount={totalIterationCount}
+            onDetailsClick={handleDetailsClick}
+            selectedRequestExId={selectedRequest?.executionId}
           />
         ),
       },
@@ -364,6 +478,8 @@ export const RunResultContainer: React.FC<{
             tabKey={RunResultTabKey.PASSED}
             results={summary.successTests}
             totalIterationCount={totalIterationCount}
+            onDetailsClick={handleDetailsClick}
+            selectedRequestExId={selectedRequest?.executionId}
           />
         ),
       },
@@ -375,6 +491,8 @@ export const RunResultContainer: React.FC<{
             tabKey={RunResultTabKey.FAILED}
             results={summary.failedTests}
             totalIterationCount={totalIterationCount}
+            onDetailsClick={handleDetailsClick}
+            selectedRequestExId={selectedRequest?.executionId}
           />
         ),
       },
@@ -386,6 +504,8 @@ export const RunResultContainer: React.FC<{
             tabKey={RunResultTabKey.SKIPPED}
             results={summary.skippedTests}
             totalIterationCount={totalIterationCount}
+            onDetailsClick={handleDetailsClick}
+            selectedRequestExId={selectedRequest?.executionId}
           />
         ),
       },
@@ -401,27 +521,21 @@ export const RunResultContainer: React.FC<{
     summary.skippedTestsCounts,
     summary.skippedTests,
     totalIterationCount,
+    handleDetailsClick,
+    selectedRequest,
   ]);
 
   return (
-    <div className="run-result-view-details">
-      {result.iterations.size === 0 ? (
-        <EmptyState
-          title="No test result found"
-          description="Please add test cases in scripts tab and run them to see results."
-        />
-      ) : (
-        <>
-          <div className="result-header">
-            {runMetrics.map((data, index) => {
-              return (
-                <div key={index} className="run-metric">
-                  <span className="label">{data.label}:</span>
-                  <span className="value">{data.value}</span>
-                </div>
-              );
-            })}
-          </div>
+    <div className="run-result-view-details-wrapper">
+      <Split
+        direction="horizontal"
+        sizes={splitSizes}
+        minSize={minSplitSizes}
+        gutterSize={selectedRequest ? 4 : 0}
+        className="run-result-split-container"
+      >
+        <div className="run-result-view-details">
+          {!showDetailedView && <MetricsHeader />}
           <div className="result-tabs-container">
             <Tabs
               moreIcon={null}
@@ -429,12 +543,30 @@ export const RunResultContainer: React.FC<{
               animated={false}
               activeKey={activeTab}
               destroyInactiveTabPane={true}
-              onChange={(activeKey) => setActiveTab(activeKey as RunResultTabKey)}
+              onChange={(activeKey) => handleTabChange(activeKey as RunResultTabKey)}
               className="test-result-tabs"
             />
           </div>
-        </>
-      )}
+        </div>
+        <div className="run-result-detail-panel-container">
+          {showDetailedView && (
+            <>
+              <div className="run-result-view-details right-panel-opened">
+                <MetricsHeader />
+              </div>
+              <div className="run-result-details">
+                {showDetailedView && selectedRequest && (
+                  <RunResultDetailedView
+                    onClose={handlePanelClose}
+                    executionId={selectedRequest.executionId}
+                    headerBreadcrumb={headerBreadcrumb}
+                  />
+                )}
+              </div>
+            </>
+          )}
+        </div>
+      </Split>
     </div>
   );
 };

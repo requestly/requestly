@@ -1,20 +1,23 @@
-import React, { useCallback, useMemo } from "react";
-import { useApiClientFileStore } from "features/apiClient/store/apiClientFilesStore";
-import { RQButton, RQTooltip } from "lib/design-system-v2/components";
-import { MdOutlineRemoveRedEye } from "@react-icons/all-files/md/MdOutlineRemoveRedEye";
 import { BiError } from "@react-icons/all-files/bi/BiError";
-import { getFileExtension, truncateString } from "features/apiClient/screens/apiClient/utils";
-import { RxCross2 } from "@react-icons/all-files/rx/RxCross2";
-import { useRunConfigStore } from "../../../run.context";
 import { MdOutlineFileUpload } from "@react-icons/all-files/md/MdOutlineFileUpload";
 import { MdOutlineInfo } from "@react-icons/all-files/md/MdOutlineInfo";
-import { useCollectionRunnerFileSelection } from "../hooks/useCollectionRunnerFileSelection.hook";
-import { DataFileModalWrapper } from "../ParseFileModal/Modals/DataFileModalWrapper";
-import { DataFileModalViewMode, useDataFileModalContext } from "../ParseFileModal/Modals/DataFileModalContext";
+import { MdOutlineRemoveRedEye } from "@react-icons/all-files/md/MdOutlineRemoveRedEye";
+import { RxCross2 } from "@react-icons/all-files/rx/RxCross2";
+import { API_CLIENT_DOCS } from "features/apiClient/constants";
+import { getFileExtension, truncateString } from "features/apiClient/screens/apiClient/utils";
+import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
+import { useApiClientFileStore } from "features/apiClient/store/apiClientFilesStore";
+import { RQButton, RQTooltip } from "lib/design-system-v2/components";
 import {
   trackCollectionRunnerFileCleared,
   trackCollectionRunnerSelectFileClicked,
 } from "modules/analytics/events/features/apiClient";
+import React, { useCallback, useMemo } from "react";
+import { isDesktopMode } from "utils/AppUtils";
+import { useCollectionView } from "../../../../../collectionView.context";
+import { useCollectionRunnerFileSelection } from "../hooks/useCollectionRunnerFileSelection.hook";
+import { DataFileModalViewMode, useDataFileModalContext } from "../ParseFileModal/Modals/DataFileModalContext";
+import { DataFileModalWrapper } from "../ParseFileModal/Modals/DataFileModalWrapper";
 
 export const DataFileSelector: React.FC = () => {
   const {
@@ -26,21 +29,24 @@ export const DataFileSelector: React.FC = () => {
     setShowModal,
   } = useDataFileModalContext();
 
-  const [dataFile, removeDataFile, setIterations] = useRunConfigStore((s) => [
-    s.dataFile,
-    s.removeDataFile,
-    s.setIterations,
-  ]);
+  const { bufferedEntity } = useCollectionView();
+
+  const dataFile = useApiClientSelector((state) => bufferedEntity.getDataFile(state));
+
+  const isDesktop = useMemo(isDesktopMode, []);
+
   const [getFilesByIds, isFilePresentLocally, storeFiles] = useApiClientFileStore((s) => [
     s.getFilesByIds,
     s.isFilePresentLocally,
     s.files,
   ]);
+
   const file = useMemo(
     () => {
       if (!dataFile) {
         return null;
       }
+
       return getFilesByIds([dataFile?.id])?.[0] ?? null;
     },
 
@@ -48,6 +54,7 @@ export const DataFileSelector: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [dataFile?.id, getFilesByIds, storeFiles]
   );
+
   const { openFileSelector } = useCollectionRunnerFileSelection();
 
   const handleFileSelection = useCallback(() => {
@@ -63,13 +70,13 @@ export const DataFileSelector: React.FC = () => {
 
   const handleRemoveFile = useCallback(() => {
     setDataFileMetadata(null);
-    removeDataFile();
-    setIterations(1);
-  }, [removeDataFile, setDataFileMetadata, setIterations]);
+    bufferedEntity.removeDataFile();
+    bufferedEntity.setIterations(1);
+  }, [bufferedEntity, setDataFileMetadata]);
 
   const handleViewExistingFile = useCallback(async () => {
-    if (dataFile) {
-      const isFilePresent = await isFilePresentLocally(dataFile.id);
+    if (file) {
+      const isFilePresent = await isFilePresentLocally(file.id);
       if (!isFilePresent) {
         // setting view mode to rerender and show error state through isValud
         setViewMode(DataFileModalViewMode.ERROR);
@@ -77,28 +84,54 @@ export const DataFileSelector: React.FC = () => {
       }
 
       setDataFileMetadata({
-        name: dataFile.name,
-        path: dataFile.path,
-        size: dataFile.size,
+        name: file.name,
+        path: file.path,
+        size: file.size,
       });
       setShowModal(true);
-      parseFile(dataFile.path, false);
+      parseFile(file.path, false);
     }
-  }, [dataFile, isFilePresentLocally, setDataFileMetadata, setShowModal, parseFile, setViewMode]);
+  }, [file, isFilePresentLocally, setDataFileMetadata, setShowModal, parseFile, setViewMode]);
+
+  const selectFileButton = (
+    <RQButton
+      size="small"
+      icon={<MdOutlineFileUpload />}
+      disabled={!isDesktop}
+      onClick={() => {
+        handleFileSelection();
+      }}
+    >
+      Select file
+    </RQButton>
+  );
 
   return (
     <>
-      {!dataFile ? (
+      {!file ? (
         <>
-          <RQButton
-            size="small"
-            icon={<MdOutlineFileUpload />}
-            onClick={() => {
-              handleFileSelection();
-            }}
-          >
-            Select file
-          </RQButton>
+          {isDesktop ? (
+            selectFileButton
+          ) : (
+            <RQTooltip
+              title={
+                <>
+                  This feature is only available in Desktop App.{" "}
+                  <a
+                    href={API_CLIENT_DOCS.COLLECTION_RUNNER_DATA_FILE}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="tooltip-link"
+                  >
+                    Learn more
+                  </a>
+                </>
+              }
+              placement="top"
+            >
+              <span>{selectFileButton}</span>
+            </RQTooltip>
+          )}
 
           <div className="file-upload-info">
             <MdOutlineInfo className="file-info-icon" />
@@ -137,7 +170,7 @@ export const DataFileSelector: React.FC = () => {
               }}
               type="transparent"
             >
-              {dataFile && <RxCross2 />}
+              {file && <RxCross2 />}
             </RQButton>
           </RQTooltip>
         </div>

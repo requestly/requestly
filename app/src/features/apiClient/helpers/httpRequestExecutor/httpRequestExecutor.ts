@@ -3,7 +3,7 @@ import { HttpRequestPreparationService } from "./httpRequestPreparationService";
 import { HttpRequestValidationService } from "./httpRequestValidationService";
 import { UserAbortError } from "../../errors/UserAbortError/UserAbortError";
 import { trackRequestFailed } from "modules/analytics/events/features/apiClient";
-import { makeRequest } from "../../screens/apiClient/utils";
+import { makeRequest, queryParamsToURLString } from "../../screens/apiClient/utils";
 import { DEFAULT_SCRIPT_VALUES } from "../../constants";
 import {
   trackScriptExecutionCompleted,
@@ -18,9 +18,11 @@ import { Ok, Result, Try } from "utils/try";
 import { NativeError } from "errors/NativeError";
 import { WorkResult, WorkResultType } from "../modules/scriptsV2/workloadManager/workLoadTypes";
 import { BaseExecutionContext, ExecutionContext, ScriptExecutionContext } from "./scriptExecutionContext";
-import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 import { APIClientWorkloadManager } from "../modules/scriptsV2/workloadManager/APIClientWorkloadManager";
 import { BaseExecutionMetadata, IterationContext } from "../modules/scriptsV2/worker/script-internals/types";
+import { ApiClientFeatureContext, selectRecordById } from "features/apiClient/slices";
+import { APIEventLogger } from "lib/eventStream/APILogger";
+import { v4 } from "uuid";
 
 enum RQErrorHeaderValue {
   DNS_RESOLUTION_ERROR = "ERR_NAME_NOT_RESOLVED",
@@ -41,6 +43,7 @@ function buildExecutionErrorObject(error: any, source: string, type: RQAPI.ApiCl
     source,
     name: error.name || "Error",
     message: error.message,
+    stack: error?.stack,
   };
 
   if (error.context?.reason) {
@@ -54,8 +57,13 @@ function buildExecutionErrorObject(error: any, source: string, type: RQAPI.ApiCl
   return errorObject;
 }
 
-function buildErroredExecutionResult(entry: RQAPI.HttpApiEntry, error: RQAPI.ExecutionError): RQAPI.ExecutionResult {
+function buildErroredExecutionResult(
+  entry: RQAPI.HttpApiEntry,
+  error: RQAPI.ExecutionError,
+  executionId: string
+): RQAPI.ExecutionResult {
   return {
+    executionId,
     status: RQAPI.ExecutionStatus.ERROR,
     executedEntry: { ...entry, response: null },
     error,
@@ -64,7 +72,7 @@ function buildErroredExecutionResult(entry: RQAPI.HttpApiEntry, error: RQAPI.Exe
 
 class ExecutionError extends NativeError {
   result: RQAPI.ExecutionResult;
-  constructor(entry: RQAPI.HttpApiEntry, error: Error) {
+  constructor(entry: RQAPI.HttpApiEntry, error: Error, executionId: string) {
     super(error.message);
 
     const executionError = buildExecutionErrorObject(
@@ -73,7 +81,13 @@ class ExecutionError extends NativeError {
       (error as any).context?.type || RQAPI.ApiClientErrorType.PRE_VALIDATION
     );
 
-    this.result = buildErroredExecutionResult(entry, executionError);
+    this.result = buildErroredExecutionResult(entry, executionError, executionId);
+  }
+
+  static fromEntry(entry: RQAPI.HttpApiEntry, error: Error): ExecutionError {
+    const execErr = new ExecutionError(entry, error);
+    execErr.stack = error.stack;
+    return execErr;
   }
 }
 
@@ -173,7 +187,7 @@ export class HttpRequestExecutor {
 
     return result.mapError((err) => {
       trackRequestFailed(RQAPI.ApiClientErrorType.PRE_VALIDATION);
-      return new NativeError(err.message).addContext({ type: RQAPI.ApiClientErrorType.PRE_VALIDATION });
+      return NativeError.fromError(err).addContext({ type: RQAPI.ApiClientErrorType.PRE_VALIDATION });
     });
   }
 
@@ -189,14 +203,14 @@ export class HttpRequestExecutor {
       executionContext?: ExecutionContext;
     }
   ): Promise<RQAPI.ExecutionResult> {
+    const execId = v4();
     const { entry, recordId } = entryDetails;
     const { abortController, scopes, executionContext } = executionConfig ?? {};
 
     this.abortController = abortController || new AbortController();
-
     const preparationResult = (
       await this.prepareRequestWithValidation(recordId, entry, scopes, executionContext)
-    ).mapError((error) => new ExecutionError(entry, error));
+    ).mapError((error) => new ExecutionError(entry, error, execId));
 
     if (preparationResult.isError()) {
       return preparationResult.unwrapError().result;
@@ -204,7 +218,7 @@ export class HttpRequestExecutor {
 
     let { preparedEntry, renderedVariables } = preparationResult.unwrap();
 
-    const recordName = this.ctx.stores.records.getState().getData(recordId)?.name ?? "";
+    const recordName = selectRecordById(this.ctx.store.getState(), recordId)?.name ?? "";
     const scriptExecutionContext = new ScriptExecutionContext(
       this.ctx,
       recordId,
@@ -251,7 +265,7 @@ export class HttpRequestExecutor {
           RQAPI.ApiClientErrorType.SCRIPT
         );
 
-        return buildErroredExecutionResult(preparedEntry, error);
+        return buildErroredExecutionResult(preparedEntry, error, execId);
       }
 
       // Re-prepare the request as pre-request script might have modified it.
@@ -262,7 +276,7 @@ export class HttpRequestExecutor {
           scopes,
           scriptExecutionContext.getContext() // Pass execution context to use runtime-modified variables
         )
-      ).mapError((error) => new ExecutionError(entry, error));
+      ).mapError((error) => new ExecutionError(entry, error, execId));
 
       if (rePreparationResult.isError()) {
         return rePreparationResult.unwrapError().result;
@@ -274,19 +288,49 @@ export class HttpRequestExecutor {
       scriptExecutionContext.setRequest(preparedEntry.request);
     }
 
+    APIEventLogger.logRequest({
+      request: preparedEntry.request,
+      workspaceId: this.ctx.workspaceId,
+      tag: {
+        recordId,
+        iteration: iterationContext.iteration,
+        executionId: execId,
+      },
+    });
+
+    /*
+      We are manually constructing the URL with encoded query parameters here because we want to clear `queryParams` in the request object passed to `makeRequest` so that they aren't appended again or double-encoded downstream.
+      preparedEntryRequest object should only be used for makeRequest()
+    */
+    const preparedEntryRequest = {
+      ...preparedEntry.request,
+      url: queryParamsToURLString(preparedEntry.request.queryParams, preparedEntry.request.url, true),
+      queryParams: [],
+    };
+
     try {
-      const response = await makeRequest(this.appMode, preparedEntry.request, this.abortController.signal);
+      const response = await makeRequest(this.appMode, preparedEntryRequest, this.abortController.signal);
       preparedEntry.response = response;
       scriptExecutionContext.setResponse(response);
       const rqErrorHeader = response?.headers?.find((header) => header.key === "x-rq-error");
 
       if (rqErrorHeader) {
-        return buildErroredExecutionResult(preparedEntry, this.buildErrorObjectFromHeader(rqErrorHeader));
+        APIEventLogger.logResponse({
+          response,
+          workspaceId: this.ctx.workspaceId,
+          tag: {
+            recordId,
+            iteration: iterationContext.iteration,
+            executionId: execId,
+          },
+        });
+        return buildErroredExecutionResult(preparedEntry, this.buildErrorObjectFromHeader(rqErrorHeader), execId);
       }
     } catch (err) {
       const error = buildExecutionErrorObject(
         {
-          ...err,
+          name: err.name,
+          stack: err.stack,
           message:
             this.appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP
               ? err.message
@@ -296,7 +340,7 @@ export class HttpRequestExecutor {
         RQAPI.ApiClientErrorType.CORE
       );
 
-      return buildErroredExecutionResult(preparedEntry, error);
+      return buildErroredExecutionResult(preparedEntry, error, execId);
     }
 
     if (
@@ -330,11 +374,22 @@ export class HttpRequestExecutor {
           RQAPI.ApiClientErrorType.SCRIPT
         );
 
-        return buildErroredExecutionResult(preparedEntry, error);
+        return buildErroredExecutionResult(preparedEntry, error, execId);
       }
     }
 
+    APIEventLogger.logResponse({
+      response: preparedEntry.response,
+      workspaceId: this.ctx.workspaceId,
+      tag: {
+        recordId,
+        iteration: iterationContext.iteration,
+        executionId: execId,
+      },
+    });
+
     const executionResult: RQAPI.ExecutionResult = {
+      executionId: execId,
       status: RQAPI.ExecutionStatus.SUCCESS,
       executedEntry: {
         ...preparedEntry,
@@ -362,12 +417,13 @@ export class HttpRequestExecutor {
   }
 
   async rerun(recordId: string, entry: RQAPI.HttpApiEntry): Promise<RQAPI.RerunResult> {
+    const executionId = v4();
     this.abortController = new AbortController();
-
     const executionContext = new ScriptExecutionContext(this.ctx, recordId, entry);
+    const recordName = selectRecordById(this.ctx.store.getState(), recordId)?.name ?? "";
     const executionMetadata: BaseExecutionMetadata = {
       requestId: recordId,
-      requestName: this.ctx.stores.records.getState().getData(recordId)?.name ?? "",
+      requestName: recordName,
       iterationContext: { iteration: 0, iterationCount: 1 },
     };
     const scriptExecutor = new HttpRequestScriptExecutionService(
@@ -384,6 +440,7 @@ export class HttpRequestExecutor {
         RQAPI.ApiClientErrorType.SCRIPT
       );
       return {
+        executionId,
         status: RQAPI.ExecutionStatus.ERROR,
         error,
       };
@@ -398,12 +455,14 @@ export class HttpRequestExecutor {
         RQAPI.ApiClientErrorType.SCRIPT
       );
       return {
+        executionId,
         status: RQAPI.ExecutionStatus.ERROR,
         error,
       };
     }
 
     return {
+      executionId,
       status: RQAPI.ExecutionStatus.SUCCESS,
       artifacts: {
         testResults: [

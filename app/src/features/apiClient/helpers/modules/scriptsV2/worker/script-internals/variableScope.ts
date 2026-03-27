@@ -42,8 +42,8 @@ function sanitizeValue(value: any): string | number | boolean | null | undefined
 
 export class VariableScope {
   constructor(
-    private localScope: LocalScope,
-    private variableScopeName: "environment" | "global" | "collectionVariables" | "variables"
+    protected localScope: LocalScope,
+    private variableScopeName: "environment" | "global" | "collectionVariables" | "variables" | "secrets"
   ) {}
 
   set(key: string, value: any, options?: any) {
@@ -57,7 +57,12 @@ export class VariableScope {
         ...currentVariables,
         [key]:
           key in currentVariables
-            ? { ...currentVariables[key], localValue: value, isPersisted: !!options?.persist }
+            ? {
+                ...currentVariables[key],
+                localValue: value,
+                isPersisted:
+                  options?.persist !== undefined ? !!options.persist : currentVariables[key].isPersisted ?? false,
+              }
             : { localValue: value, type: typeof value, isPersisted: !!options?.persist },
       });
     } else {
@@ -80,5 +85,23 @@ export class VariableScope {
     const variables = this.localScope.get(this.variableScopeName);
     delete variables[key];
     this.localScope.set(this.variableScopeName, variables);
+  }
+}
+
+export class SecretVariable extends VariableScope {
+  constructor(localScope: LocalScope) {
+    super(localScope, "secrets");
+  }
+
+  set(key: string, value: any) {
+    throw new Error("Secrets are read-only and cannot be set from scripts.");
+  }
+
+  unset(key: string) {
+    throw new Error("Secrets are read-only and cannot be unset from scripts.");
+  }
+
+  get(key: string) {
+    return this.localScope.get("secrets")[key]?.localValue;
   }
 }

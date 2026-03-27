@@ -9,6 +9,7 @@ export type FileSystemError = {
     path: string;
     fileType: FileType;
     code: ErrorCode;
+    metadata?: Record<string, any>;
   };
 };
 export type ContentfulSuccess<T> = T extends void ? { type: "success" } : { type: "success"; content: T };
@@ -27,6 +28,7 @@ export type Collection = {
 export type BaseApiRequestDetails = {
   url: string;
   auth: RQAPI.Auth;
+  rank?: string;
   scripts: {
     preRequest: string;
     postResponse: string;
@@ -43,6 +45,7 @@ export type API = {
   id: string;
   data: {
     name: string;
+    rank?: string;
     request: ApiRequestDetails;
   };
 };
@@ -78,6 +81,7 @@ export enum FileType {
 }
 
 export type ErroredRecord = {
+  id: string;
   name: string;
   path: string;
   error: string;

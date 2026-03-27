@@ -179,3 +179,16 @@
     right: 16px;
   }
 }
+
+.pricing-page-wrapper.desktop-app {
+  --desktop-titlebar-offset: 32px;
+  padding-top: var(--desktop-titlebar-offset);
+
+  .pricing-page-body-wrapper {
+    height: calc(100vh - 26px - var(--desktop-titlebar-offset));
+  }
+
+  .pricing-page-error-message-banner {
+    top: var(--desktop-titlebar-offset);
+  }
+}

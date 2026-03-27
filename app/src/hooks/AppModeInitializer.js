@@ -47,6 +47,10 @@ import { trackLocalSessionRecordingOpened } from "modules/analytics/events/featu
 import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 import { ApiClientImporterType } from "features/apiClient/types";
 import { clientStorageService } from "services/clientStorageService";
+import { initAndSubscribeSecretsManager } from "features/apiClient/slices/secrets-manager";
+import { secretsManagerService } from "services/secretsManagerService";
+import { PRICING } from "features/pricing";
+import { secretVariables } from "lib/secret-variables";
 
 let hasAppModeBeenSet = false;
 /**
@@ -219,9 +223,14 @@ const AppModeInitializer = () => {
       window.RQ.DESKTOP.SERVICES.IPC.registerEvent("initiate-app-close", () => {
         navigate(PATHS.DESKTOP.QUIT.ABSOLUTE);
       });
+
+      return () => {
+        window.RQ.DESKTOP.SERVICES.IPC.unregisterEvent("deeplink-handler");
+        window.RQ.DESKTOP.SERVICES.IPC.unregisterEvent("initiate-app-close");
+      };
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [appMode]);
 
   const closeConnectedAppsModal = useCallback(
     (props = {}) => {
@@ -278,6 +287,30 @@ const AppModeInitializer = () => {
       trackDesktopAppStartedEvent();
     }
   }, [appMode]);
+
+  useEffect(() => {
+    const isUserProfessional = [
+      PRICING.PLAN_NAMES.PROFESSIONAL,
+      PRICING.PLAN_NAMES.ENTERPRISE,
+      PRICING.PLAN_NAMES.PROFESSIONAL_ENTERPRISE,
+      PRICING.PLAN_NAMES.API_CLIENT_ENTERPRISE,
+      PRICING.PLAN_NAMES.API_CLIENT_PROFESSIONAL,
+    ].includes(user?.details?.planDetails?.planName || "");
+    if (
+      appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP &&
+      user?.loggedIn &&
+      isUserProfessional &&
+      isFeatureCompatible(FEATURES.SECRETS_MANAGER)
+    ) {
+      const initPromise = dispatch(initAndSubscribeSecretsManager(user?.details?.profile?.uid));
+
+      return () => {
+        initPromise.abort();
+        secretsManagerService.unsubscribeFromProvidersChange();
+        secretVariables.updateSourceFromSecrets([]);
+      };
+    }
+  }, [appMode, dispatch, user?.details?.planDetails?.planName, user?.details?.profile?.uid, user?.loggedIn]);
 
   useEffect(() => {
     if (

@@ -5,6 +5,19 @@
   .api-response-body-editor-container {
     height: 100%;
 
+    .html-response-preview {
+      height: calc(100% - 36px);
+      width: 100%;
+      background-color: #fff;
+      pointer-events: none;
+    }
+
+    .image-response-preview {
+      max-width: 100%;
+      max-height: calc(100% - 36px);
+      object-fit: contain;
+    }
+
     .react-resizable {
       height: calc(100% - 46px) !important;
       min-height: 20px !important;
@@ -31,6 +44,7 @@
       .api-response-body-mode-selector {
         margin: 0;
       }
+
       .ant-btn .copy-raw-response-icon {
         width: 16px;
         height: 16px;
@@ -52,13 +66,6 @@
       word-wrap: break-word;
       white-space: pre-wrap;
     }
-
-    .html-response-preview {
-      height: 100%;
-      width: 100%;
-      background-color: #fff;
-      pointer-events: none;
-    }
   }
 
   .api-response-body-mode-selector {
@@ -74,9 +81,11 @@
       &::before {
         display: none;
       }
+
       &:hover {
         color: var(--requestly-color-text-default);
       }
+
       &:focus,
       &:active {
         border: none;

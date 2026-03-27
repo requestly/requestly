@@ -10,20 +10,17 @@ import { ApiClientLocalDbQueryService } from "../helpers";
 import { ApiClientLocalDbTable } from "../helpers/types";
 import { v4 as uuidv4 } from "uuid";
 import { ResponsePromise } from "backend/types";
-import { SavedRunConfig, SavedRunConfigRecord } from "features/apiClient/commands/collectionRunner/types";
-import { RunResult, SavedRunResult } from "features/apiClient/store/collectionRunResult/runResult.store";
 import { LocalStore } from "./types";
+import { RunResult, SavedRunResult } from "features/apiClient/slices/common/runResults";
+import { SavedRunConfig, SavedRunConfigRecord } from "features/apiClient/slices/runConfig/types";
 
 export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClientLocalStoreMeta> {
   meta: ApiClientLocalStoreMeta;
-  private queryService: ApiClientLocalDbQueryService<RQAPI.ApiRecord | LocalStore.CollectionRecord>;
+  private queryService: ApiClientLocalDbQueryService<RQAPI.ApiClientRecord>;
 
   constructor(meta: ApiClientLocalStoreMeta) {
     this.meta = meta;
-    this.queryService = new ApiClientLocalDbQueryService<RQAPI.ApiRecord | LocalStore.CollectionRecord>(
-      meta,
-      ApiClientLocalDbTable.APIS
-    );
+    this.queryService = new ApiClientLocalDbQueryService<RQAPI.ApiClientRecord>(meta, ApiClientLocalDbTable.APIS);
   }
 
   private getNewId() {
@@ -506,5 +503,61 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
         },
       };
     }
+  }
+
+  async getAllExamples(
+    recordIds: string[]
+  ): Promise<{ success: boolean; data: { examples: RQAPI.ExampleApiRecord[]; failedRecordIds?: string[] } }> {
+    // TODO: Implement this, will be a dummy implementation for local store
+    return {
+      success: true,
+      data: {
+        examples: [],
+        failedRecordIds: [],
+      },
+    };
+  }
+
+  async createExampleRequest(parentRequestId: string, example: RQAPI.ExampleApiRecord): RQAPI.ApiClientRecordPromise {
+    const newExample = {
+      ...example,
+      id: this.getNewId(),
+      type: RQAPI.RecordType.EXAMPLE_API,
+      parentRequestId,
+      collectionId: null,
+      deleted: false,
+      createdBy: "",
+      ownerId: "",
+      updatedBy: "",
+      createdTs: Timestamp.now().toMillis(),
+      updatedTs: Timestamp.now().toMillis(),
+    } as RQAPI.ExampleApiRecord;
+
+    await this.queryService.createRecord(newExample);
+    return {
+      success: true,
+      data: newExample,
+    };
+  }
+
+  async updateExampleRequest(example: RQAPI.ExampleApiRecord): RQAPI.ApiClientRecordPromise {
+    const updatedExample: RQAPI.ExampleApiRecord = {
+      ...example,
+      updatedTs: Timestamp.now().toMillis(),
+    };
+
+    await this.queryService.updateRecord(example.id, updatedExample);
+    return {
+      success: true,
+      data: updatedExample,
+    };
+  }
+
+  async deleteExamples(exampleRecords: RQAPI.ExampleApiRecord[]): Promise<{ success: boolean; message?: string }> {
+    await this.queryService.deleteRecords(exampleRecords.map((example) => example.id));
+    return {
+      success: true,
+      message: "Examples deleted successfully",
+    };
   }
 }

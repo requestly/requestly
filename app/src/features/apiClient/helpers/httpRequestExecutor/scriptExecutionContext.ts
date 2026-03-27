@@ -1,18 +1,19 @@
-import { getApiClientRecordsStore } from "features/apiClient/commands/store.utils";
-import { getScopedVariables, Scope } from "../variableResolver/variable-resolver";
-import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
-import { VariableData } from "features/apiClient/store/variables/types";
-import { EnvironmentVariables, VariableScope } from "backend/environment/types";
+import { getScopedVariables, Scope, ScopedVariables } from "../variableResolver/variable-resolver";
+import { EnvironmentVariables, VariableScope, EnvironmentVariableType } from "backend/environment/types";
 import { RQAPI } from "features/apiClient/types";
-import { RuntimeVariables } from "features/apiClient/store/runtimeVariables/utils";
 import { isEmpty } from "lodash";
+import { ApiClientFeatureContext, selectRecordById } from "features/apiClient/slices";
+import { reduxStore } from "store";
+import { VariableData } from "@requestly/shared/types/entities/apiClient";
+import { secretVariables } from "lib/secret-variables";
 
 export type BaseExecutionContext = {
   global: EnvironmentVariables;
   collectionVariables: EnvironmentVariables;
   environment: EnvironmentVariables;
-  variables: RuntimeVariables;
+  variables: EnvironmentVariables;
   iterationData: EnvironmentVariables;
+  secrets: EnvironmentVariables;
 };
 
 export type ExecutionContext = BaseExecutionContext & {
@@ -21,7 +22,7 @@ export type ExecutionContext = BaseExecutionContext & {
 };
 
 export class ScriptExecutionContext {
-  private context: ExecutionContext;
+  private context: ExecutionContext = {} as any;
   private isMutated = false;
 
   constructor(
@@ -47,29 +48,77 @@ export class ScriptExecutionContext {
     this.context.request = entry.request;
     this.context.response = entry.response ?? null;
 
-    const scopedVariables = getScopedVariables([], this.ctx.stores, this.scopes);
-    const variablesByScope = this.convertScopedVariablesToRecord(scopedVariables);
+    const variablesByScope = this.convertScopedVariablesToRecord(this.getScopedVariables(recordId));
 
     // Override iterationData with scopedVariables
     // Currently only overriding iterationData because all other scopes are handled during initial context build from context but
     // iterationData needs to be updated from scope
     this.context.iterationData = (variablesByScope[VariableScope.DATA_FILE] || {}) as EnvironmentVariables;
+    this.context.secrets = this.buildSecretVariables();
 
     this.isMutated = false;
   }
 
-  private convertScopedVariablesToRecord(scopedVariables: Map<string, [VariableData, any]>) {
-    return Array.from(scopedVariables).reduce((acc, [key, [variableData, variableSource]]) => {
+  private getScopedVariables(recordId: string) {
+    const scoped = getScopedVariables(
+      this.ctx.store.getState(),
+      reduxStore.getState().runtimeVariables.entity.variables,
+      recordId,
+      { scopes: this.scopes }
+    );
+
+    // Only expose the *immediate* collection's variables in script context.
+    // (Requests in nested collections can still resolve ancestor vars during rendering via normal store resolution.)
+    const record = selectRecordById(this.ctx.store.getState(), recordId);
+    const effectiveCollectionId =
+      record?.type === RQAPI.RecordType.COLLECTION ? record.id : record?.collectionId ?? null;
+
+    if (!effectiveCollectionId) {
+      return scoped;
+    }
+
+    const filtered: ScopedVariables = {};
+    for (const key in scoped) {
+      const tuple = scoped[key];
+      if (!tuple) continue;
+
+      const [_variableData, variableSource] = tuple;
+      if (variableSource.scope === VariableScope.COLLECTION && variableSource.scopeId !== effectiveCollectionId) {
+        continue;
+      }
+      filtered[key] = tuple;
+    }
+
+    return filtered;
+  }
+
+  private convertScopedVariablesToRecord(scopedVariables: ScopedVariables) {
+    return Object.keys(scopedVariables).reduce((acc, key) => {
+      const [variableData, variableSource] = scopedVariables[key]!;
       acc[variableSource.scope] = acc[variableSource.scope] || {};
-      acc[variableSource.scope][key] = variableData;
+      acc[variableSource.scope]![key] = variableData;
       return acc;
     }, {} as Record<string, Record<string, VariableData>>);
   }
 
+  private buildSecretVariables(): EnvironmentVariables {
+    const secretsList = secretVariables.getSecretsList();
+    return secretsList.reduce((acc, secret, index) => {
+      // Remove the "secrets:" prefix for the execution context
+      const keyWithoutPrefix = secret.name.replace(/^secrets:/, "");
+      acc[keyWithoutPrefix] = {
+        id: index,
+        localValue: secret.value,
+        syncValue: secret.value,
+        type: EnvironmentVariableType.Secret,
+        isPersisted: true,
+      };
+      return acc;
+    }, {} as EnvironmentVariables);
+  }
+
   private getVariablesByScope(recordId: string) {
-    const parents = getApiClientRecordsStore(this.ctx).getState().getParentChain(recordId);
-    const scopedVariables = getScopedVariables(parents, this.ctx.stores, this.scopes);
-    return this.convertScopedVariablesToRecord(scopedVariables);
+    return this.convertScopedVariablesToRecord(this.getScopedVariables(recordId));
   }
 
   private buildExecutionContext(): ExecutionContext {
@@ -77,8 +126,9 @@ export class ScriptExecutionContext {
     const globalVariables = (variablesByScope[VariableScope.GLOBAL] || {}) as EnvironmentVariables;
     const collectionVariables = (variablesByScope[VariableScope.COLLECTION] || {}) as EnvironmentVariables;
     const environmentVariables = (variablesByScope[VariableScope.ENVIRONMENT] || {}) as EnvironmentVariables;
-    const variables = variablesByScope[VariableScope.RUNTIME] || {};
+    const variables = (variablesByScope[VariableScope.RUNTIME] || {}) as EnvironmentVariables;
     const iterationData = (variablesByScope[VariableScope.DATA_FILE] || {}) as EnvironmentVariables;
+    const secrets = this.buildSecretVariables();
 
     const baseExecutionContext: BaseExecutionContext = {
       global: globalVariables,
@@ -86,6 +136,7 @@ export class ScriptExecutionContext {
       environment: environmentVariables,
       variables,
       iterationData,
+      secrets,
     };
 
     return {
@@ -100,6 +151,7 @@ export class ScriptExecutionContext {
     this.context.collectionVariables = snapshot.collectionVariables;
     this.context.environment = snapshot.environment;
     this.context.variables = snapshot.variables;
+    this.context.secrets = snapshot.secrets;
 
     this.context.request = snapshot.request;
     if (snapshot.response) {
@@ -118,6 +170,7 @@ export class ScriptExecutionContext {
       environment: this.context.environment,
       variables: this.context.variables,
       iterationData: this.context.iterationData,
+      secrets: this.context.secrets,
     };
   }
 

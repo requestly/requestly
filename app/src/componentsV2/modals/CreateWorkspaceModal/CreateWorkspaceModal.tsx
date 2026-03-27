@@ -10,6 +10,7 @@ import { CreateWorkspaceModalOld } from "../CreateWorkspaceModalOld/CreateWorksp
 import { globalActions } from "store/slices/global/slice";
 import "./createWorkspaceModal.scss";
 import { WorkspaceType } from "features/workspaces/types";
+import { WorkspaceCreationProvider } from "./context";
 
 interface Props {
   isOpen: boolean;
@@ -64,15 +65,18 @@ export const CreateWorkspaceModal: React.FC<Props> = ({
       closable={false}
     >
       <MdClose className="create-workspace-modal__close-icon" onClick={toggleModal} />
-      <WorkspaceCreationView
-        workspaceType={workspaceType}
-        onCancel={toggleModal}
-        callback={() => {
-          toggleModal();
-          callback?.();
-        }}
-        analyticEventSource="create_workspace_modal"
-      />
+      <WorkspaceCreationProvider>
+        <WorkspaceCreationView
+          workspaceType={workspaceType}
+          onCancel={toggleModal}
+          callback={() => {
+            toggleModal();
+            callback?.();
+          }}
+          analyticEventSource="create_workspace_modal"
+          isOpenedInModal
+        />
+      </WorkspaceCreationProvider>
     </Modal>
   );
 };

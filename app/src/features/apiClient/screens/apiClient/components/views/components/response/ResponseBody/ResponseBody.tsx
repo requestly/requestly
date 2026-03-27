@@ -7,6 +7,7 @@ import { RQButton } from "lib/design-system-v2/components";
 import { IoMdCopy } from "@react-icons/all-files/io/IoMdCopy";
 import Editor from "componentsV2/CodeEditor";
 import { copyToClipBoard } from "utils/Misc";
+import { shouldRenderPreview } from "utils/CodeEditorUtils";
 
 interface Props {
   responseText: string;
@@ -68,28 +69,32 @@ const ResponseBody: React.FC<Props> = ({ responseText, contentTypeHeader }) => {
   }, [onResponseModeChange, responseMode]);
 
   const preview = useMemo<ReactElement>(() => {
+    let previewComponent: ReactElement | null = null;
     if (contentTypeHeader?.includes("text/html")) {
-      return <HTMLResponsePreview responseText={responseText} />;
+      previewComponent = <HTMLResponsePreview responseText={responseText} />;
+    } else if (contentTypeHeader?.includes("image/")) {
+      previewComponent = <ImageResponsePreview responseText={responseText} mimeType={contentTypeHeader} />;
+    } else {
+      const editorLanguage = getEditorLanguageFromContentType(contentTypeHeader);
+      return (
+        <div className="api-response-body-editor-container">
+          <Editor
+            prettifyOnInit
+            value={shouldRenderPreview(responseText, contentTypeHeader) ? responseText : "Preview not available"}
+            language={editorLanguage}
+            isReadOnly
+            toolbarOptions={{
+              title: "",
+              options: [bodyPreviewModeOptions],
+            }}
+          />
+        </div>
+      );
     }
-
-    if (contentTypeHeader?.includes("image/")) {
-      return <ImageResponsePreview responseText={responseText} mimeType={contentTypeHeader} />;
-    }
-
-    const editorLanguage = getEditorLanguageFromContentType(contentTypeHeader);
-
     return (
       <div className="api-response-body-editor-container">
-        <Editor
-          prettifyOnInit
-          value={responseText}
-          language={editorLanguage}
-          isReadOnly
-          toolbarOptions={{
-            title: "",
-            options: [bodyPreviewModeOptions],
-          }}
-        />
+        <div>{bodyPreviewModeOptions}</div>
+        {previewComponent}
       </div>
     );
   }, [contentTypeHeader, responseText, bodyPreviewModeOptions]);

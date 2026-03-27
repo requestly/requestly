@@ -1,8 +1,11 @@
 import { UpdateSpec } from "dexie";
+import { NativeError } from "errors/NativeError";
+import { ErrorSeverity } from "errors/types";
 import { ApiClientLocalStoreMeta } from "../../interfaces";
 import { ApiClientLocalDb } from "./ApiClientLocalDb";
 import dbProvider from "./ApiClientLocalDbProvider";
 import { ApiClientLocalDbTable } from "./types";
+import { MultipleInstanceError } from "features/apiClient/errors/MultipleInstanceError/MultipleInstanceError";
 
 export class ApiClientLocalDbQueryService<T> {
   private dbInstance: ApiClientLocalDb;
@@ -17,27 +20,49 @@ export class ApiClientLocalDbQueryService<T> {
   }
 
   async getRecord(id: string) {
-    return this.getTable().get(id);
+    try {
+      return await this.getTable().get(id);
+    } catch (error: any) {
+      if (error.name === "DatabaseClosedError") {
+        throw new MultipleInstanceError(
+          "Multiple instances of Requestly are running. Please close other instances to continue.",
+          "DatabaseClosedError"
+        );
+      }
+      const e = new Error(error.message);
+      throw NativeError.fromError(e).setShowBoundary(true).setSeverity(ErrorSeverity.ERROR);
+    }
   }
 
   async getRecords() {
-    return this.getTable().toArray();
+    try {
+      return await this.getTable().toArray();
+    } catch (error: any) {
+      if (error.name === "DatabaseClosedError") {
+        throw new MultipleInstanceError(
+          "Multiple instances of Requestly are running. Please close other instances to continue.",
+          "DatabaseClosedError"
+        );
+      }
+      const e = new Error(error.message);
+      throw NativeError.fromError(e).setShowBoundary(true).setSeverity(ErrorSeverity.ERROR);
+    }
   }
 
   async updateRecord(id: string, record: T) {
-    return this.getTable().update(id, record as UpdateSpec<T>);
+    return await this.getTable().update(id, record as UpdateSpec<T>);
   }
 
   async createRecord(record: T) {
-    return this.getTable().add(record);
+    return await this.getTable().add(record);
   }
 
   async createBulkRecords(records: T[]) {
-    return this.getTable().bulkAdd(records);
+    return await this.getTable().bulkAdd(records);
   }
 
   async updateRecords(updates: (Partial<T> & { id: string })[]) {
-    return this.getTable().bulkUpdate(
+    return await this.getTable().bulkUpdate(
       updates.map((update) => {
         return {
           key: update.id,
@@ -48,15 +73,15 @@ export class ApiClientLocalDbQueryService<T> {
   }
 
   async deleteRecord(id: string) {
-    return this.getTable().delete(id);
+    return await this.getTable().delete(id);
   }
 
   async deleteRecords(ids: string[]) {
-    return this.getTable().bulkDelete(ids);
+    return await this.getTable().bulkDelete(ids);
   }
 
   async clearAllRecords() {
-    return this.getTable().clear();
+    return await this.getTable().clear();
   }
 
   async getIsAllCleared() {

@@ -9,6 +9,8 @@ import {
 import { ErroredRecord } from "./helpers/modules/sync/local/services/types";
 import { ApiClientFile, FileId } from "./store/apiClientFilesStore";
 
+export type ExecutionId = string;
+
 export enum RequestMethod {
   GET = "GET",
   POST = "POST",
@@ -75,6 +77,7 @@ export enum BulkActions {
   EXPORT = "EXPORT",
   EXPORT_REQUESTLY = "EXPORT_REQUESTLY",
   EXPORT_POSTMAN = "EXPORT_POSTMAN",
+  EXPORT_OPENAPI = "EXPORT_OPENAPI",
   SELECT_ALL = "SELECT_ALL",
 }
 
@@ -92,14 +95,17 @@ export namespace RQAPI {
   export type AnalyticsEventSource =
     | "home_screen"
     | "collection_row"
+    | "example_row"
     | "collection_list_empty_state"
     | "api_client_sidebar_header"
-    | "api_client_sidebar";
+    | "api_client_sidebar"
+    | "api_client_home";
 
   export enum RecordType {
     API = "api",
     COLLECTION = "collection",
     ENVIRONMENT = "environment",
+    EXAMPLE_API = "example_api",
   }
 
   export enum ScriptType {
@@ -107,8 +113,11 @@ export namespace RQAPI {
     POST_RESPONSE = "postResponse",
   }
 
+  /* kept string here as backward compability for already generated uuids saved in firebase, 
+    for new request number should be data-type 
+  */
   export type PathVariable = {
-    id: number;
+    id: number | string;
     key: string;
     value: string;
     description?: string;
@@ -202,6 +211,7 @@ export namespace RQAPI {
       postResponse: string;
     };
     auth: Auth;
+    examples?: ExampleApiRecord[];
   };
 
   export enum ApiEntryType {
@@ -242,6 +252,7 @@ export namespace RQAPI {
     name: Error["name"];
     reason?: string;
     message: Error["message"];
+    stack?: Error["stack"];
   };
 
   export type ExecutionWarning = {
@@ -251,11 +262,13 @@ export namespace RQAPI {
 
   export type ExecutionResult =
     | {
+        executionId: ExecutionId;
         status: ExecutionStatus.SUCCESS;
         executedEntry: ApiEntry;
         warning?: ExecutionWarning;
       }
     | {
+        executionId: ExecutionId;
         status: ExecutionStatus.ERROR;
         executedEntry: ApiEntry;
         error: ExecutionError;
@@ -263,12 +276,14 @@ export namespace RQAPI {
 
   export type RerunResult =
     | {
+        executionId: ExecutionId;
         status: ExecutionStatus.SUCCESS;
         artifacts: {
           testResults: TestResult[];
         };
       }
     | {
+        executionId: ExecutionId;
         status: ExecutionStatus.ERROR;
         error: ExecutionError;
       };
@@ -280,6 +295,7 @@ export namespace RQAPI {
       postResponse: string;
     };
     variables: Omit<EnvironmentVariables, "localValue">;
+    variablesOrder?: string[]; // Array of variable keys in display order
     auth: Auth;
   }
 
@@ -288,7 +304,8 @@ export namespace RQAPI {
     name: string;
     description?: string;
     collectionId: string | null;
-    isExample?: boolean;
+    rank?: string;
+    isExample?: boolean; // this is to denote sample entities not `example` api records
     ownerId: string;
     deleted: boolean;
     createdBy: string;
@@ -297,25 +314,31 @@ export namespace RQAPI {
     updatedTs: number;
   }
 
-  export interface BaseApiRecord extends RecordMetadata {
-    type: RecordType.API;
-  }
-
   export interface CollectionRecord extends RecordMetadata {
     type: RecordType.COLLECTION;
     data: Collection;
   }
 
-  export type ApiRecord = {
+  export interface ApiRecord extends RecordMetadata {
     type: RecordType.API;
     data: ApiEntry;
-  } & BaseApiRecord;
+  }
 
   export type HttpApiRecord = ApiRecord & { data: HttpApiEntry };
 
   export type GraphQLApiRecord = ApiRecord & { data: GraphQLApiEntry };
 
-  export type ApiClientRecord = ApiRecord | CollectionRecord;
+  export type ExampleApiRecord = RecordMetadata & {
+    type: RecordType.EXAMPLE_API;
+    parentRequestId: string;
+    data: ApiEntry;
+  };
+
+  export type HttpExampleApiRecord = ExampleApiRecord & { data: HttpApiEntry };
+
+  export type GraphQLExampleApiRecord = ExampleApiRecord & { data: GraphQLApiEntry };
+
+  export type ApiClientRecord = ApiRecord | CollectionRecord | ExampleApiRecord;
 
   export type ApiClientRecordPromise = Promise<
     | {

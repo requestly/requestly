@@ -30,6 +30,7 @@
 
   .api-client-header-container {
     position: sticky;
+    z-index: 100;
     border-bottom: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
 
     &__header {
@@ -90,9 +91,14 @@
   .ant-tabs {
     .ant-tabs-nav-wrap {
       padding: 0 16px;
+
       .ant-tabs-tab {
         padding: 6px 4px;
       }
+    }
+
+    .ant-tabs-tabpane {
+      padding: var(--requestly-space-3, 6px);
     }
   }
 
@@ -134,7 +140,7 @@
     border-bottom: 2px solid transparent;
 
     + .ant-tabs-tab {
-      margin-left: 16px;
+      margin-left: 12px;
     }
 
     &.ant-tabs-tab-active {
@@ -188,24 +194,17 @@
     justify-content: center;
   }
 
-  .api-response-status-line {
+  .api-response-status-row {
     font-size: var(--requestly-font-size-xs);
     display: flex;
     align-items: center;
     gap: 8px;
+    border-right: 1px solid var(--requestly-color-white-t-20);
+    padding-right: var(--requestly-space-4);
 
     .ant-space-item {
       display: flex;
       align-items: center;
-
-      .ant-btn {
-        padding: 0;
-        color: var(--requestly-color-text-subtle, #bbb);
-
-        &:hover {
-          background-color: transparent;
-        }
-      }
     }
 
     .ant-space-item:last-child::after {
@@ -235,6 +234,17 @@
 
   .bottomsheet-split-layout-container {
     height: calc(100% - 93px);
+  }
+
+  .api-client-use-as-template-button {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+
+    svg {
+      width: 14px;
+      height: 14px;
+    }
   }
 }
 

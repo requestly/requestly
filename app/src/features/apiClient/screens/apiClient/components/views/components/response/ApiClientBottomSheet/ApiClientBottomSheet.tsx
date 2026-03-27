@@ -7,7 +7,7 @@ import { BottomSheet } from "componentsV2/BottomSheet";
 import StatusLine from "../StatusLine";
 import { TabsProps, Tag } from "antd";
 import { TestsView } from "../TestsView/TestsView";
-import { TestResult, TestStatus } from "features/apiClient/helpers/modules/scriptsV2/worker/script-internals/types";
+import { TestStatus } from "features/apiClient/helpers/modules/scriptsV2/worker/script-internals/types";
 import { ApiClientErrorPanel } from "../../errors/ApiClientErrorPanel/ApiClientErrorPanel";
 import { ApiClientLoader } from "../LoadingPlaceholder/ApiClientLoader";
 import { EmptyResponsePlaceholder } from "../EmptyResponsePlaceholder/EmptyResponsePlaceholder";
@@ -16,17 +16,16 @@ import { RequestError } from "../../errors/RequestError";
 import { ApiClientWarningPanel } from "../../errors/ApiClientWarningPanel/ApiClientWarningPanel";
 import "./apiclientBottomSheet.scss";
 import { ApiClientLargeFileLoader } from "../../../../clientView/components/response/LargeFileLoadingPlaceholder";
-import { MdDataObject } from "@react-icons/all-files/md/MdDataObject";
-import { PiTag } from "@react-icons/all-files/pi/PiTag";
-import { MdOutlineScience } from "@react-icons/all-files/md/MdOutlineScience";
 import { BottomSheetTabLabel } from "componentsV2/BottomSheet/components/BottomSheetLayout/components/BottomSheetTabLabel/BottomSheetTabLabel";
+import { BufferedGraphQLRecordEntity, BufferedHttpRecordEntity } from "features/apiClient/slices/entities";
+import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
+import { hasTests } from "features/apiClient/helpers/testGeneration/buildPostResponseTests";
 
 interface Props {
+  entity: BufferedHttpRecordEntity | BufferedGraphQLRecordEntity;
   onGenerateTests?: () => void;
+  isDraftMode: boolean;
   isGeneratingTests?: boolean;
-  canGenerateTests?: boolean;
-  response: RQAPI.Response;
-  testResults: TestResult[];
   isLoading: boolean;
   isLongRequest?: boolean;
   isFailed: boolean;
@@ -46,11 +45,10 @@ const BOTTOM_SHEET_TAB_KEYS = {
 };
 
 export const ApiClientBottomSheet: React.FC<Props> = ({
+  entity,
+  isDraftMode,
   onGenerateTests,
   isGeneratingTests = false,
-  canGenerateTests = false,
-  response,
-  testResults,
   isLoading,
   isFailed,
   isLongRequest,
@@ -62,6 +60,17 @@ export const ApiClientBottomSheet: React.FC<Props> = ({
   executeRequest,
   onDismissError,
 }) => {
+  const response = useApiClientSelector((s) => entity.getResponse(s));
+  const postResponseScript = useApiClientSelector((s) => entity.getPostResponseScript(s));
+  const testResults = useApiClientSelector((s) => entity.getTestResults(s));
+  const isExample = useApiClientSelector((s) => entity.getType(s) === RQAPI.RecordType.EXAMPLE_API);
+
+  const canGenerateTests = useMemo(() => {
+    const responseExists = Boolean(postResponseScript);
+    if (!responseExists) return false;
+    return !hasTests(postResponseScript);
+  }, [postResponseScript]);
+
   const contentTypeHeader = useMemo(() => {
     return response?.headers ? getContentTypeFromResponseHeaders(response.headers) ?? "" : "";
   }, [response?.headers]);
@@ -87,7 +96,6 @@ export const ApiClientBottomSheet: React.FC<Props> = ({
         label: (
           <BottomSheetTabLabel label="Body">
             <span className="bottom-sheet-tab">
-              <MdDataObject />
               <span>Body</span>
             </span>
           </BottomSheetTabLabel>
@@ -99,7 +107,6 @@ export const ApiClientBottomSheet: React.FC<Props> = ({
         label: (
           <BottomSheetTabLabel label="Headers">
             <span className="bottom-sheet-tab">
-              <PiTag />
               <span>
                 Headers {response?.headers?.length ? <Tag className="count">{response?.headers?.length}</Tag> : null}
               </span>
@@ -108,26 +115,30 @@ export const ApiClientBottomSheet: React.FC<Props> = ({
         ),
         children: <ResponseHeaders headers={response?.headers} />,
       },
-      {
-        key: BOTTOM_SHEET_TAB_KEYS.TEST_RESULTS,
-        label: (
-          <BottomSheetTabLabel label="Test results">
-            <span className="bottom-sheet-tab">
-              <MdOutlineScience />
-              <span>Test results {testResultsStats}</span>
-            </span>
-          </BottomSheetTabLabel>
-        ),
-        children: (
-          <TestsView
-            testResults={testResults}
-            handleTestResultRefresh={handleTestResultRefresh}
-            onGenerateTests={onGenerateTests}
-            isGeneratingTests={isGeneratingTests}
-            canGenerateTests={canGenerateTests}
-          />
-        ),
-      },
+      ...(!isExample
+        ? [
+            {
+              key: BOTTOM_SHEET_TAB_KEYS.TEST_RESULTS,
+              label: (
+                <BottomSheetTabLabel label="Test results">
+                  <span className="bottom-sheet-tab">
+                    <span>Tests {testResultsStats}</span>
+                  </span>
+                </BottomSheetTabLabel>
+              ),
+
+              children: (
+                <TestsView
+                  testResults={testResults}
+                  handleTestResultRefresh={handleTestResultRefresh}
+                  onGenerateTests={onGenerateTests}
+                  isGeneratingTests={isGeneratingTests}
+                  canGenerateTests={canGenerateTests}
+                />
+              ),
+            },
+          ]
+        : []),
     ];
 
     if (isLongRequest) {
@@ -199,6 +210,7 @@ export const ApiClientBottomSheet: React.FC<Props> = ({
     canGenerateTests,
     isGeneratingTests,
     onGenerateTests,
+    isExample,
   ]);
 
   return (
@@ -210,7 +222,9 @@ export const ApiClientBottomSheet: React.FC<Props> = ({
       <div className="api-client-sheet-panel">
         <BottomSheet
           items={bottomSheetTabItems}
-          tabBarExtraContent={!isLoading && <StatusLine response={response} />}
+          tabBarExtraContent={
+            !isLoading && <StatusLine isDraftMode={isDraftMode} response={response} entity={entity} />
+          }
         />
       </div>
     </div>

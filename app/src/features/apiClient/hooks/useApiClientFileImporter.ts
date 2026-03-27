@@ -13,10 +13,10 @@ import {
 import { processRqImportData } from "features/apiClient/screens/apiClient/components/modals/importModal/utils";
 
 import * as Sentry from "@sentry/react";
-import { useCommand } from "../commands";
 import { useNewApiClientContext } from "./useNewApiClientContext";
-import { EnvironmentVariableData } from "../store/variables/types";
-import { useApiClientRepository } from "../contexts/meta";
+import { createEnvironment, updateEnvironmentVariables } from "../slices/environments/thunks";
+import { getApiClientFeatureContext, useApiClientRepository } from "../slices";
+import { EnvironmentVariableData } from "@requestly/shared/types/entities/apiClient";
 
 const BATCH_SIZE = 25;
 
@@ -52,10 +52,6 @@ const useApiClientFileImporter = (importer: ImporterType) => {
   const [isImporting, setIsImporting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [processingStatus, setProcessingStatus] = useState<ProcessingStatus>("idle");
-
-  const {
-    env: { createEnvironment, patchEnvironmentVariables },
-  } = useCommand();
 
   const { apiClientRecordsRepository, environmentVariablesRepository } = useApiClientRepository();
   const { onSaveRecord } = useNewApiClientContext();
@@ -144,20 +140,32 @@ const useApiClientFileImporter = (importer: ImporterType) => {
   const globalEnvId = environmentVariablesRepository.getGlobalEnvironmentId();
   const handleImportEnvironments = useCallback(async (): Promise<number> => {
     try {
+      const dispatch = getApiClientFeatureContext().store.dispatch;
       const importPromises = environments.map(async (env) => {
-        if (env.isGlobal) {
-          await patchEnvironmentVariables({
-            environmentId: globalEnvId,
-            variables: env.variables,
-          });
-          return true;
-        } else {
-          await createEnvironment({
-            newEnvironmentName: env.name,
-            variables: env.variables,
-          });
+        try {
+          if (env.isGlobal) {
+            await dispatch(
+              updateEnvironmentVariables({
+                environmentId: globalEnvId,
+                variables: env.variables,
+                repository: environmentVariablesRepository,
+              }) as any
+            ).unwrap();
+            return true;
+          } else {
+            await dispatch(
+              createEnvironment({
+                name: env.name,
+                variables: env.variables,
+                repository: environmentVariablesRepository,
+              }) as any
+            ).unwrap();
+            return true;
+          }
+        } catch (error) {
+          Logger.error("Error importing environment:", error);
+          return false;
         }
-        return false;
       });
 
       const results = await Promise.allSettled(importPromises);
@@ -166,7 +174,7 @@ const useApiClientFileImporter = (importer: ImporterType) => {
       Logger.error("Data import failed:", error);
       throw error;
     }
-  }, [createEnvironment, environments, patchEnvironmentVariables, globalEnvId]);
+  }, [environments, environmentVariablesRepository, globalEnvId]);
 
   const handleImportCollectionsAndApis = useCallback(async () => {
     let importedCollectionsCount = 0;
@@ -178,6 +186,9 @@ const useApiClientFileImporter = (importer: ImporterType) => {
     const handleCollectionWrites = async (collection: RQAPI.CollectionRecord) => {
       try {
         const newCollection = await apiClientRecordsRepository.createCollectionFromImport(collection, collection.id);
+        if (!newCollection.data) {
+          throw new Error("Failed to create collection");
+        }
         onSaveRecord(newCollection.data);
         importedCollectionsCount++;
         return newCollection.data.id;
@@ -206,6 +217,9 @@ const useApiClientFileImporter = (importer: ImporterType) => {
       };
       try {
         const newApi = await apiClientRecordsRepository.createRecordWithId(updatedApi, updatedApi.id);
+        if (!newApi.data) {
+          throw new Error("Failed to create API");
+        }
         onSaveRecord(newApi.data);
         importedApisCount++;
       } catch (error) {

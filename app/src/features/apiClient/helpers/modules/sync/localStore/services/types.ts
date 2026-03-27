@@ -1,5 +1,5 @@
-import { SavedRunConfigRecord } from "features/apiClient/commands/collectionRunner/types";
-import { RunResult } from "features/apiClient/store/collectionRunResult/runResult.store";
+import { RunResult } from "features/apiClient/slices/common/runResults";
+import { SavedRunConfigRecord } from "features/apiClient/slices/runConfig/types";
 import { RQAPI } from "features/apiClient/types";
 
 export namespace LocalStore {

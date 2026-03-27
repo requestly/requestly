@@ -54,6 +54,7 @@ export class ScriptExecutionWorker implements ScriptExecutionWorkerInterface {
       request: executionContext.request,
       response: executionContext.response,
       variables: executionContext.variables,
+      secrets: executionContext.secrets,
     };
     this.localScope = new LocalScope(localScopeInitialState);
     this.executionMetadata = executionMetadata;
@@ -67,7 +68,9 @@ export class ScriptExecutionWorker implements ScriptExecutionWorkerInterface {
       "use strict";
       ${globalScript}
       try {
+      return (async () => {
         ${userScript}
+      })();
       } catch (error) {
         console.error(\`\${error.name}: \${error.message}\`);
         throw error;
@@ -75,9 +78,9 @@ export class ScriptExecutionWorker implements ScriptExecutionWorkerInterface {
       `
     ) as (globals: Record<string, any>) => void;
     try {
-      scriptFunction(globalObject);
+      await scriptFunction(globalObject);
     } catch (error) {
-      throw new ScriptExecutionError(error);
+      throw new ScriptExecutionError(typeof error === "string" ? new Error(error) : error);
     }
     try {
       this.syncLocalDump(callback);

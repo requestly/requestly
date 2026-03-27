@@ -6,19 +6,24 @@ import "./runtimevariableHeader.scss";
 import InfoIcon from "components/misc/InfoIcon";
 import { MdOutlineDeleteForever } from "@react-icons/all-files/md/MdOutlineDeleteForever";
 import { KEYBOARD_SHORTCUTS } from "../../../../../../constants/keyboardShortcuts";
+import LINKS from "config/constants/sub/links";
 interface RuntimeVariablesHeaderProps {
   searchValue: string;
-  variables: any[];
+  hasVariables: boolean;
   onSearchValueChange: (value: string) => void;
   onDeleteAll: () => void;
   onSave: () => Promise<void>;
+  hasUnsavedChanges?: boolean;
+  isSaving?: boolean;
 }
 export const RuntimeVariablesHeader: React.FC<RuntimeVariablesHeaderProps> = ({
   searchValue,
-  variables,
+  hasVariables,
   onSearchValueChange,
   onDeleteAll,
   onSave,
+  hasUnsavedChanges = false,
+  isSaving = false,
 }) => {
   return (
     <div className="runtime-variables-list-header">
@@ -29,7 +34,7 @@ export const RuntimeVariablesHeader: React.FC<RuntimeVariablesHeaderProps> = ({
             <>
               Runtime variables allow you to store and reuse values throughout the app. These values reset when the API
               client is closed, unless they’re marked as persistent.
-              <a href="https://www.requestly.com" target="_blank" rel="noreferrer">
+              <a href={LINKS.REQUESTLY_RUNTIME_VARIABLES_DOCS} target="_blank" rel="noreferrer">
                 See how to use them effectively
               </a>
             </>
@@ -58,7 +63,7 @@ export const RuntimeVariablesHeader: React.FC<RuntimeVariablesHeaderProps> = ({
         />
         <div className="runtime-variables-list-action-btn">
           <RQButton
-            disabled={variables.length < 1}
+            disabled={!hasVariables}
             className="delete-btn"
             icon={<MdOutlineDeleteForever />}
             onClick={onDeleteAll}
@@ -67,11 +72,13 @@ export const RuntimeVariablesHeader: React.FC<RuntimeVariablesHeaderProps> = ({
           </RQButton>
           <RQButton
             showHotKeyText
-            hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SAVE_RUNTIME_VARIABLES.hotKey}
+            hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SAVE_RUNTIME_VARIABLES?.hotKey}
             type="primary"
             onClick={() => {
               onSave();
             }}
+            disabled={!hasUnsavedChanges}
+            loading={isSaving}
           >
             Save
           </RQButton>

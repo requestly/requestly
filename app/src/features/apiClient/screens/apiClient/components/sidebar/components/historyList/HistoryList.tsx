@@ -6,8 +6,10 @@ import { trackRequestSelectedFromHistory } from "modules/analytics/events/featur
 import { trackRQDesktopLastActivity, trackRQLastActivity } from "utils/AnalyticsUtils";
 import { API_CLIENT } from "modules/analytics/events/features/constants";
 import { TfiClose } from "@react-icons/all-files/tfi/TfiClose";
-import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
+import { useTabActions } from "componentsV2/Tabs/slice";
+import { getApiClientFeatureContext } from "features/apiClient/slices";
 import { HistoryViewTabSource } from "../../../views/components/request/HistoryView/historyViewTabSource";
+import { createDummyApiRecord } from "features/apiClient/components/common/APIClient/APIClient";
 
 interface Props {
   history: RQAPI.ApiEntry[];
@@ -16,19 +18,38 @@ interface Props {
 }
 
 export const HistoryList: React.FC<Props> = ({ history, selectedHistoryIndex, onSelectionFromHistory }) => {
-  const [openTab] = useTabServiceWithSelector((state) => [state.openTab]);
+  const { openBufferedTab } = useTabActions();
   const [dismissNote, setDismissNote] = useState(false);
 
   const onHistoryLinkClick = useCallback(
     (index: number) => {
+      const historyEntry = history[index];
+      if (!historyEntry) {
+        return;
+      }
+
+      const ctx = getApiClientFeatureContext();
+
+      const record = createDummyApiRecord(historyEntry);
+      record.id = ""; // Override to empty for history entries
+
+      openBufferedTab({
+        source: new HistoryViewTabSource({
+          context: { id: ctx.workspaceId },
+          record,
+          entryType: historyEntry.type,
+        }),
+        preview: false,
+        singleton: true,
+      });
+
       onSelectionFromHistory(index);
 
-      openTab(new HistoryViewTabSource());
       trackRequestSelectedFromHistory();
       trackRQLastActivity(API_CLIENT.REQUEST_SELECTED_FROM_HISTORY);
       trackRQDesktopLastActivity(API_CLIENT.REQUEST_SELECTED_FROM_HISTORY);
     },
-    [onSelectionFromHistory, openTab]
+    [onSelectionFromHistory, openBufferedTab, history]
   );
 
   const getTimelineItemColor = (entry: RQAPI.ApiEntry) => {

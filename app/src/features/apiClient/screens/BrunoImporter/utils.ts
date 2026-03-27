@@ -3,8 +3,17 @@ import { KeyValuePair, RequestContentType, RequestMethod, RQAPI } from "features
 import { Bruno } from "./types";
 import { Authorization } from "../apiClient/components/views/components/request/components/AuthorizationView/types/AuthConfig";
 import { ApiClientRecordsInterface } from "features/apiClient/helpers/modules/sync/interfaces";
-import { EnvironmentVariableData } from "features/apiClient/store/variables/types";
 import { createBodyContainer } from "../apiClient/utils";
+import { EnvironmentVariableData } from "@requestly/shared/types/entities/apiClient";
+
+export type ProcessedBrunoData = {
+  collections: Partial<RQAPI.CollectionRecord>[];
+  apis: Partial<RQAPI.ApiRecord>[];
+  environments: Array<{
+    name: string;
+    variables: Record<string, EnvironmentVariableData>;
+  }>;
+};
 
 export const processBrunoScripts = (request: Bruno.Request) => {
   const scripts = {
@@ -57,7 +66,7 @@ const processParams = (params: Bruno.Param[]) => {
     params?.map((param, index) => ({
       id: index,
       key: param.name,
-      value: param.value,
+      value: param.value != null && typeof param.value !== "object" ? String(param.value) : "",
       isEnabled: param.enabled ?? true,
     })) || []
   );
@@ -165,14 +174,7 @@ const createCollectionRecord = (
 export const processBrunoCollectionData = (
   fileContent: Bruno.RootCollection,
   apiClientRecordsRepository: ApiClientRecordsInterface<Record<string, any>>
-): {
-  collections: Partial<RQAPI.CollectionRecord>[];
-  apis: Partial<RQAPI.ApiRecord>[];
-  environments: {
-    name: string;
-    variables: Record<string, EnvironmentVariableData>;
-  }[];
-} => {
+): ProcessedBrunoData => {
   const environments = (fileContent.environments || []).map((env) => ({
     name: env.name,
     variables: env.variables.reduce((acc, variable, index) => {
@@ -199,32 +201,36 @@ export const processBrunoCollectionData = (
       variables: [] as Bruno.Variable[], // To track variables from requests
     };
 
-    items.forEach((item) => {
-      if (item.type === "folder" || (item.items && item.items.length > 0)) {
-        const id = apiClientRecordsRepository.generateCollectionId(item.name, parentCollectionId);
-        const subItems = item.items?.length
-          ? processItems(item.items, id, apiClientRecordsRepository)
-          : { collections: [], apis: [], variables: [] };
+    items
+      .sort((a, b) => {
+        return a.seq > b.seq ? 1 : -1;
+      })
+      .forEach((item) => {
+        if (item.type === "folder" || (item.items && item.items.length > 0)) {
+          const id = apiClientRecordsRepository.generateCollectionId(item.name, parentCollectionId);
+          const subItems = item.items?.length
+            ? processItems(item.items, id, apiClientRecordsRepository)
+            : { collections: [], apis: [], variables: [] };
 
-        const subCollection = createCollectionRecord(
-          item.name,
-          id,
-          parentCollectionId,
-          item.root?.request?.auth,
-          item.root?.request?.vars,
-          subItems.variables
-        );
+          const subCollection = createCollectionRecord(
+            item.name,
+            id,
+            parentCollectionId,
+            item.root?.request?.auth,
+            item.root?.request?.vars,
+            subItems.variables
+          );
 
-        result.collections.push(subCollection);
-        result.collections.push(...subItems.collections);
-        result.apis.push(...subItems.apis);
-      } else if (item.type === "http") {
-        result.apis.push(createApiRecord(item, parentCollectionId, apiClientRecordsRepository));
-        if (item.request?.vars) {
-          result.variables.push(...(item.request.vars.res || []), ...(item.request.vars.req || []));
+          result.collections.push(subCollection);
+          result.collections.push(...subItems.collections);
+          result.apis.push(...subItems.apis);
+        } else if (item.type === "http") {
+          result.apis.push(createApiRecord(item, parentCollectionId, apiClientRecordsRepository));
+          if (item.request?.vars) {
+            result.variables.push(...(item.request.vars.res || []), ...(item.request.vars.req || []));
+          }
         }
-      }
-    });
+      });
 
     return result;
   };

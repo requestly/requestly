@@ -10,7 +10,7 @@ import { EditorView } from "@codemirror/view";
 import "./scriptEditor.scss";
 import { LibraryPickerPopover, insertImportStatement, getImportedPackageCount } from "../LibraryPicker";
 import { ExternalPackage } from "features/apiClient/helpers/modules/scriptsV2/worker/script-internals/scriptExecutionWorker/globals/packageTypes";
-import { trackPackageAdded } from "features/apiClient/helpers/modules/scriptsV2/analytics";
+import { trackPackageAdded, trackScriptWritten } from "features/apiClient/helpers/modules/scriptsV2/analytics";
 import { DEFAULT_SCRIPT_VALUES } from "features/apiClient/constants";
 import Editor from "componentsV2/CodeEditor";
 import { experimental_useObject as useObject } from "@ai-sdk/react";
@@ -32,9 +32,12 @@ import {
   trackAITestGenerationRejectClicked,
   trackAITestGenerationReviewCompleted,
   trackAITestGenerationSuccessful,
+  trackAIErrorShown,
 } from "modules/analytics/events/features/apiClient";
 import { useAISessionContext } from "features/ai/contexts/AISession";
 import { getChunks } from "@codemirror/merge";
+import { debounce } from "lodash";
+import { getFunctions, httpsCallable } from "firebase/functions";
 
 const TestGenerationOutputSchema = z.object({
   text: z
@@ -59,6 +62,36 @@ const defaultScripts = {
   postResponse: DEFAULT_SCRIPT_VALUES[RQAPI.ScriptType.POST_RESPONSE],
 };
 
+enum AIErrorCategory {
+  UNAUTHORIZED = "UNAUTHORIZED",
+  QUOTA_EXHAUSTED = "QUOTA_EXHAUSTED",
+  NETWORK_ERROR = "NETWORK_ERROR",
+  UNKNOWN = "UNKNOWN",
+}
+
+const parseErrorMessage = (errMessage: string): { message: string; errorType: AIErrorCategory } => {
+  const normalizedError = errMessage.toLowerCase();
+  let message: string;
+  let errorType: AIErrorCategory;
+
+  if (/quota exhausted/i.test(normalizedError)) {
+    message = "You have exhausted your AI credits.";
+    errorType = AIErrorCategory.QUOTA_EXHAUSTED;
+  } else if (/unauthorized|forbidden|permission/i.test(normalizedError)) {
+    message = "Unauthorized access.";
+    errorType = AIErrorCategory.UNAUTHORIZED;
+  } else if (/network|fetch|timeout|connection/i.test(normalizedError)) {
+    message = "Network error occurred.";
+    errorType = AIErrorCategory.NETWORK_ERROR;
+  } else {
+    message = "An unexpected error occurred.";
+    errorType = AIErrorCategory.UNKNOWN;
+  }
+
+  const separator = message.trim().endsWith(".") ? " " : ". ";
+  return { message: `${message}${separator}Please contact Support.`, errorType };
+};
+
 interface ScriptEditorProps {
   requestId: string;
   entry: RQAPI.ApiEntry;
@@ -75,7 +108,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
   focusPostResponse,
 }) => {
   const dispatch = useDispatch();
-
+  const addUserToList = httpsCallable(getFunctions(), "premiumNotifications-addUserToList");
   const activeScriptType = entry?.scripts?.[RQAPI.ScriptType.PRE_REQUEST]
     ? RQAPI.ScriptType.PRE_REQUEST
     : entry?.scripts?.[RQAPI.ScriptType.POST_RESPONSE]
@@ -89,6 +122,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
     lastUsedQuery,
     lastGeneratedCode,
     generationMetrics,
+    generationId,
     setLastUsedQuery,
     setLastGeneratedCode,
     getCurrentGenerationId,
@@ -147,6 +181,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
         if (result.object?.code?.content) {
           setLastGeneratedCode(result.object.code.content);
           trackAITestGenerationSuccessful(sessionId, currentGenerationId);
+          addUserToList({ listId: 184 }).catch(console.error); // suppress error
         }
       }
       setIsTestsStreamingFinished(true);
@@ -155,6 +190,11 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
         const proposedChanges = getChunks(editorViewRef.current?.state);
         updateGenerationMetrics("totalProposedChanges", proposedChanges?.chunks?.length ?? 0);
       }
+    },
+    onError: (finalError) => {
+      const { message, errorType } = parseErrorMessage(finalError.message);
+      trackAIErrorShown(errorType);
+      setNegativeFeedback(message);
     },
   });
 
@@ -175,6 +215,10 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
           language: "javascript",
         },
         query: lastUsedQuery,
+      },
+      meta: {
+        sessionId,
+        generationId,
       },
     });
     setLastUsedQuery(query);
@@ -365,7 +409,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
                   disabled={scriptType !== RQAPI.ScriptType.POST_RESPONSE || !entry?.response || !isAIEnabledGlobally}
                   onCancelClick={stop}
                   negativeFeedback={negativeFeedback}
-                  label={hasPostResponseScript ? "Update with AI" : "Generate tests"}
+                  label={hasPostResponseScript ? "Improve tests" : "Generate tests"}
                 />
               </>
             </Tooltip>
@@ -412,14 +456,17 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
     );
   }, [isLibraryPickerOpen, handlePackageSelect, importCount, scriptLineCount]);
 
+  const trackChangeMade = useMemo(() => debounce((type) => trackScriptWritten(type), 10_000, { leading: true }), []);
+
   return (
     <div className="api-client-script-editor-container">
       <Editor
         key={`${scriptType}`}
         value={entry?.scripts?.[scriptType] || DEFAULT_SCRIPT_VALUES[scriptType]}
-        handleChange={(value: string) =>
-          onScriptsChange({ ...(entry?.scripts || defaultScripts), [scriptType]: value })
-        }
+        handleChange={(value: string) => {
+          trackChangeMade(scriptType);
+          onScriptsChange({ ...(entry?.scripts || defaultScripts), [scriptType]: value });
+        }}
         language={EditorLanguage.JAVASCRIPT}
         toolbarOptions={{
           title: "",

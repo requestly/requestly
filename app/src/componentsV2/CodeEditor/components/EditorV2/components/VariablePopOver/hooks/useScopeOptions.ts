@@ -1,14 +1,16 @@
 import { useMemo } from "react";
 import React from "react";
 import { VariableScope } from "backend/environment/types";
-import { ScopeOption } from "../types";
-import { useActiveEnvironment } from "features/apiClient/hooks/useActiveEnvironment.hook";
+import type { ScopeOption } from "../types";
 import { MdOutlineCategory } from "@react-icons/all-files/md/MdOutlineCategory";
+import ShieldLockIcon from "assets/icons/shield-lock.svg?react";
 import { BiNote } from "@react-icons/all-files/bi/BiNote";
 import { BsGlobeCentralSouthAsia } from "@react-icons/all-files/bs/BsGlobeCentralSouthAsia";
 import { MdHorizontalSplit } from "@react-icons/all-files/md/MdHorizontalSplit";
-import { useContextId } from "features/apiClient/contexts/contextId.context";
-import { NoopContextId } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
+import { useActiveEnvironment } from "features/apiClient/slices";
+import { useWorkspaceId } from "features/apiClient/common/WorkspaceProvider";
+import { GLOBAL_ENVIRONMENT_ID, RUNTIME_VARIABLES_ENTITY_ID } from "features/apiClient/slices/common/constants";
+import { NoopContextId } from "features/apiClient/commands/utils";
 
 interface UseScopeOptionsResult {
   scopeOptions: ScopeOption[];
@@ -16,50 +18,81 @@ interface UseScopeOptionsResult {
 }
 
 const createIconWithWrapper = (
-  IconComponent: React.ComponentType<any>,
+  IconComponent: React.ComponentType<{ style?: React.CSSProperties }>,
   iconColor: string,
-  bgColor: string = "transparent"
+  bgColor: string = "transparent",
+  text?: string
 ) => {
   return React.createElement(
     "div",
     {
       style: {
-        width: "20px",
-        height: "16px",
-        display: "flex",
+        display: "inline-flex",
         alignItems: "center",
-        justifyContent: "center",
+        gap: "4px",
+        padding: "0 6px",
+        height: "16px",
         backgroundColor: bgColor,
         borderRadius: "4px",
+        fontSize: "10px",
+        lineHeight: 1,
+        whiteSpace: "nowrap",
       },
     },
     React.createElement(IconComponent, {
-      style: { color: iconColor, height: "12px", width: "12px" },
-    })
+      style: {
+        color: iconColor,
+        height: "12px",
+        width: "12px",
+        flexShrink: 0,
+      },
+    }),
+    text ? React.createElement("span", { style: { color: iconColor } }, text) : null
   );
 };
 
-export const getScopeIcon = (scope: VariableScope): React.ReactNode => {
+export const getScopeIcon = (
+  scope: VariableScope,
+  config?: {
+    showBackgroundColor?: boolean;
+    showText?: boolean;
+  }
+): React.ReactNode => {
+  const { showBackgroundColor = true, showText = false } = config ?? {};
+
   switch (scope) {
     case VariableScope.ENVIRONMENT:
       return createIconWithWrapper(
         MdHorizontalSplit,
         "var(--requestly-color-primary-text)",
-        "var(--requestly-color-primary-darker)"
+        showBackgroundColor ? "var(--requestly-color-primary-darker)" : "transparent"
       );
     case VariableScope.COLLECTION:
-      return createIconWithWrapper(BiNote, "var(--requestly-color-text-subtle)", "var(--requestly-color-surface-2)");
+      return createIconWithWrapper(
+        BiNote,
+        "var(--requestly-color-text-subtle)",
+        showBackgroundColor ? "var(--requestly-color-surface-2)" : "transparent"
+      );
     case VariableScope.GLOBAL:
+    case VariableScope.DYNAMIC:
       return createIconWithWrapper(
         BsGlobeCentralSouthAsia,
         "var(--requestly-color-success-text)",
-        "var(--requestly-color-success-darker)"
+        showBackgroundColor ? "var(--requestly-color-success-darker)" : "transparent",
+        scope === VariableScope.DYNAMIC && showText ? "DYNAMIC" : undefined
       );
     case VariableScope.RUNTIME:
       return createIconWithWrapper(
         MdOutlineCategory,
+        "var(--requestly-color-warning-dark)",
+        showBackgroundColor ? "var(--requestly-color-warning-darker)" : "transparent"
+      );
+    case VariableScope.SECRETS:
+      return createIconWithWrapper(
+        ShieldLockIcon,
         "var(--requestly-color-text-subtle)",
-        "var(--requestly-color-warning-darker)"
+        showBackgroundColor ? "var(--requestly-color-surface-2)" : "transparent",
+        showText ? "SECRETS" : undefined
       );
     default:
       return null;
@@ -68,34 +101,38 @@ export const getScopeIcon = (scope: VariableScope): React.ReactNode => {
 
 export const useScopeOptions = (collectionId?: string): UseScopeOptionsResult => {
   const activeEnvironment = useActiveEnvironment();
-  const contextId = useContextId();
-  const isNoopContext = contextId === NoopContextId;
+  const workspaceId = useWorkspaceId();
+  const isNoopContext = workspaceId === NoopContextId;
 
   return useMemo(() => {
     const options: ScopeOption[] = [
       {
         value: VariableScope.ENVIRONMENT,
-        label: activeEnvironment ? `Current environment` : "No Active Environment",
+        label: activeEnvironment ? "Current environment" : "No Active Environment",
         icon: getScopeIcon(VariableScope.ENVIRONMENT),
         disabled: !activeEnvironment,
+        id: activeEnvironment?.id,
       },
       {
         value: VariableScope.COLLECTION,
         label: "Current collection",
         icon: getScopeIcon(VariableScope.COLLECTION),
         disabled: !collectionId,
+        id: collectionId,
       },
       {
         value: VariableScope.GLOBAL,
         label: "Global",
         icon: getScopeIcon(VariableScope.GLOBAL),
         disabled: isNoopContext,
+        id: GLOBAL_ENVIRONMENT_ID,
       },
       {
         value: VariableScope.RUNTIME,
         label: "Runtime variables",
         icon: getScopeIcon(VariableScope.RUNTIME),
         disabled: false,
+        id: RUNTIME_VARIABLES_ENTITY_ID,
       },
     ];
 

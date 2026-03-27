@@ -265,6 +265,8 @@ export const API_CLIENT = {
   ENVIRONMENT_EXPORTED: "api_client_environment_exported",
   ENVIRONMENT_DELETED: "api_client_environment_deleted",
 
+  // Process File
+  POSTMAN_UNSUPPORTED_FEATURES: "api_client_postman_unsupported_features_detected",
   // Import Data
   IMPORT_STARTED: "api_client_import_started",
   IMPORT_DATA_PARSED: "api_client_import_requests_parsed",
@@ -297,6 +299,7 @@ export const API_CLIENT = {
   AI_GENERATE_TESTS_POPOVER_GENERATE_CLICKED: "ai_generate_tests_popover_generate_clicked",
   AI_GENERATE_TESTS_FAILED: "ai_generate_tests_failed",
   AI_GENERATE_TESTS_SUCCESSFUL: "ai_generate_tests_successful",
+  AI_ERROR_SHOWN: "ai_error_shown",
   AI_GENERATE_TESTS_EDIT_PROMPT_CLICKED: "ai_generate_tests_edit_prompt_clicked",
   AI_GENERATE_TESTS_REJECT_ALL_CLICKED: "ai_generate_tests_reject_all_clicked",
   AI_GENERATE_TESTS_ACCEPT_ALL_CLICKED: "ai_generate_tests_accept_all_clicked",

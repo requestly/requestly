@@ -2,10 +2,26 @@
   &__header {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    gap: 8px;
     padding-bottom: 1rem;
     font-weight: var(--requestly-font-weight-medium);
     font-size: var(--requestly-font-size-lg);
+
+    a {
+      display: inline-flex;
+      align-items: center;
+    }
+
+    &-info-icon {
+      color: var(--requestly-color-text-subtle);
+      cursor: pointer;
+      width: 16px;
+      height: 16px;
+
+      &:hover {
+        color: var(--requestly-color-primary);
+      }
+    }
   }
 
   &__post-parse-view {

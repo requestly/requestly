@@ -2,6 +2,7 @@ import PATHS from "config/constants/sub/paths";
 import { TabRoute } from "componentsV2/Tabs/types";
 import { DraftRequestContainerTabSource } from "./components/views/components/DraftRequestContainer/draftRequestContainerTabSource";
 import { RequestViewTabSource } from "./components/views/components/RequestView/requestViewTabSource";
+import { ExampleViewTabSource } from "./components/views/components/ExampleRequestView/exampleViewTabSource";
 import { CollectionViewTabSource } from "./components/views/components/Collection/collectionViewTabSource";
 import { EnvironmentViewTabSource } from "../environment/components/environmentView/EnvironmentViewTabSource";
 import { HistoryViewTabSource } from "./components/views/components/request/HistoryView/historyViewTabSource";
@@ -17,8 +18,13 @@ export const apiClientTabRoutes: TabRoute[] = [
     tabSourceFactory: RequestViewTabSource.create,
   },
   {
+    path: PATHS.API_CLIENT.EXAMPLE.ABSOLUTE,
+    tabSourceFactory: ExampleViewTabSource.create,
+  },
+  {
     path: PATHS.API_CLIENT.HISTORY.ABSOLUTE,
     tabSourceFactory: HistoryViewTabSource.create,
+    singleton: true,
   },
   {
     path: PATHS.API_CLIENT.COLLECTION.ABSOLUTE,

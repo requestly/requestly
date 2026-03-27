@@ -176,6 +176,11 @@ export const trackImportSuccess = (type, collectionsCount, requestsCount) => {
   });
 };
 
+export const trackPostmanUnsupportedFeatures = (unsupportedFeaturesList) => {
+  const params = { unsupported_features_list: unsupportedFeaturesList };
+  trackEvent(API_CLIENT.POSTMAN_UNSUPPORTED_FEATURES, params);
+};
+
 export const trackImportFailed = (type, reason) => {
   trackEvent(API_CLIENT.IMPORT_FAILED, { import_type: type, reason });
 };
@@ -328,6 +333,10 @@ export const trackAITestGenerationFailed = (session_id, generation_id) => {
 
 export const trackAITestGenerationSuccessful = (session_id, generation_id) => {
   trackEvent(API_CLIENT.AI_GENERATE_TESTS_SUCCESSFUL, { session_id, generation_id });
+};
+
+export const trackAIErrorShown = (error_type) => {
+  trackEvent(API_CLIENT.AI_ERROR_SHOWN, { error_type });
 };
 
 export const trackAITestGenerationEditPromptClicked = (session_id, generation_id) => {

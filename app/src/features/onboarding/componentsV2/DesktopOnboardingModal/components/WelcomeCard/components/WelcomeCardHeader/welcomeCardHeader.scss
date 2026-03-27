@@ -1,0 +1,40 @@
+.welcome-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  &__icon {
+    display: flex;
+    width: 48px;
+    height: 48px;
+    aspect-ratio: 1/1;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    border-radius: 50%;
+    border: 1px solid var(--stroke-glass, rgba(255, 255, 255, 0.4));
+    background: rgba(255, 255, 255, 0.04);
+
+    img {
+      width: 29px;
+      height: 29px;
+      flex-shrink: 0;
+      filter: brightness(0.7);
+    }
+  }
+
+  &__content {
+    &-title {
+      color: var(--requestly-color-text-default);
+      font-size: var(--requestly-font-size-md);
+      font-weight: var(--requestly-font-weight-medium);
+    }
+
+    &-description {
+      color: var(--requestly-color-text-subtle);
+      font-size: var(--requestly-font-size-sm);
+      margin-top: 4px;
+      width: 260px;
+    }
+  }
+}

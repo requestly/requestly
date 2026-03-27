@@ -1,4 +1,3 @@
-import { RQAPI } from "features/apiClient/types";
 import { ApiClientRequestTabs } from "../../../components/request/components/ApiClientRequestTabs/ApiClientRequestTabs";
 import React, { useMemo } from "react";
 import { RequestTabLabel } from "../../../components/request/components/ApiClientRequestTabs/components/RequestTabLabel/RequestTabLabel";
@@ -8,6 +7,9 @@ import { GraphQLAuthView } from "./components/GraphQLAuthView/GraphQLAuthView";
 import { GraphQLScripts } from "./components/GraphQLAuthView/GraphQLScripts";
 import { RQButton } from "lib/design-system/components";
 import { MdOutlineBallot } from "@react-icons/all-files/md/MdOutlineBallot";
+import { BufferedGraphQLRecordEntity } from "features/apiClient/slices/entities";
+import { useApiClientSelector } from "features/apiClient/slices/hooks/base.hooks";
+import { RQAPI } from "features/apiClient/types";
 
 enum GraphQLRequestTab {
   QUERY = "query",
@@ -17,8 +19,7 @@ enum GraphQLRequestTab {
 }
 
 interface Props {
-  requestId: RQAPI.ApiRecord["id"];
-  collectionId: RQAPI.ApiRecord["collectionId"];
+  entity: BufferedGraphQLRecordEntity;
   isSchemaBuilderOpen: boolean;
   setIsSchemaBuilderOpen: (isOpen: boolean) => void;
   focusPostResponseScriptEditor?: boolean;
@@ -26,49 +27,72 @@ interface Props {
 }
 
 export const GraphQLRequestTabs: React.FC<Props> = ({
-  requestId,
-  collectionId,
+  entity,
   isSchemaBuilderOpen,
   setIsSchemaBuilderOpen,
   focusPostResponseScriptEditor,
   scriptEditorVersion,
 }) => {
+  const entityType = useApiClientSelector((s) => entity.getType(s));
+
   const tabItems = useMemo(() => {
     return [
       {
         key: GraphQLRequestTab.QUERY,
         label: <RequestTabLabel label="Query" />,
         children: (
-          <QueryView isSchemaBuilderOpen={isSchemaBuilderOpen} setIsSchemaBuilderOpen={setIsSchemaBuilderOpen} />
+          <QueryView
+            entity={entity}
+            isSchemaBuilderOpen={isSchemaBuilderOpen}
+            setIsSchemaBuilderOpen={setIsSchemaBuilderOpen}
+          />
         ),
       },
       {
         key: GraphQLRequestTab.HEADERS,
         label: <RequestTabLabel label="Headers" />,
-        children: <RequestHeaders requestId={requestId} />,
+        children: (
+          <div className="non-scrollable-tab-content">
+            <RequestHeaders entity={entity} />
+          </div>
+        ),
       },
-      {
-        key: GraphQLRequestTab.AUTHORIZATION,
-        label: <RequestTabLabel label="Authorization" />,
-        children: <GraphQLAuthView recordId={requestId} collectionId={collectionId} />,
-      },
-      {
-        key: GraphQLRequestTab.SCRIPTS,
-        label: <RequestTabLabel label="Scripts" />,
-        children: <GraphQLScripts key={`${scriptEditorVersion}`} focusPostResponse={focusPostResponseScriptEditor} />,
-      },
+      ...(entityType === RQAPI.RecordType.API
+        ? [
+            {
+              key: GraphQLRequestTab.AUTHORIZATION,
+              label: <RequestTabLabel label="Authorization" />,
+              children: <GraphQLAuthView entity={entity} />,
+            },
+            {
+              key: GraphQLRequestTab.SCRIPTS,
+              label: <RequestTabLabel label="Scripts" />,
+              children: (
+                <GraphQLScripts
+                  key={`${scriptEditorVersion}`}
+                  entity={entity}
+                  focusPostResponse={focusPostResponseScriptEditor}
+                />
+              ),
+            },
+          ]
+        : []),
     ];
   }, [
-    requestId,
-    collectionId,
-    setIsSchemaBuilderOpen,
+    entity,
     isSchemaBuilderOpen,
+    setIsSchemaBuilderOpen,
+    entityType,
     scriptEditorVersion,
     focusPostResponseScriptEditor,
   ]);
   return (
     <div style={{ position: "relative", height: "100%", overflow: "hidden" }}>
-      <ApiClientRequestTabs requestId={requestId} items={tabItems} defaultActiveKey={GraphQLRequestTab.QUERY} />
+      <ApiClientRequestTabs
+        requestId={entity.meta.referenceId}
+        items={tabItems}
+        defaultActiveKey={GraphQLRequestTab.QUERY}
+      />
       {!isSchemaBuilderOpen && (
         <RQButton
           className="schema-builder-toggle-button"

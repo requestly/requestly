@@ -2,8 +2,8 @@ import { EnvironmentData, EnvironmentMap, EnvironmentVariables, VariableScope } 
 import { CollectionVariableMap, RQAPI } from "features/apiClient/types";
 import { ErroredRecord, FileType } from "./local/services/types";
 import { ResponsePromise } from "backend/types";
-import { SavedRunConfig } from "features/apiClient/commands/collectionRunner/types";
-import { RunResult, SavedRunResult } from "features/apiClient/store/collectionRunResult/runResult.store";
+import { SavedRunConfig } from "features/apiClient/slices/runConfig/types";
+import { RunResult, SavedRunResult } from "features/apiClient/slices/common/runResults";
 
 export interface EnvironmentInterface<Meta extends Record<string, any>> {
   meta: Meta;
@@ -23,7 +23,7 @@ export interface EnvironmentInterface<Meta extends Record<string, any>> {
   deleteEnvironment(envId: string): Promise<{ success: boolean; message?: string }>;
   updateEnvironment(
     environmentId: string,
-    updates: Partial<Pick<EnvironmentData, "name" | "variables">>
+    updates: Partial<Pick<EnvironmentData, "name" | "variables" | "variablesOrder">>
   ): Promise<void>;
   duplicateEnvironment(environmentId: string, allEnvironments: EnvironmentMap): Promise<EnvironmentData>;
   getGlobalEnvironmentId(): string;
@@ -33,11 +33,16 @@ export interface EnvironmentInterface<Meta extends Record<string, any>> {
 export interface ApiClientRecordsInterface<Meta extends Record<string, any>> {
   meta: Meta;
   getAllRecords(): RQAPI.RecordsPromise;
+  getAllExamples(
+    recordIds: string[]
+  ): Promise<{ success: boolean; data: { examples: RQAPI.ExampleApiRecord[]; failedRecordIds?: string[] } }>;
   getRecord(recordId: string): RQAPI.ApiClientRecordPromise;
-  createRecord(record: Partial<RQAPI.ApiRecord>): RQAPI.ApiClientRecordPromise;
+  createRecord(record: Partial<RQAPI.ApiClientRecord>): RQAPI.ApiClientRecordPromise;
   createCollection(record: Partial<RQAPI.CollectionRecord>): RQAPI.ApiClientRecordPromise;
   createRecordWithId(record: Partial<RQAPI.ApiClientRecord>, id: string): RQAPI.ApiClientRecordPromise;
+  createExampleRequest(parentRequestId: string, example: RQAPI.ExampleApiRecord): RQAPI.ApiClientRecordPromise;
   updateRecord(record: Partial<Omit<RQAPI.ApiClientRecord, "id">>, id: string): RQAPI.ApiClientRecordPromise;
+  updateExampleRequest(example: RQAPI.ExampleApiRecord): RQAPI.ApiClientRecordPromise;
   deleteRecords(recordIds: string[]): Promise<{ success: boolean; message?: string }>;
   deleteCollections(ids: string[]): Promise<{ success: boolean; data: unknown; message?: string }>;
   setCollectionVariables(
@@ -96,11 +101,20 @@ export interface ApiClientRecordsInterface<Meta extends Record<string, any>> {
     collectionId: RQAPI.ApiClientRecord["collectionId"],
     runResult: RunResult
   ): ResponsePromise<SavedRunResult>;
+  deleteExamples(exampleRecords: RQAPI.ExampleApiRecord[]): Promise<{ success: boolean; message?: string }>;
+}
+
+export enum RepoType {
+  CLOUD = "cloud",
+  LOCAL = "local",
+  LOCALSTORE = "localstore",
 }
 
 export interface ApiClientRepositoryInterface {
+  readonly repoType: RepoType;
   environmentVariablesRepository: EnvironmentInterface<Record<string, any>>;
   apiClientRecordsRepository: ApiClientRecordsInterface<Record<string, any>>;
+  validateConnection(): Promise<{ isValid: boolean }>;
 }
 
 export type ApiClientCloudMeta = {

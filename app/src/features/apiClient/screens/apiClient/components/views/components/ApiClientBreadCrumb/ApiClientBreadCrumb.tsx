@@ -3,16 +3,19 @@ import { Conditional } from "components/common/Conditional";
 import PATHS from "config/constants/sub/paths";
 import { RQBreadcrumb } from "lib/design-system-v2/components";
 import { useLocation } from "react-router-dom";
-import {
-  ApiClientViewMode,
-  useApiClientMultiWorkspaceView,
-} from "features/apiClient/store/multiWorkspaceView/multiWorkspaceView.store";
 import { LuFolderCog } from "@react-icons/all-files/lu/LuFolderCog";
-import "./ApiClientBreadCrumb.scss";
 import { truncateString } from "features/apiClient/screens/apiClient/utils";
-import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 import { Tooltip } from "antd";
-import { useApiClientFeatureContext } from "features/apiClient/contexts/meta";
+import {
+  useApiClientFeatureContext,
+  useViewMode,
+  useWorkspace,
+  ApiClientViewMode,
+  useAncestorRecords,
+} from "features/apiClient/slices";
+import { WorkspaceType } from "features/workspaces/types";
+import { HiOutlineDocument } from "@react-icons/all-files/hi/HiOutlineDocument";
+import "./ApiClientBreadCrumb.scss";
 
 interface Props {
   id: string;
@@ -23,6 +26,7 @@ interface Props {
   onRecordNameUpdate?: (name: string) => void;
   onBlur: (name: string) => void;
   breadCrumbType: string;
+  isDraft?: boolean;
 }
 
 export const BreadcrumbType = {
@@ -35,36 +39,30 @@ export const MultiViewBreadCrumb: React.FC<Props> = ({ ...props }) => {
 
   const location = useLocation();
   const isHistoryPath = location.pathname.includes("history");
-  const [getSelectedWorkspace] = useApiClientMultiWorkspaceView((s) => [s.getSelectedWorkspace]);
-
   const ctx = useApiClientFeatureContext();
 
-  const currentWorkspace = useMemo(() => getSelectedWorkspace(ctx.workspaceId), [
-    getSelectedWorkspace,
-    ctx.workspaceId,
-  ]);
+  const currentWorkspace = useWorkspace(ctx.workspaceId);
+  const ancestorRecords = useAncestorRecords(id);
 
-  const [getParentChain, getData] = useAPIRecords((s) => [s.getParentChain, s.getData]);
+  const localWsPath = useMemo(() => {
+    if (currentWorkspace.meta.type === WorkspaceType.LOCAL && "rootPath" in currentWorkspace.meta) {
+      return currentWorkspace.meta.rootPath ?? "";
+    }
+    return "";
+  }, [currentWorkspace]);
 
-  const localWsPath = currentWorkspace?.getState()?.rawWorkspace?.rootPath ?? "";
   const truncatePath = truncateString(localWsPath, 40);
 
   const parentCollectionNames = useMemo(() => {
-    const collections = getParentChain(id);
-
-    const parentRecords = collections
+    return ancestorRecords
       .slice()
       .reverse()
-      .map((id) => {
-        return {
-          label: getData(id)?.name,
-          pathname: "",
-          isEditable: false,
-        };
-      });
-
-    return parentRecords;
-  }, [getData, getParentChain, id]);
+      .map((record) => ({
+        label: record?.name,
+        pathname: "",
+        isEditable: false,
+      }));
+  }, [ancestorRecords]);
 
   return (
     <RQBreadcrumb
@@ -111,29 +109,36 @@ export const ApiClientBreadCrumb: React.FC<Props> = ({ ...props }) => {
 
   const location = useLocation();
   const isHistoryPath = location.pathname.includes("history");
-  const [getViewMode] = useApiClientMultiWorkspaceView((s) => [s.getViewMode]);
+  const viewMode = useViewMode();
 
   return (
     <Conditional condition={!openInModal}>
-      {getViewMode() === ApiClientViewMode.SINGLE ? (
-        <RQBreadcrumb
-          placeholder={placeholder}
-          recordName={name}
-          onRecordNameUpdate={onRecordNameUpdate}
-          onBlur={onBlur}
-          autoFocus={autoFocus}
-          defaultBreadcrumbs={[
-            { label: "API Client", pathname: PATHS.API_CLIENT.INDEX },
-            {
-              isEditable: !isHistoryPath,
-              pathname: window.location.pathname,
-              label: isHistoryPath ? "History" : name || "Untitled request",
-            },
-          ]}
-        />
-      ) : (
-        <MultiViewBreadCrumb {...props} />
-      )}
+      <div className="api-client-breadcrumb-wrapper">
+        {props.isDraft && (
+          <div className="api-client-breadcrumb-draft-badge">
+            <HiOutlineDocument /> <span>Draft</span>
+          </div>
+        )}
+        {viewMode === ApiClientViewMode.SINGLE ? (
+          <RQBreadcrumb
+            placeholder={placeholder}
+            recordName={name}
+            onRecordNameUpdate={onRecordNameUpdate}
+            onBlur={onBlur}
+            autoFocus={autoFocus}
+            defaultBreadcrumbs={[
+              { label: "API Client", pathname: PATHS.API_CLIENT.INDEX },
+              {
+                isEditable: !isHistoryPath,
+                pathname: window.location.pathname,
+                label: isHistoryPath ? "History" : name || "Untitled request",
+              },
+            ]}
+          />
+        ) : (
+          <MultiViewBreadCrumb {...props} />
+        )}
+      </div>
     </Conditional>
   );
 };

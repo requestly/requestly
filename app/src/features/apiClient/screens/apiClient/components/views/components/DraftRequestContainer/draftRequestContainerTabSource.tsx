@@ -6,21 +6,28 @@ import { MdOutlineSyncAlt } from "@react-icons/all-files/md/MdOutlineSyncAlt";
 import { RQAPI } from "features/apiClient/types";
 import { GrGraphQl } from "@react-icons/all-files/gr/GrGraphQl";
 import { TabSourceMetadata } from "componentsV2/Tabs/types";
+import { getEmptyDraftApiRecord } from "features/apiClient/screens/apiClient/utils";
+import { apiClientContextRegistry, getApiClientFeatureContext } from "features/apiClient/slices";
 
-interface DraftRequestContainerTabSourceMetadata extends Partial<TabSourceMetadata> {
+interface DraftRequestContainerTabSourceMetadata extends TabSourceMetadata {
+  emptyRecord: RQAPI.ApiRecord;
   apiEntryType?: RQAPI.ApiEntryType;
 }
 
 export class DraftRequestContainerTabSource extends BaseTabSource {
-  constructor(metadata?: DraftRequestContainerTabSourceMetadata) {
+  metadata: DraftRequestContainerTabSourceMetadata;
+  constructor(metadata: Pick<DraftRequestContainerTabSourceMetadata, "emptyRecord" | "apiEntryType" | "context">) {
     super();
     this.metadata = {
       id: `${Date.now()}`,
       name: "request",
       title: "Untitled request",
-      context: {},
       isNewTab: true,
       ...metadata,
+      context: {
+        id: apiClientContextRegistry.getLastUsedContext()?.workspaceId,
+        ...metadata.context,
+      },
     };
     this.component = (
       <DraftRequestContainer
@@ -36,7 +43,15 @@ export class DraftRequestContainerTabSource extends BaseTabSource {
   }
 
   static create(metadata?: DraftRequestContainerTabSourceMetadata): DraftRequestContainerTabSource {
-    return new DraftRequestContainerTabSource({ apiEntryType: metadata?.apiEntryType ?? RQAPI.ApiEntryType.HTTP });
+    const apiEntryType = metadata?.apiEntryType ?? RQAPI.ApiEntryType.HTTP;
+    const ctx = getApiClientFeatureContext();
+    return new DraftRequestContainerTabSource({
+      apiEntryType,
+      emptyRecord: getEmptyDraftApiRecord(apiEntryType),
+      context: {
+        id: ctx.workspaceId,
+      },
+    });
   }
 
   setUrlPath(path: string) {
@@ -52,9 +67,5 @@ export class DraftRequestContainerTabSource extends BaseTabSource {
       default:
         return <MdOutlineSyncAlt />;
     }
-  }
-
-  getIsValidTab(): boolean {
-    return true; // Always a valid tab, on reload we get new draft tab
   }
 }

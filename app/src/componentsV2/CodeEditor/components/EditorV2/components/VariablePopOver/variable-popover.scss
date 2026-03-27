@@ -1,14 +1,4 @@
 .editor-popup-container {
-  .highlight-defined-variable {
-    color: var(--requestly-color-primary-text);
-    cursor: pointer;
-  }
-
-  .highlight-undefined-variable {
-    color: var(--requestly-color-error-text);
-    cursor: pointer;
-  }
-
   .cm-editor {
     margin-top: -4px;
   }
@@ -85,8 +75,7 @@ div.n-popup {
 
   .variable-info-body {
     display: flex;
-    width: 300px;
-    min-width: 240px;
+    max-width: 300px;
     max-height: 480px;
     gap: 8px;
     flex-direction: column;
@@ -94,6 +83,10 @@ div.n-popup {
     padding: 0px;
     overflow-y: auto;
     overflow-x: hidden;
+
+    &.dynamic-variable-view {
+      width: auto;
+    }
 
     .variable-info-property-container {
       display: flex;
@@ -481,6 +474,54 @@ div.n-popup {
     &.ant-select-item-option-disabled {
       color: var(--requestly-color-text-disabled);
       opacity: 0.5;
+    }
+  }
+}
+
+.secrets-not-found-container {
+  width: 230px;
+  padding: 4px;
+
+  .secrets-not-found-message {
+    padding: var(--space-2, 4px) var(--space-5, 12px) 10px;
+    color: var(--requestly-color-text-subtle, #bbb);
+    font-family: var(--requestly-font-family-default, Inter);
+    font-size: var(--requestly-font-size-xs, 11px);
+    font-style: normal;
+    border-bottom: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
+  }
+
+  .secrets-active-instance {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 4px;
+    padding: var(--space-2, 4px);
+    margin: 0;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.15s ease;
+
+    .active-instance-label {
+      padding: var(--space-3, 6px) var(--space-5, 12px);
+      color: var(--requeslty-color-text-subtle, #bbb);
+      font-family: var(--requestly-font-family-default, Inter);
+      font-size: var(--requestly-font-size-xs, 11px);
+      font-style: normal;
+      font-weight: 500;
+      cursor: pointer;
+      width: 100% !important;
+      border-radius: 4px;
+
+      .active-instance-name {
+        color: var(--requestly-color-text-default, #fff);
+        font-weight: 400;
+        line-height: 17px;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
     }
   }
 }

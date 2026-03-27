@@ -4,25 +4,27 @@
   background: var(--requestly-color-surface-0);
   border-right: 1px solid var(--requestly-color-surface-2);
   height: 100vh;
+}
 
-  &.app-mode-desktop {
-    padding-top: 40px;
+.settings-primary-sidebar-back-btn {
+  cursor: pointer;
+  margin-bottom: 12px;
+
+  &:hover {
+    opacity: 0.8;
   }
 }
 
 .settings-primary-sidebar-title-icon {
-  margin-top: 5px;
-  color: var(--requestly-color-text-default);
-  font-size: 1.25rem;
-  height: 1.25rem;
-  cursor: pointer;
+  color: var(--requestly-color-text-secondary);
 }
 
 .settings-primary-sidebar-title {
   color: var(--requestly-color-text-default);
-  font-size: 1rem;
-  font-weight: 500;
-  letter-spacing: 0.5px;
+  font-size: var(--requestly-font-size-lg, 16px);
+  font-weight: 400;
+  padding-left: 4px;
+  margin-bottom: 8px;
 }
 
 .settings-primary-sidebar-section:not(:first-child) {

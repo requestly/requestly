@@ -1,36 +1,26 @@
-import React, { useEffect, useLayoutEffect, useState } from "react";
-import APIClientSidebar from "./screens/apiClient/components/sidebar/APIClientSidebar";
 import { TabsContainer } from "componentsV2/Tabs/components/TabsContainer";
-import { TabServiceProvider } from "componentsV2/Tabs/store/TabServiceContextProvider";
-import { LocalSyncRefreshHandler } from "./LocalSyncRefreshHandler";
-import "./container.scss";
-import { ApiClientLoadingView } from "./screens/apiClient/components/views/components/ApiClientLoadingView/ApiClientLoadingView";
-import { clearAllStaleContextOnAuthChange, setupContextWithRepo } from "./commands/context";
-import { useSelector } from "react-redux";
-import { getActiveWorkspace } from "store/slices/workspaces/selectors";
-import {
-  apiClientMultiWorkspaceViewStore,
-  ApiClientViewMode,
-  useApiClientMultiWorkspaceView,
-} from "./store/multiWorkspaceView/multiWorkspaceView.store";
-import Daemon from "./store/apiRecords/Daemon";
-import { ApiClientProvider } from "./contexts";
-import { loadWorkspaces } from "./commands/multiView/loadPendingWorkspaces.command";
-import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { createRepository } from "./commands/context/setupContext.command";
-import Split from "react-split";
+import React, { useEffect, useLayoutEffect, useState } from "react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
+import { useDispatch, useSelector } from "react-redux";
+import Split from "react-split";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
+import { RootState } from "store/types";
+import "./container.scss";
+import { ApiClientProvider } from "./contexts";
+import APIClientSidebar from "./screens/apiClient/components/sidebar/APIClientSidebar";
+import { ApiClientLoadingView } from "./screens/apiClient/components/views/components/ApiClientLoadingView/ApiClientLoadingView";
+import { useWorkspaceLoadingError } from "./slices";
+import { getWorkspaceViewSlice } from "./slices/workspaceView/slice";
+import { setupWorkspaceView } from "./slices/workspaceView/thunks";
+import Daemon from "./store/apiRecords/Daemon";
 
 const ApiClientFeatureContainer: React.FC = () => {
+  const dispatch = useDispatch();
   const user: Record<string, any> = useSelector(getUserAuthDetails);
-  const activeWorkspace = useSelector(getActiveWorkspace);
-  const [viewMode, isLoaded, getViewMode] = useApiClientMultiWorkspaceView((s) => [
-    s.viewMode,
-    s.isLoaded,
-    s.getViewMode,
-  ]);
+  const isSetupDone = useSelector((s: RootState) => getWorkspaceViewSlice(s).isSetupDone);
   const [screenWidth, setScreenWidth] = useState(window.innerWidth);
+  const loadingError = useWorkspaceLoadingError();
 
   useLayoutEffect(() => {
     const handleResize = () => {
@@ -46,78 +36,52 @@ const ApiClientFeatureContainer: React.FC = () => {
   };
 
   useEffect(() => {
-    (async () => {
-      if (getViewMode() === ApiClientViewMode.MULTI) {
-        await loadWorkspaces();
-        return;
-      }
-    })();
-  }, [getViewMode]);
+    dispatch(
+      setupWorkspaceView({
+        userId: user.details?.profile?.uid,
+      }) as any
+    );
+  }, [dispatch, user.details?.profile?.uid]);
 
-  useEffect(() => {
-    if (viewMode === ApiClientViewMode.MULTI) {
-      return;
-    }
-
-    if (!activeWorkspace) {
-      return;
-    }
-
-    (async () => {
-      apiClientMultiWorkspaceViewStore.getState().setIsLoaded(false);
-
-      clearAllStaleContextOnAuthChange({
-        user: { loggedIn: user.loggedIn },
-        workspaceType: activeWorkspace.workspaceType,
-      });
-
-      const repository = createRepository(activeWorkspace, {
-        loggedIn: user.loggedIn,
-        uid: user.details?.profile?.uid ?? "",
-      });
-
-      await setupContextWithRepo(activeWorkspace.id, repository);
-    })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- not adding `activeWorkspace` to control reactivity
-  }, [user.loggedIn, user.details?.profile?.uid, activeWorkspace?.id, viewMode]);
-
-  if (!isLoaded) {
+  if (!isSetupDone) {
     return <ApiClientLoadingView />;
+  }
+
+  if (loadingError) {
+    throw loadingError;
   }
 
   return (
     <DndProvider backend={HTML5Backend} context={window}>
-      <TabServiceProvider>
-        <LocalSyncRefreshHandler />
-        <div className="api-client-container">
-          <Daemon />
-          <ApiClientProvider>
-            <Split
-              className="api-client-container__split"
-              direction="horizontal"
-              sizes={[20, 80]}
-              minSize={[300, getSecondPaneMinSize()]}
-              gutter={(index, direction) => {
-                const gutterContainer = document.createElement("div");
-                gutterContainer.style.position = "relative";
-                gutterContainer.className = `api-client-container__split-gutter gutter-container gutter-container-${direction}`;
-                gutterContainer.innerHTML = `<div class="gutter" />`;
-                return gutterContainer;
-              }}
-              gutterStyle={() => {
-                return {
-                  height: "100%",
-                  width: "0px",
-                };
-              }}
-              gutterAlign="center"
-            >
-              <APIClientSidebar />
-              <TabsContainer />
-            </Split>
-          </ApiClientProvider>
-        </div>
-      </TabServiceProvider>
+      {/*<LocalSyncRefreshHandler /> */}
+      <div className="api-client-container">
+        <Daemon />
+        <ApiClientProvider>
+          <Split
+            className="api-client-container__split"
+            direction="horizontal"
+            sizes={[20, 80]}
+            minSize={[300, getSecondPaneMinSize()]}
+            gutter={(index, direction) => {
+              const gutterContainer = document.createElement("div");
+              gutterContainer.style.position = "relative";
+              gutterContainer.className = `api-client-container__split-gutter gutter-container gutter-container-${direction}`;
+              gutterContainer.innerHTML = `<div class="gutter" />`;
+              return gutterContainer;
+            }}
+            gutterStyle={() => {
+              return {
+                height: "100%",
+                width: "0px",
+              };
+            }}
+            gutterAlign="center"
+          >
+            <APIClientSidebar />
+            <TabsContainer />
+          </Split>
+        </ApiClientProvider>
+      </div>
     </DndProvider>
   );
 };

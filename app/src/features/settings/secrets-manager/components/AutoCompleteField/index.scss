@@ -1,0 +1,101 @@
+.form-autocomplete-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4, 8px);
+  width: 100%;
+
+  .form-autocomplete-label {
+    color: var(--requestly-color-text-default, #fff);
+    font-family: var(--font-family-default, Inter);
+    font-size: var(--font-size-xs, 11px);
+    font-style: normal;
+    font-weight: 400;
+    margin-bottom: -5px;
+  }
+
+  label {
+    font-size: var(--requestly-font-size-sm);
+    font-weight: var(--requestly-font-weight-medium);
+    color: var(--requestly-color-text-default);
+    line-height: 18px;
+  }
+
+  .form-autocomplete {
+    display: flex;
+    height: 32px;
+    align-items: center;
+    gap: var(--space-3, 6px);
+    align-self: stretch;
+    width: 100%;
+
+    .ant-select-selection-search-input {
+      height: 32px !important;
+      color: var(--requestly-color-text-default, #fff);
+      font-family: var(--font-family-default, Inter);
+      font-size: var(--font-size-sm, 12px);
+      font-style: normal;
+      font-weight: 400;
+    }
+
+    .ant-select-selector {
+      background-color: transparent !important;
+      height: 32px !important;
+      align-items: center !important;
+
+      input {
+        color: var(--requestly-color-text-default, #fff) !important;
+      }
+
+      .ant-select-selection-placeholder {
+        color: var(--alias-tokens-color-text-placeholder, #8f8f8f);
+        font-family: var(--font-family-default, Inter);
+        font-size: var(--font-size-sm, 12px);
+        font-style: normal;
+        font-weight: 400;
+        line-height: 18px;
+      }
+    }
+
+    &.ant-select-focused .ant-select-selector {
+      border-color: var(--requestly-color-primary) !important;
+      box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.1) !important;
+    }
+  }
+}
+
+.ant-select-dropdown.form-autocomplete-dropdown {
+  .ant-select-item-option {
+    display: flex;
+    padding: var(--space-4, 8px) var(--space-5, 12px);
+    align-items: center;
+    gap: var(--space-4, 8px);
+    align-self: stretch;
+    border-radius: 4px;
+    background-color: var(--requestly-color-surface-0);
+    color: var(--requestly-color-text-default);
+
+    &:hover {
+      background-color: var(--requestly-color-surface-1) !important;
+    }
+
+    &.ant-select-item-option-selected {
+      background-color: var(--requestly-color-surface-2) !important;
+    }
+
+    &.ant-select-item-option-active {
+      background-color: var(--requestly-color-surface-1) !important;
+    }
+
+    .ant-select-item-option-content {
+      color: var(--alias-tokens-color-text-default, #fff);
+      font-family: var(--font-family-default, Inter);
+      font-size: var(--font-size-xs, 11px);
+      font-style: normal;
+      font-weight: 400;
+    }
+  }
+
+  .ant-select-item + .ant-select-item {
+    margin-top: var(--space-1, 2px);
+  }
+}

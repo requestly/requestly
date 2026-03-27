@@ -8,7 +8,7 @@ import {
   TestFunction,
   TestResult,
 } from "./types";
-import { VariableScope } from "./variableScope";
+import { SecretVariable, VariableScope } from "./variableScope";
 import { RQAPI } from "features/apiClient/types";
 import { expect } from "chai";
 import { Options as AjvOptions } from "ajv";
@@ -18,6 +18,7 @@ import { status } from "http-status";
 import { IterationData } from "./IterationData";
 import { ExecutionContext } from "features/apiClient/helpers/httpRequestExecutor/scriptExecutionContext";
 import { ScriptLogger } from "./scriptExecutionWorker/ScriptLogger";
+import { variableResolver } from "../../../../../../../lib/dynamic-variables";
 
 // unsupported methods
 const createInfiniteChainable = (methodName: string) => {
@@ -58,6 +59,7 @@ export class RQ implements SandboxAPI {
   public variables: VariableScope;
   public globals: VariableScope;
   public collectionVariables: VariableScope;
+  public secrets: VariableScope;
   public expect: Chai.ExpectStatic;
   public test: TestFunction;
   public iterationData: IterationData;
@@ -87,6 +89,7 @@ export class RQ implements SandboxAPI {
     this.globals = new VariableScope(localScope, "global");
     this.collectionVariables = new VariableScope(localScope, "collectionVariables");
     this.variables = new VariableScope(localScope, "variables");
+    this.secrets = new SecretVariable(localScope);
     this.expect = expect;
     this.test = this.createTestObject();
     this.request = this.createRequestObject(localScope.get("request"));
@@ -95,6 +98,17 @@ export class RQ implements SandboxAPI {
     this.info = this.createInfoObject(executionMetadata);
 
     this.assertionHandler = new AssertionHandler(this.response);
+    this.registerDynamicVariables();
+  }
+
+  /**
+   * Registers dynamic variable methods on the RQ instance.
+   * Enables usage like rq.$randomEmail(), rq.$randomFirstName('male'), etc.
+   */
+  private registerDynamicVariables(): void {
+    for (const variable of variableResolver.listAll()) {
+      (this as any)[variable.name] = (...args: unknown[]) => variable.generate(...args);
+    }
   }
 
   private createInfoObject(executionMetadata: ExecutionMetadata) {

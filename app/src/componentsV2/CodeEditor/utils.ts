@@ -6,6 +6,10 @@ export const getEditorParserConfig = async (language: EditorLanguage) => {
   let parserPlugin = await import("prettier/parser-babel");
 
   switch (language) {
+    case EditorLanguage.XML:
+      parser = "xml";
+      parserPlugin = await import("@prettier/plugin-xml");
+      break;
     case EditorLanguage.HTML:
       parser = "html";
       parserPlugin = await import("prettier/parser-html");
@@ -15,6 +19,13 @@ export const getEditorParserConfig = async (language: EditorLanguage) => {
       parserPlugin = await import("prettier/parser-postcss");
       break;
     case EditorLanguage.JSON:
+      parser = "json";
+      break;
+    case EditorLanguage.JSON5:
+      // Cleanup for JSON5 in a future release required
+      // The proper way is to move to an updated prettier version
+      // that supports JSONC and substitute JSON5 support for JSONC
+      // in the editor
       parser = "json";
       break;
     default:

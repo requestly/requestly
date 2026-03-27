@@ -1,8 +1,15 @@
+.request-row {
+  display: flex;
+  align-items: center;
+
+  a {
+    width: 100%;
+  }
+}
+
 svg.graphql-request-icon {
   color: #ff14a9;
   min-width: 32px;
-  // position: relative;
-  // left: -5px;
 }
 
 .request-dropdown-menu .ant-dropdown-menu {
@@ -19,4 +26,30 @@ svg.graphql-request-icon {
 
 .collections-list-item.api.selected:hover {
   background-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+// Drop position visual feedback
+.request-drop-before {
+  border-top: 2px solid var(--requestly-color-primary-text, #1890ff);
+  margin-top: -2px;
+}
+
+.request-drop-after {
+  border-bottom: 2px solid var(--requestly-color-primary-text, #1890ff);
+  margin-bottom: -2px;
+}
+
+.collapsible-request-row-header {
+  display: flex;
+  align-items: center;
+  gap: var(--requestly-space-2, 4px);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.request-with-examples-row {
+  .ant-collapse-header:hover .request-options {
+    display: block !important;
+  }
 }

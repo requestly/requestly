@@ -1,8 +1,9 @@
 import { Decoration, DecorationSet, EditorView, ViewPlugin, ViewUpdate } from "@codemirror/view";
 import { ScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
+import { hasVariable } from "features/apiClient/helpers/variableResolver/variableHelper";
 
 interface VariableSetters {
-  setHoveredVariable: (token: string | null) => void;
+  handleSetVariable: (token: string | null) => void;
   setPopupPosition: (position: { x: number; y: number }) => void;
 }
 
@@ -39,7 +40,8 @@ export const highlightVariablesPlugin = (setters: VariableSetters, variables: Sc
           const startIndex = match.index;
           const endIndex = match.index + match[0].length;
 
-          const variable = match[0].slice(2, -2); // Extract the variable name
+          const variable = match[0].slice(2, -2).trim(); // Extract the variable name
+          const variableName = variable.startsWith("$") ? variable.split(/\s+/)[0] || variable : variable;
 
           this.variablePositions.push({
             start: startIndex,
@@ -47,9 +49,15 @@ export const highlightVariablesPlugin = (setters: VariableSetters, variables: Sc
             variable,
           });
 
+          // Use unified variable resolution to check both scoped and dynamic variables
+          const isDefined = variableName.length > 0 ? hasVariable(variableName, variables) : false;
+          const cls = `highlight-${isDefined ? "defined" : "undefined"}-variable`;
+          const colorVar = isDefined ? "var(--requestly-color-primary-text)" : "var(--requestly-color-error-text)";
+
           decorations.push(
             Decoration.mark({
-              class: `highlight-${variables.has(variable) ? "defined" : "undefined"}-variable`,
+              class: cls,
+              attributes: { style: `color: ${colorVar} !important;` },
             }).range(match.index, match.index + match[0].length)
           );
         }
@@ -71,17 +79,19 @@ export const highlightVariablesPlugin = (setters: VariableSetters, variables: Sc
             const token = doc.sliceString(hoveredVar.start, hoveredVar.end);
             const coords = this.view.coordsAtPos(hoveredVar.start);
 
-            const variable = token.slice(2, -2);
-            setters.setHoveredVariable(variable);
-            setters.setPopupPosition({
-              x: coords.left,
-              y: coords.top,
-            });
+            if (coords) {
+              const variable = token.slice(2, -2).trim();
+              setters.handleSetVariable(variable);
+              setters.setPopupPosition({
+                x: coords.left,
+                y: coords.top,
+              });
+            }
           } else {
-            setters.setHoveredVariable(null); // Hide popup if not hovering over a variable
+            setters.handleSetVariable(null); // Hide popup if not hovering over a variable
           }
         } else {
-          setters.setHoveredVariable(null);
+          setters.handleSetVariable(null);
         }
       }
 

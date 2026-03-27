@@ -5,13 +5,15 @@ import {
   upsertApiRecord,
   batchCreateApiRecordsWithExistingId,
   batchUpsertApiRecords,
+  getExamplesForApiRecords,
   getRunConfig as getRunConfigFromFirebase,
   upsertRunConfig as upsertRunConfigFromFirebase,
   getRunResults as getRunResultsFromFirebase,
   addRunResult as addRunResultToFirebase,
+  createExample,
 } from "backend/apiClient";
 import { ApiClientCloudMeta, ApiClientRecordsInterface } from "../../interfaces";
-import { batchWrite, firebaseBatchWrite, generateDocumentId, getOwnerId } from "backend/utils";
+import { batchWrite, generateDocumentId, getOwnerId } from "backend/utils";
 import { isApiCollection } from "features/apiClient/screens/apiClient/utils";
 import { omit } from "lodash";
 import { RQAPI } from "features/apiClient/types";
@@ -19,9 +21,14 @@ import { sanitizeRecord, updateApiRecord } from "backend/apiClient/upsertApiReco
 import { EnvironmentVariables } from "backend/environment/types";
 import { ErroredRecord } from "../../local/services/types";
 import { ResponsePromise } from "backend/types";
-import { SavedRunConfig } from "features/apiClient/commands/collectionRunner/types";
-import { RunResult, SavedRunResult } from "features/apiClient/store/collectionRunResult/runResult.store";
 import { batchCreateCollectionRunDetailsInFirebase } from "backend/apiClient/batchCreateCollectionRunDetailsInFirebase";
+import { RunResult, SavedRunResult } from "features/apiClient/slices/common/runResults";
+import { SavedRunConfig } from "features/apiClient/slices/runConfig/types";
+import { SentryCustomSpan } from "utils/sentry";
+import { captureException } from "backend/apiClient/utils";
+import { apiRecordsRankingManager } from "features/apiClient/helpers/RankingManager";
+import { updateExample } from "backend/apiClient/updateExample";
+import { deleteExamples } from "backend/apiClient/deleteExamples";
 
 export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<ApiClientCloudMeta> {
   meta: ApiClientCloudMeta;
@@ -69,8 +76,15 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
     return this.updateRecord({ id, name: newName }, id, RQAPI.RecordType.COLLECTION);
   }
 
+  @SentryCustomSpan({
+    name: "api_client.cloud.repository.createRecord",
+    op: "repository.create",
+    attributes: {
+      "_attribute.repo_type": "cloud",
+    },
+  })
   async createRecord(record: Partial<RQAPI.ApiClientRecord>) {
-    return upsertApiRecord(this.meta.uid, record, this.meta.teamId);
+    return await upsertApiRecord(this.meta.uid, record, this.meta.teamId);
   }
 
   async createCollection(record: Partial<RQAPI.ApiClientRecord>) {
@@ -78,16 +92,29 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
   }
 
   async createRecordWithId(record: Partial<RQAPI.ApiClientRecord>, id: string) {
-    return upsertApiRecord(this.meta.uid, record, this.meta.teamId, id);
+    return await upsertApiRecord(this.meta.uid, record, this.meta.teamId, id);
   }
 
+  @SentryCustomSpan({
+    name: "api_client.cloud.repository.updateRecord",
+    op: "repository.update",
+    attributes: {
+      "_attribute.repo_type": "cloud",
+    },
+  })
   async updateRecord(record: Partial<RQAPI.ApiClientRecord>, id: string, type?: RQAPI.ApiClientRecord["type"]) {
+    if (!record.rank) {
+      const existingRecord = await this.getRecord(id);
+      if (existingRecord?.success && existingRecord.data) {
+        record.rank = apiRecordsRankingManager.getEffectiveRank(existingRecord.data);
+      }
+    }
     const sanitizedRecord = sanitizeRecord(record as RQAPI.ApiClientRecord);
     sanitizedRecord.id = id;
     if (type) {
       sanitizedRecord.type = type;
     }
-    return updateApiRecord(this.meta.uid, sanitizedRecord, this.meta.teamId);
+    return await updateApiRecord(this.meta.uid, sanitizedRecord, this.meta.teamId);
   }
 
   async deleteRecords(recordIds: string[]) {
@@ -174,6 +201,12 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
   ) {
     try {
       const result = await batchWrite(batchSize, entities, writeFunction);
+      result.forEach((r) => {
+        if (r.status === "rejected") {
+          const error = r.reason;
+          captureException(error);
+        }
+      });
       return {
         success: result.every((r) => r.status === "fulfilled"),
       };
@@ -191,7 +224,8 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
   }
 
   async duplicateApiEntities(entities: RQAPI.ApiClientRecord[]) {
-    return firebaseBatchWrite("apis", entities);
+    const result = await batchUpsertApiRecords(this.meta.uid, entities, this.meta.teamId);
+    return result.success ? (result.data as RQAPI.ApiRecord[]) : [];
   }
 
   async moveAPIEntities(entities: RQAPI.ApiClientRecord[], newParentId: string) {
@@ -200,7 +234,9 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
         ? { ...record, collectionId: newParentId, data: omit(record.data, "children") }
         : { ...record, collectionId: newParentId }
     );
-    return await firebaseBatchWrite("apis", updatedRequests);
+
+    const result = await batchUpsertApiRecords(this.meta.uid, updatedRequests, this.meta.teamId);
+    return result.success ? (result.data as RQAPI.ApiRecord[]) : [];
   }
 
   async batchCreateRecordsWithExistingId(records: RQAPI.ApiClientRecord[]): RQAPI.RecordsPromise {
@@ -257,6 +293,44 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
     runResult: RunResult
   ): ResponsePromise<SavedRunResult> {
     const result = await addRunResultToFirebase(collectionId, runResult);
+    return result;
+  }
+
+  async getAllExamples(
+    recordIds: string[]
+  ): Promise<{ success: boolean; data: { examples: RQAPI.ExampleApiRecord[]; failedRecordIds?: string[] } }> {
+    const result = await getExamplesForApiRecords(this.getPrimaryId(), recordIds);
+
+    if (!result.success) {
+      return {
+        success: false,
+        data: {
+          examples: [],
+        },
+      };
+    }
+
+    return {
+      success: true,
+      data: {
+        examples: result.data,
+        failedRecordIds: result.failedRecordIds,
+      },
+    };
+  }
+
+  async createExampleRequest(parentRequestId: string, example: RQAPI.ExampleApiRecord): RQAPI.ApiClientRecordPromise {
+    const result = await createExample(this.meta.uid, parentRequestId, example, this.meta.teamId);
+    return result;
+  }
+
+  async updateExampleRequest(example: RQAPI.ExampleApiRecord): RQAPI.ApiClientRecordPromise {
+    const result = await updateExample(this.meta.uid, example, this.meta.teamId);
+    return result;
+  }
+
+  async deleteExamples(exampleRecords: RQAPI.ExampleApiRecord[]): Promise<{ success: boolean; message?: string }> {
+    const result = await deleteExamples(this.meta.uid, exampleRecords);
     return result;
   }
 }
