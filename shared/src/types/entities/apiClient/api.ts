@@ -257,6 +257,7 @@ export enum ApiClientImporterType {
   CURL = "CURL",
   OPENAPI = "OPENAPI",
   SOAP = "SOAP",
+  SOAPUI = "SOAPUI",
 }
 
 export type CollectionVariableMap = Record<string, { variables: EnvironmentVariables }>;

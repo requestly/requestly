@@ -20,7 +20,12 @@ import { ApiClientSidebarTabKey } from "../../SingleWorkspaceSidebar/SingleWorks
 import { SiOpenapiinitiative } from "@react-icons/all-files/si/SiOpenapiinitiative";
 import { LuCodeXml } from "@react-icons/all-files/lu/LuCodeXml";
 import { CommonApiClientImportModal } from "../../../modals/CommonApiClientImportModal/CommonApiClientImportModal";
-import { ApiClientImporterMethod, openApiImporter, soapImporter } from "@requestly/alternative-importers";
+import {
+  ApiClientImporterMethod,
+  openApiImporter,
+  soapImporter,
+  soapUiImporter,
+} from "@requestly/alternative-importers";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { ApiClientViewMode, useViewMode } from "features/apiClient/slices";
 import { EnvironmentSwitcher } from "./components/environmentSwitcher/EnvironmentSwitcher";
@@ -56,6 +61,7 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
   const [isPostmanImporterModalOpen, setIsPostmanImporterModalOpen] = useState(false);
   const [isBrunoImporterModalOpen, setIsBrunoImporterModalOpen] = useState(false);
   const [isSoapImporterModalOpen, setIsSoapImporterModalOpen] = useState(false);
+  const [isSoapUiImporterModalOpen, setIsSoapUiImporterModalOpen] = useState(false);
   const [commonImportModalConfig, setCommonImportModalConfig] = useState<ImportModalConfig | null>(null);
   const isOpenApiSupportEnabled = useFeatureIsOn("openapi-import-support");
 
@@ -141,6 +147,18 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
           setIsSoapImporterModalOpen(true);
         },
       },
+      {
+        key: "7",
+        label: (
+          <div className="new-btn-option">
+            <LuCodeXml /> SoapUI Project
+          </div>
+        ),
+        onClick: () => {
+          trackImportStarted(ApiClientImporterType.SOAPUI);
+          setIsSoapUiImporterModalOpen(true);
+        },
+      },
     ],
     [onImportClick, isOpenApiSupportEnabled]
   );
@@ -168,6 +186,9 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
           break;
         case ApiClientImporterType.SOAP:
           setIsSoapImporterModalOpen(true);
+          break;
+        case ApiClientImporterType.SOAPUI:
+          setIsSoapUiImporterModalOpen(true);
           break;
         default:
           break;
@@ -236,6 +257,14 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
           isOpen={isSoapImporterModalOpen}
           onClose={() => setIsSoapImporterModalOpen(false)}
           importer={soapImporter}
+        />
+      )}
+      {isSoapUiImporterModalOpen && (
+        <SoapImporterModal
+          isOpen={isSoapUiImporterModalOpen}
+          onClose={() => setIsSoapUiImporterModalOpen(false)}
+          importer={soapUiImporter}
+          importerType={ApiClientImporterType.SOAPUI}
         />
       )}
 
