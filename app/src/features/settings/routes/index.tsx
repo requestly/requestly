@@ -15,8 +15,14 @@ import Profile from "../components/Profile/ManageAccount";
 import { BillingTeamDetails } from "../components/BillingTeam/components/BillingDetails";
 import { BillingList } from "../components/BillingTeam/components/BillingList";
 import { UserPlanDetails } from "../components/BillingTeam/components/UserPlanDetails";
+import { isDesktopMode } from "utils/AppUtils";
+import Secrets from "features/settings/secrets-manager";
+import SecretsLayout from "../secrets-manager/SecretsLayout";
+import ManageProviders from "../secrets-manager/ManageProviders/Index";
+import { SecretsModalsProvider } from "../secrets-manager/context/SecretsModalsContext";
 
 const isSessionsNewSettingsPageCompatible = isFeatureCompatible(FEATURES.SESSION_ONBOARDING);
+const isSecretsManagerCompatible = isFeatureCompatible(FEATURES.SECRETS_MANAGER);
 
 export const settingRoutes: RouteObject[] = [
   {
@@ -31,6 +37,34 @@ export const settingRoutes: RouteObject[] = [
         path: PATHS.SETTINGS.DESKTOP_SETTINGS.RELATIVE,
         element: <DesktopSettings />,
       },
+
+      ...(isSecretsManagerCompatible
+        ? [
+            {
+              path: PATHS.SETTINGS.SECRETS.RELATIVE,
+              element: (
+                <SecretsModalsProvider>
+                  <SecretsLayout />
+                </SecretsModalsProvider>
+              ),
+              children: [
+                {
+                  index: true,
+                  element: <Secrets />,
+                },
+                ...(isDesktopMode()
+                  ? [
+                      {
+                        path: PATHS.SETTINGS.SECRETS.MANAGE_PROVIDERS.RELATIVE, // This is a nested route for managing providers
+                        element: <ManageProviders />,
+                      },
+                    ]
+                  : []),
+              ],
+            },
+          ]
+        : []),
+
       {
         path: PATHS.SETTINGS.SESSION_BOOK.RELATIVE,
         element: (

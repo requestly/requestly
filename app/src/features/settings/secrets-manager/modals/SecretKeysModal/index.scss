@@ -1,0 +1,144 @@
+.secret-keys-modal {
+  border-radius: 8px;
+  background: var(--requestly-color-surface-0, #212121);
+  box-shadow: 0 16px 24px -4px rgba(0, 0, 0, 0.32);
+  padding-bottom: 0 !important;
+
+  .ant-modal-header {
+    border-bottom: none;
+    padding: 16px 16px 0 16px;
+    background: transparent;
+  }
+
+  .ant-modal-body {
+    padding: 12px 16px 16px;
+  }
+
+  .ant-modal-close {
+    svg {
+      width: 12px !important;
+      height: 12px !important;
+      color: var(--requestly-color-text-default, #fff);
+    }
+  }
+
+  &__header {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    color: var(--requestly-color-text-default, #fff);
+    font-family: var(--font-family-default, Inter);
+    font-size: var(--font-size-md, 14px);
+    font-weight: 600;
+    line-height: 20px;
+  }
+
+  &__meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  &__type-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+    background: var(--requestly-color-primary, #4f8ef7);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+
+  &__type-label {
+    color: var(--alias-tokens-color-text-subtle, #bbb);
+    font-family: var(--font-family-default, Inter);
+    font-size: var(--font-size-sm, 12px);
+    font-style: normal;
+    font-weight: 400;
+    line-height: 18px;
+    margin-bottom: 5px;
+  }
+
+  &__table {
+    .ant-table {
+      background: transparent;
+      color: var(--requestly-color-text-default, #fff);
+    }
+
+    .ant-table-thead > tr > th {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      background: var(--requestly-color-surface-2, #383838) !important;
+      color: var(--requestly-color-text-default, #fff);
+      font-family: var(--font-family-default, Inter);
+      font-size: var(--font-size-xs, 11px);
+      font-weight: 500;
+      padding: 6px 10px !important;
+    }
+
+    .ant-table-tbody > tr > td {
+      background: transparent;
+      overflow: hidden;
+      padding: 5px 10px !important;
+    }
+
+    .ant-table-tbody > tr:hover > td {
+      background: var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.04)) !important;
+    }
+  }
+
+  &__cell-text {
+    color: var(--requestly-color-text-default, #fff);
+    font-family: var(--font-family-default, Inter);
+    font-size: var(--font-size-xs, 11px);
+    font-weight: 400;
+    line-height: 17px;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__value-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  &__dots {
+    color: var(--requestly-color-text-default, #fff);
+    font-size: 13px;
+    letter-spacing: 1px;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__visibility-btn {
+    padding: 0;
+    width: 24px;
+    height: 24px;
+    color: var(--requestly-color-text-subtle, #bbb);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    &:hover {
+      color: var(--requestly-color-text-default, #fff);
+      background: transparent !important;
+    }
+
+    svg {
+      font-size: 15px;
+    }
+  }
+}

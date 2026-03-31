@@ -66,8 +66,6 @@ export const ApiClientBottomSheet: React.FC<Props> = ({
   const isExample = useApiClientSelector((s) => entity.getType(s) === RQAPI.RecordType.EXAMPLE_API);
 
   const canGenerateTests = useMemo(() => {
-    const responseExists = Boolean(postResponseScript);
-    if (!responseExists) return false;
     return !hasTests(postResponseScript);
   }, [postResponseScript]);
 
