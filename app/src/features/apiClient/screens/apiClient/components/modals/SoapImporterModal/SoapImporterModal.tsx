@@ -36,7 +36,7 @@ export const SoapImporterModal: React.FC<SoapImporterModalProps> = ({
     <Modal destroyOnClose className="soap-importer-modal" open={isOpen} onCancel={onClose} footer={null} width={600}>
       <CommonApiClientImporter
         productName={productName}
-        supportedFileTypes={[".xml"]}
+        supportedFileTypes={isSoapUi ? [".xml"] : [".wsdl", ".xml"]}
         importer={importer}
         importerType={importerType}
         onImportSuccess={onClose}
