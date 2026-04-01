@@ -174,7 +174,7 @@
     "vscode-languageserver-textdocument": "^1.0.11",
     "vscode-languageserver-types": "^3.17.5",
     "xml2js": "^0.6.2",
-    "yaml": "^2.8.2",
+    "yaml": "^2.8.3",
     "zod": "^4.1.13",
     "zustand": "^5.0.3"
   },
