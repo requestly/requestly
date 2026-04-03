@@ -21,6 +21,11 @@ export const GlobalSettings = () => {
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
 
+  const isSSLVerificationCompatible = useMemo(
+    () => isFeatureCompatible(APP_CONSTANTS.FEATURES.ENABLE_SSL_VALIDATION),
+    []
+  );
+
   const isImplicitTestThisRuleCompatible = useMemo(
     () => isFeatureCompatible(APP_CONSTANTS.FEATURES.IMPLICIT_TEST_THIS_RULE),
     []
@@ -47,7 +52,7 @@ export const GlobalSettings = () => {
           {user?.loggedIn ? <DataCollection /> : null}
         </div>
         <AIConsentSetting />
-        <SSLVerification />
+        {isSSLVerificationCompatible && <SSLVerification />}
         {appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION && isImplicitTestThisRuleCompatible ? (
           <ImplicitRuleTesting />
         ) : null}
