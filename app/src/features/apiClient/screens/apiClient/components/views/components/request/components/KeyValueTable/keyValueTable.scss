@@ -76,7 +76,13 @@
     }
 
     &-disabled {
-      opacity: 0.5;
+      color: var(--requestly-color-text-placeholder);
+
+      .cm-content,
+      .cm-placeholder,
+      .cm-line {
+        color: var(--requestly-color-text-placeholder);
+      }
     }
 
     .cm-editor {
