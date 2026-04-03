@@ -6,7 +6,7 @@
   position: fixed;
   bottom: 30px;
   right: 20px;
-  z-index: 3;
+  z-index: 100;
   width: 424px;
   height: 640px;
   background-color: var(--requestly-color-surface-2);
