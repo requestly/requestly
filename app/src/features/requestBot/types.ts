@@ -1,1 +1,1 @@
-export type RequestBotModel = "app" | "ruleTypes";
+export type RequestBotModel = "app";
