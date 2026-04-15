@@ -28,7 +28,7 @@
     "karma-webpack": "^5.0.0",
     "ts-loader": "^8.1.0",
     "typescript": "^4.2.3",
-    "webpack": "^5.88.2",
+    "webpack": "^5.106.1",
     "webpack-cli": "^4.10.0",
     "webpack-node-externals": "^3.0.0"
   }
