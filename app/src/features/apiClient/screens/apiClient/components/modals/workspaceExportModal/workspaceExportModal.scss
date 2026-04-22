@@ -1,0 +1,33 @@
+.workspace-export-modal {
+  .workspace-export-modal__counts {
+    display: flex;
+    gap: 16px;
+    margin: 16px 0;
+    font-size: 13px;
+    color: var(--requestly-color-text-subtle);
+
+    .count-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+
+      .count-value {
+        font-size: 20px;
+        font-weight: 600;
+        color: var(--requestly-color-text-default);
+      }
+
+      .count-label {
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+        font-size: 11px;
+      }
+    }
+  }
+
+  .workspace-export-modal__error {
+    margin-top: 12px;
+    color: var(--requestly-color-error);
+    font-size: 12px;
+  }
+}
