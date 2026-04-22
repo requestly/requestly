@@ -5,10 +5,14 @@ import { RQAPI } from "features/apiClient/types";
 import { getFormattedDate } from "utils/DateTimeUtils";
 import "./apiClientExportModal.scss";
 import fileDownload from "js-file-download";
-import { omit } from "lodash";
 import { EnvironmentData } from "backend/environment/types";
-import { isGlobalEnvironment } from "features/apiClient/screens/environment/utils";
 import { isApiCollection } from "../../../utils";
+import {
+  ExportRecord,
+  sanitizeRecord,
+  sanitizeRecords,
+  sanitizeEnvironments,
+} from "features/apiClient/helpers/exporters/requestly/sanitize";
 import {
   trackEnvironmentExported,
   trackExportApiCollectionsFailed,
@@ -32,8 +36,6 @@ interface ExportEnvironmentsModalProps extends BaseModalProps {
 }
 
 type ExportModalProps = ExportCollectionsModalProps | ExportEnvironmentsModalProps;
-
-type ExportRecord = Omit<RQAPI.ApiClientRecord, "createdBy" | "updatedBy" | "ownerId" | "createdTs" | "updatedTs">;
 
 export interface ExportData {
   records?: ExportRecord[];
@@ -67,41 +69,6 @@ export const ApiClientExportModal: React.FC<ExportModalProps> = ({ isOpen, onClo
     }
   }, [exportData, onClose, fileInfo.label, exportType]);
 
-  const sanitizeRecord = (record: RQAPI.ApiClientRecord): ExportRecord =>
-    omit(record, ["createdBy", "updatedBy", "ownerId", "createdTs", "updatedTs"]);
-
-  const sanitizeRecords = useCallback((collection: RQAPI.CollectionRecord): ExportRecord[] => {
-    const records: ExportRecord[] = [];
-
-    // Add the collection itself (without children)
-    records.push(sanitizeRecord({ ...collection, data: omit(collection.data, "children") }) as RQAPI.CollectionRecord);
-
-    // Recursively process children
-    if (collection.data.children) {
-      collection.data.children.forEach((record: RQAPI.ApiClientRecord) => {
-        if (record.type === RQAPI.RecordType.API) {
-          records.push(sanitizeRecord(record) as ExportRecord);
-        } else {
-          records.push(...sanitizeRecords(record as RQAPI.CollectionRecord));
-        }
-      });
-    }
-
-    return records;
-  }, []);
-
-  const processEnvironments = useCallback((environments: EnvironmentData[]): EnvironmentData[] => {
-    return environments.map((env) => {
-      const updatedVariables = Object.keys(env.variables).reduce((acc, key) => {
-        const { localValue, ...rest } = env.variables[key];
-        acc[key] = rest;
-        return acc;
-      }, {} as typeof env.variables);
-
-      return { ...env, variables: updatedVariables, isGlobal: isGlobalEnvironment(env.id) };
-    });
-  }, []);
-
   useEffect(() => {
     if (!isOpen || isApiRecordsProcessed) return;
 
@@ -112,25 +79,16 @@ export const ApiClientExportModal: React.FC<ExportModalProps> = ({ isOpen, onClo
         if (isApiCollection(record)) {
           recordsToExport.push(...sanitizeRecords(record));
         } else {
-          recordsToExport.push({ ...sanitizeRecord(record), collectionId: "" });
+          recordsToExport.push({ ...sanitizeRecord(record), collectionId: "" } as ExportRecord);
         }
       });
 
       setExportData({ records: recordsToExport });
     } else {
-      const processedEnvironments = processEnvironments(environments);
-      setExportData({ environments: processedEnvironments });
+      setExportData({ environments: sanitizeEnvironments(environments) });
     }
     setIsApiRecordsProcessed(true);
-  }, [
-    isOpen,
-    recordsToBeExported,
-    environments,
-    isApiRecordsProcessed,
-    sanitizeRecords,
-    exportType,
-    processEnvironments,
-  ]);
+  }, [isOpen, recordsToBeExported, environments, isApiRecordsProcessed, exportType]);
 
   useEffect(() => {
     if (!isOpen) {
