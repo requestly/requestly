@@ -48,15 +48,18 @@ export function buildWorkspaceExport(input: BuildWorkspaceExportInput): Workspac
 
   rootRecords.forEach((record) => {
     if (record.type === RQAPI.RecordType.COLLECTION) {
-      records.push(...sanitizeRecords(record as RQAPI.CollectionRecord));
+      const sanitized = sanitizeRecords(record as RQAPI.CollectionRecord);
+      sanitized.forEach((r) => {
+        if (r.type === RQAPI.RecordType.COLLECTION) collectionCount++;
+        else if (r.type === RQAPI.RecordType.API) apiCount++;
+      });
+      records.push(...sanitized);
     } else if (record.type === RQAPI.RecordType.API) {
+      // Normalize null collectionId to "" on root-level API records — matches the shape
+      // produced by the existing per-collection export so both files in the zip share one format.
       records.push({ ...sanitizeRecord(record), collectionId: "" } as ExportRecord);
+      apiCount++;
     }
-  });
-
-  records.forEach((r) => {
-    if ((r as any).type === RQAPI.RecordType.COLLECTION) collectionCount += 1;
-    if ((r as any).type === RQAPI.RecordType.API) apiCount += 1;
   });
 
   const sanitizedEnvs = sanitizeEnvironments(environments);
