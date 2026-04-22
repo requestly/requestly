@@ -18,7 +18,7 @@ import { MdOutlineSpaceDashboard } from "@react-icons/all-files/md/MdOutlineSpac
 import { RuntimeVariables } from "features/apiClient/screens/environment/components/RuntimeVariables/runtimevariables";
 import { ApiClientFeatureContext, useApiClientFeatureContext, useApiClientRepository } from "features/apiClient/slices";
 import { ErrorFilesList } from "../components/ErrorFilesList/ErrorFileslist";
-import { SidebarFooterActions } from "../components/sidebarFooterActions/SidebarFooterActions";
+import { ExportWorkspaceAction } from "../components/exportWorkspaceAction/ExportWorkspaceAction";
 
 interface Props {}
 
@@ -253,10 +253,10 @@ export const SingleWorkspaceSidebar: React.FC<Props> = () => {
             activeKey={activeKey}
             defaultActiveKey={ApiClientSidebarTabKey.COLLECTIONS}
             onChange={handleActiveTabChange}
+            tabBarExtraContent={{ right: <ExportWorkspaceAction /> }}
           />
         </div>
         <ErrorFilesList />
-        <SidebarFooterActions />
       </div>
 
       {isDeleteModalOpen ? (
