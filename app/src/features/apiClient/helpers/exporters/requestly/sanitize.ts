@@ -3,12 +3,11 @@ import { RQAPI } from "features/apiClient/types";
 import { EnvironmentData } from "backend/environment/types";
 import { isGlobalEnvironment } from "features/apiClient/screens/environment/utils";
 
-export type ExportRecord = Omit<
-  RQAPI.ApiClientRecord,
-  "createdBy" | "updatedBy" | "ownerId" | "createdTs" | "updatedTs"
->;
-
 const METADATA_FIELDS_TO_STRIP = ["createdBy", "updatedBy", "ownerId", "createdTs", "updatedTs"] as const;
+
+export type ExportRecord = Omit<RQAPI.ApiClientRecord, typeof METADATA_FIELDS_TO_STRIP[number]>;
+
+export type SanitizedEnvironment = EnvironmentData & { isGlobal: boolean };
 
 export function sanitizeRecord(record: RQAPI.ApiClientRecord): ExportRecord {
   return omit(record, METADATA_FIELDS_TO_STRIP) as ExportRecord;
@@ -32,11 +31,14 @@ export function sanitizeRecords(collection: RQAPI.CollectionRecord): ExportRecor
   return records;
 }
 
-export function sanitizeEnvironments(environments: EnvironmentData[]): (EnvironmentData & { isGlobal: boolean })[] {
+export function sanitizeEnvironments(environments: EnvironmentData[]): SanitizedEnvironment[] {
   return environments.map((env) => {
     const updatedVariables = Object.keys(env.variables).reduce((acc, key) => {
-      const { localValue, ...rest } = env.variables[key] as any;
-      acc[key] = rest;
+      const variable = env.variables[key];
+      if (variable) {
+        const { localValue, ...rest } = variable;
+        acc[key] = rest;
+      }
       return acc;
     }, {} as typeof env.variables);
 

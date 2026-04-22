@@ -9,6 +9,7 @@ import { EnvironmentData } from "backend/environment/types";
 import { isApiCollection } from "../../../utils";
 import {
   ExportRecord,
+  SanitizedEnvironment,
   sanitizeRecord,
   sanitizeRecords,
   sanitizeEnvironments,
@@ -39,7 +40,7 @@ type ExportModalProps = ExportCollectionsModalProps | ExportEnvironmentsModalPro
 
 export interface ExportData {
   records?: ExportRecord[];
-  environments?: EnvironmentData[];
+  environments?: SanitizedEnvironment[];
 }
 
 const COLLECTIONS_SCHEMA_VERSION = "1.0.0";
