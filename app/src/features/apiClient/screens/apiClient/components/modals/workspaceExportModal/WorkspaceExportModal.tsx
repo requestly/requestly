@@ -1,9 +1,10 @@
 import React, { useCallback, useMemo, useState } from "react";
-import { Modal } from "antd";
+import { Modal, message } from "antd";
 import { MdOutlineFileDownload } from "@react-icons/all-files/md/MdOutlineFileDownload";
 import { getFormattedDate } from "utils/DateTimeUtils";
+import { useSelector } from "react-redux";
 import { useRootRecords } from "features/apiClient/slices/apiRecords/apiRecords.hooks";
-import { useAllEnvironments } from "features/apiClient/slices/environments/environments.hooks";
+import { useAllEnvironments, useGlobalEnvironment } from "features/apiClient/slices/environments/environments.hooks";
 import { parseEnvironmentEntityToData } from "features/apiClient/slices/environments/utils";
 import { buildWorkspaceExport } from "features/apiClient/helpers/exporters/requestly/buildWorkspaceExport";
 import { zipWorkspaceExport } from "features/apiClient/helpers/exporters/requestly/zipWorkspaceExport";
@@ -12,6 +13,9 @@ import {
   trackWorkspaceExportSuccessful,
   trackWorkspaceExportFailed,
 } from "modules/analytics/events/features/apiClient";
+import { useApiClientFeatureContext } from "features/apiClient/slices/workspaceView/helpers/ApiClientContextRegistry/hooks";
+import { getWorkspaceById, dummyPersonalWorkspace } from "store/slices/workspaces/selectors";
+import { RootState } from "store/types";
 import "./workspaceExportModal.scss";
 
 interface Props {
@@ -42,25 +46,37 @@ function triggerBrowserDownload(bytes: Uint8Array, fileName: string) {
 
 export const WorkspaceExportModal: React.FC<Props> = ({ isOpen, onClose, workspaceName }) => {
   const rootRecords = useRootRecords();
+  const globalEnvironment = useGlobalEnvironment();
   const allEnvironments = useAllEnvironments();
+
+  const ctx = useApiClientFeatureContext();
+  const workspaceForAnalytics = useSelector((state: RootState) =>
+    ctx.workspaceId === null ? dummyPersonalWorkspace : getWorkspaceById(ctx.workspaceId)(state)
+  );
+  const workspaceType = workspaceForAnalytics?.workspaceType ?? "UNKNOWN";
 
   const [isExporting, setIsExporting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const payload = useMemo(() => {
-    const environments = allEnvironments.map(parseEnvironmentEntityToData);
+    const environments = [
+      parseEnvironmentEntityToData(globalEnvironment),
+      ...allEnvironments.map(parseEnvironmentEntityToData),
+    ];
     return buildWorkspaceExport({ rootRecords, environments });
-  }, [rootRecords, allEnvironments]);
+  }, [rootRecords, allEnvironments, globalEnvironment]);
 
   const isEmpty = payload.counts.collections === 0 && payload.counts.apis === 0 && payload.counts.environments === 0;
 
   const handleExport = useCallback(async () => {
     setError(null);
     setIsExporting(true);
+    const startedAt = Date.now();
     trackWorkspaceExportStarted({
-      collections: payload.counts.collections,
-      apis: payload.counts.apis,
-      environments: payload.counts.environments,
+      workspaceType,
+      collectionCount: payload.counts.collections,
+      requestCount: payload.counts.apis,
+      environmentCount: payload.counts.environments,
     });
 
     try {
@@ -69,16 +85,21 @@ export const WorkspaceExportModal: React.FC<Props> = ({ isOpen, onClose, workspa
         "DD_MM_YYYY"
       )}.zip`;
       triggerBrowserDownload(bytes, fileName);
-      trackWorkspaceExportSuccessful({ zipSizeBytes: bytes.byteLength });
+      trackWorkspaceExportSuccessful({
+        workspaceType,
+        durationMs: Date.now() - startedAt,
+        zipSizeBytes: bytes.byteLength,
+      });
+      message.success("Workspace exported");
       onClose();
     } catch (e) {
-      const message = e instanceof Error ? e.message : "Unknown error";
-      setError(message);
-      trackWorkspaceExportFailed({ errorType: message });
+      const errorMessage = e instanceof Error ? e.message : "Unknown error";
+      setError(errorMessage);
+      trackWorkspaceExportFailed({ workspaceType, errorType: errorMessage });
     } finally {
       setIsExporting(false);
     }
-  }, [payload, workspaceName, onClose]);
+  }, [payload, workspaceName, onClose, workspaceType]);
 
   const handleCancel = useCallback(() => {
     if (isExporting) return;
