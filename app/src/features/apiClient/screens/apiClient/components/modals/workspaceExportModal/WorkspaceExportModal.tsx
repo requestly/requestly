@@ -3,7 +3,8 @@ import { Modal, message } from "antd";
 import { MdOutlineFileDownload } from "@react-icons/all-files/md/MdOutlineFileDownload";
 import { getFormattedDate } from "utils/DateTimeUtils";
 import { useSelector } from "react-redux";
-import { useRootRecords } from "features/apiClient/slices/apiRecords/apiRecords.hooks";
+import { useAllRecords } from "features/apiClient/slices/apiRecords/apiRecords.hooks";
+import { convertFlatRecordsToNestedRecords } from "features/apiClient/screens/apiClient/utils";
 import { useAllEnvironments, useGlobalEnvironment } from "features/apiClient/slices/environments/environments.hooks";
 import { parseEnvironmentEntityToData } from "features/apiClient/slices/environments/utils";
 import { buildWorkspaceExport } from "features/apiClient/helpers/exporters/requestly/buildWorkspaceExport";
@@ -45,7 +46,7 @@ function triggerBrowserDownload(bytes: Uint8Array, fileName: string) {
 }
 
 export const WorkspaceExportModal: React.FC<Props> = ({ isOpen, onClose, workspaceName }) => {
-  const rootRecords = useRootRecords();
+  const allRecords = useAllRecords();
   const globalEnvironment = useGlobalEnvironment();
   const allEnvironments = useAllEnvironments();
 
@@ -59,12 +60,13 @@ export const WorkspaceExportModal: React.FC<Props> = ({ isOpen, onClose, workspa
   const [error, setError] = useState<string | null>(null);
 
   const payload = useMemo(() => {
+    const { updatedRecords } = convertFlatRecordsToNestedRecords(allRecords);
     const environments = [
       parseEnvironmentEntityToData(globalEnvironment),
       ...allEnvironments.map(parseEnvironmentEntityToData),
     ];
-    return buildWorkspaceExport({ rootRecords, environments });
-  }, [rootRecords, allEnvironments, globalEnvironment]);
+    return buildWorkspaceExport({ rootRecords: updatedRecords, environments });
+  }, [allRecords, allEnvironments, globalEnvironment]);
 
   const isEmpty = payload.counts.collections === 0 && payload.counts.apis === 0 && payload.counts.environments === 0;
 
