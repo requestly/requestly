@@ -115,7 +115,7 @@
     "fuzzysort": "^2.0.4",
     "graphiql-explorer": "^0.9.0",
     "graphql": "^16.11.0",
-    "handlebars": "^4.7.8",
+    "handlebars": "^4.7.9",
     "html-validate": "^8.9.1",
     "http-status": "^2.1.0",
     "is-empty": "^1.2.0",
