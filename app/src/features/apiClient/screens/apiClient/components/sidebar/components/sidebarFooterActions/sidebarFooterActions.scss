@@ -1,0 +1,31 @@
+.sidebar-footer-actions {
+  border-top: 1px solid var(--requestly-color-surface-2);
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  .sidebar-footer-actions__button {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+    padding: 6px 8px;
+    background: transparent;
+    border: none;
+    color: var(--requestly-color-text-default);
+    font-size: 12px;
+    cursor: pointer;
+    border-radius: 4px;
+
+    &:hover:not(:disabled) {
+      background: var(--requestly-color-surface-2);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+}
