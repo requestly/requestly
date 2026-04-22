@@ -33,53 +33,7 @@ function slugifyWorkspaceName(name: string): string {
   return slug.length > 0 ? slug : "workspace";
 }
 
-const EXPORT_CANCELED = Symbol("export-canceled");
-
-type FilePickerAcceptType = { description?: string; accept: Record<string, string[]> };
-interface SaveFilePickerOptions {
-  suggestedName?: string;
-  types?: FilePickerAcceptType[];
-}
-interface FileSystemWritable {
-  write(data: Uint8Array | Blob): Promise<void>;
-  close(): Promise<void>;
-}
-interface FileSystemFileHandleLike {
-  createWritable(): Promise<FileSystemWritable>;
-}
-type ShowSaveFilePicker = (options?: SaveFilePickerOptions) => Promise<FileSystemFileHandleLike>;
-
-function isAbortError(err: unknown): boolean {
-  return err instanceof Error && err.name === "AbortError";
-}
-
-async function saveZipToFile(bytes: Uint8Array, fileName: string): Promise<void> {
-  const picker = ((window as unknown) as { showSaveFilePicker?: ShowSaveFilePicker }).showSaveFilePicker;
-
-  if (typeof picker === "function") {
-    let handle: FileSystemFileHandleLike;
-    try {
-      handle = await picker({
-        suggestedName: fileName,
-        types: [{ description: "ZIP archive", accept: { "application/zip": [".zip"] } }],
-      });
-    } catch (err) {
-      if (isAbortError(err)) {
-        throw EXPORT_CANCELED;
-      }
-      throw err;
-    }
-
-    const writable = await handle.createWritable();
-    try {
-      await writable.write(new Blob([bytes.buffer as ArrayBuffer], { type: "application/zip" }));
-    } finally {
-      await writable.close();
-    }
-    return;
-  }
-
-  // Fallback — no picker API. Trigger anchor-click download.
+function triggerBrowserDownload(bytes: Uint8Array, fileName: string) {
   const blob = new Blob([bytes.buffer as ArrayBuffer], { type: "application/zip" });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
@@ -121,20 +75,23 @@ export const WorkspaceExportModal: React.FC<Props> = ({ isOpen, onClose, workspa
     setIsExporting(true);
     const startedAt = Date.now();
 
+    trackWorkspaceExportStarted({
+      workspaceType,
+      collectionCount: payload.counts.collections,
+      requestCount: payload.counts.apis,
+      environmentCount: payload.counts.environments,
+    });
+
+    // Yield once so React can paint the "Exporting..." state before we block on zip build.
+    await Promise.resolve();
+
     try {
       const bytes = zipWorkspaceExport(payload);
       const fileName = `RQ-workspace-${slugifyWorkspaceName(workspaceName)}-export-${getFormattedDate(
         "DD_MM_YYYY"
       )}.zip`;
 
-      trackWorkspaceExportStarted({
-        workspaceType,
-        collectionCount: payload.counts.collections,
-        requestCount: payload.counts.apis,
-        environmentCount: payload.counts.environments,
-      });
-
-      await saveZipToFile(bytes, fileName);
+      triggerBrowserDownload(bytes, fileName);
 
       trackWorkspaceExportSuccessful({
         workspaceType,
@@ -144,11 +101,6 @@ export const WorkspaceExportModal: React.FC<Props> = ({ isOpen, onClose, workspa
       message.success("Workspace exported");
       onClose();
     } catch (e) {
-      if (e === EXPORT_CANCELED) {
-        setError("Export canceled");
-        trackWorkspaceExportFailed({ workspaceType, errorType: "canceled" });
-        return;
-      }
       const errorMessage = e instanceof Error ? e.message : "Unknown error";
       setError(errorMessage);
       trackWorkspaceExportFailed({ workspaceType, errorType: errorMessage });
