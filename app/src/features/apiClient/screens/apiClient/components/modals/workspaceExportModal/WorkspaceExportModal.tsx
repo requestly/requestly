@@ -29,8 +29,7 @@ function slugifyWorkspaceName(name: string): string {
 }
 
 function triggerBrowserDownload(bytes: Uint8Array, fileName: string) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const blob = new Blob([bytes as any], { type: "application/zip" });
+  const blob = new Blob([bytes.buffer as ArrayBuffer], { type: "application/zip" });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
