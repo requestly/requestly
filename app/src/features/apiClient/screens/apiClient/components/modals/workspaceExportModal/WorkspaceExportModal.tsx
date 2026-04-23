@@ -191,7 +191,6 @@ export const WorkspaceExportModal: React.FC<Props> = ({ isOpen, onClose, workspa
               <div className="workspace-export-modal__tree">
                 <Tree
                   treeData={treeData}
-                  showIcon
                   selectable={false}
                   blockNode
                   expandedKeys={expandedKeys}

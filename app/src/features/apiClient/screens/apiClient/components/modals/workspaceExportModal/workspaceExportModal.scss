@@ -54,28 +54,30 @@
       align-items: center;
     }
 
-    // Pin the row itself to a shared baseline so icon + title align.
     .ant-tree-node-content-wrapper {
+      min-height: 22px;
+    }
+
+    .ant-tree-title {
+      display: block;
+    }
+
+    // Icon + text rendered as flex siblings inside the title — mirrors the
+    // sidebar's collections-list-item pattern where alignment just works.
+    &-label {
       display: flex;
       align-items: center;
       gap: 6px;
       min-height: 22px;
-      line-height: 22px;
+      font-size: 12px;
+      color: var(--requestly-color-text-default);
     }
 
-    // Free the icon slot from antd's default fixed width so the method badge fits.
-    // Match the title's 22px line-height so icons share the same vertical midline as text.
-    .ant-tree-iconEle {
-      width: auto;
-      min-width: auto;
-      height: 22px;
-      line-height: 1;
-      margin-right: 0;
-      overflow: visible;
+    &-label-icon {
+      flex-shrink: 0;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      flex-shrink: 0;
 
       .request-method {
         flex-shrink: 0;
@@ -84,9 +86,8 @@
         line-height: 13px;
         letter-spacing: 0.5px;
         text-transform: uppercase;
-        display: inline-flex;
+        display: flex;
         width: 32px;
-        height: 14px;
         justify-content: center;
         align-items: center;
         border-radius: 2px;
@@ -97,6 +98,7 @@
         width: 14px;
         height: 14px;
         display: block;
+        min-width: 14px;
       }
 
       svg {
@@ -106,13 +108,8 @@
       }
     }
 
-    .ant-tree-title {
-      font-size: 12px;
-      color: var(--requestly-color-text-default);
-      line-height: 22px;
-      white-space: normal;
-      overflow: visible;
-      text-overflow: clip;
+    &-label-text {
+      line-height: 1.3;
     }
   }
 

@@ -16,14 +16,24 @@ function collectionLabel(record: RQAPI.CollectionRecord): string {
   return record.name || "Untitled collection";
 }
 
+// Matches the sidebar's RequestRow pattern: icon + name rendered as flex siblings
+// inside one container that owns alignment.
+function NodeLabel({ icon, text }: { icon: React.ReactNode; text: string }) {
+  return (
+    <span className="workspace-export-modal__tree-label">
+      <span className="workspace-export-modal__tree-label-icon">{icon}</span>
+      <span className="workspace-export-modal__tree-label-text">{text}</span>
+    </span>
+  );
+}
+
 function buildRecordNode(record: RQAPI.ApiClientRecord, icons: BuildNodeIcons): TreeDataNode {
   if (record.type === RQAPI.RecordType.COLLECTION) {
     const collection = record as RQAPI.CollectionRecord;
     const children = (collection.data.children ?? []).map((child) => buildRecordNode(child, icons));
     return {
       key: collection.id,
-      title: collectionLabel(collection),
-      icon: icons.collection,
+      title: <NodeLabel icon={icons.collection} text={collectionLabel(collection)} />,
       children,
     };
   }
@@ -33,14 +43,12 @@ function buildRecordNode(record: RQAPI.ApiClientRecord, icons: BuildNodeIcons): 
     const examples = (api.data as any)?.examples ?? [];
     const children: TreeDataNode[] = examples.map((ex: any) => ({
       key: ex.id,
-      title: ex.name || "Example",
-      icon: icons.example,
+      title: <NodeLabel icon={icons.example} text={ex.name || "Example"} />,
       isLeaf: true,
     }));
     return {
       key: api.id,
-      title: requestLabel(api),
-      icon: <RequestIcon record={api} />,
+      title: <NodeLabel icon={<RequestIcon record={api} />} text={requestLabel(api)} />,
       children: children.length > 0 ? children : undefined,
       isLeaf: children.length === 0,
     };
@@ -48,8 +56,7 @@ function buildRecordNode(record: RQAPI.ApiClientRecord, icons: BuildNodeIcons): 
 
   return {
     key: record.id,
-    title: (record as any).name || "Example",
-    icon: icons.example,
+    title: <NodeLabel icon={icons.example} text={(record as any).name || "Example"} />,
     isLeaf: true,
   };
 }
