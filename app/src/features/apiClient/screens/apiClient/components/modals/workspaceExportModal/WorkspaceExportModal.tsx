@@ -172,28 +172,22 @@ export const WorkspaceExportModal: React.FC<Props> = ({ isOpen, onClose, workspa
         <div>Nothing to export — this workspace has no collections or environments.</div>
       ) : (
         <>
-          <div className="workspace-export-modal__counts">
-            <div className="count-item">
-              <span className="count-value">{payload.counts.collections}</span>
-              <span className="count-label">Collections</span>
-            </div>
-            <div className="count-item">
-              <span className="count-value">{payload.counts.apis}</span>
-              <span className="count-label">Requests</span>
-            </div>
-            <div className="count-item">
-              <span className="count-value">{payload.counts.examples}</span>
-              <span className="count-label">Examples</span>
-            </div>
-            <div className="count-item">
-              <span className="count-value">{payload.counts.environments}</span>
-              <span className="count-label">Environments</span>
-            </div>
-          </div>
-
           {treeData.length > 0 && (
             <div className="workspace-export-modal__section">
-              <div className="workspace-export-modal__section-title">Collections &amp; requests</div>
+              <div className="workspace-export-modal__section-title">
+                <span>Collections &amp; requests</span>
+                <span className="workspace-export-modal__count-pill">
+                  {payload.counts.collections} {payload.counts.collections === 1 ? "collection" : "collections"}
+                </span>
+                <span className="workspace-export-modal__count-pill">
+                  {payload.counts.apis} {payload.counts.apis === 1 ? "request" : "requests"}
+                </span>
+                {payload.counts.examples > 0 && (
+                  <span className="workspace-export-modal__count-pill">
+                    {payload.counts.examples} {payload.counts.examples === 1 ? "example" : "examples"}
+                  </span>
+                )}
+              </div>
               <div className="workspace-export-modal__tree">
                 <Tree
                   treeData={treeData}
@@ -210,7 +204,12 @@ export const WorkspaceExportModal: React.FC<Props> = ({ isOpen, onClose, workspa
 
           {envNames.length > 0 && (
             <div className="workspace-export-modal__section">
-              <div className="workspace-export-modal__section-title">Environments</div>
+              <div className="workspace-export-modal__section-title">
+                <span>Environments</span>
+                <span className="workspace-export-modal__count-pill">
+                  {payload.counts.environments} {payload.counts.environments === 1 ? "environment" : "environments"}
+                </span>
+              </div>
               <ul className="workspace-export-modal__env-list">
                 {envNames.map((env) => (
                   <li key={env.id} className="workspace-export-modal__env-item">
