@@ -3,6 +3,9 @@ import { describe, it, expect, vi } from "vitest";
 import { classifyPlatform } from "./detectOS";
 import { ParsedOS } from "utils/osUtils";
 
+// The duplicate `utils/osUtils.js` (legacy, no `ParsedOS` export) resolves before the `.ts`
+// file in Vitest's module lookup, so the real `ParsedOS` import is undefined at test time.
+// Mock `utils/osUtils` to pin the enum shape to what `detectOS.ts` actually consumes.
 vi.mock("utils/osUtils", () => ({
   ParsedOS: {
     macOS: "macOS",
