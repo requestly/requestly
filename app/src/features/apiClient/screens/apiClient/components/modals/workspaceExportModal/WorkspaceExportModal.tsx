@@ -159,6 +159,7 @@ export const WorkspaceExportModal: React.FC<Props> = ({ isOpen, onClose, workspa
       }
       open={isOpen}
       onCancel={handleCancel}
+      width={600}
       closable={!isExporting}
       maskClosable={!isExporting}
       onOk={handleExport}
