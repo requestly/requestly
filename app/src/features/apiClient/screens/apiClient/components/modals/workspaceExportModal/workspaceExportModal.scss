@@ -50,31 +50,30 @@
     }
 
     .ant-tree-treenode {
-      padding: 2px 0;
-      width: 100%;
+      padding: 3px 0;
       align-items: center;
     }
 
+    // Pin the row itself to a shared baseline so icon + title align.
     .ant-tree-node-content-wrapper {
-      display: inline-flex;
+      display: flex;
       align-items: center;
       gap: 6px;
-      flex: 1;
-      min-width: 0;
       min-height: 22px;
+      line-height: 22px;
     }
 
+    // Free the icon slot from antd's default fixed width so the method badge fits.
     .ant-tree-iconEle {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
       width: auto;
       min-width: auto;
-      height: 18px;
+      height: auto;
       line-height: 1;
       margin-right: 0;
       overflow: visible;
+      display: inline-flex;
+      align-items: center;
+      flex-shrink: 0;
 
       .request-method {
         flex-shrink: 0;
@@ -83,8 +82,9 @@
         line-height: 13px;
         letter-spacing: 0.5px;
         text-transform: uppercase;
-        display: flex;
+        display: inline-flex;
         width: 32px;
+        height: 14px;
         justify-content: center;
         align-items: center;
         border-radius: 2px;
@@ -107,12 +107,10 @@
     .ant-tree-title {
       font-size: 12px;
       color: var(--requestly-color-text-default);
-      line-height: 18px;
+      line-height: 22px;
       white-space: normal;
       overflow: visible;
       text-overflow: clip;
-      display: inline-flex;
-      align-items: center;
     }
   }
 
