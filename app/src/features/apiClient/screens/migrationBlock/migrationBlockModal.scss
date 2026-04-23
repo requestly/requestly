@@ -1,0 +1,124 @@
+.migration-block-modal {
+  z-index: 1600; // above other app modals
+
+  .ant-modal-content {
+    padding: 32px 28px 24px;
+  }
+
+  &__headline {
+    margin: 0 0 16px;
+    font-size: 20px;
+    line-height: 1.35;
+    font-weight: 600;
+  }
+
+  &__intro {
+    margin: 0 0 16px;
+    opacity: 0.85;
+  }
+
+  &__steps {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 20px;
+  }
+
+  &__step {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 12px 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+
+    &:last-child {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+  }
+
+  &__step-label {
+    display: flex;
+    gap: 8px;
+  }
+
+  &__step-num {
+    font-weight: 600;
+    opacity: 0.8;
+  }
+
+  &__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.06);
+    color: inherit;
+    cursor: pointer;
+
+    &:hover:not(:disabled) {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+
+    &--primary {
+      background: #3c82f6; // Ant primary-ish — tune with design
+      border-color: #3c82f6;
+      color: #fff;
+
+      &:hover {
+        background: #2563eb;
+        border-color: #2563eb;
+      }
+    }
+  }
+
+  &__more-platforms {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 20px;
+    font-size: 12px;
+    opacity: 0.8;
+  }
+
+  &__platform-link {
+    background: none;
+    border: none;
+    padding: 0;
+    color: inherit;
+    text-decoration: underline;
+    cursor: pointer;
+    font-size: 12px;
+
+    &:hover {
+      opacity: 0.7;
+    }
+  }
+
+  &__footer {
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding-top: 12px;
+  }
+
+  &__report-link {
+    background: none;
+    border: none;
+    padding: 0;
+    color: inherit;
+    text-decoration: underline;
+    cursor: pointer;
+    opacity: 0.8;
+    font-size: 12px;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+}
