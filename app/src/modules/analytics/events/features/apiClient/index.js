@@ -386,3 +386,20 @@ export const trackWorkspaceExportSuccessful = (params) => {
 export const trackWorkspaceExportFailed = (params) => {
   trackEvent(API_CLIENT.EXPORT_WORKSPACE_FAILED, params);
 };
+
+// Migration block screen (RQ-1806)
+export const trackMigrationBlockScreenShown = (params) => {
+  trackEvent(API_CLIENT.MIGRATION_BLOCK_SCREEN_SHOWN, params);
+};
+
+export const trackMigrationBlockScreenCtaClicked = (params) => {
+  trackEvent(API_CLIENT.MIGRATION_BLOCK_SCREEN_CTA_CLICKED, params);
+};
+
+export const trackMigrationBlockScreenDismissed = (params) => {
+  trackEvent(API_CLIENT.MIGRATION_BLOCK_SCREEN_DISMISSED, params);
+};
+
+export const trackMigrationBlockScreenReportLinkClicked = (params) => {
+  trackEvent(API_CLIENT.MIGRATION_BLOCK_SCREEN_REPORT_LINK_CLICKED, params);
+};
