@@ -2,7 +2,6 @@ import React, { useCallback, useMemo, useState } from "react";
 import { Modal, Tree, message } from "antd";
 import { MdOutlineFileDownload } from "@react-icons/all-files/md/MdOutlineFileDownload";
 import { CgStack } from "@react-icons/all-files/cg/CgStack";
-import { MdOutlineHttp } from "@react-icons/all-files/md/MdOutlineHttp";
 import { MdOutlineDescription } from "@react-icons/all-files/md/MdOutlineDescription";
 import { MdHorizontalSplit } from "@react-icons/all-files/md/MdHorizontalSplit";
 import { buildExportTreeData } from "./buildExportTreeData";
@@ -81,7 +80,6 @@ export const WorkspaceExportModal: React.FC<Props> = ({ isOpen, onClose, workspa
     () =>
       buildExportTreeData(hydratedRoots, {
         collection: <CgStack />,
-        request: <MdOutlineHttp />,
         example: <MdOutlineDescription />,
       }),
     [hydratedRoots]
@@ -143,12 +141,9 @@ export const WorkspaceExportModal: React.FC<Props> = ({ isOpen, onClose, workspa
   return (
     <Modal
       title={
-        <div className="workspace-export-modal__title">
-          <div className="workspace-export-modal__title-row">
-            <MdOutlineFileDownload />
-            <span>Export workspace</span>
-          </div>
-          <div className="workspace-export-modal__subtitle">{workspaceName}</div>
+        <div className="workspace-export-modal__title-row">
+          <MdOutlineFileDownload />
+          <span>Export workspace</span>
         </div>
       }
       open={isOpen}

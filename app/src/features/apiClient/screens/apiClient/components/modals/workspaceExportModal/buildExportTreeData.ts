@@ -4,14 +4,13 @@ import { RQAPI } from "features/apiClient/types";
 
 interface BuildNodeIcons {
   collection: React.ReactNode;
-  request: React.ReactNode;
   example: React.ReactNode;
 }
 
 function requestLabel(record: RQAPI.ApiRecord): string {
   const method = (record.data as any)?.request?.method ?? (record.data as any)?.type?.toUpperCase?.() ?? "";
   const name = record.name || (record.data as any)?.request?.url || "Untitled";
-  return method ? `${method}  ${name}` : name;
+  return method ? `${method} ${name}` : name;
 }
 
 function collectionLabel(record: RQAPI.CollectionRecord): string {
@@ -42,7 +41,6 @@ function buildRecordNode(record: RQAPI.ApiClientRecord, icons: BuildNodeIcons): 
     return {
       key: api.id,
       title: requestLabel(api),
-      icon: icons.request,
       children: children.length > 0 ? children : undefined,
       isLeaf: children.length === 0,
     };
