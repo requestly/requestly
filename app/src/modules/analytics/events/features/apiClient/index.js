@@ -374,3 +374,15 @@ export const trackAITestGenerationReviewCompleted = (
     num_changes_accepted,
   });
 };
+
+export const trackWorkspaceExportStarted = (params) => {
+  trackEvent(API_CLIENT.EXPORT_WORKSPACE_STARTED, params);
+};
+
+export const trackWorkspaceExportSuccessful = (params) => {
+  trackEvent(API_CLIENT.EXPORT_WORKSPACE_SUCCESSFUL, params);
+};
+
+export const trackWorkspaceExportFailed = (params) => {
+  trackEvent(API_CLIENT.EXPORT_WORKSPACE_FAILED, params);
+};

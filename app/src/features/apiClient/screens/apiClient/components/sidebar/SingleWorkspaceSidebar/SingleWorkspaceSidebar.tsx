@@ -18,6 +18,8 @@ import { MdOutlineSpaceDashboard } from "@react-icons/all-files/md/MdOutlineSpac
 import { RuntimeVariables } from "features/apiClient/screens/environment/components/RuntimeVariables/runtimevariables";
 import { ApiClientFeatureContext, useApiClientFeatureContext, useApiClientRepository } from "features/apiClient/slices";
 import { ErrorFilesList } from "../components/ErrorFilesList/ErrorFileslist";
+import { ExportWorkspaceAction } from "../components/exportWorkspaceAction/ExportWorkspaceAction";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
 
 interface Props {}
 
@@ -34,6 +36,7 @@ export const SingleWorkspaceSidebar: React.FC<Props> = () => {
   const [activeKey, setActiveKey] = useState<ApiClientSidebarTabKey>(ApiClientSidebarTabKey.COLLECTIONS);
   const [recordTypeToBeCreated, setRecordTypeToBeCreated] = useState<RQAPI.RecordType | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const isWorkspaceExportEnabled = useFeatureIsOn("api_client_workspace_export");
 
   const {
     history,
@@ -252,6 +255,7 @@ export const SingleWorkspaceSidebar: React.FC<Props> = () => {
             activeKey={activeKey}
             defaultActiveKey={ApiClientSidebarTabKey.COLLECTIONS}
             onChange={handleActiveTabChange}
+            tabBarExtraContent={isWorkspaceExportEnabled ? { right: <ExportWorkspaceAction /> } : undefined}
           />
         </div>
         <ErrorFilesList />

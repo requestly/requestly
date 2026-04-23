@@ -1,0 +1,162 @@
+.workspace-export-modal {
+  &__title-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  &__section {
+    margin-top: 16px;
+
+    &:first-of-type {
+      margin-top: 4px;
+    }
+  }
+
+  &__section-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: var(--requestly-color-text-subtle);
+    margin-bottom: 8px;
+  }
+
+  &__count-pill {
+    font-family: var(--requestly-font-family-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: none;
+    letter-spacing: normal;
+    padding: 2px 6px;
+    border-radius: 3px;
+    background: var(--requestly-color-white-t-10);
+    color: var(--requestly-color-text-default);
+  }
+
+  &__tree {
+    max-height: 260px;
+    overflow-y: auto;
+    border: 1px solid var(--requestly-color-white-t-10);
+    border-radius: 4px;
+    padding: 4px 6px;
+
+    .ant-tree {
+      background: transparent;
+      font-size: 12px;
+    }
+
+    .ant-tree-treenode {
+      padding: 3px 0;
+      align-items: center;
+    }
+
+    .ant-tree-node-content-wrapper {
+      min-height: 22px;
+    }
+
+    .ant-tree-title {
+      display: block;
+    }
+
+    // Icon + text rendered as flex siblings inside the title — mirrors the
+    // sidebar's collections-list-item pattern where alignment just works.
+    &-label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 22px;
+      font-size: 12px;
+      color: var(--requestly-color-text-default);
+    }
+
+    &-label-icon {
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+
+      .request-method {
+        flex-shrink: 0;
+        font-size: 8px;
+        font-weight: var(--requestly-font-weight-medium);
+        line-height: 13px;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        display: flex;
+        width: 32px;
+        justify-content: center;
+        align-items: center;
+        border-radius: 2px;
+        white-space: nowrap;
+      }
+
+      .graphql-request-icon {
+        width: 14px;
+        height: 14px;
+        display: block;
+        min-width: 14px;
+      }
+
+      svg {
+        width: 14px;
+        height: 14px;
+        display: block;
+      }
+    }
+
+    &-label-text {
+      line-height: 1.3;
+    }
+  }
+
+  &__env-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-height: 180px;
+    overflow-y: auto;
+    border: 1px solid var(--requestly-color-white-t-10);
+    border-radius: 4px;
+  }
+
+  &__env-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    font-size: 12px;
+    color: var(--requestly-color-text-default);
+
+    & + & {
+      border-top: 1px solid var(--requestly-color-white-t-10);
+    }
+
+    svg {
+      color: var(--requestly-color-text-subtle);
+      flex-shrink: 0;
+      width: 14px;
+      height: 14px;
+    }
+  }
+
+  &__env-badge {
+    margin-left: auto;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    padding: 1px 6px;
+    border-radius: 3px;
+    background: var(--requestly-color-white-t-10);
+    color: var(--requestly-color-text-subtle);
+  }
+
+  &__error {
+    margin-top: 12px;
+    color: var(--requestly-color-error);
+    font-size: 12px;
+  }
+}
