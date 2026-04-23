@@ -1,6 +1,7 @@
 import React from "react";
 import { TreeDataNode } from "antd";
 import { RQAPI } from "features/apiClient/types";
+import { RequestIcon } from "../../sidebar/components/collectionsList/requestRow/RequestRow";
 
 interface BuildNodeIcons {
   collection: React.ReactNode;
@@ -8,9 +9,7 @@ interface BuildNodeIcons {
 }
 
 function requestLabel(record: RQAPI.ApiRecord): string {
-  const method = (record.data as any)?.request?.method ?? (record.data as any)?.type?.toUpperCase?.() ?? "";
-  const name = record.name || (record.data as any)?.request?.url || "Untitled";
-  return method ? `${method} ${name}` : name;
+  return record.name || (record.data as any)?.request?.url || "Untitled request";
 }
 
 function collectionLabel(record: RQAPI.CollectionRecord): string {
@@ -41,12 +40,12 @@ function buildRecordNode(record: RQAPI.ApiClientRecord, icons: BuildNodeIcons): 
     return {
       key: api.id,
       title: requestLabel(api),
+      icon: <RequestIcon record={api} />,
       children: children.length > 0 ? children : undefined,
       isLeaf: children.length === 0,
     };
   }
 
-  // EXAMPLE_API records reached here are orphans (no parent API in the tree) — render as leaf.
   return {
     key: record.id,
     title: (record as any).name || "Example",
@@ -55,11 +54,6 @@ function buildRecordNode(record: RQAPI.ApiClientRecord, icons: BuildNodeIcons): 
   };
 }
 
-/**
- * Builds Ant TreeDataNode[] from hydrated top-level records. Expects records
- * to have `data.children` populated on collections and `data.examples` on
- * API records (which is what convertFlatRecordsToNestedRecords returns).
- */
 export function buildExportTreeData(rootRecords: RQAPI.ApiClientRecord[], icons: BuildNodeIcons): TreeDataNode[] {
   return rootRecords.map((record) => buildRecordNode(record, icons));
 }

@@ -2,7 +2,7 @@ import React, { useCallback, useMemo, useState } from "react";
 import { Modal, Tree, message } from "antd";
 import { MdOutlineFileDownload } from "@react-icons/all-files/md/MdOutlineFileDownload";
 import { CgStack } from "@react-icons/all-files/cg/CgStack";
-import { MdOutlineDescription } from "@react-icons/all-files/md/MdOutlineDescription";
+import { MdOutlineDashboard } from "@react-icons/all-files/md/MdOutlineDashboard";
 import { MdHorizontalSplit } from "@react-icons/all-files/md/MdHorizontalSplit";
 import { buildExportTreeData } from "./buildExportTreeData";
 import { getFormattedDate } from "utils/DateTimeUtils";
@@ -80,7 +80,7 @@ export const WorkspaceExportModal: React.FC<Props> = ({ isOpen, onClose, workspa
     () =>
       buildExportTreeData(hydratedRoots, {
         collection: <CgStack />,
-        example: <MdOutlineDescription />,
+        example: <MdOutlineDashboard />,
       }),
     [hydratedRoots]
   );

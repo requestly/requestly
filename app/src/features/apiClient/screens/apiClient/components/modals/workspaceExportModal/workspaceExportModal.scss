@@ -59,15 +59,47 @@
 
     .ant-tree-treenode {
       padding: 2px 0;
+      align-items: center;
+    }
+
+    .ant-tree-node-content-wrapper {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .ant-tree-iconEle {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: auto;
+      height: auto;
+      line-height: 1;
+
+      .request-method {
+        font-size: 10px;
+        line-height: 1;
+        padding: 2px 4px;
+        border-radius: 3px;
+      }
+
+      .graphql-request-icon {
+        width: 14px;
+        height: 14px;
+      }
+
+      svg {
+        width: 14px;
+        height: 14px;
+      }
     }
 
     .ant-tree-title {
       font-size: 12px;
       color: var(--requestly-color-text-default);
-    }
-
-    .ant-tree-iconEle {
-      color: var(--requestly-color-text-subtle);
+      display: inline-flex;
+      align-items: center;
+      line-height: 1.3;
     }
   }
 
@@ -96,7 +128,8 @@
     svg {
       color: var(--requestly-color-text-subtle);
       flex-shrink: 0;
-      font-size: 14px;
+      width: 14px;
+      height: 14px;
     }
   }
 
