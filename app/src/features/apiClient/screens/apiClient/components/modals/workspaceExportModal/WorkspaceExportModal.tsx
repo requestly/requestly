@@ -62,6 +62,7 @@ export const WorkspaceExportModal: React.FC<Props> = ({ isOpen, onClose, workspa
 
   const [isExporting, setIsExporting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [expandedKeys, setExpandedKeys] = useState<React.Key[]>([]);
 
   const hydratedRoots = useMemo(() => {
     const { updatedRecords } = convertFlatRecordsToNestedRecords(allRecords);
@@ -138,6 +139,16 @@ export const WorkspaceExportModal: React.FC<Props> = ({ isOpen, onClose, workspa
     onClose();
   }, [isExporting, onClose]);
 
+  const handleTreeExpand = useCallback((keys: React.Key[]) => {
+    setExpandedKeys(keys);
+  }, []);
+
+  const handleTreeNodeClick = useCallback((_e: React.MouseEvent, node: { key: React.Key; children?: unknown[] }) => {
+    const hasChildren = Array.isArray(node.children) && node.children.length > 0;
+    if (!hasChildren) return;
+    setExpandedKeys((prev) => (prev.includes(node.key) ? prev.filter((k) => k !== node.key) : [...prev, node.key]));
+  }, []);
+
   return (
     <Modal
       title={
@@ -183,7 +194,15 @@ export const WorkspaceExportModal: React.FC<Props> = ({ isOpen, onClose, workspa
             <div className="workspace-export-modal__section">
               <div className="workspace-export-modal__section-title">Collections &amp; requests</div>
               <div className="workspace-export-modal__tree">
-                <Tree treeData={treeData} showIcon selectable={false} blockNode />
+                <Tree
+                  treeData={treeData}
+                  showIcon
+                  selectable={false}
+                  blockNode
+                  expandedKeys={expandedKeys}
+                  onExpand={handleTreeExpand}
+                  onClick={handleTreeNodeClick}
+                />
               </div>
             </div>
           )}
