@@ -19,10 +19,9 @@ import "./workspaceExportModal.scss";
 interface Props {
   isOpen: boolean;
   onClose: () => void;
-  workspaceName: string;
 }
 
-export const WorkspaceExportModal: React.FC<Props> = ({ isOpen, onClose, workspaceName: _workspaceName }) => {
+export const WorkspaceExportModal: React.FC<Props> = ({ isOpen, onClose }) => {
   const allRecords = useAllRecords();
   const globalEnvironment = useGlobalEnvironment();
   const allEnvironments = useAllEnvironments();
