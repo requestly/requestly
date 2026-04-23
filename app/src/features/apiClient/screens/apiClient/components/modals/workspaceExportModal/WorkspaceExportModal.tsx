@@ -1,6 +1,11 @@
 import React, { useCallback, useMemo, useState } from "react";
-import { Modal, message } from "antd";
+import { Modal, Tree, message } from "antd";
 import { MdOutlineFileDownload } from "@react-icons/all-files/md/MdOutlineFileDownload";
+import { CgStack } from "@react-icons/all-files/cg/CgStack";
+import { MdOutlineHttp } from "@react-icons/all-files/md/MdOutlineHttp";
+import { MdOutlineDescription } from "@react-icons/all-files/md/MdOutlineDescription";
+import { MdHorizontalSplit } from "@react-icons/all-files/md/MdHorizontalSplit";
+import { buildExportTreeData } from "./buildExportTreeData";
 import { getFormattedDate } from "utils/DateTimeUtils";
 import { useSelector } from "react-redux";
 import { useAllRecords } from "features/apiClient/slices/apiRecords/apiRecords.hooks";
@@ -59,14 +64,35 @@ export const WorkspaceExportModal: React.FC<Props> = ({ isOpen, onClose, workspa
   const [isExporting, setIsExporting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const payload = useMemo(() => {
+  const hydratedRoots = useMemo(() => {
     const { updatedRecords } = convertFlatRecordsToNestedRecords(allRecords);
+    return updatedRecords;
+  }, [allRecords]);
+
+  const payload = useMemo(() => {
     const environments = [
       parseEnvironmentEntityToData(globalEnvironment),
       ...allEnvironments.map(parseEnvironmentEntityToData),
     ];
-    return buildWorkspaceExport({ rootRecords: updatedRecords, environments });
-  }, [allRecords, allEnvironments, globalEnvironment]);
+    return buildWorkspaceExport({ rootRecords: hydratedRoots, environments });
+  }, [hydratedRoots, allEnvironments, globalEnvironment]);
+
+  const treeData = useMemo(
+    () =>
+      buildExportTreeData(hydratedRoots, {
+        collection: <CgStack />,
+        request: <MdOutlineHttp />,
+        example: <MdOutlineDescription />,
+      }),
+    [hydratedRoots]
+  );
+
+  const envNames = useMemo(() => {
+    return [
+      { id: globalEnvironment.id, name: globalEnvironment.name || "Global", isGlobal: true },
+      ...allEnvironments.map((e) => ({ id: e.id, name: e.name, isGlobal: false })),
+    ];
+  }, [globalEnvironment, allEnvironments]);
 
   const isEmpty = payload.counts.collections === 0 && payload.counts.apis === 0 && payload.counts.environments === 0;
 
@@ -138,24 +164,50 @@ export const WorkspaceExportModal: React.FC<Props> = ({ isOpen, onClose, workspa
       {isEmpty ? (
         <div>Nothing to export — this workspace has no collections or environments.</div>
       ) : (
-        <div className="workspace-export-modal__counts">
-          <div className="count-item">
-            <span className="count-value">{payload.counts.collections}</span>
-            <span className="count-label">Collections</span>
+        <>
+          <div className="workspace-export-modal__counts">
+            <div className="count-item">
+              <span className="count-value">{payload.counts.collections}</span>
+              <span className="count-label">Collections</span>
+            </div>
+            <div className="count-item">
+              <span className="count-value">{payload.counts.apis}</span>
+              <span className="count-label">Requests</span>
+            </div>
+            <div className="count-item">
+              <span className="count-value">{payload.counts.examples}</span>
+              <span className="count-label">Examples</span>
+            </div>
+            <div className="count-item">
+              <span className="count-value">{payload.counts.environments}</span>
+              <span className="count-label">Environments</span>
+            </div>
           </div>
-          <div className="count-item">
-            <span className="count-value">{payload.counts.apis}</span>
-            <span className="count-label">Requests</span>
-          </div>
-          <div className="count-item">
-            <span className="count-value">{payload.counts.examples}</span>
-            <span className="count-label">Examples</span>
-          </div>
-          <div className="count-item">
-            <span className="count-value">{payload.counts.environments}</span>
-            <span className="count-label">Environments</span>
-          </div>
-        </div>
+
+          {treeData.length > 0 && (
+            <div className="workspace-export-modal__section">
+              <div className="workspace-export-modal__section-title">Collections &amp; requests</div>
+              <div className="workspace-export-modal__tree">
+                <Tree treeData={treeData} showIcon selectable={false} blockNode />
+              </div>
+            </div>
+          )}
+
+          {envNames.length > 0 && (
+            <div className="workspace-export-modal__section">
+              <div className="workspace-export-modal__section-title">Environments</div>
+              <ul className="workspace-export-modal__env-list">
+                {envNames.map((env) => (
+                  <li key={env.id} className="workspace-export-modal__env-item">
+                    <MdHorizontalSplit />
+                    <span>{env.name}</span>
+                    {env.isGlobal && <span className="workspace-export-modal__env-badge">Global</span>}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </>
       )}
       {error && <div className="workspace-export-modal__error">Export failed: {error}</div>}
     </Modal>
