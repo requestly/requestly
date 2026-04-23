@@ -64,15 +64,17 @@
     }
 
     // Free the icon slot from antd's default fixed width so the method badge fits.
+    // Match the title's 22px line-height so icons share the same vertical midline as text.
     .ant-tree-iconEle {
       width: auto;
       min-width: auto;
-      height: auto;
+      height: 22px;
       line-height: 1;
       margin-right: 0;
       overflow: visible;
       display: inline-flex;
       align-items: center;
+      justify-content: center;
       flex-shrink: 0;
 
       .request-method {
