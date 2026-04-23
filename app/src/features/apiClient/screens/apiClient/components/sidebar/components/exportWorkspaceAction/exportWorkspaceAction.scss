@@ -1,0 +1,13 @@
+.export-workspace-action {
+  cursor: pointer;
+  color: var(--requestly-color-text-subtle);
+
+  &:hover:not(.disabled) {
+    background-color: var(--requestly-color-white-t-10);
+  }
+
+  &.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
