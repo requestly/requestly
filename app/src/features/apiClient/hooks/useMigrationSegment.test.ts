@@ -1,12 +1,8 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect } from "vitest";
 
 import { computeMigrationSegment } from "./useMigrationSegment";
 import { WorkspaceType } from "features/workspaces/types";
 import { ApiClientViewMode } from "features/apiClient/slices/workspaceView/types";
-
-vi.mock("react-redux", () => ({ useSelector: vi.fn() }));
-vi.mock("features/apiClient/slices/workspaceView/hooks", () => ({ useViewMode: vi.fn() }));
-vi.mock("store/slices/workspaces/selectors", () => ({ getActiveWorkspace: vi.fn() }));
 
 describe("computeMigrationSegment", () => {
   it("returns 'unknown' when workspaceType is undefined (hydrating)", () => {
