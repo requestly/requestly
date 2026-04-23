@@ -38,7 +38,10 @@ function slugifyWorkspaceName(name: string): string {
 }
 
 function triggerBrowserDownload(bytes: Uint8Array, fileName: string) {
-  const blob = new Blob([bytes.buffer as ArrayBuffer], { type: "application/zip" });
+  // Copy so the Blob contains exactly the view's bytes — `bytes.buffer` alone
+  // would include unrelated data if `bytes` were a subarray view.
+  const payload = new Uint8Array(bytes);
+  const blob = new Blob([payload.buffer as ArrayBuffer], { type: "application/zip" });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
