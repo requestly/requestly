@@ -17,6 +17,7 @@ export interface EnvironmentsExportJson {
 export interface WorkspaceExportCounts {
   collections: number;
   apis: number;
+  examples: number;
   environments: number;
 }
 
@@ -45,13 +46,18 @@ export function buildWorkspaceExport(input: BuildWorkspaceExportInput): Workspac
   const records: ExportRecord[] = [];
   let collectionCount = 0;
   let apiCount = 0;
+  let exampleCount = 0;
 
   rootRecords.forEach((record) => {
     if (record.type === RQAPI.RecordType.COLLECTION) {
       const sanitized = sanitizeRecords(record as RQAPI.CollectionRecord);
       sanitized.forEach((r) => {
         if (r.type === RQAPI.RecordType.COLLECTION) collectionCount++;
-        else if (r.type === RQAPI.RecordType.API) apiCount++;
+        else if (r.type === RQAPI.RecordType.API) {
+          apiCount++;
+          const apiData = (r as RQAPI.ApiRecord).data;
+          exampleCount += apiData?.examples?.length ?? 0;
+        }
       });
       records.push(...sanitized);
     } else if (record.type === RQAPI.RecordType.API) {
@@ -59,6 +65,7 @@ export function buildWorkspaceExport(input: BuildWorkspaceExportInput): Workspac
       // produced by the existing per-collection export so both files in the zip share one format.
       records.push({ ...sanitizeRecord(record), collectionId: "" } as ExportRecord);
       apiCount++;
+      exampleCount += record.data?.examples?.length ?? 0;
     }
   });
 
@@ -67,6 +74,11 @@ export function buildWorkspaceExport(input: BuildWorkspaceExportInput): Workspac
   return {
     collectionsJson: { schema_version: WORKSPACE_EXPORT_SCHEMA_VERSION, records },
     environmentsJson: { schema_version: WORKSPACE_EXPORT_SCHEMA_VERSION, environments: sanitizedEnvs },
-    counts: { collections: collectionCount, apis: apiCount, environments: sanitizedEnvs.length },
+    counts: {
+      collections: collectionCount,
+      apis: apiCount,
+      examples: exampleCount,
+      environments: sanitizedEnvs.length,
+    },
   };
 }

@@ -71,9 +71,11 @@ describe("buildWorkspaceExport", () => {
     expect(result.environmentsJson.environments.find((e: any) => e.id === "env1")?.isGlobal).toBe(false);
   });
 
-  it("returns counts (collections, apis, environments) for UI preview", () => {
-    const rootApi = makeApi("api0", null);
-    const nested = makeApi("api1", "col1");
+  it("returns counts (collections, apis, examples, environments) for UI preview", () => {
+    const example1 = { id: "ex1", type: RQAPI.RecordType.EXAMPLE_API, parentRequestId: "api1", data: {} };
+    const example2 = { id: "ex2", type: RQAPI.RecordType.EXAMPLE_API, parentRequestId: "api0", data: {} };
+    const rootApi = makeApi("api0", null, [example2]);
+    const nested = makeApi("api1", "col1", [example1]);
     const collection = makeCollection("col1", [nested]);
 
     const result = buildWorkspaceExport({
@@ -81,6 +83,6 @@ describe("buildWorkspaceExport", () => {
       environments: [{ id: "env1", name: "Dev", variables: {} }] as any,
     });
 
-    expect(result.counts).toEqual({ collections: 1, apis: 2, environments: 1 });
+    expect(result.counts).toEqual({ collections: 1, apis: 2, examples: 2, environments: 1 });
   });
 });

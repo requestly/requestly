@@ -117,9 +117,12 @@ export const WorkspaceExportModal: React.FC<Props> = ({ isOpen, onClose, workspa
   return (
     <Modal
       title={
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <MdOutlineFileDownload />
-          <span>Export workspace · {workspaceName}</span>
+        <div className="workspace-export-modal__title">
+          <div className="workspace-export-modal__title-row">
+            <MdOutlineFileDownload />
+            <span>Export workspace</span>
+          </div>
+          <div className="workspace-export-modal__subtitle">{workspaceName}</div>
         </div>
       }
       open={isOpen}
@@ -135,26 +138,24 @@ export const WorkspaceExportModal: React.FC<Props> = ({ isOpen, onClose, workspa
       {isEmpty ? (
         <div>Nothing to export — this workspace has no collections or environments.</div>
       ) : (
-        <>
-          <div>The exported ZIP will contain:</div>
-          <div className="workspace-export-modal__counts">
-            <div className="count-item">
-              <span className="count-value">{payload.counts.collections}</span>
-              <span className="count-label">Collections</span>
-            </div>
-            <div className="count-item">
-              <span className="count-value">{payload.counts.apis}</span>
-              <span className="count-label">Requests</span>
-            </div>
-            <div className="count-item">
-              <span className="count-value">{payload.counts.environments}</span>
-              <span className="count-label">Environments (incl. global)</span>
-            </div>
+        <div className="workspace-export-modal__counts">
+          <div className="count-item">
+            <span className="count-value">{payload.counts.collections}</span>
+            <span className="count-label">Collections</span>
           </div>
-          <div style={{ fontSize: 12, color: "var(--requestly-color-text-subtle)" }}>
-            Examples saved under requests are included.
+          <div className="count-item">
+            <span className="count-value">{payload.counts.apis}</span>
+            <span className="count-label">Requests</span>
           </div>
-        </>
+          <div className="count-item">
+            <span className="count-value">{payload.counts.examples}</span>
+            <span className="count-label">Examples</span>
+          </div>
+          <div className="count-item">
+            <span className="count-value">{payload.counts.environments}</span>
+            <span className="count-label">Environments</span>
+          </div>
+        </div>
       )}
       {error && <div className="workspace-export-modal__error">Export failed: {error}</div>}
     </Modal>
