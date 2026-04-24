@@ -3,6 +3,7 @@ import React, { useEffect, useLayoutEffect, useState } from "react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { useDispatch, useSelector } from "react-redux";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import Split from "react-split";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { RootState } from "store/types";
@@ -14,6 +15,8 @@ import { useWorkspaceLoadingError } from "./slices";
 import { getWorkspaceViewSlice } from "./slices/workspaceView/slice";
 import { setupWorkspaceView } from "./slices/workspaceView/thunks";
 import Daemon from "./store/apiRecords/Daemon";
+import { MigrationBlockModal } from "./screens/migrationBlock";
+import { MIGRATION_BLOCK_FLAG, MIGRATION_BLOCK_DISMISSABLE_FLAG } from "./screens/migrationBlock/constants";
 
 const ApiClientFeatureContainer: React.FC = () => {
   const dispatch = useDispatch();
@@ -21,6 +24,13 @@ const ApiClientFeatureContainer: React.FC = () => {
   const isSetupDone = useSelector((s: RootState) => getWorkspaceViewSlice(s).isSetupDone);
   const [screenWidth, setScreenWidth] = useState(window.innerWidth);
   const loadingError = useWorkspaceLoadingError();
+
+  // Block-modal mount: container only decides whether the modal *could* mount.
+  // Segment-specific variant routing, workspace selection, and WorkspaceProvider
+  // wrapping all live inside MigrationBlockModal so adding new variants
+  // (auto-local-fs, auto-cloud) only changes the modal, not this file.
+  const isBlockFlagOn = useFeatureIsOn(MIGRATION_BLOCK_FLAG);
+  const isDismissableFlagOn = useFeatureIsOn(MIGRATION_BLOCK_DISMISSABLE_FLAG);
 
   useLayoutEffect(() => {
     const handleResize = () => {
@@ -80,6 +90,7 @@ const ApiClientFeatureContainer: React.FC = () => {
             <APIClientSidebar />
             <TabsContainer />
           </Split>
+          {isBlockFlagOn && <MigrationBlockModal dismissable={isDismissableFlagOn} />}
         </ApiClientProvider>
       </div>
     </DndProvider>
