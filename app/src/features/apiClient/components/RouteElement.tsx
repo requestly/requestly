@@ -1,6 +1,5 @@
 import FEATURES from "config/constants/sub/features";
 import { useMemo } from "react";
-import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import { getActiveWorkspace } from "store/slices/workspaces/selectors";
 import { useSelector } from "react-redux";
@@ -10,9 +9,6 @@ import MandatoryUpdateScreen from "components/mode-specific/desktop/UpdateDialog
 import ApiClientFeatureContainer from "../container";
 import ApiClientErrorBoundary from "./ErrorBoundary/ErrorBoundary";
 import { ApiClientViewMode, useViewMode } from "../slices";
-import { useMigrationSegment } from "../hooks/useMigrationSegment";
-import { MigrationBlockModal } from "../screens/migrationBlock";
-import { MIGRATION_BLOCK_FLAG, MIGRATION_BLOCK_DISMISSABLE_FLAG } from "../screens/migrationBlock/constants";
 
 export const ApiClientRouteElement = () => {
   const currentViewMode = useViewMode();
@@ -25,20 +21,12 @@ export const ApiClientRouteElement = () => {
     return !hasIncompatibleConfiguration;
   }, [currentViewMode, activeWorkspace?.workspaceType]);
 
-  const isBlockFlagOn = useFeatureIsOn(MIGRATION_BLOCK_FLAG);
-  const isDismissableFlagOn = useFeatureIsOn(MIGRATION_BLOCK_DISMISSABLE_FLAG);
-  const segment = useMigrationSegment();
-  const shouldShowBlock = isBlockFlagOn && segment === "local-storage";
-
   return (
     <WindowsAndLinuxGatedHoc featureName="API client">
       {isApiClientCompatible ? (
-        <>
-          <ApiClientErrorBoundary boundaryId="api-client-error-boundary">
-            <ApiClientFeatureContainer />
-          </ApiClientErrorBoundary>
-          {shouldShowBlock && <MigrationBlockModal dismissable={isDismissableFlagOn} />}
-        </>
+        <ApiClientErrorBoundary boundaryId="api-client-error-boundary">
+          <ApiClientFeatureContainer />
+        </ApiClientErrorBoundary>
       ) : (
         <MandatoryUpdateScreen
           title="Update Required for API Client"
