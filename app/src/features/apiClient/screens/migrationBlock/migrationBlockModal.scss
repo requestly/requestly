@@ -67,16 +67,21 @@
     margin: 0;
     display: flex;
     flex-direction: column;
+    gap: 12px;
   }
 
   &__step {
     display: flex;
     align-items: flex-start;
     gap: 16px;
-    padding: 18px 4px;
+    padding: 16px;
+    background-color: var(--requestly-color-surface-1);
+    border: 1px solid var(--requestly-color-surface-2);
+    border-radius: 10px;
+    transition: border-color 150ms ease;
 
-    & + & {
-      border-top: 1px solid var(--requestly-color-surface-2);
+    &:hover {
+      border-color: var(--requestly-color-surface-3);
     }
 
     &--passive {
