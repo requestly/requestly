@@ -1,3 +1,16 @@
+// When Ant Modal is given `getContainer={.api-client-container}`, it renders
+// `.ant-modal-root` / `.ant-modal-mask` / `.ant-modal-wrap` *inside* the
+// container. Those children default to `position: absolute` relative to body;
+// scope them to the container so the mask doesn't leak over the sidebar.
+.api-client-container {
+  > .ant-modal-root,
+  > .ant-modal-root .ant-modal-mask,
+  > .ant-modal-root .ant-modal-wrap {
+    position: absolute;
+    inset: 0;
+  }
+}
+
 .migration-block-modal {
   z-index: 1600;
 

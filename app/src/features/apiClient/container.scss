@@ -23,4 +23,8 @@
 
   width: 100%;
   height: 100%;
+  // Positioning context for the RQ-1806 MigrationBlockModal, which uses
+  // getContainer to confine its mask to the API Client pane (leaving the
+  // sidebar / other app chrome clickable).
+  position: relative;
 }

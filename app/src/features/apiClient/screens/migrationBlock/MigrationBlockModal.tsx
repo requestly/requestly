@@ -42,6 +42,13 @@ function getAppMode(): "web" | "desktop" {
   return (window as any).RQ?.DESKTOP ? "desktop" : "web";
 }
 
+// Confine the Ant Modal (including its mask) to the API Client content area so
+// the sidebar and other app chrome stay clickable while the modal is up.
+// Falls back to document.body if the selector can't find the container.
+function getBlockModalContainer(): HTMLElement {
+  return (document.querySelector(".api-client-container") as HTMLElement) ?? document.body;
+}
+
 function openExternalLink(url: string): void {
   const ipc = (window as any).RQ?.DESKTOP?.SERVICES?.IPC;
   if (ipc && typeof ipc.invokeEventInBG === "function") {
@@ -152,6 +159,7 @@ export const MigrationBlockModal: React.FC<Props> = ({ dismissable }) => {
       onCancel={dismissable ? handleCancel : undefined}
       className="migration-block-modal"
       width={640}
+      getContainer={getBlockModalContainer}
     >
       <div className="migration-block-modal__body">
         <div className="migration-block-modal__header">
