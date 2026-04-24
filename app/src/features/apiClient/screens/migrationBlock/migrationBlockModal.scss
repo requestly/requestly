@@ -1,0 +1,244 @@
+// When Ant Modal is given `getContainer={.api-client-container}`, it renders
+// `.ant-modal-root` / `.ant-modal-mask` / `.ant-modal-wrap` *inside* the
+// container. Those children default to `position: absolute` relative to body;
+// scope them to the container so the mask doesn't leak over the sidebar.
+.api-client-container {
+  > .ant-modal-root,
+  > .ant-modal-root .ant-modal-mask,
+  > .ant-modal-root .ant-modal-wrap {
+    position: absolute;
+    inset: 0;
+  }
+}
+
+.migration-block-modal {
+  z-index: 1600;
+
+  .ant-modal-content {
+    background-color: var(--requestly-color-surface-0);
+    border: 1px solid var(--requestly-color-surface-2);
+    border-radius: 12px;
+    padding: 32px 32px 24px;
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.45);
+  }
+
+  .ant-modal-close {
+    top: 12px;
+    right: 12px;
+    color: var(--requestly-color-text-subtle);
+
+    &:hover {
+      color: var(--requestly-color-text-default);
+    }
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    color: var(--requestly-color-text-default);
+  }
+
+  &__header {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  &__headline {
+    margin: 0;
+    font-size: 22px;
+    line-height: 1.3;
+    font-weight: var(--requestly-font-weight-semibold);
+    color: var(--requestly-color-text-default);
+    letter-spacing: -0.2px;
+  }
+
+  &__subheadline {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--requestly-color-text-subtle);
+  }
+
+  &__steps {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  &__step {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 16px;
+    background-color: var(--requestly-color-surface-1);
+    border: 1px solid var(--requestly-color-surface-2);
+    border-radius: 10px;
+    transition: border-color 150ms ease;
+
+    &:hover {
+      border-color: var(--requestly-color-surface-3);
+    }
+
+    &--passive {
+      opacity: 0.78;
+    }
+  }
+
+  &__step-marker {
+    flex: 0 0 auto;
+    width: 24px;
+    height: 24px;
+    // Visually anchor the marker to the title row's baseline.
+    margin-top: 2px;
+  }
+
+  &__step-dot {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-color: var(--requestly-color-surface-2);
+    border: 1px solid var(--requestly-color-surface-3);
+    color: var(--requestly-color-text-subtle);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: var(--requestly-font-weight-semibold);
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+  }
+
+  &__step-content {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  &__step-action {
+    flex: 0 0 auto;
+    align-self: flex-start;
+    display: inline-flex;
+  }
+
+  &__step-title {
+    font-size: 15px;
+    font-weight: var(--requestly-font-weight-semibold);
+    color: var(--requestly-color-text-default);
+    line-height: 1.4;
+  }
+
+  &__step-description {
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--requestly-color-text-subtle);
+
+    strong {
+      color: var(--requestly-color-text-default);
+      font-weight: var(--requestly-font-weight-semibold);
+    }
+  }
+
+  &__platform-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+  }
+
+  &__platform-row-label {
+    font-size: 12px;
+    color: var(--requestly-color-text-placeholder);
+    margin-right: 4px;
+  }
+
+  &__platform-chip {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    background-color: var(--requestly-color-surface-2);
+    border: 1px solid transparent;
+    color: var(--requestly-color-text-subtle);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 120ms ease, color 120ms ease, border-color 120ms ease;
+    padding: 0;
+
+    svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    &:hover {
+      background-color: var(--requestly-color-surface-3);
+      color: var(--requestly-color-text-default);
+      border-color: var(--requestly-color-surface-3);
+    }
+
+    &:focus-visible {
+      outline: none;
+      border-color: var(--requestly-color-primary);
+    }
+  }
+
+  &__primary-cta {
+    flex: 0 0 auto;
+  }
+
+  &__cta-arrow {
+    width: 14px;
+    height: 14px;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+
+  &__footer {
+    display: flex;
+    justify-content: center;
+    padding-top: 8px;
+    border-top: 1px solid var(--requestly-color-surface-2);
+    margin-top: 4px;
+  }
+
+  &__report-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: transparent;
+    border: none;
+    color: var(--requestly-color-text-subtle);
+    font-size: 13px;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: color 120ms ease, background-color 120ms ease;
+
+    svg {
+      width: 15px;
+      height: 15px;
+    }
+
+    &:hover {
+      color: var(--requestly-color-text-default);
+      background-color: var(--requestly-color-surface-1);
+    }
+
+    &:focus-visible {
+      outline: 1px solid var(--requestly-color-primary);
+      outline-offset: 2px;
+    }
+  }
+
+  &__report-arrow {
+    opacity: 0.7;
+  }
+}
