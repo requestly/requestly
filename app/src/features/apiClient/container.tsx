@@ -18,6 +18,8 @@ import Daemon from "./store/apiRecords/Daemon";
 import { useMigrationSegment } from "./hooks/useMigrationSegment";
 import { MigrationBlockModal } from "./screens/migrationBlock";
 import { MIGRATION_BLOCK_FLAG, MIGRATION_BLOCK_DISMISSABLE_FLAG } from "./screens/migrationBlock/constants";
+import { WorkspaceProvider } from "./common/WorkspaceProvider";
+import { useGetAllSelectedWorkspaces } from "./slices/workspaceView/hooks";
 
 const ApiClientFeatureContainer: React.FC = () => {
   const dispatch = useDispatch();
@@ -30,6 +32,18 @@ const ApiClientFeatureContainer: React.FC = () => {
   const isDismissableFlagOn = useFeatureIsOn(MIGRATION_BLOCK_DISMISSABLE_FLAG);
   const segment = useMigrationSegment();
   const shouldShowBlock = isBlockFlagOn && segment === "local-storage";
+
+  // The modal calls useWorkspaceZipDownload, which uses useApiClientSelector + the
+  // API Client context registry. Both are keyed off the API Client's internal
+  // workspace (registered by setupWorkspaceView — can differ from the global
+  // getActiveWorkspace.id, e.g., FAKE_LOGGED_OUT_WORKSPACE_ID when signed out).
+  // Read from the same source the sidebar uses, and gate on status.loading so
+  // WorkspaceProvider doesn't hit the registry before the entry is populated.
+  const selectedWorkspaces = useGetAllSelectedWorkspaces();
+  const blockWorkspace =
+    shouldShowBlock && selectedWorkspaces.length === 1 && !selectedWorkspaces[0]?.status.loading
+      ? selectedWorkspaces[0]
+      : null;
 
   useLayoutEffect(() => {
     const handleResize = () => {
@@ -89,7 +103,11 @@ const ApiClientFeatureContainer: React.FC = () => {
             <APIClientSidebar />
             <TabsContainer />
           </Split>
-          {shouldShowBlock && <MigrationBlockModal dismissable={isDismissableFlagOn} />}
+          {blockWorkspace && (
+            <WorkspaceProvider workspaceId={blockWorkspace.id}>
+              <MigrationBlockModal dismissable={isDismissableFlagOn} />
+            </WorkspaceProvider>
+          )}
         </ApiClientProvider>
       </div>
     </DndProvider>
