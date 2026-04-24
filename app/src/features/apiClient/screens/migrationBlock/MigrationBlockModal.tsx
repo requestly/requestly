@@ -171,12 +171,14 @@ export const MigrationBlockModal: React.FC<Props> = ({ dismissable }) => {
 
         <ol className="migration-block-modal__steps">
           <li className="migration-block-modal__step">
-            <div className="migration-block-modal__step-badge" aria-hidden>
-              <span className="migration-block-modal__step-num">1</span>
-              <MdOutlineFileDownload className="migration-block-modal__step-icon" />
+            <div className="migration-block-modal__step-icon" aria-hidden>
+              <MdOutlineFileDownload />
             </div>
             <div className="migration-block-modal__step-content">
-              <div className="migration-block-modal__step-title">Export your workspace</div>
+              <div className="migration-block-modal__step-title">
+                <span className="migration-block-modal__step-number">1.</span>
+                Export your workspace
+              </div>
               <div className="migration-block-modal__step-description">
                 Save a copy of your collections, environments, and scripts.
               </div>
@@ -198,12 +200,14 @@ export const MigrationBlockModal: React.FC<Props> = ({ dismissable }) => {
           </li>
 
           <li className="migration-block-modal__step">
-            <div className="migration-block-modal__step-badge" aria-hidden>
-              <span className="migration-block-modal__step-num">2</span>
-              <MdOutlineCloudDownload className="migration-block-modal__step-icon" />
+            <div className="migration-block-modal__step-icon" aria-hidden>
+              <MdOutlineCloudDownload />
             </div>
             <div className="migration-block-modal__step-content">
-              <div className="migration-block-modal__step-title">Download the new app</div>
+              <div className="migration-block-modal__step-title">
+                <span className="migration-block-modal__step-number">2.</span>
+                Download the new app
+              </div>
               <div className="migration-block-modal__step-description">
                 Requestly API Client for {platform ? DOWNLOAD_LABELS[platform] : "your OS"}.
               </div>
@@ -245,12 +249,12 @@ export const MigrationBlockModal: React.FC<Props> = ({ dismissable }) => {
           </li>
 
           <li className="migration-block-modal__step migration-block-modal__step--passive">
-            <div className="migration-block-modal__step-badge" aria-hidden>
-              <span className="migration-block-modal__step-num">3</span>
-              <MdOutlineFileUpload className="migration-block-modal__step-icon" />
+            <div className="migration-block-modal__step-icon" aria-hidden>
+              <MdOutlineFileUpload />
             </div>
             <div className="migration-block-modal__step-content">
               <div className="migration-block-modal__step-title">
+                <span className="migration-block-modal__step-number">3.</span>
                 Import into the new app
                 <span className="migration-block-modal__step-tag">In the new app</span>
               </div>
