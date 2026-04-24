@@ -1,8 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Modal, Tooltip, notification } from "antd";
 import { MdOutlineFileDownload } from "@react-icons/all-files/md/MdOutlineFileDownload";
-import { MdOutlineFileUpload } from "@react-icons/all-files/md/MdOutlineFileUpload";
-import { MdOutlineCloudDownload } from "@react-icons/all-files/md/MdOutlineCloudDownload";
 import { MdArrowForward } from "@react-icons/all-files/md/MdArrowForward";
 import { FaApple } from "@react-icons/all-files/fa/FaApple";
 import { FaWindows } from "@react-icons/all-files/fa/FaWindows";
@@ -171,20 +169,17 @@ export const MigrationBlockModal: React.FC<Props> = ({ dismissable }) => {
 
         <ol className="migration-block-modal__steps">
           <li className="migration-block-modal__step">
-            <div className="migration-block-modal__step-icon" aria-hidden>
-              <MdOutlineFileDownload />
+            <div className="migration-block-modal__step-marker" aria-hidden>
+              <span className="migration-block-modal__step-dot">1</span>
             </div>
             <div className="migration-block-modal__step-content">
-              <div className="migration-block-modal__step-title">
-                <span className="migration-block-modal__step-number">1.</span>
-                Export your workspace
-              </div>
+              <div className="migration-block-modal__step-title">Export your workspace</div>
               <div className="migration-block-modal__step-description">
                 Save a copy of your collections, environments, and scripts.
               </div>
             </div>
             <Tooltip title={isEmpty ? "Nothing to export — this workspace is empty." : ""} placement="top">
-              <span>
+              <span className="migration-block-modal__step-action">
                 <RQButton
                   type="secondary"
                   size="default"
@@ -200,14 +195,11 @@ export const MigrationBlockModal: React.FC<Props> = ({ dismissable }) => {
           </li>
 
           <li className="migration-block-modal__step">
-            <div className="migration-block-modal__step-icon" aria-hidden>
-              <MdOutlineCloudDownload />
+            <div className="migration-block-modal__step-marker" aria-hidden>
+              <span className="migration-block-modal__step-dot">2</span>
             </div>
             <div className="migration-block-modal__step-content">
-              <div className="migration-block-modal__step-title">
-                <span className="migration-block-modal__step-number">2.</span>
-                Download the new app
-              </div>
+              <div className="migration-block-modal__step-title">Download the new app</div>
               <div className="migration-block-modal__step-description">
                 Requestly API Client for {platform ? DOWNLOAD_LABELS[platform] : "your OS"}.
               </div>
@@ -235,29 +227,27 @@ export const MigrationBlockModal: React.FC<Props> = ({ dismissable }) => {
               )}
             </div>
             {isPlatformProbed && platform !== null && PrimaryPlatformIcon ? (
-              <RQButton
-                type="primary"
-                size="default"
-                icon={<PrimaryPlatformIcon />}
-                onClick={() => handleDownloadClick(platform)}
-                className="migration-block-modal__primary-cta"
-              >
-                Download
-                <MdArrowForward className="migration-block-modal__cta-arrow" />
-              </RQButton>
+              <span className="migration-block-modal__step-action">
+                <RQButton
+                  type="primary"
+                  size="default"
+                  icon={<PrimaryPlatformIcon />}
+                  onClick={() => handleDownloadClick(platform)}
+                  className="migration-block-modal__primary-cta"
+                >
+                  Download
+                  <MdArrowForward className="migration-block-modal__cta-arrow" />
+                </RQButton>
+              </span>
             ) : null}
           </li>
 
           <li className="migration-block-modal__step migration-block-modal__step--passive">
-            <div className="migration-block-modal__step-icon" aria-hidden>
-              <MdOutlineFileUpload />
+            <div className="migration-block-modal__step-marker" aria-hidden>
+              <span className="migration-block-modal__step-dot">3</span>
             </div>
             <div className="migration-block-modal__step-content">
-              <div className="migration-block-modal__step-title">
-                <span className="migration-block-modal__step-number">3.</span>
-                Import into the new app
-                <span className="migration-block-modal__step-tag">In the new app</span>
-              </div>
+              <div className="migration-block-modal__step-title">Import into the new app</div>
               <div className="migration-block-modal__step-description">
                 Open Requestly API Client → <strong>Import</strong> → select the file you exported in step 1.
               </div>

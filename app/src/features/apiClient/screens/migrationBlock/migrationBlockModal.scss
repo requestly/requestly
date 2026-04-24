@@ -67,44 +67,45 @@
     margin: 0;
     display: flex;
     flex-direction: column;
-    gap: 12px;
   }
 
   &__step {
     display: flex;
     align-items: flex-start;
     gap: 16px;
-    padding: 16px;
-    background-color: var(--requestly-color-surface-1);
-    border: 1px solid var(--requestly-color-surface-2);
-    border-radius: 10px;
-    transition: border-color 150ms ease;
+    padding: 18px 4px;
 
-    &:hover {
-      border-color: var(--requestly-color-surface-3);
+    & + & {
+      border-top: 1px solid var(--requestly-color-surface-2);
     }
 
     &--passive {
-      opacity: 0.85;
+      opacity: 0.78;
     }
   }
 
-  &__step-icon {
+  &__step-marker {
     flex: 0 0 auto;
-    width: 36px;
-    height: 36px;
-    border-radius: 8px;
+    width: 24px;
+    height: 24px;
+    // Visually anchor the marker to the title row's baseline.
+    margin-top: 2px;
+  }
+
+  &__step-dot {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
     background-color: var(--requestly-color-surface-2);
+    border: 1px solid var(--requestly-color-surface-3);
     color: var(--requestly-color-text-subtle);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 18px;
-
-    svg {
-      width: 1em;
-      height: 1em;
-    }
+    font-size: 12px;
+    font-weight: var(--requestly-font-weight-semibold);
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
   }
 
   &__step-content {
@@ -115,42 +116,22 @@
     gap: 4px;
   }
 
+  &__step-action {
+    flex: 0 0 auto;
+    align-self: center;
+    display: inline-flex;
+  }
+
   &__step-title {
-    display: flex;
-    align-items: baseline;
-    flex-wrap: wrap;
-    gap: 8px;
     font-size: 15px;
     font-weight: var(--requestly-font-weight-semibold);
     color: var(--requestly-color-text-default);
     line-height: 1.4;
   }
 
-  &__step-number {
-    color: var(--requestly-color-text-placeholder);
-    font-weight: var(--requestly-font-weight-medium);
-    font-variant-numeric: tabular-nums;
-    margin-right: -4px;
-  }
-
-  &__step-tag {
-    display: inline-flex;
-    align-items: center;
-    padding: 1px 6px;
-    font-size: 10px;
-    font-weight: var(--requestly-font-weight-medium);
-    color: var(--requestly-color-text-placeholder);
-    background-color: transparent;
-    border: 1px solid var(--requestly-color-surface-2);
-    border-radius: 4px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    line-height: 1.4;
-  }
-
   &__step-description {
     font-size: 13px;
-    line-height: 1.5;
+    line-height: 1.55;
     color: var(--requestly-color-text-subtle);
 
     strong {
