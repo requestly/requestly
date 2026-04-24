@@ -87,6 +87,7 @@ export enum ApiClientImporterType {
   BRUNO = "BRUNO",
   CURL = "CURL",
   OPENAPI = "OPENAPI",
+  FASTAPI = "FASTAPI",
 }
 
 export type CollectionVariableMap = Record<string, { variables: EnvironmentVariables }>;

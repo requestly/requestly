@@ -175,6 +175,10 @@ export const redirectToApiClient = (navigate) => {
   navigate(`${PATHS.API_CLIENT.ABSOLUTE}`);
 };
 
+export const redirectToFastApiImporter = (navigate) => {
+  navigate(`${PATHS.API_CLIENT.IMPORT_FROM_FASTAPI.ABSOLUTE}`);
+};
+
 export const redirectToRequest = (navigate, requestId = "new") => {
   navigate(`${PATHS.API_CLIENT.ABSOLUTE}/request/${requestId}`);
 };
