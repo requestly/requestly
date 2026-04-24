@@ -7,7 +7,10 @@ import { FaWindows } from "@react-icons/all-files/fa/FaWindows";
 import { FaLinux } from "@react-icons/all-files/fa/FaLinux";
 import { FaGithub } from "@react-icons/all-files/fa/FaGithub";
 import { RQButton } from "lib/design-system-v2/components";
+import { useMigrationSegment } from "features/apiClient/hooks/useMigrationSegment";
 import { useWorkspaceZipDownload } from "features/apiClient/hooks/useWorkspaceZipDownload";
+import { WorkspaceProvider } from "features/apiClient/common/WorkspaceProvider";
+import { useGetAllSelectedWorkspaces } from "features/apiClient/slices/workspaceView/hooks";
 import { DownloadPlatform, detectDownloadPlatform, ALL_PLATFORMS } from "./detectOS";
 import { DOWNLOAD_URLS, DOWNLOAD_LABELS, REPORT_ISSUES_URL } from "./constants";
 import {
@@ -56,7 +59,33 @@ function openExternalLink(url: string): void {
   }
 }
 
+// Router: picks the variant for the current segment and handles any per-variant
+// provider wrapping (the local-storage variant needs WorkspaceProvider because
+// its content calls useWorkspaceZipDownload → useApiClientSelector). Future
+// auto-local-fs (incl. MULTI) and auto-cloud branches add here.
 export const MigrationBlockModal: React.FC<Props> = ({ dismissable }) => {
+  const segment = useMigrationSegment();
+  const selectedWorkspaces = useGetAllSelectedWorkspaces();
+
+  if (segment === "local-storage") {
+    // local-storage is always SINGLE view with exactly one selected workspace.
+    const workspace = selectedWorkspaces[0];
+    if (!workspace || workspace.status.loading) return null;
+    return (
+      <WorkspaceProvider workspaceId={workspace.id}>
+        <LocalStorageBlockModalContent dismissable={dismissable} />
+      </WorkspaceProvider>
+    );
+  }
+
+  // auto-local-fs, auto-cloud, and unknown render nothing until their variants
+  // are implemented. When auto-local-fs lands, its branch can handle MULTI view
+  // (N workspaces) however it needs — iterate per workspace, skip the provider
+  // entirely, or whatever the variant's data story requires.
+  return null;
+};
+
+const LocalStorageBlockModalContent: React.FC<Props> = ({ dismissable }) => {
   const [isDismissed, setIsDismissed] = useState(dismissable && hasDismissedThisPageLoad);
   const [platform, setPlatform] = useState<DownloadPlatform | null>(null);
   const [isPlatformProbed, setIsPlatformProbed] = useState(false);

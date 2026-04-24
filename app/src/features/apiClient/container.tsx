@@ -15,11 +15,8 @@ import { useWorkspaceLoadingError } from "./slices";
 import { getWorkspaceViewSlice } from "./slices/workspaceView/slice";
 import { setupWorkspaceView } from "./slices/workspaceView/thunks";
 import Daemon from "./store/apiRecords/Daemon";
-import { useMigrationSegment } from "./hooks/useMigrationSegment";
 import { MigrationBlockModal } from "./screens/migrationBlock";
 import { MIGRATION_BLOCK_FLAG, MIGRATION_BLOCK_DISMISSABLE_FLAG } from "./screens/migrationBlock/constants";
-import { WorkspaceProvider } from "./common/WorkspaceProvider";
-import { useGetAllSelectedWorkspaces } from "./slices/workspaceView/hooks";
 
 const ApiClientFeatureContainer: React.FC = () => {
   const dispatch = useDispatch();
@@ -28,22 +25,12 @@ const ApiClientFeatureContainer: React.FC = () => {
   const [screenWidth, setScreenWidth] = useState(window.innerWidth);
   const loadingError = useWorkspaceLoadingError();
 
+  // Block-modal mount: container only decides whether the modal *could* mount.
+  // Segment-specific variant routing, workspace selection, and WorkspaceProvider
+  // wrapping all live inside MigrationBlockModal so adding new variants
+  // (auto-local-fs, auto-cloud) only changes the modal, not this file.
   const isBlockFlagOn = useFeatureIsOn(MIGRATION_BLOCK_FLAG);
   const isDismissableFlagOn = useFeatureIsOn(MIGRATION_BLOCK_DISMISSABLE_FLAG);
-  const segment = useMigrationSegment();
-  const shouldShowBlock = isBlockFlagOn && segment === "local-storage";
-
-  // The modal calls useWorkspaceZipDownload, which uses useApiClientSelector + the
-  // API Client context registry. Both are keyed off the API Client's internal
-  // workspace (registered by setupWorkspaceView — can differ from the global
-  // getActiveWorkspace.id, e.g., FAKE_LOGGED_OUT_WORKSPACE_ID when signed out).
-  // Read from the same source the sidebar uses, and gate on status.loading so
-  // WorkspaceProvider doesn't hit the registry before the entry is populated.
-  const selectedWorkspaces = useGetAllSelectedWorkspaces();
-  const blockWorkspace =
-    shouldShowBlock && selectedWorkspaces.length === 1 && !selectedWorkspaces[0]?.status.loading
-      ? selectedWorkspaces[0]
-      : null;
 
   useLayoutEffect(() => {
     const handleResize = () => {
@@ -103,11 +90,7 @@ const ApiClientFeatureContainer: React.FC = () => {
             <APIClientSidebar />
             <TabsContainer />
           </Split>
-          {blockWorkspace && (
-            <WorkspaceProvider workspaceId={blockWorkspace.id}>
-              <MigrationBlockModal dismissable={isDismissableFlagOn} />
-            </WorkspaceProvider>
-          )}
+          {isBlockFlagOn && <MigrationBlockModal dismissable={isDismissableFlagOn} />}
         </ApiClientProvider>
       </div>
     </DndProvider>
