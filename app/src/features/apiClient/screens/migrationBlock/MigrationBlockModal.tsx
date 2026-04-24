@@ -1,6 +1,14 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Modal, Tooltip, notification } from "antd";
 import { MdOutlineFileDownload } from "@react-icons/all-files/md/MdOutlineFileDownload";
+import { MdOutlineFileUpload } from "@react-icons/all-files/md/MdOutlineFileUpload";
+import { MdOutlineCloudDownload } from "@react-icons/all-files/md/MdOutlineCloudDownload";
+import { MdArrowForward } from "@react-icons/all-files/md/MdArrowForward";
+import { FaApple } from "@react-icons/all-files/fa/FaApple";
+import { FaWindows } from "@react-icons/all-files/fa/FaWindows";
+import { FaLinux } from "@react-icons/all-files/fa/FaLinux";
+import { FaGithub } from "@react-icons/all-files/fa/FaGithub";
+import { RQButton } from "lib/design-system-v2/components";
 import { useWorkspaceZipDownload } from "features/apiClient/hooks/useWorkspaceZipDownload";
 import { DownloadPlatform, detectDownloadPlatform, ALL_PLATFORMS } from "./detectOS";
 import { DOWNLOAD_URLS, DOWNLOAD_LABELS, REPORT_ISSUES_URL } from "./constants";
@@ -22,6 +30,13 @@ interface Props {
 // Module-level flag survives component remounts within the same page load.
 // Resets on full reload. Used only when `dismissable === true`.
 let hasDismissedThisPageLoad = false;
+
+const PLATFORM_ICONS: Record<DownloadPlatform, React.ComponentType<{ className?: string }>> = {
+  mac_arm: FaApple,
+  mac_intel: FaApple,
+  win: FaWindows,
+  linux: FaLinux,
+};
 
 function getAppMode(): "web" | "desktop" {
   return (window as any).RQ?.DESKTOP ? "desktop" : "web";
@@ -62,7 +77,7 @@ export const MigrationBlockModal: React.FC<Props> = ({ dismissable }) => {
     if (shownFiredRef.current || isDismissed) return;
     shownFiredRef.current = true;
     trackMigrationBlockScreenShown({
-      user_auth_state: "signed_out", // local-storage segment implies signed-out via LOCAL_STORAGE workspace
+      user_auth_state: "signed_out",
       platform: getAppMode(),
       workspace_type: workspaceType,
       is_dismissable: dismissable,
@@ -89,10 +104,7 @@ export const MigrationBlockModal: React.FC<Props> = ({ dismissable }) => {
         zipSizeBytes: result.zipSizeBytes,
         source: "block-screen",
       });
-      notification.success({
-        message: "Workspace exported",
-        placement: "bottomRight",
-      });
+      notification.success({ message: "Workspace exported", placement: "bottomRight" });
     } catch (e) {
       const errorMessage = e instanceof Error ? e.message : "Unknown error";
       trackWorkspaceExportFailed({ workspaceType, errorType: errorMessage, source: "block-screen" });
@@ -119,9 +131,6 @@ export const MigrationBlockModal: React.FC<Props> = ({ dismissable }) => {
     hasDismissedThisPageLoad = true;
     setIsDismissed(true);
     trackMigrationBlockScreenDismissed({ dismiss_method: "close_button" });
-    // NOTE: Ant Modal's onCancel fires for X, ESC, and mask click alike — we can't
-    // cheaply distinguish them here. `dismiss_method` is best-effort; refine later
-    // with keyboard/mouse handlers if the product team needs the granularity.
   }, [dismissable]);
 
   if (isDismissed) return null;
@@ -129,6 +138,7 @@ export const MigrationBlockModal: React.FC<Props> = ({ dismissable }) => {
   const secondaryPlatforms: DownloadPlatform[] = isPlatformProbed
     ? ALL_PLATFORMS.filter((p) => p !== platform)
     : ALL_PLATFORMS;
+  const PrimaryPlatformIcon = platform ? PLATFORM_ICONS[platform] : null;
 
   return (
     <Modal
@@ -141,68 +151,113 @@ export const MigrationBlockModal: React.FC<Props> = ({ dismissable }) => {
       maskClosable={dismissable}
       onCancel={dismissable ? handleCancel : undefined}
       className="migration-block-modal"
-      width={560}
+      width={640}
     >
       <div className="migration-block-modal__body">
-        <h3 className="migration-block-modal__headline">
-          Your API client now has its own dedicated app — fast, clean, and resource-optimized.
-        </h3>
-        <p className="migration-block-modal__intro">You'll need to do this in 2 steps:</p>
+        <div className="migration-block-modal__header">
+          <h2 className="migration-block-modal__headline">Your API Client now has its own dedicated app</h2>
+          <p className="migration-block-modal__subheadline">
+            Fast, clean, and resource-optimized. Follow these 3 steps to continue your work.
+          </p>
+        </div>
+
         <ol className="migration-block-modal__steps">
           <li className="migration-block-modal__step">
-            <div className="migration-block-modal__step-label">
-              <span className="migration-block-modal__step-num">1.</span>
-              <span>Export your workspace from this app</span>
+            <div className="migration-block-modal__step-badge" aria-hidden>
+              <span className="migration-block-modal__step-num">1</span>
+              <MdOutlineFileDownload className="migration-block-modal__step-icon" />
             </div>
-            <Tooltip title={isEmpty ? "Nothing to export" : ""} placement="bottom">
-              <button
-                type="button"
-                className="migration-block-modal__cta"
-                disabled={!isReady}
-                onClick={handleExportClick}
-                aria-label="Export workspace"
-              >
-                <MdOutlineFileDownload />
-                <span>{isDownloading ? "Exporting..." : "Export Workspace"}</span>
-              </button>
+            <div className="migration-block-modal__step-content">
+              <div className="migration-block-modal__step-title">Export your workspace</div>
+              <div className="migration-block-modal__step-description">
+                Save a copy of your collections, environments, and scripts.
+              </div>
+            </div>
+            <Tooltip title={isEmpty ? "Nothing to export — this workspace is empty." : ""} placement="top">
+              <span>
+                <RQButton
+                  type="secondary"
+                  size="default"
+                  icon={<MdOutlineFileDownload />}
+                  disabled={!isReady}
+                  loading={isDownloading}
+                  onClick={handleExportClick}
+                >
+                  {isDownloading ? "Exporting…" : "Export"}
+                </RQButton>
+              </span>
             </Tooltip>
           </li>
+
           <li className="migration-block-modal__step">
-            <div className="migration-block-modal__step-label">
-              <span className="migration-block-modal__step-num">2.</span>
-              <span>Download the new app and import the file</span>
+            <div className="migration-block-modal__step-badge" aria-hidden>
+              <span className="migration-block-modal__step-num">2</span>
+              <MdOutlineCloudDownload className="migration-block-modal__step-icon" />
             </div>
-            {isPlatformProbed && platform !== null ? (
-              <button
-                type="button"
-                className="migration-block-modal__cta migration-block-modal__cta--primary"
+            <div className="migration-block-modal__step-content">
+              <div className="migration-block-modal__step-title">Download the new app</div>
+              <div className="migration-block-modal__step-description">
+                Requestly API Client for {platform ? DOWNLOAD_LABELS[platform] : "your OS"}.
+              </div>
+              {secondaryPlatforms.length > 0 && (
+                <div className="migration-block-modal__platform-row" aria-label="Other platforms">
+                  <span className="migration-block-modal__platform-row-label">
+                    {isPlatformProbed && platform ? "Other platforms" : "Choose platform"}
+                  </span>
+                  {secondaryPlatforms.map((p) => {
+                    const Icon = PLATFORM_ICONS[p];
+                    return (
+                      <Tooltip key={p} title={DOWNLOAD_LABELS[p]} placement="top">
+                        <button
+                          type="button"
+                          className="migration-block-modal__platform-chip"
+                          onClick={() => handleDownloadClick(p)}
+                          aria-label={`Download for ${DOWNLOAD_LABELS[p]}`}
+                        >
+                          <Icon />
+                        </button>
+                      </Tooltip>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+            {isPlatformProbed && platform !== null && PrimaryPlatformIcon ? (
+              <RQButton
+                type="primary"
+                size="default"
+                icon={<PrimaryPlatformIcon />}
                 onClick={() => handleDownloadClick(platform)}
-                aria-label={`Download Requestly API Client for ${DOWNLOAD_LABELS[platform]}`}
+                className="migration-block-modal__primary-cta"
               >
-                Download Requestly API Client →
-              </button>
+                Download
+                <MdArrowForward className="migration-block-modal__cta-arrow" />
+              </RQButton>
             ) : null}
           </li>
+
+          <li className="migration-block-modal__step migration-block-modal__step--passive">
+            <div className="migration-block-modal__step-badge" aria-hidden>
+              <span className="migration-block-modal__step-num">3</span>
+              <MdOutlineFileUpload className="migration-block-modal__step-icon" />
+            </div>
+            <div className="migration-block-modal__step-content">
+              <div className="migration-block-modal__step-title">
+                Import into the new app
+                <span className="migration-block-modal__step-tag">In the new app</span>
+              </div>
+              <div className="migration-block-modal__step-description">
+                Open Requestly API Client → <strong>Import</strong> → select the file you exported in step 1.
+              </div>
+            </div>
+          </li>
         </ol>
-        {secondaryPlatforms.length > 0 && (
-          <div className="migration-block-modal__more-platforms" aria-label="Other platforms">
-            {!platform && <span>Download for: </span>}
-            {platform && <span>Other platforms: </span>}
-            {secondaryPlatforms.map((p) => (
-              <button
-                key={p}
-                type="button"
-                className="migration-block-modal__platform-link"
-                onClick={() => handleDownloadClick(p)}
-              >
-                {DOWNLOAD_LABELS[p]}
-              </button>
-            ))}
-          </div>
-        )}
+
         <div className="migration-block-modal__footer">
           <button type="button" className="migration-block-modal__report-link" onClick={handleReportLinkClick}>
-            Running into issues? Let us know on GitHub →
+            <FaGithub />
+            <span>Running into issues? Let us know on GitHub</span>
+            <MdArrowForward className="migration-block-modal__report-arrow" />
           </button>
         </div>
       </div>
