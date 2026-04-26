@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Modal, Tooltip, notification } from "antd";
+import { Modal, Tooltip, Collapse, notification } from "antd";
 import { MdOutlineFileDownload } from "@react-icons/all-files/md/MdOutlineFileDownload";
 import { MdArrowForward } from "@react-icons/all-files/md/MdArrowForward";
 import { FaApple } from "@react-icons/all-files/fa/FaApple";
@@ -8,6 +8,9 @@ import { FaLinux } from "@react-icons/all-files/fa/FaLinux";
 import { FaGithub } from "@react-icons/all-files/fa/FaGithub";
 import { RQButton } from "lib/design-system-v2/components";
 import { useMigrationSegment } from "features/apiClient/hooks/useMigrationSegment";
+import { useSelector } from "react-redux";
+import { getActiveWorkspace } from "store/slices/workspaces/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useWorkspaceZipDownload } from "features/apiClient/hooks/useWorkspaceZipDownload";
 import { WorkspaceProvider } from "features/apiClient/common/WorkspaceProvider";
 import { useGetAllSelectedWorkspaces } from "features/apiClient/slices/workspaceView/hooks";
@@ -18,6 +21,7 @@ import {
   trackMigrationBlockScreenCtaClicked,
   trackMigrationBlockScreenDismissed,
   trackMigrationBlockScreenReportLinkClicked,
+  trackMigrationBlockScreenTroubleshootingOpened,
   trackWorkspaceExportStarted,
   trackWorkspaceExportSuccessful,
   trackWorkspaceExportFailed,
@@ -78,7 +82,17 @@ export const MigrationBlockModal: React.FC<Props> = ({ dismissable }) => {
     );
   }
 
-  // auto-local-fs, auto-cloud, and unknown render nothing until their variants
+  if (segment === "auto-cloud") {
+    const workspace = selectedWorkspaces[0];
+    if (!workspace || workspace.status.loading) return null;
+    return (
+      <WorkspaceProvider workspaceId={workspace.id}>
+        <CloudBlockModalContent dismissable={dismissable} />
+      </WorkspaceProvider>
+    );
+  }
+
+  // auto-local-fs and unknown render nothing until their variants
   // are implemented. When auto-local-fs lands, its branch can handle MULTI view
   // (N workspaces) however it needs — iterate per workspace, skip the provider
   // entirely, or whatever the variant's data story requires.
@@ -293,5 +307,238 @@ const LocalStorageBlockModalContent: React.FC<Props> = ({ dismissable }) => {
         </div>
       </div>
     </Modal>
+  );
+};
+
+const CloudBlockModalContent: React.FC<Props> = ({ dismissable }) => {
+  const activeWorkspace = useSelector(getActiveWorkspace);
+  const userAuth = useSelector(getUserAuthDetails);
+  const userEmail: string | undefined = userAuth?.details?.profile?.email;
+
+  const [isDismissed, setIsDismissed] = useState(dismissable && hasDismissedThisPageLoad);
+  const [platform, setPlatform] = useState<DownloadPlatform | null>(null);
+  const [isPlatformProbed, setIsPlatformProbed] = useState(false);
+  const shownFiredRef = useRef(false);
+
+  // Per-workspace gate: only show once the backend migration script has flipped
+  // the flag on this workspace's Firestore document. Lives inside the component
+  // so the early-return runs after hooks, satisfying the rules-of-hooks.
+  const isMigratedToArc = activeWorkspace?.migratedToArc === true;
+
+  useEffect(() => {
+    let cancelled = false;
+    detectDownloadPlatform().then((result) => {
+      if (cancelled) return;
+      setPlatform(result.primary);
+      setIsPlatformProbed(true);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!isMigratedToArc) return;
+    if (shownFiredRef.current || isDismissed) return;
+    shownFiredRef.current = true;
+    trackMigrationBlockScreenShown({
+      user_auth_state: userEmail ? "signed_in" : "signed_out",
+      platform: getAppMode(),
+      workspace_type: activeWorkspace?.workspaceType,
+      is_dismissable: dismissable,
+    });
+  }, [isMigratedToArc, isDismissed, dismissable, userEmail, activeWorkspace?.workspaceType]);
+
+  const handleDownloadClick = useCallback((clicked: DownloadPlatform) => {
+    trackMigrationBlockScreenCtaClicked({ cta: "download", platform_clicked: clicked });
+    openExternalLink(DOWNLOAD_URLS[clicked]);
+  }, []);
+
+  const handleReportLinkClick = useCallback(() => {
+    trackMigrationBlockScreenReportLinkClicked({});
+    openExternalLink(REPORT_ISSUES_URL);
+  }, []);
+
+  const handleCancel = useCallback(() => {
+    if (!dismissable) return;
+    hasDismissedThisPageLoad = true;
+    setIsDismissed(true);
+    trackMigrationBlockScreenDismissed({ dismiss_method: "close_button" });
+  }, [dismissable]);
+
+  if (!isMigratedToArc) return null;
+  if (isDismissed) return null;
+
+  const secondaryPlatforms: DownloadPlatform[] = isPlatformProbed
+    ? ALL_PLATFORMS.filter((p) => p !== platform)
+    : ALL_PLATFORMS;
+  const PrimaryPlatformIcon = platform ? PLATFORM_ICONS[platform] : null;
+  const signInTitle = userEmail ? `Sign in with ${userEmail}` : "Sign in to your account";
+
+  return (
+    <Modal
+      open
+      centered
+      title={null}
+      footer={null}
+      closable={dismissable}
+      keyboard={dismissable}
+      maskClosable={dismissable}
+      onCancel={dismissable ? handleCancel : undefined}
+      className="migration-block-modal"
+      width={640}
+      getContainer={getBlockModalContainer}
+    >
+      <div className="migration-block-modal__body">
+        <div className="migration-block-modal__header">
+          <h2 className="migration-block-modal__headline">Your API Client now has its own dedicated app</h2>
+          <p className="migration-block-modal__subheadline">
+            Your workspaces have already been migrated. Just sign in to continue.
+          </p>
+        </div>
+
+        <ol className="migration-block-modal__steps">
+          <li className="migration-block-modal__step">
+            <div className="migration-block-modal__step-marker" aria-hidden>
+              <span className="migration-block-modal__step-dot">1</span>
+            </div>
+            <div className="migration-block-modal__step-content">
+              <div className="migration-block-modal__step-title">Download the new app</div>
+              <div className="migration-block-modal__step-description">
+                Requestly API Client for {platform ? DOWNLOAD_LABELS[platform] : "your OS"}.
+              </div>
+              {secondaryPlatforms.length > 0 && (
+                <div className="migration-block-modal__platform-row" aria-label="Other platforms">
+                  <span className="migration-block-modal__platform-row-label">
+                    {isPlatformProbed && platform ? "Other platforms" : "Choose platform"}
+                  </span>
+                  {secondaryPlatforms.map((p) => {
+                    const Icon = PLATFORM_ICONS[p];
+                    return (
+                      <Tooltip key={p} title={DOWNLOAD_LABELS[p]} placement="top">
+                        <button
+                          type="button"
+                          className="migration-block-modal__platform-chip"
+                          onClick={() => handleDownloadClick(p)}
+                          aria-label={`Download for ${DOWNLOAD_LABELS[p]}`}
+                        >
+                          <Icon />
+                        </button>
+                      </Tooltip>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+            {isPlatformProbed && platform !== null && PrimaryPlatformIcon ? (
+              <span className="migration-block-modal__step-action">
+                <RQButton
+                  type="primary"
+                  size="default"
+                  icon={<PrimaryPlatformIcon />}
+                  onClick={() => handleDownloadClick(platform)}
+                  className="migration-block-modal__primary-cta"
+                >
+                  Download
+                  <MdArrowForward className="migration-block-modal__cta-arrow" />
+                </RQButton>
+              </span>
+            ) : null}
+          </li>
+
+          <li className="migration-block-modal__step migration-block-modal__step--passive">
+            <div className="migration-block-modal__step-marker" aria-hidden>
+              <span className="migration-block-modal__step-dot">2</span>
+            </div>
+            <div className="migration-block-modal__step-content">
+              <div className="migration-block-modal__step-title">{signInTitle}</div>
+              <div className="migration-block-modal__step-description">
+                Open Requestly API Client and sign in with this email. Your workspaces will be ready.
+              </div>
+            </div>
+          </li>
+        </ol>
+
+        <TroubleshootingPanel />
+
+        <div className="migration-block-modal__footer">
+          <button type="button" className="migration-block-modal__report-link" onClick={handleReportLinkClick}>
+            <FaGithub />
+            <span>Running into issues? Let us know on GitHub</span>
+            <MdArrowForward className="migration-block-modal__report-arrow" />
+          </button>
+        </div>
+      </div>
+    </Modal>
+  );
+};
+
+const TroubleshootingPanel: React.FC = () => {
+  const openedFiredRef = useRef(false);
+  const { download, isReady, isDownloading, workspaceType, counts } = useWorkspaceZipDownload();
+  const isEmpty = counts.collections === 0 && counts.apis === 0 && counts.environments === 0;
+
+  const handleCollapseChange = useCallback((activeKeys: string | string[]) => {
+    const isOpen = Array.isArray(activeKeys) ? activeKeys.includes("export") : activeKeys === "export";
+    if (isOpen && !openedFiredRef.current) {
+      openedFiredRef.current = true;
+      trackMigrationBlockScreenTroubleshootingOpened({});
+    }
+  }, []);
+
+  const handleExportClick = useCallback(async () => {
+    if (!isReady) return;
+    trackMigrationBlockScreenCtaClicked({ cta: "export" });
+    trackWorkspaceExportStarted({
+      workspaceType,
+      collectionCount: counts.collections,
+      requestCount: counts.apis,
+      environmentCount: counts.environments,
+      source: "block-screen",
+    });
+    try {
+      const result = await download();
+      trackWorkspaceExportSuccessful({
+        workspaceType,
+        durationMs: result.durationMs,
+        zipSizeBytes: result.zipSizeBytes,
+        source: "block-screen",
+      });
+      notification.success({ message: "Workspace exported", placement: "bottomRight" });
+    } catch (e) {
+      const errorMessage = e instanceof Error ? e.message : "Unknown error";
+      trackWorkspaceExportFailed({ workspaceType, errorType: errorMessage, source: "block-screen" });
+      notification.error({
+        message: "Export failed",
+        description: errorMessage,
+        placement: "bottomRight",
+      });
+    }
+  }, [isReady, download, workspaceType, counts]);
+
+  return (
+    <div className="migration-block-modal__troubleshooting">
+      <Collapse ghost onChange={handleCollapseChange}>
+        <Collapse.Panel header="Troubleshooting" key="export">
+          <div className="migration-block-modal__troubleshooting-explainer">
+            If you'd like a local backup of this workspace, you can export it as a zip.
+          </div>
+          <Tooltip title={isEmpty ? "Nothing to export — this workspace is empty." : ""} placement="top">
+            <span className="migration-block-modal__troubleshooting-action">
+              <RQButton
+                type="secondary"
+                size="default"
+                icon={<MdOutlineFileDownload />}
+                disabled={!isReady}
+                loading={isDownloading}
+                onClick={handleExportClick}
+              >
+                {isDownloading ? "Exporting…" : "Export workspace"}
+              </RQButton>
+            </span>
+          </Tooltip>
+        </Collapse.Panel>
+      </Collapse>
+    </div>
   );
 };
