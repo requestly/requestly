@@ -2,6 +2,7 @@ import { DownloadPlatform } from "./detectOS";
 
 export const MIGRATION_BLOCK_FLAG = "api_client_migration_block_screen";
 export const MIGRATION_BLOCK_DISMISSABLE_FLAG = "api_client_migration_block_screen_dismissable";
+export const MIGRATION_BLOCK_CLOUD_FORCE_FLAG = "api_client_migration_block_screen_cloud_force";
 
 export const DOWNLOAD_URLS: Record<DownloadPlatform, string> = {
   mac_arm: "https://get.requestly.com/mac-api-client",

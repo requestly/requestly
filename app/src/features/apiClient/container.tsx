@@ -16,7 +16,11 @@ import { getWorkspaceViewSlice } from "./slices/workspaceView/slice";
 import { setupWorkspaceView } from "./slices/workspaceView/thunks";
 import Daemon from "./store/apiRecords/Daemon";
 import { MigrationBlockModal } from "./screens/migrationBlock";
-import { MIGRATION_BLOCK_FLAG, MIGRATION_BLOCK_DISMISSABLE_FLAG } from "./screens/migrationBlock/constants";
+import {
+  MIGRATION_BLOCK_FLAG,
+  MIGRATION_BLOCK_DISMISSABLE_FLAG,
+  MIGRATION_BLOCK_CLOUD_FORCE_FLAG,
+} from "./screens/migrationBlock/constants";
 
 const ApiClientFeatureContainer: React.FC = () => {
   const dispatch = useDispatch();
@@ -31,6 +35,7 @@ const ApiClientFeatureContainer: React.FC = () => {
   // (auto-local-fs, auto-cloud) only changes the modal, not this file.
   const isBlockFlagOn = useFeatureIsOn(MIGRATION_BLOCK_FLAG);
   const isDismissableFlagOn = useFeatureIsOn(MIGRATION_BLOCK_DISMISSABLE_FLAG);
+  const isCloudForceFlagOn = useFeatureIsOn(MIGRATION_BLOCK_CLOUD_FORCE_FLAG);
 
   useLayoutEffect(() => {
     const handleResize = () => {
@@ -90,7 +95,9 @@ const ApiClientFeatureContainer: React.FC = () => {
             <APIClientSidebar />
             <TabsContainer />
           </Split>
-          {isBlockFlagOn && <MigrationBlockModal dismissable={isDismissableFlagOn} />}
+          {isBlockFlagOn && (
+            <MigrationBlockModal dismissable={isDismissableFlagOn} forceCloudMigration={isCloudForceFlagOn} />
+          )}
         </ApiClientProvider>
       </div>
     </DndProvider>

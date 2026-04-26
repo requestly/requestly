@@ -31,6 +31,11 @@ import "./migrationBlockModal.scss";
 
 interface Props {
   dismissable: boolean;
+  forceCloudMigration: boolean;
+}
+
+interface ContentProps {
+  dismissable: boolean;
 }
 
 // Module-level flag survives component remounts within the same page load.
@@ -68,7 +73,7 @@ function openExternalLink(url: string): void {
 // provider wrapping (the local-storage variant needs WorkspaceProvider because
 // its content calls useWorkspaceZipDownload → useApiClientSelector). Future
 // auto-local-fs (incl. MULTI) and auto-cloud branches add here.
-export const MigrationBlockModal: React.FC<Props> = ({ dismissable }) => {
+export const MigrationBlockModal: React.FC<Props> = ({ dismissable, forceCloudMigration }) => {
   const segment = useMigrationSegment();
   const selectedWorkspaces = useGetAllSelectedWorkspaces();
 
@@ -88,7 +93,7 @@ export const MigrationBlockModal: React.FC<Props> = ({ dismissable }) => {
     if (!workspace || workspace.status.loading) return null;
     return (
       <WorkspaceProvider workspaceId={workspace.id}>
-        <CloudBlockModalContent dismissable={dismissable} />
+        <CloudVariantRouter dismissable={dismissable} forceCloudMigration={forceCloudMigration} />
       </WorkspaceProvider>
     );
   }
@@ -100,8 +105,10 @@ export const MigrationBlockModal: React.FC<Props> = ({ dismissable }) => {
   return null;
 };
 
-const LocalStorageBlockModalContent: React.FC<Props> = ({ dismissable }) => {
+const LocalStorageBlockModalContent: React.FC<ContentProps> = ({ dismissable }) => {
   const [isDismissed, setIsDismissed] = useState(dismissable && hasDismissedThisPageLoad);
+  const userAuth = useSelector(getUserAuthDetails);
+  const userEmail: string | undefined = userAuth?.details?.profile?.email;
   const [platform, setPlatform] = useState<DownloadPlatform | null>(null);
   const [isPlatformProbed, setIsPlatformProbed] = useState(false);
   const shownFiredRef = useRef(false);
@@ -126,12 +133,12 @@ const LocalStorageBlockModalContent: React.FC<Props> = ({ dismissable }) => {
     if (shownFiredRef.current || isDismissed) return;
     shownFiredRef.current = true;
     trackMigrationBlockScreenShown({
-      user_auth_state: "signed_out",
+      user_auth_state: userEmail ? "signed_in" : "signed_out",
       platform: getAppMode(),
       workspace_type: workspaceType,
       is_dismissable: dismissable,
     });
-  }, [isDismissed, dismissable, workspaceType]);
+  }, [isDismissed, dismissable, workspaceType, userEmail]);
 
   const isEmpty = counts.collections === 0 && counts.apis === 0 && counts.environments === 0;
 
@@ -311,7 +318,36 @@ const LocalStorageBlockModalContent: React.FC<Props> = ({ dismissable }) => {
   );
 };
 
-const CloudBlockModalContent: React.FC<Props> = ({ dismissable }) => {
+// Picks the cloud variant to render based on the per-workspace migratedToArc
+// flag and the force-cloud-migration GrowthBook flag.
+// - migratedToArc === true → 2-step "auto" variant (data already migrated)
+// - migratedToArc !== true && forceCloudMigration → 3-step manual variant
+//   (reuses LocalStorageBlockModalContent — same Export → Download → Import flow,
+//   same component because the copy is workspace-type-agnostic and
+//   useWorkspaceZipDownload works for cloud workspaces too)
+// - otherwise → nothing
+const CloudVariantRouter: React.FC<{ dismissable: boolean; forceCloudMigration: boolean }> = ({
+  dismissable,
+  forceCloudMigration,
+}) => {
+  const activeWorkspace = useSelector(getActiveWorkspace);
+  const userAuth = useSelector(getUserAuthDetails);
+
+  const isPersonal = activeWorkspace?.workspaceType === WorkspaceType.PERSONAL;
+  const isMigratedToArc = isPersonal
+    ? userAuth?.details?.metadata?.migratedToArc === true
+    : activeWorkspace?.migratedToArc === true;
+
+  if (isMigratedToArc) {
+    return <CloudBlockModalContent dismissable={dismissable} />;
+  }
+  if (forceCloudMigration) {
+    return <LocalStorageBlockModalContent dismissable={dismissable} />;
+  }
+  return null;
+};
+
+const CloudBlockModalContent: React.FC<ContentProps> = ({ dismissable }) => {
   const activeWorkspace = useSelector(getActiveWorkspace);
   const userAuth = useSelector(getUserAuthDetails);
   const userEmail: string | undefined = userAuth?.details?.profile?.email;
@@ -320,17 +356,6 @@ const CloudBlockModalContent: React.FC<Props> = ({ dismissable }) => {
   const [platform, setPlatform] = useState<DownloadPlatform | null>(null);
   const [isPlatformProbed, setIsPlatformProbed] = useState(false);
   const shownFiredRef = useRef(false);
-
-  // Per-workspace gate: only show once the backend migration script has flipped
-  // the flag on this workspace's Firestore document. Lives inside the component
-  // so the early-return runs after hooks, satisfying the rules-of-hooks.
-  // PERSONAL workspaces have no Firestore workspace doc — they live per-user.
-  // Migration script writes the flag to the user's metadata for PERSONAL,
-  // and to the team workspace doc for SHARED. Pick the right source per type.
-  const isPersonal = activeWorkspace?.workspaceType === WorkspaceType.PERSONAL;
-  const isMigratedToArc = isPersonal
-    ? userAuth?.details?.metadata?.migratedToArc === true
-    : activeWorkspace?.migratedToArc === true;
 
   useEffect(() => {
     let cancelled = false;
@@ -345,7 +370,6 @@ const CloudBlockModalContent: React.FC<Props> = ({ dismissable }) => {
   }, []);
 
   useEffect(() => {
-    if (!isMigratedToArc) return;
     if (shownFiredRef.current || isDismissed) return;
     shownFiredRef.current = true;
     trackMigrationBlockScreenShown({
@@ -354,7 +378,7 @@ const CloudBlockModalContent: React.FC<Props> = ({ dismissable }) => {
       workspace_type: activeWorkspace?.workspaceType,
       is_dismissable: dismissable,
     });
-  }, [isMigratedToArc, isDismissed, dismissable, userEmail, activeWorkspace?.workspaceType]);
+  }, [isDismissed, dismissable, userEmail, activeWorkspace?.workspaceType]);
 
   const handleDownloadClick = useCallback((clicked: DownloadPlatform) => {
     trackMigrationBlockScreenCtaClicked({ cta: "download", platform_clicked: clicked });
@@ -373,7 +397,6 @@ const CloudBlockModalContent: React.FC<Props> = ({ dismissable }) => {
     trackMigrationBlockScreenDismissed({ dismiss_method: "close_button" });
   }, [dismissable]);
 
-  if (!isMigratedToArc) return null;
   if (isDismissed) return null;
 
   const secondaryPlatforms: DownloadPlatform[] = isPlatformProbed
