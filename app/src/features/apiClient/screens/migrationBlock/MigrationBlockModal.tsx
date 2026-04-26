@@ -430,7 +430,7 @@ const CloudBlockModalContent: React.FC<ContentProps> = ({ dismissable }) => {
         <div className="migration-block-modal__header">
           <h2 className="migration-block-modal__headline">Your API Client now has its own dedicated app</h2>
           <p className="migration-block-modal__subheadline">
-            Your workspaces have already been migrated. Just sign in to continue.
+            Fast, clean, and resource-optimized. Follow these 2 steps to continue your work.
           </p>
         </div>
 
@@ -498,7 +498,8 @@ const CloudBlockModalContent: React.FC<ContentProps> = ({ dismissable }) => {
                 )}
               </div>
               <div className="migration-block-modal__step-description">
-                Open Requestly API Client and sign in with this email. Your workspaces will be ready.
+                Your workspaces have already been migrated. Open Requestly API Client and sign in with this email to
+                continue your work.
               </div>
             </div>
           </li>
