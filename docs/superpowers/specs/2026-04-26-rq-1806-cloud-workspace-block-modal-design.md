@@ -36,14 +36,22 @@ The cloud modal renders when **all** of the following are true:
 |---|---|---|
 | Segment === `auto-cloud` | `useMigrationSegment()` (existing) | Active workspace is `PERSONAL` or `SHARED` in SINGLE view |
 | `api_client_migration_block_screen` GrowthBook flag is on | `useFeatureIsOn` in `container.tsx` (existing) | Global kill-switch / staged rollout |
-| `migratedToArc === true` | Two sources, picked by `workspaceType` (see below) | Per-workspace opt-in from the backend migration script |
+| `migratedToArc === true` **OR** `api_client_migration_block_screen_cloud_force` flag is on | `migratedToArc` from two sources (see below); the force-flag from GrowthBook | Per-workspace opt-in (auto-migrated path) **or** forced manual migration for unmigrated workspaces |
+
+**Two cloud sub-variants** are routed by a small `CloudVariantRouter`:
+
+- `migratedToArc === true` → 2-step "auto" variant (`CloudBlockModalContent`): data already migrated server-side, just download + sign in.
+- `migratedToArc !== true` AND `cloud_force` flag is on → 3-step "manual" variant: the same Export → Download → Import flow used for `LOCAL_STORAGE` workspaces. Implemented by literally rendering `LocalStorageBlockModalContent` — its copy and flow are workspace-type-agnostic, and `useWorkspaceZipDownload` works for cloud workspaces too.
+- Otherwise → nothing.
+
+The force-flag is the rollout knob for "we want to push everyone to the new app even if their data hasn't been auto-migrated yet." Flipping it on without the auto-migration backfill complete simply means more cloud users see the manual migration path.
 
 **`migratedToArc` is read from one of two sources, depending on workspace type**, because PERSONAL workspaces don't have a Firestore workspace document (they live entirely on the per-user record):
 
-- **SHARED**: `activeWorkspace.migratedToArc` — read from the Firestore team document, synced via the existing `useFetchTeamWorkspaces` realtime listener (the field is added to that hook's allow-list).
-- **PERSONAL**: `userAuth.details.metadata.migratedToArc` — read from the user document's `metadata` object (same place existing fields like `ai_consent` live), synced via the existing user listener.
+- **SHARED**: `activeWorkspace.migratedToArc` — read from the Firestore team document at path `teams/<teamId>`, synced via the existing `useFetchTeamWorkspaces` realtime listener (the field is added to that hook's allow-list, parallel to the existing `browserstackDetails` block).
+- **PERSONAL**: `userAuth.details.metadata.migratedToArc` — read from the user document at path `users/<uid>`, `metadata.migratedToArc` field (same place as the existing `metadata.ai_consent`). The user record is loaded once on login via `AuthHandler` (`getUser(uid)`), **not via a realtime listener**, so a flip from false → true requires the user to sign in again or reload before the modal mounts. This is acceptable since PERSONAL migration is a one-time per-user event.
 
-The cloud modal picks the right source inside `CloudBlockModalContent` using `workspaceType === WorkspaceType.PERSONAL` as the discriminator.
+The cloud-variant decision (auto vs force-manual vs none) lives in `CloudVariantRouter`, which uses `workspaceType === WorkspaceType.PERSONAL` as the discriminator for the `migratedToArc` read.
 
 The dismissable behavior is driven by the existing `api_client_migration_block_screen_dismissable` flag — same as local-storage. Honoring the flag (rather than always-blocking, as the prior spec speculated) preserves a safe rollout path: ship dismissable first, flip to blocking later if needed. The per-workspace `migratedToArc` gate is already a strong safety net.
 
