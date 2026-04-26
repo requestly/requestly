@@ -36,15 +36,24 @@ The cloud modal renders when **all** of the following are true:
 |---|---|---|
 | Segment === `auto-cloud` | `useMigrationSegment()` (existing) | Active workspace is `PERSONAL` or `SHARED` in SINGLE view |
 | `api_client_migration_block_screen` GrowthBook flag is on | `useFeatureIsOn` in `container.tsx` (existing) | Global kill-switch / staged rollout |
-| `activeWorkspace.migratedToArc === true` | Firestore workspace document, synced via the existing realtime workspace listener | Per-workspace opt-in from the backend migration script |
+| `migratedToArc === true` | Two sources, picked by `workspaceType` (see below) | Per-workspace opt-in from the backend migration script |
+
+**`migratedToArc` is read from one of two sources, depending on workspace type**, because PERSONAL workspaces don't have a Firestore workspace document (they live entirely on the per-user record):
+
+- **SHARED**: `activeWorkspace.migratedToArc` — read from the Firestore team document, synced via the existing `useFetchTeamWorkspaces` realtime listener (the field is added to that hook's allow-list).
+- **PERSONAL**: `userAuth.details.metadata.migratedToArc` — read from the user document's `metadata` object (same place existing fields like `ai_consent` live), synced via the existing user listener.
+
+The cloud modal picks the right source inside `CloudBlockModalContent` using `workspaceType === WorkspaceType.PERSONAL` as the discriminator.
 
 The dismissable behavior is driven by the existing `api_client_migration_block_screen_dismissable` flag — same as local-storage. Honoring the flag (rather than always-blocking, as the prior spec speculated) preserves a safe rollout path: ship dismissable first, flip to blocking later if needed. The per-workspace `migratedToArc` gate is already a strong safety net.
 
 The per-workspace gate lives **inside** `MigrationBlockModal`'s `auto-cloud` branch, not in `container.tsx`. This keeps the per-segment routing logic in one place — same pattern the local-storage variant uses for its `WorkspaceProvider` wrap.
 
-## Workspace type addition
+## Type additions
 
-Add an optional field to the `Workspace` interface in `app/src/features/workspaces/types/index.ts`:
+Two type extensions are required, one per source:
+
+**1. `Workspace.migratedToArc`** in `app/src/features/workspaces/types/index.ts` — for `SHARED` workspaces:
 
 ```ts
 export interface Workspace {
@@ -53,9 +62,20 @@ export interface Workspace {
 }
 ```
 
-- Defaults to `undefined` / falsy. The cloud modal only renders when explicitly `true`.
-- Populated by the backend migration script on the Firestore workspace document for both `PERSONAL` and `SHARED` workspaces.
-- The existing workspace listener pipes the field into Redux automatically — no new fetch, no new selector required beyond reading `activeWorkspace.migratedToArc`.
+**2. `UserMetadata.migratedToArc`** in `app/src/backend/models/users.ts` — for `PERSONAL` workspaces:
+
+```ts
+type UserMetadata =
+  | {
+      ai_consent?: boolean;
+      migratedToArc?: boolean;
+    }
+  | undefined;
+```
+
+Both default to `undefined` / falsy. The cloud modal only renders when explicitly `true`.
+
+The Firestore listeners already in place (`useFetchTeamWorkspaces` for SHARED, the user listener for PERSONAL — same path through which `ai_consent` already flows) propagate the values into Redux. The team fetcher uses an explicit allow-list in its `formattedTeamData` constructor, so `migratedToArc` is added there parallel to the existing `browserstackDetails` block.
 
 ## Modal structure (auto-cloud variant)
 
@@ -181,11 +201,11 @@ One new event:
 
 ## Open questions
 
-None blocking. The implementation pass should:
+None blocking. Resolved during implementation:
 
-1. Confirm the exact path/selector to read `migratedToArc` on the workspace shape returned by `useGetAllSelectedWorkspaces` (likely `workspace.data?.migratedToArc` based on the existing `workspace.status.loading` pattern, but verify).
-2. Confirm whether `Workspace.migratedToArc` should also be added to any related types in `shared/` (does `shared/` have a Workspace type that should mirror this addition? — search and decide).
-3. Pick a chevron / disclosure visual for the Troubleshooting collapsible that fits the existing modal's `--requestly-color-*` token system rather than Ant's default.
+1. ~~Confirm the exact path/selector to read `migratedToArc`~~ — Resolved: read from `getActiveWorkspace` (existing selector) for SHARED, and from `getUserAuthDetails` for PERSONAL. See "Gating" section above.
+2. Confirm whether `Workspace.migratedToArc` should also be added to any related types in `shared/` (does `shared/` have a Workspace type that should mirror this addition? — search and decide). The implementation pass added the field only to `app/src/features/workspaces/types/index.ts`; if a parallel definition exists in `shared/` it should be kept in sync in a follow-up.
+3. Pick a chevron / disclosure visual for the Troubleshooting collapsible that fits the existing modal's `--requestly-color-*` token system rather than Ant's default — handled by the SCSS in `migrationBlockModal.scss` (Antd's default chevron is preserved; only the surrounding box / colors are themed).
 
 ## Test plan
 
