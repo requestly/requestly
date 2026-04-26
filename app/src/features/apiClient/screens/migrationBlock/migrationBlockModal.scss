@@ -134,6 +134,20 @@
     line-height: 1.4;
   }
 
+  &__step-title-email {
+    display: inline-block;
+    padding: 1px 6px;
+    margin: 0 1px;
+    background-color: var(--requestly-color-surface-2);
+    border: 1px solid var(--requestly-color-surface-3);
+    border-radius: 4px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.88em;
+    font-weight: var(--requestly-font-weight-regular);
+    color: var(--requestly-color-text-default);
+    word-break: break-all;
+  }
+
   &__step-description {
     font-size: 13px;
     line-height: 1.55;

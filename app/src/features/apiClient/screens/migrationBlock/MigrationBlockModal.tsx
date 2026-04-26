@@ -411,7 +411,6 @@ const CloudBlockModalContent: React.FC<ContentProps> = ({ dismissable }) => {
     ? ALL_PLATFORMS.filter((p) => p !== platform)
     : ALL_PLATFORMS;
   const PrimaryPlatformIcon = platform ? PLATFORM_ICONS[platform] : null;
-  const signInTitle = userEmail ? `Sign in with ${userEmail}` : "Sign in to your account";
 
   return (
     <Modal
@@ -489,7 +488,15 @@ const CloudBlockModalContent: React.FC<ContentProps> = ({ dismissable }) => {
               <span className="migration-block-modal__step-dot">2</span>
             </div>
             <div className="migration-block-modal__step-content">
-              <div className="migration-block-modal__step-title">{signInTitle}</div>
+              <div className="migration-block-modal__step-title">
+                {userEmail ? (
+                  <>
+                    Sign in with <code className="migration-block-modal__step-title-email">{userEmail}</code>
+                  </>
+                ) : (
+                  "Sign in to your account"
+                )}
+              </div>
               <div className="migration-block-modal__step-description">
                 Open Requestly API Client and sign in with this email. Your workspaces will be ready.
               </div>
