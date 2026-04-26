@@ -1,8 +1,6 @@
-import { useSelector } from "react-redux";
-import { getActiveWorkspace } from "store/slices/workspaces/selectors";
 import { WorkspaceType } from "features/workspaces/types";
 import { ApiClientViewMode } from "features/apiClient/slices/workspaceView/types";
-import { useViewMode } from "features/apiClient/slices/workspaceView/hooks";
+import { useGetAllSelectedWorkspaces, useViewMode } from "features/apiClient/slices/workspaceView/hooks";
 
 export type MigrationSegment = "local-storage" | "auto-cloud" | "auto-local-fs" | "unknown";
 
@@ -32,10 +30,14 @@ export function computeMigrationSegment({ workspaceType, viewMode }: ComputeInpu
 }
 
 export function useMigrationSegment(): MigrationSegment {
-  const activeWorkspace = useSelector(getActiveWorkspace);
+  const selectedWorkspaces = useGetAllSelectedWorkspaces();
   const viewMode = useViewMode();
+  // Read workspaceType from the API-Client-scoped workspace slice rather than
+  // the global Redux active workspace selector. The latter falls back to a
+  // PERSONAL stub when there's no activeWorkspaceId (e.g., signed-out users),
+  // which would mis-label a logged-out LOCAL_STORAGE session as auto-cloud.
   return computeMigrationSegment({
-    workspaceType: activeWorkspace?.workspaceType,
+    workspaceType: selectedWorkspaces[0]?.meta?.type,
     viewMode,
   });
 }
