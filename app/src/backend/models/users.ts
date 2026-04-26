@@ -5,7 +5,6 @@ import { BlockConfig } from "componentsV2/BlockScreen/hooks/useIsUserBlocked";
 type UserMetadata =
   | {
       ai_consent?: boolean;
-      migratedToArc?: boolean;
     }
   | undefined;
 

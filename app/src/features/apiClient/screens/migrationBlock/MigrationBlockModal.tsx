@@ -338,8 +338,13 @@ const CloudVariantRouter: React.FC<{ dismissable: boolean; forceCloudMigration: 
   const userAuth = useSelector(getUserAuthDetails);
 
   const isPersonal = activeWorkspace?.workspaceType === WorkspaceType.PERSONAL;
+  // PERSONAL: backend writes migratedToArc to RDB at users/<uid>/profile/migratedToArc.
+  // The existing userNodeListener (DBListenerInit/userNodeListener.js) listens
+  // on that RDB node and dispatches updateUserProfile with the full RDB payload
+  // spread, so any field there lands on userAuth.details.profile reactively.
+  // SHARED: read from the team Firestore doc (synced by useFetchTeamWorkspaces).
   const isMigratedToArc = isPersonal
-    ? userAuth?.details?.metadata?.migratedToArc === true
+    ? userAuth?.details?.profile?.migratedToArc === true
     : activeWorkspace?.migratedToArc === true;
 
   if (isMigratedToArc) {
