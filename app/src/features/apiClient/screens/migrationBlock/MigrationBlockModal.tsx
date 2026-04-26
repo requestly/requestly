@@ -497,10 +497,7 @@ const CloudBlockModalContent: React.FC<ContentProps> = ({ dismissable }) => {
                   "Sign in to your account"
                 )}
               </div>
-              <div className="migration-block-modal__step-description">
-                Open Requestly API Client and sign in with this email. Your workspaces are ready — pick up right where
-                you left off.
-              </div>
+              <div className="migration-block-modal__step-description">Continue your work in the new app.</div>
             </div>
           </li>
         </ol>
