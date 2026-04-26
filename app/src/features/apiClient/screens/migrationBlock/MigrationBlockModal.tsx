@@ -7,6 +7,7 @@ import { FaWindows } from "@react-icons/all-files/fa/FaWindows";
 import { FaLinux } from "@react-icons/all-files/fa/FaLinux";
 import { FaGithub } from "@react-icons/all-files/fa/FaGithub";
 import { RQButton } from "lib/design-system-v2/components";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { useMigrationSegment } from "features/apiClient/hooks/useMigrationSegment";
 import { useSelector } from "react-redux";
 import { getActiveWorkspace } from "store/slices/workspaces/selectors";
@@ -16,7 +17,13 @@ import { WorkspaceProvider } from "features/apiClient/common/WorkspaceProvider";
 import { useGetAllSelectedWorkspaces } from "features/apiClient/slices/workspaceView/hooks";
 import { WorkspaceType } from "features/workspaces/types";
 import { DownloadPlatform, detectDownloadPlatform, ALL_PLATFORMS } from "./detectOS";
-import { DOWNLOAD_URLS, DOWNLOAD_LABELS, REPORT_ISSUES_URL } from "./constants";
+import {
+  DOWNLOAD_URLS,
+  DOWNLOAD_LABELS,
+  REPORT_ISSUES_URL,
+  MIGRATION_BLOCK_DISMISSABLE_FLAG,
+  MIGRATION_BLOCK_CLOUD_FORCE_FLAG,
+} from "./constants";
 import {
   trackMigrationBlockScreenShown,
   trackMigrationBlockScreenCtaClicked,
@@ -28,11 +35,6 @@ import {
   trackWorkspaceExportFailed,
 } from "modules/analytics/events/features/apiClient";
 import "./migrationBlockModal.scss";
-
-interface Props {
-  dismissable: boolean;
-  forceCloudMigration: boolean;
-}
 
 interface ContentProps {
   dismissable: boolean;
@@ -73,9 +75,11 @@ function openExternalLink(url: string): void {
 // provider wrapping (the local-storage variant needs WorkspaceProvider because
 // its content calls useWorkspaceZipDownload → useApiClientSelector). Future
 // auto-local-fs (incl. MULTI) and auto-cloud branches add here.
-export const MigrationBlockModal: React.FC<Props> = ({ dismissable, forceCloudMigration }) => {
+export const MigrationBlockModal: React.FC = () => {
   const segment = useMigrationSegment();
   const selectedWorkspaces = useGetAllSelectedWorkspaces();
+  const dismissable = useFeatureIsOn(MIGRATION_BLOCK_DISMISSABLE_FLAG);
+  const forceCloudMigration = useFeatureIsOn(MIGRATION_BLOCK_CLOUD_FORCE_FLAG);
 
   if (segment === "local-storage") {
     // local-storage is always SINGLE view with exactly one selected workspace.
