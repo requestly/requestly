@@ -16,7 +16,7 @@ import { getWorkspaceViewSlice } from "./slices/workspaceView/slice";
 import { setupWorkspaceView } from "./slices/workspaceView/thunks";
 import Daemon from "./store/apiRecords/Daemon";
 import { MigrationBlockModal } from "./screens/migrationBlock";
-import { MIGRATION_BLOCK_FLAG, MIGRATION_BLOCK_DISMISSABLE_FLAG } from "./screens/migrationBlock/constants";
+import { MIGRATION_BLOCK_FLAG } from "./screens/migrationBlock/constants";
 
 const ApiClientFeatureContainer: React.FC = () => {
   const dispatch = useDispatch();
@@ -25,12 +25,10 @@ const ApiClientFeatureContainer: React.FC = () => {
   const [screenWidth, setScreenWidth] = useState(window.innerWidth);
   const loadingError = useWorkspaceLoadingError();
 
-  // Block-modal mount: container only decides whether the modal *could* mount.
-  // Segment-specific variant routing, workspace selection, and WorkspaceProvider
-  // wrapping all live inside MigrationBlockModal so adding new variants
-  // (auto-local-fs, auto-cloud) only changes the modal, not this file.
+  // Block-modal mount: container only gates on the show-flag (kill-switch).
+  // The modal reads its own per-variant flags (dismissable, cloud-force)
+  // internally, so adding new variants doesn't churn this file.
   const isBlockFlagOn = useFeatureIsOn(MIGRATION_BLOCK_FLAG);
-  const isDismissableFlagOn = useFeatureIsOn(MIGRATION_BLOCK_DISMISSABLE_FLAG);
 
   useLayoutEffect(() => {
     const handleResize = () => {
@@ -90,7 +88,7 @@ const ApiClientFeatureContainer: React.FC = () => {
             <APIClientSidebar />
             <TabsContainer />
           </Split>
-          {isBlockFlagOn && <MigrationBlockModal dismissable={isDismissableFlagOn} />}
+          {isBlockFlagOn && <MigrationBlockModal />}
         </ApiClientProvider>
       </div>
     </DndProvider>

@@ -26,6 +26,8 @@ export interface Workspace {
     groupId: string;
     subGroupId: string | null;
   };
+
+  migratedToArc?: boolean;
 }
 
 export enum WorkspaceType {

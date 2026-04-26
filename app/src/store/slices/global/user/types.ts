@@ -14,6 +14,7 @@ export interface UserAuth {
       providerId: string;
       isSyncEnabled?: boolean;
       isBackupEnabled?: boolean;
+      migratedToArc?: boolean;
     };
     isLoggedIn?: boolean;
     username?: string;
