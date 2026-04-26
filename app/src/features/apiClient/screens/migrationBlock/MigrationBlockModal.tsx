@@ -23,6 +23,9 @@ import {
   REPORT_ISSUES_URL,
   MIGRATION_BLOCK_DISMISSABLE_FLAG,
   MIGRATION_BLOCK_CLOUD_FORCE_FLAG,
+  MIGRATION_BLOCK_LOCAL_STORAGE_FLAG,
+  MIGRATION_BLOCK_CLOUD_FLAG,
+  MIGRATION_BLOCK_LOCAL_FS_FLAG,
 } from "./constants";
 import {
   trackMigrationBlockScreenShown,
@@ -79,8 +82,12 @@ export const MigrationBlockModal: React.FC = () => {
   const selectedWorkspaces = useGetAllSelectedWorkspaces();
   const dismissable = useFeatureIsOn(MIGRATION_BLOCK_DISMISSABLE_FLAG);
   const forceCloudMigration = useFeatureIsOn(MIGRATION_BLOCK_CLOUD_FORCE_FLAG);
+  const isLocalStorageVariantOn = useFeatureIsOn(MIGRATION_BLOCK_LOCAL_STORAGE_FLAG);
+  const isCloudVariantOn = useFeatureIsOn(MIGRATION_BLOCK_CLOUD_FLAG);
+  const isLocalFsVariantOn = useFeatureIsOn(MIGRATION_BLOCK_LOCAL_FS_FLAG);
 
   if (segment === "local-storage") {
+    if (!isLocalStorageVariantOn) return null;
     // local-storage is always SINGLE view with exactly one selected workspace.
     const workspace = selectedWorkspaces[0];
     if (!workspace || workspace.status.loading) return null;
@@ -92,6 +99,7 @@ export const MigrationBlockModal: React.FC = () => {
   }
 
   if (segment === "auto-cloud") {
+    if (!isCloudVariantOn) return null;
     const workspace = selectedWorkspaces[0];
     if (!workspace || workspace.status.loading) return null;
     return (
@@ -101,10 +109,17 @@ export const MigrationBlockModal: React.FC = () => {
     );
   }
 
-  // auto-local-fs and unknown render nothing until their variants
-  // are implemented. When auto-local-fs lands, its branch can handle MULTI view
-  // (N workspaces) however it needs — iterate per workspace, skip the provider
-  // entirely, or whatever the variant's data story requires.
+  if (segment === "auto-local-fs") {
+    if (!isLocalFsVariantOn) return null;
+    // Variant not yet implemented. The flag is wired now so backend / rollout
+    // tooling can target it ahead of the implementation PR; once the variant
+    // lands its branch handles MULTI view (N workspaces) however it needs —
+    // iterate per workspace, skip the provider entirely, or whatever the
+    // variant's data story requires.
+    return null;
+  }
+
+  // unknown segments render nothing.
   return null;
 };
 
