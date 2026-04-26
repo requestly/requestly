@@ -248,4 +248,39 @@
   &__report-arrow {
     opacity: 0.7;
   }
+
+  // Tertiary "backup" link — intentionally low-key (small font, placeholder
+  // color, no icon, no arrow) so it doesn't compete with the primary
+  // Download CTA or the GitHub help link. Sits below the footer hairline
+  // cluster as a quiet footnote.
+  &__backup-link {
+    margin-top: 2px;
+    padding: 2px 6px;
+    background: transparent;
+    border: none;
+    color: var(--requestly-color-text-placeholder);
+    font-size: 11px;
+    line-height: 1.4;
+    cursor: pointer;
+    text-decoration: underline;
+    text-decoration-color: var(--requestly-color-surface-3);
+    text-underline-offset: 2px;
+    border-radius: 4px;
+    transition: color 120ms ease, text-decoration-color 120ms ease;
+
+    &:hover:not(:disabled) {
+      color: var(--requestly-color-text-subtle);
+      text-decoration-color: var(--requestly-color-text-subtle);
+    }
+
+    &:focus-visible {
+      outline: 1px solid var(--requestly-color-primary);
+      outline-offset: 2px;
+    }
+
+    &:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+  }
 }

@@ -498,29 +498,28 @@ const CloudBlockModalContent: React.FC<ContentProps> = ({ dismissable }) => {
         </ol>
 
         <div className="migration-block-modal__footer">
-          <WorkspaceBackupLink />
           <button type="button" className="migration-block-modal__report-link" onClick={handleReportLinkClick}>
             <FaGithub />
             <span>Running into issues? Let us know on GitHub</span>
             <MdArrowForward className="migration-block-modal__report-arrow" />
           </button>
+          <WorkspaceBackupLink />
         </div>
       </div>
     </Modal>
   );
 };
 
-// Quiet secondary action in the modal footer — same visual treatment as the
-// GitHub "report issues" link so the two read as a paired help cluster rather
-// than a competing third stepper. Single click triggers the workspace zip
-// download via the shared useWorkspaceZipDownload hook.
+// Very low-key escape hatch for users who want a local zip before signing
+// into the new app. Hidden in plain sight as a single quiet line below the
+// GitHub footer, no icon, no arrow, placeholder text color. Hides entirely
+// when the workspace is empty so there's no UI for an action that can't run.
 const WorkspaceBackupLink: React.FC = () => {
   const { download, isReady, isDownloading, workspaceType, counts } = useWorkspaceZipDownload();
   const isEmpty = counts.collections === 0 && counts.apis === 0 && counts.environments === 0;
-  const isDisabled = !isReady || isDownloading || isEmpty;
 
   const handleExportClick = useCallback(async () => {
-    if (isDisabled) return;
+    if (!isReady || isDownloading) return;
     trackMigrationBlockScreenCtaClicked({ cta: "export" });
     trackWorkspaceExportStarted({
       workspaceType,
@@ -547,24 +546,18 @@ const WorkspaceBackupLink: React.FC = () => {
         placement: "bottomRight",
       });
     }
-  }, [isDisabled, download, workspaceType, counts]);
+  }, [isReady, isDownloading, download, workspaceType, counts]);
 
-  const label = isDownloading
-    ? "Exporting workspace…"
-    : isEmpty
-    ? "Nothing to export — this workspace is empty"
-    : "Need a local backup? Export this workspace as zip";
+  if (!isReady || isEmpty) return null;
 
   return (
     <button
       type="button"
-      className="migration-block-modal__report-link"
+      className="migration-block-modal__backup-link"
       onClick={handleExportClick}
-      disabled={isDisabled}
+      disabled={isDownloading}
     >
-      <MdOutlineFileDownload />
-      <span>{label}</span>
-      {!isDisabled && <MdArrowForward className="migration-block-modal__report-arrow" />}
+      {isDownloading ? "Exporting workspace…" : "Backup this workspace as zip"}
     </button>
   );
 };
