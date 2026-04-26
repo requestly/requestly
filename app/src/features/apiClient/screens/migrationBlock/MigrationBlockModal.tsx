@@ -14,6 +14,7 @@ import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useWorkspaceZipDownload } from "features/apiClient/hooks/useWorkspaceZipDownload";
 import { WorkspaceProvider } from "features/apiClient/common/WorkspaceProvider";
 import { useGetAllSelectedWorkspaces } from "features/apiClient/slices/workspaceView/hooks";
+import { WorkspaceType } from "features/workspaces/types";
 import { DownloadPlatform, detectDownloadPlatform, ALL_PLATFORMS } from "./detectOS";
 import { DOWNLOAD_URLS, DOWNLOAD_LABELS, REPORT_ISSUES_URL } from "./constants";
 import {
@@ -323,7 +324,13 @@ const CloudBlockModalContent: React.FC<Props> = ({ dismissable }) => {
   // Per-workspace gate: only show once the backend migration script has flipped
   // the flag on this workspace's Firestore document. Lives inside the component
   // so the early-return runs after hooks, satisfying the rules-of-hooks.
-  const isMigratedToArc = activeWorkspace?.migratedToArc === true;
+  // PERSONAL workspaces have no Firestore workspace doc — they live per-user.
+  // Migration script writes the flag to the user's metadata for PERSONAL,
+  // and to the team workspace doc for SHARED. Pick the right source per type.
+  const isPersonal = activeWorkspace?.workspaceType === WorkspaceType.PERSONAL;
+  const isMigratedToArc = isPersonal
+    ? userAuth?.details?.metadata?.migratedToArc === true
+    : activeWorkspace?.migratedToArc === true;
 
   useEffect(() => {
     let cancelled = false;
