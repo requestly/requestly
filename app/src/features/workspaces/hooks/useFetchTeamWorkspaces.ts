@@ -86,6 +86,10 @@ export const useFetchTeamWorkspaces = () => {
                   };
                 }
 
+                if (teamData?.migratedToArc) {
+                  formattedTeamData.migratedToArc = teamData.migratedToArc;
+                }
+
                 return formattedTeamData;
               })
               .filter(Boolean);

@@ -198,6 +198,7 @@ export const API_CLIENT = {
   MIGRATION_BLOCK_SCREEN_CTA_CLICKED: "api_client_migration_block_screen_cta_clicked",
   MIGRATION_BLOCK_SCREEN_DISMISSED: "api_client_migration_block_screen_dismissed",
   MIGRATION_BLOCK_SCREEN_REPORT_LINK_CLICKED: "api_client_migration_block_screen_report_link_clicked",
+  MIGRATION_BLOCK_SCREEN_TROUBLESHOOTING_OPENED: "api_client_migration_block_screen_troubleshooting_opened",
   IMPORT_COLLECTIONS_CLICKED: "api_client_import_collections_clicked",
   IMPORT_COLLECTIONS_FAILED: "api_client_import_collections_failed",
   IMPORT_COLLECTIONS_SUCCESSFUL: "api_client_import_collections_successful",
