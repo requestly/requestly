@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Modal, Tooltip, Collapse, notification } from "antd";
+import { Modal, Tooltip, notification } from "antd";
 import { MdOutlineFileDownload } from "@react-icons/all-files/md/MdOutlineFileDownload";
 import { MdArrowForward } from "@react-icons/all-files/md/MdArrowForward";
 import { FaApple } from "@react-icons/all-files/fa/FaApple";
@@ -29,7 +29,6 @@ import {
   trackMigrationBlockScreenCtaClicked,
   trackMigrationBlockScreenDismissed,
   trackMigrationBlockScreenReportLinkClicked,
-  trackMigrationBlockScreenTroubleshootingOpened,
   trackWorkspaceExportStarted,
   trackWorkspaceExportSuccessful,
   trackWorkspaceExportFailed,
@@ -498,9 +497,8 @@ const CloudBlockModalContent: React.FC<ContentProps> = ({ dismissable }) => {
           </li>
         </ol>
 
-        <TroubleshootingPanel />
-
         <div className="migration-block-modal__footer">
+          <WorkspaceBackupLink />
           <button type="button" className="migration-block-modal__report-link" onClick={handleReportLinkClick}>
             <FaGithub />
             <span>Running into issues? Let us know on GitHub</span>
@@ -512,21 +510,17 @@ const CloudBlockModalContent: React.FC<ContentProps> = ({ dismissable }) => {
   );
 };
 
-const TroubleshootingPanel: React.FC = () => {
-  const openedFiredRef = useRef(false);
+// Quiet secondary action in the modal footer — same visual treatment as the
+// GitHub "report issues" link so the two read as a paired help cluster rather
+// than a competing third stepper. Single click triggers the workspace zip
+// download via the shared useWorkspaceZipDownload hook.
+const WorkspaceBackupLink: React.FC = () => {
   const { download, isReady, isDownloading, workspaceType, counts } = useWorkspaceZipDownload();
   const isEmpty = counts.collections === 0 && counts.apis === 0 && counts.environments === 0;
-
-  const handleCollapseChange = useCallback((activeKeys: string | string[]) => {
-    const isOpen = Array.isArray(activeKeys) ? activeKeys.includes("export") : activeKeys === "export";
-    if (isOpen && !openedFiredRef.current) {
-      openedFiredRef.current = true;
-      trackMigrationBlockScreenTroubleshootingOpened({});
-    }
-  }, []);
+  const isDisabled = !isReady || isDownloading || isEmpty;
 
   const handleExportClick = useCallback(async () => {
-    if (!isReady) return;
+    if (isDisabled) return;
     trackMigrationBlockScreenCtaClicked({ cta: "export" });
     trackWorkspaceExportStarted({
       workspaceType,
@@ -553,31 +547,24 @@ const TroubleshootingPanel: React.FC = () => {
         placement: "bottomRight",
       });
     }
-  }, [isReady, download, workspaceType, counts]);
+  }, [isDisabled, download, workspaceType, counts]);
+
+  const label = isDownloading
+    ? "Exporting workspace…"
+    : isEmpty
+    ? "Nothing to export — this workspace is empty"
+    : "Need a local backup? Export this workspace as zip";
 
   return (
-    <div className="migration-block-modal__troubleshooting">
-      <Collapse ghost onChange={handleCollapseChange}>
-        <Collapse.Panel header="Troubleshooting" key="export">
-          <div className="migration-block-modal__troubleshooting-explainer">
-            If you'd like a local backup of this workspace, you can export it as a zip.
-          </div>
-          <Tooltip title={isEmpty ? "Nothing to export — this workspace is empty." : ""} placement="top">
-            <span className="migration-block-modal__troubleshooting-action">
-              <RQButton
-                type="secondary"
-                size="default"
-                icon={<MdOutlineFileDownload />}
-                disabled={!isReady}
-                loading={isDownloading}
-                onClick={handleExportClick}
-              >
-                {isDownloading ? "Exporting…" : "Export workspace"}
-              </RQButton>
-            </span>
-          </Tooltip>
-        </Collapse.Panel>
-      </Collapse>
-    </div>
+    <button
+      type="button"
+      className="migration-block-modal__report-link"
+      onClick={handleExportClick}
+      disabled={isDisabled}
+    >
+      <MdOutlineFileDownload />
+      <span>{label}</span>
+      {!isDisabled && <MdArrowForward className="migration-block-modal__report-arrow" />}
+    </button>
   );
 };
