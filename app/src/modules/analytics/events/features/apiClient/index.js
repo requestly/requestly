@@ -403,3 +403,7 @@ export const trackMigrationBlockScreenDismissed = (params) => {
 export const trackMigrationBlockScreenReportLinkClicked = (params) => {
   trackEvent(API_CLIENT.MIGRATION_BLOCK_SCREEN_REPORT_LINK_CLICKED, params);
 };
+
+export const trackMigrationBlockScreenTroubleshootingOpened = (params) => {
+  trackEvent(API_CLIENT.MIGRATION_BLOCK_SCREEN_TROUBLESHOOTING_OPENED, params);
+};
