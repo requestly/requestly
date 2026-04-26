@@ -498,8 +498,8 @@ const CloudBlockModalContent: React.FC<ContentProps> = ({ dismissable }) => {
                 )}
               </div>
               <div className="migration-block-modal__step-description">
-                Your workspaces have already been migrated. Open Requestly API Client and sign in with this email to
-                continue your work.
+                Open Requestly API Client and sign in with this email. Your workspaces are ready — pick up right where
+                you left off.
               </div>
             </div>
           </li>
