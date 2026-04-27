@@ -1,5 +1,5 @@
 import { Table } from "@devtools-ds/table";
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { ContextMenu } from "../ContextMenu";
 import { ITEM_SIZE } from ".";
 import { useVirtualizer } from "@tanstack/react-virtual";
@@ -21,8 +21,18 @@ const VirtualTableV2: React.FC<Props> = ({ logs = [], header, renderLogRow, sele
   const [selected, setSelected] = useState<string | null>(null);
   const [lastKnownBottomIndex, setLastKnownBottomIndex] = useState<number | null>(null);
   const [isScrollToBottomEnabled, setIsScrollToBottomEnabled] = useState(true);
+  const [headerHeight, setHeaderHeight] = useState(0);
   const mounted = useRef(false);
   const parentRef = useRef<HTMLDivElement>(null);
+
+  useLayoutEffect(() => {
+    const thead = parentRef.current?.querySelector("thead");
+    if (!thead) return;
+    setHeaderHeight(thead.offsetHeight);
+    const observer = new ResizeObserver(() => setHeaderHeight(thead.offsetHeight));
+    observer.observe(thead);
+    return () => observer.disconnect();
+  }, []);
 
   // https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollHeight#determine_if_an_element_has_been_totally_scrolled
   const isListAtBottom = useCallback(() => {
@@ -46,6 +56,7 @@ const VirtualTableV2: React.FC<Props> = ({ logs = [], header, renderLogRow, sele
     count: mounted.current ? logs.length : 100,
     getScrollElement: () => parentRef.current,
     estimateSize: () => ITEM_SIZE,
+    scrollMargin: headerHeight,
     onChange: (virtualizer) => {
       requestAnimationFrame(() => {
         const isScrollToBottomEnabled = isListAtBottom();
@@ -61,19 +72,25 @@ const VirtualTableV2: React.FC<Props> = ({ logs = [], header, renderLogRow, sele
 
   // https://github.com/bvaughn/react-window/issues/60#issuecomment-781540658
   const items = rowVirtualizer.getVirtualItems();
-  const paddingTop = items.length > 0 ? items[0].start : 0;
-  const paddingBottom = items.length > 0 ? rowVirtualizer.getTotalSize() - items[items.length - 1].end : 0;
+  const paddingTop = items.length > 0 ? items[0].start - headerHeight : 0;
+  const paddingBottom =
+    items.length > 0 ? headerHeight + rowVirtualizer.getTotalSize() - items[items.length - 1].end : 0;
 
   const scrollToBottom = useCallback(() => {
-    if (logs.length > 0) rowVirtualizer.scrollToIndex(logs.length - 1, { align: "start" });
-    // rowVirtualizer.scrollToOffset(rowVirtualizer.getTotalSize(), { align: "start" });
-  }, [logs.length, rowVirtualizer]);
+    const scrollElem = parentRef.current;
+    if (scrollElem && logs.length > 0) {
+      scrollElem.scrollTop = scrollElem.scrollHeight;
+    }
+  }, [logs.length]);
+
+  const scrollToBottomRef = useRef(scrollToBottom);
+  scrollToBottomRef.current = scrollToBottom;
 
   useEffect(() => {
     if (isScrollToBottomEnabled) {
-      scrollToBottom();
+      scrollToBottomRef.current();
     }
-  }, [scrollToBottom, isScrollToBottomEnabled]);
+  }, [isScrollToBottomEnabled, logs.length]);
 
   const newLogsButton = useMemo(() => {
     if (isScrollToBottomEnabled) {
