@@ -18,7 +18,7 @@ import "./index.scss";
 import { TOUR_TYPES } from "components/misc/ProductWalkthrough/types";
 import { APIClientModal } from "features/apiClient/components/common/APIClient";
 
-export const ITEM_SIZE = 30;
+export const ITEM_SIZE = 32;
 
 interface Props {
   logs: any;
