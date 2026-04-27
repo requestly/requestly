@@ -111,12 +111,11 @@ export const MigrationBlockModal: React.FC = () => {
 
   if (segment === "auto-local-fs") {
     if (!isLocalFsVariantOn) return null;
-    // Variant not yet implemented. The flag is wired now so backend / rollout
-    // tooling can target it ahead of the implementation PR; once the variant
-    // lands its branch handles MULTI view (N workspaces) however it needs —
-    // iterate per workspace, skip the provider entirely, or whatever the
-    // variant's data story requires.
-    return null;
+    // LocalFS data lives on disk and the new app reads the same paths, so the
+    // copy is workspace-agnostic — no per-workspace export, no sign-in, no
+    // WorkspaceProvider needed. Same modal renders for SINGLE (one LOCAL ws)
+    // and MULTI (N LOCAL ws) views.
+    return <LocalFsBlockModalContent dismissable={dismissable} />;
   }
 
   // unknown segments render nothing.
@@ -579,5 +578,162 @@ const WorkspaceBackupLink: React.FC = () => {
     >
       {isDownloading ? "Exporting workspace…" : "Backup this workspace as zip"}
     </button>
+  );
+};
+
+// LocalFS auto variant — workspace JSON files already live on disk in a
+// user-owned directory; the new app reads the same paths, so there's nothing
+// to export and nothing to sign into. Two steps: download, then open.
+const LocalFsBlockModalContent: React.FC<ContentProps> = ({ dismissable }) => {
+  const userAuth = useSelector(getUserAuthDetails);
+  const userEmail: string | undefined = userAuth?.details?.profile?.email;
+  const selectedWorkspaces = useGetAllSelectedWorkspaces();
+  const workspaceType = selectedWorkspaces[0]?.meta?.type;
+
+  const [isDismissed, setIsDismissed] = useState(dismissable && hasDismissedThisPageLoad);
+  const [platform, setPlatform] = useState<DownloadPlatform | null>(null);
+  const [isPlatformProbed, setIsPlatformProbed] = useState(false);
+  const shownFiredRef = useRef(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    detectDownloadPlatform().then((result) => {
+      if (cancelled) return;
+      setPlatform(result.primary);
+      setIsPlatformProbed(true);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (shownFiredRef.current || isDismissed) return;
+    shownFiredRef.current = true;
+    trackMigrationBlockScreenShown({
+      user_auth_state: userEmail ? "signed_in" : "signed_out",
+      platform: getAppMode(),
+      workspace_type: workspaceType,
+      is_dismissable: dismissable,
+    });
+  }, [isDismissed, dismissable, userEmail, workspaceType]);
+
+  const handleDownloadClick = useCallback((clicked: DownloadPlatform) => {
+    trackMigrationBlockScreenCtaClicked({ cta: "download", platform_clicked: clicked });
+    openExternalLink(DOWNLOAD_URLS[clicked]);
+  }, []);
+
+  const handleReportLinkClick = useCallback(() => {
+    trackMigrationBlockScreenReportLinkClicked({});
+    openExternalLink(REPORT_ISSUES_URL);
+  }, []);
+
+  const handleCancel = useCallback(() => {
+    if (!dismissable) return;
+    hasDismissedThisPageLoad = true;
+    setIsDismissed(true);
+    trackMigrationBlockScreenDismissed({ dismiss_method: "close_button" });
+  }, [dismissable]);
+
+  if (isDismissed) return null;
+
+  const secondaryPlatforms: DownloadPlatform[] = isPlatformProbed
+    ? ALL_PLATFORMS.filter((p) => p !== platform)
+    : ALL_PLATFORMS;
+  const PrimaryPlatformIcon = platform ? PLATFORM_ICONS[platform] : null;
+
+  return (
+    <Modal
+      open
+      centered
+      title={null}
+      footer={null}
+      closable={dismissable}
+      keyboard={dismissable}
+      maskClosable={dismissable}
+      onCancel={dismissable ? handleCancel : undefined}
+      className="migration-block-modal"
+      width={640}
+      getContainer={getBlockModalContainer}
+    >
+      <div className="migration-block-modal__body">
+        <div className="migration-block-modal__header">
+          <h2 className="migration-block-modal__headline">Your API Client now has its own dedicated app</h2>
+          <p className="migration-block-modal__subheadline">
+            Fast, clean, and resource-optimized. Follow these 2 steps to continue your work.
+          </p>
+        </div>
+
+        <ol className="migration-block-modal__steps">
+          <li className="migration-block-modal__step">
+            <div className="migration-block-modal__step-marker" aria-hidden>
+              <span className="migration-block-modal__step-dot">1</span>
+            </div>
+            <div className="migration-block-modal__step-content">
+              <div className="migration-block-modal__step-title">Download the new app</div>
+              <div className="migration-block-modal__step-description">
+                Requestly API Client for {platform ? DOWNLOAD_LABELS[platform] : "your OS"}.
+              </div>
+              {secondaryPlatforms.length > 0 && (
+                <div className="migration-block-modal__platform-row" aria-label="Other platforms">
+                  <span className="migration-block-modal__platform-row-label">
+                    {isPlatformProbed && platform ? "Other platforms" : "Choose platform"}
+                  </span>
+                  {secondaryPlatforms.map((p) => {
+                    const Icon = PLATFORM_ICONS[p];
+                    return (
+                      <Tooltip key={p} title={DOWNLOAD_LABELS[p]} placement="top">
+                        <button
+                          type="button"
+                          className="migration-block-modal__platform-chip"
+                          onClick={() => handleDownloadClick(p)}
+                          aria-label={`Download for ${DOWNLOAD_LABELS[p]}`}
+                        >
+                          <Icon />
+                        </button>
+                      </Tooltip>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+            {isPlatformProbed && platform !== null && PrimaryPlatformIcon ? (
+              <span className="migration-block-modal__step-action">
+                <RQButton
+                  type="primary"
+                  size="default"
+                  icon={<PrimaryPlatformIcon />}
+                  onClick={() => handleDownloadClick(platform)}
+                  className="migration-block-modal__primary-cta"
+                >
+                  Download
+                  <MdArrowForward className="migration-block-modal__cta-arrow" />
+                </RQButton>
+              </span>
+            ) : null}
+          </li>
+
+          <li className="migration-block-modal__step migration-block-modal__step--passive">
+            <div className="migration-block-modal__step-marker" aria-hidden>
+              <span className="migration-block-modal__step-dot">2</span>
+            </div>
+            <div className="migration-block-modal__step-content">
+              <div className="migration-block-modal__step-title">Open the new app</div>
+              <div className="migration-block-modal__step-description">
+                Your workspaces are already there — pick up right where you left off.
+              </div>
+            </div>
+          </li>
+        </ol>
+
+        <div className="migration-block-modal__footer">
+          <button type="button" className="migration-block-modal__report-link" onClick={handleReportLinkClick}>
+            <FaGithub />
+            <span>Running into issues? Let us know on GitHub</span>
+            <MdArrowForward className="migration-block-modal__report-arrow" />
+          </button>
+        </div>
+      </div>
+    </Modal>
   );
 };
