@@ -13,6 +13,7 @@ import { PostmanImporterModal } from "../../../modals/postmanImporterModal/Postm
 import { MdOutlineTerminal } from "@react-icons/all-files/md/MdOutlineTerminal";
 import { BrunoImporterModal } from "features/apiClient/screens/BrunoImporter";
 import { SoapImporterModal } from "../../../modals/SoapImporterModal/SoapImporterModal";
+import { FastApiImporterModal } from "../../../modals/FastApiImporterModal/FastApiImporterModal";
 import { useLocation } from "react-router-dom";
 import { RoleBasedComponent } from "features/rbac";
 import { NewApiRecordDropdown } from "../NewApiRecordDropdown/NewApiRecordDropdown";
@@ -56,6 +57,7 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
   const [isPostmanImporterModalOpen, setIsPostmanImporterModalOpen] = useState(false);
   const [isBrunoImporterModalOpen, setIsBrunoImporterModalOpen] = useState(false);
   const [isSoapImporterModalOpen, setIsSoapImporterModalOpen] = useState(false);
+  const [isFastApiImporterModalOpen, setIsFastApiImporterModalOpen] = useState(false);
   const [commonImportModalConfig, setCommonImportModalConfig] = useState<ImportModalConfig | null>(null);
   const isOpenApiSupportEnabled = useFeatureIsOn("openapi-import-support");
 
@@ -141,6 +143,18 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
           setIsSoapImporterModalOpen(true);
         },
       },
+      {
+        key: "7",
+        label: (
+          <div className="new-btn-option">
+            <SiOpenapiinitiative /> FastAPI server
+          </div>
+        ),
+        onClick: () => {
+          trackImportStarted(ApiClientImporterType.FASTAPI);
+          setIsFastApiImporterModalOpen(true);
+        },
+      },
     ],
     [onImportClick, isOpenApiSupportEnabled]
   );
@@ -168,6 +182,9 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
           break;
         case ApiClientImporterType.SOAP:
           setIsSoapImporterModalOpen(true);
+          break;
+        case ApiClientImporterType.FASTAPI:
+          setIsFastApiImporterModalOpen(true);
           break;
         default:
           break;
@@ -236,6 +253,12 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
           isOpen={isSoapImporterModalOpen}
           onClose={() => setIsSoapImporterModalOpen(false)}
           importer={soapImporter}
+        />
+      )}
+      {isFastApiImporterModalOpen && (
+        <FastApiImporterModal
+          isOpen={isFastApiImporterModalOpen}
+          onClose={() => setIsFastApiImporterModalOpen(false)}
         />
       )}
 

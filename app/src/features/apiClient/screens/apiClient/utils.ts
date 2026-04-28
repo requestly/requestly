@@ -1267,8 +1267,8 @@ export const parseCollectionRunnerDataFile = async (filePath: string, maxlimit?:
   }
 };
 
-export function doesValueMatchDataType(value: string, type: KeyValueDataType | undefined): Boolean {
-  if (!value || value.includes("{{")) return true;
+export function doesValueMatchDataType(value: any, type: KeyValueDataType | undefined): Boolean {
+  if (!value || typeof value !== "string" || value.includes("{{")) return true;
 
   switch (type) {
     case KeyValueDataType.INTEGER: {

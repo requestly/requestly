@@ -1,0 +1,16 @@
+.fastapi-importer-view {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100%;
+  background-color: var(--rq-surface-surface-main);
+
+  &_content {
+    width: 600px;
+    background: var(--rq-surface-surface-100);
+    border: 1px solid var(--rq-border-border-200);
+    border-radius: var(--rq-border-radius-100);
+    padding: 32px;
+  }
+}

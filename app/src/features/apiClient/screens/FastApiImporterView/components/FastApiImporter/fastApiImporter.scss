@@ -1,0 +1,72 @@
+.fastapi-importer {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--rq-text-text-primary);
+  }
+
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  &__input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    label {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--rq-text-text-primary);
+    }
+  }
+
+  &__post-parse-view {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    padding: 24px;
+    border-radius: var(--rq-border-radius-100);
+    text-align: center;
+
+    &--success {
+      background-color: var(--rq-surface-surface-success);
+      color: var(--rq-text-text-success);
+      font-size: 16px;
+
+      svg {
+        font-size: 48px;
+      }
+    }
+
+    &--error {
+      background-color: var(--rq-surface-surface-error);
+      color: var(--rq-text-text-error);
+      font-size: 14px;
+      align-items: flex-start;
+      text-align: left;
+
+      svg {
+        font-size: 24px;
+      }
+    }
+
+    &--error-text {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 16px;
+      font-weight: 500;
+    }
+  }
+}

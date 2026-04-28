@@ -3,6 +3,7 @@ import PATHS from "config/constants/sub/paths";
 import { ApiClientEmptyView } from "./screens/apiClient/components/views/components/ApiClientEmptyView/ApiClientEmptyView";
 import ProtectedRoute from "components/authentication/ProtectedRoute";
 import { PostmanImporterView } from "./screens/PostmanImporterView/PostmanImporterView";
+import { FastApiImporterView } from "./screens/FastApiImporterView/FastApiImporterView";
 import { ApiClientRouteElement } from "./components/RouteElement";
 
 export const apiClientRoutes: RouteObject[] = [
@@ -24,5 +25,9 @@ export const apiClientRoutes: RouteObject[] = [
   {
     path: PATHS.API_CLIENT.IMPORT_FROM_POSTMAN.ABSOLUTE,
     element: <ProtectedRoute component={PostmanImporterView} />,
+  },
+  {
+    path: PATHS.API_CLIENT.IMPORT_FROM_FASTAPI.ABSOLUTE,
+    element: <ProtectedRoute component={FastApiImporterView} />,
   },
 ];

@@ -124,6 +124,7 @@ Requestly provides **Importing Configuration** from the following tools
 API Clients
 
 *   [Import from Postman](https://docs.requestly.com/general/imports/postman)
+*   [Import from FastAPI](#) - Quickly import API collections by simply providing your FastAPI `/docs` or `/openapi.json` URL. Perfect for Python developers! Requestly even auto-discovers and lets you test endpoints like WebSockets that might be missing from FastAPI's native Swagger UI.
 *   [Import from Insomnia](#) - Coming Soon
 *   [Import from Bruno](#) - Coming Soon
 
