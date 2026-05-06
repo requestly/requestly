@@ -112,9 +112,10 @@ export const MigrationBlockModal: React.FC = () => {
   if (segment === "auto-local-fs") {
     if (!isLocalFsVariantOn) return null;
     // LocalFS data lives on disk and the new app reads the same paths, so the
-    // copy is workspace-agnostic — no per-workspace export, no sign-in, no
-    // WorkspaceProvider needed. Same modal renders for SINGLE (one LOCAL ws)
-    // and MULTI (N LOCAL ws) views.
+    // copy is workspace-agnostic — no sign-in, no WorkspaceProvider at this
+    // level. Same modal renders for SINGLE (one LOCAL ws) and MULTI (N LOCAL
+    // ws) views. The footer's optional backup link mounts its own
+    // WorkspaceProvider scoped to the single workspace, in SINGLE only.
     return <LocalFsBlockModalContent dismissable={dismissable} />;
   }
 
@@ -581,6 +582,21 @@ const WorkspaceBackupLink: React.FC = () => {
   );
 };
 
+// SINGLE-only backup escape hatch for LocalFS. The router doesn't wrap LocalFS
+// in WorkspaceProvider (so MULTI works), so we mount one here scoped to the
+// lone selected workspace. Renders nothing in MULTI.
+const LocalFsWorkspaceBackupLink: React.FC = () => {
+  const selectedWorkspaces = useGetAllSelectedWorkspaces();
+  if (selectedWorkspaces.length !== 1) return null;
+  const workspace = selectedWorkspaces[0];
+  if (!workspace || workspace.status.loading) return null;
+  return (
+    <WorkspaceProvider workspaceId={workspace.id}>
+      <WorkspaceBackupLink />
+    </WorkspaceProvider>
+  );
+};
+
 // LocalFS auto variant — workspace JSON files already live on disk in a
 // user-owned directory; the new app reads the same paths, so there's nothing
 // to export and nothing to sign into. Two steps: download, then open.
@@ -732,6 +748,7 @@ const LocalFsBlockModalContent: React.FC<ContentProps> = ({ dismissable }) => {
             <span>Running into issues? Let us know on GitHub</span>
             <MdArrowForward className="migration-block-modal__report-arrow" />
           </button>
+          <LocalFsWorkspaceBackupLink />
         </div>
       </div>
     </Modal>
