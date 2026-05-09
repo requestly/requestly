@@ -37,6 +37,21 @@ describe("getSourceFilterCount", () => {
     ).toBe(0);
   });
 
+  it('does not count normalized "all" sentinel values', () => {
+    expect(
+      getSourceFilterCount([
+        {
+          pageDomains: ["all"],
+          requestMethod: " All ",
+          requestPayload: {
+            key: "ALL",
+            value: "users",
+          },
+        },
+      ])
+    ).toBe(0);
+  });
+
   it("counts completed request payload filters", () => {
     expect(
       getSourceFilterCount([
@@ -48,6 +63,18 @@ describe("getSourceFilterCount", () => {
           },
         },
       ])
+    ).toBe(1);
+  });
+
+  it("supports non-migrated object filter shape", () => {
+    expect(
+      getSourceFilterCount({
+        requestPayload: {
+          key: "operationName",
+          operator: "Contains",
+          value: "Users",
+        },
+      })
     ).toBe(1);
   });
 

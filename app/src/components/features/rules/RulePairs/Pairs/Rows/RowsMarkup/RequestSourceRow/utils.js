@@ -8,7 +8,8 @@ const hasMeaningfulFilterValue = (filterValue) => {
   }
 
   if (typeof filterValue === "string") {
-    return filterValue.trim() !== "" && filterValue !== DEFAULT_FILTER_VALUE;
+    const normalizedFilterValue = filterValue.trim().toLowerCase();
+    return normalizedFilterValue !== "" && normalizedFilterValue !== DEFAULT_FILTER_VALUE;
   }
 
   if (Array.isArray(filterValue)) {
