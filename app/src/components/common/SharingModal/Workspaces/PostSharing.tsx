@@ -74,8 +74,14 @@ export const PostSharing: React.FC<PostSharingProps> = ({ postShareViewData, set
         ctaText: "Switch to the workspace",
         action: handleSwitchWorkspace,
       },
+      [WorkspaceSharingTypes.PRIVATE_WORKSPACE]: {
+        header: <img src={"/assets/media/components/mail-success.svg"} alt="rules copied" width={60} />,
+        message: "Selected rules have been copied to your Private Workspace",
+        ctaText: "Done",
+        action: toggleModal,
+      },
     };
-  }, [handleSwitchWorkspace, setPostShareViewData, postShareViewData]);
+  }, [handleSwitchWorkspace, setPostShareViewData, postShareViewData, toggleModal]);
 
   return (
     <div className="post-sharing-wrapper">
