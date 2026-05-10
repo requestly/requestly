@@ -2,7 +2,7 @@
   .ant-popover-inner-content {
     margin-top: -10px;
     display: flex;
-    width: 240px !important;
+    width: 320px !important;
     max-height: 400px !important;
     padding: var(--space-2, 4px);
     flex-direction: column;
@@ -35,6 +35,10 @@
       margin-left: -10px !important;
       width: 144px !important;
 
+      .ant-popover-inner-content {
+        width: 144px !important;
+      }
+
       .variable-autocomplete-item {
         width: 135px !important;
       }
@@ -43,11 +47,13 @@
 
   .variable-autocomplete-item {
     display: flex;
-    padding: var(--space-3, 6px) var(--space-2, 4px) !important;
+    padding: var(--space-3, 6px) var(--space-3, 6px) !important;
     flex-direction: row;
-    width: 230px !important;
+    width: 310px !important;
     border-bottom: none !important;
     justify-content: space-between;
+    align-items: flex-start;
+    gap: var(--space-3, 6px);
     border-radius: 4px;
     cursor: pointer;
     &:hover {
@@ -60,8 +66,27 @@
 
     .item-left-section {
       display: flex;
-      flex-direction: row;
+      flex-direction: column;
       gap: var(--space-3, 6px);
+      min-width: 0;
+      flex: 1;
+      position: relative;
+
+      &.compact {
+        flex-direction: row;
+        align-items: center;
+      }
+
+      .scope-icon-wrapper {
+        display: flex;
+        align-items: center;
+        width: 16px;
+        min-width: 16px;
+        height: 18px;
+        position: absolute;
+        top: 0;
+        left: 0;
+      }
 
       .scope-tooltip {
         .ant-tooltip-inner {
@@ -82,6 +107,7 @@
       display: flex;
       width: 12px;
       height: 12px;
+      margin-top: 3px;
       color: var(--requestly-color-text-placeholder);
       font-size: 12px;
       font-style: normal;
@@ -92,6 +118,7 @@
     .namespace-chevron {
       display: flex;
       align-items: center;
+      margin-top: 4px;
       color: var(--requestly-color-text-placeholder);
       font-size: 10px;
       opacity: 0.6;
@@ -107,8 +134,55 @@
       overflow: hidden !important;
       text-overflow: ellipsis !important;
       white-space: nowrap !important;
-      max-width: 160px;
+      max-width: 240px;
       flex-shrink: 1;
+      padding-left: 22px;
+    }
+
+    .item-left-section.compact .variable-label {
+      max-width: 105px;
+      padding-left: 0;
+    }
+
+    .variable-metadata {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2, 4px);
+      min-width: 0;
+      padding-left: 22px;
+      color: var(--requestly-color-text-subtle);
+      font-size: 11px;
+      font-weight: 400;
+      line-height: 16px;
+    }
+
+    .variable-scope-badge {
+      flex-shrink: 0;
+      padding: 1px var(--space-2, 4px);
+      border-radius: 3px;
+      color: var(--requestly-color-text-subtle);
+      background: var(--requestly-color-white-t-10);
+      font-size: 10px;
+      line-height: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    .variable-source-name,
+    .variable-value-preview {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .variable-source-name {
+      max-width: 96px;
+    }
+
+    .variable-value-preview {
+      max-width: 112px;
+      color: var(--requestly-color-text-placeholder);
     }
   }
 }
