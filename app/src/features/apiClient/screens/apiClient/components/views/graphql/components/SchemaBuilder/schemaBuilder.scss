@@ -142,6 +142,12 @@
         display: none !important;
       }
 
+      .graphiql-explorer-root {
+        display: inline-block;
+        min-width: 100%;
+        width: max-content;
+      }
+
       .graphiql-explorer-node {
         margin-top: 8px;
 
