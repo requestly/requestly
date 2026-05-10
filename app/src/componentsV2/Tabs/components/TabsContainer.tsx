@@ -167,8 +167,12 @@ const DraggableTabLabel: React.FC<DraggableTabLabelProps> = ({ tab, onMoveTab, .
         }
 
         const clientOffset = monitor.getClientOffset();
+        if (!clientOffset) {
+          return;
+        }
+
         const tabBounds = ref.current.getBoundingClientRect();
-        const position = clientOffset && clientOffset.x > tabBounds.left + tabBounds.width / 2 ? "after" : "before";
+        const position = clientOffset.x > tabBounds.left + tabBounds.width / 2 ? "after" : "before";
 
         onMoveTab(item.tabId, tab.id, position);
       },
