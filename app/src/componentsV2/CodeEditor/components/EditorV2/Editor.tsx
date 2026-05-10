@@ -41,6 +41,7 @@ interface EditorProps {
   isReadOnly?: boolean;
   height?: number;
   isResizable?: boolean;
+  autoFillAvailableHeight?: boolean;
   scriptId?: string;
   toolbarOptions?: EditorCustomToolbar;
   toolbarRightContent?: React.ReactNode;
@@ -72,6 +73,7 @@ const Editor: React.FC<EditorProps> = ({
   isReadOnly = false,
   height = 225,
   isResizable = false,
+  autoFillAvailableHeight = false,
   hideCharacterCount = false,
   handleChange = () => {},
   toolbarOptions,
@@ -94,6 +96,7 @@ const Editor: React.FC<EditorProps> = ({
   const location = useLocation();
   const dispatch = useDispatch();
   const editorRef = useRef<ReactCodeMirrorRef | null>(null);
+  const resizableContainerRef = useRef<HTMLDivElement | null>(null);
   const [editorHeight, setEditorHeight] = useState(height);
   const [hoveredVariable, setHoveredVariable] = useState<string | null>(null);
   const isFullScreenModeOnboardingCompleted = useSelector(getIsCodeEditorFullScreenModeOnboardingCompleted);
@@ -114,6 +117,37 @@ const Editor: React.FC<EditorProps> = ({
   const handleResize = (event: any, { element, size, handle }: any) => {
     setEditorHeight(size.height);
   };
+
+  useEffect(() => {
+    if (!autoFillAvailableHeight || isFullScreen) {
+      return;
+    }
+
+    const updateEditorHeight = () => {
+      const resizableContainer = resizableContainerRef.current;
+      const containerTop = resizableContainer?.getBoundingClientRect().top;
+
+      if (!resizableContainer || containerTop === undefined) {
+        return;
+      }
+
+      const editorContainerBottom =
+        resizableContainer
+          .closest(".rule-editor-procard, .rule-editor-body-scroll, .bottomsheet-split-layout-container")
+          ?.getBoundingClientRect().bottom ?? window.innerHeight;
+      const bottomSpacing = isResizable ? 48 : 24;
+      const availableHeight = Math.floor(editorContainerBottom - containerTop - bottomSpacing);
+      setEditorHeight(Math.max(height, availableHeight));
+    };
+
+    const animationFrameId = requestAnimationFrame(updateEditorHeight);
+    window.addEventListener("resize", updateEditorHeight);
+
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+      window.removeEventListener("resize", updateEditorHeight);
+    };
+  }, [autoFillAvailableHeight, height, isFullScreen, isResizable]);
 
   const handleFullScreenToggle = useCallback(() => {
     handleFullScreenChange();
@@ -418,37 +452,39 @@ const Editor: React.FC<EditorProps> = ({
   ) : (
     <>
       {!hideToolbar && toolbar}
-      <ResizableBox
-        height={editorHeight}
-        width={Infinity}
-        onResize={handleResize}
-        handle={
-          isResizable ? (
-            <div className="custom-handle">
-              {!hideCharacterCount ? (
-                <div className="code-editor-character-count">{getByteSize(value)} characters</div>
-              ) : null}
-            </div>
-          ) : null
-        }
-        axis="y"
-        style={{
-          minHeight: `${height}px`,
-          marginBottom: isResizable ? "25px" : 0,
-        }}
-      >
-        {toastContainer}
-        {mergeView ? (
-          <MergeViewEditor
-            originalValue={value}
-            newValue={mergeView.incomingValue}
-            onMergeChunk={handleMergeChunk}
-            onEditorReady={editorRefCallback}
-          />
-        ) : (
-          editor
-        )}
-      </ResizableBox>
+      <div ref={resizableContainerRef}>
+        <ResizableBox
+          height={editorHeight}
+          width={Infinity}
+          onResize={handleResize}
+          handle={
+            isResizable ? (
+              <div className="custom-handle">
+                {!hideCharacterCount ? (
+                  <div className="code-editor-character-count">{getByteSize(value)} characters</div>
+                ) : null}
+              </div>
+            ) : null
+          }
+          axis="y"
+          style={{
+            minHeight: `${height}px`,
+            marginBottom: isResizable ? "25px" : 0,
+          }}
+        >
+          {toastContainer}
+          {mergeView ? (
+            <MergeViewEditor
+              originalValue={value}
+              newValue={mergeView.incomingValue}
+              onMergeChunk={handleMergeChunk}
+              onEditorReady={editorRefCallback}
+            />
+          ) : (
+            editor
+          )}
+        </ResizableBox>
+      </div>
     </>
   );
 };
