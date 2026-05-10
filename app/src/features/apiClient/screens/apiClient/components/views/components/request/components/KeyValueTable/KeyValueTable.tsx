@@ -343,7 +343,13 @@ export const KeyValueTable: React.FC<React.PropsWithChildren<KeyValueTableProps>
             scroll={{ x: 550 }}
             footer={() => (
               <div className="api-key-value-table-footer">
-                <RQButton icon={<MdAdd />} size="small" onClick={handleAddPair} className="key-value-add-more-btn">
+                <RQButton
+                  icon={<MdAdd />}
+                  size="small"
+                  title={`Add ${tableType} entry`}
+                  onClick={handleAddPair}
+                  className="key-value-add-more-btn"
+                >
                   Add More
                 </RQButton>
               </div>

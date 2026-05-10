@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Tabs, TabsProps, Typography, Popover } from "antd";
+import { Tabs, TabsProps, Typography, Popover, Tooltip } from "antd";
 import { TabItem } from "./TabItem";
 import { Outlet, unstable_useBlocker } from "react-router-dom";
 import { RQButton } from "lib/design-system-v2/components";
@@ -60,16 +60,18 @@ const BufferedTabLabel: React.FC<BufferedTabLabelProps> = ({ tab, onClose, onDou
       </div>
 
       <div className="tab-actions">
-        <RQButton
-          size="small"
-          type="transparent"
-          className="tab-close-button"
-          onClick={(e) => {
-            e.stopPropagation();
-            onClose();
-          }}
-          icon={<MdClose />}
-        />
+        <Tooltip title="Close tab" placement="bottom" color="#000">
+          <RQButton
+            size="small"
+            type="transparent"
+            className="tab-close-button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onClose();
+            }}
+            icon={<MdClose />}
+          />
+        </Tooltip>
         {isDirty && <div className="unsaved-changes-indicator" />}
       </div>
     </div>
@@ -107,16 +109,18 @@ const NonBufferedTabLabel: React.FC<TabLabelProps> = ({ tab, onClose, onDoubleCl
       </div>
 
       <div className="tab-actions">
-        <RQButton
-          size="small"
-          type="transparent"
-          className="tab-close-button"
-          onClick={(e) => {
-            e.stopPropagation();
-            onClose();
-          }}
-          icon={<MdClose />}
-        />
+        <Tooltip title="Close tab" placement="bottom" color="#000">
+          <RQButton
+            size="small"
+            type="transparent"
+            className="tab-close-button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onClose();
+            }}
+            icon={<MdClose />}
+          />
+        </Tooltip>
       </div>
     </div>
   );

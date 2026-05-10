@@ -74,7 +74,9 @@ export const SidebarListHeader: React.FC<ListHeaderProps> = ({
               onNewRecordClick("api_client_sidebar_header", params.recordType, undefined, params.entryType);
             }}
           >
-            <RQButton size="small" type="transparent" icon={<MdAdd />} className="sidebar-list-header-button" />
+            <Tooltip title="Create new request" placement="bottom" color="#000">
+              <RQButton size="small" type="transparent" icon={<MdAdd />} className="sidebar-list-header-button" />
+            </Tooltip>
           </NewApiRecordDropdown>
         )
       )}
