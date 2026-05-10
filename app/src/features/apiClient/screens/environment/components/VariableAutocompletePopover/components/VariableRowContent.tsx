@@ -55,7 +55,7 @@ const getVariablePreview = (variable: Variable, isNamespace?: boolean) => {
     }
 
     const value = data.localValue ?? data.syncValue;
-    if (value === undefined || value === "") {
+    if (value == null || value === "") {
       return "No value";
     }
 
@@ -87,8 +87,8 @@ export const VariableRowContent: React.FC<{ item: AutocompleteItem; hideIcon?: b
   const scopeTooltipTitle = isSecret
     ? "Scope: Secrets"
     : variableScope === VariableScope.DYNAMIC
-    ? "Scope: Dynamic"
-    : `Scope: ${capitalize(String(variableScope))} environment`;
+      ? "Scope: Dynamic"
+      : `Scope: ${capitalize(String(variableScope))} environment`;
 
   return (
     <>
