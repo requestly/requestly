@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
-import { Checkbox, Dropdown, MenuProps, Skeleton, Typography, notification } from "antd";
+import { Checkbox, Dropdown, MenuProps, Skeleton, Tooltip, Typography } from "antd";
 import { RQAPI } from "features/apiClient/types";
 import { RQAPI as SharedRQAPI } from "@requestly/shared/types/entities/apiClient";
 import { RQButton } from "lib/design-system-v2/components";
@@ -483,34 +483,47 @@ export const CollectionRow: React.FC<Props> = ({
 
                 <Conditional condition={!isReadOnly}>
                   <div className={`collection-options ${hoveredId === record.id ? "active" : " "}`}>
-                    <NewApiRecordDropdown
-                      invalidActions={[NewRecordDropdownItemType.ENVIRONMENT]}
-                      onSelect={(params) => {
-                        setActiveKey(record.id);
-                        setCreateNewField(params.recordType);
-                        onNewClick("collection_row", params.recordType, record.id, params.entryType).then(() => {
-                          setCreateNewField(null);
-                        });
-                      }}
-                    >
-                      <RQButton size="small" type="transparent" icon={<MdAdd />} onClick={(e) => e.stopPropagation()} />
-                    </NewApiRecordDropdown>
-                    <Dropdown
-                      trigger={["click"]}
-                      menu={{ items: getCollectionOptions(record) }}
-                      placement="bottomRight"
-                      overlayClassName="collection-dropdown-menu"
-                    >
-                      <RQButton
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setShowSelection(false);
-                        }}
-                        size="small"
-                        type="transparent"
-                        icon={<MdOutlineMoreHoriz />}
-                      />
-                    </Dropdown>
+                    <Tooltip title="New request or collection">
+                      <span>
+                        <NewApiRecordDropdown
+                          invalidActions={[NewRecordDropdownItemType.ENVIRONMENT]}
+                          onSelect={(params) => {
+                            setActiveKey(record.id);
+                            setCreateNewField(params.recordType);
+                            onNewClick("collection_row", params.recordType, record.id, params.entryType).then(() => {
+                              setCreateNewField(null);
+                            });
+                          }}
+                        >
+                          <RQButton
+                            size="small"
+                            type="transparent"
+                            icon={<MdAdd />}
+                            onClick={(e) => e.stopPropagation()}
+                          />
+                        </NewApiRecordDropdown>
+                      </span>
+                    </Tooltip>
+                    <Tooltip title="More actions">
+                      <span>
+                        <Dropdown
+                          trigger={["click"]}
+                          menu={{ items: getCollectionOptions(record) }}
+                          placement="bottomRight"
+                          overlayClassName="collection-dropdown-menu"
+                        >
+                          <RQButton
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setShowSelection(false);
+                            }}
+                            size="small"
+                            type="transparent"
+                            icon={<MdOutlineMoreHoriz />}
+                          />
+                        </Dropdown>
+                      </span>
+                    </Tooltip>
                   </div>
                 </Conditional>
               </div>

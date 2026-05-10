@@ -55,27 +55,32 @@ export const SidebarListHeader: React.FC<ListHeaderProps> = ({
 
       {listType ? (
         listType === ApiClientSidebarTabKey.ENVIRONMENTS ? (
-          <RQButton
-            size="small"
-            type="transparent"
-            icon={<MdAdd />}
-            title="Create new environment"
-            className="sidebar-list-header-button"
-            onClick={() => {
-              onNewRecordClick("api_client_sidebar_header", RQAPI.RecordType.ENVIRONMENT);
-            }}
-          />
+          <Tooltip title="New environment">
+            <RQButton
+              size="small"
+              type="transparent"
+              icon={<MdAdd />}
+              className="sidebar-list-header-button"
+              onClick={() => {
+                onNewRecordClick("api_client_sidebar_header", RQAPI.RecordType.ENVIRONMENT);
+              }}
+            />
+          </Tooltip>
         ) : null
       ) : (
         showNewRecordAction && (
-          <NewApiRecordDropdown
-            invalidActions={[NewRecordDropdownItemType.ENVIRONMENT]}
-            onSelect={(params) => {
-              onNewRecordClick("api_client_sidebar_header", params.recordType, undefined, params.entryType);
-            }}
-          >
-            <RQButton size="small" type="transparent" icon={<MdAdd />} className="sidebar-list-header-button" />
-          </NewApiRecordDropdown>
+          <Tooltip title="New request or collection">
+            <span>
+              <NewApiRecordDropdown
+                invalidActions={[NewRecordDropdownItemType.ENVIRONMENT]}
+                onSelect={(params) => {
+                  onNewRecordClick("api_client_sidebar_header", params.recordType, undefined, params.entryType);
+                }}
+              >
+                <RQButton size="small" type="transparent" icon={<MdAdd />} className="sidebar-list-header-button" />
+              </NewApiRecordDropdown>
+            </span>
+          </Tooltip>
         )
       )}
     </div>

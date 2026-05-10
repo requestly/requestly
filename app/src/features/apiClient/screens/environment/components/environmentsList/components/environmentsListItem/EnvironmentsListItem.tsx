@@ -129,7 +129,7 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
       const allEnvironmentsMap = allEnvironments.reduce((acc, env) => {
         acc[env.id] = env;
         return acc;
-      }, {} as Record<string, typeof allEnvironments[number]>);
+      }, {} as Record<string, (typeof allEnvironments)[number]>);
 
       await dispatch(
         duplicateEnvironment({
@@ -286,15 +286,19 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
       {isReadOnly ? null : (
         <div onClick={(e) => e.stopPropagation()}>
           {!isGlobalEnvironment(environment.id) ? (
-            <Dropdown menu={{ items: menuItems }} trigger={["click"]} placement="bottomRight">
-              <RQButton
-                size="small"
-                type="transparent"
-                icon={<MdOutlineMoreHoriz />}
-                className="environment-list-item-dropdown-button"
-                onClick={(e) => e.stopPropagation()}
-              />
-            </Dropdown>
+            <Tooltip title="More actions">
+              <span>
+                <Dropdown menu={{ items: menuItems }} trigger={["click"]} placement="bottomRight">
+                  <RQButton
+                    size="small"
+                    type="transparent"
+                    icon={<MdOutlineMoreHoriz />}
+                    className="environment-list-item-dropdown-button"
+                    onClick={(e) => e.stopPropagation()}
+                  />
+                </Dropdown>
+              </span>
+            </Tooltip>
           ) : null}
         </div>
       )}
