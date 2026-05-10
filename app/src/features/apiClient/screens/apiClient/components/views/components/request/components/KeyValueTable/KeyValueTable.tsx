@@ -260,13 +260,15 @@ export const KeyValueTable: React.FC<React.PropsWithChildren<KeyValueTableProps>
           }
 
           return (
-            <RQButton
-              className="key-value-delete-btn"
-              icon={<RiDeleteBin6Line />}
-              type="transparent"
-              size="small"
-              onClick={() => handleDeletePair(record)}
-            />
+            <Tooltip title={`Delete ${tableType} entry`} placement="bottom" color="#000">
+              <RQButton
+                className="key-value-delete-btn"
+                icon={<RiDeleteBin6Line />}
+                type="transparent"
+                size="small"
+                onClick={() => handleDeletePair(record)}
+              />
+            </Tooltip>
           );
         },
       },
@@ -343,15 +345,11 @@ export const KeyValueTable: React.FC<React.PropsWithChildren<KeyValueTableProps>
             scroll={{ x: 550 }}
             footer={() => (
               <div className="api-key-value-table-footer">
-                <RQButton
-                  icon={<MdAdd />}
-                  size="small"
-                  title={`Add ${tableType} entry`}
-                  onClick={handleAddPair}
-                  className="key-value-add-more-btn"
-                >
-                  Add More
-                </RQButton>
+                <Tooltip title={`Add ${tableType} entry`} placement="bottom" color="#000">
+                  <RQButton icon={<MdAdd />} size="small" onClick={handleAddPair} className="key-value-add-more-btn">
+                    Add More
+                  </RQButton>
+                </Tooltip>
               </div>
             )}
           />

@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
-import { Checkbox, Dropdown, MenuProps, Skeleton, Typography, notification } from "antd";
+import { Checkbox, Dropdown, MenuProps, Skeleton, Tooltip, Typography, notification } from "antd";
 import { RQAPI } from "features/apiClient/types";
 import { RQAPI as SharedRQAPI } from "@requestly/shared/types/entities/apiClient";
 import { RQButton } from "lib/design-system-v2/components";
@@ -493,7 +493,14 @@ export const CollectionRow: React.FC<Props> = ({
                         });
                       }}
                     >
-                      <RQButton size="small" type="transparent" icon={<MdAdd />} onClick={(e) => e.stopPropagation()} />
+                      <Tooltip title="Create new request" placement="bottom" color="#000">
+                        <RQButton
+                          size="small"
+                          type="transparent"
+                          icon={<MdAdd />}
+                          onClick={(e) => e.stopPropagation()}
+                        />
+                      </Tooltip>
                     </NewApiRecordDropdown>
                     <Dropdown
                       trigger={["click"]}
