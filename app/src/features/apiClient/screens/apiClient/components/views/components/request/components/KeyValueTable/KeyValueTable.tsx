@@ -52,6 +52,7 @@ export const KeyValueTable: React.FC<React.PropsWithChildren<KeyValueTableProps>
   headerContent,
 }) => {
   const { checkInvalidCharacter = false } = config || {};
+  const tableEntryLabel = tableType || "entry";
 
   const isDescriptionVisible =
     hasDescription(extraColumns) &&
@@ -260,7 +261,7 @@ export const KeyValueTable: React.FC<React.PropsWithChildren<KeyValueTableProps>
           }
 
           return (
-            <Tooltip title={`Delete ${tableType} entry`} placement="bottom" color="#000">
+            <Tooltip title={`Delete ${tableEntryLabel} entry`} placement="bottom" color="#000">
               <RQButton
                 className="key-value-delete-btn"
                 icon={<RiDeleteBin6Line />}
@@ -345,7 +346,7 @@ export const KeyValueTable: React.FC<React.PropsWithChildren<KeyValueTableProps>
             scroll={{ x: 550 }}
             footer={() => (
               <div className="api-key-value-table-footer">
-                <Tooltip title={`Add ${tableType} entry`} placement="bottom" color="#000">
+                <Tooltip title={`Add ${tableEntryLabel} entry`} placement="bottom" color="#000">
                   <RQButton icon={<MdAdd />} size="small" onClick={handleAddPair} className="key-value-add-more-btn">
                     Add More
                   </RQButton>

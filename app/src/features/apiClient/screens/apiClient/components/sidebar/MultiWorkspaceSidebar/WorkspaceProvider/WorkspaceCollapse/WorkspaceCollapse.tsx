@@ -157,6 +157,7 @@ export const WorkspaceCollapse: React.FC<WorkspaceCollapseProps> = ({
                             <RQButton
                               size="small"
                               type="transparent"
+                              aria-label="Create new environment"
                               icon={<MdAdd />}
                               onClick={(e) => {
                                 e.stopPropagation();
@@ -188,6 +189,7 @@ export const WorkspaceCollapse: React.FC<WorkspaceCollapseProps> = ({
                               <RQButton
                                 size="small"
                                 type="transparent"
+                                aria-label="Create new request"
                                 icon={<MdAdd />}
                                 onClick={(e) => e.stopPropagation()}
                               />
