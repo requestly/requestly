@@ -143,6 +143,8 @@ const AuthorizationInputField: React.FC<AuthorizationInputFieldProps> = ({
           size="small"
           className="sensitive-auth-toggle-btn"
           title={isValueVisible ? "Hide value" : "Show value"}
+          aria-label={isValueVisible ? "Hide value" : "Show value"}
+          aria-pressed={isValueVisible}
           icon={isValueVisible ? <RiEyeOffLine /> : <RiEyeLine />}
           onClick={() => setIsValueVisible((prev) => !prev)}
         />
