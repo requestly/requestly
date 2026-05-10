@@ -90,6 +90,26 @@
               padding: var(--requestly-space-0, 0px);
               margin-bottom: var(--requestly-space-4, 8px);
             }
+
+            .input-container.sensitive-input {
+              position: relative;
+
+              .sensitive-auth-editor {
+                padding-right: 34px;
+              }
+
+              .sensitive-auth-editor-masked .cm-content {
+                -webkit-text-security: disc;
+              }
+
+              .sensitive-auth-toggle-btn {
+                position: absolute;
+                top: 50%;
+                right: 4px;
+                transform: translateY(-50%);
+                color: var(--requestly-color-text-subtle);
+              }
+            }
           }
 
           .ant-select-selector {

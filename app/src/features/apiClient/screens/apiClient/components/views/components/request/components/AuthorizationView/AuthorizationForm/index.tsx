@@ -1,5 +1,5 @@
 import { Select } from "antd";
-import React from "react";
+import React, { useState } from "react";
 import { AuthForm } from "./formStructure/types";
 import { AuthConfig, AuthConfigMeta, Authorization } from "../types/AuthConfig";
 import { useAuthFormState } from "./hooks/useAuthFormState";
@@ -9,6 +9,9 @@ import InfoIcon from "components/misc/InfoIcon";
 import { Conditional } from "components/common/Conditional";
 import { INVALID_KEY_CHARACTERS } from "features/apiClient/constants";
 import { ScopedVariables, useScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
+import { RQButton } from "lib/design-system-v2/components";
+import { RiEyeLine } from "@react-icons/all-files/ri/RiEyeLine";
+import { RiEyeOffLine } from "@react-icons/all-files/ri/RiEyeOffLine";
 
 interface AuthorizationFormProps<AuthType extends AuthConfigMeta.AuthWithConfig> {
   recordId: string;
@@ -55,7 +58,8 @@ function generateFields(
   onChangeHandler: (value: string, id: string) => void,
   formState: Record<string, string>
 ) {
-  const hasInvalidCharacter = INVALID_KEY_CHARACTERS.test(formState[field.id]);
+  const fieldValue = formState[field.id] ?? "";
+  const hasInvalidCharacter = INVALID_KEY_CHARACTERS.test(fieldValue);
   //this is used as on mount the formState is undefinded so added a fallback
   const isHeader = (formState.addTo || addToOptions.HEADER) === addToOptions.HEADER;
   /*
@@ -64,37 +68,16 @@ function generateFields(
   switch (field.type) {
     case AuthForm.FIELD_TYPE.INPUT:
       return (
-        <div
-          className={`input-container ${
-            hasInvalidCharacter && formType === Authorization.Type.API_KEY && field.id === "key" && isHeader
-              ? "error-state"
-              : ""
-          }`}
-        >
-          <SingleLineEditor
-            key={`${formType}-${index}`}
-            className={field.className ?? ""}
-            placeholder={field.placeholder}
-            defaultValue={formState[field.id]}
-            onChange={(value) => onChangeHandler(value, field.id)}
-            variables={variables}
-          />
-          <Conditional
-            condition={hasInvalidCharacter && formType === Authorization.Type.API_KEY && field.id === "key" && isHeader}
-          >
-            <div className="error-icon">
-              <InfoIcon
-                text="Invalid character used in key"
-                tooltipPlacement="right"
-                showArrow={false}
-                style={{
-                  color: "var(--requestly-color-error)",
-                  fontFamily: "Material Symbols Outlined",
-                }}
-              />
-            </div>
-          </Conditional>
-        </div>
+        <AuthorizationInputField
+          field={field}
+          formType={formType}
+          index={index}
+          variables={variables}
+          value={fieldValue}
+          hasInvalidCharacter={hasInvalidCharacter}
+          isHeader={isHeader}
+          onChangeHandler={onChangeHandler}
+        />
       );
     case AuthForm.FIELD_TYPE.SELECT:
       return (
@@ -111,5 +94,74 @@ function generateFields(
       return null;
   }
 }
+
+interface AuthorizationInputFieldProps {
+  field: AuthForm.InputField;
+  formType: Authorization.Type;
+  index: number;
+  variables: ScopedVariables;
+  value: string;
+  hasInvalidCharacter: boolean;
+  isHeader: boolean;
+  onChangeHandler: (value: string, id: string) => void;
+}
+
+const AuthorizationInputField: React.FC<AuthorizationInputFieldProps> = ({
+  field,
+  formType,
+  index,
+  variables,
+  value,
+  hasInvalidCharacter,
+  isHeader,
+  onChangeHandler,
+}) => {
+  const [isValueVisible, setIsValueVisible] = useState(false);
+  const shouldShowError =
+    hasInvalidCharacter && formType === Authorization.Type.API_KEY && field.id === "key" && isHeader;
+  const shouldMaskValue = field.isSensitive && !isValueVisible;
+
+  return (
+    <div
+      className={`input-container ${shouldShowError ? "error-state" : ""} ${
+        field.isSensitive ? "sensitive-input" : ""
+      }`}
+    >
+      <SingleLineEditor
+        key={`${formType}-${index}`}
+        className={`${field.className ?? ""} ${field.isSensitive ? "sensitive-auth-editor" : ""} ${
+          shouldMaskValue ? "sensitive-auth-editor-masked" : ""
+        }`}
+        placeholder={field.placeholder}
+        defaultValue={value}
+        onChange={(updatedValue) => onChangeHandler(updatedValue, field.id)}
+        variables={variables}
+      />
+      <Conditional condition={!!field.isSensitive}>
+        <RQButton
+          type="transparent"
+          size="small"
+          className="sensitive-auth-toggle-btn"
+          title={isValueVisible ? "Hide value" : "Show value"}
+          icon={isValueVisible ? <RiEyeOffLine /> : <RiEyeLine />}
+          onClick={() => setIsValueVisible((prev) => !prev)}
+        />
+      </Conditional>
+      <Conditional condition={shouldShowError}>
+        <div className="error-icon">
+          <InfoIcon
+            text="Invalid character used in key"
+            tooltipPlacement="right"
+            showArrow={false}
+            style={{
+              color: "var(--requestly-color-error)",
+              fontFamily: "Material Symbols Outlined",
+            }}
+          />
+        </div>
+      </Conditional>
+    </div>
+  );
+};
 
 export default React.memo(AuthorizationForm);
