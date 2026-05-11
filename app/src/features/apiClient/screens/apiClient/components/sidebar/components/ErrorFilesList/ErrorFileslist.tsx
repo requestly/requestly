@@ -53,7 +53,9 @@ const DeleteErrorFileButton = ({ onDelete }: { onDelete: () => void }) => {
       }}
     >
       {/* TODO: Use RQ icononly button */}
-      <RiDeleteBin6Line className="error-file-item-action-icon" onClick={() => setIsConfirmationPopupOpen(true)} />
+      <Tooltip title="Delete" color="var(--requestly-color-black)" placement="top">
+        <RiDeleteBin6Line className="error-file-item-action-icon" onClick={() => setIsConfirmationPopupOpen(true)} />
+      </Tooltip>
     </Popconfirm>
   );
 };
@@ -112,7 +114,7 @@ const ErrorFileItem: React.FC<{
       <ErrorFileItemTitle file={file} />
 
       <div className="error-file-item-actions">
-        <Tooltip title="Edit file" color="var(--requestly-color-black)" placement="top">
+        <Tooltip title="Edit" color="var(--requestly-color-black)" placement="top">
           <MdEdit className="error-file-item-action-icon" onClick={() => openErrorFile(file)} />
         </Tooltip>
         <DeleteErrorFileButton

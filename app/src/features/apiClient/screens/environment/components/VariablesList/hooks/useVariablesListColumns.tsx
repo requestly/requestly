@@ -182,13 +182,15 @@ export const useVariablesListColumns = ({
           <RoleBasedComponent resource="api_client_environment" permission="delete">
             <div className="variable-row-actions">
               {record.type === EnvironmentVariableType.Secret ? (
-                <RQButton
-                  icon={checkIsSecretHidden(record.id) ? <RiEyeOffLine /> : <RiEyeLine />}
-                  type="transparent"
-                  size="small"
-                  onClick={() => updateVisibleSecretsRowIds(record.id)}
-                  className="secret-variable-toggle-btn"
-                />
+                <Tooltip title={checkIsSecretHidden(record.id) ? "Show" : "Hide"} placement="top" color="#000">
+                  <RQButton
+                    icon={checkIsSecretHidden(record.id) ? <RiEyeOffLine /> : <RiEyeLine />}
+                    type="transparent"
+                    size="small"
+                    onClick={() => updateVisibleSecretsRowIds(record.id)}
+                    className="secret-variable-toggle-btn"
+                  />
+                </Tooltip>
               ) : null}
 
               {(recordsCount > 1 ||
@@ -196,13 +198,15 @@ export const useVariablesListColumns = ({
                   (record.key !== "" ||
                     record.syncValue !== "" ||
                     (container === "environments" && record.localValue !== "")))) && (
-                <RQButton
-                  icon={<RiDeleteBin6Line />}
-                  type="transparent"
-                  size="small"
-                  className="delete-variable-btn"
-                  onClick={() => handleDeleteVariable(record.id)}
-                />
+                <Tooltip title="Delete" placement="top" color="#000">
+                  <RQButton
+                    icon={<RiDeleteBin6Line />}
+                    type="transparent"
+                    size="small"
+                    className="delete-variable-btn"
+                    onClick={() => handleDeleteVariable(record.id)}
+                  />
+                </Tooltip>
               )}
             </div>
           </RoleBasedComponent>
