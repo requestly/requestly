@@ -71,13 +71,22 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisab
   const getFilterCount = useCallback(
     (pairIndex) => {
       const copyOfCurrentlySelectedRule = JSON.parse(JSON.stringify(currentlySelectedRuleData));
-      return isSourceFilterFormatUpgraded(pairIndex, copyOfCurrentlySelectedRule)
-        ? Object.keys(currentlySelectedRuleData.pairs[pairIndex].source.filters[0] || {}).filter(
-            (key) => key !== GLOBAL_CONSTANTS.RULE_SOURCE_FILTER_TYPES.PAGE_URL
-          ).length
-        : Object.keys(currentlySelectedRuleData.pairs[pairIndex].source.filters || {}).filter(
-            (key) => key !== GLOBAL_CONSTANTS.RULE_SOURCE_FILTER_TYPES.PAGE_URL
-          ).length;
+      if (isSourceFilterFormatUpgraded(pairIndex, copyOfCurrentlySelectedRule)) {
+        const filters = currentlySelectedRuleData.pairs[pairIndex].source.filters[0] || {};
+        return Object.keys(filters).filter(
+          (key) => {
+            const value = filters[key];
+            return !(typeof value === 'object' && value !== null && Object.keys(value).length === 0);
+          }
+        ).length;
+      }
+      const filters = currentlySelectedRuleData.pairs[pairIndex].source.filters || {};
+      return Object.keys(filters).filter(
+        (key) => {
+          const value = filters[key];
+          return !(typeof value === 'object' && value !== null && Object.keys(value).length === 0);
+        }
+      ).length;
     },
     [currentlySelectedRuleData, isSourceFilterFormatUpgraded]
   );
@@ -293,7 +302,7 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisab
               autoFocus={MODE === "create"}
               placeholder={
                 ruleDetails.ALLOW_APPLY_RULE_TO_ALL_URLS
-                  ? "Enter url here or leave this field empty to apply rule to all url’s..."
+                  ? "Enter url here or leave this field empty to apply rule to all url's..."
                   : generatePlaceholderText(pair.source.operator, "source-value", pair.source.key)
               }
               type="text"
