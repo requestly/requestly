@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Tabs, TabsProps, Typography, Popover } from "antd";
+import { Tabs, TabsProps, Typography, Popover, Tooltip } from "antd";
 import { TabItem } from "./TabItem";
 import { Outlet, unstable_useBlocker } from "react-router-dom";
 import { RQButton } from "lib/design-system-v2/components";
@@ -312,6 +312,11 @@ export const TabsContainer: React.FC = () => {
         className="tabs-content"
         popupClassName="tabs-content-more-dropdown"
         size="small"
+        addIcon={
+          <Tooltip title="New request" placement="bottom" color="#000">
+            <span>+</span>
+          </Tooltip>
+        }
         onChange={(key) => {
           setActiveTab(key.toString());
         }}
