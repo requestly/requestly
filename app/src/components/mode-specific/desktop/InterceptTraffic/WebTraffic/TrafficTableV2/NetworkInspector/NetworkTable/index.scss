@@ -34,4 +34,10 @@
       }
     }
   }
+
+  tbody tr,
+  tbody tr td,
+  tbody tr td * {
+    cursor: pointer;
+  }
 }
