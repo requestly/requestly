@@ -65,6 +65,7 @@ interface Props {
 export type DraggableApiRecord = {
   record: RQAPI.ApiClientRecord;
   workspaceId: ApiClientFeatureContext["workspaceId"];
+  onDropComplete?: () => void;
 };
 
 export const CollectionRow: React.FC<Props> = ({

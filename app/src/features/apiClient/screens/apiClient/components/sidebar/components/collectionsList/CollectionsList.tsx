@@ -36,14 +36,7 @@ import { ExampleCollectionsNudge } from "../ExampleCollectionsNudge/ExampleColle
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import APP_CONSTANTS from "config/constants";
-import {
-  duplicateRecords,
-  useAllRecords,
-  useApiClientRepository,
-  useChildToParent,
-  moveRecords,
-  getApiClientFeatureContext,
-} from "features/apiClient/slices";
+import { duplicateRecords, useAllRecords, useApiClientRepository, useChildToParent } from "features/apiClient/slices";
 import { useApiClientDispatch } from "features/apiClient/slices/hooks/base.hooks";
 import { EXPANDED_RECORD_IDS_UPDATED } from "features/apiClient/slices/exampleCollections";
 import { ErrorSeverity } from "errors/types";
@@ -90,6 +83,50 @@ const trackUserProperties = (records: RQAPI.ApiClientRecord[]) => {
   const totalRequests = records.length - totalCollections;
   submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_COLLECTIONS, totalCollections);
   submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_REQUESTS, totalRequests);
+};
+
+interface TopLevelDropZoneProps {
+  dropWorkspaceId: Workspace["id"] | null;
+  isReadOnly: boolean;
+  onDropToTopLevel: (item: DraggableApiRecord, dropWorkspaceId: Workspace["id"] | null) => Promise<void>;
+  position: "top" | "bottom";
+}
+
+const TopLevelDropZone: React.FC<TopLevelDropZoneProps> = ({
+  dropWorkspaceId,
+  isReadOnly,
+  onDropToTopLevel,
+  position,
+}) => {
+  const [{ isOver, canDrop }, drop] = useDrop(
+    () => ({
+      accept: [RQAPI.RecordType.API, RQAPI.RecordType.COLLECTION],
+      drop: (item: DraggableApiRecord, monitor) => {
+        if (!monitor.isOver({ shallow: true })) {
+          return;
+        }
+
+        onDropToTopLevel(item, dropWorkspaceId);
+      },
+      canDrop: (item: DraggableApiRecord) => !isReadOnly && !!item.record.collectionId,
+      collect: (monitor) => ({
+        isOver: monitor.isOver({ shallow: true }),
+        canDrop: monitor.canDrop(),
+      }),
+    }),
+    [dropWorkspaceId, isReadOnly, onDropToTopLevel]
+  );
+
+  const className = [
+    "top-level-drop-zone",
+    `top-level-drop-zone--${position}`,
+    canDrop ? "available" : "",
+    isOver && canDrop ? "active" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  return <div ref={drop} className={className} aria-hidden="true" />;
 };
 
 export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCreated, handleRecordsToBeDeleted }) => {
@@ -416,33 +453,10 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
       // Empty string for collectionId means move to top-level (no parent collection)
       await handleRecordDrop(item, dropWorkspaceId, {
         targetCollectionId: "",
+        onFinally: item.onDropComplete,
       });
     },
     []
-  );
-
-  const [{ isOver, canDrop }, drop] = useDrop(
-    () => ({
-      accept: [RQAPI.RecordType.API, RQAPI.RecordType.COLLECTION],
-      drop: (item: DraggableApiRecord, monitor) => {
-        const isOverCurrent = monitor.isOver({ shallow: true });
-        if (!isOverCurrent) return;
-
-        // Only handle drop if item is from a collection (collectionId is not empty)
-        if (item.record.collectionId) {
-          handleRecordDropToTopLevel(item, workspaceId || null);
-        }
-      },
-      canDrop: (item: DraggableApiRecord) => {
-        // Can drop if the item is currently in a collection (moving it to top-level)
-        return !!item.record.collectionId;
-      },
-      collect: (monitor) => ({
-        isOver: monitor.isOver({ shallow: true }),
-        canDrop: monitor.canDrop(),
-      }),
-    }),
-    [handleRecordDropToTopLevel, workspaceId]
   );
 
   useEffect(() => {
@@ -474,10 +488,17 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
         )}
       </div>
       <div className={`collections-list-container ${showSelection ? "selection-enabled" : ""}`}>
-        <div className={`collections-list-content ${isOver && canDrop ? "drop-target-active" : ""}`} ref={drop}>
+        <div className="collections-list-content">
           <ExampleCollectionsNudge />
           {updatedRecords.count > 0 ? (
             <div className="collections-list">
+              <TopLevelDropZone
+                dropWorkspaceId={workspaceId || null}
+                isReadOnly={!isValidPermission}
+                onDropToTopLevel={handleRecordDropToTopLevel}
+                position="top"
+              />
+
               {updatedRecords.collections.map((record) => {
                 return (
                   <CollectionRow
@@ -524,7 +545,12 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
               )}
 
               {/* Dedicated drop zone for easier dropping at top-level */}
-              <div className={`top-level-drop-zone ${isOver && canDrop ? "active" : ""}`}></div>
+              <TopLevelDropZone
+                dropWorkspaceId={workspaceId || null}
+                isReadOnly={!isValidPermission}
+                onDropToTopLevel={handleRecordDropToTopLevel}
+                position="bottom"
+              />
             </div>
           ) : (
             <ApiRecordEmptyState
