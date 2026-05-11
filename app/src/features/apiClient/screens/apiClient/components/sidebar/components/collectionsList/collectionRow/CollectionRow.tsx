@@ -493,7 +493,12 @@ export const CollectionRow: React.FC<Props> = ({
                         });
                       }}
                     >
-                      <Tooltip title="Create new request or collection" placement="top" color="#000">
+                      <Tooltip
+                        title="Create new request or collection"
+                        placement="top"
+                        color="#000000"
+                        mouseEnterDelay={0.2}
+                      >
                         <RQButton size="small" type="transparent" icon={<MdAdd />} onClick={(e) => e.stopPropagation()} />
                       </Tooltip>
                     </NewApiRecordDropdown>
@@ -503,15 +508,17 @@ export const CollectionRow: React.FC<Props> = ({
                       placement="bottomRight"
                       overlayClassName="collection-dropdown-menu"
                     >
-                      <RQButton
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setShowSelection(false);
-                        }}
-                        size="small"
-                        type="transparent"
-                        icon={<MdOutlineMoreHoriz />}
-                      />
+                      <Tooltip title="More actions" placement="top" color="#000000" mouseEnterDelay={0.2}>
+                        <RQButton
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setShowSelection(false);
+                          }}
+                          size="small"
+                          type="transparent"
+                          icon={<MdOutlineMoreHoriz />}
+                        />
+                      </Tooltip>
                     </Dropdown>
                   </div>
                 </Conditional>

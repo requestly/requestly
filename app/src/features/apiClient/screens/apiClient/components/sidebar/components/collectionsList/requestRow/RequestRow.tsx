@@ -493,14 +493,14 @@ export const RequestRow: React.FC<Props> = ({
 
       <Conditional condition={!isReadOnly}>
         <div className={`request-options ${isDropdownVisible ? "active" : ""}`}>
-          <Tooltip title="More actions" placement="top" color="#000">
-            <Dropdown
-              trigger={["click"]}
-              menu={{ items: requestOptions }}
-              placement="bottomRight"
-              open={isDropdownVisible}
-              onOpenChange={handleDropdownVisibleChange}
-            >
+          <Dropdown
+            trigger={["click"]}
+            menu={{ items: requestOptions }}
+            placement="bottomRight"
+            open={isDropdownVisible}
+            onOpenChange={handleDropdownVisibleChange}
+          >
+            <Tooltip title="More actions" placement="top" color="#000000" mouseEnterDelay={0.2}>
               <RQButton
                 onClick={(e) => {
                   e.stopPropagation();
@@ -510,8 +510,8 @@ export const RequestRow: React.FC<Props> = ({
                 type="transparent"
                 icon={<MdOutlineMoreHoriz />}
               />
-            </Dropdown>
-          </Tooltip>
+            </Tooltip>
+          </Dropdown>
         </div>
       </Conditional>
     </div>
@@ -641,14 +641,14 @@ export const RequestRow: React.FC<Props> = ({
 
             <Conditional condition={!isReadOnly}>
               <div className={`request-options ${isDropdownVisible ? "active" : ""}`}>
-                <Tooltip title="More actions" placement="top" color="#000">
-                  <Dropdown
-                    trigger={["click"]}
-                    menu={{ items: requestOptions }}
-                    placement="bottomRight"
-                    open={isDropdownVisible}
-                    onOpenChange={handleDropdownVisibleChange}
-                  >
+                <Dropdown
+                  trigger={["click"]}
+                  menu={{ items: requestOptions }}
+                  placement="bottomRight"
+                  open={isDropdownVisible}
+                  onOpenChange={handleDropdownVisibleChange}
+                >
+                  <Tooltip title="More actions" placement="top" color="#000000" mouseEnterDelay={0.2}>
                     <RQButton
                       onClick={(e) => {
                         e.stopPropagation();
@@ -658,8 +658,8 @@ export const RequestRow: React.FC<Props> = ({
                       type="transparent"
                       icon={<MdOutlineMoreHoriz />}
                     />
-                  </Dropdown>
-                </Tooltip>
+                  </Tooltip>
+                </Dropdown>
               </div>
             </Conditional>
           </div>
