@@ -15,6 +15,9 @@ interface RequestBotProps {
   modelType?: RequestBotModel;
 }
 
+const REQUEST_BOT_OPEN_RIGHT_OFFSET = 16;
+const REQUEST_BOT_CLOSED_RIGHT_OFFSET = -450;
+
 export const RequestBot: React.FC<RequestBotProps> = ({ isOpen, onClose, modelType = "app" }) => {
   const isOptedforAIFeatures = useSelector(getIsOptedforAIFeatures);
   const [userHasConsented, setUserHasConsented] = useState(false);
@@ -39,8 +42,11 @@ export const RequestBot: React.FC<RequestBotProps> = ({ isOpen, onClose, modelTy
   return (
     <>
       <m.div
-        initial={{ opacity: 0, right: -450 }}
-        animate={{ opacity: shouldShowBot ? 1 : 0, right: shouldShowBot ? 65 : -450 }}
+        initial={{ opacity: 0, right: REQUEST_BOT_CLOSED_RIGHT_OFFSET }}
+        animate={{
+          opacity: shouldShowBot ? 1 : 0,
+          right: shouldShowBot ? REQUEST_BOT_OPEN_RIGHT_OFFSET : REQUEST_BOT_CLOSED_RIGHT_OFFSET,
+        }}
         transition={{ duration: 0.2 }}
         className="request-bot"
         style={{ pointerEvents: shouldShowBot ? "auto" : "none" }}
