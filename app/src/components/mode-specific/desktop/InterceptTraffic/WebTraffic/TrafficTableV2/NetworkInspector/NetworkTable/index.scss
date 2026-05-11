@@ -1,5 +1,12 @@
 .web-traffic-table-container {
   height: 100%;
+
+  tbody tr,
+  tbody tr td,
+  tbody tr td * {
+    cursor: pointer;
+  }
+
   table {
     tbody {
       tr[aria-selected="true"] {
