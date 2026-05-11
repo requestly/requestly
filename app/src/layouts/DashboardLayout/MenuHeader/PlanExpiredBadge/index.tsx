@@ -10,20 +10,30 @@ import { getPrettyPlanName } from "utils/FormattingHelper";
 export const PlanExpiredBadge = () => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
+  const handleBadgeClick = () => {
+    trackRenewNowClicked("header");
+    dispatch(
+      globalActions.toggleActiveModal({
+        modalName: "pricingModal",
+        newValue: true,
+        newProps: { selectedPlan: null, source: "header_renew_button" },
+      })
+    );
+  };
 
   return (
     <div className="header-plan-expired-badge-container">
       <div
         className="header-plan-expired-badge"
-        onClick={() => {
-          trackRenewNowClicked("header");
-          dispatch(
-            globalActions.toggleActiveModal({
-              modalName: "pricingModal",
-              newValue: true,
-              newProps: { selectedPlan: null, source: "header_renew_button" },
-            })
-          );
+        role="button"
+        tabIndex={0}
+        aria-label="Renew expired plan"
+        onClick={handleBadgeClick}
+        onKeyDown={(event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            handleBadgeClick();
+          }
         }}
       >
         <span>

@@ -23,6 +23,11 @@
   line-height: 22px;
   cursor: pointer;
 
+  &:focus-visible {
+    outline: 2px solid var(--requestly-color-primary);
+    outline-offset: 2px;
+  }
+
   & .ant-badge-status-dot {
     width: 8px;
     height: 8px;

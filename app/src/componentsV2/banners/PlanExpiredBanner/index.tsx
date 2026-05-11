@@ -2,8 +2,9 @@ import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { getIsPlanExpiredBannerClosed } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { RQButton } from "lib/design-system/components";
+import { RQButton } from "lib/design-system-v2/components";
 import { IoMdClose } from "@react-icons/all-files/io/IoMdClose";
+import { RiErrorWarningLine } from "@react-icons/all-files/ri/RiErrorWarningLine";
 import { globalActions } from "store/slices/global/slice";
 import { getPlanNameFromId } from "utils/PremiumUtils";
 import { getPrettyPlanName } from "utils/FormattingHelper";
@@ -33,13 +34,14 @@ export const PlanExpiredBanner = () => {
   if (isBannerVisible) {
     return (
       <div className="plan-expired-banner">
-        <span className="plan-expired-banner-badge">PLAN EXPIRED</span>
-        <span className="text-white text-bold">
+        <RiErrorWarningLine className="plan-expired-banner-icon" />
+        <span className="plan-expired-banner-badge">Plan expired</span>
+        <span className="plan-expired-banner-message">
           Your {getPrettyPlanName(getPlanNameFromId(user?.details?.planDetails?.planId))} plan has expired. Renew now to
-          get full feature access!
+          keep full feature access.
         </span>
         <RQButton
-          type="default"
+          type="danger"
           className="plan-expired-banner-btn"
           onClick={() => {
             dispatch(
@@ -54,8 +56,11 @@ export const PlanExpiredBanner = () => {
           Renew now
         </RQButton>
 
-        <IoMdClose
+        <RQButton
+          type="transparent"
           className="plan-expired-banner-close-btn"
+          icon={<IoMdClose />}
+          aria-label="Close plan expired banner"
           onClick={() => dispatch(globalActions.updatePlanExpiredBannerClosed(true))}
         />
       </div>
