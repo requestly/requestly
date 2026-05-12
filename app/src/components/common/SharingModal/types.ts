@@ -1,4 +1,5 @@
 import { Group as NewGroup, Rule as NewRule } from "@requestly/shared/types/entities/rules";
+import React from "react";
 import { Workspace } from "features/workspaces/types";
 
 export enum SharingOptions {
@@ -28,6 +29,7 @@ export enum WorkspaceSharingTypes {
   NEW_WORKSPACE_CREATED = "new_workspace_created",
   USERS_INVITED = "users_invites",
   EXISTING_WORKSPACE = "existing_workspace",
+  PRIVATE_WORKSPACE = "private_workspace",
 }
 
 export type PostShareViewData = {
@@ -35,3 +37,5 @@ export type PostShareViewData = {
   targetTeamData?: Workspace;
   sourceTeamData?: Workspace | null;
 };
+
+export type SetPostShareViewData = React.Dispatch<React.SetStateAction<PostShareViewData | null>>;

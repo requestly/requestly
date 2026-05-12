@@ -2,12 +2,13 @@ import React, { useState, useCallback } from "react";
 import { useSelector } from "react-redux";
 import { getAppMode } from "store/selectors";
 import { WorkspaceShareMenu } from "./WorkspaceShareMenu";
-import { Tooltip } from "antd";
+import { Avatar, Row, Tooltip } from "antd";
+import { LockOutlined } from "@ant-design/icons";
 import { RQButton } from "lib/design-system/components";
 import CopyButton from "components/misc/CopyButton";
 import { httpsCallable, getFunctions } from "firebase/functions";
 import { trackAddTeamMemberSuccess } from "modules/analytics/events/features/teams";
-import { PostShareViewData, WorkspaceSharingTypes } from "../types";
+import { SetPostShareViewData, WorkspaceSharingTypes } from "../types";
 import { TeamRole } from "types";
 import { duplicateRulesToTargetWorkspace } from "../actions";
 import {
@@ -26,7 +27,7 @@ import { Workspace } from "features/workspaces/types";
 
 interface Props {
   selectedRules: string[];
-  setPostShareViewData: ({ type, targetTeamData }: PostShareViewData) => void;
+  setPostShareViewData: SetPostShareViewData;
   onRulesShared?: () => void;
 }
 
@@ -97,8 +98,39 @@ export const ShareFromWorkspace: React.FC<Props> = ({
     [appMode, onRulesShared, selectedRules, activeWorkspace, setPostShareViewData]
   );
 
+  const handleTransferToPrivateWorkspace = useCallback(() => {
+    setIsLoading(true);
+    duplicateRulesToTargetWorkspace(appMode, null, selectedRules).then(() => {
+      setIsLoading(false);
+      trackSharingModalRulesDuplicated("team", selectedRules.length);
+      setPostShareViewData({
+        type: WorkspaceSharingTypes.PRIVATE_WORKSPACE,
+        sourceTeamData: activeWorkspace,
+      });
+
+      onRulesShared();
+    });
+  }, [appMode, onRulesShared, selectedRules, activeWorkspace, setPostShareViewData]);
+
   return (
     <>
+      <div className="workspace-share-menu-item-card">
+        <Row align="middle" className="items-center">
+          <Avatar size={35} shape="square" icon={<LockOutlined />} className="workspace-avatar" />
+          <span className="workspace-card-description">
+            <div className="text-white">Private Workspace</div>
+            <div className="text-gray">Not shared with anyone</div>
+          </span>
+        </Row>
+        <RQButton
+          disabled={isLoading}
+          type="link"
+          className="workspace-menu-item-transfer-btn"
+          onClick={handleTransferToPrivateWorkspace}
+        >
+          Copy here
+        </RQButton>
+      </div>
       <WorkspaceShareMenu onTransferClick={handleTransferToOtherWorkspace} isLoading={isLoading} />
       <div className="subheader mt-1">Share with Teammates</div>
       <div className="mt-8 text-gray">Collaborate in real-time with your teammates within a shared workspace.</div>

@@ -10,7 +10,7 @@ import { getFunctions, httpsCallable } from "firebase/functions";
 import { isVerifiedBusinessDomainUser } from "utils/Misc";
 import { duplicateRulesToTargetWorkspace } from "../actions";
 import { trackAddTeamMemberSuccess, trackNewTeamCreateSuccess } from "modules/analytics/events/features/teams";
-import { WorkspaceSharingTypes, PostShareViewData } from "../types";
+import { WorkspaceSharingTypes, SetPostShareViewData } from "../types";
 import { TeamRole } from "types";
 import { trackSharingModalRulesDuplicated } from "modules/analytics/events/misc/sharing";
 import EmailInputWithDomainBasedSuggestions from "components/common/EmailInputWithDomainBasedSuggestions";
@@ -24,7 +24,7 @@ import { Workspace, WorkspaceType } from "features/workspaces/types";
 
 interface Props {
   selectedRules: string[];
-  setPostShareViewData: ({ type, targetTeamData }: PostShareViewData) => void;
+  setPostShareViewData: SetPostShareViewData;
   onRulesShared?: () => void;
 }
 

@@ -4,6 +4,7 @@ import { ShareFromPrivate } from "./ShareFromPrivate";
 import { ShareFromWorkspace } from "./ShareFromWorkspace";
 import { PostSharing } from "./PostSharing";
 import { isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
+import { PostShareViewData } from "../types";
 
 interface ShareInWorkspaceProps {
   selectedRules: string[];
@@ -17,7 +18,7 @@ export const ShareInWorkspaces: React.FC<ShareInWorkspaceProps> = ({
   onRulesShared = () => {},
 }) => {
   const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
-  const [postShareViewData, setPostShareViewData] = useState(null);
+  const [postShareViewData, setPostShareViewData] = useState<PostShareViewData | null>(null);
 
   return (
     <div className="sharing-modal-body share-in-workspaces-wrapper">

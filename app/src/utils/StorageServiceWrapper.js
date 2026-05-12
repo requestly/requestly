@@ -50,7 +50,7 @@ class StorageServiceWrapper {
    * @param ruleOrGroup rule or group
    * @param options options for save operation
    * @param {boolean} options.silentUpdate do not update last modified timestamp
-   * @param {string} options.workspaceId workspace identifier
+   * @param {string|null} options.workspaceId workspace identifier. Use null for the private workspace.
    * @returns a promise on save of the rule or group
    */
   async saveRuleOrGroup(ruleOrGroup, options = {}) {

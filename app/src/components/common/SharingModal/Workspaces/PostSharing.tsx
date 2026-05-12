@@ -5,16 +5,17 @@ import { getAppMode } from "store/selectors";
 import { RQButton } from "lib/design-system/components";
 import { switchWorkspace } from "actions/TeamWorkspaceActions";
 import { FaRegCopy } from "@react-icons/all-files/fa/FaRegCopy";
-import { PostShareViewData, WorkspaceSharingTypes } from "../types";
+import { PostShareViewData, SetPostShareViewData, WorkspaceSharingTypes } from "../types";
 import { trackInviteTeammatesClicked } from "modules/analytics/events/common/teams";
 import "./index.scss";
 import { toast } from "utils/Toast";
 import { isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 import WorkspaceAvatar from "features/workspaces/components/WorkspaceAvatar";
+import { Workspace, WorkspaceType } from "features/workspaces/types";
 
 interface PostSharingProps {
   postShareViewData: PostShareViewData;
-  setPostShareViewData: ({ type, targetTeamData }: PostShareViewData) => void;
+  setPostShareViewData: SetPostShareViewData;
   toggleModal: () => void;
 }
 
@@ -24,6 +25,11 @@ export const PostSharing: React.FC<PostSharingProps> = ({ postShareViewData, set
   const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
 
   const handleSwitchWorkspace = useCallback(() => {
+    if (!postShareViewData.targetTeamData) {
+      toggleModal();
+      return;
+    }
+
     switchWorkspace(
       {
         teamId: postShareViewData.targetTeamData.id,
@@ -74,8 +80,14 @@ export const PostSharing: React.FC<PostSharingProps> = ({ postShareViewData, set
         ctaText: "Switch to the workspace",
         action: handleSwitchWorkspace,
       },
+      [WorkspaceSharingTypes.PRIVATE_WORKSPACE]: {
+        header: <WorkspaceSharingInfoHeader postShareViewData={postShareViewData} />,
+        message: "Selected rules have been copied to your Private Workspace",
+        ctaText: "Done",
+        action: toggleModal,
+      },
     };
-  }, [handleSwitchWorkspace, setPostShareViewData, postShareViewData]);
+  }, [handleSwitchWorkspace, setPostShareViewData, postShareViewData, toggleModal]);
 
   return (
     <div className="post-sharing-wrapper">
@@ -94,17 +106,23 @@ export const PostSharing: React.FC<PostSharingProps> = ({ postShareViewData, set
 
 const WorkspaceSharingInfoHeader: React.FC<{ postShareViewData: PostShareViewData }> = ({ postShareViewData }) => {
   const { targetTeamData, sourceTeamData } = postShareViewData;
+  const sourceWorkspaceData = sourceTeamData ?? undefined;
+  const targetWorkspaceData: Workspace = targetTeamData ?? {
+    id: null,
+    name: "Private Workspace",
+    workspaceType: WorkspaceType.PERSONAL,
+  };
 
   return (
     <div className="items-center workspace-sharing-flow-cta">
       <div className="sharing-flow-cta-workspace-avatar">
-        <WorkspaceAvatar workspace={sourceTeamData} />
-        <div className="mt-8">{sourceTeamData?.name}</div>
+        <WorkspaceAvatar workspace={sourceWorkspaceData} />
+        <div className="mt-8">{sourceWorkspaceData?.name}</div>
       </div>
       <FaRegCopy className="header text-gray" />
       <div className="sharing-flow-cta-workspace-avatar">
-        <WorkspaceAvatar workspace={targetTeamData} />
-        <div className="mt-8">{targetTeamData?.name}</div>
+        <WorkspaceAvatar workspace={targetWorkspaceData} />
+        <div className="mt-8">{targetWorkspaceData.name}</div>
       </div>
     </div>
   );
