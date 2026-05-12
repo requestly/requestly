@@ -117,12 +117,7 @@ const TopLevelDropZone: React.FC<TopLevelDropZoneProps> = ({
     [dropWorkspaceId, isReadOnly, onDropToTopLevel]
   );
 
-  const className = [
-    "top-level-drop-zone",
-    `top-level-drop-zone--${position}`,
-    canDrop ? "available" : "",
-    isOver && canDrop ? "active" : "",
-  ]
+  const className = ["top-level-drop-zone", canDrop ? "available" : "", isOver && canDrop ? "active" : ""]
     .filter(Boolean)
     .join(" ");
 
