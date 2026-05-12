@@ -1,7 +1,16 @@
+
 .web-traffic-table-container {
   height: 100%;
   table {
     tbody {
+      tr {
+        cursor: pointer;
+      }
+
+      td {
+        cursor: inherit;
+      }
+
       tr[aria-selected="true"] {
         .graphql-operation-name {
           color: var(--requestly-color-text-default);
