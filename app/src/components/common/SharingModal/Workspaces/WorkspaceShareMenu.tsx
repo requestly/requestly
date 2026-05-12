@@ -5,9 +5,10 @@ import { RQButton } from "lib/design-system/components";
 import { MdOutlineKeyboardArrowDown } from "@react-icons/all-files/md/MdOutlineKeyboardArrowDown";
 import type { MenuProps } from "antd";
 import { trackShareModalWorkspaceDropdownClicked } from "modules/analytics/events/misc/sharing";
-import { getActiveWorkspace, getAllWorkspaces } from "store/slices/workspaces/selectors";
+import { dummyPersonalWorkspace, getActiveWorkspace, getAllWorkspaces } from "store/slices/workspaces/selectors";
 import { Workspace } from "features/workspaces/types";
 import WorkspaceAvatar from "features/workspaces/components/WorkspaceAvatar";
+import { isPersonalWorkspace } from "features/workspaces/utils";
 
 interface Props {
   /**
@@ -16,6 +17,7 @@ interface Props {
   defaultActiveWorkspaces?: number;
   onTransferClick: (teamData: Workspace) => void;
   isLoading: boolean;
+  includePrivateWorkspace?: boolean;
 }
 
 interface WorkspaceItemProps {
@@ -26,11 +28,20 @@ interface WorkspaceItemProps {
   isLoading?: boolean;
 }
 
-export const WorkspaceShareMenu: React.FC<Props> = ({ onTransferClick, isLoading, defaultActiveWorkspaces = 0 }) => {
+export const WorkspaceShareMenu: React.FC<Props> = ({
+  onTransferClick,
+  isLoading,
+  defaultActiveWorkspaces = 0,
+  includePrivateWorkspace = false,
+}) => {
   const availableWorkspaces = useSelector(getAllWorkspaces);
   const activeWorkspace = useSelector(getActiveWorkspace);
 
-  const filteredAvailableWorkspaces = availableWorkspaces.filter((workspace) => !workspace.browserstackDetails); // Filtering our Browserstack Workspaces)
+  const filteredAvailableWorkspaces = useMemo(() => {
+    const nonBrowserStackWorkspaces = availableWorkspaces.filter((workspace) => !workspace.browserstackDetails);
+
+    return includePrivateWorkspace ? [...nonBrowserStackWorkspaces, dummyPersonalWorkspace] : nonBrowserStackWorkspaces;
+  }, [availableWorkspaces, includePrivateWorkspace]); // Filtering our Browserstack Workspaces)
 
   const sortedTeams: Workspace[] = useMemo(
     () =>
@@ -124,6 +135,10 @@ const WorkspaceItem: React.FC<WorkspaceItemProps> = ({
   showArrow = false,
   isLoading = false,
 }) => {
+  const description = isPersonalWorkspace(workspace)
+    ? "Not shared with anyone"
+    : `${workspace.accessCount ?? 0} ${(workspace.accessCount ?? 0) !== 1 ? "members" : "member"}`;
+
   return (
     <div
       className={`workspace-share-menu-item-card ${
@@ -134,9 +149,7 @@ const WorkspaceItem: React.FC<WorkspaceItemProps> = ({
         <WorkspaceAvatar workspace={workspace} size={35} />
         <span className="workspace-card-description">
           <div className="text-white">{workspace.name}</div>
-          <div className="text-gray">
-            {workspace.accessCount ?? 0} {(workspace.accessCount ?? 0) !== 1 ? "members" : "member"}
-          </div>
+          <div className="text-gray">{description}</div>
         </span>
       </Row>
       {showArrow ? (
