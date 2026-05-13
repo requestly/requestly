@@ -43,7 +43,6 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
             <RQButton
               size="small"
               type="transparent"
-              title={dockTooltipTitle}
               onClick={() => toggleSheetPlacement()}
               className="bottom-sheet-toggle-btn"
               icon={isSheetPlacedAtBottom ? <BiDockRight /> : <BiDockBottom />}
@@ -89,7 +88,6 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
         <RQButton
           size="small"
           type="transparent"
-          title={dockTooltipTitle}
           onClick={() => toggleSheetPlacement()}
           className="bottom-sheet-toggle-btn"
           icon={isSheetPlacedAtBottom ? <BiDockRight /> : <BiDockBottom />}

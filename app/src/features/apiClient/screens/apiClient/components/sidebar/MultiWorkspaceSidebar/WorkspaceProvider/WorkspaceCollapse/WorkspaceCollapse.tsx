@@ -158,7 +158,6 @@ export const WorkspaceCollapse: React.FC<WorkspaceCollapseProps> = ({
                               size="small"
                               type="transparent"
                               icon={<MdAdd />}
-                              title="New environment"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 onNewClickV2({
@@ -190,7 +189,6 @@ export const WorkspaceCollapse: React.FC<WorkspaceCollapseProps> = ({
                                 size="small"
                                 type="transparent"
                                 icon={<MdAdd />}
-                                title="New request or collection"
                                 onClick={(e) => e.stopPropagation()}
                               />
                             </Tooltip>
@@ -213,7 +211,6 @@ export const WorkspaceCollapse: React.FC<WorkspaceCollapseProps> = ({
                           size="small"
                           type="transparent"
                           icon={<MdOutlineMoreHoriz />}
-                          title="More actions"
                         />
                       </Tooltip>
                     </Dropdown>

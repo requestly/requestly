@@ -60,7 +60,6 @@ export const SidebarListHeader: React.FC<ListHeaderProps> = ({
               size="small"
               type="transparent"
               icon={<MdAdd />}
-              title="New environment"
               className="sidebar-list-header-button"
               onClick={() => {
                 onNewRecordClick("api_client_sidebar_header", RQAPI.RecordType.ENVIRONMENT);
@@ -77,13 +76,7 @@ export const SidebarListHeader: React.FC<ListHeaderProps> = ({
             }}
           >
             <Tooltip title="New request or collection" color="#000" placement="top">
-              <RQButton
-                size="small"
-                type="transparent"
-                icon={<MdAdd />}
-                title="New request or collection"
-                className="sidebar-list-header-button"
-              />
+              <RQButton size="small" type="transparent" icon={<MdAdd />} className="sidebar-list-header-button" />
             </Tooltip>
           </NewApiRecordDropdown>
         )

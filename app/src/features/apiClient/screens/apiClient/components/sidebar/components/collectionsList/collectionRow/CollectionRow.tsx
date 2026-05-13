@@ -498,7 +498,6 @@ export const CollectionRow: React.FC<Props> = ({
                           size="small"
                           type="transparent"
                           icon={<MdAdd />}
-                          title="New request or collection"
                           onClick={(e) => e.stopPropagation()}
                         />
                       </Tooltip>
@@ -518,7 +517,6 @@ export const CollectionRow: React.FC<Props> = ({
                           size="small"
                           type="transparent"
                           icon={<MdOutlineMoreHoriz />}
-                          title="More actions"
                         />
                       </Tooltip>
                     </Dropdown>

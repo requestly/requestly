@@ -283,7 +283,6 @@ export const ExampleRow: React.FC<Props> = ({ record, isReadOnly, handleRecordsT
                   size="small"
                   type="transparent"
                   icon={<MdOutlineMoreHoriz />}
-                  title="More actions"
                 />
               </Tooltip>
             </Dropdown>
