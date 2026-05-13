@@ -26,6 +26,40 @@ import "./RequestSourceRow.css";
 
 const { Text } = Typography;
 
+const FILTER_KEYS_TO_IGNORE_IN_COUNT = [GLOBAL_CONSTANTS.RULE_SOURCE_FILTER_TYPES.PAGE_URL];
+
+const hasNonEmptyFilterValue = (filterKey, filterValue) => {
+  if (Array.isArray(filterValue)) {
+    return filterValue.some((value) => hasNonEmptyFilterValue(filterKey, value));
+  }
+
+  if (filterKey === GLOBAL_CONSTANTS.RULE_SOURCE_FILTER_TYPES.REQUEST_DATA) {
+    return !!filterValue?.key?.trim?.() && !!filterValue?.value?.trim?.();
+  }
+
+  if (filterValue && typeof filterValue === "object") {
+    return Object.entries(filterValue).some(([key, value]) => {
+      if (key === "operator") {
+        return false;
+      }
+
+      return hasNonEmptyFilterValue(key, value);
+    });
+  }
+
+  if (typeof filterValue === "string") {
+    return filterValue.trim().length > 0;
+  }
+
+  return filterValue !== null && filterValue !== undefined && filterValue !== false;
+};
+
+const getAppliedFiltersCount = (sourceFilters) => {
+  return Object.entries(sourceFilters || {}).filter(([key, value]) => {
+    return !FILTER_KEYS_TO_IGNORE_IN_COUNT.includes(key) && hasNonEmptyFilterValue(key, value);
+  }).length;
+};
+
 const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabled }) => {
   const dispatch = useDispatch();
   const location = useLocation();
@@ -71,13 +105,11 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisab
   const getFilterCount = useCallback(
     (pairIndex) => {
       const copyOfCurrentlySelectedRule = JSON.parse(JSON.stringify(currentlySelectedRuleData));
-      return isSourceFilterFormatUpgraded(pairIndex, copyOfCurrentlySelectedRule)
-        ? Object.keys(currentlySelectedRuleData.pairs[pairIndex].source.filters[0] || {}).filter(
-            (key) => key !== GLOBAL_CONSTANTS.RULE_SOURCE_FILTER_TYPES.PAGE_URL
-          ).length
-        : Object.keys(currentlySelectedRuleData.pairs[pairIndex].source.filters || {}).filter(
-            (key) => key !== GLOBAL_CONSTANTS.RULE_SOURCE_FILTER_TYPES.PAGE_URL
-          ).length;
+      const sourceFilters = isSourceFilterFormatUpgraded(pairIndex, copyOfCurrentlySelectedRule)
+        ? currentlySelectedRuleData.pairs[pairIndex].source.filters[0]
+        : currentlySelectedRuleData.pairs[pairIndex].source.filters;
+
+      return getAppliedFiltersCount(sourceFilters);
     },
     [currentlySelectedRuleData, isSourceFilterFormatUpgraded]
   );
