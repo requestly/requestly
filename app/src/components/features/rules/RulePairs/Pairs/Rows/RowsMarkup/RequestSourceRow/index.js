@@ -28,7 +28,7 @@ const { Text } = Typography;
 
 const hasAppliedFilterValue = (value) => {
   if (Array.isArray(value)) {
-    return value.length > 0;
+    return value.some(hasAppliedFilterValue);
   }
 
   if (value && typeof value === "object") {
