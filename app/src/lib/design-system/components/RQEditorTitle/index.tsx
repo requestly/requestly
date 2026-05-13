@@ -128,34 +128,32 @@ export const RQEditorTitle: React.FC<TitleProps> = ({
               <div className="editor-description">
                 <Typography.Paragraph
                   disabled={disabled}
-                  style={{ width: "100%" }}
+                  style={{ flex: 1, minWidth: 0 }}
                   ellipsis={{
                     rows: 3,
                   }}
-                  editable={{
-                    icon:
-                      description.length > 0 ? (
-                        <RQButton
-                          disabled={disabled}
-                          onClick={() => {
-                            setIsDescriptionEditable(true);
-                          }}
-                          className="edit-description-btn"
-                          type="text"
-                        >
-                          Edit description
-                        </RQButton>
-                      ) : (
-                        <></>
-                      ),
-                    tooltip: false,
-                  }}
                   onClick={() => {
+                    if (disabled) {
+                      return;
+                    }
+
                     setIsDescriptionEditable(true);
                   }}
                 >
                   <span>{description ? description : descriptionPlaceholder}</span>
                 </Typography.Paragraph>
+                {description.length > 0 ? (
+                  <RQButton
+                    disabled={disabled}
+                    onClick={() => {
+                      setIsDescriptionEditable(true);
+                    }}
+                    className="edit-description-btn"
+                    type="text"
+                  >
+                    Edit description
+                  </RQButton>
+                ) : null}
               </div>
             )}
           </Row>
