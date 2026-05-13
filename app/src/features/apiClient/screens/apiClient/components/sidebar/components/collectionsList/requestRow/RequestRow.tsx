@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useRef, useState } from "react";
-import { Typography, Dropdown, MenuProps, Checkbox, notification } from "antd";
+import { Typography, Dropdown, MenuProps, Checkbox, Tooltip, notification } from "antd";
 import { REQUEST_METHOD_BACKGROUND_COLORS, REQUEST_METHOD_COLORS } from "../../../../../../../../../constants";
 import { RequestMethod, RQAPI } from "features/apiClient/types";
 import { RQButton } from "lib/design-system-v2/components";
@@ -500,15 +500,18 @@ export const RequestRow: React.FC<Props> = ({
             open={isDropdownVisible}
             onOpenChange={handleDropdownVisibleChange}
           >
-            <RQButton
-              onClick={(e) => {
-                e.stopPropagation();
-                setShowSelection(false);
-              }}
-              size="small"
-              type="transparent"
-              icon={<MdOutlineMoreHoriz />}
-            />
+            <Tooltip title="More actions" color="#000" placement="top">
+              <RQButton
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowSelection(false);
+                }}
+                size="small"
+                type="transparent"
+                icon={<MdOutlineMoreHoriz />}
+                title="More actions"
+              />
+            </Tooltip>
           </Dropdown>
         </div>
       </Conditional>
