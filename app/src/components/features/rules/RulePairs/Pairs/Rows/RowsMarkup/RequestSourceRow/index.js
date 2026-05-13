@@ -30,7 +30,9 @@ const IGNORED_FILTER_BADGE_KEYS = new Set([GLOBAL_CONSTANTS.RULE_SOURCE_FILTER_T
 
 const hasAppliedFilterValue = (key, value) => {
   if (key === GLOBAL_CONSTANTS.RULE_SOURCE_FILTER_TYPES.REQUEST_DATA) {
-    return Boolean(value?.key || value?.value);
+    const payloadKey = typeof value?.key === "string" ? value.key.trim() : value?.key;
+    const payloadValue = typeof value?.value === "string" ? value.value.trim() : value?.value;
+    return Boolean(payloadKey || payloadValue);
   }
 
   if (Array.isArray(value)) {
