@@ -155,11 +155,11 @@ export const WorkspaceCollapse: React.FC<WorkspaceCollapseProps> = ({
                         {type === ApiClientSidebarTabKey.ENVIRONMENTS ? (
                           <Tooltip title="New environment" color="#000" placement="top">
                             <RQButton
-                              size="small"
-                              type="transparent"
-                              icon={<MdAdd />}
-                              aria-label="Add environment"
-                              onClick={(e) => {
+	                              size="small"
+	                              type="transparent"
+	                              icon={<MdAdd />}
+	                              aria-label="New environment"
+	                              onClick={(e) => {
                                 e.stopPropagation();
                                 onNewClickV2({
                                   contextId: workspaceId,
@@ -187,11 +187,11 @@ export const WorkspaceCollapse: React.FC<WorkspaceCollapseProps> = ({
                           >
                             <Tooltip title="New request or collection" color="#000" placement="top">
                               <RQButton
-                                size="small"
-                                type="transparent"
-                                icon={<MdAdd />}
-                                aria-label="Add request or collection"
-                                onClick={(e) => e.stopPropagation()}
+	                                size="small"
+	                                type="transparent"
+	                                icon={<MdAdd />}
+	                                aria-label="New request or collection"
+	                                onClick={(e) => e.stopPropagation()}
                               />
                             </Tooltip>
                           </NewApiRecordDropdown>
@@ -210,11 +210,11 @@ export const WorkspaceCollapse: React.FC<WorkspaceCollapseProps> = ({
                           onClick={(e) => {
                             e.stopPropagation();
                           }}
-                          size="small"
-                          type="transparent"
-                          icon={<MdOutlineMoreHoriz />}
-                          aria-label="More actions"
-                        />
+	                          size="small"
+	                          type="transparent"
+	                          icon={<MdOutlineMoreHoriz />}
+	                          aria-label="More actions"
+	                        />
                       </Tooltip>
                     </Dropdown>
                   </div>
