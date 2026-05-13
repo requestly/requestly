@@ -9,6 +9,8 @@ import { dummyPersonalWorkspace, getActiveWorkspace, getAllWorkspaces } from "st
 import { Workspace } from "features/workspaces/types";
 import WorkspaceAvatar from "features/workspaces/components/WorkspaceAvatar";
 
+const PRIVATE_WORKSPACE_KEY = "private_workspace";
+
 interface Props {
   /**
    * The default number of active workspaces to display before dropdown menu.
@@ -56,7 +58,7 @@ export const WorkspaceShareMenu: React.FC<Props> = ({ onTransferClick, isLoading
       .map((team: Workspace, index: number) => {
         if (!defaultActiveWorkspaces && team?.id === activeWorkspace?.id) return null;
         return {
-          key: team.id ?? "private_workspace",
+          key: team.id ?? PRIVATE_WORKSPACE_KEY,
           label: <WorkspaceItem isLoading={isLoading} onTransferClick={onTransferClick} workspace={team} />,
         };
       })
@@ -93,7 +95,7 @@ export const WorkspaceShareMenu: React.FC<Props> = ({ onTransferClick, isLoading
                 isLoading={isLoading}
                 workspace={team}
                 onTransferClick={onTransferClick}
-                key={team.id ?? "private_workspace"}
+                key={team.id ?? PRIVATE_WORKSPACE_KEY}
               />
             ))}
           </div>
