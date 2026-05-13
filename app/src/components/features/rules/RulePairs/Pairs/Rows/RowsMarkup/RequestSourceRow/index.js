@@ -26,6 +26,34 @@ import "./RequestSourceRow.css";
 
 const { Text } = Typography;
 
+const IGNORED_FILTER_BADGE_KEYS = new Set([GLOBAL_CONSTANTS.RULE_SOURCE_FILTER_TYPES.PAGE_URL]);
+
+const hasAppliedFilterValue = (key, value) => {
+  if (key === GLOBAL_CONSTANTS.RULE_SOURCE_FILTER_TYPES.REQUEST_DATA) {
+    return Boolean(value?.key || value?.value);
+  }
+
+  if (Array.isArray(value)) {
+    return value.length > 0;
+  }
+
+  if (typeof value === "string") {
+    return value.trim().length > 0;
+  }
+
+  if (value && typeof value === "object") {
+    return Object.entries(value).some(([nestedKey, nestedValue]) => hasAppliedFilterValue(nestedKey, nestedValue));
+  }
+
+  return Boolean(value);
+};
+
+const getAppliedFilterCount = (filters = {}) => {
+  return Object.entries(filters || {}).filter(([key, value]) => {
+    return !IGNORED_FILTER_BADGE_KEYS.has(key) && hasAppliedFilterValue(key, value);
+  }).length;
+};
+
 const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabled }) => {
   const dispatch = useDispatch();
   const location = useLocation();
@@ -72,12 +100,8 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisab
     (pairIndex) => {
       const copyOfCurrentlySelectedRule = JSON.parse(JSON.stringify(currentlySelectedRuleData));
       return isSourceFilterFormatUpgraded(pairIndex, copyOfCurrentlySelectedRule)
-        ? Object.keys(currentlySelectedRuleData.pairs[pairIndex].source.filters[0] || {}).filter(
-            (key) => key !== GLOBAL_CONSTANTS.RULE_SOURCE_FILTER_TYPES.PAGE_URL
-          ).length
-        : Object.keys(currentlySelectedRuleData.pairs[pairIndex].source.filters || {}).filter(
-            (key) => key !== GLOBAL_CONSTANTS.RULE_SOURCE_FILTER_TYPES.PAGE_URL
-          ).length;
+        ? getAppliedFilterCount(currentlySelectedRuleData.pairs[pairIndex].source.filters[0])
+        : getAppliedFilterCount(currentlySelectedRuleData.pairs[pairIndex].source.filters);
     },
     [currentlySelectedRuleData, isSourceFilterFormatUpgraded]
   );
