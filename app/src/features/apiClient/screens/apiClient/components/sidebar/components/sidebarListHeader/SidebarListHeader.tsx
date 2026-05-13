@@ -41,13 +41,13 @@ export const SidebarListHeader: React.FC<ListHeaderProps> = ({
       {showMultiSelect && (
         <div className="multi-select-option">
           <Tooltip title={"Select items"}>
-            <RQButton
-              aria-label="Select items"
-              size="small"
-              type="transparent"
-              icon={<BiSelectMultiple />}
-              onClick={toggleMultiSelect}
-            />
+	            <RQButton
+	              size="small"
+	              type="transparent"
+	              icon={<BiSelectMultiple />}
+	              aria-label="Select items"
+	              onClick={toggleMultiSelect}
+	            />
           </Tooltip>
         </div>
       )}
@@ -64,11 +64,11 @@ export const SidebarListHeader: React.FC<ListHeaderProps> = ({
           <Tooltip title="New environment" color="#000" placement="top">
             <RQButton
               size="small"
-              type="transparent"
-              icon={<MdAdd />}
-              aria-label="Add environment"
-              className="sidebar-list-header-button"
-              onClick={() => {
+	              type="transparent"
+	              icon={<MdAdd />}
+	              className="sidebar-list-header-button"
+	              aria-label="New environment"
+	              onClick={() => {
                 onNewRecordClick("api_client_sidebar_header", RQAPI.RecordType.ENVIRONMENT);
               }}
             />
@@ -83,13 +83,13 @@ export const SidebarListHeader: React.FC<ListHeaderProps> = ({
             }}
           >
             <Tooltip title="New request or collection" color="#000" placement="top">
-              <RQButton
-                size="small"
-                type="transparent"
-                icon={<MdAdd />}
-                aria-label="Add request or collection"
-                className="sidebar-list-header-button"
-              />
+	              <RQButton
+	                size="small"
+	                type="transparent"
+	                icon={<MdAdd />}
+	                className="sidebar-list-header-button"
+	                aria-label="New request or collection"
+	              />
             </Tooltip>
           </NewApiRecordDropdown>
         )
