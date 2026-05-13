@@ -92,6 +92,7 @@
   max-width: 600px;
 }
 .editor-description .edit-description-btn {
+  flex-shrink: 0;
   padding: 0;
   color: var(--text-gray);
   transition: 0.2s ease-in-out;
