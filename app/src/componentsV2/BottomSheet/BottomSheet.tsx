@@ -82,7 +82,7 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
         />
       </div>
     ),
-    right: (
+    right: disableDocking ? null : (
       <RQTooltip title={isSheetPlacedAtBottom ? "Dock to right" : "Dock to bottom"} placement="top">
         <RQButton
           size="small"

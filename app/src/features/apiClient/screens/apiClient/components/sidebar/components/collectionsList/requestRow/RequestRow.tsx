@@ -648,15 +648,17 @@ export const RequestRow: React.FC<Props> = ({
                   open={isDropdownVisible}
                   onOpenChange={handleDropdownVisibleChange}
                 >
-                  <RQButton
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setShowSelection(false);
-                    }}
-                    size="small"
-                    type="transparent"
-                    icon={<MdOutlineMoreHoriz />}
-                  />
+                  <RQTooltip title="More actions" placement="top">
+                    <RQButton
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowSelection(false);
+                      }}
+                      size="small"
+                      type="transparent"
+                      icon={<MdOutlineMoreHoriz />}
+                    />
+                  </RQTooltip>
                 </Dropdown>
               </div>
             </Conditional>
