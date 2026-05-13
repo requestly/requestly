@@ -41,7 +41,13 @@ export const SidebarListHeader: React.FC<ListHeaderProps> = ({
       {showMultiSelect && (
         <div className="multi-select-option">
           <Tooltip title={"Select items"}>
-            <RQButton size="small" type="transparent" icon={<BiSelectMultiple />} onClick={toggleMultiSelect} />
+            <RQButton
+              aria-label="Select items"
+              size="small"
+              type="transparent"
+              icon={<BiSelectMultiple />}
+              onClick={toggleMultiSelect}
+            />
           </Tooltip>
         </div>
       )}
@@ -60,6 +66,7 @@ export const SidebarListHeader: React.FC<ListHeaderProps> = ({
               size="small"
               type="transparent"
               icon={<MdAdd />}
+              aria-label="Add environment"
               className="sidebar-list-header-button"
               onClick={() => {
                 onNewRecordClick("api_client_sidebar_header", RQAPI.RecordType.ENVIRONMENT);
@@ -76,7 +83,13 @@ export const SidebarListHeader: React.FC<ListHeaderProps> = ({
             }}
           >
             <Tooltip title="New request or collection" color="#000" placement="top">
-              <RQButton size="small" type="transparent" icon={<MdAdd />} className="sidebar-list-header-button" />
+              <RQButton
+                size="small"
+                type="transparent"
+                icon={<MdAdd />}
+                aria-label="Add request or collection"
+                className="sidebar-list-header-button"
+              />
             </Tooltip>
           </NewApiRecordDropdown>
         )
