@@ -44,7 +44,7 @@
     "@types/uuid": "^9.0.1",
     "archiver": "^5.3.1",
     "postcss": "^8.4.30",
-    "rollup": "^2.79.1",
+    "rollup": "^2.80.0",
     "rollup-plugin-copy": "^3.4.0",
     "rollup-plugin-postcss": "^4.0.2",
     "rollup-plugin-svg": "^2.0.0",
