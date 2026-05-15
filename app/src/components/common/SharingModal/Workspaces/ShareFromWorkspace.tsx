@@ -82,9 +82,9 @@ export const ShareFromWorkspace: React.FC<Props> = ({
   const handleTransferToOtherWorkspace = useCallback(
     (teamData: Workspace) => {
       setIsLoading(true);
-      duplicateRulesToTargetWorkspace(appMode, teamData.id!, selectedRules).then(() => {
+      duplicateRulesToTargetWorkspace(appMode, teamData.id, selectedRules).then(() => {
         setIsLoading(false);
-        trackSharingModalRulesDuplicated("team", selectedRules.length);
+        trackSharingModalRulesDuplicated(teamData.id === null ? "personal" : "team", selectedRules.length);
         setPostShareViewData({
           type: WorkspaceSharingTypes.EXISTING_WORKSPACE,
           targetTeamData: teamData,
@@ -99,7 +99,11 @@ export const ShareFromWorkspace: React.FC<Props> = ({
 
   return (
     <>
-      <WorkspaceShareMenu onTransferClick={handleTransferToOtherWorkspace} isLoading={isLoading} />
+      <WorkspaceShareMenu
+        onTransferClick={handleTransferToOtherWorkspace}
+        isLoading={isLoading}
+        includePrivateWorkspace
+      />
       <div className="subheader mt-1">Share with Teammates</div>
       <div className="mt-8 text-gray">Collaborate in real-time with your teammates within a shared workspace.</div>
       <div className="mt-1">
