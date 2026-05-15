@@ -15,6 +15,7 @@ import {
 } from "features/apiClient/slices";
 import { WorkspaceType } from "features/workspaces/types";
 import { HiOutlineDocument } from "@react-icons/all-files/hi/HiOutlineDocument";
+import { buildParentCollectionBreadcrumbs } from "./apiClientBreadcrumbUtils.mjs";
 import "./ApiClientBreadCrumb.scss";
 
 interface Props {
@@ -53,16 +54,22 @@ export const MultiViewBreadCrumb: React.FC<Props> = ({ ...props }) => {
 
   const truncatePath = truncateString(localWsPath, 40);
 
-  const parentCollectionNames = useMemo(() => {
-    return ancestorRecords
-      .slice()
-      .reverse()
-      .map((record) => ({
-        label: record?.name,
-        pathname: "",
-        isEditable: false,
-      }));
+  const parentCollectionBreadcrumbs = useMemo(() => {
+    return buildParentCollectionBreadcrumbs(ancestorRecords, PATHS.API_CLIENT.INDEX);
   }, [ancestorRecords]);
+
+  const workspaceBreadcrumbLabel = localWsPath ? (
+    <div>
+      <Tooltip trigger="hover" title={localWsPath} color="var(--requestly-color-black)" placement="bottom">
+        <span className="api-client-local-workspace-path-breadcrumb">
+          <LuFolderCog className="api-client-local-workspace-icon" />
+          {truncatePath}
+        </span>
+      </Tooltip>
+    </div>
+  ) : (
+    "API Client"
+  );
 
   return (
     <RQBreadcrumb
@@ -73,22 +80,11 @@ export const MultiViewBreadCrumb: React.FC<Props> = ({ ...props }) => {
       autoFocus={autoFocus}
       defaultBreadcrumbs={[
         {
-          label: (
-            <Conditional condition={!!truncatePath}>
-              <div>
-                <Tooltip trigger="hover" title={localWsPath} color="var(--requestly-color-black)" placement="bottom">
-                  <span className="api-client-local-workspace-path-breadcrumb">
-                    <LuFolderCog className="api-client-local-workspace-icon" />
-                    {truncatePath}
-                  </span>
-                </Tooltip>
-              </div>
-            </Conditional>
-          ),
+          label: workspaceBreadcrumbLabel,
           pathname: PATHS.API_CLIENT.INDEX,
           isEditable: false,
         },
-        ...parentCollectionNames,
+        ...parentCollectionBreadcrumbs,
         {
           isEditable: breadCrumbType === BreadcrumbType.API_REQUEST ? !isHistoryPath : true,
           pathname: window.location.pathname,
