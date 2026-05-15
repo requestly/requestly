@@ -48,12 +48,14 @@ const FileDropdown: React.FC<FileDropdownProps> = ({ onAddMoreFiles, onDeleteFil
             </div>
             <div className="file-details">
               <span className="file-size">{formatBytes(file.size)}</span>
-              <RQButton
-                className="file-dropdown-remove-button"
-                icon={<RiDeleteBinLine />}
-                size="small"
-                onClick={() => onDeleteFile(file.id)}
-              />
+              <RQTooltip title="Delete" placement="top">
+                <RQButton
+                  className="file-dropdown-remove-button"
+                  icon={<RiDeleteBinLine />}
+                  size="small"
+                  onClick={() => onDeleteFile(file.id)}
+                />
+              </RQTooltip>
             </div>
           </div>
         ))}
