@@ -273,13 +273,16 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
         <div onClick={(e) => e.stopPropagation()}>
           {!isGlobalEnvironment(environment.id) ? (
             <Dropdown menu={{ items: menuItems }} trigger={["click"]} placement="bottomRight">
-              <RQButton
-                size="small"
-                type="transparent"
-                icon={<MdOutlineMoreHoriz />}
-                className="environment-list-item-dropdown-button"
-                onClick={(e) => e.stopPropagation()}
-              />
+              <Tooltip title="More actions">
+                <RQButton
+                  size="small"
+                  type="transparent"
+                  icon={<MdOutlineMoreHoriz />}
+                  aria-label="More actions"
+                  className="environment-list-item-dropdown-button"
+                  onClick={(e) => e.stopPropagation()}
+                />
+              </Tooltip>
             </Dropdown>
           ) : null}
         </div>

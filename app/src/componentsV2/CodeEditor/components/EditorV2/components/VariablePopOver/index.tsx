@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useMemo } from "react";
-import { Popover } from "antd";
+import { Popover, Tooltip } from "antd";
 import { EnvironmentVariableType, VariableScope } from "backend/environment/types";
 import type { VariableValueType } from "backend/environment/types";
 import { capitalize } from "lodash";
@@ -315,16 +315,18 @@ const VariableInfo: React.FC<{
         <span>{getScopeIcon(source.scope)}</span>
         <span className="variable-header-info-separator" />
         <div className="variable-info-header-name">{source.name}</div>
-        <RQButton
-          type="transparent"
-          size="small"
-          icon={<MdEdit className="edit-icon" />}
-          onClick={onEditClick}
-          className="edit-variable-btn"
-          hidden={!isValidPermission}
-        >
-          Edit
-        </RQButton>
+        <Tooltip title="Edit">
+          <RQButton
+            type="transparent"
+            size="small"
+            icon={<MdEdit className="edit-icon" />}
+            onClick={onEditClick}
+            className="edit-variable-btn"
+            hidden={!isValidPermission}
+          >
+            Edit
+          </RQButton>
+        </Tooltip>
       </div>
 
       <div className="variable-info-content-container">
