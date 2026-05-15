@@ -1,8 +1,10 @@
 import React, { ReactNode, useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import type { MenuProps } from "antd";
 import { Dropdown } from "antd";
 import { copyToClipBoard } from "../../../../../../../../utils/Misc";
+import PATHS from "config/constants/sub/paths";
 import { globalActions } from "store/slices/global/slice";
 import { getIsTrafficTableTourCompleted } from "store/selectors";
 import { trackRuleCreationWorkflowStartedEvent } from "modules/analytics/events/common/rules";
@@ -22,6 +24,7 @@ import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/syn
 import { LocalWorkspaceTooltip } from "features/apiClient/screens/apiClient/components/views/components/LocalWorkspaceTooltip/LocalWorkspaceTooltip";
 import { TOUR_TYPES } from "components/misc/ProductWalkthrough/types";
 import { RQNetworkLog } from "../../../TrafficExporter/harLogs/types";
+import { getApiClientCurlImportState } from "./apiClientCurlImportState.mjs";
 
 interface ContextMenuProps {
   log: RQNetworkLog;
@@ -31,6 +34,7 @@ interface ContextMenuProps {
 
 export const ContextMenu: React.FC<ContextMenuProps> = ({ children, log, onReplayRequest }) => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const isTrafficTableTourCompleted = useSelector(getIsTrafficTableTourCompleted);
   const selectedRequestResponse = useSelector(getLogResponseById(log?.id)) || log?.response?.body;
   const isLocalSyncEnabled = useCheckLocalSyncSupport();
@@ -150,15 +154,33 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({ children, log, onRepla
     ];
 
     if (isFeatureCompatible(FEATURES.API_CLIENT)) {
-      menuItems.splice(2, 0, {
-        key: "replay_request",
-        label: "Edit and Replay",
-        onClick: () => {
-          trackTrafficTableDropdownClicked("replay_request");
-          trackRQDesktopLastActivity(TRAFFIC_TABLE.TRAFFIC_TABLE_REQUEST_DROPDOWN_CLICKED);
-          onReplayRequest();
+      const apiClientMenuItems: MenuProps["items"] = [
+        {
+          key: "replay_request",
+          label: "Edit and Replay",
+          onClick: () => {
+            trackTrafficTableDropdownClicked("replay_request");
+            trackRQDesktopLastActivity(TRAFFIC_TABLE.TRAFFIC_TABLE_REQUEST_DROPDOWN_CLICKED);
+            onReplayRequest();
+          },
         },
-      });
+      ];
+
+      if (log.requestShellCurl) {
+        apiClientMenuItems.unshift({
+          key: "save_to_api_collection",
+          label: "Save to API Collection",
+          onClick: () => {
+            trackTrafficTableDropdownClicked("save_to_api_collection");
+            trackRQDesktopLastActivity(TRAFFIC_TABLE.TRAFFIC_TABLE_REQUEST_DROPDOWN_CLICKED);
+            navigate(PATHS.API_CLIENT.ABSOLUTE, {
+              state: getApiClientCurlImportState(log),
+            });
+          },
+        });
+      }
+
+      menuItems.splice(2, 0, ...apiClientMenuItems);
     }
 
     if (!log.requestShellCurl) {
@@ -166,7 +188,7 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({ children, log, onRepla
     }
 
     return menuItems;
-  }, [log, onReplayRequest, handleOnClick, isLocalSyncEnabled]);
+  }, [log, onReplayRequest, handleOnClick, isLocalSyncEnabled, navigate]);
 
   const handleDropdownOpenChange = (open: boolean) => {
     if (open) {

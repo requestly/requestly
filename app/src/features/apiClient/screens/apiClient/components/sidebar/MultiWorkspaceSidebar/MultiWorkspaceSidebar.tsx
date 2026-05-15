@@ -229,6 +229,9 @@ export const MultiWorkspaceSidebar: React.FC = () => {
       </div>
 
       <ImportFromCurlModal
+        initialCurlCommand={state?.curlCommand}
+        source={state?.source || ""}
+        pageURL={state?.pageURL || ""}
         isRequestLoading={isLoading}
         isOpen={isImportModalOpen}
         handleImportRequest={handleImportRequest}
