@@ -9,7 +9,7 @@ export const buildParentCollectionBreadcrumbs = (ancestorRecords, apiClientRootP
   return (ancestorRecords ?? [])
     .slice()
     .reverse()
-    .filter((record) => record?.id)
+    .filter((record) => record?.id !== undefined && record?.id !== null && record.id !== "")
     .map((record) => ({
       label: record?.name || "Untitled collection",
       pathname: getApiClientCollectionPath(apiClientRootPath, record.id),

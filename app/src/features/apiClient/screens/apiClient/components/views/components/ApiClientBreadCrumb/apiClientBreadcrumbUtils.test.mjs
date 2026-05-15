@@ -55,6 +55,16 @@ test("uses the API client collection route for collection ids", () => {
   expect(getApiClientCollectionPath("/api-client", "parent/child")).toBe("/api-client/collection/parent%2Fchild");
 });
 
+test("keeps numeric zero collection ids when building parent breadcrumbs", () => {
+  expect(buildParentCollectionBreadcrumbs([{ id: 0, name: "Root" }], "/api-client")).toEqual([
+    {
+      label: "Root",
+      pathname: "/api-client/collection/0",
+      isEditable: false,
+    },
+  ]);
+});
+
 test("normalizes trailing slashes in the API client root path", () => {
   expect(getApiClientCollectionPath("/api-client/", "collection-1")).toBe("/api-client/collection/collection-1");
 });
