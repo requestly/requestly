@@ -139,7 +139,14 @@ export const RQBreadcrumb: React.FC<Props> = ({
                     </Typography.Text>
                     {disabled || !isValidPermission ? null : (
                       <Tooltip title="Edit" placement="bottom" color="#000">
-                        <MdOutlineEdit className="edit-icon" onClick={handleRecordNameEditClick} />
+                        <button
+                          type="button"
+                          className="edit-icon-button"
+                          aria-label="Edit record name"
+                          onClick={handleRecordNameEditClick}
+                        >
+                          <MdOutlineEdit className="edit-icon" />
+                        </button>
                       </Tooltip>
                     )}
                   </div>

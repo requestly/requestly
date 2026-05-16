@@ -68,10 +68,14 @@ export const InlineInput: React.FC<Props> = ({
             </Typography.Text>
             {!disabled && (
               <Tooltip title="Edit" placement="bottom" color="#000">
-                <MdOutlineEdit
-                  className={`${textarea ? "align-self-start" : "align-self-center"}`}
+                <button
+                  type="button"
+                  className="inline-input-edit-button"
+                  aria-label="Edit"
                   onClick={() => setIsEditable(true)}
-                />
+                >
+                  <MdOutlineEdit className={`${textarea ? "align-self-start" : "align-self-center"}`} />
+                </button>
               </Tooltip>
             )}
           </div>
