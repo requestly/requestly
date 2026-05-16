@@ -21,6 +21,11 @@ test("does not count an empty upgraded source filter object", () => {
   expect(getSourceFilterCount([{}])).toBe(0);
 });
 
+test("handles missing source filters", () => {
+  expect(getSourceFilterCount(null)).toBe(0);
+  expect(getSourceFilterCount(undefined)).toBe(0);
+});
+
 test("does not count empty source filter values", () => {
   expect(
     getSourceFilterCount([
@@ -29,6 +34,18 @@ test("does not count empty source filter values", () => {
         resourceType: [],
         requestMethod: [],
         requestPayload: {},
+      },
+    ])
+  ).toBe(0);
+});
+
+test("does not count whitespace-only source filter values", () => {
+  expect(
+    getSourceFilterCount([
+      {
+        pageDomains: ["   "],
+        requestMethod: ["\t"],
+        requestPayload: { key: "\n" },
       },
     ])
   ).toBe(0);
@@ -55,6 +72,32 @@ test("counts configured source filters", () => {
       },
     ])
   ).toBe(4);
+});
+
+test("counts configured filters mixed with empty filters", () => {
+  expect(
+    getSourceFilterCount([
+      {
+        pageDomains: ["", "example.com"],
+        resourceType: [],
+        requestMethod: ["  ", "POST"],
+        requestPayload: { key: "", value: "operationName" },
+      },
+    ])
+  ).toBe(3);
+});
+
+test("counts deeply nested configured filter values only", () => {
+  expect(
+    getSourceFilterCount([
+      {
+        requestPayload: {
+          all: [{ key: "" }, { nested: { value: "userId" } }],
+        },
+        resourceType: [{ values: [] }],
+      },
+    ])
+  ).toBe(1);
 });
 
 test("counts legacy source filter objects", () => {
