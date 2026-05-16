@@ -59,7 +59,8 @@
     &:hover {
       background: var(--requestly-color-white-t-10);
       .error-file-item-actions {
-        display: flex;
+        opacity: 1;
+        pointer-events: auto;
       }
     }
 
@@ -67,7 +68,32 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      display: none;
+      opacity: 0;
+      pointer-events: none;
+
+      &:focus-within {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      .error-file-item-action-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 14px;
+        height: 14px;
+        padding: 0;
+        border: none;
+        background: transparent;
+        color: inherit;
+        cursor: pointer;
+
+        &:focus-visible {
+          outline: 1px solid var(--requestly-color-primary);
+          outline-offset: 2px;
+          border-radius: 2px;
+        }
+      }
 
       .error-file-item-action-icon {
         width: 14px;

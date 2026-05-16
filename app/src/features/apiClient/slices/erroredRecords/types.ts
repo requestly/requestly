@@ -3,4 +3,6 @@ import { ErroredRecord } from "features/apiClient/helpers/modules/sync/local/ser
 export interface ErroredRecordsState {
   apiErroredRecords: ErroredRecord[];
   environmentErroredRecords: ErroredRecord[];
+  excludedApiErroredRecordIds: ErroredRecord["id"][];
+  excludedEnvironmentErroredRecordIds: ErroredRecord["id"][];
 }

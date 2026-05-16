@@ -324,6 +324,8 @@ class ApiClientContextService {
       erroredRecordsSlice.actions.hydrate({
         apiErroredRecords: erroredRecords.apiErroredRecords,
         environmentErroredRecords: erroredRecords.environmentErroredRecords,
+        excludedApiErroredRecordIds: erroredRecords.excludedApiErroredRecordIds,
+        excludedEnvironmentErroredRecordIds: erroredRecords.excludedEnvironmentErroredRecordIds,
       })
     );
   }
@@ -439,6 +441,8 @@ class ApiClientContextService {
       erroredRecords: {
         apiErroredRecords: result.apiClientRecords.erroredRecords,
         environmentErroredRecords: result.environments.erroredRecords,
+        excludedApiErroredRecordIds: [],
+        excludedEnvironmentErroredRecordIds: [],
       },
     });
 
