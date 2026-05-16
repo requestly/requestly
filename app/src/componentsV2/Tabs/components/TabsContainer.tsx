@@ -150,6 +150,20 @@ export const TabsContainer: React.FC = () => {
     [setActiveTab]
   );
 
+  const toggleMorePopover = useCallback(() => {
+    setIsMorePopoverOpen((isOpen) => !isOpen);
+  }, []);
+
+  const onMorePopoverKeyDown = useCallback(
+    (event: React.KeyboardEvent<HTMLDivElement>) => {
+      if (event.key === "Enter" || event.key === " " || event.key === "Spacebar") {
+        event.preventDefault();
+        toggleMorePopover();
+      }
+    },
+    [toggleMorePopover]
+  );
+
   const operations = useMemo(
     () => (
       <Popover
@@ -161,12 +175,21 @@ export const TabsContainer: React.FC = () => {
         open={isMorePopoverOpen}
         onOpenChange={setIsMorePopoverOpen}
       >
-        <div className={`tabs-more-icon ${isMorePopoverOpen ? "tabs-more-icon-open" : ""}`}>
+        <div
+          className={`tabs-more-icon ${isMorePopoverOpen ? "tabs-more-icon-open" : ""}`}
+          role="button"
+          tabIndex={0}
+          aria-label="More actions"
+          aria-haspopup="menu"
+          aria-expanded={isMorePopoverOpen}
+          onClick={toggleMorePopover}
+          onKeyDown={onMorePopoverKeyDown}
+        >
           <IoIosArrowDown />
         </div>
       </Popover>
     ),
-    [isMorePopoverOpen, onTabItemClick]
+    [isMorePopoverOpen, onMorePopoverKeyDown, onTabItemClick, toggleMorePopover]
   );
 
   // Reset popover state when no tabs are present
