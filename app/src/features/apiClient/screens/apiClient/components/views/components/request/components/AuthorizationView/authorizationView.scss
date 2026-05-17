@@ -83,12 +83,17 @@
                 }
               }
             }
-            .input-container.error-state > .editor-popup-container {
+            .input-container.error-state > .single-line-editor-wrapper {
               width: 100%;
               height: 100%;
-              border: none;
-              padding: var(--requestly-space-0, 0px);
               margin-bottom: var(--requestly-space-4, 8px);
+
+              .editor-popup-container {
+                width: 100%;
+                height: 100%;
+                border: none;
+                padding: var(--requestly-space-0, 0px);
+              }
             }
           }
 

@@ -78,6 +78,7 @@ function generateFields(
             defaultValue={formState[field.id]}
             onChange={(value) => onChangeHandler(value, field.id)}
             variables={variables}
+            isSecret={field.isSecret}
           />
           <Conditional
             condition={hasInvalidCharacter && formType === Authorization.Type.API_KEY && field.id === "key" && isHeader}

@@ -15,6 +15,9 @@ import {
 } from "componentsV2/CodeEditor/components/EditorV2/plugins";
 import { VariableAutocompletePopover } from "../VariableAutocompletePopover/VariableAutocompletePopover";
 import { useVariableAutocomplete } from "../hooks/useVariableAutocomplete";
+import { RQButton } from "lib/design-system-v2/components";
+import { RiEyeLine } from "@react-icons/all-files/ri/RiEyeLine";
+import { RiEyeOffLine } from "@react-icons/all-files/ri/RiEyeOffLine";
 
 export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
   className,
@@ -26,16 +29,13 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
   onPaste,
   variables,
   suggestions,
+  isSecret = false,
 }) => {
   const editorRef = useRef<HTMLDivElement>(null);
   const editorViewRef = useRef<EditorView | null>(null);
 
-  const {
-    autocompleteState,
-    autocompleteExtension,
-    handleSelectVariable,
-    handleCloseAutocomplete,
-  } = useVariableAutocomplete({ editorViewRef });
+  const { autocompleteState, autocompleteExtension, handleSelectVariable, handleCloseAutocomplete } =
+    useVariableAutocomplete({ editorViewRef });
 
   /*
   onKeyDown, onBlur and onChange is in the useEffect dependencies (implicitly through the editor setup),
@@ -60,6 +60,7 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
   const [hoveredVariable, setHoveredVariable] = useState<string | null>(null);
   const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
   const [isPopoverPinned, setIsPopoverPinned] = useState(false);
+  const [isSecretRevealed, setIsSecretRevealed] = useState(false);
 
   useEffect(() => {
     isPopoverPinnedRef.current = isPopoverPinned;
@@ -204,19 +205,31 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
 
   return (
     <>
-      <div
-        ref={editorRef}
-        className={`${className ?? ""} editor-popup-container ant-input`}
-        onMouseLeave={handleMouseLeave}
-      >
-        <Conditional condition={!!hoveredVariable}>
-          <VariablePopover
-            editorRef={editorRef as React.RefObject<HTMLDivElement>}
-            hoveredVariable={hoveredVariable || ""}
-            popupPosition={popupPosition}
-            variables={variables || emptyVariables}
-            onClose={handleClosePopover}
-            onPinChange={setIsPopoverPinned}
+      <div className={`single-line-editor-wrapper ${isSecret && !isSecretRevealed ? "single-line-editor-secret" : ""}`}>
+        <div
+          ref={editorRef}
+          className={`${className ?? ""} editor-popup-container ant-input ${isSecret ? "has-secret-toggle" : ""}`}
+          onMouseLeave={handleMouseLeave}
+        >
+          <Conditional condition={!!hoveredVariable}>
+            <VariablePopover
+              editorRef={editorRef as React.RefObject<HTMLDivElement>}
+              hoveredVariable={hoveredVariable || ""}
+              popupPosition={popupPosition}
+              variables={variables || emptyVariables}
+              onClose={handleClosePopover}
+              onPinChange={setIsPopoverPinned}
+            />
+          </Conditional>
+        </div>
+
+        <Conditional condition={isSecret}>
+          <RQButton
+            className="single-line-editor-secret-toggle"
+            type="transparent"
+            size="small"
+            icon={isSecretRevealed ? <RiEyeLine /> : <RiEyeOffLine />}
+            onClick={() => setIsSecretRevealed((prev) => !prev)}
           />
         </Conditional>
       </div>
