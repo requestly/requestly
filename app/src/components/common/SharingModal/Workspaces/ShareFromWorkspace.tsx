@@ -82,17 +82,25 @@ export const ShareFromWorkspace: React.FC<Props> = ({
   const handleTransferToOtherWorkspace = useCallback(
     (teamData: Workspace) => {
       setIsLoading(true);
-      duplicateRulesToTargetWorkspace(appMode, teamData.id, selectedRules).then(() => {
-        setIsLoading(false);
-        trackSharingModalRulesDuplicated("team", selectedRules.length);
-        setPostShareViewData({
-          type: WorkspaceSharingTypes.EXISTING_WORKSPACE,
-          targetTeamData: teamData,
-          sourceTeamData: activeWorkspace,
-        });
+      duplicateRulesToTargetWorkspace(appMode, teamData.id, selectedRules)
+        .then(() => {
+          trackSharingModalRulesDuplicated("team", selectedRules.length);
+          setPostShareViewData({
+            type: WorkspaceSharingTypes.EXISTING_WORKSPACE,
+            targetTeamData: teamData,
+            sourceTeamData: activeWorkspace,
+          });
 
-        onRulesShared();
-      });
+          onRulesShared();
+        })
+        .catch(() => {
+          const errorMessage = "Could not copy rules to the selected workspace.";
+          toast.error(errorMessage);
+          trackSharingModalToastViewed(errorMessage);
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
     },
     [appMode, onRulesShared, selectedRules, activeWorkspace, setPostShareViewData]
   );

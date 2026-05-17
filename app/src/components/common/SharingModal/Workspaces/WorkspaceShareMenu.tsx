@@ -68,6 +68,8 @@ export const WorkspaceShareMenu: React.FC<Props> = ({
       .filter(Boolean);
   }, [sortedTeams, activeWorkspace?.id, onTransferClick, defaultActiveWorkspaces, isLoading]);
 
+  const isDropdownEnabled = shareableWorkspaces.length > 1;
+
   const chooseOtherWorkspaceItem = (
     <div className="workspace-share-menu-item-card workspace-share-menu-dropdown">
       <Row align="middle" className="items-center">
@@ -116,13 +118,17 @@ export const WorkspaceShareMenu: React.FC<Props> = ({
           menu={{ items: menuItems }}
           placement="bottom"
           overlayClassName="workspace-share-menu-wrapper"
-          trigger={shareableWorkspaces?.length > 1 ? ["click"] : undefined}
+          trigger={isDropdownEnabled ? ["click"] : undefined}
           onOpenChange={(open) => {
             if (open) trackShareModalWorkspaceDropdownClicked();
           }}
         >
           <div>
-            <WorkspaceItem workspace={activeWorkspace} showArrow availableWorkspaces={filteredAvailableWorkspaces} />
+            <WorkspaceItem
+              workspace={activeWorkspace}
+              showArrow={isDropdownEnabled}
+              availableWorkspaces={shareableWorkspaces}
+            />
           </div>
         </Dropdown>
       )}
