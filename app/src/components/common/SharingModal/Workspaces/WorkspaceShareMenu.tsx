@@ -5,8 +5,8 @@ import { RQButton } from "lib/design-system/components";
 import { MdOutlineKeyboardArrowDown } from "@react-icons/all-files/md/MdOutlineKeyboardArrowDown";
 import type { MenuProps } from "antd";
 import { trackShareModalWorkspaceDropdownClicked } from "modules/analytics/events/misc/sharing";
-import { getActiveWorkspace, getAllWorkspaces } from "store/slices/workspaces/selectors";
-import { Workspace } from "features/workspaces/types";
+import { dummyPersonalWorkspace, getActiveWorkspace, getAllWorkspaces } from "store/slices/workspaces/selectors";
+import { Workspace, WorkspaceType } from "features/workspaces/types";
 import WorkspaceAvatar from "features/workspaces/components/WorkspaceAvatar";
 
 interface Props {
@@ -16,6 +16,7 @@ interface Props {
   defaultActiveWorkspaces?: number;
   onTransferClick: (teamData: Workspace) => void;
   isLoading: boolean;
+  includePrivateWorkspace?: boolean;
 }
 
 interface WorkspaceItemProps {
@@ -26,20 +27,30 @@ interface WorkspaceItemProps {
   isLoading?: boolean;
 }
 
-export const WorkspaceShareMenu: React.FC<Props> = ({ onTransferClick, isLoading, defaultActiveWorkspaces = 0 }) => {
+export const WorkspaceShareMenu: React.FC<Props> = ({
+  onTransferClick,
+  isLoading,
+  defaultActiveWorkspaces = 0,
+  includePrivateWorkspace = false,
+}) => {
   const availableWorkspaces = useSelector(getAllWorkspaces);
   const activeWorkspace = useSelector(getActiveWorkspace);
 
   const filteredAvailableWorkspaces = availableWorkspaces.filter((workspace) => !workspace.browserstackDetails); // Filtering our Browserstack Workspaces)
+  const workspacesForMenu = useMemo(
+    () =>
+      includePrivateWorkspace && activeWorkspace?.workspaceType !== WorkspaceType.PERSONAL
+        ? [dummyPersonalWorkspace, ...filteredAvailableWorkspaces]
+        : filteredAvailableWorkspaces,
+    [activeWorkspace?.workspaceType, filteredAvailableWorkspaces, includePrivateWorkspace]
+  );
 
   const sortedTeams: Workspace[] = useMemo(
     () =>
-      filteredAvailableWorkspaces
-        ? [...filteredAvailableWorkspaces].sort(
-            (a: Workspace, b: Workspace) => (b.accessCount ?? 0) - (a.accessCount ?? 0)
-          )
+      workspacesForMenu
+        ? [...workspacesForMenu].sort((a: Workspace, b: Workspace) => (b.accessCount ?? 0) - (a.accessCount ?? 0))
         : [],
-    [filteredAvailableWorkspaces]
+    [workspacesForMenu]
   );
 
   const menuItems: MenuProps["items"] = useMemo(() => {
@@ -103,13 +114,13 @@ export const WorkspaceShareMenu: React.FC<Props> = ({ onTransferClick, isLoading
           menu={{ items: menuItems }}
           placement="bottom"
           overlayClassName="workspace-share-menu-wrapper"
-          trigger={filteredAvailableWorkspaces?.length > 1 ? ["click"] : undefined}
+          trigger={workspacesForMenu?.length > 1 ? ["click"] : undefined}
           onOpenChange={(open) => {
             if (open) trackShareModalWorkspaceDropdownClicked();
           }}
         >
           <div>
-            <WorkspaceItem workspace={activeWorkspace} showArrow availableWorkspaces={filteredAvailableWorkspaces} />
+            <WorkspaceItem workspace={activeWorkspace} showArrow availableWorkspaces={workspacesForMenu} />
           </div>
         </Dropdown>
       )}
@@ -124,6 +135,8 @@ const WorkspaceItem: React.FC<WorkspaceItemProps> = ({
   showArrow = false,
   isLoading = false,
 }) => {
+  const isPrivateWorkspace = workspace.workspaceType === WorkspaceType.PERSONAL;
+
   return (
     <div
       className={`workspace-share-menu-item-card ${
@@ -135,7 +148,9 @@ const WorkspaceItem: React.FC<WorkspaceItemProps> = ({
         <span className="workspace-card-description">
           <div className="text-white">{workspace.name}</div>
           <div className="text-gray">
-            {workspace.accessCount ?? 0} {(workspace.accessCount ?? 0) !== 1 ? "members" : "member"}
+            {isPrivateWorkspace
+              ? "Not shared with anyone"
+              : `${workspace.accessCount ?? 0} ${(workspace.accessCount ?? 0) !== 1 ? "members" : "member"}`}
           </div>
         </span>
       </Row>

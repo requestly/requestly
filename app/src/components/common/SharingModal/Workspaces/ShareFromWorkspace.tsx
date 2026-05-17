@@ -99,7 +99,11 @@ export const ShareFromWorkspace: React.FC<Props> = ({
 
   return (
     <>
-      <WorkspaceShareMenu onTransferClick={handleTransferToOtherWorkspace} isLoading={isLoading} />
+      <WorkspaceShareMenu
+        onTransferClick={handleTransferToOtherWorkspace}
+        isLoading={isLoading}
+        includePrivateWorkspace
+      />
       <div className="subheader mt-1">Share with Teammates</div>
       <div className="mt-8 text-gray">Collaborate in real-time with your teammates within a shared workspace.</div>
       <div className="mt-1">
