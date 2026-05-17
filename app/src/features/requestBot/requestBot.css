@@ -9,6 +9,9 @@
   z-index: 100;
   width: 424px;
   height: 640px;
+  max-width: calc(100vw - 32px);
+  max-height: calc(100vh - 60px);
+  box-sizing: border-box;
   background-color: var(--requestly-color-surface-2);
   padding: 8px;
   border-radius: 1rem;
