@@ -5,7 +5,7 @@ import { RQButton } from "lib/design-system/components";
 import { MdOutlineKeyboardArrowDown } from "@react-icons/all-files/md/MdOutlineKeyboardArrowDown";
 import type { MenuProps } from "antd";
 import { trackShareModalWorkspaceDropdownClicked } from "modules/analytics/events/misc/sharing";
-import { getActiveWorkspace, getAllWorkspaces } from "store/slices/workspaces/selectors";
+import { dummyPersonalWorkspace, getActiveWorkspace, getAllWorkspaces } from "store/slices/workspaces/selectors";
 import { Workspace } from "features/workspaces/types";
 import WorkspaceAvatar from "features/workspaces/components/WorkspaceAvatar";
 
@@ -14,6 +14,7 @@ interface Props {
    * The default number of active workspaces to display before dropdown menu.
    */
   defaultActiveWorkspaces?: number;
+  includePrivateWorkspace?: boolean;
   onTransferClick: (teamData: Workspace) => void;
   isLoading: boolean;
 }
@@ -26,20 +27,32 @@ interface WorkspaceItemProps {
   isLoading?: boolean;
 }
 
-export const WorkspaceShareMenu: React.FC<Props> = ({ onTransferClick, isLoading, defaultActiveWorkspaces = 0 }) => {
+export const WorkspaceShareMenu: React.FC<Props> = ({
+  onTransferClick,
+  isLoading,
+  defaultActiveWorkspaces = 0,
+  includePrivateWorkspace = false,
+}) => {
   const availableWorkspaces = useSelector(getAllWorkspaces);
   const activeWorkspace = useSelector(getActiveWorkspace);
 
-  const filteredAvailableWorkspaces = availableWorkspaces.filter((workspace) => !workspace.browserstackDetails); // Filtering our Browserstack Workspaces)
+  const filteredAvailableWorkspaces = useMemo(
+    () => availableWorkspaces.filter((workspace) => !workspace.browserstackDetails),
+    [availableWorkspaces]
+  ); // Filtering our Browserstack Workspaces)
+
+  const shareableWorkspaces = useMemo(
+    () =>
+      includePrivateWorkspace ? [dummyPersonalWorkspace, ...filteredAvailableWorkspaces] : filteredAvailableWorkspaces,
+    [filteredAvailableWorkspaces, includePrivateWorkspace]
+  );
 
   const sortedTeams: Workspace[] = useMemo(
     () =>
-      filteredAvailableWorkspaces
-        ? [...filteredAvailableWorkspaces].sort(
-            (a: Workspace, b: Workspace) => (b.accessCount ?? 0) - (a.accessCount ?? 0)
-          )
+      shareableWorkspaces
+        ? [...shareableWorkspaces].sort((a: Workspace, b: Workspace) => (b.accessCount ?? 0) - (a.accessCount ?? 0))
         : [],
-    [filteredAvailableWorkspaces]
+    [shareableWorkspaces]
   );
 
   const menuItems: MenuProps["items"] = useMemo(() => {
@@ -103,7 +116,7 @@ export const WorkspaceShareMenu: React.FC<Props> = ({ onTransferClick, isLoading
           menu={{ items: menuItems }}
           placement="bottom"
           overlayClassName="workspace-share-menu-wrapper"
-          trigger={filteredAvailableWorkspaces?.length > 1 ? ["click"] : undefined}
+          trigger={shareableWorkspaces?.length > 1 ? ["click"] : undefined}
           onOpenChange={(open) => {
             if (open) trackShareModalWorkspaceDropdownClicked();
           }}
@@ -124,6 +137,8 @@ const WorkspaceItem: React.FC<WorkspaceItemProps> = ({
   showArrow = false,
   isLoading = false,
 }) => {
+  const memberCount = workspace.accessCount ?? workspace.membersCount ?? 0;
+
   return (
     <div
       className={`workspace-share-menu-item-card ${
@@ -135,7 +150,7 @@ const WorkspaceItem: React.FC<WorkspaceItemProps> = ({
         <span className="workspace-card-description">
           <div className="text-white">{workspace.name}</div>
           <div className="text-gray">
-            {workspace.accessCount ?? 0} {(workspace.accessCount ?? 0) !== 1 ? "members" : "member"}
+            {memberCount} {memberCount !== 1 ? "members" : "member"}
           </div>
         </span>
       </Row>
