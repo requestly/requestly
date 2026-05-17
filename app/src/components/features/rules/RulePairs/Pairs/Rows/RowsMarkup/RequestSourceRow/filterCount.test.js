@@ -5,6 +5,11 @@ describe("countAppliedSourceFilters", () => {
   it("returns 0 for empty filters", () => {
     expect(countAppliedSourceFilters()).toBe(0);
     expect(countAppliedSourceFilters({})).toBe(0);
+    expect(countAppliedSourceFilters(null)).toBe(0);
+    expect(countAppliedSourceFilters([])).toBe(0);
+    expect(countAppliedSourceFilters("")).toBe(0);
+    expect(countAppliedSourceFilters(0)).toBe(0);
+    expect(countAppliedSourceFilters(false)).toBe(0);
   });
 
   it("ignores pageUrl and empty array filters", () => {

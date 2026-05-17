@@ -39,7 +39,7 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisab
   const { MODE } = getModeData(window.location);
 
   const isSourceFilterFormatUpgraded = useCallback((pairIndex, rule) => {
-    return Array.isArray(rule.pairs[pairIndex].source.filters);
+    return Array.isArray(rule?.pairs?.[pairIndex]?.source?.filters);
   }, []);
 
   const migrateToNewSourceFilterFormat = useCallback(
@@ -71,10 +71,9 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisab
 
   const getFilterCount = useCallback(
     (pairIndex) => {
-      const copyOfCurrentlySelectedRule = JSON.parse(JSON.stringify(currentlySelectedRuleData));
-      const sourceFilters = isSourceFilterFormatUpgraded(pairIndex, copyOfCurrentlySelectedRule)
-        ? currentlySelectedRuleData.pairs[pairIndex].source.filters[0]
-        : currentlySelectedRuleData.pairs[pairIndex].source.filters;
+      const sourceFilters = isSourceFilterFormatUpgraded(pairIndex, currentlySelectedRuleData)
+        ? currentlySelectedRuleData?.pairs?.[pairIndex]?.source?.filters?.[0]
+        : currentlySelectedRuleData?.pairs?.[pairIndex]?.source?.filters;
 
       return countAppliedSourceFilters(sourceFilters);
     },
