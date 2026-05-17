@@ -64,6 +64,7 @@
 
     .doc-explorer-contents {
       height: 100%;
+      min-width: max-content;
       font-size: var(--requestly-font-size-sm);
 
       form.graphiql-explorer-actions.variable-editor-title {
@@ -200,6 +201,8 @@
 
 // Styling to make field types more visible
 .graphiql-explorer-root {
+  min-width: max-content;
+
   & > div:first-child {
     flex-grow: unset !important;
     height: calc(100% - 48px) !important;

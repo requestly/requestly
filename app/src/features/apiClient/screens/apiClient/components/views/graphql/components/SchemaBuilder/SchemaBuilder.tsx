@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import Explorer from "graphiql-explorer";
 import { buildClientSchema, parse } from "graphql";
 import "@graphiql/plugin-explorer/style.css";
@@ -29,7 +29,7 @@ export const SchemaBuilder: React.FC<Props> = ({ entity, setIsSchemaBuilderOpen 
     url,
   });
 
-  const hasParsedSuccessfully = useRef(false);
+  const [hasParsedSuccessfully, setHasParsedSuccessfully] = useState(false);
 
   /*
    * This effect is added due to Explorer component's internal query caching logic.
@@ -47,15 +47,15 @@ export const SchemaBuilder: React.FC<Props> = ({ entity, setIsSchemaBuilderOpen 
    * shared state issues between different instances.
    */
   useEffect(() => {
-    if (!hasParsedSuccessfully.current) {
+    if (!hasParsedSuccessfully) {
       try {
         parse(operation);
-        hasParsedSuccessfully.current = true;
+        setHasParsedSuccessfully(true);
       } catch (e) {
         // NO OP
       }
     }
-  }, [operation]);
+  }, [hasParsedSuccessfully, operation]);
 
   const handleEdit = (query: string) => {
     entity.setOperation(query);
@@ -80,7 +80,7 @@ export const SchemaBuilder: React.FC<Props> = ({ entity, setIsSchemaBuilderOpen 
           <div className="schema-builder__content">
             <Explorer
               schema={introspectionData ? buildClientSchema(introspectionData) : {}}
-              query={hasParsedSuccessfully.current ? operation : ""}
+              query={hasParsedSuccessfully ? operation : ""}
               explorerIsOpen={true}
               arrowClosed={<Checkbox checked={false} className="schema-builder__checkbox" />}
               arrowOpen={<Checkbox checked={true} className="schema-builder__checkbox" />}
