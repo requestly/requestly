@@ -71,13 +71,24 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisab
   const getFilterCount = useCallback(
     (pairIndex) => {
       const copyOfCurrentlySelectedRule = JSON.parse(JSON.stringify(currentlySelectedRuleData));
-      return isSourceFilterFormatUpgraded(pairIndex, copyOfCurrentlySelectedRule)
-        ? Object.keys(currentlySelectedRuleData.pairs[pairIndex].source.filters[0] || {}).filter(
-            (key) => key !== GLOBAL_CONSTANTS.RULE_SOURCE_FILTER_TYPES.PAGE_URL
-          ).length
-        : Object.keys(currentlySelectedRuleData.pairs[pairIndex].source.filters || {}).filter(
-            (key) => key !== GLOBAL_CONSTANTS.RULE_SOURCE_FILTER_TYPES.PAGE_URL
-          ).length;
+      const filters = isSourceFilterFormatUpgraded(pairIndex, copyOfCurrentlySelectedRule)
+        ? currentlySelectedRuleData.pairs[pairIndex].source.filters[0] || {}
+        : currentlySelectedRuleData.pairs[pairIndex].source.filters || {};
+
+      return Object.entries(filters).filter(([key, value]) => {
+        // PAGE_URL is the base URL field — always present, not a user-applied filter
+        if (key === GLOBAL_CONSTANTS.RULE_SOURCE_FILTER_TYPES.PAGE_URL) {
+          return false;
+        }
+        // Only count filters that have meaningful values set
+        if (Array.isArray(value)) {
+          return value.length > 0;
+        }
+        if (typeof value === "object" && value !== null) {
+          return Object.keys(value).length > 0;
+        }
+        return value !== undefined && value !== null && value !== "";
+      }).length;
     },
     [currentlySelectedRuleData, isSourceFilterFormatUpgraded]
   );
