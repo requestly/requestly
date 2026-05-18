@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState, useCallback, useMemo } from "react";
 import { EditorView, placeholder as cmPlaceHolder, keymap } from "@codemirror/view";
-import { EditorState } from "@codemirror/state";
+import { Compartment, EditorState } from "@codemirror/state";
 import { history, historyKeymap } from "@codemirror/commands";
 import { startCompletion } from "@codemirror/autocomplete"; // New Import
 import { VariablePopover } from "componentsV2/CodeEditor/components/EditorV2/components/VariablePopOver";
@@ -40,6 +40,7 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
 }) => {
   const editorRef = useRef<HTMLDivElement>(null);
   const editorViewRef = useRef<EditorView | null>(null);
+  const maskCompartmentRef = useRef(new Compartment());
 
   const { autocompleteState, autocompleteExtension, handleSelectVariable, handleCloseAutocomplete } =
     useVariableAutocomplete({ editorViewRef });
@@ -185,7 +186,7 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
             },
             variables || emptyVariables
           ),
-          useDecorationMask ? secretMaskExtension : null,
+          maskCompartmentRef.current.of(useDecorationMask ? secretMaskExtension : []),
           generateCompletionsForVariables(emptyVariables, suggestions),
           cmPlaceHolder(placeholder ?? "Input here"),
         ].filter((ext): ext is NonNullable<typeof ext> => ext !== null),
@@ -199,7 +200,13 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
     //Need to disable to implement the onChange handler
     // Shouldn't be recreated every render
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [placeholder, variables, handleSetVariable, suggestions, useDecorationMask]);
+  }, [placeholder, variables, handleSetVariable, suggestions]);
+
+  useEffect(() => {
+    editorViewRef.current?.dispatch({
+      effects: maskCompartmentRef.current.reconfigure(useDecorationMask ? secretMaskExtension : []),
+    });
+  }, [useDecorationMask]);
 
   useEffect(() => {
     if (defaultValue !== previousDefaultValueRef.current) {
