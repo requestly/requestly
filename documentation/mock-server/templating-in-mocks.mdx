@@ -1,0 +1,25 @@
+---
+title: Templating in File server
+label: Templating in File Server
+slug: templating-in-mocks
+visibility: PUBLIC
+---
+Our methods support handlebars-like templating (`{{}}` )along with the following special methods to make your responses dynamic
+
+1. `urlParam`
+
+   You can define parameters inside the mock endpoint using a colon (`:`).
+
+   For example - the endpoint `/book/:id` defines the `id` parameter that can be used inside the body of your mocks as `{{urlParam 'id'}}`
+
+2. `header`
+
+   The value of any of the request headers can be dynamically rendered into your response using this method.
+
+   For example - the string `{{header 'content-type'}}` renders the value of the content-type header
+
+3. `method` : You can add the request method to your mock's response body by including `{{method}}` in your mock response
+
+4. `statusCode` : Renders the original status code inside the template
+
+Let us know if you have ideas for other templating methods that you might need.

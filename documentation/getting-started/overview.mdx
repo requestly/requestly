@@ -1,0 +1,120 @@
+---
+title: "Overview"
+label: "Overview"
+slug: "overview"
+description: "Start here to understand Requestly Interceptor, choose the right workflow, complete setup, and reach your first success quickly."
+visibility: "PUBLIC"
+---
+
+Requestly Interceptor helps you inspect and modify network traffic in real time. You can debug browser requests, intercept mobile and desktop app traffic, rewrite requests and responses, create mocks, and share debugging sessions with your team.
+
+## Choose Your Path
+
+<CardGroup cols={2}>
+  <Card title="Debug Browser Traffic" href="/getting-started/quick-start-guide/browser-extension-setup" icon="browser">
+    Use the Browser Extension when you want to inspect and modify traffic in the browser.
+  </Card>
+  <Card title="Debug Mobile Or Desktop Traffic" href="/getting-started/quick-start-guide/desktop-app-setup" icon="desktop">
+    Use the Desktop App when you need proxy-based interception for mobile apps, emulators, terminal tools, or system traffic.
+  </Card>
+  <Card title="Modify Or Mock Traffic" href="/http-rules/overview" icon="wand-magic-sparkles">
+    Rewrite headers, bodies, query params, and responses without changing your application code.
+  </Card>
+  <Card title="Create Mocks" href="/mock-server/overview" icon="server">
+    Build reusable mock APIs and hosted responses for testing, demos, and collaboration.
+  </Card>
+</CardGroup>
+
+## Understand The Product Areas
+
+### Debugging & Interception
+
+Use the [HTTP Interceptor](/interceptor/overview) when you need to inspect live traffic from a browser, desktop app, mobile device, emulator, terminal, or Node.js runtime.
+
+### Modify Traffic
+
+Use [HTTP Rules](/http-rules/overview) to modify headers, redirect requests, rewrite bodies, delay responses, inject scripts, or map requests to local and remote resources.
+
+### Mock APIs & Responses
+
+Use [API Mocking](/api-mocking/api-mocking) and [File Server](/mock-server/overview) to simulate backend behavior for development, testing, demos, and failure scenarios.
+
+## Which Setup Should You Choose?
+
+<Tabs>
+  <Tab title="Browser Extension">
+    Choose the Browser Extension when:
+
+    - you only need browser-based workflows
+    - you want quick setup with no system proxy configuration
+    - you plan to inspect traffic, create rules, or work from the extension popup
+
+    <Card title="Set Up Browser Extension" href="/getting-started/quick-start-guide/browser-extension-setup" icon="arrow-right">
+      Install the extension, understand the interface, and learn what it can do.
+    </Card>
+  </Tab>
+  <Tab title="Desktop App">
+    Choose the Desktop App when:
+
+    - you need to intercept mobile devices, emulators, or desktop apps
+    - you need system-wide or proxy-based interception
+    - you want richer network capture, HAR workflows, or advanced debugging
+
+    <Card title="Set Up Desktop App" href="/getting-started/quick-start-guide/desktop-app-setup" icon="arrow-right">
+      Install the desktop app and connect the right runtime for your workflow.
+    </Card>
+  </Tab>
+</Tabs>
+
+<Tip>
+  Still deciding? Read [how the Browser Extension differs from the Desktop App](/getting-started/difference-between-desktop-app-and-browser-extension).
+</Tip>
+
+## Recommended First Steps
+
+<Steps>
+  <Step title="Choose Browser Extension Or Desktop App">
+    If you only need browser-based traffic tools, start with the Browser Extension. If you need to intercept mobile apps, emulators, localhost traffic, or system-wide traffic, use the Desktop App.
+  </Step>
+  <Step title="Complete Setup">
+    Follow either the [Browser Extension setup](/getting-started/quick-start-guide/browser-extension-setup) or [Desktop App setup](/getting-started/quick-start-guide/desktop-app-setup) guide.
+  </Step>
+  <Step title="Reach Your First Success">
+    Pick one clear first task:
+
+    - [Inspect live traffic](/interceptor/overview)
+    - [Create your first traffic rule](/http-rules/rule-types)
+    - [Create your first mock](/mock-server/create/create-mock-api)
+  </Step>
+  <Step title="Go Deeper Once The Basics Work">
+    After your first successful task, explore sessions, collaboration, advanced rules, and mock scenarios.
+  </Step>
+</Steps>
+
+## Common Journeys
+
+<CardGroup cols={2}>
+  <Card title="Modify Headers Or Redirect Requests" href="/http-rules/overview" icon="shuffle">
+    Start with HTTP Rules if you need to change traffic without updating application code.
+  </Card>
+  <Card title="Inspect Browser Or App Traffic" href="/interceptor/overview" icon="magnifying-glass">
+    Start with HTTP Interceptor if you need to see live network traffic and trace issues.
+  </Card>
+  <Card title="Record And Share Debug Sessions" href="/sessions/overview" icon="camera">
+    Start with Sessions if you need reproducible bug reports or sharable network captures.
+  </Card>
+  <Card title="Simulate Backend Behavior" href="/mock-server/overview" icon="server">
+    Start with File Server when you need stable responses for testing or demos.
+  </Card>
+</CardGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Troubleshoot Setup" href="/troubleshoot/http-interceptor/unable-to-intercept-web-traffic-on-browser-mobile-or-emulator" icon="wrench">
+    Get help with certificate, localhost, proxy, and device interception issues.
+  </Card>
+  <Card title="Public APIs" href="/public-apis/overview" icon="code">
+    Automate Requestly Interceptor workflows programmatically.
+  </Card>
+</CardGroup>

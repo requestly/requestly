@@ -1,0 +1,106 @@
+---
+title: "Validate Rules Execution"
+slug: "validate-rules-execution"
+path: "/http-rules/advanced-usage/validate-rules-execution"
+visibility: "PUBLIC"
+format: "MDX"
+description: "Learn how to verify if a Requestly Interceptor rule is executed successfully."
+---
+
+***
+
+The way Requestly Interceptor shows rule executions varies between the browser extension and desktop app, tailored to their respective environments:
+
+<Tabs>
+  <Tab title="Browser Extension">
+    Once you have enabled a Requestly Interceptor rule to modify some part of a network request or the page, the next thing you would like to do is confirm if the rule executed successfully.
+
+    Here are 4 ways to know if a rule is executed on a page.
+
+    ## 1. Extension icon turns green
+
+    If any of the rules executes on the current page, the Requestly Interceptor icon in the extension toolbar (next to the address bar) will turn from a normal icon to a green icon.
+
+    <img src="/images/validate-rules-execution/48bfa7f8-5eb1-44f7-bff2-6b7ad79ec86d.png" align="center" fullwidth="false" />
+
+    ## 2. Status Notification Widget
+
+    A small widget appears in the **Top-right corner** of the page for **5 seconds** after the page loads or a rule is triggered.
+
+    <img src="/images/validate-rules-execution/d91ceedb-9387-495b-becd-797134e063fa.png" align="center" fullwidth="false" />
+
+    ***
+
+    ### Disable the Widget
+
+    <Steps>
+      <Step title="Click the Eye Icon">
+        Click the **eye icon** on the widget when it appears. This will take you directly to **Global Settings**.
+
+        <img src="/images/validate-rules-execution/c16facc7-0a43-449a-a2bc-2b175a443f8c.png" align="center" fullwidth="false" />
+      </Step>
+
+      <Step title="Toggle Off the Option">
+        Find the option **"Show widget when rule is applied"** and toggle it off to disable the widget popup.
+
+        <Tip>
+          Customise when the widget appears under **Show widget on**:
+
+          * **All Rules**: Widget appears if **any rule** executes.
+
+          * **Specific Rules**: The widget appears **only for the rules you select**.
+        </Tip>
+
+        <img src="/images/validate-rules-execution/d6dab012-8e24-40d1-b8d2-f20ae96aa0b9.png" align="center" fullwidth="false" />
+      </Step>
+    </Steps>
+
+    ***
+
+    ## 3. Executed Rules Tab in Popup
+
+    <Steps>
+      <Step title="Open Requestly Interceptor Popup">
+        Click on the **Requestly Interceptor Icon** in the browser toolbar to open the extension.
+
+        <img src="/images/validate-rules-execution/eb469889-2e5b-4f11-afb8-0e31b5ad89c7.png" align="center" fullwidth="false" />
+      </Step>
+
+      <Step title="Switch to the Executed Rules Tab">
+        Navigate to the **Executed Rules** tab to see the list of rules that ran on the current page.
+
+        <img src="/images/validate-rules-execution/b13f05bd-d271-45d5-872a-e4ea2381336b.png" align="center" fullwidth="false" />
+      </Step>
+    </Steps>
+
+    ***
+
+    ## 4. Requestly Interceptor DevTools Tab
+
+    <Steps>
+      <Step title="Open DevTools">
+        Right-click on the page and select **Inspect** or press **Ctrl+Shift+i** to open the DevTools.
+
+        <img src="/images/validate-rules-execution/5b181287-692c-4b6b-90e4-4e0d144c88a0.png" align="center" fullwidth="false" />
+      </Step>
+
+      <Step title="Switch to the Requestly Interceptor Tab">
+        Go to the **Requestly Interceptor tab** within DevTools.
+
+        <img src="/images/validate-rules-execution/6cb3411c-89b4-4b18-9d62-f55e97bc7300.png" align="center" fullwidth="false" />
+      </Step>
+
+      <Step title="Navigate to the Rule Executions">
+        Reload the page and navigate to the **Rule Executions** section to see the list of rules that ran on the current page.
+
+        <img src="/images/validate-rules-execution/28ac062a-2bf6-4e52-8765-ac0454654399.png" align="center" fullwidth="false" />
+      </Step>
+    </Steps>
+  </Tab>
+
+  <Tab title="Desktop App">
+    The **rules table** visually highlights which rules were applied by turning the corresponding request rows **green**.
+
+    <img src="/images/validate-rules-execution/d736b021-8f49-4b21-885e-472a480d839e.png" align="center" fullwidth="false" />
+  </Tab>
+</Tabs>

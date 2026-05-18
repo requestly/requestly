@@ -1,0 +1,101 @@
+---
+title: "Replace String Rule"
+slug: "replace-strings"
+path: "/http-rules/rule-types/replace-strings"
+visibility: "PUBLIC"
+format: "MDX"
+description: "Learn how to modify URLs, query parameters, or content dynamically with Requestly Interceptor's Replace String Rule. Test and debug changes without altering your code."
+---
+
+***
+
+The **Replace String Rule** in Requestly Interceptor allows you to modify the content of HTTP requests and responses, making it easy to test, debug, or apply fixes dynamically without modifying your original codebase. This feature is useful for replacing URLs, headers, or specific content in requests and responses.
+
+## Why Use the Replace String Rule?
+
+1. **Switch Domains:** To test your app with the new changes done on the local server, you can use replace `your-app-server.com` with `localhost` using Replace String Rule. In this way, you can test your app without having to change any of your code.\
+   <a target="_blank" href="https://requestly.com/blog/how-to-load-local-js-files-on-live-production-sites/">Learn more →</a>
+
+2. **Change Query Parameter Values:** You can change the values of query parameters present in a URL.\
+   For example: Changing `?dl-0` to `?dl=1` in a Dropbox URL downloads the file directly without going to the usual preview page.\
+   <a target="_blank" href="https://requestly.medium.com/replace-rule-documentation-8a0fd205f172">Learn more →</a>
+
+## **How to Configure the Replace** String **Rule**
+
+<Steps>
+  <Step title="Open HTTP Rules and Create a New Rule">
+    Navigate to the **HTTP Rules** tab in the Requestly Interceptor web or desktop app. Click on `+ New Rule` and select the `Replace String` option.
+
+    <img src="/images/replace-strings/1500ef19-bf66-4380-b9e0-959e37a49e07.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Name and Describe Your Rule">
+    Provide a **descriptive name** for your rule to keep things organised. Optionally, add a **brief description** to explain its purpose for easy identification later.
+
+    <img src="/images/replace-strings/2f3afa22-a208-416b-a3d8-4b52ba555491.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Define the Source Condition">
+    Define the criteria for the rule to be applied, such as **URL**, **Host**, or **Path**. Choose from **Regex**, **Contains**, **Wildcard**, or **Equals**, or use <a target="_blank" href="/http-rules/advanced-usage/advance-filters">Advance Filters</a> for more precise conditions.
+
+    For more detailed guidance, refer to the <a target="_blank" href="/http-rules/advanced-usage/advance-targeting">Source Conditions Guide</a>.
+
+    <Card title="Example:">
+      For this example, we are using the [**Requestly Interceptor Playground**](https://requestly-playground.com/) to demonstrate the `Replace Request` rule. This gives you a near-live experience of how the rule works. In this case, we are targeting API requests that fetch product data.
+
+      To replace the API endpoint to fetch products
+
+      * **Condition Type:** URL
+
+      * **Operator:** Contains
+
+      * **Value:** `https://rest.requestly-playground.com/api/products`
+    </Card>
+
+    <img src="/images/replace-strings/8f28a425-4557-424f-95d9-e5cc07f12359.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Replace Part of the URL">
+    In this step, configure the **Replace String Rule** with the following two sections:
+
+    1. **Replace**: Define the part of the URL you want to replace. This could be the hostname, query value, or any specific part of the URL.
+
+       Example: `type.slug:bakery`
+
+    2. **With**: Specify the value or string that will replace the original part of the URL.
+
+       Example: `type.slug:grocery`
+
+    This rule ensures that any requests matching the given criteria will have the specified URL part replaced dynamically.
+
+    <img src="/images/replace-strings/97a467af-ce83-4f24-b519-a08e5101ea0d.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Save and Activate the Rule">
+    Once satisfied with your setup, click **Save** to store the rule. Don’t forget to toggle it **ON** to activate it and apply the changes.
+
+    <img src="/images/replace-strings/8a1ddda8-a5c4-4348-bbc1-4267151c0ed2.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Test the Rule">
+    To verify the rule works as expected, click the **Test** button, enter a relevant URL, and then click **Test Rule**.
+
+    You can use the following URL to test the redirection: [https://www.requestly-playground.com/?rq-category=replace](https://www.requestly-playground.com/?rq-category=replace)
+
+    <img src="/images/replace-strings/ca743a6c-5494-4302-a762-bee8ee176125.png" align="center" fullwidth="false" />
+  </Step>
+</Steps>
+
+<Tip>
+  There are multiple ways to validate if a rule is applied or not, learn more about how to <a target="_blank" href="/http-rules/advanced-usage/validate-rules-execution">`validate rule execution`</a>.
+</Tip>
+
+<Tabs>
+  <Tab title="Before">
+    <img src="/images/replace-strings/f6c92641-dbdf-4338-a5ef-a3d2d527d805.png" align="center" fullwidth="false" />
+  </Tab>
+
+  <Tab title="After">
+    <img src="/images/replace-strings/d484b7ca-8385-465b-b3c3-97c4b4c69904.png" align="center" fullwidth="false" />
+  </Tab>
+</Tabs>

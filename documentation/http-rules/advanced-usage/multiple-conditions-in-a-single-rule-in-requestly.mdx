@@ -1,0 +1,142 @@
+---
+title: "Multiple Conditions in a Single Rule in Requestly Interceptor"
+slug: "multiple-conditions-in-a-single-rule-in-requestly"
+path: "/http-rules/advanced-usage/multiple-conditions-in-a-single-rule-in-requestly"
+visibility: "PUBLIC"
+format: "MDX"
+description: "Learn how to define and use multiple conditions in a single rule in Requestly Interceptor to optimise rule management."
+---
+
+Requestly Interceptor allows users to define **multiple conditions within a single rule**, making request modifications easier. Instead of creating separate rules for each scenario, you can configure a single rule to handle multiple actions, targeting multiple URLs at once in a single rule.
+
+### How Multiple Conditions Work
+
+Requestly Interceptor evaluates multiple conditions within a single rule independently. If a condition matches, the corresponding action is executed. This allows users to apply different modifications without needing separate rules for each case.
+
+### Why to use Multiple Conditions in a Single Rule?
+
+Using multiple conditions in a single rule makes your workspace cleaner and more efficient. Instead of creating a bunch of separate rules for small tweaks, you can group related changes together in one neat, easy-to-manage rule.
+
+### Redirect Rule
+
+The **Redirect Rule** in Requestly Interceptor allows users to define multiple conditions within a single rule, enabling different URLs to be redirected to different destinations. Instead of creating separate redirect rules for each URL, you can consolidate multiple redirections into one rule for better organization and efficiency.
+
+<img src="/images/multiple-conditions-in-a-single-rule-in-requestly/86e32681-4b4f-4a76-b3e1-eedd3154833a.png" align="center" fullwidth="false" />
+
+**Key Points to Remember**
+
+* Each condition is evaluated **independently**.
+
+* If multiple conditions match the same request, the **first defined condition** in the rule takes precedence.
+
+### Replace Rule
+
+The **Replace Rule** in Requestly Interceptor allows users to define multiple conditions within a single rule to modify different parts of a URL dynamically. Instead of creating separate replace rules for different replacements, you can manage them all in one rule, ensuring efficient and flexible URL transformations.
+
+<img src="/images/multiple-conditions-in-a-single-rule-in-requestly/0dc2ae94-fee7-4418-bb1c-e4b2bcebf5c1.png" align="center" fullwidth="false" />
+
+**Key Points to Remember**
+
+* Each condition is evaluated **independently**, meaning multiple replacements can be applied to the same request.
+
+* If multiple conditions modify overlapping parts of the URL, they execute **in the order they are defined** in the rule.
+
+### Query Param Rule
+
+The **Query Param Rule** in Requestly Interceptor allows users to define multiple conditions within a single rule to modify query parameters in different URLs. Instead of manually appending, updating, or removing query parameters in multiple rules, you can consolidate all changes into one rule .
+
+<img src="/images/multiple-conditions-in-a-single-rule-in-requestly/dfec7e2c-1697-405e-a481-9a753409f64d.png" align="center" fullwidth="false" />
+
+**Key Points to Remember**
+
+* Each condition applies **independently** based on the matching URL pattern.
+
+* **If a query parameter is added and then modified later**, the modified value will be the final one applied.
+
+### Modify Headers Rule
+
+The **Modify Headers Rule** in Requestly Interceptor allows users to define multiple conditions within a single rule to **add, modify, or remove HTTP headers** across different URLs. Instead of creating multiple rules for different header modifications, you can consolidate them into one rule, ensuring efficiency and better rule management.
+
+<img src="/images/multiple-conditions-in-a-single-rule-in-requestly/b1b943f5-b836-4742-9cb7-c03c7d93b96e.png" align="center" fullwidth="false" />
+
+**Key Points to Remember**
+
+* Each condition applies **independently** to the matching URLs.
+
+* **Header modifications follow the order they are listed.** If a header is **added first and then modified**, the modified value will be the final one applied.
+
+### Modify User Agent
+
+The **Modify User Agent Rule** in Requestly Interceptor allows users to define multiple conditions within a single rule to **modify the User-Agent header** for different URLs. This is particularly useful for testing how a website behaves across different browsers, devices, and platforms without needing to use actual devices or browser extensions.
+
+<img src="/images/multiple-conditions-in-a-single-rule-in-requestly/a4ae4b8b-7d93-44df-8e0d-22a3812457d9.png" align="center" fullwidth="false" />
+
+**Key Points to Remember**
+
+* Each condition applies **independently** to the matching URLs.
+
+* If multiple conditions match the same URL, the **last matching condition will take precedence**.
+
+* The modified **User-Agent is sent with all requests** to the specified URLs, affecting how servers respond.
+
+### Cancel Request Rule
+
+The **Cancel Request Rule** in Requestly Interceptor allows users to define multiple conditions within a single rule to **block specific requests** based on different URLs. This is useful for preventing unnecessary or harmful requests, improving performance, and ensuring a cleaner browsing or testing environment.
+
+<img src="/images/multiple-conditions-in-a-single-rule-in-requestly/f5adcff8-801a-403f-957e-8e117ce06cc1.png" align="center" fullwidth="false" />
+
+**Key Points to Remember**
+
+* Each condition applies **independently** to the matching URLs.
+
+* Once a request is **canceled**, no further processing occurs for that request.
+
+* The rule applies to **both browser requests and API calls**, ensuring unwanted requests are blocked across different scenarios.
+
+### Delay Network Request Rule
+
+The **Delay Network Request Rule** in Requestly Interceptor allows users to define multiple conditions within a single rule to **artificially delay specific requests**. This is useful for testing how applications behave under slow network conditions or simulating real-world latency issues.
+
+<img src="/images/multiple-conditions-in-a-single-rule-in-requestly/405cc76f-7844-4c8a-9752-bdaf017c14e5.png" align="center" fullwidth="false" />
+
+**Key Points to Remember**
+
+* Each condition applies **independently** to the matching URLs.
+
+* **Delays apply only to matched requests**, meaning unrelated requests remain unaffected.
+
+* Requests are **paused before reaching the server**, simulating real-world latency.
+
+### Insert Script Rule
+
+Insert Script rule allows you to insert multiple scripts and styles on a single page all the scripts are executed serially, You define a **single condition**, specifying the URL where the scripts should be injected. Multiple JavaScript and CSS files can be added to that page. Scripts and styles execute **serially, in order**, ensuring dependencies are handled correctly.
+
+**How It Works**
+
+* You define a **single condition**, specifying the URL where the scripts should be injected.
+
+* Multiple JavaScript and CSS files can be added to that page.
+
+* Scripts and styles execute **serially, in order**, ensuring dependencies are handled correctly.
+
+<img src="/images/multiple-conditions-in-a-single-rule-in-requestly/15d7d34e-c1b4-4a4d-abcb-e7b9715a0f9f.png" align="center" fullwidth="false" />
+
+**Key Points to Remember**
+
+* **Single Condition:** The rule applies to **one URL pattern** only.
+
+* **Multiple Scripts and Styles:** You can inject multiple JavaScript and CSS files.
+
+* **Serial Execution:** Scripts run **one after another**, following the specified order.
+
+* **Ensuring Dependencies:** If one script depends on another, place it **later in the order**.
+
+**Best Practices**
+
+* **Load Dependencies First:** If a script relies on another (e.g., jQuery), inject it **before** dependent scripts.
+
+* **Use Minified Versions:** For better performance, use minified .js and .css files.
+
+* **Avoid Blocking UI:** Large scripts should be loaded asynchronously when possible.
+
+* **Test in Requestly Interceptor:** Use the **Test Rule** feature to ensure scripts load in the right sequence.

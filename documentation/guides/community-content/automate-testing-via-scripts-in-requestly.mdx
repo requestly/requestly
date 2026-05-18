@@ -1,0 +1,236 @@
+---
+title: Automate API Testing via Scripts in Requestly
+author: Mustafa Sayyed
+authorUrl: https://github.com/mustafa-sayyed
+date: 2025-11-13
+description: Learn how to automate repetitive API testing tasks using Requestly's powerful Pre-request and Post-response scripting features
+tags: [api-testing, scripting, testing]
+difficulty: beginner
+---
+
+# Automate API Testing via Scripts in Requestly
+
+## Introduction
+
+While working on backend projects, I started noticing a pattern in my API testing workflow. A lot of time was going into small repetitive steps - adding authentication tokens, updating headers, checking response fields, and copying values from one request into another.
+
+None of it was difficult, but it was slowing everything down.
+
+When I started exploring Requestly's Pre-request and Post-response scripting feature, things changed. With a few small scripts, I was able to automate most of those repetitive steps and focus more on actual development and debugging instead of setup work.
+
+In this article, I'll walk through what I learned, the examples I tried, and how you can use Requestly scripts to make your own API testing faster and more organized.
+
+## Scripts?
+
+Now, you may be questioning what these scripts are.
+
+The Scripts are just functions written in JavaScript to customize and validate API requests, responses, dynamically inject headers, authentication tokens, and many more things you can do using scripts.
+
+> In fact, they have introduced an amazing new feature that allows you to use NPM packages inside scripts. I will talk about it later in this article.
+
+**In Requestly**, Scripts allow you to customize requests before the request is sent ( Pre-Request Scripts ) and validate the response data after the request is executed ( Post-Request Scripts)
+
+![Pre-Request and Post-Request Scripts](/images/guide-pre-and-post-scripts/scripts.png)
+
+
+Before diving deep into pre-request scripts and post-request scripts, let's understand the basics of Scripting.
+
+## The Basics:
+
+**rq**: rq is the base object that contains all the methods that you can use for testing, customizing APIs, and validating responses. The `rq` object is available in all pre-request and post-response scripts.
+
+**rq.request**: Access and manipulate API request details including method, headers, body, URL, and query parameters. Use this in both pre-request and post-response scripts to read or modify request data.
+
+**rq.response**: Access API response details including body, headers, status code, and response time. Primarily used in post-response scripts to process and validate API responses.
+
+**rq.test**: The `rq.test` object allows you to write tests in your post-response scripts to validate API responses and ensure your APIs are working as expected. You can learn more about `rq.test` here.
+
+**rq.expect**: Write assertions for API testing using the powerful Chai.js assertion library. Use it with `rq.test` to validate response data.
+
+**rq.environment**: Manage environment-specific variables dynamically. Environment variables are scoped to a specific environment (dev, staging, production) and can be used across multiple requests.
+
+
+## Console Logs in Scripts
+
+You can even use `console.log()` or `console.error()` in your Pre-Request and Post-Response Scripts to debug your logic and inspect values at runtime. The logs are prefixed with `#script` so you can filter them, and they appear in Requestly's built-in DevTools panel: click the **DevTools** button in the footer to open the Console tab, or use the **Debug** tab in the response area to see logs for a single request. See the [DevTools page](/api-client/devtools) for the full walkthrough.
+
+Let's now dive deep into the Pre-Request and Post-Request Scripts
+
+---
+
+## Pre-Request Scripts:
+
+Pre-request scripts execute right before the API call hits the server. Use them to tweak headers, bodies, query params, or URLs based on logic, variables, or conditions.​
+
+Access request details through rq.request and manage variables with rq.environment or rq.globals. Common uses include auth token injection and random data generation.
+
+### Example 1: Automatically Inject Auth Tokens in Headers
+
+One of the most annoying parts of API testing is dealing with authentication tokens.
+
+When testing login or register APIs, the server typically returns an authentication token in the response. After that, for every protected API, you have to manually copy that token and paste it into the Authorization header again and again.
+
+It's time-consuming, error-prone, and honestly… very frustrating.
+
+With Requestly scripts, you can completely automate this process.
+
+#### Step 1: Save Token from Login Response
+
+In the Post-response Script of your login or register API, add:
+
+```javascript
+// Save auth token in environment variable
+rq.environment.set("authToken", rq.response.json().accessToken);
+```
+
+Now, whenever the login request succeeds, the token is automatically stored in Requestly's environment.
+
+#### Step 2: Inject Token into Every Request Automatically
+
+In the Pre-request Script of your protected APIs, add:
+
+```javascript
+const token = rq.environment.get("authToken");
+rq.request.headers["Authorization"] = `Bearer ${token}`;
+```
+
+Now every request automatically carries the correct authentication token - no manual copying, no mistakes, no wasted time.
+
+### Example 2: Auto-Increment Pagination
+
+For paginated APIs, increment a page counter automatically: Suppose your API looks like this, and you are using an environment variable to keep track of the page number
+
+```
+https://api.example.com/users?page={{page_number}}
+```
+
+Pre-Request script:
+
+```javascript
+const currentPage = rq.environment.get("page_number") || 0;
+rq.environment.set("page_number", currentPage + 1);
+```
+
+Now, every time you hit Send, the page number increases automatically
+
+---
+
+## Post-Request Scripts:
+
+Post-response scripts run after the server responds. This is where Requestly becomes incredibly powerful.
+
+Post-response scripts allow you to:
+
+- Inspect the response
+- Validate data
+- Log important values
+- Extract information for later requests
+- Automate multi-step API workflows
+
+### Example 1: Validating API Responses Automatically
+
+Instead of manually checking if an API succeeded, you can let Requestly do it for you.
+
+Add this in the Post-response Script:
+
+```javascript
+if (rq.response.status !== 200) {
+  console.error("Request failed with status:", rq.response.status);
+}
+```
+
+Now, whenever an API fails, you'll immediately see a clear error in the console.
+
+### Example 2: Debugging APIs with Structured Logs
+
+When an API behaves strangely, Post-response scripts become your debugger.
+
+```javascript
+console.log("Status:", rq.response.status);
+console.log("Headers:", rq.response.headers);
+console.log("Body:", rq.response.body);
+```
+
+This gives you a complete picture of what the server returned.
+
+### Example 3: Advanced Testing with Assertions
+
+Validate schemas and body paths:
+
+```javascript
+rq.test("Status is OK", () => {
+  rq.response.to.be.ok;
+});
+
+rq.test("Valid user schema", () => {
+  rq.response.to.have.jsonSchema({
+    type: "object",
+    required: ["id", "name"],
+    properties: {
+      id: { type: "number" },
+      name: { type: "string" }
+    }
+  });
+});
+
+rq.test("Correct user name", () => {
+  rq.response.to.have.jsonBody("user.name", "John Doe");
+});
+```
+
+---
+
+## Use NPM Packages Inside Your Requestly Scripts
+
+One feature that really surprised me while working with Requestly is that you're not limited to plain JavaScript. You can actually use popular NPM packages directly inside your scripts.
+
+This opens up a lot of powerful possibilities - from generating fake data to validating complex formats.
+
+Let's look at a simple but extremely useful example.
+
+### Example: Generating Unique User IDs using uuid
+
+Suppose you are testing a user creation API and every request needs a unique identifier.
+
+Instead of manually typing random values, you can use the popular uuid package.
+
+```javascript
+// Pre Request Script
+const { v4: uuidv4 } = require("uuid");
+
+const userId = uuidv4();
+
+rq.request.body = JSON.stringify({
+  id: userId,
+  name: "Test User",
+  role: "admin"
+});
+```
+
+Now, every time you send the request:
+
+- a new unique ID is generated
+- automatically attached to the request body
+- without any manual effort
+
+
+## Use AI to generate Test Scripts
+Requestly recently introduced a new feature to generate tests scripts using AI.
+You can use AI to generate Pre-Request and Post-Response scripts by describing what you want.
+
+Learn more about [AI Test Generation](https://docs.requestly.com/api-client/ai-test-generator)
+
+![AI Generated Scripts](/images/guide-pre-and-post-scripts/ai-generate-scripts.gif)
+
+
+## Wrapping Up
+In this article, we explored how Requestly's Pre-request and Post-response scripting features can automate repetitive API testing tasks. By injecting authentication tokens, automating pagination, validating responses, and even using NPM packages like uuid, you can significantly speed up your workflow.
+
+The best part is that these scripts are easy to set up and require only basic JavaScript knowledge. Once you start using them, you'll wonder how you ever managed without them.
+
+
+## Additional Resources
+
+- Learn more about [Requestly Scripts](https://docs.requestly.com/api-client/scripts)
+- [Use NPM Packages in Requestly Scripts - YouTube](https://youtu.be/C21BaqCOxF0?si=46P7AVdl5dR5NPfC)
+- [Pre Scripts and Post Scripts in Requestly - YouTube](https://youtu.be/jh3Pu4XnbxQ?si=l0hkO0EoCIuxHdEZ)

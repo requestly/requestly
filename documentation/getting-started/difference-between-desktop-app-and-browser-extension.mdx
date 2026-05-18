@@ -1,0 +1,169 @@
+---
+title: Desktop App vs Browser Extension
+label: Desktop App vs Browser Extension
+slug: difference-between-desktop-app-and-browser-extension
+description: >-
+  Compare the Requestly Desktop App and Browser Extension to choose the right HTTP interception setup.
+seoTitle: Requestly Desktop App vs Browser Extension
+seoDescription: >-
+  Compare Requestly's Desktop App and Browser Extension for HTTP interception, traffic debugging, and rule application.
+visibility: PUBLIC
+---
+
+Requestly offers two ways to intercept and modify HTTP traffic. Use the right one for your workflow, or use both in combination.
+
+<CardGroup cols={2}>
+  <Card title="Browser Extension" icon="browser" href="/getting-started/quick-start-guide/browser-extension-setup">
+    **Best for:** Intercepting and modifying traffic from inside the browser, fast setup, no configuration.
+  </Card>
+
+  <Card title="Desktop App" icon="desktop" href="/getting-started/quick-start-guide/desktop-app-setup">
+    **Best for:** System-wide traffic interception, desktop apps, mobile devices, simulators, terminal, Node.js.
+  </Card>
+</CardGroup>
+
+<Tip>
+  **Can't decide?** Both experiences sync your rules through Team Workspaces, so you can use whichever suits your current task.
+</Tip>
+
+---
+
+## Feature Comparison
+
+### Platform Availability
+
+| Feature                | Browser Extension                                 | Desktop App                 |
+| ---------------------- | ------------------------------------------------- | --------------------------- |
+| **Supported Browsers** | Chrome, Firefox, Edge, Brave, Arc, Vivaldi, Opera | N/A                         |
+| **Supported OS**       | Any OS with supported browser                     | Windows, macOS, Linux       |
+| **Installation**       | Install from browser store                        | Download installer          |
+| **Launch Speed**       | Fast (in browser)                                 | Fast (standalone app)       |
+
+---
+
+### Interception Scope
+
+| Feature                           | Browser Extension | Desktop App |
+| --------------------------------- | ----------------- | ----------- |
+| **Intercept browser traffic**     | ✅ Supported      | ✅ Supported |
+| **Intercept desktop app traffic** | ❌ Not supported  | ✅ Supported |
+| **Intercept mobile devices**      | ❌ Not supported  | ✅ Supported |
+| **Intercept iOS/Android simulators** | ❌ Not supported | ✅ Supported |
+| **Intercept Node.js apps**        | ❌ Not supported  | ✅ Supported |
+| **Intercept terminal/CLI traffic** | ❌ Not supported | ✅ Supported |
+| **System-wide proxy**             | ❌ Not supported  | ✅ Supported |
+
+---
+
+### HTTP Rules
+
+| Feature                       | Browser Extension | Desktop App  |
+| ----------------------------- | ----------------- | ------------ |
+| **Modify Headers**            | ✅ Supported      | ✅ Supported |
+| **Modify Request/Response Body** | ✅ Supported    | ✅ Supported |
+| **Modify Query Params**       | ✅ Supported      | ✅ Supported |
+| **Redirect Rules**            | ✅ Supported      | ✅ Supported |
+| **Replace Strings**           | ✅ Supported      | ✅ Supported |
+| **Delay Requests**            | ✅ Supported      | ✅ Supported |
+| **Cancel Requests**           | ✅ Supported      | ✅ Supported |
+| **Insert Scripts**            | ✅ Supported      | ✅ Supported |
+| **Map Local / Map Remote**    | ✅ Supported      | ✅ Supported |
+| **Modify User Agent**         | ✅ Supported      | ✅ Supported |
+
+---
+
+### Network Inspection & Sessions
+
+| Feature                             | Browser Extension | Desktop App  |
+| ----------------------------------- | ----------------- | ------------ |
+| **Network Traffic Table**           | ✅ (via DevTools) | ✅ Supported |
+| **Session Recording**               | ✅ Supported      | ✅ Supported |
+| **HAR File Import**                 | ✅ Supported      | ✅ Supported |
+| **Save logs to local file**         | ❌ Not supported  | ✅ Supported |
+
+---
+
+### Collaboration & Workspaces
+
+| Feature             | Browser Extension | Desktop App    |
+| ------------------- | ----------------- | -------------- |
+| **Local Workspace** | ❌ Not available  | ✅ Supported   |
+| **Team Workspaces** | ✅ Supported      | ✅ Supported   |
+
+---
+
+## Decision Guide
+
+<Tabs>
+  <Tab title="Browser Extension">
+    ### Choose the **Browser Extension** if you:
+
+    - ✅ Only need to intercept traffic inside a browser
+    - ✅ Want a zero-configuration setup
+    - ✅ Debug web apps during frontend development
+    - ✅ Work mostly with JSON/HTML responses in the browser
+
+    <Card title="Set up the Browser Extension" icon="browser" href="/getting-started/quick-start-guide/browser-extension-setup">
+      Install and get started in under a minute
+    </Card>
+  </Tab>
+
+  <Tab title="Desktop App">
+    ### Choose the **Desktop App** if you:
+
+    - ✅ Need to intercept traffic from mobile devices or simulators
+    - ✅ Debug native desktop applications
+    - ✅ Modify traffic from Node.js, terminal, or CLI tools
+    - ✅ Require a local workspace for offline work
+    - ✅ Want system-wide proxy control
+
+    <Card title="Set up the Desktop App" icon="desktop" href="/getting-started/quick-start-guide/desktop-app-setup">
+      Download and configure the full-featured desktop application
+    </Card>
+  </Tab>
+</Tabs>
+
+---
+
+## Can I Use Both?
+
+**Absolutely.** Many people use both:
+
+- **Browser Extension** for quick in-browser debugging during frontend work
+- **Desktop App** for mobile, native-app, and system-wide interception
+
+Your rules sync across both when you use Team Workspaces, giving you flexibility to switch based on your current task.
+
+---
+
+## Need Help Choosing?
+
+<CardGroup cols={2}>
+  <Card
+    title="Getting started"
+    href="/getting-started/overview"
+    icon="rocket"
+  >
+    Choose a path and set up Requestly
+  </Card>
+
+  <Card
+    title="Browser Extension setup"
+    href="/getting-started/quick-start-guide/browser-extension-setup"
+    icon="browser"
+  >
+    Install and configure the browser extension
+  </Card>
+
+  <Card
+    title="Desktop App setup"
+    href="/getting-started/quick-start-guide/desktop-app-setup"
+    icon="desktop"
+  >
+    Install and configure the desktop app
+  </Card>
+
+  <Card title="Team Workspaces" href="/collaboration/workspaces" icon="users">
+    Sync your work across platforms
+  </Card>
+</CardGroup>

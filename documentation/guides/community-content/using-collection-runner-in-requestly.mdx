@@ -1,0 +1,218 @@
+---
+title: Automating API Tests with Requestly Interceptor's Collection Runner
+author: Bhogeshwarj
+authorUrl: https://github.com/bhogeshwarj
+date: 2025-11-13
+description: Learn how to automate API testing workflows using Requestly Interceptor's Collection Runner feature - from setup to execution, with real examples using JSONPlaceholder.
+tags: [api-testing, automation, collection-runner, testing, workflow]
+difficulty: beginner
+---
+
+## Introduction
+
+"What if I could test all my APIs at once, like a chain reaction, without switching tabs or hitting Send repeatedly?"
+
+If you've ever tested APIs manually, you know the pain:
+
+1. Send a login request
+2. Copy the token
+3. Paste it into the next request
+4. Then test one endpoint after another
+
+It's repetitive and time-consuming, especially when you're testing a whole workflow like **Login → Create User → Fetch User → Delete User**.
+
+That's where Requestly Interceptor's Collection Runner shines. In this guide, I'll walk you through how I explored the Collection Runner feature, how it simplifies API automation, and how you can start using it right away, even if you're completely new to automated API testing.
+
+## Prerequisites
+
+Before you begin, make sure you have:
+
+- Requestly Interceptor app installed (desktop or browser extension)
+- Basic understanding of APIs and HTTP methods
+- Access to an API for testing (we'll use JSONPlaceholder in this tutorial)
+- Familiarity with JavaScript (helpful but not required)
+
+## What Is the Collection Runner?
+
+The Collection Runner in Requestly Interceptor lets you execute multiple saved API requests sequentially, in a single automated flow.
+
+Imagine chaining requests together: **Login → Create User → Fetch User → Delete User**
+
+You can run them one after another, apply test scripts, reuse variables, and even debug results visually, all without writing a single line of backend automation code.
+
+## Step-by-Step Guide
+
+### Step 1: Setting Up Your First Collection
+
+I started by opening the Requestly Interceptor app → going to **APIs** → **New** → and clicking **Collection**. You can also import a pre-existing API collection by clicking the **Import** button.
+
+I named mine **User Management APIs**, because I wanted to simulate a typical CRUD workflow using JSONPlaceholder's `/users` endpoint.
+
+Inside my collection, I added the following 4 requests:
+
+1. `GET /users`, Fetch all users
+2. `GET /users/1`, Get a specific user
+3. `POST /users`, Create a new user
+4. `DELETE /users/1`, Delete a user (mock)
+
+![Setting Up](/images/using-collection-runner-in-requestly/setting-up.png)
+
+Each request can include pre-request scripts, test scripts, and variables.
+
+### Step 2: Using Pre-Request & Post-Response Scripts
+
+You can use JavaScript to make your requests dynamic. Let's test a real example using JSONPlaceholder (a free mock API).
+
+#### Pre-Request Script
+
+```javascript
+const randomName = "User_" + (+new Date()).toString(36).slice(-5);
+const randomEmail = randomName + "@example.com";
+const randomPhone = Math.floor(Math.random() * 9000000000) + 1000000000;
+
+rq.environment.set("name", randomName);
+rq.environment.set("email", randomEmail);
+rq.environment.set("phone_number", randomPhone);
+```
+
+#### Post-Request Script
+
+```javascript
+rq.test("Status code is 201", () => {
+  rq.response.to.have.status(201);
+});
+
+rq.test("Request method is POST", () => {
+  rq.expect(rq.request.method).to.equal("POST");
+});
+
+rq.test("Response has valid JSON body", () => {
+  rq.response.to.have.jsonBody();
+});
+
+rq.test("Response body is JSON object", () => {
+  const parsed = JSON.parse(rq.response.body);
+  rq.expect(parsed).to.be.an("object").and.not.to.be.an("array");
+});
+```
+
+![Scripts](/images/using-collection-runner-in-requestly/add-scripts.png)
+
+These tests automatically validate the response when your collection runs. So now, after every run, I could instantly see if a request passed or failed, without manually checking the response body.
+
+### Step 3: Running All Your Requests at Once
+
+Once my collection was ready, I clicked the little **▶ Run** icon beside it (honestly, the most satisfying button).
+
+This opened the Collection Runner, where I could configure:
+
+![Collection Runner](/images/using-collection-runner-in-requestly/collection-runner.png)
+
+- **Iterations**: How many times to repeat the run
+- **Delay**: How long to wait between requests (useful if your server needs a breather)
+- **Select data file**: Optional, useful if you want to pass different input sets for multiple runs
+
+### Step 4: Reordering or Skipping Requests
+
+Here's something I really liked, before running, I could reorder the requests or uncheck the ones I didn't want to include.
+
+I dragged my "Delete User" request to the end (because, obviously, who deletes before testing?). That small UX detail made the workflow feel super flexible.
+
+![Reordering](/images/using-collection-runner-in-requestly/reordering.png)
+
+After setting everything up, I hit **Run Collection**, and boom! Requestly Interceptor started running all my requests in order, one after another, while I just watched it go.
+
+![Collection-Running](/images/using-collection-runner-in-requestly/collection-successful-running.png)
+
+### Step 5: Making It Dynamic with Variables & Environments
+
+Hardcoding URLs and values works for one-time tests, but it quickly becomes a hassle when switching between environments like dev, staging, or prod.
+
+That's where variables come in. Instead of writing full URLs, you can use placeholders like:
+
+```
+{{base_url}}/users
+```
+
+Then, in your **Variables** tab, define your base URL:
+
+![Variables](/images/using-collection-runner-in-requestly/setting-variables.png)
+
+This way, you can easily switch between different environments without modifying each request individually.
+
+### Step 6: The Results Dashboard
+
+After running my JSONPlaceholder collection, Requestly Interceptor displayed a **Run Summary** that instantly made everything click.
+
+It didn't just show "pass" or "fail", it broke everything down clearly:
+
+- ✅ Number of passed tests
+- ❌ Number of failed tests
+- ⏱ Total execution time
+- 💬 Average response time per request
+
+Each request had its own section showing:
+
+- HTTP method and endpoint (like `GET /users`, `POST /users`, `DELETE /users`)
+- Response status (e.g., `200 OK`, `201 Created`)
+- Test outcomes for each assertion you wrote
+- Response body preview
+
+![Final Tests](/images/using-collection-runner-in-requestly/final-tests.png)
+
+Another really neat feature is the **History** tab in the top right corner. It automatically saves each run, so you can:
+
+- Revisit old runs anytime
+- Compare results between test iterations
+- Track when something started failing
+
+That means you can build up a timeline of test runs, perfect for debugging or regression tracking later on.
+
+## What's Actually Happening Behind the Scenes
+
+Here's a simple breakdown of what goes on under the hood when you click **Run**:
+
+1. Variables like `{{base_url}}` get replaced
+2. Pre-request scripts (if any) execute
+3. The actual HTTP request is made
+4. Post-response tests run automatically
+5. Everything is logged in the Test results for you to analyze
+
+It's basically like having a mini continuous testing pipeline, right inside Requestly Interceptor, but without the complexity of CI/CD setup.
+
+## Examples
+
+### Real-World Use Cases
+
+After just one run, I could already see how useful this tool is for developers and testers alike:
+
+**Regression Testing**: Run your full suite of APIs before every deployment.
+
+**Chained Workflow Testing**: Simulate real user journeys (e.g., Create → Fetch → Update → Delete).
+
+**Environment Switching**: Use variables to test across dev, staging, and prod instantly.
+
+**QA Validation**: Automate repeated test cases with zero manual effort.
+
+## Conclusion
+
+The Collection Runner in Requestly Interceptor turns API testing from a manual chore into an effortless, automated workflow. Instead of juggling multiple tabs and copying data around, you can just run one collection and validate everything at once.
+
+**Key Takeaways:**
+
+- Collections let you organize and run multiple API requests in sequence
+- Pre and post-request scripts enable dynamic testing and validation
+- Variables make it easy to switch between environments
+- The results dashboard provides instant visibility into test outcomes
+- History tracking helps with debugging and regression analysis
+
+It's like giving your APIs an autopilot mode. Try it once, and you'll never want to test manually again.
+
+## Additional Resources
+
+- [Requestly Interceptor Documentation, Collection Runner](https://docs.requestly.com)
+- [Try Requestly Interceptor App](https://app.requestly.io)
+- [GitHub Docs Repo](https://github.com/requestly/requestly-docs)
+- [JSONPlaceholder Fake REST API](https://jsonplaceholder.typicode.com)
+
+---

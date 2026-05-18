@@ -1,0 +1,84 @@
+---
+title: Get Group
+label: Get Group
+slug: get-group
+description: >-
+  Learn how to retrieve details of specific groups or all groups using
+  Requestly Interceptor's API
+seoTitle: Get Group
+seoDescription: >-
+  Learn how to retrieve details of specific groups or all groups using
+  Requestly Interceptor's API
+visibility: PUBLIC
+---
+***
+
+This endpoint allows you to fetch a list of all groups in your Requestly Interceptor account. It supports pagination for handling large datasets.
+
+For a live view and to test this API interactively, visit the [API Playground](https://requestly.readme.io/reference/get_groups-1).
+
+***
+
+### Endpoint
+
+* **Method**: GET
+
+* **URL**: `https://api2.requestly.io/v1/groups`
+
+***
+
+### Query Parameters
+
+| **Parameter** | **Type** | **Description**                                                       | **Required** | **Default Value** |
+| ------------- | -------- | --------------------------------------------------------------------- | ------------ | ----------------- |
+| `offset`      | Integer  | The index from where the results should start. Useful for pagination. | No           | `0`               |
+| `pageSize`    | Integer  | The number of results to return. Maximum value is `75`.               | No           | `30`              |
+
+***
+
+### cURL Request
+
+```bash
+curl --request GET \
+  --url https://api2.requestly.io/v1/groups \
+  --header 'accept: application/json' \
+  --header 'x-api-key: your_api_key'
+```
+
+***
+
+### Sample Response
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "createdBy": "IUAGkRiEx6XI0B6qCc82qbwroKX2",
+      "creationDate": 1736059835086,
+      "currentOwnerId": "IUAGkRiEx6XI0B6qCc82qbwroKX2",
+      "id": "Group_qrszh",
+      "isFavourite": false,
+      "lastModifiedBy": "IUAGkRiEx6XI0B6qCc82qbwroKX2",
+      "modificationDate": 1736059835086,
+      "name": "Group",
+      "objectType": "group",
+      "status": "Inactive"
+    },
+    ... more groups
+  ],
+  "nextOffset": null,
+  "total": 50
+}
+```
+
+***
+
+### Response Codes
+
+| **Status Code** | **Description**                        |
+| --------------- | -------------------------------------- |
+| **200**         | List of groups retrieved successfully. |
+| **400**         | Bad Request.                           |
+| **401**         | Unauthorized action.                   |
+| **500**         | Server error.                          |

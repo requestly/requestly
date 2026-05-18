@@ -1,0 +1,43 @@
+---
+title: "Advance Filters"
+slug: "advance-filters"
+path: "/http-rules/advanced-usage/advance-filters"
+visibility: "PUBLIC"
+format: "MDX"
+---
+
+Enhance your source conditions with additional filters. These can be accessed using the filters button next to the input field
+
+<img src="/images/advance-filters/13705b27-0f18-48b7-a830-bdd60be11537.png" align="center" fullwidth="false" />
+
+### Supported Options
+
+Filter options vary depending on the type of rule you're working with. Here's a breakdown of what's available:
+
+**Common Filters (Available for Most Rules):**
+
+<img src="/images/advance-filters/1255c445-5b3e-4839-93f3-5a6560b4dc2a.png" align="center" fullwidth="false" />
+
+* **Page Domain Name:** Limit targeting to requests originating from a specific domain. This is especially useful for distinguishing between network calls made from different websites, such as CDN calls shared across multiple domains.
+
+* **Resource Type:** Specify the type of resource to limit matching to particular requests. For instance, path-level matching can apply to both CSS and JavaScript files, but advanced filters allow narrowing it down to only CSS or JavaScript as needed.
+
+* **Request Method:** Filter based on the HTTP method (e.g., GET, POST, OPTIONS). For example, two requests can have the same path but behave differently based on the method used. An API call to a resource with the GET method retrieves the resource details, while a PATCH call updates the resource.
+
+### Modify Request Body & Modify API Response
+
+Only the **Request Method** filter is available for these rule types.\
+Use it to precisely target requests based on how they're made.
+
+<img src="/images/advance-filters/c6416f7c-68bf-4f0e-8083-c56ca4d3815d.png" align="center" fullwidth="false" />
+
+### Insert Script Rule
+
+<img src="/images/advance-filters/99f35968-81bf-400d-8d50-29aacf7a9bc0.png" align="center" fullwidth="false" />
+
+**Resource Type**\
+Specify where the script should be injected:
+
+* **Main Document**: Insert into the main page
+
+* **iFrame Document**: Inject into an embedded iframe

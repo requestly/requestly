@@ -1,0 +1,102 @@
+---
+title: "Delay Network Requests"
+slug: "delay-network-requests"
+path: "/http-rules/rule-types/delay-network-requests"
+visibility: "PUBLIC"
+format: "MDX"
+description: "Learn how to configure HTTP rules to simulate network latency for testing slow connections"
+---
+
+***
+
+The **Delay Network Request** rule in Requestly Interceptor enables you to simulate network latency on HTTP requests for testing and debugging purposes. By adding delays, you can observe how your application behaves under slow network conditions.
+
+## Why Use the Delay Network Requests?
+
+* **Test Slow Network Scenarios:** Understand how your application handles slow connections, especially for users in remote areas.
+
+* **Test API Latency:** Evaluate how your app behaves when one or more APIs respond slowly, ensuring appropriate error handling and fallback mechanisms.
+
+* **Identify Race Conditions:** Check if any race conditions exist when resource X gets loaded before or after resource Y.
+
+* **UI/UX Testing:** Verify if the user interface provides appropriate feedback (like loaders or error messages) during delays.
+
+<img src="/images/delay-network-requests/00ad2ee5-c12b-4ced-9646-a318c6ff0a40.png" align="center" fullwidth="false" />
+
+## How to Configure the Rule
+
+<Steps>
+  <Step title="Open HTTP Rules and Create a New Rule">
+    Navigate to the HTTP Rules tab in the web or desktop app. Click on `+ New Rule` and select `Delay Network Requests` from the options.
+
+    <img src="/images/delay-network-requests/e7cb46fe-471d-4f77-a651-9d2efe17d325.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Name and Describe Your Rule">
+    Provide a **descriptive name** for the rule to keep your setup organized. Optionally, add a **brief description** explaining its purpose for easier identification later.
+
+    <img src="/images/delay-network-requests/cc455327-ebc9-4a82-9289-c550aebdd82b.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Define the Source Condition">
+    Define where the rule should be applied by specifying criteria such as **URL**, **Host**, or **Path**. You can choose from options like **Regex**, **Contains**, **Wildcard**, or **Equals**, or use <a target="_blank" href="/http-rules/advanced-usage/advance-filters">**Advance Filters**</a> for more precise conditions.
+
+    For more details on source conditions, [**read this guide**.](/http-rules/advanced-usage/advance-targeting)
+
+    <Card title="Example :">
+      To apply a rule to an API fetching product data on [our playground website](https://www.requestly-playground.com/), use the following configuration:
+
+      * **Condition Type:** URL
+
+      * **Operator:** Contains
+
+      * **Value:** `rest.requestly-playground.com/api/products`
+
+      This example targets the product data API of our playground website, [`https://www.requestly-playground.com/`](https://www.requestly-playground.com/)**.**
+    </Card>
+
+    <img src="/images/delay-network-requests/4788f672-577c-4942-80df-75ab5f13ef62.png" align="center" fullwidth="false" />
+
+    You can also import this rule and apply it directly by using this [**shared list**](https://app.requestly.io/rules/shared-lists/viewer/ba070616357f468593a2b16131e7ccd0-Delay-API-Response).
+  </Step>
+
+  <Step title="Set the Request Delay">
+    Specify the delay duration in milliseconds. For example, enter `4000` to introduce a 4-second delay.
+
+    <Warning>
+      **Delay Capping**, In the browser extension, delays are capped to prevent performance issues. The maximum delay is **5000 ms** for XHR/Fetch requests and **10000 ms** for other resources (JS, CSS, images, etc.). The <a target="_blank" href="https://requestly.com/desktop">Desktop App</a> has no such restrictions.
+    </Warning>
+
+    <img src="/images/delay-network-requests/5144a828-7638-4a87-bc32-74bd9d23f583.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Save and Activate the Rule">
+    Once you are satisfied with your configuration, click **Save** to store the rule. After saving, make sure to toggle the rule **ON** to activate it. This will apply the rule and ensure it works as expected.
+
+    <img src="/images/delay-network-requests/8447e1ee-595b-40e1-8501-4b21c47dfcbe.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Test the Rule">
+    To ensure the rule is working correctly, click the **Test** button and enter the URL of the page where you want to apply this rule.
+
+    <img src="/images/delay-network-requests/98cd87ee-654e-450b-bc7a-55bf7e45456a.png" align="center" fullwidth="false" />
+  </Step>
+</Steps>
+
+<Tip>
+  There are multiple ways to validate if a rule is applied or not, learn more about how to <a target="_blank" href="/http-rules/advanced-usage/validate-rules-execution">**validate rule execution**</a>**.**
+</Tip>
+
+<Tabs>
+  <Tab title="Before">
+    This will open the webpage in a new tab, with a widget showing the status of applier rules.
+
+    <img src="/images/delay-network-requests/cb9e06e8-f842-445d-9415-60c44d316aaa.png" align="center" fullwidth="false" />
+  </Tab>
+
+  <Tab title="After">
+    Here, You can see the requests are delayed, as the `Queued At`/`Started At` time in the Network tab goes up by 4 seconds (4000 ms).
+
+    <img src="/images/delay-network-requests/7298fd50-0fbc-4b35-9e2f-e1e174cc4530.png" align="center" fullwidth="false" />
+  </Tab>
+</Tabs>

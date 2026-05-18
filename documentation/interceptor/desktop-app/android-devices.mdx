@@ -1,0 +1,169 @@
+---
+title: "Android Devices Interception"
+slug: "android-devices"
+path: "/http-interceptor/desktop-app/android-devices"
+visibility: "PUBLIC"
+format: "MDX"
+description: "Learn how to set up Requestly Interceptor to intercept, monitor, and debug HTTP requests on your Android devices for Android app development, debugging, and testing."
+---
+
+***
+
+When working with Android apps, debugging HTTP Requests can be a challenge. Requestly Interceptor provides an easy-to-use solution for everyone who needs to monitor, modify, or debug HTTP requests and responses during development or QA testing. This section outlines step-by-step instructions, guiding you on how to set up Requestly Interceptor for your Android device.
+
+By the end of this guide, you will have a fully functional interception setup tailored to your Android development needs.
+
+## **Step-by-Step Guide**
+
+## Rooted Setup
+
+If you have a rooted device the setup is straightforward -
+
+<Steps>
+  <Step title="Enable USB Debugging">
+    Open **Settings > Developer Options** on your device and turn on **USB Debugging**.
+  </Step>
+
+  <Step title="Connect the Emulator">
+    Use a USB cable to connect your device to your computer and launch the **Requestly Interceptor Desktop App**.
+  </Step>
+
+  <Step title="Connect Device">
+    On the Requestly Interceptor dashboard click **Connect Apps > Mobile Apps and Browser**, and Requestly Interceptor will automatically list out detected devices. Simply click **Connect** to proceed. 🎉
+  </Step>
+
+  <Step title="Verify Connection">
+    Once connected, a success message will appear. You can now visit [amiusing.requestly.io](http://amiusing.requestly.io) to verify your connection.
+  </Step>
+</Steps>
+
+## Non Rooted Setup
+
+If your device is not rooted, you can manually setup Requestly Interceptor by following these steps:
+
+### Configure proxy
+
+<Steps>
+  <Step title="Select Network">
+    <img src="/images/android-devices/a7d9984e-410c-4968-b84b-dec4f2fc169b.png" align="center" fullwidth="false" />
+
+    Tap on the Internet and click on the gear icon on the connected network name to open its settings.
+  </Step>
+
+  <Step title="Modify Network Settings">
+    <img src="/images/android-devices/8842c671-0b7c-4fe2-b128-2a51d62fad70.png" align="center" fullwidth="false" />
+
+    * At the top right of the screen click the edit icon
+
+    * Enable "Advanced Options" if needed.
+
+    * Set the **Proxy** to "Manual."
+  </Step>
+
+  <Step title="Enter Proxy Details">
+    <img src="/images/android-devices/bfa40352-26e3-409d-91da-bbb7c80d2dc0.png" align="center" fullwidth="false" />
+
+    Input the following:
+
+    * **Proxy Hostname:** Use the IP shown in the Requestly Interceptor Desktop App (e.g., `192.168.1.10`).
+
+    * **Proxy Port:** Use the port displayed in the Requestly Interceptor Desktop App (e.g., `8080`).
+  </Step>
+
+  <Step title="Save Changes">
+    Apply the settings and continue with the certificate installation
+  </Step>
+</Steps>
+
+### Install CA Certificate
+
+To intercept HTTPS traffic, you also need to install Requestly Interceptor's root CA certificate on your device:
+
+<Steps>
+  <Step title="Download Certificate">
+    <img src="/images/android-devices/f74bc49a-05cf-401c-a832-cffb0aa4dac3.png" align="center" fullwidth="false" />
+
+    * Open Chrome in an incognito tab
+
+    * Go to [http://requestly.io/ssl](http://requestly.io/ssl) (⚠️ **Use HTTP here, not HTTPS)**
+
+    * This will download RQProxyCA.pem.cert
+  </Step>
+
+  <Step title="Install CA Certificate">
+    <img src="/images/android-devices/456ea005-967e-47da-9771-aee6eb513517.png" align="center" fullwidth="false" />
+
+    * Go to **Settings > Search "CA Certificate" > Install Anyway**.
+
+    * Select the downloaded certificate and install it.
+  </Step>
+
+  <Step title="Verify Installation:">
+    <img src="/images/android-devices/dd7f045b-c67e-4069-a315-b493e088c0d0.png" align="center" fullwidth="false" />
+
+    After installation, confirm your setup by going to [amiusing.requestly.io](http://amiusing.requestly.io)
+  </Step>
+</Steps>
+
+## **SSL Pinning \[if-required]**
+
+From Android API level 23 (Android 6.0+), many apps enforce SSL pinning for security. To intercept HTTPS traffic, setting up SSL pinning is required.
+
+<Info>
+  Make sure to remove these in production builds
+</Info>
+
+Add these configs to your app codebase for it to work
+
+1. Add **res/xml/network\_security\_config.xml**
+
+```xml
+<network-security-config>
+  <debug-overrides>
+    <trust-anchors>
+      <certificates src="user" />
+      <certificates src="system" />
+    </trust-anchors>
+  </debug-overrides>
+
+  <base-config cleartextTrafficPermitted="true">
+    <trust-anchors>
+      <certificates src="system" />
+      <certificates src="user" />
+    </trust-anchors>
+  </base-config>
+</network-security-config>
+```
+
+1. Add to **AndroidManifest.xml**
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<manifest ... >
+    <application android:networkSecurityConfig="@xml/network_security_config" ... >
+    ...
+    </application>
+</manifest>
+```
+
+## **Turn off Interception**
+
+Remember to disable the HTTP Proxy in your Settings when you stop using Requestly Interceptor, otherwise, you'll get confusing network failures in your applications! You just need to set the network proxy(part 1) the next time you want to debug with Requestly Interceptor.
+
+<Steps>
+  <Step title="Select Network">
+    <img src="/images/android-devices/a7d9984e-410c-4968-b84b-dec4f2fc169b.png" align="center" fullwidth="false" />
+
+    Tap on the Internet and click on the gear icon on the connected network name to open its settings.
+  </Step>
+
+  <Step title="Modify Network Settings">
+    <img src="/images/android-devices/8842c671-0b7c-4fe2-b128-2a51d62fad70.png" align="center" fullwidth="false" />
+
+    * At the top right of the screen click the edit icon
+
+    * Enable "Advanced Options" if needed.
+
+    * Set the **Proxy** to "None”
+  </Step>
+</Steps>

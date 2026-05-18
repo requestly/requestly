@@ -1,0 +1,25 @@
+---
+title: "Saving Logs to local file "
+slug: "saving-logs-to-local-file"
+path: "/http-interceptor/desktop-app/saving-logs-to-local-file"
+visibility: "PUBLIC"
+format: "MDX"
+---
+
+For external scripts to work on top of the intercepted logs you can enable savings logs to a local file.
+
+Navigate to settings from the icon on the top right and under `Desktop Settings` there is a section for `Session Log Storage`
+
+<img src="/images/saving-logs-to-local-file/79986f7b-ecf9-441e-98c6-4915a28acca2.png" align="center" fullwidth="false" />
+
+<Tip>
+  Note: The logs do get cleared whenever app restarts
+
+  This is done to avoid the log file from getting unnecessarily large which has shown to cause performance issues
+</Tip>
+
+The mentions the path of the file where the log is stored.
+
+This is a `.jsonl` file where each line is an intercepted request stored as a `har` with one entry.
+
+The request is added to the file only if the url matches any of the substrings that you add as matching strings

@@ -1,0 +1,130 @@
+---
+title: "Redirect Request"
+slug: "redirect-rule"
+path: "/http-rules/rule-types/redirect-rule"
+visibility: "PUBLIC"
+format: "MDX"
+description: "Learn how to use Requestly Interceptor's Redirect Rule for testing, debugging, and development, with step-by-step guides and use cases."
+---
+
+***
+
+The **Redirect Request Rule** in Requestly Interceptor allows you to seamlessly redirect HTTP requests to a different URL or resource. This is particularly useful for testing, debugging, or even for creating workarounds during development.
+
+## Why Use the Redirect Rule?
+
+1. **Redirect Production to Local Environment:** Map your production scripts or APIs to your local running code and test your local code directly on production sites without deployment.\
+   <a target="_blank" href="https://requestly.io/blog/how-to-load-local-js-files-on-live-production-sites/">Learn more →</a>
+
+2. **Test API version changes**: If a new API version is available, you can test backward compatibility by setting up a redirect rule to point all URLs from the old version to the new one. This lets you test the upgrade without modifying your code.\
+   <a target="_blank" href="https://requestly.com/blog/redirect-a-url-from-one-environment-to-another-using-chrome-extension/">Learn more →</a>
+
+3. **Swap Javascript from production to staging/dev environment:** Test your dev implementation in tag manager scripts like Adobe DTM, Tealium Tag, and Google Tag Manager Containers before pushing them live on client websites.
+
+   <a target="_blank" href="https://requestly.com/blog/how-to-load-local-script-in-production-in-adobe-launch/">Learn more →</a>
+
+<img src="/images/redirect-rule/f7733fa2-7d0a-4f8b-9320-141c137dd608.png" align="center" fullwidth="false" />
+
+## **How to Configure the Redirect Rule**
+
+<Steps>
+  <Step title="Open HTTP Rules and Create a New Rule">
+    Navigate to the HTTP Rules tab in the web or desktop app. Click on `+ New Rule` and select `Redirect Rule` from the options.
+
+    <img src="/images/redirect-rule/736521a7-2efc-4dca-9b61-9bc34510fc59.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Name and Describe Your Rule">
+    Provide a **descriptive name** for the rule to keep your setup organised. Optionally, add a **brief description** explaining its purpose for easier identification later.
+
+    <img src="/images/redirect-rule/0a00e09e-ec94-4915-86bf-b02f5780b0d3.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title=" Define the Source Condition">
+    Define where the rule should be applied by specifying criteria such as **URL**, **Host**, or **Path**. You can choose from options like **Regex**, **Contains**, **Wildcard**, or **Equals**, or use <a target="_blank" href="/http-rules/advanced-usage/advance-filters">Advance Filters</a> for more precise conditions.
+
+    For more details on source conditions, [read this guide](/http-rules/advanced-usage/advance-targeting).
+
+    <Card title="Example :">
+      For this example, we are using the <a target="_blank" href="https://requestly-playground.com/">Requestly Interceptor Playground</a> (a demo eCommerce Store) to demonstrate the `Redirect Request` rule. This gives you a near-live experience of how the rule works.
+
+      In this case, we are targeting API requests that fetch data for the page, specifically those with query parameters like `type.slug:bakery`.
+
+      * **Condition Type:** URL
+
+      * **Operator:** Contains
+
+      * **Value:** `https://rest.requestly-playground.com/api/products?searchJoin=and&with=type%3Bauthor&limit=30&language=en&search=type.slug:bakery%3Bstatus:publish`
+    </Card>
+
+    <img src="/images/redirect-rule/301b32f5-ee14-4f6c-9a93-fcc6842b953b.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Specify the Redirect Target">
+    Set the target URL to which requests should be redirected. You can use the following options:
+
+    <Tabs>
+      <Tab title="URL">
+        To redirect requests from one API endpoint to another, set the following:
+
+        * **Source URL**: `https://rest.requestly-playground.com/api/products?searchJoin=and&with=type%3Bauthor&limit=30&language=en&search=type.slug:bakery%3Bstatus:publish`
+
+        * **Redirect Target**: `https://rest.requestly-playground.com/api/products?searchJoin=and&with=type%3Bauthor&limit=30&language=en&search=type.slug:gadget%3Bstatus:publish`
+
+        In this case, we are changing the query parameter `type.slug:bakery` in the **Source URL** to `type.slug:gadget` in the **Redirect Target**. This redirects requests for bakery products to a new endpoint for tech products.
+
+        <img src="/images/redirect-rule/6802d4ef-84fa-4258-8ec5-2c22cceb170b.png" align="center" fullwidth="false" />
+
+        You can also import this rule and apply it directly by using this <a target="_blank" href="https://app.requestly.io/rules/shared-lists/viewer/d599a7a833ac4030a377e9c96d8bf5c2-redirect-1745477771407">shared list</a>**.**
+      </Tab>
+
+      <Tab title="Local File">
+        > The local file option is available only in the [desktop app](https://requestly.com/downloads).
+
+        To redirect an API request to a local file, choose **File from your device** as the redirect target. This will serve the response from your local file instead of the live server.
+
+        <img src="/images/redirect-rule/b490f8aa-3ec5-49ee-9aa1-f3e99506440c.png" align="center" fullwidth="false" />
+      </Tab>
+
+      <Tab title="Pick From Files Server">
+        You can redirect API requests to a custom response hosted on **Requestly Interceptor’s File Server**.
+
+        Choose from an existing **JSON file** or upload a new one.
+
+        <img src="/images/redirect-rule/401d8bd0-92af-4baa-99ab-d7d6ec216dbf.png" align="center" fullwidth="false" />
+
+        Once selected, the request will return the hosted response instead of hitting the live server.
+
+        <img src="/images/redirect-rule/a5b7a6c7-8531-45c9-b008-7472e0974842.png" align="center" fullwidth="false" />
+      </Tab>
+    </Tabs>
+  </Step>
+
+  <Step title="Save and Activate the Rule">
+    Once you are satisfied with your configuration, click `Save` to store the rule. After saving, make sure to toggle the rule `ON` to activate it. This will apply the rule and ensure it works as expected.
+
+    <img src="/images/redirect-rule/05f1eb25-24f9-43e2-b295-0ae00a618d31.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Test the Rule">
+    To verify that the rule is working, click the `Test button`, enter a relevant URL, and then click `Test Rule`.
+
+    You can use the following URL to test the redirection: `https://www.requestly-playground.com/?rq-category=redirect`.
+
+    <img src="/images/redirect-rule/1de19cff-e6c9-45ea-8f06-9bd3783cec97.png" align="center" fullwidth="false" />
+  </Step>
+</Steps>
+
+<Tip>
+  There are multiple ways to validate if a rule is applied or not, learn more about how to <a target="_blank" href="/http-rules/advanced-usage/validate-rules-execution">`validate rule execution`</a> .
+</Tip>
+
+<Tabs>
+  <Tab title="Before">
+    <img src="/images/redirect-rule/e1d75fea-10b2-49ef-8a82-31eff3b53361.png" align="center" fullwidth="false" />
+  </Tab>
+
+  <Tab title="After">
+    <img src="/images/redirect-rule/79a75302-8dfe-4ea0-a7a6-d71a12c5a3c9.png" align="center" fullwidth="false" />
+  </Tab>
+</Tabs>

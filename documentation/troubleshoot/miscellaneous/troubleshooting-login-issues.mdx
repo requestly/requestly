@@ -1,0 +1,41 @@
+---
+title: Troubleshooting login issues
+label: Troubleshooting login issues
+slug: troubleshooting-login-issues
+visibility: PUBLIC
+---
+If you're unable to log into Requestly Interceptor, try the following troubleshooting steps:
+
+## **Check for VPN Services**
+
+If you are using a VPN, it may interfere with Requestly Interceptor's login mechanisms, especially with Google authentication and email-based magic link delivery. Disable your VPN and try logging in again.
+
+## **Google Authentication Failing**
+
+In some cases, custom rules created in Requestly Interceptor can interfere with Google's authentication requests. If you're unable to log in via Google Sign-In:
+
+* Disable any active rules that may affect `google.com` or related domains.
+
+* You can also pause the Requestly Interceptor extension temporarily and attempt the login again.
+
+* Once logged in, you can resume the extension and re-enable your rules.
+
+## **Not Receiving Magic Link**
+
+If you've requested a magic link and haven’t received it:
+
+* Check your spam or junk email folder.
+
+* Make sure no VPN is active, as it may block or delay email delivery.
+
+* Try requesting the link again after disabling your VPN.
+
+## **Still Facing Issues?**
+
+If login continues to fail after following the above steps, please contact Requestly Interceptor Support. Include:
+
+* The email address you are trying to log in with
+
+* Any error messages or screenshots
+
+* Whether any VPN or Requestly Interceptor rules were active during login attempts

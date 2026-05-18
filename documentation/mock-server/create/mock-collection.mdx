@@ -1,0 +1,81 @@
+---
+title: "Use File Collection"
+slug: "mock-collection"
+path: "/mock-server/create/mock-collection"
+visibility: "PUBLIC"
+format: "MDX"
+---
+
+Mock collections provide a structured way to manage your mocks. Each collection can optionally include a static “path” that is automatically prepended to the mock endpoints within that collection. This feature is particularly useful for versioning your mocks, ensuring consistency and clarity across different versions of your API.
+
+### Key benefits
+
+1. **Efficient Organization**:
+
+   * Group related mocks together, making it easier to manage and locate them.
+
+2) **Better Versioning**:
+
+   * Utilize the static "path" feature to prepend a version identifier or other relevant prefixes to your mock endpoints.
+
+   * Simplify the process of updating and managing multiple versions of your API.
+
+### Example
+
+Consider a collection for API version 1.0:
+
+* Collection path: `/api/v1`
+
+- Mock Endpoints:
+
+  * `/users`
+
+  * `/products`
+
+With the collection path, the actual mock endpoints become:
+
+* `/api/v1/users`
+
+- `/api/v1/products`
+
+This approach ensures that all endpoints within the collection are easily versioned, improving maintainability and clarity.
+
+**Creating a New Collection:**
+
+<Steps>
+  <Step title="Go to the Mocks Dashboard">
+    From the Requestly Interceptor dashboard, click on "Mock" in the left menu bar.
+  </Step>
+
+  <Step title="Click on &#x22;New Collection&#x22;">
+    On the top right side of the table, click on new collection
+
+    <img src="/images/mock-collection/a24ebef4-4308-41d8-910e-737098a6a7a6.png" align="left" fullwidth="false" />
+  </Step>
+
+  <Step title="Enter the details of the Mock Collection.">
+    <img src="/images/mock-collection/b71ad662-9ccf-43fa-8545-4d008a3cc49e.png" align="left" fullwidth="false" />
+
+    * **Name**: Give the collection a name.
+
+    * **Collection Path**: A path which gets prepended to all the mocks inside this collection. For example, if the collection path is "/api/v1", then all the child mocks’ endpoints will start with this path.
+
+    * **Description**: Provide a brief description of the collection.
+  </Step>
+
+  <Step title="Click on &#x22;Save&#x22; to finalize the collection." />
+</Steps>
+
+**Moving Mocks into a Collection:**
+
+Once the collection is created, you can move mocks into it:
+
+<Steps>
+  <Step title="Click on the options button on the right of the mock you want to move and select &#x22;Move.&#x22;">
+    <img src="/images/mock-collection/7a4ca5d4-851f-4fe2-b813-a230a721e630.png" align="left" fullwidth="false" />
+  </Step>
+
+  <Step title="Select the appropriate collection and click &#x22;Move.&#x22;">
+    <img src="/images/mock-collection/4f3b90b8-02de-48e2-9fbd-5a0b01e07a96.png" align="left" fullwidth="false" />
+  </Step>
+</Steps>

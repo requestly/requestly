@@ -1,0 +1,76 @@
+---
+title: Modifying response asynchronously
+label: Modifying response asynchronously
+slug: modifying-response-asynchronously
+visibility: PUBLIC
+---
+Before going into Async Modifications, lets learn about Requestly Interceptor Response Rule a little bit.
+
+[Requestly Interceptor Response Rule](/http-rules/rule-types/modify-response-body) comes in handy when you have to modify the response of a Request. You can either modify the response using `Static Data` or `Programmatically` write a script to modify the response.
+
+## **Programmatic Response Rule**
+
+Modifying Response body using Programmatic mode is really powerful. You can modify the response body programmatically based on incoming request's headers, status code, request method etc.
+
+For example, this rule changes the response body to `{"foo": "bar"}` when request method is `GET` and return original response for rest of the methods.
+
+```bash
+function modifyResponse(args) {
+  const {method, url, response, responseType, requestHeaders, requestData, responseJSON} = args;
+  // Change response below depending upon request attributes received in args
+  
+  if(method === "GET") {
+    return {"foo": "bar"}
+  }
+
+  return response;
+}
+```
+
+## **Async Modifications**
+
+Async modifications lets you perform some long running tasks before returning the response. You can learn about async await from [here](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function). This can be helpful in the following scenarios:
+
+## Usecases
+
+* Changing response based on response from some other URL.
+
+- Respond to the request with the response from another website.
+
+* Adding delays in Response (This is also possible using [Requestly Interceptor Delay Rule](/http-rules/rule-types/delay-network-requests))
+
+### **Example 1**
+
+In this example, we'll try to hit an external URL to fetch the auth\_token and then add the token in the original response.
+
+> Rule: [https://app.requestly.io/rules#sharedList/1677765397812-Async-Modification-Response-Rule](https://app.requestly.io/rules#sharedList/1677765397812-Async-Modification-Response-Rule)
+
+<img src="/images/modifying-response-asynchronously/891ff9d6-50dd-4972-833b-f46130798ccd.png" align="left" fullwidth="false" />
+
+<img src="/images/modifying-response-asynchronously/08d5df69-abf3-47e2-8a3a-4ca6c331fca8.png" align="left" fullwidth="false" />
+
+Original Response
+
+<img src="/images/modifying-response-asynchronously/c46cb45c-41b9-47f0-b792-50b7d33af8de.png" align="left" fullwidth="false" />
+
+Updated Response with token
+
+1. Fetching Token from URL `https://demo_requestly.requestly.dev/auth_token`.
+
+2) Adding token in Response.
+
+### Example 2
+
+This example changes the response of a non-existent domain ([https://non-existent-url.com](https://non-existent-url.com/)) by fetching the response from another url ([https://demo\_requestly.requestly.dev/users/1](https://demo_requestly.requestly.dev/users/1))
+
+> Rule: [https://app.requestly.io/rules#sharedList/1677766334864-Async-Modification-Changing-response-of-non-existent-domain-programmatically](https://app.requestly.io/rules#sharedList/1677766334864-Async-Modification-Changing-response-of-non-existent-domain-programmatically)
+
+<img src="/images/modifying-response-asynchronously/7ba815cc-7867-4ffb-9c55-de4009c1ce84.png" align="left" fullwidth="false" />
+
+<img src="/images/modifying-response-asynchronously/8de0b446-831c-4acc-8973-f2ca15b219a0.png" align="left" fullwidth="false" />
+
+Original Response
+
+<img src="/images/modifying-response-asynchronously/b74550f8-1490-4788-9368-37d2001471a0.png" align="left" fullwidth="false" />
+
+Updated Response

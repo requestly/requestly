@@ -1,0 +1,188 @@
+---
+title: "GraphQL Support"
+slug: "graphql-modify-request-response"
+path: "/http-rules/advanced-usage/graphql-modify-request-response"
+visibility: "PUBLIC"
+format: "MDX"
+description: "Learn to modify GraphQL API requests and responses using Requestly Interceptor to debug and test GraphQL APIs."
+---
+
+***
+
+Unlike REST APIs, GraphQL APIs provide a flexible approach to querying and mutating data through a single endpoint. They allow clients to specify exactly what data is needed, reducing over-fetching and under-fetching issues common with REST APIs. GraphQL APIs can be modified to customize requests and responses for testing and debugging. This guide provides detailed steps to achieve this using Requestly Interceptor.
+
+## Modifying GraphQL Responses
+
+In GraphQL, client interactions are typically managed through a single HTTP endpoint. The specific operation to execute is often indicated by the `operationName` field in the request payload.
+
+**Example Request**
+
+```bash
+POST <https://www.example.com/graphqlapi>
+{
+  "operationName": "getUsers",
+  "query": `
+    query getUsers {
+      users {
+        id
+        email
+      }
+    }
+  `
+}
+```
+
+To modify the response of a GraphQL API:
+
+### Steps to Modify API Response
+
+<Steps>
+  <Step title="Open HTTP Rules">
+    Navigate to the HTTP Rules section in the web or desktop app.
+
+    <img src="/images/graphql-modify-request-response/c2dbce79-cafa-4f4a-8fb3-3054f2027f85.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Create a New Rule">
+    Click on "+ New Rule" and select **Modify API Response**.
+
+    <img src="/images/graphql-modify-request-response/4f54d5ec-8d60-4edf-a0e0-45488977bcbc.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Configure Resource Type">
+    Choose "GraphQL API" as the Resource Type.
+
+    <img src="/images/graphql-modify-request-response/94125ed8-54e8-4a23-b0c4-83bf87af50f9.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Set GraphQL Operation Filter">
+    In the **GraphQL Operation (Request Payload Filter)** section:
+
+    * Enter **Key** as `operationName`.
+
+    * Enter **Value** as the operation name you want to target (e.g., `getUsers`).
+
+    <img src="/images/graphql-modify-request-response/f308ed77-6708-4e56-9495-6cb08bd93f1a.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Customize Response">
+    Define the new response you want to serve for the specified operation.
+
+    <img src="/images/graphql-modify-request-response/ade413a6-caeb-4f6a-b065-697ecd83ed69.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Save and Activate">
+    Click **Save** to store the rule and toggle it ON to apply the changes.
+
+    <img src="/images/graphql-modify-request-response/7ef71084-b8cb-4e54-9ccb-633d11c77db1.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Test the Rule">
+    Validate the rule by sending a request matching your conditions and verifying the modified response.
+
+    <img src="/images/graphql-modify-request-response/a1e80ffd-39ed-4fa0-baca-656a432fa90d.png" align="center" fullwidth="false" />
+  </Step>
+</Steps>
+
+For additional details, visit the Modify API Response Rule Page.
+
+**Notes**
+
+* The **Key** represents the JSON key in the request payload and supports nested paths. For example:
+
+  * If `operationName` is located at `data.operationName`, specify `data.operationName`.
+
+  * For array payloads, such as `[{"operationName": "value"}]`, use `0.operationName` as the key.
+
+* If the request does not include `operationName`, select **Resource Type** as "REST API" and use **Dynamic (JavaScript) Mode** to filter and modify the response.
+
+### Example Without `operationName`
+
+In cases where the operation is specified within the `query` field:
+
+```bash
+POST /graphql
+{
+  "query": `
+    query getUsers {
+      users {
+        id
+        email
+      }
+    }
+  `
+}
+```
+
+You can modify the response using a JavaScript snippet:
+
+```jsx
+function modifyResponse(args) {
+  const { url, response, requestData, responseJSON } = args;
+
+  if (requestData.query?.includes("query getUsers")) {
+    console.log("Requestly Interceptor: Modifying response", { query: requestData.query });
+    return { ...responseJSON, custom: true };
+  }
+
+  return response;
+}
+```
+
+***
+
+## Modifying GraphQL Requests
+
+If you need to alter the GraphQL query or its variables, use the **Modify Request Body** rule to change the request payload dynamically.
+
+### Steps to Modify Request Body
+
+<Steps>
+  <Step title="Open HTTP Rules">
+    Navigate to the HTTP Rules tab in the web or desktop app.
+
+    <img src="/images/graphql-modify-request-response/5bb28e10-7243-4eaa-8618-229476ccf604.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Create a New Rule">
+    Click on "+ New Rule" and select **Modify Request Body**.
+
+    <img src="/images/graphql-modify-request-response/77286f4f-e8cc-4267-b18a-a715c6ae16f1.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Configure Resource Type">
+    Choose "GraphQL API" as the Resource Type.
+
+    <img src="/images/graphql-modify-request-response/112f8c75-4bb0-4e3d-91a6-c78c9f0434c5.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Set GraphQL Operation Filter">
+    In the **GraphQL Operation (Request Payload Filter)** section:
+
+    * Enter **Key** as `operationName`.
+
+    * Enter **Value** as the operation name you want to target (e.g., `getUsers`).
+
+    <img src="/images/graphql-modify-request-response/dde4dd52-6ffd-4c94-86d9-171a88d5a88d.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Customize Request">
+    Define the new Request you want to serve for the specified operation
+
+    <img src="/images/graphql-modify-request-response/027a3c69-b67f-4608-a5e5-7ae5e93fe875.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Save and Activate">
+    Click **Save** to store the rule and toggle it ON to apply the changes
+
+    <img src="/images/graphql-modify-request-response/6751b63e-802b-4efa-954c-124dbc162c86.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Test the Rule">
+    Validate the rule by sending a request matching your conditions and verifying the modified response.
+
+    <img src="/images/graphql-modify-request-response/fa513012-32fe-4203-848f-3b4edec6abda.png" align="center" fullwidth="false" />
+  </Step>
+</Steps>
+
+For additional details, visit the Modify Request Rule Page.

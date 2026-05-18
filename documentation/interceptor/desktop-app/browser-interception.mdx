@@ -1,0 +1,133 @@
+---
+title: "Browser Interception"
+slug: "browser-interception"
+path: "/http-interceptor/desktop-app/browser-interception"
+visibility: "PUBLIC"
+format: "MDX"
+---
+
+Requestly Interceptor desktop app allows you to connect multiple browsers, making it easy to configure and switch between them for network interception.
+
+To connect browser instance, open the **Connect Panel**, follow these steps:
+
+<Steps>
+  <Step title="Open the Network Traffic Tab">
+    Navigate to the **Network Traffic** tab located on the right sidebar.
+  </Step>
+
+  <Step title="Click the Connect Apps Button">
+    Click on any of the `Connect Apps` buttons, as shown below:
+
+    <img src="/images/browser-interception/eee9bbf1-de2a-49b4-b731-65f074ad9cc0.png" align="center" fullwidth="false" />
+
+    This will open the **Connect Panel**, displaying all supported browsers on your system, along with other sources that Requestly Interceptor supports.
+  </Step>
+
+  <Step title="Launch a Browser with Requestly Interceptor Proxy">
+    Select your preferred browser from the Connect Panel and click **Launch/Open**. This will start a new browser instance configured with the Requestly Interceptor proxy.
+
+    <img src="/images/browser-interception/b7819290-87d6-497a-8156-23eb1d117088.png" align="center" fullwidth="false" />
+
+    1. For Chromium-based browsers, Requestly Interceptor applies the `--proxy-server` flag, configuring the browser to route all network traffic through the Requestly Interceptor proxy server
+
+    2. Then requestly automatically installs CA certificate to your system’s certificate store.
+  </Step>
+
+  <Step title="Verify Proxy Setup">
+    The newly launched browser instance will automatically open [amiusing.requestly.io](https://amiusing.requestly.io/). A success message on this page confirms that the browser is using Requestly Interceptor’s proxy.
+
+    <img src="/images/browser-interception/64151f01-599f-4ba9-b74c-9bbda13095b3.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="View Captured Traffic">
+    Return to the Requestly Interceptor dashboard to review all captured network traffic in the Network table.
+
+    <img src="/images/browser-interception/a2ac18d0-594c-4329-9f84-b0b8541cb2e4.png" align="center" fullwidth="false" />
+  </Step>
+</Steps>
+
+## Supported Browsers & Profiles
+
+The **Connect Panel** shows a list of browsers that Requestly Interceptor supports. You can select from various profiles for browsers such as Google Chrome, Firefox, and Safari. Here are the details of each browser and its profile options:
+
+* **Google Chrome (New Profile)**:
+
+  Launch a new browser profile without any pre-configured settings, logins, or extensions. This is ideal for testing requests in a clean environment.
+
+* **Google Chrome (Existing Profile)**:
+
+  Use an existing Chrome profile to connect, keeping all your extensions, settings, and history intact.
+
+* **Firefox**:
+
+  Connect to Firefox for testing your network requests on this browser. it will launch a new profile with a clean environment.
+
+* **Arc**:
+
+  Arc is another modern browser supported by Requestly Interceptor. You can create a new profile or use an existing one.
+
+* **Safari**:
+
+  Connect to the Safari browser, clicking the connect button will open a new Safari window.
+
+<Info>
+  When you launch Safari from Requestly Interceptor, it sets a system-wide proxy due to technical constraints. Make sure to turn it off after done debugging
+</Info>
+
+For other browsers, find the proxy IP and port at the top of Requestly Interceptor’s dashboard and refer to your browser's documentation to configure proxy settings.
+
+## **Connect existing browser profile**
+
+You can connect your existing browser profile to the desktop app using the [**Requestly Interceptor extension**](https://requestly.com/downloads/)**.**
+
+<Warning>
+  Available on desktop app version >=1.7.4
+</Warning>
+
+<iframe className="w-full aspect-video rounded-xl" src="https://www.youtube.com/embed/VFTwLMhXkTY" />
+
+## **Steps to connect using browser extension**
+
+1. Launch the desktop app
+
+2. Open the Requestly Interceptor extension popup in the browser profile you want to connect.
+
+   <img src="/images/browser-interception/a60db20e-df15-416e-8a93-f5e3ac07568c.png" align="left" fullwidth="false" />
+
+   **This button is only visible when the desktop app is open.**
+
+3. You should see a connect button in the popup to connect with the desktop app.
+
+4. Click on the button and the desktop app starts intercepting the traffic.
+
+With this method, you can easily link your current browser profile to the desktop app without needing to relaunch or lose your browsing session
+
+## Custom Browser Launch Options
+
+Requestly Interceptor offers **custom browser launch options** for certain browsers, specifically Chromium-based ones. These options allow you to tweak the behavior of the browser during interception.
+
+Use the buttons next to the browser selection to customize the launch options. Here's a quick rundown of the **preset configurations**:
+
+<img src="/images/browser-interception/000714ac-1c0e-4389-86ed-9b1ac01b036f.png" align="center" fullwidth="false" />
+
+**Without Safety Checks** Disables security restrictions, allowing insecure content to run and third-party modules to load. Flags used:
+
+* `--allow-running-insecure-content` Allows the browser to load content from websites that are not served over HTTPS.
+
+* `--allow-insecure-localhost` Allows insecure content to be loaded from `localhost`
+
+* `--allow-third-party-modules` Allows third-party modules (which could include extensions or custom scripts) to run even if they are not from trusted sources
+
+**Without CORS** The `--disable-web-security` flag disables CORS (Cross-Origin Resource Sharing) restrictions in the browser, allowing requests to be made across different domains without security checks, to learn more on cors check out our blogpost <a target="_blank" href="https://requestly.com/blog/what-is-cors-and-how-to-bypass-it/">here</a>.
+
+**With Custom Arguments**
+
+Launch the browser with custom flags (only supported for Chromium-based browsers). Here are some interesting flags for launching Chromium-based browsers with custom arguments:
+
+`--incognito`: Launches Chromium in Incognito mode by default.
+
+`--window-size`: Sets the initial window size. Provided as a string in the format "800,600".
+
+`--user-agent` : A string used to override the default user agent with a custom one.
+
+A full list of available arguments can be found <a target="_blank" href="https://gist.github.com/dodying/34ea4760a699b47825a766051f47d43b">**here**</a>.

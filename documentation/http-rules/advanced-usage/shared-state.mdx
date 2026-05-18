@@ -1,0 +1,137 @@
+---
+title: "Shared State"
+slug: "shared-state"
+path: "/http-rules/advanced-usage/shared-state"
+visibility: "PUBLIC"
+format: "MDX"
+description: "Discover how to use Shared State in Requestly Interceptor to manage data across Modify Request and Response rules with examples and best practices."
+---
+
+***
+
+Shared State allows developers to store and retrieve data within and across Modify Request Body and Modify API Response rules. This functionality is facilitated by `$sharedState`, a JavaScript object where you can assign key-value pairs to enhance rule customisation.
+
+<Warning>
+  Shared State was introduced in the Requestly Interceptor extension version `24.8.13` and Desktop App `1.7.1` . Make sure you are using the latest version.
+</Warning>
+
+## Use Cases for Shared State
+
+1. **Conditional Request/Response Modification**: Use shared state to modify requests or responses dynamically based on conditions stored in prior requests. For example, you can conditionally fail requests based on request counts.
+
+2. **Data Aggregation Across Requests**: Collect and aggregate data from multiple requests to use within a rule. For instance, you can store API responses and utilize them for further processing across different Requestly Interceptor rules.
+
+3. **Token Management Across API Requests**: Manage shared values such as tokens or other critical data across various API interactions, streamlining complex workflows.
+
+## How to Use Shared State
+
+<Steps>
+  <Step title="Create or Modify a Rule">
+    Start by creating a new "Modify Request" or "Modify Response" rule in Requestly Interceptor. You can access this feature in both the web app and desktop versions.
+
+    <img src="/images/shared-state/c2c8fa1a-7f7c-402e-ab77-2a2ae3e535df.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Enable Dynamic JavaScript Modification">
+    In the rule editor, select "Dynamic JavaScript Modification" to leverage `$sharedState`. This enables the use of JavaScript for programmatic customisation.
+
+    <img src="/images/shared-state/85818b19-4b3e-4885-8d2d-dc3cd8612da0.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Use Shared State to Manage Data">
+    You can store and retrieve values using `$sharedState` within your JavaScript code.
+
+    <img src="/images/shared-state/f665af25-6330-4565-98bb-5f40fde17b44.png" align="center" fullwidth="false" />
+
+    ```javascript
+    function modifyResponse(args) {
+      const {
+        method, url, response, 
+        responseType, requestHeaders, 
+        requestData, responseJSON
+        } = args;
+
+      const [urlPath, queryParams] = url.split('?');
+
+      // Store Request URLs and their responses
+      const urlMap = $sharedState.urlMap || {};
+      urlMap[urlPath] = response;
+      $sharedState.urlMap = urlMap;
+      
+      // Block all subsequent requests if a specific URL was accessed
+      if ($sharedState.urlMap && 
+            "https://mock.redq.io/api/products" in $sharedState.urlMap) {
+        console.log("Blocked: "+urlPath);
+        return null;
+      }
+      
+      return response;
+    }
+    ```
+  </Step>
+</Steps>
+
+## Best Practices
+
+* **Namespace Your Keys**: Use structured keys (e.g., `"moduleX.keyY"`) to avoid overwriting shared data.
+
+* **Clean Up When Done**: Remove unnecessary data to prevent memory bloat.
+
+* **Test Thoroughly**: Ensure that shared state logic doesn’t introduce unintended side effects.
+
+## Frequently Asked Questions
+
+<AccordionGroup>
+  <Accordion title="How Do I Access the Shared State?">
+    You can set and retrieve data in the shared state as shown below:
+
+    **Set a Value:**
+
+    ```jsx
+    $sharedState.myVariable = "some value";
+    ```
+
+    **Retrieve a Value:**
+
+    ```jsx
+    let myValue = $sharedState.myVariable;
+    ```
+  </Accordion>
+
+  <Accordion title="What Data Can Be Stored?">
+    You can store any data type that can be serialized into JSON, such as strings, numbers, booleans, objects, and arrays.
+  </Accordion>
+
+  <Accordion title="How Long Does Data Persist in $sharedState?">
+    `$sharedState` has different runtime contexts in the Requestly Interceptor Desktop App and the Requestly Interceptor browser extension.
+
+    * **Desktop App**: Data persists until the app is closed.
+
+    * **Browser Extension**: Data persists as long as the browser tab is open.
+  </Accordion>
+
+  <Accordion title="How Can I Limit Requests (e.g., Only Block First 3 Requests)?">
+    Use `$sharedState` to count requests and dynamically control behavior:
+
+    ```jsx
+    function modifyResponse(args) {
+      const { 
+        method, url, response, 
+        responseType, requestHeaders, 
+        requestData, responseJSON
+        } = args;
+
+      let count=$sharedState.count ?? 0;
+      ++count;
+      $sharedState.count=count;
+
+      // Succeed if it is not the first request
+      if($sharedState.count>3){
+        return response;
+      } else {
+        return null;
+      }
+    }
+    ```
+  </Accordion>
+</AccordionGroup>

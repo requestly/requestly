@@ -1,0 +1,154 @@
+---
+title: "Modify API Response"
+slug: "modify-response-body"
+path: "/http-rules/rule-types/modify-response-body"
+visibility: "PUBLIC"
+format: "MDX"
+description: "Learn how to modify API responses in Requestly Interceptor with Dynamic Modification. Simulate edge cases, test with custom data, and create API mocks for faster front-end development and QA workflows"
+---
+
+***
+
+The **Modify API Response Rule** in Requestly Interceptor allows developers to modify API responses directly without requiring back-end access. It is often used to simulate edge cases, replicate bugs, and support QA workflows. With **Dynamic Modification**, developers can use JavaScript to conditionally alter responses based on the original request or server response
+
+## Why Use Modify API Response Rule?
+
+Modify API Response Rules are useful in several scenarios:
+
+* **Frontend Development**: Work seamlessly even if the backend is unavailable or incomplete.
+
+* **Custom Testing**: Test application behaviour with modified or custom data.
+
+* **Error Simulation**: Trigger specific errors by modifying response status codes.
+
+* **Backend Independence**: Make changes to API responses without requiring backend changes.
+
+<Tip>
+  This rule can also be used to create API Mocks that are beneficial during development and QA cycles.
+</Tip>
+
+## Steps to Configure a Modify API Response Rule
+
+<Steps>
+  <Step title="Create a Response Rule">
+    Navigate to the HTTP Rules section in the Requestly Interceptor app. Click `+ New Rule` and choose the `Modify API Response` option.
+
+    <img src="/images/modify-response-body/10acf5f2-7052-4fe8-b9f4-13c01e026082.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Select Resource Type">
+    Choose the resource type for modification:
+
+    * **REST API**: Modify `XHR/Fetch` requests initiated by web pages.
+
+    * **GraphQL**: Target and modify GraphQL APIs by operation.
+
+    * **HTML/JS/CSS (Desktop App Only)**: Modify static files for desktop applications.
+
+    <img src="/images/modify-response-body/49016663-2d31-4c48-907e-385967e879f3.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Define Matching Criteria">
+    Define the criteria for the rule to be applied, such as **URL**, **Host**, or **Path**. Choose from **Regex**, **Contains**, **Wildcard**, or **Equals**, or use <a target="_blank" href="/http-rules/advanced-usage/advance-filters">**Advance Filters**</a> for more precise conditions.
+
+    For more detailed guidance, refer to the <a target="_blank" href="/http-rules/advanced-usage/advance-targeting">**Source Conditions Gui**</a>[**de**.](/http-rules/advanced-usage/advance-targeting)
+
+    <img src="/images/modify-response-body/88bb1a89-f535-4ffa-b3a3-13251fbfd139.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Filter GraphQL Queries (Optional)">
+    If targeting GraphQL APIs, filter queries by their operation name. Add the **Payload JSON Key** (e.g., `operationName`) and specify the corresponding **Value** (e.g., `getUsers`) to target specific GraphQL operations.
+
+    <img src="/images/modify-response-body/2783cbe8-823e-4665-90b5-8496eb45dcef.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Change Response Status Code">
+    Modify the status code of the response using the dropdown menu. Choose from:
+
+    * `2XX` for successful responses
+
+    * `4XX` for client errors
+
+    * `5XX` for server errors
+
+    If left empty, the original status code remains unchanged.
+
+    <img src="/images/modify-response-body/c616ed33-495d-4d61-90e1-0627932adc5b.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Modify Response Data">
+    Choose one of the following methods to modify the response data:
+
+    * **Static Response Modification**: Input a static value as the response body.
+
+    * **Dynamic** **Modification Script (JavaScript)**: Use JavaScript to modify responses dynamically. The script provides access to parameters like:
+
+      * `method`: HTTP Method (GET, POST, etc.)
+
+      * `url`: Full URL of the request
+
+      * `response`: Original response body (string)
+
+      * `responseType`: Content type of the original response
+
+      * `requestHeaders`: Headers sent with the request
+
+      * `responseJSON`: Original response parsed as a JSON object
+
+    **Example:**
+
+    ```jsx
+    function modifyResponse({ responseJSON }) {
+        responseJSON.modifiedKey = "modifiedValue";
+        return responseJSON;
+    }
+    ```
+
+    <Card title="Desktop App feature">
+      You can store and retrieve data within and across Modify Request and Modify Response rules using shared state in programmatic JavaScript mode.\
+      →<a target="_blank" href="/http-rules/advanced-usage/shared-state">Learn more about shared state here.</a>
+    </Card>
+
+    *     <img src="/images/modify-response-body/def6fdf1-d07c-4b50-98e6-cd5359c6e259.png" align="center" fullwidth="false" />
+
+          <Tip>
+            You can check the “Serve this response body without making call to the server” checkbox as the label suggests it will ensure you get the response locally without hitting your API server.
+          </Tip>
+  </Step>
+
+  <Step title="Save and Activate the Rule">
+    Click **Save** to store the rule and toggle it **ON**. This will apply the rule to the defined source conditions.
+
+    <img src="/images/modify-response-body/1ac00604-b3be-4be9-9616-f039b880ae75.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Test the Rule">
+    <Warning>
+      This feature is available on the browser extension only.
+    </Warning>
+
+    To ensure the rule is working correctly, click the `Test` button and enter the URL of the page where you want to apply this rule. This will open the webpage in a new tab, with a widget showing the status of applied rules.
+
+    <Tip>
+      There are multiple ways to validate if a rule is applied or not. Learn more about how to <a target="_blank" href="/http-rules/advanced-usage/validate-rules-execution">`validate rule execution`</a>**.**
+    </Tip>
+
+    <img src="/images/modify-response-body/12c3c967-083b-4a34-977a-7a9c1e36d7a9.png" align="center" fullwidth="false" />
+
+    <Warning>
+      Changes applied by this rule won’t appear in browser devtools due to technical constraints, but are sent with the actual requests.
+    </Warning>
+  </Step>
+</Steps>
+
+**Serve local files**
+
+Replace API, HTML, JS, or CSS responses with local files. Changes to the file are reflected in real-time, no need to update the rule.
+
+<img src="/images/modify-response-body/0866dfe3-91e9-4592-9cdb-07bd7a030c22.png" align="center" fullwidth="false" />
+
+**Override HTML/JS/CSS**
+
+Intercept and modify static assets like HTML, JavaScript, and CSS. Useful for testing UI changes without touching production code.
+
+<img src="/images/modify-response-body/ce736574-4fda-41b1-952a-5efbe70ae13a.png" align="center" fullwidth="false" />

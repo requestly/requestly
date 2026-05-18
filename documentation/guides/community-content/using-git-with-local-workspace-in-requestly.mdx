@@ -1,0 +1,170 @@
+---
+title: Version Control for Your APIs - Using Git with Requestly’s Local Workspace
+author: Aries Dmello
+authorUrl: https://github.com/dmelloaries
+date: 2025-11-13
+description: Learn how to connect, version, and collaborate on your Requestly Local Workspace using Git and GitHub for seamless team workflows.
+tags: [api-testing, git, version-control, collaboration]
+difficulty: beginner
+---
+
+## Introduction
+
+Imagine treating your API collections with the same care you give your codebase, tracking every change, collaborating effortlessly with your team, and having the confidence to experiment knowing you can always roll back. That's exactly what happens when you connect Requestly's Local Workspace with Git.
+
+Your API work becomes versioned, shareable, and reviewable. Team members can contribute to the same collections, changes are tracked automatically, and everyone stays in sync. Whether you're building a new API ecosystem or maintaining existing ones, Git transforms your workspace into a collaborative hub that evolves with your team.
+
+Let's explore how to set this up and unlock a more professional workflow for your API development.
+
+---
+
+## What You'll Need
+
+Before diving in, make sure you have:
+
+- **[Requestly Desktop App](https://requestly.com/downloads)**, For creating and managing Local Workspaces
+- **[Git](https://git-scm.com/downloads)**, Installed and configured on your machine
+- **[GitHub Account](https://github.com)**, To host your repository and enable team collaboration
+
+If you're already using Git for your code, you're all set, this will feel familiar.
+
+---
+
+## Setting Up Your Workspace
+
+### 1. Create Your Local Workspace
+
+Open the Requestly Desktop App and create a new Local Workspace. You'll be asked to choose a folder on your system, pick somewhere dedicated to your API work. This folder will hold all your collections, requests, and configurations as actual files on your machine.
+
+![Create Workspace](/images/how-to-use-git-with-local-workspace/creating-workspace.gif)
+
+Once created, start building your API collections just as you normally would. The beauty of a local workspace is that everything you create gets saved as files in that folder, making them perfect candidates for version control.
+
+![Create API's](/images/how-to-use-git-with-local-workspace/creating-apis.gif)
+
+---
+
+### 2. Connect to Git and Share with Your Team
+
+Now comes the powerful part, turning your local workspace into a version-controlled, shareable project. Here's how:
+
+1. **Create a GitHub repository**
+
+   - Go to [GitHub](https://github.com/new) and create a new repository
+   - Leave it empty (no README, .gitignore, or license)
+   - Copy the repository URL for later
+
+2. **Initialize Git in your workspace**
+
+   Open your terminal and run:
+
+   ```bash
+   cd path/to/your-workspace
+   git init
+   git add .
+   git commit -m "Initial commit: Add Requestly workspace"
+   git branch -M main
+   ```
+
+3. **Connect and push to GitHub**
+
+   ```bash
+   git remote add origin https://github.com/your-username/your-repository-name.git
+   git push -u origin main
+   ```
+
+   Replace `your-username` and `your-repository-name` with your actual GitHub details.
+
+Your workspace is now hosted on GitHub and ready for collaboration. Share the repository URL with your team so they can start contributing.
+
+---
+
+### 3. Joining an Existing Workspace
+
+When a teammate shares a workspace repository with you, follow these steps:
+
+1. **Clone the repository**
+
+   ```bash
+   cd path/to/your-projects
+   git clone https://github.com/username/repository-name.git
+   ```
+
+2. **Import into Requestly**
+
+   - Open Requestly Desktop App
+   - Create a new Local Workspace and name it exactly as your cloned folder
+   - Select the **parent folder** containing the cloned repository
+
+   ![Clone and Import](/images/how-to-use-git-with-local-workspace/clone-and-import.gif)
+
+> **⚠️ Important:** Make sure to select the parent directory containing the cloned workspace, not the workspace folder itself. The workspace name should match the cloned folder name exactly.
+
+Once imported, you'll see all the APIs and collections your teammates have created. You're now working on the same workspace with full Git capabilities.
+
+---
+
+### 4. The Daily Workflow: Making and Sharing Changes
+
+Working with a Git-connected workspace feels natural:
+
+1. **Make your changes in Requestly**
+
+   - Update APIs
+   - Create new collections
+   - Modify responses
+
+   ![Make changes to API](/images/how-to-use-git-with-local-workspace/making-changes-to-api.gif)
+
+2. **Commit and push to share with your team**
+
+   ```bash
+   cd path/to/your-workspace
+   git add .
+   git commit -m "Update API endpoints responses"
+   git push origin main
+   ```
+
+> **💡 Tip:** Use meaningful commit messages to help everyone understand what changed and why.
+
+Your teammates will see your updates when they pull.
+
+---
+
+### 5. Staying in Sync
+
+When teammates push changes, stay current with their updates:
+
+1. **Pull the latest changes**
+
+   ```bash
+   cd path/to/your-workspace
+   git pull origin main
+   ```
+
+2. **Refresh your Requestly workspace**
+
+   After pulling, refresh the app to see the latest APIs and collections.
+
+   ![Pull Changes](/images/how-to-use-git-with-local-workspace/pull-changes.png)
+
+> **⚠️ Important:** If you have unsaved changes in Requestly, save them before pulling to avoid conflicts.
+
+This bidirectional workflow means everyone can contribute, review changes, and stay in sync. It's the same collaborative power you're used to with code, now applied to your API development.
+
+---
+
+## Wrapping Up
+
+You've just elevated your API workflow to match the professionalism of your code development. Here's what you've unlocked:
+
+- **Version control**, Complete history of every change made
+- **Team collaboration**, Work together without conflicts
+- **Flexibility**, Branch, experiment, and roll back with confidence
+
+All the Git patterns you know and trust now apply to your API work. If something breaks, roll back. If someone makes an interesting change, review it. If you want to experiment, create a branch.
+
+## Additional Resources
+
+- [Version Control for Your APIs using Git - Medium Blog](https://medium.com/@dmelloaries/version-control-for-your-apis-using-git-with-requestlys-local-workspace-4369cd766e93)
+- [Working with Local Workspaces in Requestly - YouTube](https://youtu.be/mBYzDXBNQQA?si=AdA1eqmeS2eAvrLN)

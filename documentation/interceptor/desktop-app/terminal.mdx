@@ -1,0 +1,58 @@
+---
+title: "Intercept Traffic from your terminal"
+slug: "terminal"
+path: "/http-interceptor/desktop-app/terminal"
+visibility: "PUBLIC"
+format: "MDX"
+description: "Learn how to set up the Requestly Interceptor proxy in the terminal to intercept and modify terminal requests effortlessly."
+---
+
+## **Steps**
+
+<Steps>
+  <Step title="Open Connected Apps">
+    Go to the **Requestly Interceptor desktop** **app** and click on the **Connect apps** button. A popup modal will appear.
+
+    <img src="/images/terminal/2ec569ca-893d-4617-8293-bf81354eccfe.png" align="left" fullwidth="false" />
+  </Step>
+
+  <Step title="Locate Terminal Processes">
+    In the popup modal, navigate to the **Terminal processes** section. Click on **Setup instruction** for Terminal.
+
+    <img src="/images/terminal/ccb5742f-050c-4a71-befe-3634be06a186.png" align="left" fullwidth="false" />
+  </Step>
+
+  <Step title="Copy the Setup Command">
+    You will see a command displayed in the setup instructions. Copy the command. It will look something like this:
+
+    ```plaintext
+    <(curl -sS localhost:7040/tpsetup)
+    ```
+
+    > ***Note: This command might be different depending upon port availability. Checkout in Connected Apps > Terminal***
+
+    <img src="/images/terminal/d600051b-e741-4f0f-978a-c417bde78ed1.png" align="left" fullwidth="false" />
+  </Step>
+
+  <Step title="Run the Command in Terminal">
+    Open the terminal where you will start your **Node.js server** and paste the copied command. Press **Enter** to execute it.
+
+    If the command runs successfully, you should see a confirmation message in your terminal indicating that **interception is enabled**.
+
+    <img src="/images/terminal/737375d3-602b-49c3-a6d1-bcb09a98033a.png" align="left" fullwidth="false" />
+  </Step>
+</Steps>
+
+## **Testing Proxy**
+
+1. Go to `Network Traffic` tab in Requestly Interceptor Desktop App.
+
+2) Now Make a curl request to [**https://amiusing.requestly.io/**](https://amiusing.requestly.io/) using your terminal and look for that request in the **Network Traffic** tab.
+
+```plaintext
+curl https://amiusing.requestly.io/
+```
+
+3. You should see the Request in the `Network Traffic` Table.
+
+   <img src="/images/terminal/bc31d3f5-80e3-41ad-b9ab-74d7b4ad7034.png" align="center" fullwidth="false" />

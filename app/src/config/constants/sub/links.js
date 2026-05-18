@@ -6,12 +6,15 @@ const LINKS = {
 
   // Download
   REQUESTLY_DOWNLOAD_PAGE: getLinkWithMetadata("https://requestly.com/downloads"),
+  // Pricing page
+  REQUESTLY_PRICING_PAGE: "https://requestly.com/pricing",
+  // Docs
   REQUESTLY_DOCS: "https://docs.requestly.com/",
-  //Docs - Using Rules
+  // Docs - Using Rules
   REQUESTLY_DOCS_USING_RULES: "https://docs.requestly.com/general/http-rules/overview/",
-  //Docs -Sharing Rules
+  // Docs -Sharing Rules
   REQUESTLY_DOCS_SHARING_RULES: "https://docs.requestly.com/general/http-rules/sharing",
-  //Docs - File Service
+  // Docs - File Service
   REQUESTLY_DOCS_FILES_SERVICE: "https://docs.requestly.com/general/mock-server/overview",
 
   // Docs - Premium Subscription

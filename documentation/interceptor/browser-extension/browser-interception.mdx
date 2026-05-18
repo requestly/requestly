@@ -1,0 +1,81 @@
+---
+title: "Browser Interception"
+slug: "browser-interception"
+path: "/http-interceptor/browser-extension/browser-interception"
+visibility: "PUBLIC"
+format: "MDX"
+---
+
+Once you’ve installed the Requestly Interceptor browser extension, you can start intercepting, inspecting, and modifying HTTP(S) traffic directly in your browser. This feature is great for testing APIs, debugging frontend issues, and simulating server responses, without touching your backend or deploying changes.
+
+<Tip>
+  This guide assumes you’ve already installed the [`Requestly Interceptor browser extension`](https://requestly.com/downloads) for your browser. If not, start there.
+</Tip>
+
+### Steps to Intercept traffic in Browser DevTools
+
+<Steps>
+  <Step title="Open DevTools">
+    Right-click on the webpage and click **Inspect**.
+
+    <img
+      src="/images/browser-interception/0f3b0c8d-0a6f-47e8-8162-d286ecaa8e6c.png"
+      align="center"
+      fullwidth="false"
+    />
+  </Step>
+  <Step title="Open Requestly Interceptor Panel">
+    Click on the **Requestly Interceptor** tab.
+
+    <img
+      src="/images/browser-interception/96cebd5a-c4cb-4866-86ac-97b05679a175.png"
+      align="center"
+      fullwidth="false"
+    />
+
+    If it is not visible, click on the **\>\>** button to expand the hidden tabs and then select **Requestly Interceptor**
+
+    <img
+      src="/images/browser-interception/bbfbefb3-9a0b-4589-aeb1-aa9f85529561.png"
+      align="center"
+      fullwidth="false"
+    />
+  </Step>
+</Steps>
+
+Once open, this tab will list out all the requests made by your browser. Here, you have two tabs:
+
+<Tabs>
+  <Tab title="Network Traffic">
+    <Tabs>
+      <Tab title="Network Traffic">
+        <img
+          src="/images/browser-interception/cc488288-573b-4a99-bb01-f45a28af8e3b.png"
+          align="center"
+          fullwidth="false"
+        />
+
+        <Note>
+          If you want to intercept traffic from another browser extension, please use the [Requestly Interceptor Desktop App](/interceptor/desktop-app#desktop-app) instead.
+        </Note>
+        The **Network Traffic** tab displays a network table where all requests and responses from the webpage are listed. This tab provides debugging options such as:
+
+        - **Add JavaScript to Page**: Injects custom JavaScript into the webpage.
+        - **Add CSS to Page**: Applies custom styles to the page.
+        - **Emulate a Different Device**: Simulates how the page renders on different devices.
+
+        Clicking on any request in the network table reveals detailed information, including request headers, request body, and response body. Additionally, users have the option to create a rule directly from the network table for the selected request.
+
+        The available rule creation options are:
+
+        - **Redirect to Another URL**
+        - **Replace Host**
+        - **Replace Part of URL**
+        - **Delay Request**
+        - **Cancel Request**
+
+        Clicking any of these buttons will take you to the Requestly Interceptor dashboard with some parameters set, Here you can customize and apply your modifications.
+      </Tab>
+    </Tabs>
+  </Tab>
+</Tabs>

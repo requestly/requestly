@@ -1,0 +1,73 @@
+---
+title: "Network Table"
+slug: "network-table"
+path: "/http-interceptor/desktop-app/network-table"
+visibility: "PUBLIC"
+format: "MDX"
+---
+
+The **Network Table** is the heart of Requestly Interceptor’s Desktop App; here you can monitor, inspect, and manage all intercepted network traffic. It’s packed with powerful features to help you debug with ease. Here's a quick overview of its key components:
+
+<img src="/images/network-table/f69ed79e-af93-491f-8416-4233aba3bf15.png" align="center" fullwidth="false" />
+
+1. **Traffic Table -** Displays all intercepted requests and responses with key details like URL, status, and time.
+
+2. **Export HAR button** **-** Export captured network traffic as a HAR file for analysis or sharing.
+
+3. **Save Session Button** **-** Save the current network session for future debugging or comparison.
+
+4. **Request / Response Details -** Show detailed headers, payloads, and cookies for selected requests or responses.
+
+5. **Search and Filter options -** Quickly find traffic entries using search keywords or advanced filters.
+
+6. **Clear Logs or Pause Button -** Clears logs or pauses traffic capture to reduce noise and focus.
+
+7. **App and Domains Filter -** Filters traffic by specific apps or domains for focused analysis.
+
+## **Filtering Traffic**
+
+Use the filter option to find a set of particular requests from hundreds of intercepted requests. There are 4 types of filters available as follows:
+
+* **URL**: Filter requests by using a string search on the URL of the request.
+
+* **Method**: Filter by HTTP methods such as: GET, POST, PUT, PATCH, or DELETE.
+
+* **Status Code**: Narrow down by response status codes, including 1XX (Informational), 2XX (Success), 3XX (Redirection), 4XX (Client Errors), and 5XX (Server Errors).
+
+* **Resource Type**: Focus on specific resource types like HTML, JSON, JavaScript, CSS, Images, Media (Audio and Video), FormData, or Fonts.
+
+<img src="/images/network-table/42115947-3445-406f-af8c-9c3955d9ee3a.png" align="center" fullwidth="false" />
+
+## Network Modification
+
+One of Requestly Interceptor’s most powerful capabilities is **network modification**, allowing you to dynamically alter requests and responses in real time. This feature helps in debugging, testing, and even bypassing certain network constraints. Here’s how you can modify network traffic:
+
+<Steps>
+  <Step title="Right Click on a Request">
+    Right-click on any network request in the Network Traffic table.
+
+    <img src="/images/network-table/360df924-9811-4b40-8200-3ff4773da1dc.png" align="left" fullwidth="false" />
+  </Step>
+
+  <Step title="Select the Rule Type">
+    Choose the rule you want to create from the available options.
+  </Step>
+
+  <Step title="Configure the Rule">
+    Fill in the necessary details for modification in the Rule Editor Modal
+
+    <img src="https://imagedelivery.net/IEMzXmjRvW0g933AN5ejrA/wwwnotionso-image-prod-files-secures3us-west-2amazonawscom-8e04dd23-74cd-4c44-8158-4238eac359d1-dd234d3f-ae4c-4ee4-8dd4-9bddbe01755b-ss-2_18png/public" align="left" fullwidth="false" />
+  </Step>
+
+  <Step title="Create the Rule">
+    Click on the **Create Rule** button at the top-right corner of the Rule Editor Modal
+  </Step>
+</Steps>
+
+### Testing Modification
+
+Now, when the same request is triggered again, the request will be highlighted. This indicates that the Requestly Interceptor Rule is applied to the request.
+
+<img src="https://imagedelivery.net/IEMzXmjRvW0g933AN5ejrA/wwwnotionso-image-prod-files-secures3us-west-2amazonawscom-8e04dd23-74cd-4c44-8158-4238eac359d1-d3729c0b-0680-444c-b127-637cd9188e8c-modified-requestpng/public" align="left" fullwidth="false" />
+
+These modification tools provide developers with greater control over their network traffic, enabling deeper debugging and customization without needing backend changes.

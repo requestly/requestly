@@ -1,0 +1,101 @@
+---
+title: 'Unable to intercept web traffic on browser, mobile, or emulator'
+label: 'Unable to intercept web traffic on browser, mobile, or emulator'
+slug: unable-to-intercept-web-traffic-on-browser-mobile-or-emulator
+description: Troubleshooting guide to resolve common interceptor issues
+visibility: PUBLIC
+---
+Use this page as a decision tree when setup looks complete but traffic is still missing from Requestly Interceptor.
+
+## Start With The Fastest Checks
+
+Before diving into platform-specific troubleshooting, confirm these basics:
+
+- Requestly Interceptor is running and the correct browser, device, or runtime is connected
+- you completed the relevant [HTTP Interceptor setup guide](/interceptor/overview)
+- the traffic you expect is actually leaving the app or browser
+- you are looking in the correct interception view
+
+## Choose The Symptom That Matches Your Issue
+
+<CardGroup cols={2}>
+  <Card title="Only HTTP Works" href="/troubleshoot/http-interceptor/troubleshooting-untrusted-ssl-certificate" icon="lock">
+    HTTPS traffic usually fails when the certificate is missing or not trusted.
+  </Card>
+  <Card title="Localhost Traffic Is Missing" href="/troubleshoot/http-interceptor/intercepting-requests-from-localhost" icon="house-laptop">
+    Localhost and `127.0.0.1` need additional setup.
+  </Card>
+  <Card title="Browser Or App Is Not Showing Any Traffic" href="/interceptor/desktop-app/browser-interception" icon="browser">
+    Revisit the matching browser or runtime setup path first.
+  </Card>
+  <Card title="Mobile Device Or Emulator Is Connected But Empty" href="/interceptor/desktop-app/android-devices" icon="mobile-screen">
+    Verify proxy, network, and certificate setup for the device or emulator.
+  </Card>
+</CardGroup>
+
+## Browser And System-Wide Troubleshooting
+
+### Only HTTP Traffic Is Intercepted
+
+HTTPS traffic usually means the SSL certificate is not installed or trusted correctly.
+
+- Follow [Troubleshooting Untrusted SSL Certificate](/troubleshoot/http-interceptor/troubleshooting-untrusted-ssl-certificate)
+- Restart the browser or app after updating certificate trust
+
+### Localhost Traffic Is Missing
+
+Intercepting `localhost` or `127.0.0.1` requires extra configuration.
+
+- Follow [Intercepting Requests from Localhost](/troubleshoot/http-interceptor/intercepting-requests-from-localhost)
+
+### Safari-Specific Problems
+
+Safari can require certificate regeneration and a full app restart.
+
+- Follow [Troubleshooting Safari](/troubleshoot/http-interceptor/troubleshooting-safari)
+
+## Mobile Devices And Emulators
+
+### Device Is Connected But Traffic Is Missing
+
+Check all of the following:
+
+- the device and desktop app are on the same network
+- the proxy settings match the Requestly Interceptor desktop app
+- the SSL certificate is installed and trusted
+- the correct setup guide was followed for the device or simulator
+
+Use these setup references:
+
+- [Android devices](/interceptor/desktop-app/android-devices)
+- [Android emulator](/interceptor/desktop-app/android-simulator-interception)
+- [iOS devices](/interceptor/desktop-app/ios-devices-interception)
+- [iOS simulator](/interceptor/desktop-app/ios-simulator-interception)
+
+### Emulator Is Not Detected
+
+Restart the Requestly Interceptor Desktop App and reconnect the emulator. If the emulator still does not appear, re-run the matching platform setup steps.
+
+### Only Some Mobile Apps Are Intercepted
+
+This is commonly caused by SSL pinning. Proxy-based tools cannot intercept pinned secure traffic unless the app supports it.
+
+- Review the SSL pinning section in [Android devices](/interceptor/desktop-app/android-devices#ssl-pinning-if-required)
+
+## Other Common Causes
+
+### Blocked Domains
+
+Make sure you did not exclude the target domain from interception.
+
+- See [How to Avoid Intercepting Certain Domains](/guides/how-to-avoid-intercepting-certain-domains-on-the-desktop-app)
+
+## Still Need Help?
+
+If the issue persists, collect these details before contacting support:
+
+- where you are intercepting from: browser, system-wide, mobile device, emulator, terminal, or Node.js
+- operating system and Requestly Interceptor version
+- whether HTTP works while HTTPS fails
+- whether localhost traffic is involved
+- any visible proxy, certificate, or console errors

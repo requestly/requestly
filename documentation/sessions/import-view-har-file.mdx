@@ -1,0 +1,112 @@
+---
+title: Import & View HAR File
+label: Import & View HAR File
+slug: import-view-har-file
+description: >-
+  Learn how to generate and import HAR files in Requestly Interceptor to analyze network
+  activity, diagnose issues, and improve web performance
+seoTitle: Import & View HAR File
+seoDescription: >-
+  Learn how to generate and import HAR files in Requestly Interceptor to analyze network
+  activity, diagnose issues, and improve web performance
+visibility: PUBLIC
+---
+***
+
+HAR ( HTTP Archive ) files store detailed information about the network requests and responses, including URLs, headers, status codes, and timings. This data is useful for diagnosing issues and analyzing web performance.
+
+<Tip>
+  **SessionBook** is an enhanced version of the HAR file feature in Requestly Interceptor. It not only records HTTP traffic but also captures screen and mouse movements for a more detailed session playback.
+</Tip>
+
+## How to Generate a HAR File
+
+To capture and analyze network activity, you can generate a HAR (HTTP Archive) file from any browser's developer tools. Here’s how to create a HAR file using Google Chrome:
+
+<img src="/images/import-view-har-file/4212c88b-e67b-4fc2-ada0-3fda6af358cc.png" alt="Export HAR File From Chrome - Import & View HAR File" align="center" fullwidth="false" />
+
+### Step 1: Open Google Chrome
+
+Navigate to the webpage you want to analyze.
+
+### Step 2: Open Developer Tools
+
+Right-click anywhere on the page and select **Inspect**, or press `Ctrl + Shift + I` (Windows) or `Cmd + Option + I` (Mac).
+
+### Step 3: Go to the Network Tab
+
+In the Developer Tools panel, switch to the **Network** tab to begin recording network activity.
+
+### Step 4: Start Recording Network Activity
+
+Locate the round icon at the top-left of the Network tab:
+
+* If the icon is **red**, recording is active.
+
+* If it’s **gray**, click the icon to start recording.
+
+### Step 5: Perform the Desired Action
+
+<Tip>
+  To ensure all network requests are captured, enable **Preserve log** by checking the checkbox next to it. This will keep the recorded data even if you navigate or reload the page.
+</Tip>
+
+Please navigate through the page or reload it to capture the network traffic for the action you're analyzing.
+
+### Step 6: Save the HAR File
+
+Once you’ve captured the network traffic, Click the **download icon** in the Network tab to save the HAR File.
+
+***
+
+> Note: If you're using the Requestly Interceptor desktop app, you can also export network sessions directly from the traffic table or the Sessions tab.
+
+## Export a HAR File from the Requestly Interceptor Desktop App
+
+You can export a `HAR file` from captured traffic using the <a target="_blank" href="/desktop-app/features/traffic-inspector">**HTTP Interceptor**</a> while monitoring browser or app traffic. Follow these steps:
+
+### Step 1: Navigate to the Network Table:
+
+Open the **Requestly Interceptor Desktop App** and go to the **Network Table** to begin monitoring traffic.
+
+### Step 2: Connect an App:
+
+Click the **Connect Apps** button to establish a connection between Requestly Interceptor and your app.
+
+<img src="/images/import-view-har-file/3fb1cff3-4eb4-4048-8489-f112d506727b.png" align="center" fullwidth="false" />
+
+### Step 3: Select the Traffic Source:
+
+Choose the source from which you want to intercept traffic (e.g., browser, Android, iOS). For browser traffic, click **Open/Launch** and follow the on-screen instructions. For mobile traffic, follow the specific instructions for connecting Android or iOS.
+
+<img src="/images/import-view-har-file/496c5696-49bf-4f73-819f-384aa41db910.png" align="center" fullwidth="false" />
+
+### Step 4: Download the HAR File:
+
+Once traffic is captured, you can either directly export the HAR file from the traffic table or save the network session and export it later from the Sessions Tab.
+
+<img src="/images/import-view-har-file/e18e5a4e-ac31-4d25-8002-2512042563b8.png" align="center" fullwidth="false" />
+
+***
+
+## **How to Import a HAR File into Requestly Interceptor**
+
+To analyze network activity, you can import a HAR file into the Requestly Interceptor desktop app:
+
+<img src="/images/import-view-har-file/34eaa444-7261-462b-9bf7-96e919a39080.png" alt="Import HAR File - Import & View HAR File" align="center" fullwidth="false" />
+
+### Step 1: Open the Requestly Interceptor Desktop App
+
+Go to the **Sessions** tab in the sidebar.
+
+### Step 2: Click Import HAR File
+
+Click the **Import HAR File** button to upload your HAR file.
+
+### Step 3: Select the HAR File
+
+Choose the HAR file from your device to upload.
+
+Once you've imported the HAR file, you will see an interface like this:
+
+<img src="/images/import-view-har-file/aca7fc7a-cb26-4530-bf31-385a3770d27d.png" alt="session Interface - Import & View HAR File" align="center" fullwidth="false" />

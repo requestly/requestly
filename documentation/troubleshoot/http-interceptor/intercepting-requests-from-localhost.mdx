@@ -1,0 +1,51 @@
+---
+title: Cannot Intercept Requests from Localhost
+label: Cannot Intercept Requests from Localhost
+slug: intercepting-requests-from-localhost
+description: ''
+visibility: PUBLIC
+---
+On macOS, any requests to localhost do not go through the configured proxy. To get around this we need to rename localhost to something else for it to be captured by Requestly Interceptor. There are two ways you can do this
+
+## **Solution 1: configure rq.proxy to point to localhost in** `/etc/hosts`
+
+1. Open `/etc/hosts` as a `sudo` user . For eg. using `sudo nano /etc/hosts` . You will be prompted to enter your password
+
+2. Add the following entries to this file:
+
+   ```plaintext
+   127.0.0.1       rq.proxy
+   ::1             rq.proxy
+   ```
+
+3. Save the changes into this file.
+
+4. Replace all your calls to [**localhost**](http://localhost/) with `rq.proxy` . For eg. [**http://localhost:3000**](http://localhost:3000/) → [**http://rq.proxy:3000**](http://rq.proxy:3000/)
+
+5. If you are using Chrome you might need to also stop automatic redirects from http → https for this domain:
+
+   1. Go to `chrome://flags`
+
+   2. search for the `#unsafely-treat-insecure-origin-as-secure` flag
+
+   3. set the value as [`http://rq.proxy`](http://rq.proxy/)`, `[`http://localhost.requestly.io`](http://localhost.requestly.io/) (the second domain is used in the next solution, incase this one doesn’t work)
+
+## **Solution 2: Use** [**localhost.requestly.io**](http://localhost.requestly.io/) **instead**
+
+We have setup this domain to point to 127.0.0.1 (i.e. your [**localhost**](http://localhost/)). But for this to work you will have to follow the steps to stop automatic redirects from http → https.
+
+As mentioned earlier, to do this in chrome:
+
+1. Go to `chrome://flags`
+
+2. search for the `#unsafely-treat-insecure-origin-as-secure` flag
+
+3. set the value as [`http://localhost.requestly.io`](http://localhost.requestly.io/)
+
+<img src="/images/intercepting-requests-from-localhost/610e5348-e8e2-4e4c-b49c-5bf60b4eb820.png" align="left" fullwidth="false" />
+
+Once that’s done, replace all your calls to [**localhost**](http://localhost/) with [`localhost.requestly.io`](http://localhost.requestly.io/) . For eg. [**http://localhost:3000**](http://localhost:3000/) → [**http://localhost.requestly.io:3000**](http://localhost.requestly.io:3000/)
+
+<Warning>
+  **Note: You might need to modify the source condition of any rules that were originally meant to be applied on localhost**
+</Warning>

@@ -1,0 +1,211 @@
+---
+title: "Getting Started with Requestly’s Local Workspace: My Hands-On Experience"
+author: Bhogeshwarj
+authorUrl: https://github.com/bhogeshwarj
+date: 2025-12-06
+description: A beginner-friendly hands-on guide to exploring Requestly’s Local Workspace, creating workspaces, collections, requests, and deleting workspaces safely.
+tags: [requestly, api-testing, local-workspace, beginners-guide, productivity]
+difficulty: beginner
+---
+
+## Introduction
+
+As developers, we love tools that save time, reduce friction, and give us control. Requestly has always been one of those tools, especially for testing APIs, debugging network calls, managing headers, redirects, and more.
+
+While exploring Requestly, I stumbled upon something new that immediately grabbed my attention, Local Workspace.
+
+At first, I assumed it was just another workspace option. But once I actually used it, I realized:
+
+> This is a totally different way to organize and test APIs, privately, offline, and with full control.
+
+If you’ve ever wished:
+
+- _“I wish my API collections weren’t tied to the cloud.”_
+- _“I want my requests to live locally so I can Git commit them.”_
+- _“I don’t want to sync everything while experimenting.”_
+
+… then Local Workspace might be exactly what you need.
+
+So here’s my experience using it for the first time, step-by-step, what worked, what surprised me, and how you can try it too.
+
+---
+
+## 🧠 What is Local Workspace (in the simplest words)?
+
+Local Workspace lets you create a Requestly workspace whose data is stored only on your computer, not online, not synced, not shared.
+
+Everything stays in a folder you choose:
+
+- Requests
+- Collections
+- Environments
+- Response history
+
+It’s like having Postman collections + VSCode folder + Git version control all combined.
+
+> No team, no cloud, no login required.  
+> Just you and your local machine.
+
+This was a big win for me because I often test APIs that are still internal or experimental, now I don’t have to worry about where the data goes.
+
+---
+
+## 🚀 Setting up a Local Workspace
+
+### Step 1: Open Requestly
+
+### Step 2: Click on Workspaces
+
+### Step 3: Choose “New local workspace”
+
+![New Workspace](/images/guide-local-workspace/new-workspace.webp)
+
+### Step 4: Create a Local Workspace
+
+Requestly will ask you for:
+
+- A name for your workspace
+- A folder location on your computer  
+   _(Your APIs, variables and related metadata will be stored here)_
+
+![Name Workspace](/images/guide-local-workspace/name-workspace.png)
+
+### Step 5: Click Create
+
+That’s it. No complicated setup, no onboarding screens, no permission drama.
+
+After that, Requestly created a workspace linked to the folder I selected. Anything I did inside the API Client immediately reflected as real files in that folder.
+
+![Created Workspace](/images/guide-local-workspace/created-workspace.png)
+
+---
+
+## 🧪 Using the Local Workspace
+
+Once inside, I started by creating my first collection and adding sample REST endpoints:
+
+- `GET /users`
+- `POST /auth/login`
+- `GET /profile`
+  ![Using Workspace](/images/guide-local-workspace/using-workspace.gif)
+
+---
+
+## 📂 Creating Collections & Adding Multiple Requests
+
+Once my Local Workspace was ready, I created a new collection to organize my API tests.
+
+### Step 1: Create a Collection
+
+- Click Create Collection
+- Give it a name
+- Example: Todo API
+
+![Creating Collection](/images/guide-local-workspace/creating-collection.gif)
+
+The collection instantly appeared as a structured file inside my Local Workspace, meaning everything exists as real source-controlled files, not just cloud data.  
+That felt powerful.
+
+---
+
+### Step 2: Add Requests to the Collection
+
+Inside _Todo API_, click:
+
+➡️ **New Request**
+
+You can now start adding CRUD operations for the public TODO API.
+
+#### Example Requests I Created:
+
+| Operation   | Method | Endpoint                                     |
+| ----------- | ------ | -------------------------------------------- |
+| Get Todo    | GET    | https://jsonplaceholder.typicode.com/todos/1 |
+| Create Todo | POST   | https://jsonplaceholder.typicode.com/todos   |
+| Update Todo | PUT    | https://jsonplaceholder.typicode.com/todos/1 |
+| Delete Todo | DELETE | https://jsonplaceholder.typicode.com/todos/1 |
+
+![Running Requests](/images/guide-local-workspace/running-request.gif)
+
+---
+
+### ▶️ Running Requests
+
+Running requests works exactly the same as the cloud version:
+
+- Writing body & headers
+- Checking JSON responses
+- Viewing performance, status, history
+
+---
+
+## 🗑 Deleting a Local Workspace (Clean-Up Step)
+
+After experimenting with different collections and requests, you might want to clean up your environment, maybe to start fresh or remove unused workspaces. Requestly makes it super simple to delete a Local Workspace safely.
+
+Here’s how I deleted mine when I was done testing:
+
+---
+
+### Steps to Delete a Local Workspace
+
+1. Open Requestly Desktop App
+2. Click on the name of your workspace
+3. Hover over the Local Workspace you want to delete and click _Settings_
+
+![Selecting Workspace](/images/guide-local-workspace/selecting-workspace.png)
+
+4. Click **Delete Workspace**
+
+![Delete Workspace](/images/guide-local-workspace/delete-workspace.png)
+
+---
+
+### Delete Options
+
+#### Option 1: Delete workspace (from app only)
+
+This removes the workspace from the Requestly interface, but keeps the underlying files safe locally so you can reopen or import them later.
+
+#### Option 2: Also delete all related files and folders from this device
+
+Ticking this checkbox permanently deletes:
+
+- Workspace folder
+- Request files
+- Collections
+- Tests / scripts
+
+⚠ Warning: This action cannot be undone.
+
+![Delete Dialog](/images/guide-local-workspace/delete-dialog.png)
+
+Write the name of your workspace and confirm deletion.
+
+---
+
+## 🎯 Final Thoughts
+
+Using Local Workspace changed how I think about API testing.  
+It feels clean, private, fast, and developer-friendly.
+
+Instead of juggling messy exported JSON collections or cloud sync, I now have:
+
+- Organized local collections
+- Requests stored as real readable files
+- API testing that stays with my project’s source code
+
+Honestly, if you’re a backend or full-stack dev, you should try this immediately.
+
+---
+
+## Additional Resources
+
+- [Try Requestly App](https://app.requestly.io)
+- [Documentation, Local Workspace](https://docs.requestly.com/collaboration/local-workspace)
+
+---
+
+Thanks for reading!  
+If you found this helpful, share it with someone exploring API workflows.  
+_Bhogeshwar_

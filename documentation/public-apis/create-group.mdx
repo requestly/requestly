@@ -1,0 +1,86 @@
+---
+title: Create A New Group
+label: Create Group
+slug: create-group
+description: >-
+  Learn how to create groups in Requestly Interceptor's API for better rule organization and
+  management
+seoTitle: Create A New Group
+seoDescription: >-
+  Learn how to create groups in Requestly Interceptor's API for better rule organization and
+  management
+visibility: PUBLIC
+---
+***
+
+This endpoint allows you to create a new group in your Requestly Interceptor account. Groups help in organizing and managing rules efficiently.
+
+For a live view and to test this API interactively, visit the <a target="_blank" href="https://requestly.readme.io/reference/post_groups">API Playground</a>.
+
+***
+
+### Endpoint
+
+* **Method**: POST
+
+* **URL**: `https://api2.requestly.io/v1/groups`
+
+***
+
+### Body Parameters
+
+| **Parameter** | **Type** | **Description**                                         | **Required** | **Default Value** |
+| ------------- | -------- | ------------------------------------------------------- | ------------ | ----------------- |
+| `name`        | String   | The name of the group to be created.                    | Yes          | -                 |
+| `status`      | String   | The status of the group. Options: `Active`, `Inactive`. | No           | `Active`          |
+| `isFavourite` | Boolean  | Pins the group (true or false).                         | No           | `false`           |
+
+***
+
+### cURL Request
+
+```bash
+curl --request POST \
+  --url https://api2.requestly.io/v1/groups \
+  --header 'accept: application/json' \
+  --header 'content-type: application/json' \
+  --header 'x-api-key: your_api_key' \
+  --data '{
+    "name": "Group",
+    "status": "Active",
+    "isFavourite": false
+  }'
+```
+
+***
+
+### Sample Response
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": "Group_qrszh",
+    "creationDate": 1736059835086,
+    "modificationDate": 1736059835086,
+    "createdBy": "IUAGkRiEx6XI0B6qCc82qbwroKX2",
+    "lastModifiedBy": "IUAGkRiEx6XI0B6qCc82qbwroKX2",
+    "name": "Group",
+    "objectType": "group",
+    "status": "Inactive",
+    "isFavourite": false,
+    "currentOwnerId": "IUAGkRiEx6XI0B6qCc82qbwroKX2"
+  }
+}
+```
+
+***
+
+### Response Codes
+
+| **Status Code** | **Description**             |
+| --------------- | --------------------------- |
+| **200**         | Group created successfully. |
+| **400**         | Invalid group payload.      |
+| **401**         | Unauthorized action.        |
+| **500**         | Server error.               |

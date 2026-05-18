@@ -1,0 +1,239 @@
+---
+title: Record API Sessions
+label: Record API Sessions
+slug: record-api-sessions
+description: >-
+  Learn how to record APIs using Requestly Interceptor Desktop App, save and share API
+  sessions, import HAR files, perform bulk mocking, and replay sessions for
+  debugging.
+seoDescription: >-
+  Learn how to record APIs using Requestly Interceptor Desktop App, save and share API
+  sessions, import HAR files, perform bulk mocking, and replay sessions for
+  debugging.
+visibility: PUBLIC
+---
+***
+
+**Recording API sessions** allows you to monitor and debug HTTP traffic between your application and the server. This can significantly improve debugging efficiency by providing insights into network behavior, as well as enhance testing workflows by enabling precise analysis of API interactions.
+
+With the Requestly Interceptor Desktop App, you can capture and analyze network activity effortlessly. This guide will walk you through the steps to create, manage, and utilize API sessions effectively.
+
+<Warning>
+  This feature is available only on <a target="_blank" href="https://requestly.com/downloads/">Desktop App</a>.
+</Warning>
+
+## How to Create an API Session in Requestly Interceptor
+
+Creating an API session in Requestly Interceptor is straightforward, allowing you to record, import, and analyze network traffic with ease. Here are three methods to get started:
+
+### Save Captured Live Traffic with HTTP Interceptor
+
+One way to create an API session in Requestly Interceptor is by saving captured traffic using the **HTTP Interceptor** while monitoring a browser or an app’s traffic. This allows you to share or analyze the traffic later.
+
+Here's how:
+
+<Steps>
+  <Step title="Navigate to the Network Table">
+    Open the Requestly Interceptor desktop and access the Network Table.
+  </Step>
+
+  <Step title="Connect an App">
+    Click the `Connect Apps` button
+
+    <img src="/images/record-api-sessions/e27862b0-793d-40b9-b2f1-4b0fc2464a13.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Select the Traffic Source">
+    Choose from where you want to intercept traffic (e.g., browser, Android, iOS). Click **Open/Launch** for browser traffic and follow the instructions for mobile traffic.
+
+    <img src="/images/record-api-sessions/9238e6e6-0dab-42d1-8f2a-30cee28053bb.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Capture and Save Traffic">
+    As traffic gets intercepted, perform relevant activities. When you're ready to save the session, click the `Save` button.
+
+    <img src="/images/record-api-sessions/d9cbfef7-6811-4b36-863f-6411702c5362.png" align="center" fullwidth="false" />
+  </Step>
+</Steps>
+
+### Import a HAR File
+
+Another method is to **import a HAR file**, which can be generated from various sources, including browser network sessions, other interceptors, or even Requestly Interceptor's traffic interceptor.
+
+Follow these steps:
+
+<Steps>
+  <Step title="Export the HAR File">
+    Generate and **export the HAR** file from your preferred source.
+  </Step>
+
+  <Step title="Import into Requestly Interceptor">
+    In the Requestly Interceptor app, go to the **Sessions** tab and click **Import HAR**.
+
+    <img src="/images/record-api-sessions/60864cc6-0519-4d29-9031-0fde2fc5a303.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Analyze the Session">
+    Once imported, you can start analyzing the session data.
+  </Step>
+</Steps>
+
+### Import a .rqly File
+
+Requestly Interceptor also supports importing its proprietary `.rqly` file format. This is useful for loading sessions captured from browser-based Sessions workflows.
+
+Here's how:
+
+<Steps>
+  <Step title="Download the Session">
+    Navigate to the desired session in the web app's Session and click **Download**.
+
+    <img src="/images/record-api-sessions/fd44be4c-1820-4343-82b8-80be502f3dd4.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Import into Requestly Interceptor">
+    In the Requestly Interceptor Desktop App, click **Import .rqly File** and upload the downloaded file.
+
+    <img src="/images/record-api-sessions/de206470-f4a2-4e72-87fa-8c3fc8aded39.png" align="center" fullwidth="false" />
+  </Step>
+</Steps>
+
+You can view the saved session later under the **Sessions** tab on the left side of the app.
+
+***
+
+## Session Interface
+
+<img src="/images/record-api-sessions/2b2020df-250b-4350-882e-239dd34ad792.png" align="center" fullwidth="false" />
+
+### Search and Filters
+
+<img src="/images/record-api-sessions/ae78ca53-6210-4eec-9137-98d9c93f8af6.png" align="center" fullwidth="false" />
+
+* **Search URL**: Look for specific requests by entering part of the URL, a wildcard, or a regular expression.
+
+* **Filter by Method**: Narrow requests using HTTP methods like GET, POST, or PUT.
+
+* **Filter by Status Code**: Filter responses by status codes (e.g., 200 for success, 404 for not found).
+
+* **Filter by Resource Type**: Focus on resource types such as CSS files, JavaScript files, or images.
+
+* **Modified Requests**: Check this box to see only requests altered by your applied rules.
+
+* **Clear All**: Reset all filters to view the full list of requests.
+
+### Traffic Table
+
+<img src="/images/record-api-sessions/f35800fc-4548-4d1e-95fd-9634f90f4436.png" align="center" fullwidth="false" />
+
+The main table provides a detailed overview of network requests, including:
+
+* **Time**: The timestamp of each request.
+
+* **URL**: The accessed URLs for better visibility into endpoints.
+
+* **Method**: The HTTP method used (e.g., GET, POST).
+
+* **Content-Type**: The type of content being transmitted (e.g., `text/css`, `application/json`).
+
+* **Status**: The HTTP response status code (e.g., 200, 404).
+
+### Details Section (Bottom Panel)
+
+<img src="/images/record-api-sessions/8ea7dcc1-9a49-49db-bced-1b1616453695.png" align="center" fullwidth="false" />
+
+The bottom panel provides detailed information about selected requests, including
+
+* **Request Details**: View the HTTP method, path, host, and port.
+
+* **Headers**: Inspect request and response headers.
+
+* **Payload**: Check data sent with the request (e.g., for POST requests).
+
+* **Body**: Examine the response body.
+
+* **Preview**: Render response content, such as HTML or CSS, if applicable
+
+### Action Buttons
+
+* **Create Mocks**: Simulate backend responses for testing and development without relying on an actual server. You can also perform **bulk mocking** to create multiple mock responses at once, streamlining the testing process.
+
+* **Delete Sessions**: Remove old or unnecessary sessions to keep your workflow organized.
+
+* **Download HAR Files**: Export HTTP Archive (HAR) files to analyze network activity and debug issues easily.
+
+## Additional Features
+
+### Bulk Mocking
+
+Create multiple mock responses at once to save time and simplify your testing. This feature lets you simulate different backend scenarios, speeding up both development and testing.
+
+With Bulk Mocking, you can quickly create mock responses for selected requests in a session, streamlining your workflow. Once your mocks are created, you can view and manage them easily.
+
+For more detailed instructions, check out our <a target="_blank" href="/api-mocking/create-local-api-mocks#using-recorded-sessions-for-bulk-api-mocking">Bulk Mocking Guide</a>.
+
+### Saving and Sharing Sessions
+
+You can keep your session data for later use or **share it** with others. Use the **Export HAR** option to download session data, which can be shared or re-imported into Requestly Interceptor. To learn more, visit the <a target="_blank" href="/sessions/import-view-har-file">**Import/View HAR file page**</a>.
+
+### Creating Rules from Captured Sessions
+
+Requestly Interceptor allows you to use captured sessions to create rules tailored to specific testing scenarios. This method helps replicate real-world conditions effectively. Here's how you can leverage sessions to define rules:
+
+**Popular Use Cases**
+
+* **Redirect Requests:** Create rules to reroute specific URLs to alternative endpoints for testing purposes.
+
+* **Modify Headers:** Adjust request or response headers to simulate various environments or configurations.
+
+* **Delay Responses:** Introduce network delays to observe how your app handles slow response times.
+
+Here’s how to create a Rule from Captured Sessions:
+
+<Steps>
+  <Step title="Open Your Session">
+    Open Your Session and Right-click any request from the traffic table.
+  </Step>
+
+  <Step title="Select a Rule Type:">
+    Choose a rule type (e.g., Redirect URL, Modify Header).
+
+    <img src="/images/record-api-sessions/98aa04ca-f9cb-44bf-aecb-438cc6eebd56.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Configure the Rule:">
+    Configure the rule as needed for your testing scenario.
+
+    <img src="/images/record-api-sessions/246a9604-43b1-440f-9a1c-854a12a0803e.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Save the Rule:">
+    Click `Save` to finalize and apply the rule.
+  </Step>
+</Steps>
+
+### Edit and Replay
+
+The Edit and Replay feature lets you send API requests to an endpoint and modify various parameters like headers, body, query parameters, and more. This functionality acts as an integrated API client within your sessions, making it easier to test and modify API requests directly.
+
+<img src="/images/record-api-sessions/12630239-ec3c-48f6-bc09-7374c3079f8a.png" align="center" fullwidth="false" />
+
+Here’s how to use Edit and Replay :
+
+<Steps>
+  <Step title="Select a Session">
+    In your session, choose the interaction or API request you want to analyze. **Right-click** the session and click **Edit and Replay**.
+
+    <img src="/images/record-api-sessions/0d9debea-50bb-4c8f-b3e1-2e40fb30e195.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Analyze Session Data">
+    Review the recorded parameters, including headers, body, and query parameters, to understand the request behavior.
+
+    <img src="/images/record-api-sessions/e8d5113d-3fd0-41c1-8efa-1356fa1a440a.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Replay and Debug">
+    After analyzing the session, click the **Send** button to resend the modified request and debug the issue effectively.
+  </Step>
+</Steps>

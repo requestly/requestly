@@ -1,0 +1,70 @@
+---
+title: Delete Rule
+label: Delete Rule
+slug: delete-rule
+description: >-
+  Learn how to delete specific rules in Requestly Interceptor's API with required parameters
+  and response examples
+seoTitle: Delete Rule
+seoDescription: >-
+  Learn how to delete specific rules in Requestly Interceptor's API with required parameters
+  and response examples
+visibility: PUBLIC
+---
+***
+
+This endpoint allows you to delete a specific rule from your Requestly Interceptor account using its unique `ruleId`.\
+Use this API call to permanently remove a rule that is no longer required.
+
+For a live view and to test this API interactively, visit the [API Playground](https://requestly.readme.io/reference/delete_rules-ruleid).
+
+***
+
+### Endpoint
+
+* **Method**: DELETE
+
+* **URL**: `https://api2.requestly.io/v1/rules/{ruleId}`
+
+***
+
+### Path Parameters
+
+| **Parameter** | **Type** | **Description**                          | **Required** |
+| ------------- | -------- | ---------------------------------------- | ------------ |
+| `ruleId`      | String   | The unique ID of the rule to be deleted. | Yes          |
+
+***
+
+### cURL Example
+
+```bash
+curl --request DELETE \
+  --url https://api2.requestly.io/v1/rules/Redirect_a9qau \
+  --header 'accept: application/json' \
+  --header 'x-api-key: your_api_key'
+```
+
+***
+
+### Sample Response
+
+```json
+{
+  "success": true,
+  "message": "Rule deleted successfully"
+}
+```
+
+***
+
+### Response Codes
+
+| **Status Code** | **Description**                |
+| --------------- | ------------------------------ |
+| **200**         | Rule deleted successfully.     |
+| **400**         | Invalid rule pairs or payload. |
+| **401**         | Unauthorized action.           |
+| **404**         | Rule or group not found.       |
+| **405**         | Rule type update not allowed.  |
+| **429**         | Too many requests.             |

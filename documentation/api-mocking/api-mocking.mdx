@@ -1,0 +1,39 @@
+---
+title: API Mocking
+label: API Mocking
+slug: api-mocking
+visibility: PUBLIC
+---
+## **Introduction to API Mocking**
+
+This section introduces the concept of API mocking and explains how it can help developers and testers during the development process. API mocking is particularly useful for frontend developers, testers, and teams working in environments where backend services are unavailable or incomplete.
+
+By the end of this section, you will have a clear understanding of API mocking and its benefits, along with links to detailed pages for each approach.
+
+## What is API Mocking?
+
+API mocking is the process of simulating API responses without relying on the actual backend server. It allows developers and testers to create mock responses to API calls, making development and testing faster, more flexible, and independent of backend availability.
+
+By using API mocking, you can:
+
+* Unblock frontend development when APIs are incomplete or unavailable.
+
+* Test your application against different API responses (success, error, or edge cases).
+
+* Simulate performance scenarios like delayed responses.
+
+With **Requestly Interceptor**, you can easily create and manage API mocks to streamline your development workflow. Requestly Interceptor provides two approaches to mocking APIs:
+
+### **Create Local API Mocks**
+
+Using Requestly Interceptor’s **Modify Response** feature, you can easily create **Local API Mocks** to simulate API responses without hitting the actual server. This is perfect for testing and development when you need to work offline or want to simulate specific scenarios. You can create mocks for individual endpoints or use a recorded session from Requestly Interceptor to create mock responses in bulk.
+
+For detailed instructions on setting up Local Mocks and Modify Response, visit our [Local Mocks Documentation](/api-mocking/create-local-api-mocks).
+
+## Create Cloud Mocks
+
+With **File Server**, you can upload or create files directly on Requestly Interceptor’s servers. These files can then be used as **redirect destinations** for any API request using Requestly Interceptor’s **Redirect Rule**. This allows you to simulate API responses effortlessly without relying on a live server.
+
+Each mock file is accessible via a **dedicated URL**, making it easy to share across teams and environments. This approach is perfect for collaborative testing, automated workflows, and ensuring consistent API simulation throughout the development and testing lifecycle.
+
+For step-by-step instructions on creating and managing Cloud Mocks, visit our [Cloud Mocks Documentation](/api-mocking/create-cloud-based-mocks).

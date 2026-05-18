@@ -1,0 +1,72 @@
+---
+title: Delete Group
+label: Delete Group
+slug: delete-group
+description: >-
+  Learn how to delete specific groups in Requestly Interceptor's API with steps and example
+  responses.
+seoTitle: Delete Group
+seoDescription: >-
+  Learn how to delete specific groups in Requestly Interceptor's API with steps and example
+  responses.
+visibility: PUBLIC
+---
+***
+
+This endpoint allows you to delete a specific group using its unique ID.
+
+<Warning>
+  Deleting a group does not delete the rules within it. Instead, the rules are moved out of the group and remain intact in your account
+</Warning>
+
+For a live view and to test this API interactively, visit the [API Playground](https://requestly.readme.io/reference/delete_groups-id).
+
+***
+
+### Endpoint
+
+* **Method**: DELETE
+
+* **URL**: `https://api2.requestly.io/v1/groups/{id}`
+
+***
+
+### Path Parameters
+
+| Parameter | Type   | Description                                   | Required |
+| --------- | ------ | --------------------------------------------- | -------- |
+| id        | String | The unique identifier of the group to delete. | Yes      |
+
+***
+
+### **cURL** Request
+
+```bash
+curl --request DELETE \
+  --url https://api2.requestly.io/v1/groups/Group_qrszh \
+  --header 'accept: application/json' \
+  --header 'x-api-key: your_api_key'
+```
+
+***
+
+### Sample Response
+
+```json
+{
+  "success": true,
+  "message": "Group deleted successfully"
+}
+```
+
+***
+
+### Response Codes
+
+| **Status Code** | **Description**                     |
+| --------------- | ----------------------------------- |
+| **200**         | Group deleted successfully.         |
+| **400**         | The provided group ID is invalid.   |
+| **401**         | Unauthorized action.                |
+| **404**         | The specified group does not exist. |
+| **500**         | An error occurred on the server.    |

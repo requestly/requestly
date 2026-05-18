@@ -1,0 +1,225 @@
+---
+title: "Android Simulator Interception"
+slug: "android-simulator-interception"
+path: "/http-interceptor/desktop-app/android-simulator-interception"
+visibility: "PUBLIC"
+format: "MDX"
+description: "Learn how to set up Requestly Interceptor to intercept, monitor, and debug HTTP requests on your Android Simulator for Android app development and testing."
+---
+
+***
+
+When working with Android apps, debugging HTTP Requests can be a challenge. Requestly Interceptor provides an easy-to-use solution for everyone who needs to monitor, modify, or debug HTTP requests and responses during development or QA testing. This section outlines step-by-step instructions, guiding you on how to set up Requestly Interceptor for your Android emulator.
+
+By the end of this guide, you will have a fully functional interception setup tailored to your Android development needs.
+
+## **Step-by-Step Guide**
+
+### Video Guide
+
+For a visual walkthrough, check out our YouTube video guide:
+
+<iframe className="w-full aspect-video rounded-xl" src="https://www.youtube.com/embed/37R0qOw6mrY" />
+
+## Automatic Setup
+
+Requestly Interceptor offers a one-click setup for Android emulators using Desktop App version **1.7.0+**. Here's how:
+
+<Steps>
+  <Step title="Start Your Android Emulator">
+    Ensure your emulator is up and running before proceeding
+  </Step>
+
+  <Step title="Open Requestly Interceptor Desktop App">
+    Launch the Requestly Interceptor desktop application on your computer.
+  </Step>
+
+  <Step title="Click any one of the Connect Apps buttons from the network table as shown below">
+    <img src="/images/android-simulator-interception/fdfdc05f-f6d6-4545-851f-efc8c4979ae3.png" align="left" fullwidth="false" />
+  </Step>
+
+  <Step title="Here go to Mobiles apps and you should be able to see all Android emulators running on your device simply click on connect">
+    <img src="/images/android-simulator-interception/aa29d6a6-7090-4f9c-8d3a-9c9fe7a068d6.png" align="left" fullwidth="false" />
+  </Step>
+</Steps>
+
+## Manual Setup
+
+If the automatic setup does not work for you, you can manually configure the proxy by following these steps:
+
+If you have ADB installed, you can skip the proxy setup through the emulator's UI by running the following command in your Android studio terminal:
+
+```bash
+adb shell settings put global http_proxy "<ip>:<port>"
+```
+
+Make sure to change the: in the above command to the one mentioned in the header of the Requestly Interceptor desktop app
+
+Otherwise, follow these steps to configure the proxy manually:
+
+<Steps>
+  <Step title="Select Network:">
+    <img src="/images/android-simulator-interception/e390d696-998e-4bc9-b741-03fe4e4af25a.png" align="left" fullwidth="false" />
+
+    Tap on the Internet and click on the gear icon on the connected network name to open its settings.
+  </Step>
+
+  <Step title="Modify Network Settings:">
+    <img src="/images/android-simulator-interception/31545abc-85f1-4443-9acf-3e00a5ad628d.png" align="left" fullwidth="false" />
+
+    * At the top right of the screen click the edit icon
+
+    * Enable "Advanced Options" if needed.
+
+    * Set the **Proxy** to "Manual."
+  </Step>
+
+  <Step title="Enter Proxy Details, and input the following:">
+    <img src="/images/android-simulator-interception/6bf13327-839c-4f7d-a777-d084d72c6c27.png" align="left" fullwidth="false" />
+
+    * **Proxy Hostname:** Use the IP shown in the Requestly Interceptor Desktop App (e.g., `192.168.1.10`).
+
+    * **Proxy Port:** Use the port displayed in the Requestly Interceptor Desktop App (e.g., `8080`).
+  </Step>
+
+  <Step title="Save Changes">
+    Apply the settings and continue with the certificate installation
+  </Step>
+</Steps>
+
+## CA Certificate Installation
+
+To intercept HTTPS traffic, you need to install Requestly Interceptor's root CA certificate on the emulator. You can do this in two ways:
+
+**Option 1: From the Desktop:**
+
+<Steps>
+  <Step title="Download the certificate from Requestly Interceptor's Desktop app">
+    * Open the Requestly Interceptor Desktop App.
+
+    * Navigate to **Connect Apps > Others > Manual Setup > Save Certificate** to download the root CA certificate.
+  </Step>
+
+  <Step title="Install the Certificate">
+    After the certificate is downloaded on your PC, Run this script in **Android Studio** to push it to the emulator using the following script:
+
+    ```bash
+    #!/bin/bash
+    subjectHash=`openssl x509 -inform PEM -subject_hash_old -in **<certificate-path>** | head -n 1`
+    openssl x509 -in **<certificate-path>** -inform PEM -outform DER -out $subjectHash.0
+    adb root
+    adb push ./$subjectHash.0 /data/misc/user/0/cacerts-added/$subjectHash.0
+    adb shell "su 0 chmod 644 /data/misc/user/0/cacerts-added/$subjectHash.0"
+    adb reboot
+    ```
+
+    > ***Replace \<certificate-path> with the path to the downloaded certificate***
+  </Step>
+</Steps>
+
+**Option 2: Directly on the Emulator:**
+
+<Steps>
+  <Step title="Download Certificate">
+    <img src="/images/android-simulator-interception/99ac42dc-b95e-4210-9f19-615e15feed4b.png" align="left" fullwidth="false" />
+
+    * Open Chrome in an incognito tab
+
+    * Go to [**http://requestly.io/ssl**](http://requestly.io/ssl) (⚠️ Use HTTP here, not HTTPS)
+
+    * This will download RQProxyCA.pem.cert
+  </Step>
+
+  <Step title="Install CA Certificate">
+    <img src="/images/android-simulator-interception/321a72c4-4e52-4caa-b9ff-da066d602049.png" align="left" fullwidth="false" />
+
+    * Go to **Settings > Search "CA Certificate" > Install Anyway**.
+
+    * Select the downloaded certificate and install it.
+  </Step>
+
+  <Step title="Verify Installation:">
+    <img src="/images/android-simulator-interception/ca1878c7-83ce-40db-8068-3618f12f1862.png" align="left" fullwidth="false" />
+
+    After installation, confirm your setup by going to [**amiusing.requestly.io**](http://amiusing.requestly.io/)
+  </Step>
+</Steps>
+
+## **SSL Pinning \[if-required]**
+
+From Android API level 23 (Android 6.0+), many apps enforce SSL pinning for security. To intercept HTTPS traffic, setting up SSL pinning is required.
+
+<Info>
+  Make sure to remove these in production builds
+</Info>
+
+Add these configs to your app codebase for it to work
+
+**Step 1:** Add **res/xml/network\_security\_config.xml**
+
+```xml
+<network-security-config>
+  <debug-overrides>
+    <trust-anchors>
+      <certificates src="user" />
+      <certificates src="system" />
+    </trust-anchors>
+  </debug-overrides>
+
+  <base-config cleartextTrafficPermitted="true">
+    <trust-anchors>
+      <certificates src="system" />
+      <certificates src="user" />
+    </trust-anchors>
+  </base-config>
+</network-security-config>
+```
+
+**Step 2:** Add to **AndroidManifest.xml**
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<manifest ... >
+    <application android:networkSecurityConfig="@xml/network_security_config" ... >
+    ...
+    </application>
+</manifest>
+```
+
+## **Deactivate Proxy (After done debugging)**
+
+Please make sure to revert the proxy after you are done testing using Requestly Interceptor
+
+```bash
+adb shell settings put global http_proxy :0
+```
+
+# **Troubleshooting**
+
+### **Emulator not detected?**
+
+* Check if your emulator is running.
+
+* Check if `adb` is installed. If not, install it from [**here**](https://developer.android.com/tools/releases/platform-tools)
+
+* Try Restarting your emulator.
+
+# **How does it work?**
+
+Here's the code that makes this happen in a single click
+
+[**https://github.com/requestly/requestly-desktop-app/blob/fb1f321a3d2431cfcd9d95d1396bcd39820a4ec9/src/renderer/actions/apps/mobile/android.js#L63-L74**](https://github.com/requestly/requestly-desktop-app/blob/fb1f321a3d2431cfcd9d95d1396bcd39820a4ec9/src/renderer/actions/apps/mobile/android.js#L63-L74)
+
+1. Searches for online ADB devices
+
+2. On `Connect`
+
+   1. Root the device (To install Requestly Interceptor CA)
+
+   2. Inject Requestly Interceptor CA (if not already)
+
+   3. Setup Proxy on Emulator
+
+   4. Restart the Emulator (Only first time)
+
+3. On `Disconnect` - Removes the Proxy

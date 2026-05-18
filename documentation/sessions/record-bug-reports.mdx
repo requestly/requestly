@@ -1,0 +1,182 @@
+---
+title: Record Bug Reports
+label: Record Bug Reports
+slug: record-bug-reports
+description: >-
+  Learn how to record screen, console logs, network logs, etc then securely
+  share them to speed up issue resolution.
+seoDescription: >-
+  Learn how to record and share debug sessions with Requestly Interceptor Sessions. Capture screen
+  recording, console logs, network logs, etc then securely share them to speed
+  up issue resolution.
+visibility: PUBLIC
+---
+***
+
+Requestly Interceptor **Sessions** helps you capture and share detailed bug reports by recording browsing sessions along with mouse movements, clicks, network logs, console logs, environment details, and LocalStorage changes. It provides the information developers need to reproduce and debug issues without relying only on written reproduction steps.
+
+Let’s see how to record a bug report, save it, and share it with your team.
+
+<Warning>
+  This feature is supported in Browser Extensions only.
+</Warning>
+
+## Configure Session Recording
+
+To begin using **Sessions**, the first thing you'll need to do is **set up your pages**. This ensures that the right pages are ready for recording.
+
+<Steps>
+  <Step title="Navigate to the Sessions Tab">
+    Go to the <a target="_blank" href="https://app.requestly.io/sessions">**Sessions**</a> tab from the left-hand menu in the Requestly Interceptor web app.
+
+    <img src="/images/record-bug-reports/84c6a07e-b0b6-4e2e-8e04-e8c2eb491d43.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Open Settings">
+    Click on **Settings**.
+  </Step>
+
+  <Step title="Choose Page Configuration">
+    Choose one of the following options:
+
+    * **All Pages**: Record sessions on all the websites you visit.
+
+    * **Specific Pages**: Record only on specific web pages matching the criteria. Websites and web pages can be filtered based on URL or Hostname and matched using Equals, Contains, RegEx, and Wildcard conditions on the string you type in the source URL field.
+
+          <img src="/images/record-bug-reports/632beaa5-f5ea-486b-bec9-17e7149ea3dd.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Save Custom Page Configuration (Optional)">
+    If selecting **Specific Pages**, add the source condition, then click **Save**. You can add multiple matching conditions by clicking the **Add Page Source** button.
+  </Step>
+</Steps>
+
+Once everything is set up, you can **start recording a session**, which will capture all user actions like clicks, page changes, and mouse movements.
+
+## Recording Sessions
+
+To record a session, you can either use manual recording, where you start and stop recording sessions as needed, or auto-recording mode, which automatically captures sessions based on predefined settings.
+
+<img src="/images/record-bug-reports/1d265804-d097-43df-8722-47551ec7edae.png" align="center" fullwidth="false" />
+
+### Auto Recording Mode
+
+This mode captures user interactions, such as clicks, page transitions, and mouse movements, with sessions capped at 5 minutes for optimal browser performance. Sessions are temporarily stored in local storage, discarding older activity for efficiency, until saved or shared.
+
+<Steps>
+  <Step title="Visit Webpage">
+    Visit a webpage where a bug occurs or any webpage where you want to test it.
+  </Step>
+
+  <Step title="Open the Requestly Interceptor Extension">
+    Click the **Requestly Interceptor** extension icon in your browser toolbar.
+
+    <Tip>
+      Pin Requestly Interceptor to your toolbar, for faster access.
+    </Tip>
+  </Step>
+
+  <Step title="Replay Recent Activity">
+    Click on **Watch Last 5 Min Replay** in the popup. If you have configured Requestly Interceptor to auto-record only selected domains then it will only be available on those domains.
+  </Step>
+
+  <Step title="Save or Share">
+    The recorded session draft will open in a new browser tab. There you can either save it or share it with developers.
+
+    <Warning>
+      Sessions are stored in LocalStorage of your browser until you save them on the cloud or share them by creating a link.
+    </Warning>
+  </Step>
+</Steps>
+
+### Manual Recording
+
+If Session Recording hasn’t been pre-configured for a specific webpage, you can manually record sessions by following these steps.
+
+<Steps>
+  <Step title="Open the Page to Record">
+    Open the page that you want to record.
+  </Step>
+
+  <Step title="Open Requestly Interceptor Extension">
+    Open the **Requestly Interceptor** extension popup from your browser toolbar.
+
+    <img src="/images/record-bug-reports/e5a3e133-8dea-45f3-9b66-3878e0475aed.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Start Recording">
+    Click the **Record this tab** button to begin capturing session data.
+  </Step>
+
+  <Step title="Stop and Review">
+    Once you're finished, click the **Stop & Watch** button, either from the extension popup or from the Requestly Interceptor widget at the bottom-left corner.
+
+    <img src="/images/record-bug-reports/20962623-ec37-4f42-9c74-cc7958d5ee6a.png" align="center" fullwidth="false" />
+  </Step>
+</Steps>
+
+## Saving a Session
+
+After recording the session, it enters a draft state, allowing you to review and make edits. You can trim the video, add a title and description, and make any other adjustments before saving it. During this time, the session is stored in the local storage of your browser only.
+
+<img src="/images/record-bug-reports/826fc9f0-4236-4273-9197-c68887a2cddc.png" align="center" fullwidth="false" />
+
+<Steps>
+  <Step title="Open the Session">
+    Open the session in the extension popup.
+  </Step>
+
+  <Step title="Review Details">
+    Replay the video and review details such as:
+
+    * Console logs
+
+    * Network logs
+
+    * Environment details
+
+    * Local storage changes
+  </Step>
+
+  <Step title="Trim Video (Optional)">
+    Optionally, you can trim the video to skip irrelevant portions.
+  </Step>
+
+  <Step title="Add a Description">
+    Add a description to explain the bug or include additional information.
+  </Step>
+
+  <Step title="Save Recording">
+    Click **Save Recording** to:
+
+    * Save online on the Requestly Interceptor cloud.
+
+    * Download locally if needed.
+
+    <img src="/images/record-bug-reports/bb3a9d41-cbef-48e7-b07a-8857361a1a91.png" align="center" fullwidth="false" />
+  </Step>
+</Steps>
+
+<Info>
+  Before saving, use the checkboxes to include or exclude **network logs** and **console logs** as per your needs. Request headers are not stored for security reasons, as they generally contain authentication information.
+</Info>
+
+## Sharing a Session
+
+Once a recording is saved, you can share it with your team using different access controls:
+
+* **Private**
+
+* **Anyone with the Link**
+
+* **Only with Specific People**
+
+For more detailed steps on how to share and manage access, visit the <a target="_blank" href="/sessions/access-control-of-session">Access Control section</a>.
+
+<img src="/images/record-bug-reports/cd85a844-cb89-462b-ac4c-4cf6137951c5.png" align="center" fullwidth="false" />
+
+Click the **Copy Link** to get the shareable URL.
+
+<Info>
+  If sharing with specific people, they’ll receive an email notification with the link.
+</Info>

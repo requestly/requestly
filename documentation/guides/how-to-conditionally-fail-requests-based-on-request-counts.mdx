@@ -1,0 +1,49 @@
+---
+title: How to conditionally fail requests based on request counts
+label: How to conditionally fail requests based on request counts
+slug: how-to-conditionally-fail-requests-based-on-request-counts
+visibility: PUBLIC
+---
+Simulate a failed response on the first request and a successful one on subsequent attempts using [shared state](/http-rules/advanced-usage/shared-state) in Requestly Interceptor.
+
+<Warning>
+  `$sharedState` is only available in extension versions > v24.8.13 and desktop app versions > v1.7.1.
+</Warning>
+
+### Steps to conditionally fail requests are:
+
+<Steps>
+  <Step title="Create a Modify Response Rule">
+    Open Requestly Interceptor and create a new **Modify Response** rule.
+  </Step>
+
+  <Step title="Enable Dynamic JavaScript Modification">
+    Choose the **Dynamic JavaScript** option to write custom logic for the response.
+  </Step>
+
+  <Step title="Add JavaScript to Control Response Based on Request Count">
+    Use the following code to fail the first request and let others succeed:
+
+    ```javascript
+    function modifyResponse(args) {
+      const {
+        method, url, response, responseType,
+        requestHeaders, requestData, responseJSON
+      } = args;
+
+      // Get the current count or start from 0
+      let count = $sharedState.count ?? 0;
+      count++;
+      $sharedState.count = count;
+
+      // Fail only the first request
+      if (count === 1) {
+        return null;
+      }
+
+      // Allow all subsequent requests to succeed
+      return response;
+    }
+    ```
+  </Step>
+</Steps>

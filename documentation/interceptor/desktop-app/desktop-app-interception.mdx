@@ -1,0 +1,68 @@
+---
+title: "System Wide Proxy"
+slug: "desktop-app-interception"
+path: "/http-interceptor/desktop-app/desktop-app-interception"
+visibility: "PUBLIC"
+format: "MDX"
+description: "Learn how to set up and manage a system-wide proxy with Requestly Interceptor to intercept and debug network requests across all applications."
+---
+
+***
+
+Setting up a system-wide proxy allows you to intercept and debug network requests from all applications on your computer, not just your browser. This is particularly useful in situations where an application-level proxy setup is not available.
+
+<Info>
+  This feature is only available in the **Requestly Interceptor Desktop App**. Ensure you are using the desktop version to proceed with these steps.
+</Info>
+
+## Setting Up System-Wide Proxy
+
+<Steps>
+  <Step title="Launch the App and Click Connect App">
+    Open the Requestly Interceptor desktop app and click the **Connect App** button at the top to view the sources you can intercept.
+
+    <img src="/images/desktop-app-interception/6e10b23b-a8b5-48bf-b36d-cf5fcaf65efc.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Select the System-Wide Proxy Option">
+    From the displayed sources, select **Enable Requestly Interceptor system-wide** to enable traffic interception across all applications on your device.
+
+    <img src="/images/desktop-app-interception/3ad37efb-4c3c-466b-9043-4f6bdf8a813a.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Authorize the App">
+    The first time you select this option, you’ll be prompted to enter your system password. This step allows Requestly Interceptor to add its CA certificate to your system, making it possible to modify HTTPS requests.
+
+    <img src="/images/desktop-app-interception/e0ee0ab2-16cc-4e9c-bcd1-246c0a116c01.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Inspect Network Traffic">
+    Once the system-wide proxy is enabled, network traffic will start appearing in the network table. You can click on any request to view request and response details, setup rules, etc.
+
+    <img src="/images/desktop-app-interception/288be981-dc9d-4175-a2c3-a3ac36d733d2.png" align="center" fullwidth="false" />
+  </Step>
+</Steps>
+
+## Turn Off System-Wide Proxy
+
+To disable the system-wide proxy, go to the **Connect App** section in the Requestly Interceptor Desktop App and click on the **Disconnect** option to turn it off. This will stop intercepting traffic across your system.
+
+<img src="/images/desktop-app-interception/ed2c4a1f-eba1-438d-93ed-e61ead71ce11.png" align="center" fullwidth="false" />
+
+### Filtering by App and Domain
+
+Requestly Interceptor makes it easy to organize and focus on specific network traffic:
+
+<img src="/images/desktop-app-interception/e2a25596-3552-45ac-aa74-6393b5cfa330.png" align="center" fullwidth="false" />
+
+Requestly Interceptor provides two dropdowns in the **Network Inspector's** left sidebar for easy filtering:
+
+* **Apps Dropdown**:
+
+  This dropdown lists all the applications on your system that are making network requests. Clicking on an app filters the traffic in the network table to show only the requests originating from that application.
+
+* **Domains Dropdown**:
+
+  This dropdown lists all the domains accessed by the applications on your system. Clicking on a domain filters the traffic in the network table to display only the requests made to or from that domain.
+
+These filtering options help you focus on specific network traffic. For example, you can isolate requests from a single application or focus on traffic for a specific API or website

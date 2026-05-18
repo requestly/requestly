@@ -1,0 +1,62 @@
+---
+title: Record and Mock Flaky APIs in bulk
+label: Record and Mock Flaky APIs in bulk
+slug: record-and-mock-flaky-apis-in-bulk
+description: ''
+visibility: PUBLIC
+---
+This guide provides detailed instructions on how to use Requestly Interceptor for mocking API requests to ensure reliable development workflows.
+
+Mocking will be accomplished using the [Modify Response rule](/http-rules/rule-types/modify-response-body), which allows overriding the response of an API.
+
+<Warning>
+  This feature is available only on the [Desktop App](https://requestly.com/desktop/).
+</Warning>
+
+### **Recording traffic**
+
+1. **Connect an App**: Launch a new app or connect an existing app with Requestly Interceptor to start intercepting network traffic. Learn more [here](/interceptor/overview).
+
+2) **Capture Network Traffic**: Perform actions in your app to generate network traffic. Monitor and review this traffic within Requestly Interceptor.
+
+   <img src="https://imagedelivery.net/IEMzXmjRvW0g933AN5ejrA/wwwnotionso-image-prod-files-secures3us-west-2amazonawscom-8e04dd23-74cd-4c44-8158-4238eac359d1-3f8ba3e4-3838-4b58-aecc-dda167111336-beadf9c4-20d3-44b2-94e2-a6bfe1b9d218png/public" alt="" align="left" fullwidth="false" />
+
+3. **Save and Navigate to the Captured Session**: Once all desired requests are captured, save this data as a session and proceed to the session details.
+
+### **Creating Mocks**
+
+1. **Create Mocks from the Session**: Click on 'Create Mocks from this Session' button. Then, select the type of APIs you want to mock.
+
+   <img src="https://imagedelivery.net/IEMzXmjRvW0g933AN5ejrA/wwwnotionso-image-prod-files-secures3us-west-2amazonawscom-8e04dd23-74cd-4c44-8158-4238eac359d1-44591711-c6ec-4bdc-bb75-9b4751858d7d-2bf801ab-9c0d-4e5d-b9c9-65700b9f449bpng/public" alt="" align="left" fullwidth="false" />
+
+   * For REST APIs: Filter and select the requests you wish to mock.
+
+   * For GraphQL APIs: Apply a Payload Filter to find specific requests containing the desired key. Then, filter and select the requests you wish to mock.
+
+     <img src="https://imagedelivery.net/IEMzXmjRvW0g933AN5ejrA/wwwnotionso-image-prod-files-secures3us-west-2amazonawscom-8e04dd23-74cd-4c44-8158-4238eac359d1-f8012549-eb39-4245-937c-88afd187420d-54efdd26-d977-4aef-a880-78b70055e4dapng/public" alt="" align="left" fullwidth="false" />
+
+2) **Specify Matching Conditions to Create Rules**: Define the rules for mocking by choosing matching conditions such as matching the entire URL, only the path, or both path and query parameters. Review the created rules in the rules index.
+
+<img src="https://imagedelivery.net/IEMzXmjRvW0g933AN5ejrA/wwwnotionso-image-prod-files-secures3us-west-2amazonawscom-8e04dd23-74cd-4c44-8158-4238eac359d1-b54eebf4-0bbb-4d21-a785-bc1762bd2f3a-03e764b0-d62c-4bd1-a5b4-8d55be9572ccpng/public" alt="" align="left" fullwidth="false" />
+
+### **Testing the Mocks**
+
+1. **Navigate to the Traffic Interceptor**: Use the sidebar to access the traffic interceptor section and reconnect your app.
+
+2) **Retrace your flow to Test Mocks**: Retrace the actions in your app to test the behaviour of the mocked requests. Look for highlighted requests in the logs, which indicate modifications by the mocking rules.
+
+   <img src="https://imagedelivery.net/IEMzXmjRvW0g933AN5ejrA/wwwnotionso-image-prod-files-secures3us-west-2amazonawscom-8e04dd23-74cd-4c44-8158-4238eac359d1-599bf9bd-4f5f-4cfd-9c43-973d6d6f70dd-6c39490e-fca4-4487-9ad2-afc91eb9c999png/public" alt="" align="left" fullwidth="false" />
+
+3) **Review and Edit Rules**: Click on the applied rules icon on any modified request to view or edit the rule definitions directly.
+
+This process ensures a consistent development environment, as the APIs always return the expected responses and thus you gain independence from the current status of the API/service.
+
+<Warning>
+  The current system can't handle the large volume of rules created in bulk, which in certain cases prevents users from creating multiple mocks when many mocks already exist. This is a technical debt, and we are working on a fix for upcoming releases. If you encounter this issue, you can use this workaround to continue testing.
+</Warning>
+
+We recommend backing up your rules in advance. To do this, select all your rules and click on the "Share Rules" button. Then, choose the option to download the rules to obtain a local copy.
+
+A simpler way could be to delete the rules that you no longer need. If you are still not able to create mocks, please turn off syncing in the [Global Settings](https://app.requestly.io/settings/global-settings).
+
+Disabling syncing will allow you to create as many rules as you need. However, be aware that your rules will be local and not synced across your devices.

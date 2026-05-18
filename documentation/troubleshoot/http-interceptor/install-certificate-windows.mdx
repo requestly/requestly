@@ -1,0 +1,64 @@
+---
+title: How to Install Requestly Interceptor CA Certificate in Windows Certificate Manager
+description: Steps to install Requestly Interceptor CA (Certificate Authority) certificate to intercept HTTPS network traffic on Windows
+---
+
+To intercept HTTPS network traffic, you need to install the Requestly Interceptor CA (Certificate Authority) certificate to your Windows certificate manager. There are two methods: automatic and manual.
+
+<Tabs>
+  <Tab title="Automatic (Recommended)">
+    <Steps>
+      <Step title="Open Requestly Interceptor Desktop App">
+        Launch the Requestly Interceptor Desktop App on your Windows system
+      </Step>
+      
+      <Step title="Enable System-wide Proxy">
+        Click on **"Enable Requestly Interceptor System-wide"**
+        <img src="/images/install-certificate-windows/requestly-desktop-app-windows.webp" alt="Requestly Interceptor Desktop App Windows" />
+      </Step>
+      
+      <Step title="Install & Trust Certificate">
+        - Click on **"Install & Trust"** button
+        - A popup will automatically appear to install the certificate
+        - Follow the prompts to complete the installation
+        <img src="/images/install-certificate-windows/install-and-trust-certs.webp" alt="Install and Trust Certificate" />
+      </Step>
+    </Steps>
+  </Tab>
+  
+  <Tab title="Manual">
+    If the automatic method doesn't work, follow these manual steps:
+    
+    <Steps>
+      <Step title="Download the CA certificate">
+        - In Requestly Interceptor Desktop App, go to the System Proxy popup
+        - Click on **Manual** tab
+        - Click on **Save Certificate** button
+        - Save the CA certificate to any location on your system (e.g., Desktop or Downloads folder)
+        <img src="/images/install-certificate-windows/manual-certificate-installation.webp" alt="Manual Certificate Installation" />
+      </Step>
+      
+      <Step title="Import the CA certificate in Certificate Manager">
+        - Press `WIN + R`, type `certmgr.msc` and press Enter
+        - Navigate to: **Trusted Root Certification Authorities → Certificates**
+        - Right-click on **Certificates** → **All Tasks → Import**
+        - Browse and select the CA certificate file you downloaded in step 1
+        - Click **Finish**
+        <img src="/images/install-certificate-windows/install-win-cert.gif" alt="Install Certificate in Windows Certificate Manager" />
+      </Step>
+      
+      <Step title="Verify the installation">
+        - To verify if HTTPS traffic is being intercepted, connect to the proxy
+        - Check that secure (HTTPS) traffic is now being logged in Requestly Interceptor
+        <img src="/images/install-certificate-windows/intercepted-traffic.webp" alt="Intercepted HTTPS Traffic" />
+      </Step>
+    </Steps>
+  </Tab>
+</Tabs>
+
+### Troubleshooting
+
+If you're still unable to intercept HTTPS traffic after following these steps, please ensure:
+- The CA certificate was imported to the correct location (Trusted Root Certification Authorities)
+- The proxy is properly configured and running
+- Try restarting your browser/ application after CA certificate installation

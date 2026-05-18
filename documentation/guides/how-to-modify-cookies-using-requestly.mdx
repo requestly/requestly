@@ -1,0 +1,125 @@
+---
+title: How to Modify Cookies Using Requestly Interceptor
+label: How to Modify Cookies Using Requestly Interceptor
+slug: how-to-modify-cookies-using-requestly
+visibility: PUBLIC
+---
+Modifying cookies is useful when you're testing authentication flows, simulating different user states, or tweaking behavior without changing backend code. Requestly Interceptor makes this easy by letting you **intercept HTTP requests/responses** and **manipulate cookies** on the fly.
+
+## Use Cases
+
+* Testing login/logout behavior
+
+* A/B testing variants
+
+* Simulating admin/user roles
+
+* Bypassing feature flags
+
+## Modify Cookies in Requestly Interceptor
+
+<Tabs>
+  <Tab title="In Request Header">
+    This is useful for **sending a custom cookie value** to the server.
+
+    <Tip>
+      Cookies are sent as a single string in the `Cookie` header, separated by semicolons.
+    </Tip>
+
+    <Steps>
+      <Step title="Create a New Modify Headers Rule">
+        Go to the **HTTP Rules** section, click on `+ New Rule` , and select `Modify Headers` from the list of options.
+
+        <img src="/images/how-to-modify-cookies-using-requestly/e160e006-cd79-478c-bfd8-e8b73f02b59a.png" align="left" fullwidth="false" />
+      </Step>
+
+      <Step title="Name and Describe Your Rule">
+        Give your rule a clear name like **Set Custom Cookie**. Optionally, add a short description so you can easily identify its purpose later.
+
+        <img src="/images/how-to-modify-cookies-using-requestly/e67393fc-8a5e-4358-8643-fbd46df465a4.png" align="left" fullwidth="false" />
+      </Step>
+
+      <Step title="Define Where the Rule Should Apply">
+        Define where the rule should be applied by specifying criteria such as **URL**, **Host**, or **Path**. You can choose from options like **Regex**, **Contains**, **Wildcard**, or **Equals**, or use <a target="_blank" href="/http-rules/advanced-usage/advance-filters">**Advance Filters**</a> for more precise conditions.
+
+        For more details on source conditions, [**read this guide**.](/http-rules/advanced-usage/advance-targeting)
+
+        <img src="/images/how-to-modify-cookies-using-requestly/e3a514b7-a8f3-4a49-9cac-c845fac7d699.png" align="left" fullwidth="false" />
+      </Step>
+
+      <Step title="Set Up the Header Modification">
+        In the **Modification Type**, select **Request Headers** since we're modifying outgoing request headers.\
+        Under the **Request Headers** tab, click **Add Header** and set the following:
+
+        * **Action**: Add or Override
+
+        * **Header Name**: `Cookie`
+
+        * **Value**: `username=John Doe; expires=Thu, 18 Dec 2013 12:00:00 UTC`
+
+        This tells the browser to attach the specified cookie string in all matching requests.
+
+        <img src="/images/how-to-modify-cookies-using-requestly/4a88bdc7-6c5e-4799-b7f2-1cf6a332c389.png" align="center" fullwidth="false" />
+      </Step>
+
+      <Step title="Save and Activate the Rule">
+        Click **Save** to store the rule. After saving, make sure to **toggle it ON** to activate it.
+      </Step>
+    </Steps>
+  </Tab>
+
+  <Tab title="In Response Header">
+    This is useful to **change or inject cookies** coming from the server (e.g., simulate logged-in state).
+
+    <Warning>
+      Response Headers modification done by Requestly Interceptor are not visible in Browsers devtool but they are actually modified
+    </Warning>
+
+    <Steps>
+      <Step title="Create a New Modify Headers Rule">
+        Go to the **HTTP Rules** section, click `+ New Rule`, and choose **Modify Headers** from the list.
+
+        <img src="/images/how-to-modify-cookies-using-requestly/e160e006-cd79-478c-bfd8-e8b73f02b59a.png" align="left" fullwidth="false" />
+      </Step>
+
+      <Step title="Name and Describe Your Rule">
+        Give your rule a meaningful name like **Override Set-Cookie**.\
+        Add a short description to clarify that this rule modifies cookies sent from the server, useful for simulating logged-in sessions or testing different cookie values
+
+        <img src="/images/how-to-modify-cookies-using-requestly/e67393fc-8a5e-4358-8643-fbd46df465a4.png" align="left" fullwidth="false" />
+      </Step>
+
+      <Step title="Set the Scope of the Rule">
+        Define where the rule should be applied by specifying criteria such as **URL**, **Host**, or **Path**. You can choose from options like **Regex**, **Contains**, **Wildcard**, or **Equals**, or use <a target="_blank" href="/http-rules/advanced-usage/advance-filters">**Advance Filters**</a> for more precise conditions.
+
+        For more details on source conditions, [**read this guide**.](/http-rules/advanced-usage/advance-targeting)
+
+        <img src="/images/how-to-modify-cookies-using-requestly/e3a514b7-a8f3-4a49-9cac-c845fac7d699.png" align="left" fullwidth="false" />
+      </Step>
+
+      <Step title="Modify the Response Header">
+        Choose **Response Headers** under **Modification Type**, since we're altering headers coming from the server.
+
+        Then under the **Response Headers** tab:
+
+        * **Action**: Modify
+
+        * **Header Name**: `Set-Cookie`
+
+        * **Value**: `username=John Doe; expires=Thu, 18 Dec 2013 12:00:00 UTC`
+
+        This will override the original `Set-Cookie` header sent by the server and inject your custom value instead.
+
+        <img src="/images/how-to-modify-cookies-using-requestly/5798b429-d576-4c7e-824c-b3a4e3bf5ba9.png" align="center" fullwidth="false" />
+      </Step>
+
+      <Step title="Save and Activate the Rule">
+        Click **Save** to store your rule and **toggle it ON** to enable it.
+      </Step>
+    </Steps>
+  </Tab>
+</Tabs>
+
+<Tip>
+  Use `document.cookie` in the DevTools Console to check current cookies, or inspect request headers in the **Network tab**.
+</Tip>

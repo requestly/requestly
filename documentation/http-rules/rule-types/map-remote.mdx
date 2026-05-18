@@ -1,0 +1,46 @@
+---
+title: "Map Remote"
+slug: "map-remote"
+path: "/http-rules/rule-types/map-remote"
+visibility: "PUBLIC"
+format: "MDX"
+description: "The Map Remote feature allows redirection of network requests to alternate destinations, facilitating transparent testing, debugging, and API version management."
+---
+
+***
+
+The Map Remote feature allows you to redirect the location of a network request to a new destination, enabling the response to be transparently served from this new location as though it were the original destination.
+
+## Why Use Map Remote?
+
+The Map Remote feature is particularly useful in the following scenarios:
+
+* **Testing Local Changes on Production Sites:** Use development or staging endpoints in place of production ones without modifying the source code, allowing for seamless testing of local code.
+
+* **Domain Switching:** Redirect traffic to a local environment for testing purposes, such as evaluating changes before deployment.
+
+* **HTTP to HTTPS Mapping:** Easily switch between HTTP and HTTPS destinations for secure testing.
+
+* **API Backward Compatibility:** Test the backward compatibility of new API versions by mapping requests to a different API version
+
+## How to Use Map Remote
+
+In Requestly Interceptor, there are 2 ways you can implement a Map Remote configuration. You can utilize the two rule types: **Redirect Request** and **Replace Rule**.
+
+### Redirect Request
+
+The Redirect rule enables you to specify a complete URL to which a network request should be redirected. This is particularly helpful for direct mappings of entire endpoints or domains.\
+→ [Learn how to create a Redirect Request rule.](/http-rules/rule-types/redirect-rule)
+
+<img src="/images/map-remote/c7a72477-fb6a-409a-b122-df285c6efc1a.png" align="center" fullwidth="false" />
+
+### Replace Rule
+
+The Replace rule allows you to substitute a specific part of a URL with another string. This provides greater flexibility for partial URL adjustments, such as replacing a subdomain or path segment.\
+→ <a target="_blank" href="/http-rules/rule-types/replace-strings">Learn how to create a Replace Rule.</a>
+
+<Tip>
+  There are multiple ways to validate if a rule is applied or not, learn more about how to <a target="_blank" href="/http-rules/advanced-usage/validate-rules-execution">`validate rule execution`</a>**.**
+</Tip>
+
+<img src="/images/map-remote/f67abcac-0a3f-4c40-b7a9-174288289257.png" align="center" fullwidth="false" />

@@ -1,0 +1,44 @@
+---
+title: SSL Certificate Issues with Safari
+label: Safari Certificate Issues
+slug: troubleshooting-safari
+description: >-
+  Resolve SSL certificate trust issues in Safari. Learn how to regenerate SSL
+  certificates and fix interception errors.
+visibility: PUBLIC
+---
+If you're experiencing trust issues or certificate warnings when using Requestly Interceptor to intercept traffic in Safari or via the system-wide proxy, it may be due to an invalid or untrusted Root Certificate.
+
+**Error indication:** You may see a security warning or certificate error in your browser (especially Safari) when Requestly Interceptor attempts to intercept traffic.
+
+This typically indicates that the Requestly Interceptor Root Certificate has expired, been invalidated, or is not trusted by the system.
+
+<img src="https://imagedelivery.net/IEMzXmjRvW0g933AN5ejrA/wwwnotionso-image-prod-files-secures3us-west-2amazonawscom-8e04dd23-74cd-4c44-8158-4238eac359d1-0a66faab-9671-4187-b55d-192c04226ed9-screenshot_2023-11-30_at_75745_pmpng/public" align="left" fullwidth="false" />
+
+## Solution: Regenerate Requestly Interceptor SSL Certificates
+
+Follow these steps to resolve certificate trust issues:
+
+<Steps>
+  <Step title="Access Settings in Requestly Interceptor:">
+    * Open the Requestly Interceptor desktop application.
+
+    * Click on the Settings Icon located at the top right.
+
+    <img src="https://imagedelivery.net/IEMzXmjRvW0g933AN5ejrA/wwwnotionso-image-prod-files-secures3us-west-2amazonawscom-8e04dd23-74cd-4c44-8158-4238eac359d1-e641b751-07b7-4bc6-a2b4-3ca84dabf685-screenshot_2023-11-30_at_72433_pmpng/public" align="left" fullwidth="false" />
+  </Step>
+
+  <Step title="Regenerate SSL Certificates">
+    * Inside the Settings, find and click the `Regenerate` button.
+
+    * This action regenerates the SSL certificates.
+
+    <img src="https://imagedelivery.net/IEMzXmjRvW0g933AN5ejrA/wwwnotionso-image-prod-files-secures3us-west-2amazonawscom-8e04dd23-74cd-4c44-8158-4238eac359d1-bd07855a-16c7-4761-be3d-6664b9f9899e-screenshot_2023-11-30_at_74433_pmpng/public" align="left" fullwidth="false" />
+  </Step>
+
+  <Step title="Restart and Verify:">
+    * The application will automatically close to complete the regeneration process.
+
+    * Relaunch the app and start intercepting traffic again. The previously encountered error should now be resolved.
+  </Step>
+</Steps>

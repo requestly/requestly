@@ -1,0 +1,210 @@
+---
+title: Get Rule
+label: Get Rule
+slug: get-rule
+description: >-
+  Learn how to retrieve all rules or specific ones using Requestly Interceptor's API with
+  detailed examples.
+seoTitle: Get Rule
+seoDescription: >-
+  Learn how to retrieve all rules or specific ones using Requestly Interceptor's API with
+  detailed examples.
+visibility: PUBLIC
+---
+***
+
+You can either get a list of all your rules or look up a specific rule using its unique ID.
+
+## Get All Rules
+
+Retrieve all rules associated with your Requestly Interceptor workspace. This endpoint supports pagination for managing large sets of data.
+
+For a live view and to test this API interactively, visit the [API Playground](https://requestly.readme.io/reference/get_rules-1).
+
+### Endpoint
+
+* **Method**: GET
+
+* **URL**: `https://api2.requestly.io/v1/rules`
+
+***
+
+### Query Parameters
+
+| Parameter  | Type    | Description                                                                                                       | Required | Default Value |
+| ---------- | ------- | ----------------------------------------------------------------------------------------------------------------- | -------- | ------------- |
+| `offset`   | Integer | The index from where the results should start. Use the value received in `nextOffset` from the previous response. | No       | 0             |
+| `pageSize` | Integer | Number of results to return. Maximum value is 75.                                                                 | No       | 30            |
+
+***
+
+### cURL Example:
+
+```bash
+curl --request GET \
+  --url https://api2.requestly.io/v1/rules \
+  --header 'accept: application/json' \
+  --header 'x-api-key: your_api_key'
+```
+
+***
+
+### Sample Responses
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "createdBy": "IUAGkRiEx6XI0B6qCc82qbwroKX2",
+      "creationDate": 1735820120338,
+      "currentOwnerId": "IUAGkRiEx6XI0B6qCc82qbwroKX2",
+      "description": "hello ",
+      "extensionRules": [
+        {
+          "action": {
+            "redirect": {
+              "url": "https://www.bing.com/"
+            },
+            "type": "redirect"
+          },
+          "condition": {
+            "excludedInitiatorDomains": [
+              "requestly.io"
+            ],
+            "excludedRequestDomains": [
+              "requestly.io"
+            ],
+            "isUrlFilterCaseSensitive": true,
+            "urlFilter": "https://www.google.com/"
+          }
+        }
+      ],
+      "groupId": "",
+      "id": "Redirect_a9qau",
+      "isFavourite": false,
+      "isSample": false,
+      "lastModifiedBy": "IUAGkRiEx6XI0B6qCc82qbwroKX2",
+      "modificationDate": 1735820120338,
+      "name": "test",
+      "objectType": "rule",
+      "pairs": [
+        {
+          "destination": "https://www.bing.com/",
+          "destinationType": "url",
+          "id": "8id6k",
+          "source": {
+            "key": "Url",
+            "operator": "Contains",
+            "value": "https://www.google.com/"
+          }
+        }
+      ],
+      "ruleType": "Redirect",
+      "schemaVersion": "3.0.0",
+      "status": "Inactive"
+    }
+    // ... other rules
+  ],
+  "total": 56,
+  "nextOffset": 31,
+} 
+```
+
+## Retrieve a Specific Rule
+
+This endpoint allows you to fetch details about a specific rule in your Requestly Interceptor account by its unique `ruleId`.
+
+For a live view and to test this API interactively, visit the [API Playground](https://requestly.readme.io/reference/get_rules-ruleid).
+
+### Endpoint
+
+* **Method**: GET
+
+* **URL**: `https://api2.requestly.io/v1/rules/{ruleId}`
+
+***
+
+### Path Parameters
+
+| **Parameter** | **Type** | **Description**                            | **Required** |
+| ------------- | -------- | ------------------------------------------ | ------------ |
+| [`ruleId`]()  | String   | The unique ID of the rule to be retrieved. | Yes          |
+
+***
+
+### cURL Example
+
+```bash
+curl --request GET \
+  --url https://api2.requestly.io/v1/rules/Redirect_a9qau \
+  --header 'accept: application/json' \
+  --header 'x-api-key: your_api_key'
+```
+
+***
+
+### Sample Response
+
+```json
+{
+  "success": true,
+  "data": {
+    "createdBy": "IUAGkRiEx6XI0B6qCc82qbwroKX2",
+    "creationDate": 1735820120338,
+    "currentOwnerId": "IUAGkRiEx6XI0B6qCc82qbwroKX2",
+    "description": "hello",
+    "extensionRules": [
+      {
+        "action": {
+          "redirect": {
+            "url": "https://www.bing.com/"
+          },
+          "type": "redirect"
+        },
+        "condition": {
+          "excludedInitiatorDomains": ["requestly.io"],
+          "excludedRequestDomains": ["requestly.io"],
+          "isUrlFilterCaseSensitive": true,
+          "urlFilter": "https://www.google.com/"
+        }
+      }
+    ],
+    "groupId": "",
+    "id": "Redirect_a9qau",
+    "isFavourite": false,
+    "isSample": false,
+    "lastModifiedBy": "IUAGkRiEx6XI0B6qCc82qbwroKX2",
+    "modificationDate": 1735820120338,
+    "name": "test",
+    "objectType": "rule",
+    "pairs": [
+      {
+        "destination": "https://www.bing.com/",
+        "destinationType": "url",
+        "id": "8id6k",
+        "source": {
+          "key": "Url",
+          "operator": "Contains",
+          "value": "https://www.google.com/"
+        }
+      }
+    ],
+    "ruleType": "Redirect",
+    "schemaVersion": "3.0.0",
+    "status": "Inactive"
+  }
+}
+```
+
+***
+
+### Response Codes
+
+| **Status Code** | **Description**                |
+| --------------- | ------------------------------ |
+| **200**         | Rule retrieved successfully.   |
+| **400**         | Invalid rule pairs or payload. |
+| **401**         | Unauthorized action.           |
+| **404**         | Rule or group not found.       |
+| **429**         | Too many requests.             |

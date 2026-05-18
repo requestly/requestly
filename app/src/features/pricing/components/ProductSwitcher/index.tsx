@@ -2,8 +2,11 @@ import { PRICING } from "features/pricing/constants/pricing";
 import { PRODUCT_FEATURES } from "features/pricing/constants/productFeatures";
 import React, { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { redirectToProductSpecificPricing } from "utils/RedirectionUtils";
+import { redirectToProductSpecificPricing, redirectToUrl } from "utils/RedirectionUtils";
+import APP_CONSTANTS from "config/constants";
 import "./productSwitcher.scss";
+
+const { LINKS } = APP_CONSTANTS;
 
 interface Props {
   activeProduct: string;
@@ -17,6 +20,10 @@ const ProductSwitcher: React.FC<Props> = ({ activeProduct, setActiveProduct, isO
   const productFromQuery = searchParams.get("product") ?? null;
 
   const productChangeHandler = (value: string) => {
+    if (value === PRICING.PRODUCTS.API_CLIENT) {
+      redirectToUrl(LINKS.REQUESTLY_PRICING_PAGE);
+      return;
+    }
     if (!isOpenedFromModal) redirectToProductSpecificPricing(navigate, value);
     setActiveProduct(value);
   };

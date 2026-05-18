@@ -1,0 +1,73 @@
+---
+title: How to Modify HTML Document using Modify API Response Rule
+label: How to Modify HTML document using modify API Response Rule
+slug: modify-html-document-using-modify-api-response-rule
+visibility: PUBLIC
+---
+Requestly Interceptor's **Modify API Response** rule lets you **directly modify the response of top-level HTML documents**. This feature is **only available for desktop app** but you can use file server and redirect rule as a workaround for most use cases.
+
+<Info>
+  <a target="_blank" href="https://requestly.com/downloads/">**Click here to download**</a> the Desktop App for your OS.
+</Info>
+
+<Steps>
+  <Step title="Create a Response Rule">
+    Navigate to the HTTP Rules section in the Requestly Interceptor app. Click `+ New Rule` and choose the `Modify API Response` option.
+
+    <img src="/images/modify-html-document-using-modify-api-response-rule/10acf5f2-7052-4fe8-b9f4-13c01e026082.png" align="left" fullwidth="false" />
+  </Step>
+
+  <Step title="Name and Describe Your Rule">
+    Provide a **descriptive name** for the rule to keep your setup organized. Optionally, add a **brief description** explaining its purpose for easier identification later.
+  </Step>
+
+  <Step title="Select Resource Type">
+    In the Resource Type choose HTML/ JS/ CSS
+
+    <img src="/images/modify-html-document-using-modify-api-response-rule/fed9b55a-7ad9-461a-8eca-2e4d8e3ec51e.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Define Matching Criteria">
+    Define the criteria for the rule to be applied, such as **URL**, **Host**, or **Path**. Choose from **Regex**, **Contains**, **Wildcard**, or **Equals**, or use <a target="_blank" href="/http-rules/advanced-usage/advance-filters">**Advance Filters**</a> for more precise conditions.
+
+    For more detailed guidance, refer to [**Source Conditions Guide**](/http-rules/advanced-usage/source-conditions).
+  </Step>
+
+  <Step title="Change Response Status Code">
+    Modify the status code of the response using the dropdown menu. Choose from:
+
+    * `2XX` for successful responses
+
+    * `4XX` for client errors
+
+    * `5XX` for server errors
+
+    If left empty, the original status code remains unchanged.
+
+    <img src="/images/modify-html-document-using-modify-api-response-rule/a500b630-4b38-4d3d-bae7-45fb3dd254b6.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Modify Response Data">
+    Choose one of the following methods to modify the response data:
+
+    * **Static Response Modification**: Input a static value as the response body.
+
+    * **Dynamic** **Modification Script (JavaScript)**: Use JavaScript to modify responses dynamically. The script provides access to parameters like:
+
+      * `method`: HTTP Method (GET, POST, etc.)
+
+      * `url`: Full URL of the request
+
+      * `response`: Original response body (string)
+
+      * `responseType`: Content type of the original response
+
+      * `requestHeaders`: Headers sent with the request
+
+      * `responseJSON`: Original response parsed as a JSON object
+  </Step>
+
+  <Step title="Save and Activate the Rule">
+    Click **Save** to store the rule and toggle it **ON**. This will apply the rule to the defined source conditions.
+  </Step>
+</Steps>

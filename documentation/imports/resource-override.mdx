@@ -1,0 +1,114 @@
+---
+title: Resource Override
+label: Resource Override
+slug: resource-override
+description: >-
+  Learn how to migrate your configurations from Resource Override Chrome
+  Extension to Requestly Interceptor
+visibility: PUBLIC
+---
+## **Import Resource Override Configurations**
+
+Instead of manually setting up rules, you can quickly import your Resource Override configuration and apply them with a few simple steps.
+
+<Steps>
+  <Step title="Go to Developer Tools (DevTools)">
+    Open your browser’s DevTools and navigate to the “Override” option.
+
+    <img src="/images/resource-override/835b641d-14eb-455f-b1e9-ae6f95cccb78.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Download Rule Configuration">
+    Click on the “Options” menu and then click “Save Rule” to download your current rule configuration.
+
+    <img src="/images/resource-override/085b2fe3-7616-4288-9b88-6e6b13582de7.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Open Requestly Interceptor Dashboard">
+    Go to the Requestly Interceptor dashboard and navigate to the **HTTP Rules** section.
+
+    <Tip>
+      For the web app, you can directly open <a target="_blank" href="https://app.requestly.io/import-settings-from-resource-override">`Import from Resource Override`</a>.
+    </Tip>
+
+    <img src="/images/resource-override/ef06ed10-9a48-4bfc-832d-76c5b572871e.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Click on “Import” and select “Resource Override”">
+    Click the **Import** button in the HTTP Rules section. Choose “Resource Override” from the available import options.
+
+    <img src="/images/resource-override/d3375b7c-536a-4e67-8ea8-07d5d5ecc6af.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Upload Your Configuration and click Import">
+    Upload the saved configuration file you downloaded earlier and click on the **Import rules** button, and your rules will be applied to your Requestly Interceptor setup
+  </Step>
+</Steps>
+
+Once you confirm, click on the **Import** button, and your rules will be applied to your Requestly Interceptor setup.
+
+## **Resource Override Features Comparison**
+
+Learn more about equivalent features of Requestly Interceptor that you were used in Resource Override.
+
+### **URL → URL**
+
+Every request URL is compared with the *Match URL* and is redirected to the *Replace URL* if the match is successful.
+
+**Exact Match**
+
+If your Resource Override configuration is with exact match without using any \* in it.
+
+<img src="/images/resource-override/fbf8b401-87d1-49d9-8990-ca8fee5e51f4.png" align="center" fullwidth="false" />
+
+This becomes a very straightforward setup in Requestly Interceptor. Use the [Redirect Rule](/http-rules/rule-types/redirect-rule) with the "Equals" operator.
+
+<img src="/images/resource-override/536cdadb-a153-4a55-a1b9-1ab35b58271c.png" align="center" fullwidth="false" />
+
+**Wildcard Match**
+
+If your Resource Override configuration is a wildcard match with 1 \* in it.
+
+In Requestly Interceptor, Use the "Wildcard" operator and the substituted value should be replaced with `$1`, Alternatively, if you want to modify the request instead of redirecting it, you can use the <a target="_blank" href="/http-rules/rule-types/replace-strings">Replace Rule</a>. The matched portion of the URL can be replaced using `$1`
+
+e.g. In Requestly Interceptor, You will use HTTP Redirect Rule like
+
+**Multiple Wildcard Operators**
+
+If your Resource Override configuration is a wildcard match with multiple \*’s in it.
+
+<img src="/images/resource-override/1a75a7c3-f947-43c1-8c57-13a84f617794.png" align="center" fullwidth="false" />
+
+In Requestly Interceptor, This becomes HTTP Redirect Rule with Wildcard Operator. Each star gets a number from left to right. You can use $\<number> like $1, $2 where you want to use the matched values of \*’s.
+
+<img src="/images/resource-override/117bbd33-cf1a-4203-96ed-c606d63d3dbf.png" align="center" fullwidth="false" />
+
+### URL → File
+
+When you want to load a file in place of the Matched URL.
+
+<img src="/images/resource-override/9b2bd712-a83b-4e55-ac36-fd183ee98475.png" align="center" fullwidth="false" />
+
+In Requestly Interceptor, you can use the **Redirect Request Rule** with **Redirects to** option as **Pick from Files/File Server** and then select the file/create a file that you want to load.
+
+<img src="/images/resource-override/07f033fd-22b3-49fa-9c57-d45e21e086ed.png" align="center" fullwidth="false" />
+
+### Inject File
+
+In Resource Override, you can select a file(JS/CSS) and inject that into a webpage.
+
+<img src="/images/resource-override/83f33f5c-20ee-4b83-9e53-76a97fc4d54d.png" align="center" fullwidth="false" />
+
+In Requestly Interceptor, you can use Inject Script Rule as below.
+
+<img src="/images/resource-override/5c302e15-3474-4f73-9b27-0271dbb26042.png" align="center" fullwidth="false" />
+
+### Change Headers
+
+In Resource Override, you can use Change Headers to update the Request or Response Headers.
+
+<img src="/images/resource-override/71b8ec68-1966-410f-84ff-1968e11e58d9.png" align="center" fullwidth="false" />
+
+In Requestly Interceptor, you can use the Modify Headers Rule and similarly configure the rule as below.
+
+<img src="/images/resource-override/589051b6-3f02-4885-b1c7-b98746596713.png" align="center" fullwidth="false" />

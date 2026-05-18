@@ -1,0 +1,43 @@
+---
+title: Troubleshooting Proxy Not Shown Issue (Windows)
+description: Steps to troubleshoot when proxy is not shown in Requestly Interceptor Desktop App on Windows
+---
+
+
+
+If you're seeing a "No Proxy" issue in the Requestly Interceptor Desktop App on Windows, follow these troubleshooting steps:
+
+### Troubleshooting Steps
+
+<Steps>
+  <Step title="Check if default port 8281 is available and identify the process">
+    Verify that port 8281 is not being used by another application. Open Command Prompt and run:
+    ```
+    netstat -ano | findstr :8281
+    ```
+    This will show you the Process ID (PID) using this port. Then identify which process is using the port by running (replace `7136` with the PID from the previous command):
+    ```
+    tasklist /FI "PID eq 7136"
+    ```
+    <img src="/images/troubleshoot-proxy-no-shown-windows/check-requestly-process.webp" alt="Check Requestly Interceptor Process on Port 8281" />
+  </Step>
+  
+  <Step title="Change default proxy port if needed">
+    If the port is being used by an application other than Requestly Interceptor:
+    - Go to Requestly Interceptor Settings
+    - Change the default proxy port to an available port
+    <img src="/images/troubleshoot-proxy-no-shown-windows/set-default-port.webp" alt="Set Default Proxy Port" />
+  </Step>
+  
+  <Step title="Try manual proxy connection (if Requestly Interceptor is using the port)">
+    If Requestly Interceptor is using port 8281 but you still see the "No Proxy" issue:
+    <img src="/images/troubleshoot-proxy-no-shown-windows/use-ipconfig.webp" alt="Use ipconfig to connect to proxy" />
+    - Get your local `IPv4` address by running `ipconfig` in Command Prompt
+    - Try connecting to the proxy manually using your local IP and port 8281
+    - Configure your system or browser to use this proxy: `<your-local-ip>:8281`
+  </Step>
+</Steps>
+
+### Still Having Issues?
+
+If the above steps don't resolve your issue, please reach out to us via [email](mailto:contact@requestly.io) for further assistance.

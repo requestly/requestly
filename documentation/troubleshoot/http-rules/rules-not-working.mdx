@@ -1,0 +1,177 @@
+---
+title: "Rules Not working"
+label: "Rules Not Working"
+slug: "rules-not-working"
+description: "Having trouble with your rules? Follow this step-by-step checklist to quickly identify and resolve common issues with the Requestly Interceptor browser extension."
+visibility: "PUBLIC"
+---
+
+If your Requestly Interceptor rules are not applying, use this checklist in order. Most issues come from extension permissions, paused Requestly Interceptor state, inactive groups, or rule-type limitations.
+
+## Start Here
+
+Check these basics first:
+
+- the Requestly Interceptor extension is installed and enabled
+- site access is allowed for the page you are testing
+- Requestly Interceptor is running and not paused
+- the relevant rule group is turned on
+- you refreshed the page or retriggered the request after saving the rule
+## 1. Confirm Extension Permissions
+
+<Steps>
+  <Step title="Open Extension Settings">
+    Go to `chrome://extensions/` in your browser.
+  </Step>
+  <Step title="Access Requestly Interceptor Details">
+    Find the Requestly Interceptor extension and click **Details.**
+
+    <img
+      src="/images/rules-not-working/1e42a891-b028-499c-88f2-3f16a994f3aa.png"
+      align="center"
+      fullwidth="false"
+    />
+  </Step>
+  <Step title="Set Site Access">
+    Under **Site access**, choose **"On all sites"**.
+
+    <img
+      src="/images/rules-not-working/5ec26ed8-5e34-442c-9995-67559326a40a.png"
+      align="center"
+      fullwidth="false"
+    />
+  </Step>
+</Steps>
+
+## 2. Ensure the Extension Is Enabled
+
+<Steps>
+  <Step title="Open Extension Page">
+    Go to `chrome://extensions/`
+  </Step>
+  <Step title="Check the Toggle">
+    Make sure the toggle for Requestly Interceptor is **enabled** (blue).
+
+    <img
+      src="/images/rules-not-working/0e737992-174a-4319-9c1b-c9de72919f21.png"
+      align="center"
+      fullwidth="false"
+    />
+  </Step>
+</Steps>
+
+## 3. Check If the Rule Group Is Active
+
+Groups allow you to organize rules into logical groups and enable/disable them in one go.
+
+<Steps>
+  <Step title="Open the Dashboard">
+    Visit the <a target="_blank" href="https://app.requestly.io/">
+     Requestly Interceptor dashboard</a>
+
+    .
+  </Step>
+  <Step title="Locate Your Rule Group">
+    Find the group that contains your rule.
+  </Step>
+  <Step title="Activate the Group">
+    Make sure the toggle for that group is switched **on**
+
+    <img
+      src="/images/rules-not-working/366cd164-d8d2-44be-8609-a1a8361a723c.png"
+      align="center"
+      fullwidth="false"
+    />
+  </Step>
+</Steps>
+
+## 4. Activate the Extension (If Disabled)
+
+<Steps>
+  <Step title="Open Requestly Interceptor Popup">
+    Locate and click the Requestly Interceptor icon in your browser’s toolbar to open the menu.
+
+    <img
+      src="/images/rules-not-working/91587b36-aa09-4918-8d8e-5b658b45eeaf.png"
+      align="left"
+      fullwidth="false"
+    />
+  </Step>
+  <Step title="Enable Requestly Interceptor">
+    Click the Requestly Interceptor icon in your browser’s toolbar and find the toggle labeled "Requestly Interceptor paused." Click the toggle to activate Requestly Interceptor. The label will change to "Requestly Interceptor running," confirming activation.
+
+    <img
+      src="/images/rules-not-working/88f3b0fe-7f2c-43e5-8d33-a1541dc15b43.png"
+      align="left"
+      fullwidth="false"
+    />
+  </Step>
+  <Step title="Refresh the Page">
+    Refresh your browser page to ensure that Requestly Interceptor’s rules are properly applied.
+  </Step>
+</Steps>
+
+## 5. Recheck The Rule Match
+
+Before assuming the rule is broken, confirm that it actually matches the request:
+
+- the URL condition matches the request you are testing
+- the rule type supports the traffic you are trying to change
+- the target page is not a browser-internal page such as `chrome://`
+
+<Tip>
+  Use [Test This Rule](/http-rules/advanced-usage/test-rules) to verify whether the rule conditions match the request you expect.
+</Tip>
+
+## **Common Issues by Rule Type**
+
+> Some rule types in Requestly Interceptor have specific behaviors or limitations. Here's what you need to know for each one:
+
+### Modify API Response
+
+**Not visible in Chrome DevTools**\
+API response modifications made by Requestly Interceptor don’t show up in the browser’s DevTools, but they’re still applied in the background.
+
+**Only works with XHR/Fetch requests**\
+Modify API Response **can’t modify** HTML, CSS, or other static files in the extension. For that, use the [Desktop App](https://requestly.com/downloads/desktop/).
+
+### Modify Request Body
+
+Only works with **XHR** and **Fetch** requests
+
+### Modify Response Headers
+
+Response Headers modification done by Requestly Interceptor are not visible in Browsers devtool but they are actually modified.
+
+### Delay Request
+
+In the browser extension, delays are automatically capped to prevent performance issues. XHR/Fetch requests can be delayed up to 5,000 ms, while other resources (like JS, CSS, images) support up to 10,000 ms. For unlimited delays, switch to the  **Desktop App**
+
+### Insert Script Rule
+
+**Inline JavaScript is ignored when using the URL option**\
+When you choose the **URL** method, only the external script is loaded. Any inline JavaScript written between the `<script>` tags will be completely ignored by the browser
+
+**Doesn’t run on internal browser pages**\
+Scripts won’t run on pages like `chrome://`, [`file://`](file://), or other system-level pages. For testing, use a local server or the **Desktop App**.
+
+## Next Best Debugging Steps
+
+<CardGroup cols={2}>
+  <Card title="Review HTTP Rules Overview" href="/http-rules/overview" icon="wand-magic-sparkles">
+    Revisit when to use each rule type and the recommended first workflows.
+  </Card>
+  <Card title="Inspect Traffic First" href="/interceptor/overview" icon="magnifying-glass">
+    Use HTTP Interceptor if you need to confirm what request is actually leaving the app.
+  </Card>
+  <Card title="Modify Headers" href="/http-rules/rule-types/modify-headers" icon="bars">
+    Start with a simple rule type to validate your setup.
+  </Card>
+  <Card title="Use The Desktop App" href="/getting-started/quick-start-guide/desktop-app-setup" icon="desktop">
+    Switch to the Desktop App for advanced traffic scenarios and larger delay limits.
+  </Card>
+</CardGroup>
+
+## Still Stuck?
+
+If you’ve walked through all the above and the issue persists, reach out to the team at [contact@requestly.io](mailto:contact@requestly.io) **.**

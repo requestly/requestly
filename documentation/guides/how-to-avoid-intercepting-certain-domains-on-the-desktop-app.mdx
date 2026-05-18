@@ -1,0 +1,37 @@
+---
+title: How to avoid intercepting certain domains
+label: How to avoid intercepting certain domains on the desktop app
+slug: how-to-avoid-intercepting-certain-domains-on-the-desktop-app
+visibility: PUBLIC
+---
+Depending on from where you intend to intercept your requests there are multiple ways of achieving this
+
+## Existing browser profile
+
+<Steps>
+  <Step title="Prepare your blocklist">
+    You can already define a <a target="_blank" href="/account/blocklist">blocklist</a> - domains that remain unaffected by the Requestly Interceptor extension inside the global settings of the webapp
+
+    <img src="/images/how-to-avoid-intercepting-certain-domains-on-the-desktop-app/73b665ce-0245-4b38-86df-594c07abd2e7.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Connect to the desktop app using the extension">
+    If you have the Requestly Interceptor extension installed inside your browser, you can connect that browser easily to the desktop app using the <a target="_blank" href="/getting-started/quick-start-guide/browser-extension-setup#extension-popup">`Connect To Desktop App`</a> button in the extension popup
+
+    <img src="/images/how-to-avoid-intercepting-certain-domains-on-the-desktop-app/80bcfae5-6284-438f-8cdf-7f529bec23e1.png" align="center" fullwidth="false" />
+  </Step>
+</Steps>
+
+***
+
+While establishing this connection, the extension makes sure that the domains from the blocklist are not affected by the proxy settings and hence do not get affected by the rules on the desktop app either.
+
+## System wide proxy
+
+When setting the system wide proxy you can also define a bypass list. The steps for this differs based on the operating system that you use.
+
+On MacOS, Open `Settings` and navigate to the details of the `Wifi` that you are connected to.
+
+In the proxy settings, you can define a comma separated bypass list that makes sure that requests matching these entries aren’t affected by the systemwide proxy settings
+
+<img src="/images/how-to-avoid-intercepting-certain-domains-on-the-desktop-app/4bc830f0-9c2b-4f33-8987-0c6988e8f2b8.png" align="center" fullwidth="false" />

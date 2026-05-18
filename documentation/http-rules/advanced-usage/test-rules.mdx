@@ -1,0 +1,74 @@
+---
+title: "Test This Rule"
+slug: "test-rules"
+path: "/http-rules/advanced-usage/test-rules"
+visibility: "PUBLIC"
+format: "MDX"
+description: "Validate and debug HTTP rules in real-time using Requestly Interceptor's \"Test This Rule\" feature with session recording and detailed test reports."
+---
+
+***
+
+The **Test This Rule** feature in the HTTP Rules section allows users to validate their rule configurations by applying them to a specific webpage or endpoint in real-time. This feature is especially useful for debugging, ensuring rules behave as expected before deploying them broadly.
+
+## Why Use the Test This Rule Feature?
+
+1. **Real-Time Feedback**: Instantly see how your rule affects the target webpage or API endpoint.
+
+2. **Debugging and Optimisation**: Identify and resolve issues in your configurations before wider application.
+
+## How to Use the Test This Rule Feature
+
+<Steps>
+  <Step title="Configure Your Rule">
+    Before using the **Test This Rule** feature, ensure that you have a configured rule ready. This can be any rule created under the HTTP Rules section, such as modifying requests, delaying network requests, or redirecting URLs. Save and activate the rule.
+
+    Tip: After saving the rule, the test panel opens automatically.
+
+    <img src="/images/test-rules/923de020-b74e-4f81-bd75-cca18ac29bca.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Open the Test Panel">
+    Open the test rule panel using the `Test` button located next to the "Add to Group" dropdown. Here, you’ll find an input field to enter the URL of the page or endpoint where you want to apply the rule.
+
+    <img src="/images/test-rules/9699864f-4679-447e-ab27-39b61cb087ee.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Enter a Test URL">
+    Enter the URL of the webpage where you expect to apply your rule, and click the **Test Rule** button. Additionally, you can check the ***Save the test session with video, console & network logs*** checkbox if you want to capture session details during the test for deeper analysis.
+
+    <img src="/images/test-rules/38245f9d-f4f0-4242-a76d-3ebc537db70d.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Initiate the Test">
+    After clicking the **Test Rule** button, the specified URL will open in a new tab or within the test environment. A widget will appear on the page, displaying the status of the applied rules. The widget allows you to:
+
+    * View details about the active rule.
+
+    * Confirm whether the rule has been applied as expected.
+
+    * Make adjustments if needed.
+
+    <img src="/images/test-rules/ec8cbb5e-4b2b-4b7f-be96-927719827911.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="View Test Results">
+    When you’re done with testing, click on the **View Results** button to generate a detailed test report in the rule editor. This report provides insights into how the rule performed and whether any adjustments are necessary.
+
+    <img src="/images/test-rules/1af7b86c-1273-4a55-8ace-98b562c0dd81.png" align="center" fullwidth="false" />
+  </Step>
+</Steps>
+
+## Advanced Usage: View Test Session
+
+To gain more details about the test report, you can view the network and console logs of the testing session by clicking on the **Watch Session** button. Requestly Interceptor maintains reports for the last three tests you’ve run for each rule. Learn [more about the sessions here](/sessions/record-bug-reports).
+
+<img src="/images/test-rules/0e5c6f35-c2ec-43f6-bd08-29589e19a6f5.png" align="center" fullwidth="false" />
+
+## Key Considerations
+
+* **Browser Limitations**: Modified request bodies or headers may not be visible in browser developer tools but are applied to the actual network request.
+
+* **URL Compatibility**: Ensure the entered URL matches the source condition specified in the rule for accurate testing.
+
+* **Performance Constraints**: For some rules, such as delaying network requests, ensure delays are within allowable thresholds to avoid performance bottlenecks.

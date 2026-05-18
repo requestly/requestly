@@ -1,0 +1,272 @@
+---
+title: Working with GraphQL in Requestly - A Practical Guide
+author: Aries Dmello
+authorUrl: https://github.com/dmelloaries
+date: 2025-12-08
+description: Learn how to work with GraphQL APIs in Requestly, from auto-fetching schemas to writing queries and mutations with ease.
+tags: [graphql, api-testing, api-client, queries, mutations]
+difficulty: beginner
+---
+
+## Introduction
+
+Ever made three API calls just to load one page? Frustrating, right? That's the problem GraphQL solves.
+
+GraphQL lets you ask for exactly what you need in one request. No more juggling endpoints or filtering out useless data. Just describe what you want, and you get it.
+
+Requestly's API Client makes this even better. The schema loads automatically, autocomplete guides you as you type, and there's a visual builder if you'd rather click than code.
+
+Let's dive in.
+
+---
+
+## What is GraphQL?
+
+GraphQL is a powerful query language that gives you precise control over your API requests. Think of it as a more efficient alternative to traditional REST APIs.
+
+**Why developers love it:**
+
+- **No over-fetching**, Get only the fields you need, not the entire object
+- **No under-fetching**, Fetch related data in one go instead of making multiple calls
+- **Strongly typed**, Know exactly what data is available through the schema
+- **Single endpoint**, One URL for all your operations
+
+Instead of juggling multiple endpoints like `/users/1`, `/users/1/posts`, and `/users/1/comments`, you make one GraphQL request that gets everything you need.
+
+---
+
+## Queries and Mutations: The Two Core Operations
+
+Think of GraphQL operations like database operations:
+
+**Queries = Reading data** (like SELECT in SQL)
+
+```graphql
+query {
+  user(id: 1) {
+    name
+    email
+  }
+}
+```
+
+**Mutations = Modifying data** (like INSERT, UPDATE, DELETE in SQL)
+
+```graphql
+mutation {
+  createPost(title: "Hello", body: "World") {
+    id
+    title
+  }
+}
+```
+
+That's the foundation. Now let's see how Requestly makes working with these operations effortless.
+
+---
+
+## Getting Started with GraphQL in Requestly
+
+We'll use a free GraphQL API to explore how Requestly simplifies everything: `https://graphqlzero.almansi.me/api`
+
+This API provides a complete playground with users, posts, and comments, perfect for learning.
+
+---
+
+### 1. Auto Schema Fetching
+
+Here's where Requestly shines. Open the API Client and create a new GraphQL request:
+
+1. Paste the endpoint: `https://graphqlzero.almansi.me/api`
+2. Hit Enter
+
+That's it! Requestly automatically fetches the entire schema. types, and fields. No more digging through documentation or guessing what's available.
+
+![Create GraphQL API](/images/using-graphql/create-and-autofetch-schema.gif)
+
+The schema explorer shows you every query, mutation, and type definition available. Click on any type to see its fields, arguments, and relationships.
+
+---
+
+### 2. Writing Queries
+
+Requestly gives you flexibility, write queries manually with intelligent autocomplete, or use the visual interface for a code-free experience.
+
+**Manual Approach:** Type your query directly in the editor. As you type, Requestly suggests available fields and validates your query structure in real-time.
+
+**Visual Approach:** Click the "Explorer" or "Query Builder" tab, browse available queries, check boxes next to fields you want, and watch your query build automatically.
+
+Here's an example query to fetch user data:
+
+```graphql
+query GetUser {
+  user(id: 1) {
+    id
+    name
+    email
+    posts {
+      data {
+        title
+        body
+      }
+    }
+  }
+}
+```
+
+Click "Send" and get your response instantly.
+
+![Query in GraphQL](/images/using-graphql/query-in-graphql.gif)
+
+---
+
+### 3. Working with Mutations
+
+Let's create some data. Mutations in Requestly work exactly like queries, with the same autocomplete and variable support.
+
+```graphql
+mutation CreatePost {
+  createPost(
+    input: {
+      title: "My First Post"
+      body: "Learning GraphQL is easier than I thought!"
+    }
+  ) {
+    id
+    title
+    body
+  }
+}
+```
+
+![Mutation in GraphQL](/images/using-graphql/mutation-in-graphql.gif)
+
+---
+
+### 4. Working with Variables
+
+Instead of hardcoding values, use variables to make your operations dynamic and reusable. This works for both queries and mutations.
+
+**Why use variables?**
+
+- Reuse the same operation with different values
+- Handle user input from forms
+
+**Example: Query with Variables**
+
+```graphql
+query GetUser($userId: ID!) {
+  user(id: $userId) {
+    id
+    name
+    email
+  }
+}
+```
+
+**Variables:**
+
+```json
+{
+  "userId": "2"
+}
+```
+
+Need a different user? Just change `"2"` to `"5"` in the variables, no need to touch your query.
+
+![Query with Variables in GraphQL](/images/using-graphql/query-with-variables.gif)
+
+**Example: Mutation with Variables**
+
+```graphql
+mutation CreatePost($title: String!, $body: String!) {
+  createPost(input: { title: $title, body: $body }) {
+    id
+    title
+    body
+  }
+}
+```
+
+**Variables:**
+
+```json
+{
+  "title": "My First Post",
+  "body": "Learning GraphQL with Requestly!"
+}
+```
+
+![Mutation with Variables in GraphQL](/images/using-graphql/mutation-with-variables.gif)
+
+---
+
+### 5. Multiple Operations in One Request
+
+GraphQL allows you to define multiple operations in a single request, and Requestly makes it easy to manage them.
+
+**How It Works**
+
+You can write multiple queries or mutations together:
+
+```graphql
+query GetUser($userId: ID!) {
+  user(id: $userId) {
+    id
+    name
+    email
+  }
+}
+
+mutation CreatePost($title: String!, $body: String!) {
+  createPost(input: { title: $title, body: $body }) {
+    id
+    title
+    body
+  }
+}
+```
+
+**Variables:**
+
+```json
+{
+  "userId": "1",
+  "title": "My Post Title",
+  "body": "Post content here"
+}
+```
+
+**Choosing Which Operation to Execute**
+
+When you have multiple operations defined, Requestly shows an "Operation Name" dropdown near the Send button. Simply select which operation you want to execute:
+
+- Select `GetUser` to fetch user data
+- Select `CreatePost` to create a new post
+
+![Create GraphQL API](/images/using-graphql/multiple-operation-in-graphql-request.gif)
+
+This is incredibly useful when testing multiple operations without switching between different requests or commenting out code. You can keep all related operations together and switch between them with a single click.
+
+---
+
+## Wrapping Up
+
+You've just learned how to work efficiently with GraphQL in Requestly. Here's what you can now do:
+
+- **Auto-fetch schemas**, No more hunting for documentation
+- **Write queries two ways**, Code or visual interface, your choice
+- **Use variables**, Make dynamic, reusable queries
+- **Execute mutations**, Create, update, and delete data with confidence
+- **Manage multiple operations**, Keep related queries and mutations together, switch between them instantly
+
+Requestly transforms GraphQL from complex to accessible. Whether you're a developer who loves writing queries or a team member who prefers clicking buttons, you have the tools you need.
+
+Start exploring GraphQL APIs with Requestly today.
+
+## Additional Resources
+
+- [Requestly GraphQL Documentation](https://docs.requestly.com/api-client/graphql-request)
+- [GraphQL Official Documentation](https://graphql.org/learn/)
+- [GraphQL Zero - Free Test API](https://graphqlzero.almansi.me/)
+- [Testing GraphQL APIs in Requestly - YouTube ](https://youtu.be/0i0W7AipZqc?si=Nwigv3rIBa6ZnIs-)

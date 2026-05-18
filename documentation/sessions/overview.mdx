@@ -1,0 +1,78 @@
+---
+title: Overview
+label: Overview
+slug: overview
+description: >-
+  Learn when to use Sessions, how to record bug reports or API sessions, and how to share debugging context with your team.
+seoDescription: >-
+  Record bug reports, capture API sessions, import HAR files, and share debugging context with Requestly Interceptor Sessions.
+visibility: PUBLIC
+---
+Sessions help you capture the evidence around a problem so it is easier to debug, replay, share, or turn into a mock later.
+
+## When To Use Sessions
+
+Use Sessions when you want to:
+
+- record browser activity, console logs, network logs, and environment context for bug reports
+- capture API traffic from the Desktop App for replay, analysis, or bulk mocking
+- import HAR files for investigation
+- share reproducible debugging context with teammates
+
+You may still encounter older references to **Session Book** in the product or legacy links. In the docs, this workflow is documented under **Sessions**.
+
+## Choose The Right Session Workflow
+
+<Tabs>
+  <Tab title="Record Bug Reports">
+    Use this path when you want browser-focused debugging context such as screen activity, console logs, network logs, and environment details.
+
+    <Card title="Record Bug Reports" icon="bug" href="/sessions/record-bug-reports">
+      Capture reproducible bug reports directly from the browser workflow.
+    </Card>
+  </Tab>
+  <Tab title="Capture API Sessions">
+    Use this path when you want to record API traffic from the Desktop App, inspect requests and responses, or create mocks from captured traffic.
+
+    <Card title="Capture API Sessions" icon="network-wired" href="/sessions/record-api-sessions">
+      Record and analyze network traffic from interception workflows.
+    </Card>
+  </Tab>
+</Tabs>
+
+## First Success Path
+
+<Steps>
+  <Step title="Pick Bug Reports Or API Sessions">
+    Start with browser bug reports if you need user-facing reproduction context. Start with API sessions if the problem is primarily network behavior.
+  </Step>
+  <Step title="Capture The Session">
+    Use [Record Bug Reports](/sessions/record-bug-reports) or [Record API Sessions](/sessions/record-api-sessions) depending on the workflow.
+  </Step>
+  <Step title="Share Or Reuse The Output">
+    Share the session, import/export HAR files, or use captured traffic to support mocking and debugging flows.
+  </Step>
+</Steps>
+
+## Explore Sessions
+
+<CardGroup cols={2}>
+  <Card title="Record Bug Reports" icon="bug" href="/sessions/record-bug-reports">
+    Capture browser activity and rich debugging context for issue reproduction.
+  </Card>
+  <Card title="Capture API Sessions" icon="network-wired" href="/sessions/record-api-sessions">
+    Record and analyze traffic captured from interception workflows.
+  </Card>
+  <Card title="Import HAR Files" icon="file-import" href="/sessions/import-view-har-file">
+    Open and analyze existing HAR files in Requestly Interceptor.
+  </Card>
+  <Card title="Access Control" icon="lock" href="/sessions/access-control-of-session">
+    Control who can view and use shared sessions.
+  </Card>
+  <Card title="Inspect Traffic First" icon="magnifying-glass" href="/interceptor/overview">
+    Start with HTTP Interceptor if you need to capture traffic before recording a reusable session.
+  </Card>
+  <Card title="Mock From Captured Traffic" icon="wand-magic-sparkles" href="/guides/record-and-mock-flaky-apis-in-bulk">
+    Use captured sessions to create repeatable mocking workflows.
+  </Card>
+</CardGroup>

@@ -1,0 +1,291 @@
+---
+title: Create Rule
+label: Create Rule
+slug: create-rule
+description: >-
+  Learn how to create a rule in Requestly Interceptor's API for URL redirects,
+  modifications, or other rule types.
+seoTitle: Create Rule
+seoDescription: >-
+  Learn how to create a rule in Requestly Interceptor's API for URL redirects,
+  modifications, or other rule types.
+visibility: PUBLIC
+---
+***
+
+This endpoint allows you to create various types of rules in Requestly Interceptor, such as Redirect, Cancel, Replace, Headers, User-Agent, Query Param, Modify Request, Modify Response, and Delay. Each rule has a specific structure and parameters.
+
+## Endpoint
+
+* **Method**: POST
+
+* **URL**: `https://api2.requestly.io/v1/rules`
+
+***
+
+## Request Structure
+
+### Body Parameters
+
+| Name            | Type               | Required | Default  | Description                                                                                                                                                      |
+| --------------- | ------------------ | -------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **name**        | `string`           | Yes      |          | Name of the rule.                                                                                                                                                |
+| **description** | `string`           | No       |          | Description of the rule.                                                                                                                                         |
+| **objectType**  | `string`           | Yes      | `rule`   | Type of the object. For this endpoint, it is always `rule`.                                                                                                      |
+| **ruleType**    | `string`           | Yes      |          | Type of the rule. Possible values are: `Redirect`, `Cancel`, `Replace`, `Headers`, `UserAgent`, `QueryParam`, `Request`, `Response`, `Delay`.                    |
+| **status**      | `string`           | No       | `Active` | Status of the rule, either `Active` or `Inactive`.                                                                                                               |
+| **pairs**       | `array of objects` | Yes      |          | List of key-value pair objects that define the specific conditions and actions for the rule. The structure and details of each pair vary based on the rule type. |
+| **groupId**     | `string`           | No       |          | The ID of the group the rule belongs to. If omitted, the rule is ungrouped.                                                                                      |
+
+***
+
+## cURL Request
+
+```bash
+curl --request POST \
+     --url https://api2.requestly.io/v1/rules \
+     --header 'accept: application/json' \
+     --header 'content-type: application/json' \
+     --header 'x-api-key: your_api_key' \
+     --data '
+{
+  "objectType": "rule",
+  "ruleType": "Redirect",
+  "status": "Inactive",
+  "pairs": [
+    {
+      "destinationType": "url",
+      "source": {
+        "value": "https://www.google.com/",
+        "operator": "Equals",
+        "key": "Url"
+      },
+      "destination": "https://www.bing.com/"
+    }
+  ],
+  "name": "Redirect to Bing"
+}
+'
+```
+
+## Response
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": "Redirect_wi3uj",
+    "creationDate": 1736060959798,
+    "modificationDate": 1736060959798,
+    "createdBy": "IUAGkRiEx6XI0B6qCc82qbwroKX2",
+    "lastModifiedBy": "IUAGkRiEx6XI0B6qCc82qbwroKX2",
+    "name": "Redirect to Bing",
+    "description": "",
+    "ruleType": "Redirect",
+    "objectType": "rule",
+    "pairs": [
+      {
+        "destinationType": "url",
+        "source": {
+          "value": "https://www.google.com/",
+          "operator": "Equals",
+          "key": "Url"
+        },
+        "destination": "https://www.bing.com/",
+        "id": "jnc6s"
+      }
+    ],
+    "groupId": "",
+    "status": "Inactive",
+    "isSample": false,
+    "isFavourite": false,
+    "schemaVersion": "3.0.0",
+    "extensionRules": [
+      {
+        "action": {
+          "type": "redirect",
+          "redirect": {
+            "url": "https://www.bing.com/"
+          }
+        },
+        "condition": {
+          "urlFilter": "|https://www.google.com/|",
+          "isUrlFilterCaseSensitive": true,
+          "excludedInitiatorDomains": [
+            "requestly.io"
+          ],
+          "excludedRequestDomains": [
+            "requestly.io"
+          ]
+        }
+      }
+    ],
+    "currentOwnerId": "IUAGkRiEx6XI0B6qCc82qbwroKX2"
+  }
+}
+```
+
+***
+
+## Rule Type Details
+
+Each rule type has a unique structure for its **pairs** of objects. The schemas for each rule type are detailed below:
+
+### Common Source Schema
+
+The source object is consistent across all rule types. It has the following structure:
+
+| Property     | Type     | Required | Description                                                                      |
+| ------------ | -------- | -------- | -------------------------------------------------------------------------------- |
+| **key**      | `string` | Yes      | The key for the source (e.g., `url`, `host`, `path`).                            |
+| **operator** | `string` | Yes      | The operator for matching (`Equals`, `Contains`, `Matches`, `Wildcard_Matches`). |
+| **value**    | `string` | Yes      | The value to match against.                                                      |
+| **filters**  | `array`  | No       | Optional filters for more accurate targeting.                                    |
+
+***
+
+### Redirect Rule
+
+* **ruleType**: `Redirect`
+
+* **pairs** schema:
+
+| Property            | Type     | Required | Description                                                                    |
+| ------------------- | -------- | -------- | ------------------------------------------------------------------------------ |
+| **source**          | `object` | Yes      | The source object for matching (see common source schema).                     |
+| **destinationType** | `string` | Yes      | Type of the destination (`u`below`rl`, `map_local`, or `mock_or_file_picker`). |
+| **destination**     | `string` | Yes      | The destination URL value.                                                     |
+
+***
+
+### Cancel Rule
+
+* **ruleType**: `Cancel`
+
+* **pairs** schema:
+
+| Property   | Type     | Required | Description                     |
+| ---------- | -------- | -------- | ------------------------------- |
+| **source** | `object` | Yes      | The source object for matching. |
+
+***
+
+### Replace Rule
+
+* **ruleType**: `Replace`
+
+* **pairs** schema:
+
+| Property   | Type     | Required | Description                     |
+| ---------- | -------- | -------- | ------------------------------- |
+| **source** | `object` | Yes      | The source object for matching. |
+| **from**   | `string` | Yes      | The target string to replace.   |
+| **to**     | `string` | Yes      | The replacement value.          |
+
+***
+
+### Headers Rule
+
+* **ruleType**: `Headers`
+
+* **pairs** schema:
+
+| Property          | Type     | Required | Description                               |
+| ----------------- | -------- | -------- | ----------------------------------------- |
+| **source**        | `object` | Yes      | The source object for matching.           |
+| **modifications** | `array`  | Yes      | List of header modifications (see below). |
+
+**Header Modification Object:**
+
+| Property   | Type     | Required | Description                                                        |
+| ---------- | -------- | -------- | ------------------------------------------------------------------ |
+| **header** | `string` | Yes      | The name of the header to modify.                                  |
+| **type**   | `string` | Yes      | Modification type (`Add`, `Remove`, or `Modify`).                  |
+| **value**  | `string` | No       | The value to set for the header (required for `Add` and `Modify`). |
+
+***
+
+### User-Agent Rule
+
+* **ruleType**: `UserAgent`
+
+* **pairs** schema:
+
+| Property      | Type     | Required | Description                     |
+| ------------- | -------- | -------- | ------------------------------- |
+| **source**    | `object` | Yes      | The source object for matching. |
+| **userAgent** | `string` | Yes      | The User-Agent string to set.   |
+
+***
+
+### Query Param Rule
+
+* **ruleType**: `QueryParam`
+
+* **pairs** schema:
+
+| Property          | Type     | Required | Description                                         |
+| ----------------- | -------- | -------- | --------------------------------------------------- |
+| **source**        | `object` | Yes      | The source object for matching.                     |
+| **modifications** | `array`  | Yes      | Array of query parameter modifications (see below). |
+
+**Query Param Modification Object:**
+
+| Property  | Type     | Required | Description                                           |
+| --------- | -------- | -------- | ----------------------------------------------------- |
+| **param** | `string` | Yes      | The name of the query parameter to modify.            |
+| **type**  | `string` | Yes      | Modification type (`Add`, `Remove`, or `Remove All`). |
+| **value** | `string` | No       | The value to set (required for `Add` and `Modify`).   |
+
+***
+
+### Modify Request Rule
+
+* **ruleType**: `Request`
+
+* **pairs** schema:
+
+| Property  | Type     | Required | Description                                        |
+| --------- | -------- | -------- | -------------------------------------------------- |
+| **type**  | `string` | Yes      | Type of request modification (`code` or `static`). |
+| **value** | `string` | Yes      | The request value or code.                         |
+
+***
+
+### Modify Response Rule
+
+* **ruleType**: `Response`
+
+* **pairs** schema:
+
+| Property                | Type      | Required | Description                                            |
+| ----------------------- | --------- | -------- | ------------------------------------------------------ |
+| **type**                | `string`  | Yes      | Type of response modification (`code` or `static`).    |
+| **value**               | `string`  | Yes      | The response value or status code.                     |
+| **serveWithoutRequest** | `boolean` | No       | Whether to serve the response directly from Requestly Interceptor. |
+
+***
+
+### Delay Rule
+
+* **ruleType**: `Delay`
+
+* **pairs** schema:
+
+| Property   | Type     | Required | Description                     |
+| ---------- | -------- | -------- | ------------------------------- |
+| **source** | `object` | Yes      | The source object for matching. |
+| **delay**  | `number` | Yes      | Delay value in milliseconds.    |
+
+***
+
+## Responses
+
+| Status Code | Description                   |
+| ----------- | ----------------------------- |
+| **200**     | Rule created successfully.    |
+| **400**     | Invalid rule or payload.      |
+| **401**     | Unauthorized action.          |
+| **404**     | Rule or group not found.      |
+| **405**     | Rule type update not allowed. |
+| **429**     | Too many requests.            |

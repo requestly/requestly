@@ -1,0 +1,83 @@
+---
+title: Overview
+label: Overview
+slug: overview
+description: >-
+  Learn when to use HTTP Rules, how to create your first rule, and which traffic modification workflows to explore next.
+seoTitle: Overview
+seoDescription: >-
+  Learn how to use Requestly Interceptor HTTP Rules to modify headers, redirect URLs, rewrite bodies, delay responses, and share rules.
+visibility: PUBLIC
+---
+HTTP Rules are the fastest way to change traffic without changing your app. Use them to modify headers, rewrite request or response bodies, redirect calls, inject scripts, delay traffic, or map requests to local and remote resources.
+
+## When To Use HTTP Rules
+
+Use HTTP Rules when you want to:
+
+- modify headers, query params, bodies, or user agents
+- redirect requests between environments
+- simulate errors, delays, and edge cases
+- inject scripts or override resources during frontend testing
+- create repeatable traffic changes for demos, debugging, and QA
+
+If your goal is to inspect live traffic first, use [HTTP Interceptor](/interceptor/overview). If you need hosted mock endpoints, use [File Server](/mock-server/overview).
+
+## Start With These Rule Types
+
+<CardGroup cols={2}>
+  <Card title="Modify Headers" href="/http-rules/rule-types/modify-headers" icon="bars">
+    Add, remove, or overwrite headers for debugging and API testing.
+  </Card>
+  <Card title="Redirect Requests" href="/http-rules/rule-types/redirect-rule" icon="shuffle">
+    Switch requests between environments or alternate resources instantly.
+  </Card>
+  <Card title="Modify Response Body" href="/http-rules/rule-types/modify-response-body" icon="file-code">
+    Simulate backend changes, mock responses, and reproduce edge cases.
+  </Card>
+  <Card title="Delay Requests" href="/http-rules/rule-types/delay-network-requests" icon="clock">
+    Reproduce slow networks and performance-related issues.
+  </Card>
+</CardGroup>
+
+## First Success Path
+
+<Steps>
+  <Step title="Pick One Rule Type">
+    Start with a single change such as [Modify Headers](/http-rules/rule-types/modify-headers) or [Redirect Rule](/http-rules/rule-types/redirect-rule).
+  </Step>
+  <Step title="Set Match Conditions">
+    Use URL and source conditions to target only the traffic you want to change.
+  </Step>
+  <Step title="Verify The Result">
+    Use [Test This Rule](/http-rules/advanced-usage/test-rules), app behavior, or your API workflow to confirm the traffic changed as expected.
+  </Step>
+</Steps>
+
+## Explore By Workflow
+
+<CardGroup cols={2}>
+  <Card title="All Rule Types" href="/http-rules/rule-types" icon="list">
+    Browse the full catalog of traffic modification capabilities.
+  </Card>
+  <Card title="Advanced Usage" href="/http-rules/advanced-usage" icon="sliders">
+    Learn grouping, source conditions, testing, shared state, and filters.
+  </Card>
+  <Card title="Share Rules" href="/http-rules/sharing" icon="users">
+    Share, sync, and distribute rules with your team or workspace.
+  </Card>
+  <Card title="Import Existing Rules" href="/imports/charles-proxy" icon="download">
+    Migrate rule configurations from other tools and extensions.
+  </Card>
+</CardGroup>
+
+## Related Capabilities
+
+<CardGroup cols={2}>
+  <Card title="Inspect Live Traffic" href="/interceptor/overview" icon="magnifying-glass">
+    Use HTTP Interceptor when you need to see requests and responses before deciding what to modify.
+  </Card>
+  <Card title="Hosted Mocks" href="/mock-server/overview" icon="server">
+    Use File Server when you need reusable mock endpoints instead of in-place traffic overrides.
+  </Card>
+</CardGroup>

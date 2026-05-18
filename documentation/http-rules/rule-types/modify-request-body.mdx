@@ -1,0 +1,153 @@
+---
+title: "Modify Request Body"
+slug: "modify-request-body"
+path: "/http-rules/rule-types/modify-request-body"
+visibility: "PUBLIC"
+format: "MDX"
+description: "Learn to modify HTTP request payloads with static data or JavaScript. A guide to setting up rules for testing APIs, handling GraphQL, and debugging payloads."
+---
+
+***
+
+The Modify Request Body rule enables you to override or programmatically modify the data sent to the server in an HTTP request body. This rule is particularly useful for debugging, testing, and dynamically altering API payloads.
+
+## Why Use the Modify Request Body Rule?
+
+* **Static Request Body Modification**: Replace the request body with predefined static data for consistent testing.
+
+* **Programmatic Request Body Modification**: Dynamically modify the request payload using JavaScript based on specific conditions.
+
+* **Testing Edge Cases**: Simulate unsupported or erroneous fields in request payloads to evaluate server responses.
+
+* **Send Additional Data**: Include extra fields in the payload for enhanced server communication, especially for GraphQL queries or APIs.
+
+## How to Configure the Rule
+
+<Steps>
+  <Step title="Open HTTP Rules and Create a New Rule">
+    Navigate to the HTTP Rules tab in the web or desktop app. Click on `+ New Rule` and select `Modify Request Body` from the options.
+
+    <img src="/images/modify-request-body/a61f36f9-ee57-4a69-bbd3-0ecea77053fa.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Name and Describe Your Rule">
+    Provide a **descriptive name** for the rule to keep your setup organized. Optionally, add a brief **description** explaining its purpose for easier identification later.
+
+    <img src="/images/modify-request-body/a3d2a4d6-2260-4cd3-86af-afb697d76bc5.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Select Resource Type">
+    Choose the resource type for modification:
+
+    * **REST API**: Modify `XHR/Fetch` requests initiated by web pages.
+
+    * **GraphQL**: Target and modify GraphQL APIs by operation.
+
+    <img src="/images/modify-request-body/1a8519b7-3ecd-4883-9811-a0ef769c7c0d.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Define the Source Condition">
+    Define the criteria for the rule to be applied, such as **URL**, **Host**, or **Path**. Choose from **Regex**, **Contains**, **Wildcard**, or **Equals**, or use <a target="_blank" href="/http-rules/advanced-usage/advance-filters">Advance Filters</a> for more precise conditions.
+
+    For more detailed guidance, refer to the <a target="_blank" href="/http-rules/advanced-usage/advance-targeting">Source Conditions Guide</a>.
+
+    <Card title="Example:">
+      * **Condition Type**: URL
+
+      * **Operator**: Contains
+
+      * **Value**: `api.example.com`
+    </Card>
+
+    <img src="/images/modify-request-body/34b59426-6771-45db-b514-8d626e90ec85.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Filter GraphQL Queries (Optional)">
+    If targeting GraphQL APIs, filter queries by their operation name. Add the **Payload JSON Key** (e.g., `operationName`) and specify the corresponding **Value** (e.g., `getUsers`) to target specific GraphQL operations
+
+    <img src="/images/modify-request-body/12bc05c2-ebdd-4e41-b005-b9812fae21c8.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Choose Static or Programmatic Modification">
+    You can override a request body using a static JSON or programatically using JS.
+
+    <Tabs>
+      <Tab title="Static Data">
+        **Static Request Body**
+
+        Enter the static JSON payload you want to forward to the server.
+
+        ```json
+        {
+          "key": "value",
+          "feature": "modify-request"
+        }
+        ```
+
+        <img src="/images/modify-request-body/5289c17a-6e2f-437c-a6a3-7ef0ea89fae8.png" align="center" fullwidth="false" />
+      </Tab>
+
+      <Tab title="Dynamic (JavaScript)">
+        **Dynamic Request Body**
+
+        Use JavaScript to dynamically modify the request payload based on attributes such as HTTP method, URL, or the original request body. You can use following properties:
+
+        `method (string)`: The HTTP method of the request (e.g., GET, POST, PUT, DELETE).
+
+        `url (string)`: The full URL of the request.
+
+        `body (string)`: The original request body as a raw string.
+
+        `bodyAsJson (object)`: The original request body parsed into a JSON object.
+
+        Example:
+
+        ```typescript
+        function modifyRequestBody(args) {
+          const { method, url, bodyAsJson } = args;
+          let newBody = bodyAsJson;
+          if (method === "POST") {
+            newBody["feature"] = "modify-request";
+          }
+          return newBody;
+        }
+        ```
+
+        `Return`
+
+        You can `return` modified body as `string` or `JSON` object.
+
+        <img src="/images/modify-request-body/bba4a79f-3363-4d99-9ce8-d9b57c9cc898.png" align="center" fullwidth="false" />
+      </Tab>
+    </Tabs>
+
+    <Tip>
+      You can also use Dynamic Data to override GraphQL APIs by detecting the operation name in the request body.
+    </Tip>
+  </Step>
+
+  <Step title="Save and Activate the Rule">
+    Click **Save** to store the rule and toggle it **ON**. This will apply the rule to the defined source conditions.
+
+    <img src="/images/modify-request-body/82de4a0b-6376-4eb5-919e-20396178a174.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Test the Rule">
+    <Warning>
+      Modified request bodies will not appear in browser network devTools due to technical constraints but will still be applied to the actual request sent to the server.
+    </Warning>
+
+    To ensure the rule is working correctly, click the `Test` button and enter the URL of the page where the matching URL is called. This will open the webpage in a new tab, with a widget showing the status of applied rules.
+
+    <Tip>
+      There are multiple ways to validate if a rule is applied or not, learn more about how to <a target="_blank" href="/http-rules/advanced-usage/validate-rules-execution">`validate rule execution`</a>**.**
+    </Tip>
+
+    <img src="/images/modify-request-body/30851961-b052-410e-b9f5-bcba1f1d21f4.png" align="center" fullwidth="false" />
+  </Step>
+</Steps>
+
+## Shared State for Advanced Modifications
+
+You can store and retrieve data within and across Modify Request and Modify Response rules using shared state in programmatic JavaScript mode.\
+→ <a target="_blank" href="/http-rules/advanced-usage/shared-state">Learn more about shared state</a>.

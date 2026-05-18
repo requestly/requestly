@@ -1,0 +1,170 @@
+---
+title: "Source Conditions"
+slug: "source-conditions"
+path: "/http-rules/advanced-usage/source-conditions"
+visibility: "PUBLIC"
+format: "MDX"
+description: "Define source conditions and advanced filters for precise network request rules, including regex and wildcard testing."
+---
+
+***
+
+Source conditions allow you to specify criteria for matching network requests. These criteria define where the rules should be applied, such as specific URLs, hosts, or paths.
+
+Let's explore the elements of source conditions from left to right:
+
+<Steps>
+  <Step title="Select Source to Match">
+    Select whether the matching should be performed on the host or the full URL.
+
+    <img src="/images/source-conditions/83ba98f9-d8ed-4c1b-9c58-b28c1adc8aa4.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Operator">
+    Choose from four operators to define how the matching should be performed:
+
+    * **Equals:** Matches exactly the specified value.
+
+    * **Contains:** Matches if the value includes the specified substring.
+
+    * **Regex:** Enables pattern matching using regular expressions.
+
+    * **Wildcard:** Allows flexible pattern matching using wildcard characters.
+
+    <img src="/images/source-conditions/a3a75291-c2f9-4ec0-bd6a-04884814f68b.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Source Matching Field">
+    The value of this field varies based on the operator selected. For **Equals**, enter the exact string to match, such as the full URL if you select the URL in the source. For **Contains**, provide a substring for broad matching across all URLs containing this string. For **Regex**, enter a regex pattern to match. For **Wildcard**, use a wildcard pattern to specify the matching criteria.
+
+    <img src="/images/source-conditions/8de2a100-64b7-439f-8ca5-3f2a391689a5.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Advanced Filters">
+    Enhance your source conditions with additional filters. These can be accessed using the filters button next to the input field:
+
+    <img src="/images/source-conditions/086825a3-bb7c-4156-9970-80424ec2ec7c.png" align="center" fullwidth="false" />
+
+    1. **Page Domain Name**
+
+       * Targets requests based on the domain of the page making the request.
+
+       * Useful when the same request (e.g., a CDN file) is made from multiple websites
+
+    2. **Resource Type**
+
+       * Filter by the type of resource being requested.
+
+       * Common types include:
+
+         * `script`
+
+         * `stylesheet`
+
+         * `image`
+
+         * `xhr` (XMLHttpRequest or fetch)
+
+         * `document`, etc.
+
+    3. **Request Method**
+
+       * Filters requests based on the HTTP method (e.g., `GET`, `POST`, `PUT`, `PATCH`, `DELETE`, `OPTIONS`).
+  </Step>
+</Steps>
+
+### Test URL Condition
+
+The test URL condition feature is only applicable when using regex or wildcard operators. A button labeled **Test Regex** or **Test Wildcard** appears when you select these options. This feature helps you validate whether the rule source URL condition you have set up works for the request URL you want it to work with, improving the rule creation and editing experience.
+
+To test a URL condition:
+
+<Steps>
+  <Step title="Open a Rule Editor">
+    Start by opening any rule editor in the interface where you can define and edit source URL conditions.
+
+    <img src="/images/source-conditions/60f8f6f5-8734-435e-95fd-0a2a3e39bd6d.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Enter the Source URL Condition">
+    Input the source URL condition using either the **Regex** or **Wildcard** operator, depending on your requirements.
+
+    <img src="/images/source-conditions/83cea435-24e1-4a45-8abc-238490489f01.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Test the URL Condition">
+    Click on the **Test Regex** or **Test Wildcard** button (depending on the selected operator). This will open a test URL popup modal for validation.
+
+    <img src="/images/source-conditions/862660bd-33ac-43af-8c4b-1970247894d1.png" align="center" fullwidth="false" />
+
+    This popup modal includes the following components:
+
+    * **Source Condition:** Displays the source condition defined in the rule editor. It is editable, allowing adjustments as needed.
+
+    * **URL Field:** Enter the complete URL you want the rule to be applied to.
+
+    * **Result:** Displays whether the rule will apply to the entered URL.
+  </Step>
+</Steps>
+
+### Testing URL with Regex Condition
+
+To test a URL with a regex pattern in the source URL condition, enter the complete URL in the URL field. The result will indicate whether the rule applies to the URL based on the regex pattern.
+
+**Examples:**
+
+| **Source Condition**          | **Match with URL**                | **Is Matched** |
+| ----------------------------- | --------------------------------- | -------------- |
+| `/^https://.*github.*/`       | `https://subdomain.github.io/`    | Yes            |
+| `/^https://blog\\..*\\.com$/` | `https://blog.example.com/`       | Yes            |
+| `/^((?!example).)*$/`         | `https://www.examplewebsite.com/` | No             |
+
+<img src="/images/source-conditions/3954cd7f-8c71-47cf-93bb-2a55cf69ba13.png" align="center" fullwidth="false" />
+
+<Tip>
+  Ensure the regex pattern in the source condition is valid and enclosed with slashes (`/`).
+
+  **Examples**:
+
+  * `/^https://.*github.*/` ✅ Valid regex
+
+  * `/^https://.*github.*` ❌ Invalid regex
+</Tip>
+
+### Testing URL with Wildcard Condition
+
+To test a URL with a wildcard pattern in the source URL condition, enter the complete URL in the URL field. The result will indicate whether the rule applies to the URL based on the wildcard pattern.
+
+**Examples:**
+
+| **Source Condition**    | **Match with URL**                               | **Is Matched** |
+| ----------------------- | ------------------------------------------------ | -------------- |
+| `://*.yahoo.com`        | `http://cricket.yahoo.com`                       | Yes            |
+| `*google.com*?param=*`  | `https://www.google.com/page?param=value`        | Yes            |
+| `*example.com*?param=*` | `https://www.examplewebsite.com/page?param=test` | No             |
+
+**Using Variables in Wildcard Patterns**
+
+When you use the wildcard (`*`) operator, each `*` acts as a capturing group. The matched values are automatically stored in corresponding variables like `$1`, `$2`, and so on. These variables can then be used in the **destination configuration** (e.g., redirect URL, response modification, etc.) to dynamically refer to parts of the matched URL.
+
+<img src="/images/source-conditions/470f8a16-dd2d-4f66-ae5e-ac78d99cb2d5.png" align="center" fullwidth="false" />
+
+**Example:**
+
+* **Wildcard Pattern**: `https://example.com/product/*/details/*`
+
+* **Matched URL**: `https://example.com/product/123/details/shoes`
+
+* **Captured Variables**:
+
+  * `$1 = 123`
+
+  * `$2 = shoes`
+
+You can then use `$1` and `$2` in your rule actions, such as:
+
+* **Redirect to**: `https://newstore.com/items/$1/info/$2`
+
+* Result: `https://newstore.com/items/123/info/shoes`
+
+This allows for powerful and dynamic rule creation using flexible wildcard patterns and extracted values.

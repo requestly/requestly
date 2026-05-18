@@ -1,0 +1,34 @@
+---
+title: Rule changes not reflecting in Chrome DevTools
+label: Rule changes not reflecting in Chrome DevTools
+slug: rule-changes-not-reflecting-in-chrome-devtools
+description: >-
+  Requestly Interceptor rule changes may not show in Chrome DevTools, learn why and how to
+  verify they’re working.
+visibility: PUBLIC
+---
+Some rule modifications made using Requestly Interceptor may **not appear** in Chrome’s Network DevTools, even though they are **successfully applied** in the background.
+
+### Why This Happens
+
+This primarily affects:
+
+* **Modify Response Rule**
+
+* **Modify Response Headers Rule**
+
+When these rules are applied, Requestly Interceptor intercepts and modifies the response **after** it has been received by the browser, but **before** it's delivered to the page. However, Chrome DevTools continues to display the **original unmodified response** because of technical limitations in the browser’s extension APIs.
+
+In short, your modifications **do take effect**, but they **won’t be reflected** in the Network tab of DevTools.
+
+### How to Confirm That Modifications Are Working
+
+To verify that your rule is working as expected:
+
+* Follow this guide to [validate rule execution in your browser](/http-rules/advanced-usage/validate-rules-execution)[.](/http-rules/advanced-usage/validate-rules-execution)
+
+* Check if the application is behaving according to your changes (e.g., modified data is rendered on the page).
+
+* Use `console.log()` or inspect values in the page context (e.g., responses received by `fetch()` or `XMLHttpRequest`).
+
+* Add temporary debug markers (e.g., a test field in a JSON response or a custom response header) and verify their usage in the application logic.

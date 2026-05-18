@@ -1,0 +1,64 @@
+---
+title: "Cancel Request Rule"
+slug: "cancel-rule"
+path: "/http-rules/rule-types/cancel-rule"
+visibility: "PUBLIC"
+format: "MDX"
+description: "Learn how to block network requests using Cancel Request Rule. Explore key use cases like blocking distracting websites and testing error scenarios."
+---
+
+***
+
+Cancel Request Rule is a feature used to block network requests, allowing users to avoid distractions or test specific error scenarios effectively. This guide explains how to configure and utilize the Cancel Request Rule in your workflow.
+
+## Why Use Cancel Request Rule?
+
+* **Blocking Distracting Websites:** Leverage the Cancel Rule to block access to websites such as YouTube, Twitter, or Facebook to stay focused. Set the source condition to match the URLs of these websites and enable the rule.
+
+* **Testing Error Scenarios:** Simulate real-world application behaviors when resources are unavailable. For example, block a specific non-critical API request and observe how your application handles the missing resource.
+
+## How to Configure Cancel Rule
+
+<Steps>
+  <Step title="Open HTTP Rules and Create a New Rule">
+    Navigate to the HTTP Rules section in your application and click on the `+ New Rule` button. From the available options, select `Cancel Rule` to begin configuration.
+
+    <img src="/images/cancel-rule/5fa98429-e8c3-45d3-9231-44c2fb0fa559.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Name and Describe Your Rule">
+    Provide a **descriptive name** and an optional **description** for your Cancel Rule. This helps keep your rules organized and ensures clarity when managing multiple rules.
+
+    <img src="/images/cancel-rule/6801092f-4bab-4606-b8d9-729913f62731.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Define the Source Condition">
+    Define where the rule should be applied by specifying criteria such as **URL**, **Host**, or **Path**. You can choose from options like **Regex**, **Contains**, **Wildcard**, or **Equals**, or use <a target="_blank" href="/http-rules/advanced-usage/advance-filters">**Advance Filters**</a> for more precise conditions.
+
+    For more details on source conditions, [**read this guide**](/http-rules/advanced-usage/advance-targeting) **.**
+
+    <Card title="Example:">
+      Let’s try to block product listing API call on `https://www.requestly-playground.com/`
+    </Card>
+
+    <img src="/images/cancel-rule/201843f0-20ec-447c-aa3c-1a105c012223.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Save and Activate the Rule">
+    Once you have configured the conditions and filters, save the rule and toggle it on to activate. This ensures that the rule applies immediately to the specified requests.
+
+    <img src="/images/cancel-rule/99c9d2df-1fb4-40eb-8d14-a05e477c7867.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title=" Test the Rule">
+    To ensure the rule is working correctly, click the `Test` button and enter the URL of the page where the matching URL is called. This will open the webpage in a new tab, with a widget showing the status of applied rules.
+
+    <Tip>
+      There are multiple ways to validate if a rule is applied or not, learn more about how to <a target="_blank" href="/http-rules/advanced-usage/validate-rules-execution">**validate rule execution**</a>**.**
+    </Tip>
+
+    On loading the `https://www.requestly-playground.com/` website, it shows network error. A small widget on the page confirms that the Rule is applied. You can click on **View Results** button to view the result details.
+
+    <img src="/images/cancel-rule/01331342-8e1f-4fa5-95cd-3eefd0f1afa9.png" align="center" fullwidth="false" />
+  </Step>
+</Steps>

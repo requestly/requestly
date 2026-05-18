@@ -1,0 +1,70 @@
+---
+title: "Map Local"
+slug: "map-local"
+path: "/http-rules/rule-types/map-local"
+visibility: "PUBLIC"
+format: "MDX"
+description: "Use the Map Local feature in Requestly Interceptor to instantly test local file changes by serving them as live responses for intercepted requests."
+---
+
+***
+
+The **Map Local** feature in Requestly Interceptor enables you to serve any local file as the response for an intercepted request in real time. This is particularly useful for testing, as you can modify the local file and immediately see the changes without deploying them to a server.
+
+<img src="/images/map-local/fc5f3389-bc97-42b0-8eaf-231e88c88875.png" align="center" fullwidth="false" />
+
+<Warning>
+  This feature is only available in the <a target="_blank" href="https://requestly.com/downloads/">`Requestly Interceptor Desktop App`</a>.
+</Warning>
+
+## Why Use Map Local?
+
+* **Map Production JS/CSS/HTML Files to Local Files**: Test and debug changes to production assets by mapping them to local versions, ensuring seamless updates before deployment.
+
+* **Create Mock APIs Using Local Files**: Simulate API responses by serving local JSON or other data files, allowing for more flexible and controlled testing.
+
+## How to Create a Map Local
+
+Using **Map Local**, you can replace a server response with a local file. Follow these steps:
+
+<Steps>
+  <Step title="Install Requestly Interceptor Desktop App">
+    Download and install the Requestly Interceptor <a target="_blank" href="https://requestly.com/downloads/">Desktop App</a> to access the **Map Local** feature.
+  </Step>
+
+  <Step title="Connect to the Browser">
+    Open the Requestly Interceptor Desktop app and click **Connect Apps** to establish the connection. Then, select your browser and open it. Once the browser is open, go to the website where you want to use the **Map Local** feature.
+
+    <img src="/images/map-local/8ac06a70-9a90-4531-a16f-365f36fd1287.webp" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Capture Network Traffic">
+    In the **Network Traffic** table of the Requestly Interceptor app, locate the request you want to modify (e.g., `https://example.com`). Right-click on it and choose **Redirect URL (Map Local/Remote)**.
+
+    <img src="/images/map-local/60052282-cbb6-48b9-aa58-f48fbee2c8e2.webp" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Specify the Local File">
+    <Tip>
+      Requestly Interceptor serves the local file in real-time. Any changes made to the file are immediately reflected in the responses, eliminating the need to update the rule.
+    </Tip>
+
+    Choose the **Map Local** option in **Redirects to** and browse your system to select the local file that should replace the server’s response.
+
+    This file will now be used instead of the original request’s response.
+
+    <img src="/images/map-local/4239a0f3-e2a0-4ff7-89f6-562b021b9008.webp" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Save and Activate the Rule">
+    Click **Save Rule** to save the configuration.
+
+    Reload the website to see the local file replacing the server response in real time. Ensure the rule is **enabled** so it remains active and correctly applied.
+
+    <Tip>
+      There are multiple ways to validate if a rule is applied or not, learn more about how to <a target="_blank" href="/http-rules/advanced-usage/validate-rules-execution">`validate rule execution`</a>**.**
+    </Tip>
+
+    <img src="/images/map-local/14f6d06c-611d-4956-a65c-48a64489aeb0.webp" align="center" fullwidth="false" />
+  </Step>
+</Steps>

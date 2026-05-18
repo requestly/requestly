@@ -1,0 +1,94 @@
+---
+title: Update A Specific Groups
+label: Update Group
+slug: update-existing-groups
+description: >-
+  Learn how to update group details in Requestly Interceptor's API with parameters and
+  example payloads
+seoTitle: Update A Specific Groups
+seoDescription: >-
+  Learn how to update group details in Requestly Interceptor's API with parameters and
+  example payloads
+visibility: PUBLIC
+---
+***
+
+This endpoint enables you to update details such as the name, status, and favorite status of an existing group using its unique ID.
+
+For a live view and to test this API interactively, visit the [API Playground](https://requestly.readme.io/reference/put_groups-id).
+
+***
+
+### Endpoint
+
+* **Method**: PUT
+
+* **URL**: `https://api2.requestly.io/v1/groups/{id}`
+
+***
+
+### Path Parameters
+
+| **Parameter** | **Type** | **Description**                               | **Required** |
+| ------------- | -------- | --------------------------------------------- | ------------ |
+| `id`          | String   | The unique identifier of the group to update. | Yes          |
+
+***
+
+### Body Parameters
+
+| **Parameter** | **Type** | **Description**                  | **Required** | **Default Value** |
+| ------------- | -------- | -------------------------------- | ------------ | ----------------- |
+| `name`        | String   | The new name of the group.       | Yes          |                   |
+| `status`      | String   | The updated status of the group. | No           | `Active`          |
+| `isFavourite` | Boolean  | Pins the group (true or false).  | No           | `false`           |
+
+***
+
+### cURL Request
+
+```bash
+curl --request PUT \
+  --url https://api2.requestly.io/v1/groups/Group_qrszh \
+  --header 'accept: application/json' \
+  --header 'content-type: application/json' \
+  --header 'x-api-key: your_api_key' \
+  --data '{
+    "name": "Data",
+    "status": "Active",
+    "isFavourite": true
+  }'
+```
+
+***
+
+### Sample Response
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": "Group_qrszh",
+    "creationDate": 1736059835086,
+    "modificationDate": 1736059838864,
+    "createdBy": "IUAGkRiEx6XI0B6qCc82qbwroKX2",
+    "lastModifiedBy": "IUAGkRiEx6XI0B6qCc82qbwroKX2",
+    "name": "Data",
+    "objectType": "group",
+    "status": "Active",
+    "isFavourite": true
+  }
+}
+```
+
+***
+
+### Response Codes
+
+| **Status Code** | **Description**                     |
+| --------------- | ----------------------------------- |
+| **200**         | Group updated successfully.         |
+| **400**         | The provided group ID is invalid.   |
+| **401**         | Unauthorized action.                |
+| **404**         | The specified group does not exist. |
+| **500**         | An error occurred on the server.    |

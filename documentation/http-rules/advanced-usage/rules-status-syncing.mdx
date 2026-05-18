@@ -1,0 +1,42 @@
+---
+title: "Rules Status Syncing"
+slug: "rules-status-syncing"
+path: "/http-rules/advanced-usage/rules-status-syncing"
+visibility: "PUBLIC"
+format: "MDX"
+description: "Learn how to manage rules status syncing in team workspaces to ensure consistent configurations or independent rule management."
+---
+
+***
+
+Rules status syncing allows all members of a shared workspace to maintain consistent rule statuses. If one user enables a rule, the rule is automatically enabled across the workspace for all members. This feature is particularly beneficial for teams involving non-technical roles, such as sales or customer success, ensuring that the same configurations are applied universally.
+
+<Warning>
+  In a standard development workflow, it is generally recommended to keep rules status syncing turned off to avoid unintended changes affecting all users.
+</Warning>
+
+### Enabling Rules Status Syncing
+
+Rules status syncing can only be activated in team workspaces. To enable this setting, follow the steps below:
+
+<Steps>
+  <Step title="Access the Workspace Management Settings">
+    Switch to the desired workspace using the workspace switcher dropdown. From the dropdown, open the "Manage Workspace" link.
+
+    <img src="/images/rules-status-syncing/9e1b8b28-c8b3-4706-b9b2-3b8e59fa263d.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Navigate to Workspace Settings">
+    In the workspace management interface, switch to the "Workspace Settings" tab. This tab contains various configuration options specific to the workspace.
+
+    <img src="/images/rules-status-syncing/2c8dc366-0abc-4868-856b-619fa9cb1a9d.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Enable or Disable Status Syncing">
+    Locate the toggle option labeled **"Enable status syncing in team workspaces."** Use this toggle to enable or disable rules status syncing across workspace members as required.
+
+    <img src="/images/rules-status-syncing/dd94f6b9-e762-4149-a8e8-25c4b70c91ac.png" align="center" fullwidth="false" />
+  </Step>
+</Steps>
+
+Once this setting is enabled, any changes to rule statuses by one user will automatically reflect for all workspace members. Conversely, disabling this feature will allow individual users to manage rule statuses independently.

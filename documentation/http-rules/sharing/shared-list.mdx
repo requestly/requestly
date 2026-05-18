@@ -1,0 +1,96 @@
+---
+title: "Shared List"
+slug: "shared-list"
+path: "/http-rules/sharing/shared-list"
+visibility: "PUBLIC"
+format: "MDX"
+description: "Learn to create and share a Shared List for distributing HTTP rules with controlled access."
+---
+
+***
+
+A Shared List is a convenient way to share HTTP rules using a single shareable link. You can create a Shared List for team collaboration or distribution while maintaining control over accessibility.
+
+## Key Features of Shared Lists
+
+* **Simple Sharing:** Share multiple rules via a single link.
+
+* **Controlled Access:** Public or private options ensure flexibility in accessibility.
+
+* **Static State:** Shared Lists share the current state of rules and **do not update** in real-time.
+
+## Steps to Create a Shared List
+
+<Steps>
+  <Step title="Select Rules to Share">
+    Go to HTTP Rules, and open "My Rules" from the left sidebar. Select the rules you want to share by using the checkboxes in the rules table.
+
+    <img src="/images/shared-list/4edaf68f-8c87-4f2c-9a73-105ef41de319.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Open the Share Modal and Create Shared List">
+    Click on the "Share" button in the toolbar above the rules table. In the "Shared List" tab of the Share modal, you can define the accessibility of the Shared List:
+
+    1. **Public Shared List:** The link is automatically generated; just copy the link and share it with anyone to allow them to view and import the Shared List.
+
+           <img src="/images/shared-list/ee1ae17f-6bda-4a35-837c-eda7775dfeee.png" align="center" fullwidth="false" />
+
+    2. **Private Shared List:** Requires you to add specific email addresses for users who can view and import the Shared List. After entering the email IDs, click on "Create List." An email is sent to the user, and additionally, you can copy the generated link and share it with the person. They need to log in using the same email to import the Shared List.
+
+           <img src="/images/shared-list/2976b253-e7e7-4130-b127-1517efaf913b.gif" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Import notification">
+    You can get the shared list import email when someone imports your shared list.
+
+    <img src="/images/shared-list/d765b509-03ee-4c66-8982-812471a29e1b.gif" align="center" fullwidth="false" />
+
+    For existing shared lists, you can click on more options on shared list row and enable or disable it from there.
+
+    <img src="/images/shared-list/79cbb6cd-00e2-4a96-922e-56900efd66d3.gif" align="center" fullwidth="false" />
+  </Step>
+</Steps>
+
+## Steps to Import a Shared List
+
+Importing a Shared List differs between the browser extension and the desktop app, with specific steps for each platform.
+
+### Import in Browser Extension
+
+<Steps>
+  <Step title="Use the Shared List Link">
+    If you have received a Shared List link, open it in your browser. Try opening <a target="_blank" href="https://app.requestly.io/rules#sharedList/6b827aed8bd44ec2af3391bbcfb54b55-requestly_shared_list_23_12_2024">this demo Shared List</a>.
+
+    <img src="/images/shared-list/1008ae41-4569-45a6-9d04-c5b187807b85.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Preview the Rules">
+    Click on the `View` button to review the rules in the Shared List before importing.
+
+    <img src="/images/shared-list/3a8926e5-db9a-48b6-88d0-107d7ced0297.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Import the Rules">
+    Click on "Import to My Rules" to add the Shared List rules to your dashboard.
+
+    <img src="/images/shared-list/ea95af42-9721-463b-b5cc-ac8a29e4e24e.png" align="center" fullwidth="false" />
+  </Step>
+</Steps>
+
+### Import in Desktop App
+
+<Steps>
+  <Step title="Open SharedList Importer">
+    Go to HTTP Rules, and open "Shared List" from the left sidebar. Click "Import from URL."
+
+  </Step>
+
+  <Step title="Review and Import the Shared List">
+    Paste the Shared List link into the input box. Click "Import Rules from this list" to view the Shared List content. Review the rules and click "Import to My Rules" to add them to your dashboard.
+
+  </Step>
+</Steps>
+
+<Warning>
+  Unlike sharing in workspaces, Shared Lists do not reflect real-time updates. To collaborate with live updates, consider using the "Share in Workspace" feature.
+</Warning>

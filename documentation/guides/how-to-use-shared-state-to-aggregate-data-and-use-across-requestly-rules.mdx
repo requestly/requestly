@@ -1,0 +1,84 @@
+---
+title: Use Shared State to Aggregate Data Across Rules
+label: How to use shared state to aggregate data and use across rules
+slug: how-to-use-shared-state-to-aggregate-data-and-use-across-requestly-rules
+seoTitle: >-
+  How to use shared state to aggregate data and use across modify request/
+  modify response rule
+seoDescription: >-
+  Mock an API request body to use data from the response of another API. This
+  can be done with shared state to aggregate data and use across modify request/
+  modify response rule.
+visibility: PUBLIC
+---
+You can store response data from one API call and use it in the request body of another. This is done using `$sharedState`, allowing seamless data sharing between Modify Response and Modify Request rules
+
+<Warning>
+  `$sharedState` is only available in extension versions **> v24.8.13** and desktop app versions **> v1.7.1**.
+</Warning>
+
+### Aggregate Data from API Response
+
+<Steps>
+  <Step title="Create a Modify Response Rule">
+    Open Requestly Interceptor and create a new [Modify Response](/http-rules/rule-types/modify-response-body) rule.
+  </Step>
+
+  <Step title="Select Dynamic Modification (JavaScript)">
+    Choose **Dynamic JavaScript Modification** in the rule options
+  </Step>
+
+  <Step title="Store Response Data in $sharedState">
+    Use the following code to store response values like `products` and `currency`:
+
+    ```javascript
+    function modifyResponse(args) {
+      const { method, url, response, responseType, requestHeaders, requestData, responseJSON } = args;
+
+      // Extract data from response
+      const productList = responseJSON.products;
+      const currency = responseJSON.currency;
+
+      // Store in shared state
+      $sharedState.productList = productList;
+      $sharedState.currency = currency;
+
+      return response;
+    }
+    ```
+  </Step>
+</Steps>
+
+## **Use Aggregated Data in Request Body**
+
+<Steps>
+  <Step title="Create a Modify Request Body Rule">
+    Create a new <a target="_blank" href="/http-rules/rule-types/modify-request-body">Modify Request Body</a> rule in Requestly Interceptor.
+  </Step>
+
+  <Step title="Select Dynamic Modification (JavaScript)">
+    Select the **Dynamic Modification** option.
+  </Step>
+
+  <Step title="Use Data from $sharedState in the Request">
+    **Inject the stored products and currency into your outgoing request**\
+    Here’s the code to include the previously saved data:
+
+    ```javascript
+    function modifyRequestBody(args) {
+      const { method, url, body, bodyAsJson } = args;
+
+      // Retrieve shared state values
+      const products = $sharedState.productList;
+      const currency = $sharedState.currency;
+
+      // Inject into request body
+      return {
+        ...bodyAsJson,
+        products,
+        currency
+      };
+    }
+    ```
+  </Step>
+</Steps>

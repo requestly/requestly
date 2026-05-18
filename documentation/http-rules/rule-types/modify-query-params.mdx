@@ -1,0 +1,80 @@
+---
+title: "Modify Query Params"
+slug: "modify-query-params"
+path: "/http-rules/rule-types/modify-query-params"
+visibility: "PUBLIC"
+format: "MDX"
+description: "Learn to modify query parameters in Requestly Interceptor. Add, remove, or override URL query params with custom rules."
+---
+
+***
+
+Using Requestly Interceptor, you can modify the query parameters (query params) sent to the server. This includes adding new query params, updating the values of existing params, or removing specific or all query params from the URL. The following sections explain the steps and common scenarios for modifying query params.
+
+## Why Use Modify Query Parameters Rule
+
+1. **Remove UTM Tracking Parameters**: Automatically strip out UTM tags from URLs to ensure cleaner analytics data.
+
+2. **Burst Cache Using Query Params**: Append a versioning query param (e.g., `?v=2`) to the URL to bypass caching and fetch fresh data.
+
+3. **Send Additional Information to APIs**: Add custom parameters to API calls, such as indicating internal testing (e.g., `?testing=true`).
+
+## How to Modify Query Params
+
+<Steps>
+  <Step title="Open HTTP Rules and Create a New Rule">
+    Navigate to the HTTP Rules section in the Requestly Interceptor web or desktop app. Click on the `+ New Rule` button and select `Modify Query Params` from the list of options.
+
+    <img src="/images/modify-query-params/52a0bcd5-0987-4d52-91e1-b0968a8ca7ec.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Define the Rule Name and Description">
+    Provide a **descriptive name** for the rule to keep your setup organised. Optionally, add a **description** to explain the purpose of the rule for easier identification.
+
+    For example, a name like `Remove UTM Tags` can help quickly understand the rule’s objective.
+
+    <img src="/images/modify-query-params/d248a5a7-7f1d-4e7c-a4f5-d55c91e6e567.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Define the Source Condition">
+    Source Condition specifies the criteria for matching requests. You can target requests using the following attributes:
+
+    * **URL, Host, or Path**: Define what part of the request should be matched.
+
+    * **Operators**: Choose from Regex, Contains, Wildcard, or Equals to apply precise matching logic.
+
+    For more detailed guidance, refer to the [Source Conditions Guide](/http-rules/advanced-usage/advance-targeting).
+
+    <Card title="Example :">
+      You can target URLs containing `?utm_` to remove UTM tracking parameters. These source conditions ensure the rule activates only for relevant requests.
+    </Card>
+
+    <img src="/images/modify-query-params/db746ed6-6bbf-41c2-ac4f-9d0d3fd24217.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Perform Query Param Modifications">
+    * **Add Query Params**: Specify the key and value to be appended to the URL.
+
+    * **Remove Query Params**: Enter the names of query parameters to delete, or select the option to remove all parameters.
+
+    * **Override Query Params**: Update an existing parameter’s value by specifying its key and new value. This flexibility lets you customize query parameters for various scenarios like versioning or testing.
+
+    <img src="/images/modify-query-params/3a96cf9b-270c-4a1b-97b5-8dc067cbbcbb.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Save and Activate the Rule">
+    Click **Save** to store the rule and toggle it **ON** to activate. Activating the rule ensures it applies to all requests matching the defined source conditions, dynamically modifying URLs as specified.
+
+    <img src="/images/modify-query-params/53672d87-a9c5-4c4b-9016-546b7c4d3da6.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Test the Rule">
+    Use the Test option to verify the rule’s functionality. Enter a test URL to view the modified URL with applied changes in query parameters. This helps confirm the rule’s effectiveness before deployment.
+
+    <Tip>
+      There are multiple ways to validate if a rule is applied or not, learn more about how to <a target="_blank" href="/http-rules/advanced-usage/validate-rules-execution">`validate rule execution`</a>**.**
+    </Tip>
+
+    <img src="/images/modify-query-params/c5b812bf-cd39-4313-97b1-aba2fc73ca3f.png" align="center" fullwidth="false" />
+  </Step>
+</Steps>

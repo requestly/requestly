@@ -1,0 +1,44 @@
+---
+title: Error on saving rule
+label: Error on saving rule
+slug: error-on-saving-rule
+description: >-
+  If you encounter an error while saving a rule in Requestly Interceptor, follow the steps
+  below to identify and resolve the issue:
+visibility: PUBLIC
+---
+<img src="/images/error-on-saving-rule/d71cbff7-196a-4377-ae11-3591b1d95adb.png" align="center" fullwidth="false" />
+
+## 1. Check Console for Error Details
+
+Open the **Developer Console** in your browser (Right-click → Inspect → Console tab).\
+You will find an error message logged along with the **Rule ID** that caused the issue.
+
+This information is essential for debugging or sharing with the support team if needed.
+
+## 2. Common Errors and Resolutions
+
+### a. Regex Size Limit Exceeded
+
+If the error message indicates that the regex exceeds the supported size limit, please refer to this issue for known limitations and potential workarounds:\
+[Regex Size Limit Issue #1690](https://github.com/requestly/requestly/issues/1690)
+
+### b. Invalid Regex / Unsupported Lookaheads
+
+If the error message mentions *"Invalid regex"* or unsupported syntax such as **lookaheads**, it means the pattern is not compatible with the regex engine we use.
+
+<Info>
+  Requestly Interceptor uses **RE2-compatible regular expressions**, as required by **Chrome's Manifest V3** security model.\
+  This is a technical limitation imposed by Chrome, and not something we can bypass.
+</Info>
+
+For reference on RE2-compatible syntax, you can visit:\
+[RE2 Syntax Documentation](https://github.com/google/re2/wiki/Syntax)
+
+## 3. Still Facing Issues?
+
+If your error does not fall under the above categories, or you're unsure how to proceed, please:
+
+* Note the **error message** from the console.
+
+* Contact our support team or file an issue with details on [GitHub](https://github.com/requestly/requestly/issues).

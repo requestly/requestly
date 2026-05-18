@@ -1,0 +1,323 @@
+---
+title: >-
+  Intercept & Modify Network Requests in Web Automation (Selenium, Playwright,
+  etc.)
+label: >-
+  Intercept & Modify Network Requests in Web Automation (Selenium, Playwright,
+  etc.)
+slug: >-
+  intercepting-and-modifying-network-requests-in-web-automation-frameworks-like-selenium-and-playwright
+description: ''
+seoTitle: Learn how to use requestly in testing frameworks like selenium and playwright
+visibility: PUBLIC
+---
+**Requestly Interceptor** is a powerful browser extension that allows developers and QAs to intercept and modify HTTP requests. It offers features like:
+
+* HTTP header modifications
+
+* URL redirects
+
+* Request and response body overrides
+
+* Injecting custom CSS and JavaScript
+
+In this guide, we’ll show you how to use Requestly Interceptor in an end-to-end (E2E) web testing framework.
+
+### What You Can Do with Requestly Interceptor in Automation For now
+
+There are **2 main ways** to use Requestly Interceptor in an automation environment:
+
+<Tip>
+  We also offer an NPM package, **@requestly/rq-automation**, to make this easier.\
+  <a target="_blank" href="https://github.com/requestly/requestly-automation">`Learn more →`</a>
+</Tip>
+
+1. **Header Modifications**, quick, one-off rules (no API key required)
+
+2. **Import Rules via API Key**, for predefined rules managed from your Requestly Interceptor account
+
+### Header Modifications
+
+If you only need simple header overrides (without API key), like adding or removing request/response headers, refer to this page:\
+[Modify HTTP Headers →](/guides/modify-http-headers-in-web-automation-using-requestly)
+
+### Import Rules via API Key
+
+<Steps>
+  <Step title="Configure Rules in a Team Workspace and Get API Key">
+    Start by creating the rules you want to use in a new team workspace. Once the rules are set up, request an API key for the workspace by filling out [**this form**](https://app.formbricks.com/s/clryn62s316gjdeho9j03t7oa). The rules in this workspace will be automatically fetched and applied during the end-to-end (E2E) testing in the browser instance.
+  </Step>
+
+  <Step title="Install Chrome for Testing">
+    Download [**Chrome for Testing**](https://googlechromelabs.github.io/chrome-for-testing), the automation-friendly version of Chrome.
+
+    <Info>
+      **Why Chrome for Testing?**
+
+      Starting with Chrome 137, official Chrome builds **no longer support the** `--load-extension` flag due to security concerns. [`There commit →`](https://chromium.googlesource.com/chromium/src/+/290ed8046692651ce76088914750cb659b65fb17%5E%21/chrome/browser/extensions/extension_service.cc)
+
+      To load extensions in automation tools (Selenium, Playwright, Puppeteer, etc.), you **must use Chrome for Testing** or Chromium.
+
+      Regular Chrome will block extension loading via automation. Use Chrome for Testing to avoid breakages and ensure compatibility.
+    </Info>
+  </Step>
+
+  <Step title="Install the Automation Tool of Your Choice">
+    <Tabs>
+      <Tab title="Selenium">
+        ```bash
+        npm install selenium-webdriver
+        ```
+      </Tab>
+
+      <Tab title="Playwright">
+        ```javascript
+        npm install playwright
+        ```
+      </Tab>
+
+      <Tab title="Puppeteer">
+        ```javascript
+        npm install puppeteer
+        ```
+      </Tab>
+    </Tabs>
+  </Step>
+
+  <Step title="Download the Requestly Interceptor CRX Extension">
+    <Tip>
+      If you're using our NPM package, you don’t need to download it. Simply call the function `getExtension()`.
+    </Tip>
+
+    Download the CRX file of the [**Requestly Interceptor Extension**](https://requestly.com/downloads/crx/).
+  </Step>
+
+  <Step title="Configure the Browser with the Extension">
+    Use your automation tool’s configuration options to:
+
+    * Set the path to Chrome for Testing binary
+
+    * Add the Requestly Interceptor CRX extension
+
+    <Tip>
+      For JavaScript, use our NPM package `@requestly/rq-automation`.\
+      <a target="_blank" href="https://github.com/requestly/requestly-automation">`Learn more →`</a>
+    </Tip>
+
+    <Tabs>
+      <Tab title="Selenium">
+        For Javascript ( Node.js )
+
+        ```javascript
+        const { Builder } = require("selenium-webdriver");
+        const chrome = require("selenium-webdriver/chrome");
+        const path = require("path");
+        const extensionPath = path.resolve(__dirname, 'requestly.crx'); // unpacked CRX folder
+
+        // IF Using Our NPM Package @requestly/rq-automation
+        // const { getExtension } = require("@requestly/rq-automation");
+        // const extensionPath = getExtension("crx");
+        // -----
+
+        const options = new chrome.Options();
+        options.setChromeBinaryPath("/Path/to/chrome-for-testing"); 
+        options.addExtensions(extensionPath);  
+
+        const driver = await new Builder()
+          .forBrowser("chrome")
+          .setChromeOptions(options)
+          .build();
+        // Now use driver.get() to navigate as needed...
+        ```
+
+        For Python
+
+        ```python
+        from selenium import webdriver
+        from selenium.webdriver.chrome.options import Options
+
+        chrome_options = Options()
+        chrome_options.binary_location = "/Path/to/chrome-for-testing"
+        chrome_options.add_extension("/path/to/requestly.crx")
+
+        driver = webdriver.Chrome(options=chrome_options)
+        # driver.get(...) to open pages
+        ```
+
+        For Java
+
+        ```java
+        ChromeOptions options = new ChromeOptions();
+        options.setBinary("/Path/to/chrome-for-testing");
+        options.addExtensions(new File("/path/to/requestly.crx"));
+        WebDriver driver = new ChromeDriver(options);
+        // driver.get(...) to open pages
+        ```
+      </Tab>
+
+      <Tab title="Playwright">
+        For Javascript ( Node.js )
+
+        ```javascript
+        const { chromium } = require('playwright');
+        const extensionPath = require('path').resolve(__dirname, 'requestly'); // unpacked CRX folder
+
+        // IF Using Our NPM Package @requestly/rq-automation
+        // const { getExtension } = require("@requestly/rq-automation");
+        // const extensionPath = getExtension("unpacked");
+        // -----
+
+        const userDataDir = './user-data';
+
+        const context = await chromium.launchPersistentContext(userDataDir, {
+          channel: "chromium", // Enable extensions
+          headless: false, // Set to true only if you handle '--headless=new'
+          args: [
+              `--disable-extensions-except=${extensionPath}`,
+              `--load-extension=${extensionPath}`,
+            ],
+          });
+
+        const page = await context.newPage();
+        // Use page.goto(...) next
+        ```
+
+        For Python
+
+        ```python
+        from playwright.sync_api import sync_playwright
+
+        path_to_ext = "./requestly"   # path to unpacked CRX folder
+        user_data_dir = "/tmp/user-data-dir"
+
+        with sync_playwright() as pw:
+            context = pw.chromium.launch_persistent_context(
+                user_data_dir,
+                channel="chromium",
+                headless=False,
+                args=[
+                    f"--disable-extensions-except={path_to_ext}",
+                    f"--load-extension={path_to_ext}"
+                ]
+            )
+            page = context.new_page()
+            # use page.goto(...)
+            context.close()
+        ```
+      </Tab>
+
+      <Tab title="Puppeteer">
+        For Javascript ( Node.js )
+
+        ```javascript
+        const puppeteer = require('puppeteer');
+        const path = require('path');
+        const extensionPath = path.resolve(__dirname, 'requestly'); 
+
+        // IF Using Our NPM Package @requestly/rq-automation
+        // const { getExtension } = require("@requestly/rq-automation");
+        // const extensionPath = getExtension("unpacked");
+        // -----
+
+        const browser = await puppeteer.launch({
+          executablePath: "/Path/to/chrome-for-testing",
+          headless: false,
+          args: [
+            `--disable-extensions-except=${extensionPath}`,
+            `--load-extension=${extensionPath}`
+          ]
+        });
+        const page = await browser.newPage();
+        // page.goto(...) next
+        ```
+      </Tab>
+    </Tabs>
+  </Step>
+
+  <Step title="(Optional) Close Extension Welcome Page">
+    When Chrome installs the Requestly Interceptor extension, it may open a "welcome" (post-install) tab that interrupts automation. You can close this tab programmatically:
+
+    <Tabs>
+      <Tab title="Selenium">
+        ```javascript
+          // give Chrome a moment for any stray tabs
+          await driver.sleep(500);
+
+          // close any “welcome” tab if still present
+          const handles = await driver.getAllWindowHandles();
+          const mainHandle = handles[0];
+          for (const handle of handles.slice(1)) {
+            await driver.switchTo().window(handle);
+            await driver.close();
+          }
+          await driver.switchTo().window(mainHandle);
+        ```
+      </Tab>
+
+      <Tab title="Playwright">
+        ```javascript
+          const page = await context.newPage(); // Assume the first one is your primary page
+          await page.waitForTimeout(2000);
+          // Get all open pages in the current context
+          const pages = context.pages();
+          // Iterate through the pages and close any that are not the primary 'page' object
+          for (const openedPage of pages) {
+            if (openedPage !== page) {
+              console.log(`Closing extraneous page: ${openedPage.url()}`);
+              await openedPage.close();
+            }
+           }
+          // page.goto(...) next
+        ```
+      </Tab>
+
+      <Tab title="Puppeteer">
+        ```javascript
+          const pages = await browser.pages();
+          const page = pages[0]; // Assume the first one is your primary page
+
+          await page.waitForTimeout(2000);
+
+          // Close all other pages except the primary one
+          for (const openedPage of pages) {
+            if (openedPage !== page) {
+              console.log(`Closing extraneous page: ${openedPage.url()}`);
+              await openedPage.close();
+            }
+          }
+        ```
+      </Tab>
+
+      <Tab title="With NPM Package">
+        ```javascript
+        const { closeWelcomePage } = require("@requestly/rq-automation");
+        await closeWelcomePage(driver);
+        ```
+      </Tab>
+    </Tabs>
+  </Step>
+
+  <Step title="Import Rules from Requestly Interceptor">
+    Visit the following URL in your automated browser to import all active rules from your account:
+
+    <Tabs>
+      <Tab title="Normal way">
+        ```java
+        https://app.requestly.io/automation?apiKey=<YOUR_API_KEY>
+        ```
+      </Tab>
+
+      <Tab title="NPM package">
+        ```javascript
+        const { importRules } = require("@requestly/rq-automation");
+
+        // this will return an URL to import rules 
+        importRules("YOUR_API_KEY") 
+        // https://app.requestly.io/automation?apiKey=<YOUR_API_KEY>
+        ```
+      </Tab>
+    </Tabs>
+
+    <img src="/images/intercepting-and-modifying-network-requests-in-web-automation-frameworks-like-selenium-and-playwright/5f80987d-31ef-464c-90d0-212f05503041.png" align="center" fullwidth="false" />
+  </Step>
+</Steps>

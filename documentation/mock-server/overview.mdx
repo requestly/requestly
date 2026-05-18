@@ -1,0 +1,58 @@
+---
+title: Overview
+label: Overview
+slug: overview
+description: "Learn when to use File Server, how it differs from in-place traffic modification, and how to create your first hosted mock."
+visibility: PUBLIC
+---
+Requestly Interceptor **File Server** lets you host reusable mock endpoints and static assets for testing, demos, and development workflows.
+
+You may still see references to "File Server" in some parts of the product. This feature is called **File Server**.
+
+## When To Use File Server
+
+Use File Server when you want to:
+
+- create hosted mock APIs for frontend or QA work
+- serve JSON, JavaScript, CSS, images, or other test assets over a public URL
+- share reusable mocks with teammates
+- combine hosted mocks with [HTTP Rules](/http-rules/overview) to redirect live requests to mock endpoints
+
+If you only need to change traffic inside your current browser or app session, [HTTP Rules](/http-rules/overview) may be faster. If you need a quick local response override, [API Mocking](/api-mocking/api-mocking) may be a better fit.
+
+## First Success Path
+
+<Steps>
+  <Step title="Create A Mock">
+    Start with [Create Mock API](/mock-server/create/create-mock-api) to define an endpoint and response.
+  </Step>
+  <Step title="Test The Endpoint">
+    Verify the response using [Test Mock APIs](/mock-server/test) or your preferred client.
+  </Step>
+  <Step title="Connect It To Your Workflow">
+    Use the mock directly, or pair it with [Redirect Rule](/http-rules/rule-types/redirect-rule) to switch traffic to your hosted mock.
+  </Step>
+</Steps>
+
+## Explore By Workflow
+
+<CardGroup cols={2}>
+  <Card title="Create Your First Mock" icon="plus" href="/mock-server/create/create-mock-api">
+    Build and publish your first mock endpoint.
+  </Card>
+  <Card title="Test Mock APIs" icon="flask" href="/mock-server/test">
+    Validate responses before connecting apps or teammates.
+  </Card>
+  <Card title="Use Templating" icon="brackets-curly" href="/mock-server/templating-in-mocks">
+    Add dynamic values and richer mock behavior.
+  </Card>
+  <Card title="Import And Export Mocks" icon="download" href="/mock-server/import-and-export-mocks">
+    Move mocks between workflows and share them more easily.
+  </Card>
+  <Card title="Quick Local Mocking" icon="bolt" href="/api-mocking/api-mocking">
+    Start with local or cloud-based quick mocks when you do not need a full hosted mock server.
+  </Card>
+  <Card title="Redirect Traffic To A Mock" icon="shuffle" href="/http-rules/rule-types/redirect-rule">
+    Route live requests to your mock endpoint without changing application code.
+  </Card>
+</CardGroup>

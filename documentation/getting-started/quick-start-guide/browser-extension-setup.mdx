@@ -1,0 +1,111 @@
+---
+title: "Browser Extension Setup"
+slug: "browser-extension-setup"
+path: "/getting-started/quick-start-guide/browser-extension-setup"
+visibility: "PUBLIC"
+format: "MDX"
+---
+
+The Requestly Interceptor Browser Extension is a lightweight yet powerful tool designed for developers working on **browser-based workflows**.
+
+Requestly Interceptor’s browser extension is available for all major browsers including **Chrome, Firefox, Edge, Brave, Vivaldi, Arc**, and **Opera**.
+
+With the Browser Extension, you can:
+
+- Intercept and modify network requests directly in your browser
+- Use the in-browser **Network Inspector**
+- Capture rich debugging data (console logs, network logs, screen recordings)
+- Connect with the Desktop App for enhanced capabilities like bulk mocking
+
+<Info>
+  <a target="_blank" href="https://requestly.com/downloads/">
+  Click here to download 
+  </a>
+
+   the Requestly Interceptor extension for your favorite browser.
+</Info>
+
+The extension uses your browser’s native network APIs, which means **no conflicts with VPNs or proxies**, and it runs seamlessly without installing any system-level tools.
+
+### **Extension Popup**
+
+You can open the Requestly Interceptor Extension popup by clicking its icon in the browser’s extensions list or top bar if pinned. We recommend pinning the Requestly Interceptor Extension for quick access.
+
+<img
+  src="/images/browser-extention-setup/7028b82e-1ff6-48a0-8e74-8ed0314b0612.png"
+  align="center"
+  fullwidth="false"
+/>
+
+The pop-up serves several purposes:
+
+1. The first section includes the **Running Status toggle** to turn the extension on/off and an **Open App** button to launch the Requestly Interceptor app ([`https://app.requestly.io/`](https://app.requestly.io/)) for creating rules and using the web app.
+2. The second section helps manage rules. Pinned rules and recently used rules appear for quick access. The **Executed Rules** tab shows rules applied to the current page. You can toggle rules using the toggle button and quickly create new ones using the button in the top-right corner.
+3. The third section is for reporting webpage issues with detailed information, including screen recordings, console logs, network logs, local storage, and environment details. `Record this tab` starts recording, and `Watch last 5 min replay` shows recent activity, enabled via the **Configure** option. Data is stored locally and doesn’t affect performance unless shared.
+
+   You can click on `Record this tab` and check out the working of this feature quickly.
+4. The last section, visible only if the Desktop App is running, lets you intercept browser traffic via the desktop app. Click **Connect** to link the browser profile to the app, useful for tasks like bulk mocking.
+
+### **Web App**
+
+The Web App can be accessed using the `Open App` button in the Extension Popup or by visiting [`https://app.requestly.io/`](https://app.requestly.io/) directly in your browser. The app is organised into main sections, represented by icons on the left sidebar:
+
+1. **Home**: The homepage provides an overview of your resources and quick access to key actions.
+2. **Network Inspector**: Similar to the browser’s dev tools, but with additional features.
+3. **HTTP Rules**: Allows you to override network requests by modifying parts of the request or redirecting them, our most popular feature.
+4. **Sessions**: Contains saved sessions from the Extension Popup discussed earlier.
+5. **File Server**: Allows you to host custom files and mock endpoints in the cloud so you can test APIs and resource overrides with shareable URLs.
+
+Each area has its own documentation, use the sidebar to explore Network Inspector, HTTP Rules, Sessions, and File Server.
+
+<img
+  src="/images/browser-extention-setup/2133a708-b409-4802-b4bb-ae45f034747c.png"
+  align="center"
+  fullwidth="false"
+/>
+
+**On Top (from left to right)**
+
+1. **Workspace Selector** , Allows you to create a new workspace or switch between existing ones. Workspaces are where you group your work for specific teams or projects.
+2. **Star** , A GitHub widget to star our repository and track Requestly Interceptor’s development.
+3. **Search** , Helps you quickly navigate the app; search for an action like “Create New Workspace” and hit enter to quickly create new workspace.
+4. **Ask AI** , An AI bot that can instantly assist with most queries. While our support team is prompt, AI provides even faster responses.
+5. **Settings (Cog Icon)** , Opens the settings page, where you can configure Requestly Interceptor to suit your needs.
+6. **Profile Picture Dropdown** , Displays your logged-in profile information and includes links to billing and logout.
+
+**On the Bottom Left**
+
+1. **Invite Button** , This lets you invite teammates to collaborate on Requestly Interceptor.
+2. **Version Information** , Displays the current version of Requestly Interceptor, which can be helpful when communicating with our support team.
+
+**On the Bottom Right**
+
+1. **Chat Support Icon** , Located slightly above the API Documentation link, this connects you to our dedicated customer support team.
+
+## When To Use The Browser Extension
+
+Use the Browser Extension when you want to:
+
+- inspect and modify traffic from websites and browser apps
+- debug HTTP traffic without configuring a system proxy
+- create HTTP Rules in a browser-first workflow
+- capture browser-based debugging context quickly
+
+Use the [Desktop App setup](/getting-started/quick-start-guide/desktop-app-setup) instead if you need mobile, emulator, terminal, Node.js, or system-wide interception.
+
+## Recommended Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Getting Started Overview" href="/getting-started/overview" icon="rocket">
+    Choose a path and complete setup for interception-focused workflows.
+  </Card>
+  <Card title="Inspect Browser Traffic" href="/interceptor/browser-extension/browser-interception" icon="magnifying-glass">
+    Learn how interception works inside the browser extension.
+  </Card>
+  <Card title="Create Your First HTTP Rule" href="/http-rules/rule-types" icon="wand-magic-sparkles">
+    Modify headers, redirect URLs, or rewrite responses without changing application code.
+  </Card>
+  <Card title="Troubleshoot Browser Setup" href="/troubleshoot/http-rules/rules-not-working" icon="wrench">
+    Check common extension and rules issues if traffic changes are not applying.
+  </Card>
+</CardGroup>

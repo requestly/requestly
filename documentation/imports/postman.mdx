@@ -1,0 +1,87 @@
+---
+title: Postman
+label: Postman
+slug: postman
+description: >-
+  Learn how to migrate your Postman collections and environment variables to
+  Requestly.
+seoTitle: Import collections & environments from Postman to Requestly
+seoDescription: >-
+  Learn how to migrate your Postman collections and environment variables to
+  Requestly.
+visibility: PUBLIC
+---
+***
+
+Postman is a popular API development tool widely used for testing and managing APIs. Requestly can import collections and environment files exported from Postman.
+
+<iframe className="w-full aspect-video rounded-xl" src="https://www.youtube.com/embed/7jXGYMj9izw" />
+
+### **Export all the workspace data from Postman**
+
+**Step 1**: Click your profile icon in the top-right corner of Postman and select **Settings**.
+
+<img src="/images/postman/d59ffe07-f75e-48b5-b14c-5118125a9e67.png" align="center" fullwidth="false" />
+
+**Step 2**: Navigate to the **Account** tab and click **Export Data**. It will redirect you to Export data page. Click on **Export data** button.
+
+<img src="/images/postman/70ae35a8-27b1-4364-ac90-1b5df84c84ff.png" align="center" fullwidth="false" />
+
+**Step 3**: Select the data to export (collections, environments, or both) and click **Request Data Export**.
+
+<img src="/images/postman/943ec5e3-aff4-4923-a504-a787906a4be5.png" align="center" fullwidth="false" />
+
+**Step 4**: Check your registered email for exported data, download the ZIP file and extract its contents.
+
+<Tip>
+  You can also export individual collections and environments from Postman, as explained at the end of this documentation.
+</Tip>
+
+<Warning>
+  Global variables are not automatically exported using this method.\
+  To use them in Requestly, you need to manually export global variables from Postman and import it into Requestly.
+</Warning>
+
+### **Importing into Requestly**
+
+**Step 1**: In Requestly, navigate to the **API Client** section.
+
+**Step 2**: Click the **Import** button located in the sidebar header and choose **Postman** from the import options.
+
+<img src="/images/postman/11bb225d-e951-42cb-a760-185f92fe99f9.png" align="center" fullwidth="false" />
+
+**Step 3**: In the upload modal, select and upload the exported Postman **collection** and **environment** files(Multiple files can be imported at once).
+
+<img src="/images/postman/2d2c2344-ea8f-464a-89b9-fe4323dc53ae.png" align="center" fullwidth="false" />
+
+**Step 4**: Once the files are processed, click **Import** to finalize the migration.
+
+<img src="/images/postman/b325343a-9d36-4b01-a9a8-307607ce4720.png" align="center" fullwidth="false" />
+
+### **Exporting individual Collections from Postman**
+
+**Step 1**: Open Postman and navigate to the **Collections** tab in the left sidebar to view your collections.
+
+<img src="/images/postman/8545b3a7-ac94-4669-b9cc-4702e31961de.png" align="center" fullwidth="false" />
+
+**Step 2**: Click the ellipsis (`...`) next to the collection you wish to export and select **Export** from the dropdown menu.
+
+**Step 3**: In the export dialog, select either **Collection v2** or **Collection v2.1**(Requestly supports both) as the export format. Click **Export** and save the file.
+
+<img src="/images/postman/378a8db4-9de3-4ebd-b0ed-e91ba40ae841.png" align="center" fullwidth="false" />
+
+**Step 4**: Import using the same steps as explained in **Import into Requestly** section above.
+
+### **Exporting individual Environments from Postman**
+
+**Step 1**: Open Postman and go to the **Environments** tab in the left sidebar to view your environments.
+
+<img src="/images/postman/5e139394-7c92-4384-94b3-5dd3e0f6f0bd.png" align="center" fullwidth="false" />
+
+**Step 2**: Click the ellipsis (`...`) next to the environment you wish to export and select **Export**.
+
+**Step 3**: Choose a location to save the exported environment file and click **Save**.
+
+<img src="/images/postman/e438749a-2a63-4a64-9441-a7f24adf3a02.png" align="center" fullwidth="false" />
+
+**Step 4**: Import using the same steps as explained in **Import into Requestly** section above.

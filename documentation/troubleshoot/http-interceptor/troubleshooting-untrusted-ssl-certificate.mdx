@@ -1,0 +1,63 @@
+---
+title: 'Troubleshooting: Untrusted SSL certificate'
+label: Untrusted SSL certificate
+slug: troubleshooting-untrusted-ssl-certificate
+visibility: PUBLIC
+---
+Safari does not support setting a proxy on the browser instance due to technical constraints. Therefore, we have to set up a system-wide proxy to connect to Safari. This may lead to some issues, which can be resolved by following troubleshooting steps:
+
+Before following the troubleshooting steps, make sure you have done both of these setup for Safari:
+
+1. **Make sure to launch Safari App from the Connected Apps modal.** In case Safari doesn't open automatically, you can open it yourself also.
+
+2) Try opening [**https://amiusing.requestly.io/**](https://amiusing.requestly.io/) after launching Safari. If it shows `Failure` message, then it indicates that traffic is not being intercepted by Requestly Interceptor and your proxy isn't set up properly. Follow the below steps to troubleshoot the most common problems with setting up Safari.
+
+### **System wide proxy does not work with VPN**
+
+Safari connection might not work with VPN because of the system-wide proxy setup. **If you are using Requestly Interceptor with VPN, you need to disable VPN first, then launch Safari from** `Connected Apps` **and then restart your VPN.**
+
+> ***In our internal testing we found that TunnelBlick and the OpenVPN work well with Requestly Interceptor system wide proxy running. In case you face issues working with these or any other VPN client, feel free to reach out at*** [***contact@requestly.io***](mailto:contact@requestly.io) ***or*** [***raise an issue***](https://github.com/requestly/requestly/issues/new?assignees=\&labels=bug\&labels=vpn\&projects=\&template=bug-report.yml\&title=bug%3A+)
+
+### **Verify Proxy**
+
+The steps to do this vary slightly based on your macOS version
+
+#### **macOS 13 Ventura or later**
+
+1. Open System Preferences
+
+2) Type Proxies in Search
+
+3. Select Proxies
+
+4) Check whether Web Proxy (HTTP) and Secure Web Proxy (HTTPS) are enabled or not. And the Port mentioned there matches the port mentioned on the header of Requestly Interceptor Desktop App
+
+<img src="https://imagedelivery.net/IEMzXmjRvW0g933AN5ejrA/wwwnotionso-image-prod-files-secures3us-west-2amazonawscom-8e04dd23-74cd-4c44-8158-4238eac359d1-c8459d8c-ce46-4785-be4f-1f95481b5fd7-disabling-system-wide-proxy-venturagif/public" align="left" fullwidth="false" />
+
+#### **Before macOS 13 Ventura**
+
+1. Open System Preferences
+
+2) Go to Network
+
+3. Select Advanced
+
+4) Go to Proxies
+
+5. Check whether Web Proxy (HTTP) and Secure Web Proxy (HTTPS) are enabled or not. And the Port mentioned there matches the port mentioned on the header of Requestly Interceptor Desktop App
+
+### **Validate that Certificate is trusted**
+
+For Requestly Interceptor to intercept HTTPS traffic, you need to install Requestly Interceptor Certificate in the keychain
+
+* Open keychain access (Press cmd + enter and then type "keychain")
+
+- Select login keychain
+
+* Check whether RQProxyCA is present and trusted or not.
+
+<img src="https://imagedelivery.net/IEMzXmjRvW0g933AN5ejrA/wwwnotionso-image-prod-files-secures3us-west-2amazonawscom-8e04dd23-74cd-4c44-8158-4238eac359d1-253b2413-84ee-44fd-8dca-bc6da2dec8cd-macos-certificate-trustedpng/public" align="left" fullwidth="false" />
+
+### **Check your Firewall**
+
+Check if you are using any Firewall software like Sophos. Firewalls generally block web proxies for security reasons and mistake Requestly Interceptor as a web proxy but Requestly Interceptor only runs on yourlocal device. Sending them an email will get Requestly Interceptor unblocked for you.

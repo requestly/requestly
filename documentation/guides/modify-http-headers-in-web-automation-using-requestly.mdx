@@ -1,0 +1,525 @@
+---
+title: Modify HTTP Headers in Web Automation Using Requestly Interceptor
+label: Modify HTTP Headers in Web Automation Using Requestly Interceptor
+slug: modify-http-headers-in-web-automation-using-requestly
+visibility: PUBLIC
+---
+In this guide, we’ll walk through how to integrate Requestly Interceptor into any browser-based automation framework (Selenium, Playwright, Puppeteer, etc.) to programmatically modify request and response headers.
+
+### Steps to Use Requestly Interceptor for Header Modification in Automation
+
+<Tip>
+  We also offer an NPM package, **@requestly/rq-automation**, to make this easier.\
+  <a target="_blank" href="https://github.com/requestly/requestly-automation">`Learn more →`</a>
+</Tip>
+
+<Steps>
+  <Step title="Install Chrome for Testing">
+    Download [**Chrome for Testing**](https://googlechromelabs.github.io/chrome-for-testing), the automation-friendly version of Chrome.
+
+    <Info>
+      **Why Chrome for Testing?**
+
+      Starting with Chrome 137, official Chrome builds **no longer support the** `--load-extension` flag due to security concerns. [`There commit →`](https://chromium.googlesource.com/chromium/src/+/290ed8046692651ce76088914750cb659b65fb17%5E%21/chrome/browser/extensions/extension_service.cc)
+
+      To load extensions in automation tools (Selenium, Playwright, Puppeteer, etc.), you **must use Chrome for Testing** or Chromium.
+
+      Regular Chrome will block extension loading via automation. Use Chrome for Testing to avoid breakages and ensure compatibility.
+    </Info>
+  </Step>
+
+  <Step title="Install the Automation Tool of Your Choice">
+    <Tabs>
+      <Tab title="Selenium">
+        ```bash
+        npm install selenium-webdriver
+        ```
+      </Tab>
+
+      <Tab title="Playwright">
+        ```bash
+        npm install playwright
+        ```
+      </Tab>
+
+      <Tab title="Puppeteer">
+        ```bash
+        npm install puppeteer
+        ```
+      </Tab>
+    </Tabs>
+  </Step>
+
+  <Step title="Download the Requestly Interceptor CRX Extension">
+    <Tip>
+      If you're using our NPM package, you don’t need to download it. Simply call the function `getExtension()`.
+    </Tip>
+
+    Download the CRX file of the [Requestly Interceptor Extension](https://requestly.com/downloads/crx/).
+  </Step>
+
+  <Step title="Configure the Browser with the Extension">
+    Use your automation tool’s configuration options to:
+
+    * Set the path to Chrome for Testing binary
+
+    * Add the Requestly Interceptor CRX extension
+
+    <Tip>
+      For JavaScript, use our NPM package `@requestly/rq-automation`.\
+      <a target="_blank" href="https://github.com/requestly/requestly-automation">`Learn more →`</a>
+    </Tip>
+
+    <Tabs>
+      <Tab title="Selenium">
+        For Javascript ( Node.js )
+
+        ```javascript
+        const { Builder } = require("selenium-webdriver");
+        const chrome = require("selenium-webdriver/chrome");
+        const path = require("path");
+        const extensionPath = path.resolve(__dirname, 'requestly.crx'); // unpacked CRX folder
+
+        // IF Using Our NPM Package @requestly/rq-automation
+        // const { getExtension } = require("@requestly/rq-automation");
+        // const extensionPath = getExtension("crx");
+        // -----
+
+        const options = new chrome.Options();
+        options.setChromeBinaryPath("/Path/to/chrome-for-testing"); 
+        options.addExtensions(extensionPath);  
+
+        const driver = await new Builder()
+          .forBrowser("chrome")
+          .setChromeOptions(options)
+          .build();
+        // Now use driver.get() to navigate as needed...
+        ```
+
+        For Python
+
+        ```python
+        from selenium import webdriver
+        from selenium.webdriver.chrome.options import Options
+
+        chrome_options = Options()
+        chrome_options.binary_location = "/Path/to/chrome-for-testing"
+        chrome_options.add_extension("/path/to/requestly.crx")
+
+        driver = webdriver.Chrome(options=chrome_options)
+        # driver.get(...) to open pages
+        ```
+
+        For Java
+
+        ```java
+        ChromeOptions options = new ChromeOptions();
+        options.setBinary("/Path/to/chrome-for-testing");
+        options.addExtensions(new File("/path/to/requestly.crx"));
+        WebDriver driver = new ChromeDriver(options);
+        // driver.get(...) to open pages
+        ```
+      </Tab>
+
+      <Tab title="Playwright">
+        For Javascript ( Node.js )
+
+        ```javascript
+        const { chromium } = require('playwright');
+        const extensionPath = require('path').resolve(__dirname, 'requestly'); // unpacked CRX folder
+
+        // IF Using Our NPM Package @requestly/rq-automation
+        // const { getExtension } = require("@requestly/rq-automation");
+        // const extensionPath = getExtension("unpacked");
+        // -----
+
+        const userDataDir = './user-data';
+
+        const context = await chromium.launchPersistentContext(userDataDir, {
+          channel: "chromium", // Enable extensions
+          headless: false, // Set to true only if you handle '--headless=new'
+          args: [
+              `--disable-extensions-except=${extensionPath}`,
+              `--load-extension=${extensionPath}`,
+            ],
+          });
+
+        const page = await context.newPage();
+        // Use page.goto(...) next
+        ```
+
+        For Python
+
+        ```python
+        from playwright.sync_api import sync_playwright
+
+        path_to_ext = "./requestly"   # path to unpacked CRX folder
+        user_data_dir = "/tmp/user-data-dir"
+
+        with sync_playwright() as pw:
+            context = pw.chromium.launch_persistent_context(
+                user_data_dir,
+                channel="chromium",
+                headless=False,
+                args=[
+                    f"--disable-extensions-except={path_to_ext}",
+                    f"--load-extension={path_to_ext}"
+                ]
+            )
+            page = context.new_page()
+            # use page.goto(...)
+            context.close()
+        ```
+      </Tab>
+
+      <Tab title="Puppeteer">
+        For Javascript ( Node.js )
+
+        ```javascript
+        const puppeteer = require('puppeteer');
+        const path = require('path');
+        const extensionPath = path.resolve(__dirname, 'requestly'); 
+
+        // IF Using Our NPM Package @requestly/rq-automation
+        // const { getExtension } = require("@requestly/rq-automation");
+        // const extensionPath = getExtension("unpacked");
+        // -----
+
+        const browser = await puppeteer.launch({
+          executablePath: "/Path/to/chrome-for-testing",
+          headless: false,
+          args: [
+            `--disable-extensions-except=${extensionPath}`,
+            `--load-extension=${extensionPath}`
+          ]
+        });
+        const page = await browser.newPage();
+        // page.goto(...) next
+        ```
+      </Tab>
+    </Tabs>
+  </Step>
+
+  <Step title="Close Extension Welcome Page">
+    When Chrome installs the Requestly Interceptor extension, it may open a "welcome" (post-install) tab that interrupts automation. You can close this tab programmatically:
+
+    <Tabs>
+      <Tab title="Selenium">
+        ```javascript
+          // give Chrome a moment for any stray tabs
+          await driver.sleep(500);
+
+          // close any “welcome” tab if still present
+          const handles = await driver.getAllWindowHandles();
+          const mainHandle = handles[0];
+          for (const handle of handles.slice(1)) {
+            await driver.switchTo().window(handle);
+            await driver.close();
+          }
+          await driver.switchTo().window(mainHandle)
+        ```
+      </Tab>
+
+      <Tab title="Playwright">
+        ```javascript
+          const page = await context.newPage(); // Assume the first one is your primary page
+          await page.waitForTimeout(2000);
+          // Get all open pages in the current context
+          const pages = context.pages();
+          // Iterate through the pages and close any that are not the primary 'page' object
+          for (const openedPage of pages) {
+            if (openedPage !== page) {
+              console.log(`Closing extraneous page: ${openedPage.url()}`);
+              await openedPage.close();
+            }
+           }
+          // page.goto(...) next
+        ```
+      </Tab>
+
+      <Tab title="Puppeteer">
+        ```javascript
+          const pages = await browser.pages();
+          const page = pages[0]; // Assume the first one is your primary page
+
+          await page.waitForTimeout(2000);
+
+          // Close all other pages except the primary one
+          for (const openedPage of pages) {
+            if (openedPage !== page) {
+              console.log(`Closing extraneous page: ${openedPage.url()}`);
+              await openedPage.close();
+            }
+          }
+        ```
+      </Tab>
+
+      <Tab title="With NPM Package">
+        ```javascript
+        // FOR SELENIUM ONLY
+        const { closeWelcomePage } = require("@requestly/rq-automation");
+        await closeWelcomePage(driver);
+        ```
+      </Tab>
+    </Tabs>
+  </Step>
+
+  <Step title="Perform Header Modifications Using Automation URLs">
+    Once the browser is launched with Requestly Interceptor, hit the following URLs to programmatically apply rules:
+
+    <Tabs>
+      <Tab title="Normal way">
+        #### Add Request Header
+
+        <Tip>
+          To add multiple headers, simply append them using the `&` symbol like this:\
+          `?header1=value1&header2=value2&header3=value3`
+        </Tip>
+
+        ```bash
+        https://app.requestly.io/automation/add-request-header?<headerName>=<headerValue>
+        ```
+
+        #### Add Response Header
+
+        ```bash
+        https://app.requestly.io/automation/add-response-header?<headerName>=<headerValue>
+        ```
+
+        #### Remove Request Headers
+
+        <Tip>
+          To remove multiple headers, simply append them using the `&` symbol like this:\
+          `?header1&header2&header3`
+        </Tip>
+
+        ```bash
+        https://app.requestly.io/automation/remove-request-header?<headerName>
+        ```
+
+        #### Remove Response Headers
+
+        ```bash
+        https://app.requestly.io/automation/remove-response-header?<headerName>
+        ```
+      </Tab>
+
+      <Tab title="NPM package">
+        ```javascript
+        const {
+          addRequestHeaderUrl,
+          addRequestHeadersUrl,
+          removeRequestHeaderUrl,
+          removeRequestHeadersUrl,
+          addResponseHeaderUrl,
+          addResponseHeadersUrl,
+          removeResponseHeaderUrl,
+          removeResponseHeadersUrl,
+        } = require("@requestly/rq-automation");
+
+         // Add a single request header
+          await driver.get(addRequestHeaderUrl("X-Custom-Header", "MyValue"));
+
+          // Add multiple request headers
+          await driver.get(
+            addRequestHeadersUrl({
+              Authorization: "Bearer token123",
+              "X-Another-Header": "AnotherValue",
+            })
+          );
+
+          // Remove a request header
+          await driver.get(removeRequestHeaderUrl("X-Another-Header"));
+
+          // Remove multiple request headers
+          await driver.get(
+            removeRequestHeadersUrl(["Authorization", "X-Custom-Header"])
+          );
+
+          // Add a response header
+          await driver.get(addResponseHeaderUrl("Access-Control-Allow-Origin", "*"));
+
+          // Add multiple response headers
+          await driver.get(
+            addResponseHeadersUrl({
+              "X-Response-Header": "ResponseValue",
+              "X-Another-Response-Header": "AnotherResponseValue",
+            })
+          );
+
+          // Remove a response header
+          await driver.get(removeResponseHeaderUrl("X-Another-Response-Header"));
+
+          // Remove multiple response headers
+          await driver.get(
+            removeResponseHeadersUrl(["X-Response-Header", "X-Another-Response-Header"])
+          );
+        ```
+      </Tab>
+    </Tabs>
+  </Step>
+
+  <Step title="Test on a Live Site">
+    To verify if the headers are successfully modified, open [https://testheaders.com](https://testheaders.com) in the automated browser and inspect the headers shown.
+
+    *You may need to trigger a button click to reveal headers on some pages.*
+  </Step>
+</Steps>
+
+### Complete Working Example in Selenium ( Javascript )
+
+Here’s a working example using **Selenium**, but this logic can be adapted easily to **Playwright**, **Puppeteer**, or others.
+
+<Tabs>
+  <Tab title="Normal way">
+    ```javascript
+    const { Builder, By, until } = require("selenium-webdriver");
+    const chrome = require("selenium-webdriver/chrome");
+    const path = require("path");
+
+    (async () => {
+      const options = new chrome.Options();
+
+      options.setChromeBinaryPath("/Path/to/chrome-for-testing");
+      options.addExtensions(path.resolve(__dirname, "requestly.crx"));
+
+      const driver = await new Builder()
+        .forBrowser("chrome")
+        .setChromeOptions(options)
+        .build();
+      
+      // give Chrome a moment for any stray tabs
+      await driver.sleep(500);
+
+      // close any “welcome” tab if still present
+      const handles = await driver.getAllWindowHandles();
+      const mainHandle = handles[0];
+      for (const handle of handles.slice(1)) {
+        await driver.switchTo().window(handle);
+        await driver.close();
+      }
+      await driver.switchTo().window(mainHandle)
+
+      try {
+        await driver.get("https://app.requestly.io/automation/add-request-header?x-testing=selenium");
+
+        await driver.wait(
+          until.elementTextContains(
+            driver.findElement(By.tagName("body")),
+            "Success"
+          ),
+          1000
+        );
+
+        await driver.get("https://testheaders.com");
+
+        await driver.findElement(By.css("button")).click();
+
+        await driver.wait(
+          until.elementTextContains(
+            driver.findElement(By.tagName("body")),
+            "x-testing"
+          ),
+          5000
+        );
+
+        console.log("Header added and verified!");
+
+      } catch (err) {
+        console.error("Error during automation:", err);
+      } finally {
+        await driver.quit();
+      }
+    })();
+    ```
+  </Tab>
+
+  <Tab title="NPM package">
+    ```javascript
+    const {
+      addRequestHeaderUrl,
+      addRequestHeadersUrl,
+      removeRequestHeaderUrl,
+      removeRequestHeadersUrl,
+      addResponseHeaderUrl,
+      addResponseHeadersUrl,
+      removeResponseHeaderUrl,
+      removeResponseHeadersUrl,
+      importRules,
+      closeWelcomePage,
+    } = require("@requestly/rq-automation");
+    const { Builder } = require("selenium-webdriver");
+    const chrome = require("selenium-webdriver/chrome");
+    const { getExtension } = require("@requestly/rq-automation");
+
+    async function setupDriver() {
+      const options = new chrome.Options();
+
+      // Load Requestly Interceptor extension
+      const extensionPath = getExtension("unpacked");
+      options.addArguments(`--load-extension=${extensionPath}`);
+      options.addArguments(`--disable-extensions-except=${extensionPath}`);
+
+      const driver = await new Builder()
+        .forBrowser("chrome")
+        .setChromeOptions(options)
+        .build();
+
+      return driver;
+    }
+
+    async function seleniumExample() {
+      const driver = await setupDriver();
+      await closeWelcomePage(driver);
+
+      // Add a single request header
+      await driver.get(addRequestHeaderUrl("X-Custom-Header", "MyValue"));
+
+      // Add multiple request headers
+      await driver.get(
+        addRequestHeadersUrl({
+          Authorization: "Bearer token123",
+          "X-Another-Header": "AnotherValue",
+        })
+      );
+
+      // Remove a request header
+      await driver.get(removeRequestHeaderUrl("X-Another-Header"));
+
+      // Remove multiple request headers
+      await driver.get(
+        removeRequestHeadersUrl(["Authorization", "X-Custom-Header"])
+      );
+
+      // Add a response header
+      await driver.get(addResponseHeaderUrl("Access-Control-Allow-Origin", "*"));
+
+      // Add multiple response headers
+      await driver.get(
+        addResponseHeadersUrl({
+          "X-Response-Header": "ResponseValue",
+          "X-Another-Response-Header": "AnotherResponseValue",
+        })
+      );
+
+      // Remove a response header
+      await driver.get(removeResponseHeaderUrl("X-Another-Response-Header"));
+
+      // Remove multiple response headers
+      await driver.get(
+        removeResponseHeadersUrl(["X-Response-Header", "X-Another-Response-Header"])
+      );
+
+      // Import a shared list of rules
+      await driver.get(importRules("YOUR_API_KEY"));
+
+      // Your test code here
+      await driver.get("https://example.com");
+
+      await driver.quit();
+    }
+
+    seleniumExample();
+    ```
+  </Tab>
+</Tabs>

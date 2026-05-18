@@ -1,0 +1,167 @@
+---
+title: 'Create Local API Mocks '
+label: Create Local API Mocks
+slug: create-local-api-mocks
+description: Learn how to mock APIs locally with ease using Requestly Interceptor
+seoTitle: Create Local API Mocks
+visibility: PUBLIC
+---
+## **Introduction**
+
+Creating mock APIs locally with Requestly Interceptor is a powerful way to simulate server responses directly in your development environment. This feature is invaluable for developers looking to test features, handle edge cases, or debug applications without relying on live servers.
+
+On this page, you'll see how to use Requestly Interceptor’s Modify API Response rule to mock API responses and create bulk mocks using recorded sessions, making your workflow faster and more efficient.
+
+## **Steps to Create a Mock API Using the Modify Response Rule**
+
+The **Modify API Response** rule allows you to intercept and alter API responses without needing changes on the server. It’s a powerful feature for testing, debugging, and mocking APIs during development.
+
+This rule is available on both the **Requestly Interceptor desktop app** and the **browser extension**, giving you flexibility across environments.
+
+To create a mock API, you can use this rule to intercept and return a static response for a specific request without sending it to the server.
+
+<Steps>
+  <Step title="Open the Requestly Interceptor Dashboard">
+    Log in to your Requestly Interceptor account and navigate to the **HTTP** **Rules** section.
+
+    <img src="/images/create-local-api-mocks/e23ebdc7-dde8-4b6c-8239-9eb506135625.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Create a New Modify Response Rule">
+    Here click on New rule and select **Modify API Response** as the rule type.
+
+    <img src="/images/create-local-api-mocks/7983aeac-89fc-493b-8d11-baadb366d9b7.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Configure the Rule">
+    Set up your Modify API Response rule with the necessary configurations. We'll use [**Requestly Interceptor Playground**](https://www.requestly-playground.com/) as a demo for this [example](https://app.requestly.io/rules#sharedList/320743d1f2eb488bb71047ae5501c7fc-Requestly Interceptor-Playground):
+
+    <img src="/images/create-local-api-mocks/8802464c-1dac-49b8-ace3-f2ee8bb1b1c1.png" align="center" fullwidth="false" />
+
+    * **Source Condition**: Match [`https://mock.redq.io/api/products`](https://mock.redq.io/api/products) (using contains).
+
+    * **Response Status Code**: Set to `200`.
+
+    * **Response Body**: Provide a static JSON response
+
+    <Info>
+      You can tick the “Server this response body without making call to the server” checkbox as the label suggests it will ensure you get the response locally without hitting your API server.
+    </Info>
+
+    For a detailed breakdown of all available options, refer to the Modify API Response Rule page.
+  </Step>
+
+  <Step title="Save and test the Rule">
+    Save your rule and visit the [website](https://www.requestly-playground.com/) to test your mock api
+
+    <img src="/images/create-local-api-mocks/b5c3b31f-3a55-450f-a2ae-03e5099dc2bc.png" align="center" fullwidth="false" />
+  </Step>
+</Steps>
+
+## **Bulk API Mocking (Desktop App Only)**
+
+Bulk API Mocking allows you to mock multiple API endpoints at once using recorded sessions. This helps replicate API responses for testing or development without hitting the live server.
+
+### Recording a Session for Bulk API Mocking
+
+**Record a Session**
+
+If you haven’t already recorded a session, start by capturing the API requests and responses you want to mock using Requestly Interceptor’s interceptor and save it in a session, start by:
+
+<Steps>
+  <Step title="Open Requestly Interceptor Desktop app">
+    Open the Requestly Interceptor Desktop App and navigate to the **network traffic** tab on the left sidebar.
+  </Step>
+
+  <Step title="Open the Connect Panel">
+    Click any of the `Connect Apps` buttons to open the **Connect Panel**, which displays all supported apps Requestly Interceptor can connect to.
+
+    <img src="/images/create-local-api-mocks/63d6da6b-7eac-40d7-8fd7-a6181aad9b53.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Select the Application">
+    Choose the application you want to connect to from the Connect Panel.
+
+    <img src="/images/create-local-api-mocks/5ef3ea95-c56e-414d-b856-2f25b2c20d58.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Capture API Requests">
+    Perform the actions or user flows in your app or website to trigger the API requests you want to record. Requestly Interceptor will log all requests and responses automatically.
+  </Step>
+
+  <Step title="Stop Recording">
+    Once you've captured all the necessary API requests disconnect the app.
+
+    <img src="/images/create-local-api-mocks/2f032689-488a-4694-bcb9-7fd4fd2be5f7.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Save the Session">
+    Click the **Save** button to store the recorded session. This saves all the captured API calls, allowing you to generate mock rules from them later.
+
+    <img src="/images/create-local-api-mocks/997456ae-3efb-421b-aacd-4ae21229e16b.png" align="center" fullwidth="false" />
+  </Step>
+</Steps>
+
+### **Using Recorded Sessions for Bulk API Mocking**
+
+Once you've recorded an API session, you can easily generate bulk mock rules based on the captured requests. This is a quick way to mock multiple API endpoints without manually configuring each one.
+
+<Steps>
+  <Step title="Go to the Sessions Tab">
+    Navigate to the **Sessions** tab in the left sidebar of the Requestly Interceptor dashboard.
+
+    <img src="/images/create-local-api-mocks/02062a81-e7a1-486f-8eee-f6d3573c3796.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Select the Session for Mocks">
+    From the list of recorded sessions, select the session you want to use for mocking.
+
+    <img src="/images/create-local-api-mocks/daa90ef9-0105-49cd-b166-712d015600cc.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Create Mocks from the Session">
+    Click on **Create Mocks from This Session** in the top-right corner of the session page.
+
+    <img src="/images/create-local-api-mocks/33fdbd8a-1c7f-4ff7-be05-f7054d95068f.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Choose the Resource Type">
+    In the dropdown, select the type of resource you want to mock: **REST** or **GraphQL**. Then, click **Proceed**.
+
+    <img src="/images/create-local-api-mocks/14bda2aa-ae05-40cf-88ed-9cea7bb863d4.png" align="center" fullwidth="false" />
+
+    If you're mocking GraphQL requests, specify the keys (e.g., operationName) and values (e.g., ExampleQuery) to filter out the GraphQL requests you want to mock. This is useful to target specific GraphQL operations and ensure you're mocking only the relevant queries.
+
+    <img src="/images/create-local-api-mocks/d7272941-231a-44c3-8fff-e6c0df3e7d40.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Select Requests or API Calls for Mocking">
+    In the traffic table, choose the responses you want to create mocks for. You can select individual requests or multiple requests as needed.
+
+    <img src="/images/create-local-api-mocks/ba2d6350-535f-44e4-9d39-9ad5a7a2309b.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Choose Matching Condition">
+    Click on the **Create Mocks** button and select the matching condition from the dropdown:
+
+    * **Match Entire URL -** Matches the full URL, including protocol, host, path, and query parameters. eg: <a target="_blank" href="https://mock.redq.io/api/products?limit=5">`https://mock.redq.io/api/products?limit=5`</a> matches only if everything is identical.
+
+    * **Match Only Path -** Matches just the path, ignoring protocol, host, and query parameters. eg: `/api/products` matches regardless of <a target="_blank" href="https://mock.redq.io">`https://mock.redq.io`</a> or <a target="_blank" href="https://demo.redq.io">`https://demo.redq.io`</a>
+
+    * **Match Path and Query Params -** Matches the path and query parameters together. Example: `/v1/users?id=123` matches only if both are identical.
+
+    <img src="/images/create-local-api-mocks/94a8724b-1513-4938-9f9c-6ff71b096a1a.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Create Rules">
+    Click **Create Rules** to generate the mock rules. Requestly Interceptor will automatically create a collection of **Modify Response** rules, all enabled and ready to use.
+
+    <img src="/images/create-local-api-mocks/3d315c2e-6742-44c8-90d2-576a3a648574.png" align="center" fullwidth="false" />
+  </Step>
+</Steps>
+
+<Info>
+  To disable the mock you can either disable the whole collection or individual rules
+</Info>
+
+These rules will intercept the API requests and return the mocked responses you configured, simplifying the process of mocking multiple APIs at once.

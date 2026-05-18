@@ -1,0 +1,106 @@
+---
+title: "Modify Headers"
+slug: "modify-headers"
+path: "/http-rules/rule-types/modify-headers"
+visibility: "PUBLIC"
+format: "MDX"
+description: "Modify HTTP request and response headers with Requestly Interceptor for Free. Learn how to add, remove, or override headers for debugging, testing, and customizing API requests."
+---
+
+***
+
+HTTP(s) Headers are key-value pairs that pass additional information with HTTP(s) requests or responses. This document explains how developers can use Requestly Interceptor to modify these headers by adding, removing, or overriding values easily.
+
+## Why Use the Modify Headers Rule
+
+* **Open Websites in an iframe for Testing:** Headers like `X-Frame-Options` and `Content-Security-Policy` prevent pages from being opened in iframes to avoid clickjacking. Use Requestly Interceptor to modify these headers for testing purposes.\
+  <a target="_blank" href="https://requestly.com/blog/bypass-iframe-busting-header/">Learn more →</a>
+
+* **Remove Content-Security-Policy:** The `Content-Security-Policy` header restricts the injection of external scripts. Requestly Interceptor can remove this header for testing purposes.\
+  <a target="_blank" href="https://requestly.com/blog/learn-and-bypass-content-security-policy-http-response-header/">Learn more →</a>
+
+* **Debugging CORS Issues:** To resolve CORS errors in browsers, modify response headers such as `Access-Control-Allow-Origin`, `Access-Control-Allow-Methods`, `Access-Control-Allow-Headers`, and `Access-Control-Allow-Credentials`.\
+  <a target="_blank" href="https://requestly.com/blog/how-to-troubleshoot-the-cors-error-using-requestly/">Learn more →</a>
+
+## Steps to Create Header Rules
+
+<Steps>
+  <Step title="Open HTTP Rules and Create a New Rule">
+    Navigate to the **HTTP Rules** section and click on `+ New Rule` and select the `Modify Headers` option.
+
+    <img src="/images/modify-headers/e160e006-cd79-478c-bfd8-e8b73f02b59a.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Name and Describe Your Rule">
+    Provide a **descriptive name** for the rule to keep your setup organised. Optionally, add a brief **description** explaining its purpose for easier identification later.
+
+    <img src="/images/modify-headers/e67393fc-8a5e-4358-8643-fbd46df465a4.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Define Conditions">
+    Add conditions using **Source Condition** and **Source Filters** to target specific requests. Conditions can include URL, Host, or Path with matching options such as **Regex**, **Contains**, **Wildcard**, or **Equals**.
+
+    <Card title="Example:">
+      Let’s use an echo endpoint that returns request headers, body, query params etc as JSON response.\
+      <a target="_blank" href="">Endpoint →</a> `https://echo-http-requests.appspot.com/echo`
+    </Card>
+
+    <img src="/images/modify-headers/e3a514b7-a8f3-4a49-9cac-c845fac7d699.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Specify Header Modifications">
+    In this step, you can select the option to modify. It rule allows you to edit both the request and the response headers.
+
+    <Tabs>
+      <Tab title="Modify Request Headers">
+        Specify key-value pairs to add, remove, or override headers. If you want to **Modify** **Request Headers**, add values under the Request headers tab.
+
+        <img src="/images/modify-headers/c6f3c805-19c4-4f74-adb3-1f422ff9ee77.png" align="center" fullwidth="false" />
+      </Tab>
+
+      <Tab title="Modify Response Headers">
+        Specify key-value pairs to add, remove, or override headers. If you want to **Modify Response headers**, add values under the Response headers tab.
+
+        <img src="/images/modify-headers/d76d2468-04d8-4dbd-a936-aa658afa2eb0.png" align="center" fullwidth="false" />
+      </Tab>
+    </Tabs>
+  </Step>
+
+  <Step title="Save and Test the Rule">
+    Once you are satisfied with your configuration, click `Save` to store the rule. After saving, make sure to toggle the rule `ON` to activate it. This will apply the rule and ensure it works as expected.
+
+    <Tip>
+      There are multiple ways to validate if a rule is applied or not, learn more about how to [`validate rule execution`](/http-rules/advanced-usage/validate-rules-execution).
+    </Tip>
+
+    <Tabs>
+      <Tab title="Modify Request Headers">
+        Test the rule by opening the URL \[[`https://echo-http-requests.appspot.com/echo`](https://echo-http-requests.appspot.com/echo)] in a new tab to see the changed header values.
+
+        <img src="/images/modify-headers/580f8ef4-ea77-4d54-883a-c50ab0585b83.png" align="left" fullwidth="false" />
+      </Tab>
+
+      <Tab title="Modify Response Headers">
+        Test by sending a request from the <a target="_blank" href="https://app.requestly.io/">Requestly Interceptor web app</a>.
+
+        <img src="/images/modify-headers/cb8e7704-934a-424c-9b11-168713f217f9.png" align="left" fullwidth="false" />
+      </Tab>
+    </Tabs>
+  </Step>
+</Steps>
+
+***
+
+## What's Next?
+
+<CardGroup cols={3}>
+  <Card title="Modify Request Body" icon="file-code" href="/http-rules/rule-types/modify-request-body">
+    Learn to modify API request payloads
+  </Card>
+  <Card title="Modify Response Body" icon="reply" href="/http-rules/rule-types/modify-response-body">
+    Simulate different API responses for testing
+  </Card>
+  <Card title="Group & Organize Rules" icon="folder-tree" href="/http-rules/advanced-usage/grouping">
+    Keep your rules organized with groups
+  </Card>
+</CardGroup>

@@ -1,0 +1,84 @@
+---
+title: Create Cloud-based Mocks
+label: Create Cloud-based Mocks
+slug: create-cloud-based-mocks
+description: Learn how to create modify and manage mock files in requestly
+visibility: PUBLIC
+---
+Cloud-based mocks let you simulate API responses by hosting mock data online instead of running a local server. With Requestly Interceptor’s File Server, you can upload mock files like JSON or HTML and redirect real API requests to these files. It’s a fast, shareable, and reliable way to mock backend APIs for frontend development and testing in isolation.
+
+## How to Create a Cloud-based Mock
+
+To create a cloud mock, you’ll first create a file in File Server and then set up a Redirect Rule to serve it in place of a real API.
+
+### Step 1: Create a File in Requestly Interceptor File Server
+
+<Steps>
+  <Step title="Open File Server:">
+    From the Requestly Interceptor Dashboard, go to the **Files** tab in the sidebar.
+  </Step>
+
+  <Step title="Click &#x22;New File&#x22; or Upload:">
+    Choose **New File** to create one from scratch, or upload an existing JSON file.
+
+    <img src="/images/create-cloud-based-mocks/de32dd86-8b34-4cfd-94c5-25347627b290.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Configure the File and save the file:">
+    Give it a descriptive name and fill in the following options:
+
+    * **Method**: HTTP method to match (GET, POST, etc.)
+
+    * **Status**: Response code (e.g. 200 OK)
+
+    * **Content Type**: e.g. `application/json`
+
+    * **Latency** *(optional)*: Simulate response delay
+
+    * **Endpoint**: Define a unique URL path
+
+    * **Response Body**: Add your mock JSON/text
+
+    * **Headers** *(optional)*: Add custom response headers
+
+    * **Password Protection** *(optional)*: Secure with a query param password
+
+    <img src="/images/create-cloud-based-mocks/aeb2aff4-de54-4934-9438-c7816e8d5a8a.png" align="center" fullwidth="false" />
+  </Step>
+</Steps>
+
+### Step 2: Redirect API Requests to File Server
+
+<Steps>
+  <Step title="Create a Redirect Rule:">
+    Go to **HTTP Rules → + New Rule → Redirect Rule**.
+
+    <img src="/images/create-cloud-based-mocks/362047f4-03f2-49b8-93f7-515522bd10b1.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Name the Rule:">
+    Give your rule a clear name and optional description.
+
+    <img src="/images/create-cloud-based-mocks/67515110-0849-4dbc-a9a9-de8b86ddd79d.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Set the Source Condition">
+    Define when the rule should trigger. Use filters like **URL Contains**, **Equals**, **Regex**, or **Advanced Filters**.
+
+    > 💡 Example:
+    >
+    > Match the bakery products API in the [Requestly Interceptor Playground:](https://requestly-playground.com/)
+    >
+    > [`https://rest.requestly-playground.com/api/products?searchJoin=and&with=type%3Bauthor&limit=30&language=en&search=type.slug:bakery%3Bstatus:publish`](https://rest.requestly-playground.com/api/products?searchJoin=and\&with=type%3Bauthor\&limit=30\&language=en\&search=type.slug:bakery%3Bstatus:publish)
+
+    <img src="/images/create-cloud-based-mocks/0abbb077-399a-4943-9585-ac8a2fa0319e.png" align="center" fullwidth="false" />
+  </Step>
+
+  <Step title="Set the Redirect Target:">
+    Paste the File Server URL copied earlier. You can also select the file directly from File Server.
+  </Step>
+
+  <Step title="Save and Enable the Rule:">
+    Click **Save** and toggle the rule **ON** to activate it.
+  </Step>
+</Steps>

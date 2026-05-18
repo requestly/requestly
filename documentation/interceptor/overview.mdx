@@ -1,0 +1,87 @@
+---
+title: Overview
+label: Overview
+slug: overview
+description: >-
+  Learn when to use HTTP Interceptor, choose the right interception setup, and debug traffic across browsers, devices, and runtimes.
+seoDescription: >-
+  Debug HTTP traffic in real time with Requestly Interceptor for browsers, mobile devices, emulators, Node.js, terminal tools, and system-wide setups.
+visibility: PUBLIC
+---
+HTTP Interceptor helps you inspect and debug real network traffic. Use it when you need to see what your browser, app, device, or runtime is actually sending and receiving.
+
+## When To Use HTTP Interceptor
+
+Use HTTP Interceptor when you want to:
+
+- inspect requests and responses in real time
+- debug browser, mobile, emulator, terminal, or Node.js traffic
+- verify whether an issue is in the client, proxy, or backend
+- capture traffic for sessions, HAR analysis, or later mocking
+
+If you already know exactly how you want to change traffic, go to [HTTP Rules](/http-rules/overview).
+
+## Choose Your Interception Setup
+
+<CardGroup cols={2}>
+  <Card title="Browser Extension" icon="browser" href="/interceptor/browser-extension/browser-interception">
+    Best for browser-only workflows and the fastest setup.
+  </Card>
+  <Card title="Desktop App" icon="desktop" href="/interceptor/desktop-app">
+    Best for mobile apps, emulators, localhost, terminal tools, Node.js, and system-wide traffic.
+  </Card>
+</CardGroup>
+
+## First Success Path
+
+<Steps>
+  <Step title="Pick Browser Extension Or Desktop App">
+    Use the Browser Extension for browser-based traffic. Use the Desktop App when you need proxy-based interception outside the browser.
+  </Step>
+  <Step title="Complete The Matching Setup Guide">
+    Follow one setup path and make sure the browser, device, or runtime is correctly connected to Requestly Interceptor.
+  </Step>
+  <Step title="Confirm Traffic Is Visible">
+    Open the [network table](/interceptor/desktop-app/network-table) or browser interception view and verify requests appear before moving on to rules or mocks.
+  </Step>
+</Steps>
+
+## Explore By Runtime
+
+<CardGroup cols={2}>
+  <Card title="Desktop Browsers" href="/interceptor/desktop-app/browser-interception" icon="globe">
+    Connect Chrome, Firefox, Edge, and similar browsers through the Desktop App.
+  </Card>
+  <Card title="Android Devices" href="/interceptor/desktop-app/android-devices" icon="mobile-screen">
+    Intercept traffic from Android phones and tablets.
+  </Card>
+  <Card title="Android Emulators" href="/interceptor/desktop-app/android-simulator-interception" icon="mobile">
+    Capture traffic from Android Studio emulators.
+  </Card>
+  <Card title="iOS Devices & Simulators" href="/interceptor/desktop-app/ios-devices-interception" icon="mobile-notch">
+    Set up iPhones, iPads, and iOS simulators.
+  </Card>
+  <Card title="Node.js" href="/interceptor/desktop-app/nodejs" icon="terminal">
+    Debug server-side requests from Node.js applications.
+  </Card>
+  <Card title="Terminal & CLI Tools" href="/interceptor/desktop-app/terminal" icon="square-terminal">
+    Inspect cURL, scripts, and other command-line network activity.
+  </Card>
+</CardGroup>
+
+## After Traffic Starts Flowing
+
+<CardGroup cols={2}>
+  <Card title="Create Rules" href="/http-rules/overview" icon="wand-magic-sparkles">
+    Modify intercepted traffic once you know what needs to change.
+  </Card>
+  <Card title="Capture Sessions" href="/sessions/overview" icon="camera">
+    Save traffic and debugging context for sharing, replaying, or mock creation.
+  </Card>
+  <Card title="Import HAR Files" href="/sessions/import-view-har-file" icon="file-import">
+    Analyze previously captured network data inside Requestly Interceptor.
+  </Card>
+  <Card title="Fix Interception Issues" href="/troubleshoot/http-interceptor/unable-to-intercept-web-traffic-on-browser-mobile-or-emulator" icon="wrench">
+    Use the troubleshooting path for certificate, localhost, proxy, or device issues.
+  </Card>
+</CardGroup>

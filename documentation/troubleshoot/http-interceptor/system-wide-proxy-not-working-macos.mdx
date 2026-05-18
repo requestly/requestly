@@ -1,0 +1,52 @@
+---
+title: System Wide Proxy Not Working (macOS)
+label: System Wide Proxy Issue (macOS)
+slug: system-wide-proxy-not-working-macos
+description: Steps for Troubleshooting Requestly Interceptor System wide proxy on OSX
+visibility: PUBLIC
+---
+### **Check Proxy**
+
+The steps to do this vary slightly based on your macOS version
+
+#### **macOS 13 Ventura or later**
+
+<Steps>
+  <Step title="Open System Preferences" />
+
+  <Step title="Type Proxies in Search" />
+
+  <Step title="Select Proxies">
+    Check whether Web Proxy (HTTP) and Secure Web Proxy (HTTPS) are enabled or not. And the Port mentioned there matches the port mentioned on the header of Requestly Interceptor Desktop App
+
+    <img src="https://imagedelivery.net/IEMzXmjRvW0g933AN5ejrA/wwwnotionso-image-prod-files-secures3us-west-2amazonawscom-8e04dd23-74cd-4c44-8158-4238eac359d1-c8459d8c-ce46-4785-be4f-1f95481b5fd7-disabling-system-wide-proxy-venturagif/public" align="left" fullwidth="false" />
+  </Step>
+</Steps>
+
+#### **Before macOS 13 Ventura**
+
+<Steps>
+  <Step title="Open System Preferences" />
+
+  <Step title="Go to Network" />
+
+  <Step title="Select Advanced" />
+
+  <Step title="Go to Proxies" />
+
+  <Step title="Check Certificate">
+    Check whether Web Proxy (HTTP) and Secure Web Proxy (HTTPS) are enabled or not. And the Port mentioned there matches the port mentioned on the header of Requestly Interceptor Desktop App
+  </Step>
+</Steps>
+
+### **Check Certificate**
+
+For Requestly Interceptor to intercept HTTPS traffic, you need to install Requestly Interceptor Certificate in the keychain
+
+* Open keychain access (Press cmd + enter and then type "keychain")
+
+- Select login keychain
+
+* Check whether RQProxyCA is present and trusted or not.
+
+<img src="https://imagedelivery.net/IEMzXmjRvW0g933AN5ejrA/wwwnotionso-image-prod-files-secures3us-west-2amazonawscom-8e04dd23-74cd-4c44-8158-4238eac359d1-aa9a2c46-0557-42ba-bfce-9dccaaa9e04f-macos-certificate-trustedpng/public" align="left" fullwidth="false" />

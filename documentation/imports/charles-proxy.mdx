@@ -1,0 +1,72 @@
+---
+title: Charles Proxy
+label: Charles Proxy
+slug: charles-proxy
+description: >-
+  Learn how to export Charles Proxy configurations and import them into
+  Requestly Interceptor.
+seoTitle: Import configs from Charles Proxy to Requestly Interceptor
+seoDescription: >-
+  Learn how to export Charles Proxy configurations and import them into
+  Requestly Interceptor.
+visibility: PUBLIC
+---
+***
+
+Charles Proxy is a popular debugging tool for monitoring and managing network traffic. Requestly Interceptor can import configurations exported from Charles Proxy, enabling you to use your existing Charles Proxy rules and settings directly within Requestly Interceptor. Step-by-step instructions are outlined below for exporting configurations from Charles Proxy and importing them into Requestly Interceptor.
+
+<Info>
+  Requestly Interceptor supports Rewrite, Map Local, Map Remote, No Caching, Block lists & Block Cookies configuration imports from Charles Proxy.
+</Info>
+
+## Exporting Configurations from Charles Proxy
+
+Follow the steps below to export your configurations from Charles Proxy:
+
+### Step 1: Access Import/Export Settings
+
+From the Charles top menu bar, select **Tools > Import/Export Settings**.
+
+<img src="/images/charles-proxy/70787a6e-db1a-4f21-b827-e605fef695b8.png" align="center" fullwidth="false" />
+
+### Step 2: Select Tools to Export
+
+A new popup window will open. Switch to the **Export** tab. Under the **Tools** section, select the tools you want to export. Click on the **Export** button located in the bottom-right corner.
+
+<img src="/images/charles-proxy/1c15cf21-e7e9-46cb-bd4f-03168306ab42.png" align="center" fullwidth="false" />
+
+<Info>
+  To export a single rule, follow the same process, but select only the specific configuration you wish to export.
+</Info>
+
+## Importing Configurations into Requestly Interceptor
+
+After exporting your configurations from Charles Proxy, follow these steps to import them into Requestly Interceptor:
+
+### Step 1: Open Import from Charles
+
+<Tip>
+  For the web app, you can directly open <a target="_blank" href="https://app.requestly.io/import-settings-from-charles">***import from Charles screen***</a>.
+</Tip>
+
+Navigate to the HTTP Rules section.
+
+If no rules exist, the **Import from Charles** option will be displayed. Click it to open the import popup.
+
+<img src="/images/charles-proxy/d27a8c49-3e5e-413a-89fc-5718f19bf218.png" align="center" fullwidth="false" />
+
+If you already have rules, click the **Import** button located in the top-right corner and select the **Import from Charles** option from the bottom of the popup.
+
+<img src="/images/charles-proxy/41734068-bfb0-4d48-903b-9178420abdc3.png" align="center" fullwidth="false" />
+
+### Step 2: Upload the Exported File
+
+Drop or select your exported Charles `.xml` file on the import page.
+
+<img src="/images/charles-proxy/0f378fa3-1157-4823-b481-2d210c0cb277.png" align="center" fullwidth="false" />
+
+### Step 3: Review Imported Rules
+
+On successful import, the Charles Proxy tool settings will appear as Requestly Interceptor rules. Your rules will be grouped in Requestly Interceptor according to the tool name from Charles Proxy.
+
+<img src="/images/charles-proxy/9019409a-2bac-4693-a399-a44eebccc390.png" align="center" fullwidth="false" />

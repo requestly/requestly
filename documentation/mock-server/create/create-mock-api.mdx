@@ -1,0 +1,55 @@
+---
+title: "Create JSON Files"
+slug: "create-mock-api"
+path: "/mock-server/create/create-mock-api"
+visibility: "PUBLIC"
+format: "MDX"
+---
+
+You can upload a JSON file to Requestly Interceptor’s File Server and use it as a API endpoint in your application by creating a Redirect Rule, which is perfect for testing and development scenarios. Here are the steps to set it up:
+
+<Steps>
+  <Step title="Go to the File Server in Requestly Interceptor Dashboard">
+    From the Requestly Interceptor dashboard, click on "Files" in the left menu bar.
+  </Step>
+
+  <Step title="Click on &#x22;New file&#x22; or upload a JSON file directly.">
+    This allows you to start creating a new JSON or import an existing JSON file.
+
+    <img src="/images/create-mock-api/e176d483-be3d-4faa-be8e-58cac5a2d0bd.png" align="left" fullwidth="false" />
+  </Step>
+
+  <Step title="Enter the details for the New File.">
+    <img src="/images/create-mock-api/4940a339-ae71-4c27-afbc-949ef7b46872.png" align="left" fullwidth="false" />
+
+    Provide a descriptive name for the file and Configure the following options on the creation screen:
+
+    * **Method**: Select the HTTP method to be used (e.g., GET, POST, etc.).
+
+    * **Status**: Specify the HTTP response status code (e.g., 200, 404, 500).
+
+    * **Content Type**: Define the content type of the response (e.g., application/json).
+
+    * **Latency**: Optionally, add a delay (in milliseconds) to simulate network latency.
+
+    * **Endpoint**: Define the unique path or endpoint for the File.
+
+    * **Response Body**: Provide the body of the response in JSON or plain text.
+
+    * **Response Headers** (optional): Add custom headers to the response as needed.
+
+    * **Password Protection**: In the "More" dropdown, you can set a password for your JSON file. If a password is set, users must include it as a query parameter (e.g., `rq_password=<password>`) to access the file’s contents.
+  </Step>
+
+  <Step title="Click on &#x22;Create&#x22; to finalize your file creation.">
+    Once created, you can copy the generated URL using the “Copy URL” button.
+
+    <img src="/images/create-mock-api/7c64f62f-854f-401f-9f71-0bc24f825a18.png" align="left" fullwidth="false" />
+  </Step>
+</Steps>
+
+Your JSON file is now ready! Copy the generated URL to see it in action. This endpoint can be utilized in multiple ways:
+
+* Integrate the endpoint into your application to replace live API calls during testing.
+
+* Use tools like Postman or cURL to manually test and validate the file responses.
