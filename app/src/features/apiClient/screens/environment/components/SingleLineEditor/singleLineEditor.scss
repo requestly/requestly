@@ -6,7 +6,7 @@
     padding-right: 34px;
   }
 
-  &.single-line-editor-secret {
+  &.single-line-editor-secret--text-security {
     .cm-content {
       -webkit-text-security: disc;
     }
@@ -14,6 +14,10 @@
     .cm-placeholder {
       -webkit-text-security: none;
     }
+  }
+
+  .cm-secret-mask-bullet {
+    color: var(--requestly-color-text-default);
   }
 
   .single-line-editor-secret-toggle {

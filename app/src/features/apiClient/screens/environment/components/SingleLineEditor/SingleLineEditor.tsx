@@ -18,6 +18,13 @@ import { useVariableAutocomplete } from "../hooks/useVariableAutocomplete";
 import { RQButton } from "lib/design-system-v2/components";
 import { RiEyeLine } from "@react-icons/all-files/ri/RiEyeLine";
 import { RiEyeOffLine } from "@react-icons/all-files/ri/RiEyeOffLine";
+import {
+  getSecretToggleAriaLabel,
+  secretMaskExtension,
+  shouldResetSecretReveal,
+  shouldUseSecretMask,
+  supportsTextSecurity,
+} from "./secretMaskUtils";
 
 export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
   className,
@@ -48,6 +55,8 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
   const onPasteRef = useRef(onPaste);
   const previousDefaultValueRef = useRef(defaultValue);
   const isPopoverPinnedRef = useRef(false);
+  const didChangeFromEditorRef = useRef(false);
+  const isSyncingDefaultValueRef = useRef(false);
 
   const emptyVariables = useMemo(() => new Map(), []);
 
@@ -61,6 +70,20 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
   const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
   const [isPopoverPinned, setIsPopoverPinned] = useState(false);
   const [isSecretRevealed, setIsSecretRevealed] = useState(false);
+  const shouldMaskSecret = shouldUseSecretMask({ isSecret, isSecretRevealed });
+  const useTextSecurityMask = shouldMaskSecret && supportsTextSecurity();
+  const useDecorationMask = shouldMaskSecret && !useTextSecurityMask;
+
+  useEffect(() => {
+    if (shouldResetSecretReveal(isSecret)) {
+      if (didChangeFromEditorRef.current) {
+        didChangeFromEditorRef.current = false;
+        return;
+      }
+
+      setIsSecretRevealed(false);
+    }
+  }, [isSecret, defaultValue]);
 
   useEffect(() => {
     isPopoverPinnedRef.current = isPopoverPinned;
@@ -108,6 +131,9 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
           }),
           EditorView.updateListener.of((update) => {
             if (update.docChanged) {
+              if (!isSyncingDefaultValueRef.current) {
+                didChangeFromEditorRef.current = true;
+              }
               onChangeRef.current?.(update.state.doc.toString());
             }
           }),
@@ -159,6 +185,7 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
             },
             variables || emptyVariables
           ),
+          useDecorationMask ? secretMaskExtension : null,
           generateCompletionsForVariables(emptyVariables, suggestions),
           cmPlaceHolder(placeholder ?? "Input here"),
         ].filter((ext): ext is NonNullable<typeof ext> => ext !== null),
@@ -172,7 +199,7 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
     //Need to disable to implement the onChange handler
     // Shouldn't be recreated every render
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [placeholder, variables, handleSetVariable, suggestions]);
+  }, [placeholder, variables, handleSetVariable, suggestions, useDecorationMask]);
 
   useEffect(() => {
     if (defaultValue !== previousDefaultValueRef.current) {
@@ -191,8 +218,13 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
           // Prevent calling onChange when default value is changed through this useEffect
           const originalOnChange = onChangeRef.current;
           onChangeRef.current = () => {};
-          editorViewRef.current.dispatch(transaction);
-          onChangeRef.current = originalOnChange;
+          isSyncingDefaultValueRef.current = true;
+          try {
+            editorViewRef.current.dispatch(transaction);
+          } finally {
+            isSyncingDefaultValueRef.current = false;
+            onChangeRef.current = originalOnChange;
+          }
         }
       }
     }
@@ -205,7 +237,11 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
 
   return (
     <>
-      <div className={`single-line-editor-wrapper ${isSecret && !isSecretRevealed ? "single-line-editor-secret" : ""}`}>
+      <div
+        className={`single-line-editor-wrapper ${
+          useTextSecurityMask ? "single-line-editor-secret single-line-editor-secret--text-security" : ""
+        }`}
+      >
         <div
           ref={editorRef}
           className={`${className ?? ""} editor-popup-container ant-input ${isSecret ? "has-secret-toggle" : ""}`}
@@ -229,6 +265,8 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
             type="transparent"
             size="small"
             icon={isSecretRevealed ? <RiEyeLine /> : <RiEyeOffLine />}
+            aria-label={getSecretToggleAriaLabel(isSecretRevealed)}
+            aria-pressed={isSecretRevealed}
             onClick={() => setIsSecretRevealed((prev) => !prev)}
           />
         </Conditional>
