@@ -26,6 +26,18 @@ import "./RequestSourceRow.css";
 
 const { Text } = Typography;
 
+const hasFilterValue = (value) => {
+  if (Array.isArray(value)) {
+    return value.some(hasFilterValue);
+  }
+
+  if (value && typeof value === "object") {
+    return Object.values(value).some(hasFilterValue);
+  }
+
+  return value !== undefined && value !== null && value !== "";
+};
+
 const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabled }) => {
   const dispatch = useDispatch();
   const location = useLocation();
@@ -70,14 +82,13 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisab
 
   const getFilterCount = useCallback(
     (pairIndex) => {
-      const copyOfCurrentlySelectedRule = JSON.parse(JSON.stringify(currentlySelectedRuleData));
-      return isSourceFilterFormatUpgraded(pairIndex, copyOfCurrentlySelectedRule)
-        ? Object.keys(currentlySelectedRuleData.pairs[pairIndex].source.filters[0] || {}).filter(
-            (key) => key !== GLOBAL_CONSTANTS.RULE_SOURCE_FILTER_TYPES.PAGE_URL
-          ).length
-        : Object.keys(currentlySelectedRuleData.pairs[pairIndex].source.filters || {}).filter(
-            (key) => key !== GLOBAL_CONSTANTS.RULE_SOURCE_FILTER_TYPES.PAGE_URL
-          ).length;
+      const filters = isSourceFilterFormatUpgraded(pairIndex, currentlySelectedRuleData)
+        ? currentlySelectedRuleData.pairs[pairIndex].source.filters[0] || {}
+        : currentlySelectedRuleData.pairs[pairIndex].source.filters || {};
+
+      return Object.entries(filters).filter(
+        ([key, value]) => key !== GLOBAL_CONSTANTS.RULE_SOURCE_FILTER_TYPES.PAGE_URL && hasFilterValue(value)
+      ).length;
     },
     [currentlySelectedRuleData, isSourceFilterFormatUpgraded]
   );
