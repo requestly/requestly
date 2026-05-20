@@ -20,6 +20,7 @@ import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
 import { RQButton } from "lib/design-system-v2/components";
 import { sampleRegex } from "./sampleRegex";
+import { getAppliedSourceFilterCount } from "./utils";
 import { useLocation } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
 import "./RequestSourceRow.css";
@@ -70,16 +71,11 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisab
 
   const getFilterCount = useCallback(
     (pairIndex) => {
-      const copyOfCurrentlySelectedRule = JSON.parse(JSON.stringify(currentlySelectedRuleData));
-      return isSourceFilterFormatUpgraded(pairIndex, copyOfCurrentlySelectedRule)
-        ? Object.keys(currentlySelectedRuleData.pairs[pairIndex].source.filters[0] || {}).filter(
-            (key) => key !== GLOBAL_CONSTANTS.RULE_SOURCE_FILTER_TYPES.PAGE_URL
-          ).length
-        : Object.keys(currentlySelectedRuleData.pairs[pairIndex].source.filters || {}).filter(
-            (key) => key !== GLOBAL_CONSTANTS.RULE_SOURCE_FILTER_TYPES.PAGE_URL
-          ).length;
+      const sourceFilters = currentlySelectedRuleData.pairs[pairIndex].source.filters;
+
+      return getAppliedSourceFilterCount(sourceFilters, GLOBAL_CONSTANTS.RULE_SOURCE_FILTER_TYPES.PAGE_URL);
     },
-    [currentlySelectedRuleData, isSourceFilterFormatUpgraded]
+    [currentlySelectedRuleData]
   );
 
   const sourceKeys = useMemo(
