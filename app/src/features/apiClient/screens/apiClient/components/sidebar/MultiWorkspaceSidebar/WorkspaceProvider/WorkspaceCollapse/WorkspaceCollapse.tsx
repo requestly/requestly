@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import { MdAdd } from "@react-icons/all-files/md/MdAdd";
 import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
 import { MdOutlineArrowForwardIos } from "@react-icons/all-files/md/MdOutlineArrowForwardIos";
-import { Collapse, Dropdown, MenuProps, Typography } from "antd";
+import { Collapse, Dropdown, MenuProps, Typography, Tooltip } from "antd";
 import { Conditional } from "components/common/Conditional";
 import { useRBAC } from "features/rbac";
 import { RQButton } from "lib/design-system-v2/components";
@@ -63,12 +63,8 @@ export const WorkspaceCollapse: React.FC<WorkspaceCollapseProps> = ({
   const user = useSelector(getUserAuthDetails);
   const userId = user?.details?.profile?.uid;
 
-  const {
-    handleWorkspaceSwitch,
-    confirmWorkspaceSwitch,
-    isWorkspaceLoading,
-    setIsWorkspaceLoading,
-  } = useWorkspaceSwitcher();
+  const { handleWorkspaceSwitch, confirmWorkspaceSwitch, isWorkspaceLoading, setIsWorkspaceLoading } =
+    useWorkspaceSwitcher();
 
   const { onNewClickV2 } = useApiClientContext();
 
@@ -157,20 +153,22 @@ export const WorkspaceCollapse: React.FC<WorkspaceCollapseProps> = ({
                     {showNewRecordBtn ? (
                       <>
                         {type === ApiClientSidebarTabKey.ENVIRONMENTS ? (
-                          <RQButton
-                            size="small"
-                            type="transparent"
-                            icon={<MdAdd />}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onNewClickV2({
-                                contextId: workspaceId,
-                                analyticEventSource: "api_client_sidebar_header",
-                                recordType: RQAPI.RecordType.ENVIRONMENT,
-                                collectionId: undefined,
-                              });
-                            }}
-                          />
+                          <Tooltip title="New environment" color="#000">
+                            <RQButton
+                              size="small"
+                              type="transparent"
+                              icon={<MdAdd />}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onNewClickV2({
+                                  contextId: workspaceId,
+                                  analyticEventSource: "api_client_sidebar_header",
+                                  recordType: RQAPI.RecordType.ENVIRONMENT,
+                                  collectionId: undefined,
+                                });
+                              }}
+                            />
+                          </Tooltip>
                         ) : (
                           <NewApiRecordDropdown
                             invalidActions={[NewRecordDropdownItemType.ENVIRONMENT]}
@@ -186,12 +184,14 @@ export const WorkspaceCollapse: React.FC<WorkspaceCollapseProps> = ({
                               });
                             }}
                           >
-                            <RQButton
-                              size="small"
-                              type="transparent"
-                              icon={<MdAdd />}
-                              onClick={(e) => e.stopPropagation()}
-                            />
+                            <Tooltip title="New request or collection" color="#000">
+                              <RQButton
+                                size="small"
+                                type="transparent"
+                                icon={<MdAdd />}
+                                onClick={(e) => e.stopPropagation()}
+                              />
+                            </Tooltip>
                           </NewApiRecordDropdown>
                         )}
                       </>
@@ -203,14 +203,16 @@ export const WorkspaceCollapse: React.FC<WorkspaceCollapseProps> = ({
                       placement="bottomRight"
                       overlayClassName="collection-dropdown-menu"
                     >
-                      <RQButton
-                        onClick={(e) => {
-                          e.stopPropagation();
-                        }}
-                        size="small"
-                        type="transparent"
-                        icon={<MdOutlineMoreHoriz />}
-                      />
+                      <Tooltip title="More actions" color="#000">
+                        <RQButton
+                          onClick={(e) => {
+                            e.stopPropagation();
+                          }}
+                          size="small"
+                          type="transparent"
+                          icon={<MdOutlineMoreHoriz />}
+                        />
+                      </Tooltip>
                     </Dropdown>
                   </div>
                 </Conditional>
