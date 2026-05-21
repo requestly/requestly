@@ -260,13 +260,15 @@ export const KeyValueTable: React.FC<React.PropsWithChildren<KeyValueTableProps>
           }
 
           return (
-            <RQButton
-              className="key-value-delete-btn"
-              icon={<RiDeleteBin6Line />}
-              type="transparent"
-              size="small"
-              onClick={() => handleDeletePair(record)}
-            />
+            <Tooltip title="Delete row" color="#000000" mouseEnterDelay={0.2} placement="left">
+              <RQButton
+                className="key-value-delete-btn"
+                icon={<RiDeleteBin6Line />}
+                type="transparent"
+                size="small"
+                onClick={() => handleDeletePair(record)}
+              />
+            </Tooltip>
           );
         },
       },
