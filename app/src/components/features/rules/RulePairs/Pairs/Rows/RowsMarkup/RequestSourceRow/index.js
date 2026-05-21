@@ -22,31 +22,10 @@ import { RQButton } from "lib/design-system-v2/components";
 import { sampleRegex } from "./sampleRegex";
 import { useLocation } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
+import { getAdvancedFiltersCount } from "./utils";
 import "./RequestSourceRow.css";
 
 const { Text } = Typography;
-
-const hasFilterValue = (value) => {
-  if (Array.isArray(value)) {
-    return value.length > 0;
-  }
-
-  if (value && typeof value === "object") {
-    return Object.values(value).some(hasFilterValue);
-  }
-
-  if (typeof value === "string") {
-    return value.trim().length > 0;
-  }
-
-  return value !== null && value !== undefined;
-};
-
-const getAdvancedFiltersCount = (filters) => {
-  return Object.entries(filters || {}).filter(([key, value]) => {
-    return key !== GLOBAL_CONSTANTS.RULE_SOURCE_FILTER_TYPES.PAGE_URL && hasFilterValue(value);
-  }).length;
-};
 
 const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabled }) => {
   const dispatch = useDispatch();
