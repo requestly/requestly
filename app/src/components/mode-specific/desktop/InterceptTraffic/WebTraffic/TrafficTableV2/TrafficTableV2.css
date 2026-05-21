@@ -143,6 +143,10 @@
 }
 
 /* table */
+.traffic-table-split-container .traffic-table tbody tr {
+  cursor: pointer;
+}
+
 .traffic-table-split-container table[class*="Table-chrome"] tbody tr[aria-selected="true"] {
   background-color: #1e69ffdb;
 }

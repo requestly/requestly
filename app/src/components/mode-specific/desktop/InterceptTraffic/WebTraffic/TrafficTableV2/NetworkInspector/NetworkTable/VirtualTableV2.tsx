@@ -141,6 +141,7 @@ const VirtualTableV2: React.FC<Props> = ({ logs = [], header, renderLogRow, sele
       >
         <Table
           id="vtable"
+          className="traffic-table"
           style={
             {
               "--virtualPaddingTop": paddingTop + "px",
