@@ -25,24 +25,34 @@
     overflow: auto;
     padding: 0 var(--requestly-space-2, 4px);
 
-    &.drop-target-active {
-      background: #004eeb33;
-      border: 1px solid var(--requestly-color-primary-600);
-      border-radius: 4px;
-    }
-
     .collections-list {
       display: flex;
       flex-direction: column;
 
       .top-level-drop-zone {
-        min-height: 20px;
-        transition: all 0.2s ease;
+        height: 0;
+        display: flex;
+        align-items: center;
+        overflow: hidden;
+        opacity: 0;
+        transition: height 0.15s ease, opacity 0.15s ease;
+
+        &::before {
+          content: "";
+          width: 100%;
+          height: 2px;
+          border-radius: 2px;
+          background: var(--requestly-color-primary-600);
+        }
+
+        &.available {
+          height: 12px;
+          opacity: 0.35;
+        }
 
         &.active {
-          min-height: 10px;
-          opacity: 0.2;
-          border-radius: 4px;
+          height: 12px;
+          opacity: 1;
         }
       }
     }
