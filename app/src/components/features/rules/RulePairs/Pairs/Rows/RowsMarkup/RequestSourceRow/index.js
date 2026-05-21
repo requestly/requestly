@@ -26,6 +26,32 @@ import "./RequestSourceRow.css";
 
 const { Text } = Typography;
 
+const hasActiveFilterValue = (value) => {
+  if (Array.isArray(value)) {
+    return value.some(hasActiveFilterValue);
+  }
+
+  if (value && typeof value === "object") {
+    return Object.values(value).some(hasActiveFilterValue);
+  }
+
+  return value !== null && value !== undefined && String(value).trim() !== "";
+};
+
+const getActiveSourceFilterCount = (filters = {}) => {
+  return Object.entries(filters || {}).filter(([key, value]) => {
+    if (key === GLOBAL_CONSTANTS.RULE_SOURCE_FILTER_TYPES.PAGE_URL) {
+      return false;
+    }
+
+    if (key === GLOBAL_CONSTANTS.RULE_SOURCE_FILTER_TYPES.REQUEST_PAYLOAD) {
+      return hasActiveFilterValue(value?.key) || hasActiveFilterValue(value?.value);
+    }
+
+    return hasActiveFilterValue(value);
+  }).length;
+};
+
 const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabled }) => {
   const dispatch = useDispatch();
   const location = useLocation();
@@ -38,7 +64,7 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisab
   const { MODE } = getModeData(window.location);
 
   const isSourceFilterFormatUpgraded = useCallback((pairIndex, rule) => {
-    return Array.isArray(rule.pairs[pairIndex].source.filters);
+    return Array.isArray(rule?.pairs?.[pairIndex]?.source?.filters);
   }, []);
 
   const migrateToNewSourceFilterFormat = useCallback(
@@ -70,14 +96,12 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisab
 
   const getFilterCount = useCallback(
     (pairIndex) => {
-      const copyOfCurrentlySelectedRule = JSON.parse(JSON.stringify(currentlySelectedRuleData));
-      return isSourceFilterFormatUpgraded(pairIndex, copyOfCurrentlySelectedRule)
-        ? Object.keys(currentlySelectedRuleData.pairs[pairIndex].source.filters[0] || {}).filter(
-            (key) => key !== GLOBAL_CONSTANTS.RULE_SOURCE_FILTER_TYPES.PAGE_URL
-          ).length
-        : Object.keys(currentlySelectedRuleData.pairs[pairIndex].source.filters || {}).filter(
-            (key) => key !== GLOBAL_CONSTANTS.RULE_SOURCE_FILTER_TYPES.PAGE_URL
-          ).length;
+      const sourceFilters = currentlySelectedRuleData?.pairs?.[pairIndex]?.source?.filters;
+      const filters = isSourceFilterFormatUpgraded(pairIndex, currentlySelectedRuleData)
+        ? sourceFilters?.[0]
+        : sourceFilters;
+
+      return getActiveSourceFilterCount(filters);
     },
     [currentlySelectedRuleData, isSourceFilterFormatUpgraded]
   );
