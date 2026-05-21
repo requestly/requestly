@@ -5,7 +5,7 @@ import { MdOutlineArrowForwardIos } from "@react-icons/all-files/md/MdOutlineArr
 import { Collapse, Dropdown, MenuProps, Typography } from "antd";
 import { Conditional } from "components/common/Conditional";
 import { useRBAC } from "features/rbac";
-import { RQButton } from "lib/design-system-v2/components";
+import { RQButton, RQTooltip } from "lib/design-system-v2/components";
 import {
   useGetAllSelectedWorkspaces,
   useViewMode,
@@ -157,20 +157,22 @@ export const WorkspaceCollapse: React.FC<WorkspaceCollapseProps> = ({
                     {showNewRecordBtn ? (
                       <>
                         {type === ApiClientSidebarTabKey.ENVIRONMENTS ? (
-                          <RQButton
-                            size="small"
-                            type="transparent"
-                            icon={<MdAdd />}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onNewClickV2({
-                                contextId: workspaceId,
-                                analyticEventSource: "api_client_sidebar_header",
-                                recordType: RQAPI.RecordType.ENVIRONMENT,
-                                collectionId: undefined,
-                              });
-                            }}
-                          />
+                          <RQTooltip title="New environment" placement="top">
+                            <RQButton
+                              size="small"
+                              type="transparent"
+                              icon={<MdAdd />}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onNewClickV2({
+                                  contextId: workspaceId,
+                                  analyticEventSource: "api_client_sidebar_header",
+                                  recordType: RQAPI.RecordType.ENVIRONMENT,
+                                  collectionId: undefined,
+                                });
+                              }}
+                            />
+                          </RQTooltip>
                         ) : (
                           <NewApiRecordDropdown
                             invalidActions={[NewRecordDropdownItemType.ENVIRONMENT]}
@@ -186,12 +188,14 @@ export const WorkspaceCollapse: React.FC<WorkspaceCollapseProps> = ({
                               });
                             }}
                           >
-                            <RQButton
-                              size="small"
-                              type="transparent"
-                              icon={<MdAdd />}
-                              onClick={(e) => e.stopPropagation()}
-                            />
+                            <RQTooltip title="New request or collection" placement="top">
+                              <RQButton
+                                size="small"
+                                type="transparent"
+                                icon={<MdAdd />}
+                                onClick={(e) => e.stopPropagation()}
+                              />
+                            </RQTooltip>
                           </NewApiRecordDropdown>
                         )}
                       </>
@@ -203,14 +207,16 @@ export const WorkspaceCollapse: React.FC<WorkspaceCollapseProps> = ({
                       placement="bottomRight"
                       overlayClassName="collection-dropdown-menu"
                     >
-                      <RQButton
-                        onClick={(e) => {
-                          e.stopPropagation();
-                        }}
-                        size="small"
-                        type="transparent"
-                        icon={<MdOutlineMoreHoriz />}
-                      />
+                      <RQTooltip title="More actions" placement="top">
+                        <RQButton
+                          onClick={(e) => {
+                            e.stopPropagation();
+                          }}
+                          size="small"
+                          type="transparent"
+                          icon={<MdOutlineMoreHoriz />}
+                        />
+                      </RQTooltip>
                     </Dropdown>
                   </div>
                 </Conditional>
