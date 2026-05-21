@@ -43,7 +43,7 @@ export const doSyncRecords = async (
   records: any,
   syncType: SyncType,
   appMode: AppMode,
-  options: { forceSync?: boolean; workspaceId?: string } = {}
+  options: { forceSync?: boolean; workspaceId?: string | null } = {}
 ): Promise<void> => {
   // If the user is not logged in, do not proceed with syncing
   if (!window.uid) return;

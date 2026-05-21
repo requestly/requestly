@@ -107,7 +107,8 @@ const preventWorkspaceSyncWrite = async (key, latestRules, objectId, uid, remote
 };
 
 export const updateUserSyncRecords = async (uid, records, appMode, options) => {
-  const targetWorkspaceId = options.workspaceId ?? window.currentlyActiveWorkspaceTeamId;
+  const targetWorkspaceId =
+    typeof options.workspaceId !== "undefined" ? options.workspaceId : window.currentlyActiveWorkspaceTeamId;
   const isSameWorkspaceOperation = targetWorkspaceId === window.currentlyActiveWorkspaceTeamId;
 
   const latestRules = _.cloneDeep(records); // Does not contain all rules, only contains rules that has been updated.

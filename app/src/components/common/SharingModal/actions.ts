@@ -77,7 +77,7 @@ export const prepareContentToExport = (appMode: string, selectedRuleIds: string[
 
 export const duplicateRulesToTargetWorkspace = async (
   appMode: string,
-  workspaceId: string,
+  workspaceId: string | null,
   ruleIdsToShare: string[]
 ) => {
   const { rules, groups } = await getRulesAndGroupsFromRuleIds(appMode, ruleIdsToShare);
