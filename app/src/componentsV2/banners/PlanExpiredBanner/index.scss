@@ -4,46 +4,55 @@
 
 .plan-expired-banner {
   position: relative;
-  background: var(--requestly-color-error-dark);
-  padding: 8px 2rem;
+  background: #4c1113;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 8px 56px;
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
+
+  &-icon {
+    flex-shrink: 0;
+    color: var(--requestly-color-error);
+    font-size: 18px;
+  }
 
   &-badge {
     padding: 4px 8px;
     color: var(--requestly-color-text-default);
-    font-weight: 900;
-    letter-spacing: 1.5px;
+    font-weight: 600;
     font-size: 10px;
     line-height: 12px;
     background: var(--requestly-color-error);
     border-radius: 4px;
+    text-transform: uppercase;
   }
 
-  &-btn.ant-btn.ant-btn-default {
-    border: 1px solid var(--requestly-color-text-default);
+  &-message {
     color: var(--requestly-color-text-default);
     font-weight: 500;
-    background: transparent;
-    cursor: pointer;
-
-    &:hover,
-    &:focus,
-    &:active {
-      border: 1px solid var(--requestly-color-text-default) !important;
-      color: var(--requestly-color-text-default) !important;
-      background-color: var(--requestly-color-error) !important;
-    }
   }
 
-  &-close-btn {
+  &-btn.ant-btn {
+    font-weight: 500;
+  }
+
+  &-close-btn.ant-btn {
     position: absolute;
     right: 18px;
-    top: 12px;
-    font-size: 20px;
+    top: 8px;
     color: var(--requestly-color-text-default);
-    cursor: pointer;
+  }
+
+  @media (max-width: 768px) {
+    padding: 8px 44px 8px 12px;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+
+    &-message {
+      flex-basis: 100%;
+      order: 3;
+    }
   }
 }
