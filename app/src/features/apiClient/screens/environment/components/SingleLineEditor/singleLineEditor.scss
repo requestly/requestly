@@ -1,3 +1,45 @@
+.single-line-editor-wrapper {
+  position: relative;
+  width: 100%;
+
+  .has-secret-toggle {
+    padding-right: 34px;
+  }
+
+  &.single-line-editor-secret--text-security {
+    .cm-content {
+      -webkit-text-security: disc;
+    }
+
+    .cm-placeholder {
+      -webkit-text-security: none;
+    }
+  }
+
+  .cm-secret-mask-bullet {
+    color: var(--requestly-color-text-default);
+  }
+
+  .single-line-editor-secret-toggle {
+    position: absolute;
+    top: 50%;
+    right: 6px;
+    transform: translateY(-50%);
+    padding: 4px;
+    min-height: unset;
+
+    svg {
+      width: 16px;
+      height: 16px;
+      color: var(--requestly-color-text-subtle);
+    }
+
+    &:hover svg {
+      color: var(--requestly-color-text-default);
+    }
+  }
+}
+
 .editor-popup-container {
   .popup-option {
     background-color: var(--requestly-color-surface-0);
