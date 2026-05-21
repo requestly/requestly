@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from "react";
 import Explorer from "graphiql-explorer";
 import { buildClientSchema, parse } from "graphql";
 import "@graphiql/plugin-explorer/style.css";
-import { Checkbox } from "antd";
+import { Checkbox, Tooltip } from "antd";
 import { RQButton } from "lib/design-system-v2/components";
 import { IoMdRefresh } from "@react-icons/all-files/io/IoMdRefresh";
 import { useGraphQLIntrospection } from "features/apiClient/hooks/useGraphQLIntrospection";
@@ -67,13 +67,17 @@ export const SchemaBuilder: React.FC<Props> = ({ entity, setIsSchemaBuilderOpen 
         <div className="schema-builder__header-container">
           <div className="schema-builder__header-container__title">SCHEMA</div>
           <div className="schema-builder__header-container__actions">
-            <RQButton size="small" type="transparent" onClick={introspectAndSaveSchema} icon={<IoMdRefresh />} />
-            <RQButton
-              size="small"
-              type="transparent"
-              icon={<MdClose />}
-              onClick={() => setIsSchemaBuilderOpen(false)}
-            />
+            <Tooltip title="Refresh schema" placement="top">
+              <RQButton size="small" type="transparent" onClick={introspectAndSaveSchema} icon={<IoMdRefresh />} />
+            </Tooltip>
+            <Tooltip title="Close schema builder" placement="top">
+              <RQButton
+                size="small"
+                type="transparent"
+                icon={<MdClose />}
+                onClick={() => setIsSchemaBuilderOpen(false)}
+              />
+            </Tooltip>
           </div>
         </div>
         {introspectionData ? (
