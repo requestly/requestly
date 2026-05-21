@@ -92,14 +92,13 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisab
 
   const getFilterCount = useCallback(
     (pairIndex) => {
-      const copyOfCurrentlySelectedRule = JSON.parse(JSON.stringify(currentlySelectedRuleData));
       const sourceFilters = currentlySelectedRuleData.pairs[pairIndex].source.filters;
 
-      return isSourceFilterFormatUpgraded(pairIndex, copyOfCurrentlySelectedRule)
+      return Array.isArray(sourceFilters)
         ? getAdvancedFiltersCount(sourceFilters[0])
         : getAdvancedFiltersCount(sourceFilters);
     },
-    [currentlySelectedRuleData, isSourceFilterFormatUpgraded]
+    [currentlySelectedRuleData]
   );
 
   const sourceKeys = useMemo(
