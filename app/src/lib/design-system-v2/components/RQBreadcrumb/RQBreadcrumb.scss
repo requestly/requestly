@@ -61,12 +61,19 @@ ol.rq-breadcrumb {
     font-weight: var(--requestly-font-weight-medium);
     margin-top: 1px;
 
-    .edit-icon {
+    .edit-icon-button {
       flex-shrink: 0;
+      background: transparent;
+      border: none;
+      padding: 0;
+      display: flex;
+      margin-left: 6px;
+    }
+
+    .edit-icon {
       width: 10px;
       height: 10px;
       cursor: pointer;
-      margin-left: 6px;
       color: var(--requestly-color-text-placeholder, #8f8f8f);
     }
   }

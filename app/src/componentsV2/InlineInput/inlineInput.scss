@@ -24,6 +24,13 @@
         color: var(--requestly-color-text-default);
       }
 
+      .inline-input-edit-button {
+        background: transparent;
+        border: none;
+        padding: 0;
+        display: flex;
+      }
+
       svg {
         cursor: pointer;
         width: 14px;
