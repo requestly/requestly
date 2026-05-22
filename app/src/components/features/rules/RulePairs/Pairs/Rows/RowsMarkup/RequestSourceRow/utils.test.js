@@ -25,6 +25,8 @@ describe("getAdvancedFiltersCount", () => {
     expect(getAdvancedFiltersCount({})).toBe(0);
     expect(getAdvancedFiltersCount({ requestPayload: {} })).toBe(0);
     expect(getAdvancedFiltersCount({ requestPayload: { key: "", value: "", operator: "" } })).toBe(0);
+    expect(getAdvancedFiltersCount({ requestPayload: { key: "operationName", value: "" } })).toBe(0);
+    expect(getAdvancedFiltersCount({ requestPayload: { key: "", value: "ProductsQuery" } })).toBe(0);
     expect(getAdvancedFiltersCount({ resourceType: [] })).toBe(0);
     expect(getAdvancedFiltersCount({ requestMethod: [""] })).toBe(0);
     expect(getAdvancedFiltersCount({ pageDomains: [{}] })).toBe(0);
@@ -37,7 +39,7 @@ describe("getAdvancedFiltersCount", () => {
   it("counts only meaningful advanced filters", () => {
     expect(getAdvancedFiltersCount({ resourceType: ["xhr"] })).toBe(1);
     expect(getAdvancedFiltersCount({ requestMethod: ["GET"], resourceType: [] })).toBe(1);
-    expect(getAdvancedFiltersCount({ requestPayload: { key: "operationName", value: "" } })).toBe(1);
+    expect(getAdvancedFiltersCount({ requestPayload: { key: "operationName", value: "ProductsQuery" } })).toBe(1);
     expect(getAdvancedFiltersCount({ pageUrl: { value: "https://example.com" }, pageDomains: ["example.com"] })).toBe(1);
   });
 });
