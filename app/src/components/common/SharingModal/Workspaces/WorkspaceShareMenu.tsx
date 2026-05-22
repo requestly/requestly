@@ -3,10 +3,11 @@ import { useSelector } from "react-redux";
 import { Avatar, Row, Dropdown } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { MdOutlineKeyboardArrowDown } from "@react-icons/all-files/md/MdOutlineKeyboardArrowDown";
+import { LockOutlined } from "@ant-design/icons";
 import type { MenuProps } from "antd";
 import { trackShareModalWorkspaceDropdownClicked } from "modules/analytics/events/misc/sharing";
 import { getActiveWorkspace, getAllWorkspaces } from "store/slices/workspaces/selectors";
-import { Workspace } from "features/workspaces/types";
+import { Workspace, PrivateWorkspaceStub } from "features/workspaces/types";
 import WorkspaceAvatar from "features/workspaces/components/WorkspaceAvatar";
 
 interface Props {
@@ -43,7 +44,7 @@ export const WorkspaceShareMenu: React.FC<Props> = ({ onTransferClick, isLoading
   );
 
   const menuItems: MenuProps["items"] = useMemo(() => {
-    return sortedTeams
+    const items = sortedTeams
       .slice(defaultActiveWorkspaces || 0)
       .map((team: Workspace, index: number) => {
         if (!defaultActiveWorkspaces && team?.id === activeWorkspace?.id) return null;
@@ -53,7 +54,41 @@ export const WorkspaceShareMenu: React.FC<Props> = ({ onTransferClick, isLoading
         };
       })
       .filter(Boolean);
-  }, [sortedTeams, activeWorkspace?.id, onTransferClick, defaultActiveWorkspaces, isLoading]);
+
+    // Add Private Workspace option if user is currently in a team workspace
+    if (activeWorkspace?.id !== null) {
+      items.push({
+        key: "private",
+        label: (
+          <div className="workspace-share-menu-item-card">
+            <Row align="middle" className="items-center">
+              <Avatar
+                size={35}
+                shape="square"
+                icon={<LockOutlined />}
+                className="workspace-avatar"
+                style={{ backgroundColor: "#1E69FF" }}
+              />
+              <span className="workspace-card-description">
+                <div className="text-white">Private workspace</div>
+                <div className="text-gray">Not shared with anyone</div>
+              </span>
+            </Row>
+            <RQButton
+              disabled={isLoading}
+              type="link"
+              className="workspace-menu-item-transfer-btn"
+              onClick={() => onTransferClick?.(PrivateWorkspaceStub)}
+            >
+              Copy here
+            </RQButton>
+          </div>
+        ),
+      });
+    }
+
+    return items;
+  }, [sortedTeams, activeWorkspace, onTransferClick, defaultActiveWorkspaces, isLoading]);
 
   const chooseOtherWorkspaceItem = (
     <div className="workspace-share-menu-item-card workspace-share-menu-dropdown">
