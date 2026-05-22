@@ -26,6 +26,42 @@ import "./RequestSourceRow.css";
 
 const { Text } = Typography;
 
+const isFilterValueApplied = (value) => {
+  if (Array.isArray(value)) {
+    return value.some(isFilterValueApplied);
+  }
+
+  if (value && typeof value === "object") {
+    return Object.values(value).some(isFilterValueApplied);
+  }
+
+  return Boolean(value);
+};
+
+const isRequestPayloadFilterApplied = (requestPayloadFilter) => {
+  return isFilterValueApplied(requestPayloadFilter?.key) && isFilterValueApplied(requestPayloadFilter?.value);
+};
+
+const getAppliedSourceFilterCount = (sourceFilters) => {
+  const filterConfig = Array.isArray(sourceFilters) ? sourceFilters[0] : sourceFilters;
+
+  if (!filterConfig || typeof filterConfig !== "object") {
+    return 0;
+  }
+
+  return Object.entries(filterConfig).filter(([key, value]) => {
+    if (key === GLOBAL_CONSTANTS.RULE_SOURCE_FILTER_TYPES.PAGE_URL) {
+      return false;
+    }
+
+    if (key === GLOBAL_CONSTANTS.RULE_SOURCE_FILTER_TYPES.REQUEST_DATA) {
+      return isRequestPayloadFilterApplied(value);
+    }
+
+    return isFilterValueApplied(value);
+  }).length;
+};
+
 const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabled }) => {
   const dispatch = useDispatch();
   const location = useLocation();
@@ -70,16 +106,9 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisab
 
   const getFilterCount = useCallback(
     (pairIndex) => {
-      const copyOfCurrentlySelectedRule = JSON.parse(JSON.stringify(currentlySelectedRuleData));
-      return isSourceFilterFormatUpgraded(pairIndex, copyOfCurrentlySelectedRule)
-        ? Object.keys(currentlySelectedRuleData.pairs[pairIndex].source.filters[0] || {}).filter(
-            (key) => key !== GLOBAL_CONSTANTS.RULE_SOURCE_FILTER_TYPES.PAGE_URL
-          ).length
-        : Object.keys(currentlySelectedRuleData.pairs[pairIndex].source.filters || {}).filter(
-            (key) => key !== GLOBAL_CONSTANTS.RULE_SOURCE_FILTER_TYPES.PAGE_URL
-          ).length;
+      return getAppliedSourceFilterCount(currentlySelectedRuleData.pairs[pairIndex].source.filters);
     },
-    [currentlySelectedRuleData, isSourceFilterFormatUpgraded]
+    [currentlySelectedRuleData]
   );
 
   const sourceKeys = useMemo(
