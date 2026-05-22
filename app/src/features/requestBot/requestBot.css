@@ -4,11 +4,13 @@
 
 .request-bot {
   position: fixed;
-  bottom: 30px;
-  right: 20px;
+  bottom: 16px;
+  right: 16px;
   z-index: 100;
-  width: 424px;
-  height: 640px;
+  box-sizing: border-box;
+  width: min(424px, calc(100vw - 32px));
+  height: min(640px, calc(100vh - 32px));
+  overflow: hidden;
   background-color: var(--requestly-color-surface-2);
   padding: 8px;
   border-radius: 1rem;
