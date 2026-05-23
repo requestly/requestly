@@ -4,6 +4,7 @@ import { MdOutlineChevronRight } from "@react-icons/all-files/md/MdOutlineChevro
 import { Input, Skeleton, Typography } from "antd";
 import { MdOutlineEdit } from "@react-icons/all-files/md/MdOutlineEdit";
 import { useRBAC } from "features/rbac";
+import { RQTooltip } from "../RQTooltip/RQTooltip";
 import "./RQBreadcrumb.scss";
 
 interface Props {
@@ -138,7 +139,9 @@ export const RQBreadcrumb: React.FC<Props> = ({
                       {name || placeholder}
                     </Typography.Text>
                     {disabled || !isValidPermission ? null : (
-                      <MdOutlineEdit className="edit-icon" onClick={handleRecordNameEditClick} />
+                      <RQTooltip title="Edit" placement="bottom">
+                        <MdOutlineEdit className="edit-icon" onClick={handleRecordNameEditClick} />
+                      </RQTooltip>
                     )}
                   </div>
                 )

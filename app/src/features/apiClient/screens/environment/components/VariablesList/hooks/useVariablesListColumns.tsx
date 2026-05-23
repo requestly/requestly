@@ -196,13 +196,15 @@ export const useVariablesListColumns = ({
                   (record.key !== "" ||
                     record.syncValue !== "" ||
                     (container === "environments" && record.localValue !== "")))) && (
-                <RQButton
-                  icon={<RiDeleteBin6Line />}
-                  type="transparent"
-                  size="small"
-                  className="delete-variable-btn"
-                  onClick={() => handleDeleteVariable(record.id)}
-                />
+                <Tooltip title="Delete" color="#000" placement="bottom">
+                  <RQButton
+                    icon={<RiDeleteBin6Line />}
+                    type="transparent"
+                    size="small"
+                    className="delete-variable-btn"
+                    onClick={() => handleDeleteVariable(record.id)}
+                  />
+                </Tooltip>
               )}
             </div>
           </RoleBasedComponent>
