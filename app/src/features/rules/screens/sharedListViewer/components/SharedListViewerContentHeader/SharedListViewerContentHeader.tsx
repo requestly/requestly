@@ -153,6 +153,7 @@ export const SharedListsContentHeader: React.FC<ContentHeaderProps> = ({
       <ContentListHeader
         searchValue={searchValue}
         setSearchValue={handleSearchValueUpdate}
+        filters={[]}
         actions={[
           <RQButton
             type="primary"
