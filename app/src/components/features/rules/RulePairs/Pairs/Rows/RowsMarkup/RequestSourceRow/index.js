@@ -68,18 +68,34 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisab
     trackRuleFilterModalToggled(false, currentlySelectedRuleData?.ruleType);
   }, [currentlySelectedRuleData?.ruleType]);
 
+  const isFilterValueApplied = useCallback((filterValue) => {
+    if (!filterValue) {
+      return false;
+    }
+
+    if (Array.isArray(filterValue)) {
+      return filterValue.length > 0;
+    }
+
+    if (typeof filterValue === "object") {
+      return Object.keys(filterValue).some((key) => isFilterValueApplied(filterValue[key]));
+    }
+
+    return Boolean(filterValue);
+  }, []);
+
   const getFilterCount = useCallback(
     (pairIndex) => {
       const copyOfCurrentlySelectedRule = JSON.parse(JSON.stringify(currentlySelectedRuleData));
-      return isSourceFilterFormatUpgraded(pairIndex, copyOfCurrentlySelectedRule)
-        ? Object.keys(currentlySelectedRuleData.pairs[pairIndex].source.filters[0] || {}).filter(
-            (key) => key !== GLOBAL_CONSTANTS.RULE_SOURCE_FILTER_TYPES.PAGE_URL
-          ).length
-        : Object.keys(currentlySelectedRuleData.pairs[pairIndex].source.filters || {}).filter(
-            (key) => key !== GLOBAL_CONSTANTS.RULE_SOURCE_FILTER_TYPES.PAGE_URL
-          ).length;
+      const filters = isSourceFilterFormatUpgraded(pairIndex, copyOfCurrentlySelectedRule)
+        ? currentlySelectedRuleData.pairs[pairIndex].source.filters[0] || {}
+        : currentlySelectedRuleData.pairs[pairIndex].source.filters || {};
+
+      return Object.keys(filters).filter(
+        (key) => key !== GLOBAL_CONSTANTS.RULE_SOURCE_FILTER_TYPES.PAGE_URL && isFilterValueApplied(filters[key])
+      ).length;
     },
-    [currentlySelectedRuleData, isSourceFilterFormatUpgraded]
+    [currentlySelectedRuleData, isFilterValueApplied, isSourceFilterFormatUpgraded]
   );
 
   const sourceKeys = useMemo(
