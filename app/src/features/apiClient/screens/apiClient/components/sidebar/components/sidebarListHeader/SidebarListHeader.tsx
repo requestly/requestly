@@ -41,7 +41,13 @@ export const SidebarListHeader: React.FC<ListHeaderProps> = ({
       {showMultiSelect && (
         <div className="multi-select-option">
           <Tooltip title={"Select items"}>
-            <RQButton size="small" type="transparent" icon={<BiSelectMultiple />} onClick={toggleMultiSelect} />
+            <RQButton
+              size="small"
+              type="transparent"
+              icon={<BiSelectMultiple />}
+              aria-label="Select items"
+              onClick={toggleMultiSelect}
+            />
           </Tooltip>
         </div>
       )}
@@ -55,16 +61,18 @@ export const SidebarListHeader: React.FC<ListHeaderProps> = ({
 
       {listType ? (
         listType === ApiClientSidebarTabKey.ENVIRONMENTS ? (
-          <RQButton
-            size="small"
-            type="transparent"
-            icon={<MdAdd />}
-            title="Create new environment"
-            className="sidebar-list-header-button"
-            onClick={() => {
-              onNewRecordClick("api_client_sidebar_header", RQAPI.RecordType.ENVIRONMENT);
-            }}
-          />
+          <Tooltip title="New environment" color="#000" placement="top">
+            <RQButton
+              size="small"
+              type="transparent"
+              icon={<MdAdd />}
+              className="sidebar-list-header-button"
+              aria-label="New environment"
+              onClick={() => {
+                onNewRecordClick("api_client_sidebar_header", RQAPI.RecordType.ENVIRONMENT);
+              }}
+            />
+          </Tooltip>
         ) : null
       ) : (
         showNewRecordAction && (
@@ -74,7 +82,15 @@ export const SidebarListHeader: React.FC<ListHeaderProps> = ({
               onNewRecordClick("api_client_sidebar_header", params.recordType, undefined, params.entryType);
             }}
           >
-            <RQButton size="small" type="transparent" icon={<MdAdd />} className="sidebar-list-header-button" />
+            <Tooltip title="New request or collection" color="#000" placement="top">
+              <RQButton
+                size="small"
+                type="transparent"
+                icon={<MdAdd />}
+                className="sidebar-list-header-button"
+                aria-label="New request or collection"
+              />
+            </Tooltip>
           </NewApiRecordDropdown>
         )
       )}

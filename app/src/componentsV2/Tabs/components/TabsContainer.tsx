@@ -1,9 +1,10 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Tabs, TabsProps, Typography, Popover } from "antd";
+import { Tabs, TabsProps, Typography, Popover, Tooltip } from "antd";
 import { TabItem } from "./TabItem";
 import { Outlet, unstable_useBlocker } from "react-router-dom";
 import { RQButton } from "lib/design-system-v2/components";
 import { MdClose } from "@react-icons/all-files/md/MdClose";
+import { MdAdd } from "@react-icons/all-files/md/MdAdd";
 import { IoIosArrowDown } from "@react-icons/all-files/io/IoIosArrowDown";
 import { useSetUrl } from "../hooks/useSetUrl";
 import { useCloseActiveTabShortcut } from "hooks/useCloseActiveTabShortcut";
@@ -312,6 +313,11 @@ export const TabsContainer: React.FC = () => {
         className="tabs-content"
         popupClassName="tabs-content-more-dropdown"
         size="small"
+        addIcon={
+          <Tooltip title="New request" color="#000" placement="bottom">
+            <MdAdd />
+          </Tooltip>
+        }
         onChange={(key) => {
           setActiveTab(key.toString());
         }}
