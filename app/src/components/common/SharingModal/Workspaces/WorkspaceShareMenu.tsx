@@ -8,6 +8,7 @@ import { trackShareModalWorkspaceDropdownClicked } from "modules/analytics/event
 import { dummyPersonalWorkspace, getActiveWorkspace, getAllWorkspaces } from "store/slices/workspaces/selectors";
 import { Workspace } from "features/workspaces/types";
 import WorkspaceAvatar from "features/workspaces/components/WorkspaceAvatar";
+import { isWorkspaceShareDropdownEnabled } from "./workspaceShareUtils";
 
 interface Props {
   /**
@@ -21,7 +22,6 @@ interface Props {
 
 interface WorkspaceItemProps {
   workspace: Workspace;
-  availableWorkspaces?: Workspace[];
   onTransferClick?: (teamData: Workspace) => void;
   showArrow?: boolean;
   isLoading?: boolean;
@@ -68,7 +68,7 @@ export const WorkspaceShareMenu: React.FC<Props> = ({
       .filter(Boolean);
   }, [sortedTeams, activeWorkspace?.id, onTransferClick, defaultActiveWorkspaces, isLoading]);
 
-  const isDropdownEnabled = shareableWorkspaces.length > 1;
+  const isDropdownEnabled = isWorkspaceShareDropdownEnabled(shareableWorkspaces);
 
   const chooseOtherWorkspaceItem = (
     <div className="workspace-share-menu-item-card workspace-share-menu-dropdown">
@@ -124,11 +124,7 @@ export const WorkspaceShareMenu: React.FC<Props> = ({
           }}
         >
           <div>
-            <WorkspaceItem
-              workspace={activeWorkspace}
-              showArrow={isDropdownEnabled}
-              availableWorkspaces={shareableWorkspaces}
-            />
+            <WorkspaceItem workspace={activeWorkspace} showArrow={isDropdownEnabled} />
           </div>
         </Dropdown>
       )}
@@ -139,18 +135,13 @@ export const WorkspaceShareMenu: React.FC<Props> = ({
 const WorkspaceItem: React.FC<WorkspaceItemProps> = ({
   workspace,
   onTransferClick,
-  availableWorkspaces,
   showArrow = false,
   isLoading = false,
 }) => {
   const memberCount = workspace.accessCount ?? workspace.membersCount ?? 0;
 
   return (
-    <div
-      className={`workspace-share-menu-item-card ${
-        showArrow && (availableWorkspaces?.length ?? 0) > 1 ? "workspace-share-menu-dropdown" : ""
-      }`}
-    >
+    <div className={`workspace-share-menu-item-card ${showArrow ? "workspace-share-menu-dropdown" : ""}`}>
       <Row align="middle" className="items-center">
         <WorkspaceAvatar workspace={workspace} size={35} />
         <span className="workspace-card-description">
@@ -161,9 +152,7 @@ const WorkspaceItem: React.FC<WorkspaceItemProps> = ({
         </span>
       </Row>
       {showArrow ? (
-        availableWorkspaces?.length && availableWorkspaces?.length > 1 ? (
-          <MdOutlineKeyboardArrowDown className="text-gray header mr-8" />
-        ) : null
+        <MdOutlineKeyboardArrowDown className="text-gray header mr-8" />
       ) : (
         <RQButton
           disabled={isLoading}
