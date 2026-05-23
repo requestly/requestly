@@ -238,6 +238,7 @@ const NetworkTable: React.FC<Props> = ({
           id={log.id}
           onContextMenu={() => setSelectedRowData(log)}
           {...rowProps}
+          className={["web-traffic-table-row", rowProps?.className].filter(Boolean).join(" ")}
           data-tour-id={index === 0 && !isTrafficTableTourCompleted ? "traffic-table-row" : null}
         >
           {columns.map((column: any) => {
