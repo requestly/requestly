@@ -23,6 +23,14 @@ import { getAvailableBillingTeams } from "store/features/billing/selectors";
 import TEAM_WORKSPACES from "config/constants/sub/team-workspaces";
 import { getActiveWorkspace } from "store/slices/workspaces/selectors";
 import { Workspace } from "features/workspaces/types";
+import {
+  executeWorkspaceShareAction,
+  WORKSPACE_COPY_ERROR_MESSAGE,
+  WORKSPACE_INVITE_ERROR_MESSAGE,
+} from "./workspaceShareUtils";
+
+const WORKSPACE_MEMBER_ALREADY_INVITED_ERROR_MESSAGE =
+  "The user is either in the workspace or has a pending invite.";
 
 interface Props {
   selectedRules: string[];
@@ -40,66 +48,84 @@ export const ShareFromWorkspace: React.FC<Props> = ({
   const billingTeams = useSelector(getAvailableBillingTeams);
   const [memberEmails, setMemberEmails] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const showShareError = useCallback((errorMessage: string) => {
+    toast.error(errorMessage);
+    trackSharingModalToastViewed(errorMessage);
+  }, []);
 
   const handleInviteMembers = useCallback(() => {
-    setIsLoading(true);
     const createTeamInvites = httpsCallable(getFunctions(), "invites-createTeamInvites");
-    createTeamInvites({
-      teamId: activeWorkspace.id,
-      emails: memberEmails,
-      role: TeamRole.write,
-      teamName: activeWorkspace.name,
-      numberOfMembers: activeWorkspace.accessCount,
-      source: "sharing_modal_from_workspace",
-    }).then((res: any) => {
-      const hasSuccessfulInvite = res?.data.results.some((result: any) => result.success);
+    void executeWorkspaceShareAction({
+      action: () =>
+        createTeamInvites({
+          teamId: activeWorkspace.id,
+          emails: memberEmails,
+          role: TeamRole.write,
+          teamName: activeWorkspace.name,
+          numberOfMembers: activeWorkspace.accessCount,
+          source: "sharing_modal_from_workspace",
+        }).then((res: any) => {
+          const hasSuccessfulInvite = res?.data.results.some((result: any) => result.success);
 
-      if (hasSuccessfulInvite) {
-        trackAddTeamMemberSuccess({
-          team_id: activeWorkspace.id,
-          email: memberEmails,
-          is_admin: false,
-          source: "sharing_modal",
-          num_users_added: memberEmails.length,
-          workspace_type: isWorkspaceMappedToBillingTeam(activeWorkspace.id!, billingTeams)
-            ? TEAM_WORKSPACES.WORKSPACE_TYPE.MAPPED_TO_BILLING_TEAM
-            : TEAM_WORKSPACES.WORKSPACE_TYPE.NOT_MAPPED_TO_BILLING_TEAM,
-        });
+          if (!hasSuccessfulInvite) {
+            throw Object.assign(new Error("pending invite"), {
+              userFacingMessage: WORKSPACE_MEMBER_ALREADY_INVITED_ERROR_MESSAGE,
+            });
+          }
+
+          trackAddTeamMemberSuccess({
+            team_id: activeWorkspace.id,
+            email: memberEmails,
+            is_admin: false,
+            source: "sharing_modal",
+            num_users_added: memberEmails.length,
+            workspace_type: isWorkspaceMappedToBillingTeam(activeWorkspace.id!, billingTeams)
+              ? TEAM_WORKSPACES.WORKSPACE_TYPE.MAPPED_TO_BILLING_TEAM
+              : TEAM_WORKSPACES.WORKSPACE_TYPE.NOT_MAPPED_TO_BILLING_TEAM,
+          });
+        }),
+      errorMessage: WORKSPACE_INVITE_ERROR_MESSAGE,
+      onError: showShareError,
+      onSuccess: () => {
         setPostShareViewData({
           type: WorkspaceSharingTypes.USERS_INVITED,
         });
 
         onRulesShared();
-      } else {
-        const errorMessage = "The user is either in the workspace or has a pending invite.";
-        toast.error(errorMessage);
-        trackSharingModalToastViewed(errorMessage);
-      }
-      setIsLoading(false);
+      },
+      setIsLoading,
     });
-  }, [memberEmails, onRulesShared, activeWorkspace, setPostShareViewData, billingTeams]);
+  }, [memberEmails, onRulesShared, activeWorkspace, setPostShareViewData, billingTeams, showShareError]);
 
   const handleTransferToOtherWorkspace = useCallback(
     (teamData: Workspace) => {
-      setIsLoading(true);
-      duplicateRulesToTargetWorkspace(appMode, teamData.id!, selectedRules).then(() => {
-        setIsLoading(false);
-        trackSharingModalRulesDuplicated("team", selectedRules.length);
-        setPostShareViewData({
-          type: WorkspaceSharingTypes.EXISTING_WORKSPACE,
-          targetTeamData: teamData,
-          sourceTeamData: activeWorkspace,
-        });
+      void executeWorkspaceShareAction({
+        action: () => duplicateRulesToTargetWorkspace(appMode, teamData.id, selectedRules),
+        errorMessage: WORKSPACE_COPY_ERROR_MESSAGE,
+        onError: showShareError,
+        onSuccess: () => {
+          trackSharingModalRulesDuplicated("team", selectedRules.length);
+          setPostShareViewData({
+            type: WorkspaceSharingTypes.EXISTING_WORKSPACE,
+            targetTeamData: teamData,
+            sourceTeamData: activeWorkspace,
+          });
 
-        onRulesShared();
+          onRulesShared();
+        },
+        setIsLoading,
       });
     },
-    [appMode, onRulesShared, selectedRules, activeWorkspace, setPostShareViewData]
+    [appMode, onRulesShared, selectedRules, activeWorkspace, setPostShareViewData, showShareError]
   );
 
   return (
     <>
-      <WorkspaceShareMenu onTransferClick={handleTransferToOtherWorkspace} isLoading={isLoading} />
+      <WorkspaceShareMenu
+        includePrivateWorkspace
+        onTransferClick={handleTransferToOtherWorkspace}
+        isLoading={isLoading}
+      />
       <div className="subheader mt-1">Share with Teammates</div>
       <div className="mt-8 text-gray">Collaborate in real-time with your teammates within a shared workspace.</div>
       <div className="mt-1">
