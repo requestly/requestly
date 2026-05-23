@@ -1,8 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Tabs, TabsProps, Typography, Popover } from "antd";
+import { Tabs, TabsProps, Typography, Popover, Tooltip } from "antd";
 import { TabItem } from "./TabItem";
 import { Outlet, unstable_useBlocker } from "react-router-dom";
 import { RQButton } from "lib/design-system-v2/components";
+import { MdAdd } from "@react-icons/all-files/md/MdAdd";
 import { MdClose } from "@react-icons/all-files/md/MdClose";
 import { IoIosArrowDown } from "@react-icons/all-files/io/IoIosArrowDown";
 import { useSetUrl } from "../hooks/useSetUrl";
@@ -306,6 +307,11 @@ export const TabsContainer: React.FC = () => {
     <div className="tabs-container">
       <Tabs
         type="editable-card"
+        addIcon={
+          <Tooltip title="New request" color="#000" placement="bottom">
+            <MdAdd />
+          </Tooltip>
+        }
         tabBarExtraContent={operations}
         items={tabItems}
         activeKey={activeTabId}
