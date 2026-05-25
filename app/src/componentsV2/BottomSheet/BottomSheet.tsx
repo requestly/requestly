@@ -1,5 +1,5 @@
 import React, { ReactNode } from "react";
-import { Tabs, TabsProps } from "antd";
+import { Tabs, TabsProps, Tooltip } from "antd";
 import { useBottomSheetContext } from "./context";
 import { BiDockRight } from "@react-icons/all-files/bi/BiDockRight";
 import { BiDockBottom } from "@react-icons/all-files/bi/BiDockBottom";
@@ -38,32 +38,38 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
         {utilities}
 
         {disableDocking ? null : (
+          <Tooltip title={isSheetPlacedAtBottom ? "Dock to right" : "Dock to bottom"} placement="bottom" color="#000">
+            <RQButton
+              size="small"
+              type="transparent"
+              onClick={() => toggleSheetPlacement()}
+              className="bottom-sheet-toggle-btn"
+              icon={isSheetPlacedAtBottom ? <BiDockRight /> : <BiDockBottom />}
+            />
+          </Tooltip>
+        )}
+
+        <Tooltip
+          title={isBottomSheetOpen ? "Collapse response panel" : "Expand response panel"}
+          placement="bottom"
+          color="#000"
+        >
           <RQButton
             size="small"
             type="transparent"
-            title="Toggle"
-            onClick={() => toggleSheetPlacement()}
-            className="bottom-sheet-toggle-btn"
-            icon={isSheetPlacedAtBottom ? <BiDockRight /> : <BiDockBottom />}
+            className="bottom-sheet-collapse-btn bottom-sheet-collapse-btn__vertical"
+            onClick={() => toggleBottomSheet({ action: "bottom_sheet_collapse_expand" })}
+            icon={
+              !isBottomSheetOpen ? (
+                <MdOutlineKeyboardArrowUp />
+              ) : isSheetPlacedAtBottom ? (
+                <MdOutlineKeyboardArrowDown />
+              ) : (
+                <MdOutlineKeyboardArrowRight />
+              )
+            }
           />
-        )}
-
-        <RQButton
-          size="small"
-          type="transparent"
-          title="Collapse"
-          className="bottom-sheet-collapse-btn bottom-sheet-collapse-btn__vertical"
-          onClick={() => toggleBottomSheet({ action: "bottom_sheet_collapse_expand" })}
-          icon={
-            !isBottomSheetOpen ? (
-              <MdOutlineKeyboardArrowUp />
-            ) : isSheetPlacedAtBottom ? (
-              <MdOutlineKeyboardArrowDown />
-            ) : (
-              <MdOutlineKeyboardArrowRight />
-            )
-          }
-        />
+        </Tooltip>
       </div>
     </div>
   );
@@ -71,25 +77,31 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
   const horizontalTabExtraContent = {
     left: (
       <div className="bottom-sheet-collapse-btn__horizontal-container">
-        <RQButton
-          size="small"
-          type="transparent"
-          title="Collapse"
-          className="bottom-sheet-collapse-btn bottom-sheet-collapse-btn__horizontal"
-          onClick={() => toggleBottomSheet({ action: "bottom_sheet_collapse_expand" })}
-          icon={isBottomSheetOpen ? <MdOutlineKeyboardArrowRight /> : <MdOutlineKeyboardArrowLeft />}
-        />
+        <Tooltip
+          title={isBottomSheetOpen ? "Collapse response panel" : "Expand response panel"}
+          placement="right"
+          color="#000"
+        >
+          <RQButton
+            size="small"
+            type="transparent"
+            className="bottom-sheet-collapse-btn bottom-sheet-collapse-btn__horizontal"
+            onClick={() => toggleBottomSheet({ action: "bottom_sheet_collapse_expand" })}
+            icon={isBottomSheetOpen ? <MdOutlineKeyboardArrowRight /> : <MdOutlineKeyboardArrowLeft />}
+          />
+        </Tooltip>
       </div>
     ),
     right: (
-      <RQButton
-        size="small"
-        type="transparent"
-        title="Toggle"
-        onClick={() => toggleSheetPlacement()}
-        className="bottom-sheet-toggle-btn"
-        icon={isSheetPlacedAtBottom ? <BiDockRight /> : <BiDockBottom />}
-      />
+      <Tooltip title={isSheetPlacedAtBottom ? "Dock to right" : "Dock to bottom"} placement="left" color="#000">
+        <RQButton
+          size="small"
+          type="transparent"
+          onClick={() => toggleSheetPlacement()}
+          className="bottom-sheet-toggle-btn"
+          icon={isSheetPlacedAtBottom ? <BiDockRight /> : <BiDockBottom />}
+        />
+      </Tooltip>
     ),
   };
 
