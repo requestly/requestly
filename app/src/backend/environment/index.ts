@@ -126,7 +126,12 @@ export const attachCollectionVariableListener = (
   }
 
   const apisRef = collection(db, "apis");
-  const q = query(apisRef, where("ownerId", "==", ownerId), where("type", "==", RQAPI.RecordType.COLLECTION));
+  const q = query(
+    apisRef,
+    where("ownerId", "==", ownerId),
+    where("type", "==", RQAPI.RecordType.COLLECTION),
+    where("deleted", "==", false)
+  );
 
   const unsubscribe = onSnapshot(q, (snapshot) => {
     const collectionVariableDetails: CollectionVariableMap = {};
