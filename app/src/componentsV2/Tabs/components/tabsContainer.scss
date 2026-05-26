@@ -255,6 +255,35 @@
       }
     }
   }
+
+  .draggable-tab-label {
+    width: 100%;
+    position: relative;
+
+    &.dragging {
+      opacity: 0.5;
+    }
+
+    &.drop-target-before::before,
+    &.drop-target-after::after {
+      content: "";
+      position: absolute;
+      top: 2px;
+      bottom: 2px;
+      width: 2px;
+      border-radius: 2px;
+      background-color: var(--requestly-color-primary);
+      z-index: 2;
+    }
+
+    &.drop-target-before::before {
+      left: -4px;
+    }
+
+    &.drop-target-after::after {
+      right: -4px;
+    }
+  }
 }
 
 .tabs-content-more-dropdown {

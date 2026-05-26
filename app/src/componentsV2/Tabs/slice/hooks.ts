@@ -75,6 +75,10 @@ export function useTabActions() {
       setPreviewTab(params: Parameters<typeof tabsActions.setPreviewTab>[0]) {
         return dispatch(tabsActions.setPreviewTab(params));
       },
+
+      reorderTab(params: Parameters<typeof tabsActions.reorderTab>[0]) {
+        return dispatch(tabsActions.reorderTab(params));
+      },
     };
   }, [dispatch]);
 

@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Tabs, TabsProps, Typography, Popover } from "antd";
+import { useDrag, useDrop } from "react-dnd";
 import { TabItem } from "./TabItem";
 import { Outlet, unstable_useBlocker } from "react-router-dom";
 import { RQButton } from "lib/design-system-v2/components";
@@ -130,11 +131,83 @@ const TabLabel: React.FC<TabLabelProps> = ({ tab, onClose, onDoubleClick }) => {
   return <NonBufferedTabLabel tab={tab} onClose={onClose} onDoubleClick={onDoubleClick} />;
 };
 
+const TAB_DRAG_TYPE = "api-client-tab";
+
+type TabDropPosition = "before" | "after";
+
+interface DragTabItem {
+  tabId: TabId;
+}
+
+interface DraggableTabLabelProps extends TabLabelProps {
+  onMoveTab: (tabId: TabId, targetTabId: TabId, position: TabDropPosition) => void;
+}
+
+const DraggableTabLabel: React.FC<DraggableTabLabelProps> = ({ tab, onMoveTab, ...props }) => {
+  const ref = useRef<HTMLDivElement>(null);
+
+  const [{ isDragging }, drag] = useDrag(
+    () => ({
+      type: TAB_DRAG_TYPE,
+      item: { tabId: tab.id },
+      collect: (monitor) => ({
+        isDragging: monitor.isDragging(),
+      }),
+    }),
+    [tab.id]
+  );
+
+  const [{ isOver, dropPosition }, drop] = useDrop(
+    () => ({
+      accept: TAB_DRAG_TYPE,
+      canDrop: (item: DragTabItem) => item.tabId !== tab.id,
+      drop: (item: DragTabItem, monitor) => {
+        if (!ref.current || item.tabId === tab.id) {
+          return;
+        }
+
+        const clientOffset = monitor.getClientOffset();
+        if (!clientOffset) {
+          return;
+        }
+
+        const tabBounds = ref.current.getBoundingClientRect();
+        const position = clientOffset.x > tabBounds.left + tabBounds.width / 2 ? "after" : "before";
+
+        onMoveTab(item.tabId, tab.id, position);
+      },
+      collect: (monitor) => {
+        const clientOffset = monitor.getClientOffset();
+        const tabBounds = ref.current?.getBoundingClientRect();
+        const position =
+          clientOffset && tabBounds && clientOffset.x > tabBounds.left + tabBounds.width / 2 ? "after" : "before";
+
+        return {
+          isOver: monitor.isOver({ shallow: true }) && monitor.canDrop(),
+          dropPosition: position,
+        };
+      },
+    }),
+    [onMoveTab, tab.id]
+  );
+
+  drag(drop(ref));
+
+  return (
+    <div
+      ref={ref}
+      className={`draggable-tab-label ${isDragging ? "dragging" : ""} ${isOver ? `drop-target-${dropPosition}` : ""}`}
+    >
+      <TabLabel tab={tab} {...props} />
+    </div>
+  );
+};
+
 export const TabsContainer: React.FC = () => {
   const tabs = useTabs();
   const activeTabId = useActiveTabId();
   const previewTabId = usePreviewTabId();
-  const { closeTab, setActiveTab, openBufferedTab, setPreviewTab } = useTabActions();
+  const { closeTab, setActiveTab, openBufferedTab, setPreviewTab, reorderTab } = useTabActions();
   const [isMorePopoverOpen, setIsMorePopoverOpen] = useState(false);
   const [workflowModalTabId, setWorkflowModalTabId] = useState<TabId | null>(null);
 
@@ -270,20 +343,28 @@ export const TabsContainer: React.FC = () => {
     [closeTab]
   );
 
+  const handleMoveTab = useCallback(
+    (tabId: TabId, targetTabId: TabId, position: TabDropPosition) => {
+      reorderTab({ tabId, targetTabId, position });
+    },
+    [reorderTab]
+  );
+
   const tabItems: TabsProps["items"] = useMemo(() => {
     return tabs.map((tab) => ({
       key: tab.id,
       closable: false,
       label: (
-        <TabLabel
+        <DraggableTabLabel
           tab={tab}
           onClose={() => handleTabCloseRequest(tab)}
           onDoubleClick={() => handleUnpreviewTab(tab.id)}
+          onMoveTab={handleMoveTab}
         />
       ),
       children: <TabItem tabId={tab.id}>{tab.source.render()}</TabItem>,
     }));
-  }, [tabs, handleTabCloseRequest, handleUnpreviewTab]);
+  }, [tabs, handleTabCloseRequest, handleUnpreviewTab, handleMoveTab]);
 
   const handleWorkflowModalCancel = useCallback(() => {
     setWorkflowModalTabId(null);
