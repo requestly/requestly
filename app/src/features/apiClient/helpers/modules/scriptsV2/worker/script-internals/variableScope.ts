@@ -1,4 +1,5 @@
 import { LocalScope } from "modules/localScope";
+import { isEmpty } from "lodash";
 
 function sanitizeValue(value: any): string | number | boolean | null | undefined {
   const type = typeof value;
@@ -78,7 +79,18 @@ export class VariableScope {
 
   get(key: string) {
     const variables = this.localScope.get(this.variableScopeName);
-    return variables[key]?.localValue || variables[key]?.syncValue;
+    const variable = variables[key];
+    if (!variable) {
+      return undefined;
+    }
+
+    // Keep fallback behavior aligned with request template rendering:
+    // use current/local value when present, otherwise use initial/sync value.
+    if (typeof variable.localValue === "number" || typeof variable.localValue === "boolean") {
+      return variable.localValue;
+    }
+
+    return isEmpty(variable.localValue) ? variable.syncValue : variable.localValue;
   }
 
   unset(key: string) {
