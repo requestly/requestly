@@ -15,7 +15,7 @@ import { useNavigate } from "react-router-dom";
 import { isSafariBrowser } from "actions/ExtensionActions";
 import { getAppMode, getRequestBot } from "store/selectors";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import { Col } from "antd";
+import { Col, Tooltip } from "antd";
 import PremiumPlanBadge from "./PremiumPlanBadge/PremiumPlanBadge";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import GitHubButton from "react-github-btn";
@@ -103,11 +103,13 @@ export const MenuHeader = () => {
         </div>
 
         <div className="app-primary-header__right-section">
-          <RQButton
-            type="transparent"
-            icon={<Settings />}
-            onClick={() => redirectToSettings(navigate, window.location.pathname, "header")}
-          />
+          <Tooltip title="Settings" color="#000" placement="bottom">
+            <RQButton
+              type="transparent"
+              icon={<Settings />}
+              onClick={() => redirectToSettings(navigate, window.location.pathname, "header")}
+            />
+          </Tooltip>
           <HeaderUser />
         </div>
       </div>

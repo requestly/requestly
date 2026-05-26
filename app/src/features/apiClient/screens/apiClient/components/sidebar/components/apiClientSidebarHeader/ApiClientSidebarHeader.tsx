@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Dropdown, MenuProps } from "antd";
+import { Dropdown, MenuProps, Tooltip } from "antd";
 import { MdAdd } from "@react-icons/all-files/md/MdAdd";
 import { BsCollection } from "@react-icons/all-files/bs/BsCollection";
 import { RQButton } from "lib/design-system-v2/components";
@@ -188,9 +188,13 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
                   onNewClick(params.recordType, params.entryType);
                 }}
               >
-                <RQButton type="transparent" size="small" icon={<MdAdd />}>
-                  New
-                </RQButton>
+                <span>
+                  <Tooltip title="New request or collection" color="#000" placement="bottom">
+                    <RQButton type="transparent" size="small" icon={<MdAdd />}>
+                      New
+                    </RQButton>
+                  </Tooltip>
+                </span>
               </NewApiRecordDropdown>
               <Dropdown
                 menu={{ items: importItems }}
