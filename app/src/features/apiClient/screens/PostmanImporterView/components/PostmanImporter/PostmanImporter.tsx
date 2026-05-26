@@ -182,6 +182,7 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
             .catch((error) => {
               trackImportParseFailed(ApiClientImporterType.POSTMAN, error.message);
               setImportError(error.message);
+              setProcessingStatus("idle");
               Sentry.withScope((scope) => {
                 scope.setTag("error_type", "api_client_postman_import");
                 Sentry.captureException(error);
@@ -189,16 +190,11 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
               Sentry.getActiveSpan()?.setStatus({
                 code: SPAN_STATUS_ERROR,
               });
-            })
-            .finally(() => {
-              if (importError) {
-                setProcessingStatus("idle");
-              }
             });
         }
       )(files);
     },
-    [importError, apiClientRecordsRepository]
+    [apiClientRecordsRepository]
   );
 
   const handleImportEnvironments = useCallback(async () => {
