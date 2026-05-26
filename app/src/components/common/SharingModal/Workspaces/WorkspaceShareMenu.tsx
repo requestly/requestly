@@ -56,7 +56,7 @@ export const WorkspaceShareMenu: React.FC<Props> = ({ onTransferClick, isLoading
       .filter(Boolean);
 
     // Add Private Workspace option if user is currently in a team workspace
-    if (activeWorkspace?.id !== null) {
+    if (activeWorkspace && activeWorkspace.id !== null) {
       items.push({
         key: "private",
         label: (
