@@ -247,6 +247,7 @@ const CustomScriptRow = ({
               handleChange={handleEditorUpdate}
               isReadOnly={isInputDisabled}
               analyticEventProperties={{ source: "rule_editor", rule_type: RuleType.SCRIPT }}
+              autoFillAvailableHeight
               toolbarOptions={{
                 title: "Code",
               }}

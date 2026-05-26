@@ -337,6 +337,7 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
                 handleChange={responseBodyChangeHandler}
                 isResizable
                 analyticEventProperties={{ source: "rule_editor", rule_type: RuleType.RESPONSE }}
+                autoFillAvailableHeight
                 toolbarOptions={{
                   title: "Response Body",
                   options: [EditorRadioGroupOptions],

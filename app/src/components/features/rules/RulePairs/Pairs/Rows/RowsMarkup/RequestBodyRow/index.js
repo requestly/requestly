@@ -136,6 +136,7 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisable
                 prettifyOnInit={true}
                 isReadOnly={isInputDisabled}
                 analyticEventProperties={{ source: "rule_editor", rule_type: RuleType.REQUEST }}
+                autoFillAvailableHeight
                 toolbarOptions={{
                   title: "Request Body",
                   options: [EditorRadioGroupOptions],
