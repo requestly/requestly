@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Link, Params, useMatches } from "react-router-dom";
 import { MdOutlineChevronRight } from "@react-icons/all-files/md/MdOutlineChevronRight";
-import { Input, Skeleton, Typography } from "antd";
+import { Input, Skeleton, Tooltip, Typography } from "antd";
 import { MdOutlineEdit } from "@react-icons/all-files/md/MdOutlineEdit";
 import { useRBAC } from "features/rbac";
 import "./RQBreadcrumb.scss";
@@ -138,7 +138,9 @@ export const RQBreadcrumb: React.FC<Props> = ({
                       {name || placeholder}
                     </Typography.Text>
                     {disabled || !isValidPermission ? null : (
-                      <MdOutlineEdit className="edit-icon" onClick={handleRecordNameEditClick} />
+                      <Tooltip title="Edit">
+                        <MdOutlineEdit className="edit-icon" onClick={handleRecordNameEditClick} />
+                      </Tooltip>
                     )}
                   </div>
                 )

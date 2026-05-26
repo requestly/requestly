@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useRef, useState } from "react";
-import { Typography, Dropdown, MenuProps } from "antd";
+import { Typography, Dropdown, MenuProps, Tooltip } from "antd";
 import { RQAPI } from "features/apiClient/types";
 import { RQButton } from "lib/design-system-v2/components";
 import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
@@ -268,22 +268,26 @@ export const ExampleRow: React.FC<Props> = ({ record, isReadOnly, handleRecordsT
 
         <Conditional condition={!isReadOnly}>
           <div className={`request-options ${isDropdownVisible ? "active" : ""}`}>
-            <Dropdown
-              trigger={["click"]}
-              menu={{ items: exampleOptions }}
-              placement="bottomRight"
-              open={isDropdownVisible}
-              onOpenChange={setIsDropdownVisible}
-            >
-              <RQButton
-                onClick={(e) => {
-                  e.stopPropagation();
-                }}
-                size="small"
-                type="transparent"
-                icon={<MdOutlineMoreHoriz />}
-              />
-            </Dropdown>
+            <Tooltip title="More actions">
+              <span>
+                <Dropdown
+                  trigger={["click"]}
+                  menu={{ items: exampleOptions }}
+                  placement="bottomRight"
+                  open={isDropdownVisible}
+                  onOpenChange={setIsDropdownVisible}
+                >
+                  <RQButton
+                    onClick={(e) => {
+                      e.stopPropagation();
+                    }}
+                    size="small"
+                    type="transparent"
+                    icon={<MdOutlineMoreHoriz />}
+                  />
+                </Dropdown>
+              </span>
+            </Tooltip>
           </div>
         </Conditional>
       </div>

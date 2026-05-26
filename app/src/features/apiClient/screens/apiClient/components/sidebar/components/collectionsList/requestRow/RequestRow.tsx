@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useRef, useState } from "react";
-import { Typography, Dropdown, MenuProps, Checkbox, notification } from "antd";
+import { Typography, Dropdown, MenuProps, Checkbox, Tooltip, notification } from "antd";
 import { REQUEST_METHOD_BACKGROUND_COLORS, REQUEST_METHOD_COLORS } from "../../../../../../../../../constants";
 import { RequestMethod, RQAPI } from "features/apiClient/types";
 import { RQButton } from "lib/design-system-v2/components";
@@ -493,23 +493,27 @@ export const RequestRow: React.FC<Props> = ({
 
       <Conditional condition={!isReadOnly}>
         <div className={`request-options ${isDropdownVisible ? "active" : ""}`}>
-          <Dropdown
-            trigger={["click"]}
-            menu={{ items: requestOptions }}
-            placement="bottomRight"
-            open={isDropdownVisible}
-            onOpenChange={handleDropdownVisibleChange}
-          >
-            <RQButton
-              onClick={(e) => {
-                e.stopPropagation();
-                setShowSelection(false);
-              }}
-              size="small"
-              type="transparent"
-              icon={<MdOutlineMoreHoriz />}
-            />
-          </Dropdown>
+          <Tooltip title="More actions">
+            <span>
+              <Dropdown
+                trigger={["click"]}
+                menu={{ items: requestOptions }}
+                placement="bottomRight"
+                open={isDropdownVisible}
+                onOpenChange={handleDropdownVisibleChange}
+              >
+                <RQButton
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowSelection(false);
+                  }}
+                  size="small"
+                  type="transparent"
+                  icon={<MdOutlineMoreHoriz />}
+                />
+              </Dropdown>
+            </span>
+          </Tooltip>
         </div>
       </Conditional>
     </div>
@@ -639,23 +643,27 @@ export const RequestRow: React.FC<Props> = ({
 
             <Conditional condition={!isReadOnly}>
               <div className={`request-options ${isDropdownVisible ? "active" : ""}`}>
-                <Dropdown
-                  trigger={["click"]}
-                  menu={{ items: requestOptions }}
-                  placement="bottomRight"
-                  open={isDropdownVisible}
-                  onOpenChange={handleDropdownVisibleChange}
-                >
-                  <RQButton
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setShowSelection(false);
-                    }}
-                    size="small"
-                    type="transparent"
-                    icon={<MdOutlineMoreHoriz />}
-                  />
-                </Dropdown>
+                <Tooltip title="More actions">
+                  <span>
+                    <Dropdown
+                      trigger={["click"]}
+                      menu={{ items: requestOptions }}
+                      placement="bottomRight"
+                      open={isDropdownVisible}
+                      onOpenChange={handleDropdownVisibleChange}
+                    >
+                      <RQButton
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setShowSelection(false);
+                        }}
+                        size="small"
+                        type="transparent"
+                        icon={<MdOutlineMoreHoriz />}
+                      />
+                    </Dropdown>
+                  </span>
+                </Tooltip>
               </div>
             </Conditional>
           </div>

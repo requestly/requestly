@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import { MdAdd } from "@react-icons/all-files/md/MdAdd";
 import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
 import { MdOutlineArrowForwardIos } from "@react-icons/all-files/md/MdOutlineArrowForwardIos";
-import { Collapse, Dropdown, MenuProps, Typography } from "antd";
+import { Collapse, Dropdown, MenuProps, Tooltip, Typography } from "antd";
 import { Conditional } from "components/common/Conditional";
 import { useRBAC } from "features/rbac";
 import { RQButton } from "lib/design-system-v2/components";
@@ -63,12 +63,8 @@ export const WorkspaceCollapse: React.FC<WorkspaceCollapseProps> = ({
   const user = useSelector(getUserAuthDetails);
   const userId = user?.details?.profile?.uid;
 
-  const {
-    handleWorkspaceSwitch,
-    confirmWorkspaceSwitch,
-    isWorkspaceLoading,
-    setIsWorkspaceLoading,
-  } = useWorkspaceSwitcher();
+  const { handleWorkspaceSwitch, confirmWorkspaceSwitch, isWorkspaceLoading, setIsWorkspaceLoading } =
+    useWorkspaceSwitcher();
 
   const { onNewClickV2 } = useApiClientContext();
 
@@ -157,61 +153,71 @@ export const WorkspaceCollapse: React.FC<WorkspaceCollapseProps> = ({
                     {showNewRecordBtn ? (
                       <>
                         {type === ApiClientSidebarTabKey.ENVIRONMENTS ? (
-                          <RQButton
-                            size="small"
-                            type="transparent"
-                            icon={<MdAdd />}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onNewClickV2({
-                                contextId: workspaceId,
-                                analyticEventSource: "api_client_sidebar_header",
-                                recordType: RQAPI.RecordType.ENVIRONMENT,
-                                collectionId: undefined,
-                              });
-                            }}
-                          />
-                        ) : (
-                          <NewApiRecordDropdown
-                            invalidActions={[NewRecordDropdownItemType.ENVIRONMENT]}
-                            onSelect={(params) => {
-                              apiClientContextRegistry.setLastUsedContext(workspaceId);
-                              //FIXME: fix the analytics here
-                              onNewClickV2({
-                                contextId: workspaceId,
-                                analyticEventSource: "api_client_sidebar_header",
-                                recordType: params.recordType,
-                                collectionId: undefined,
-                                entryType: params.entryType,
-                              });
-                            }}
-                          >
+                          <Tooltip title="New environment">
                             <RQButton
                               size="small"
                               type="transparent"
                               icon={<MdAdd />}
-                              onClick={(e) => e.stopPropagation()}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onNewClickV2({
+                                  contextId: workspaceId,
+                                  analyticEventSource: "api_client_sidebar_header",
+                                  recordType: RQAPI.RecordType.ENVIRONMENT,
+                                  collectionId: undefined,
+                                });
+                              }}
                             />
-                          </NewApiRecordDropdown>
+                          </Tooltip>
+                        ) : (
+                          <Tooltip title="New request or collection">
+                            <span>
+                              <NewApiRecordDropdown
+                                invalidActions={[NewRecordDropdownItemType.ENVIRONMENT]}
+                                onSelect={(params) => {
+                                  apiClientContextRegistry.setLastUsedContext(workspaceId);
+                                  //FIXME: fix the analytics here
+                                  onNewClickV2({
+                                    contextId: workspaceId,
+                                    analyticEventSource: "api_client_sidebar_header",
+                                    recordType: params.recordType,
+                                    collectionId: undefined,
+                                    entryType: params.entryType,
+                                  });
+                                }}
+                              >
+                                <RQButton
+                                  size="small"
+                                  type="transparent"
+                                  icon={<MdAdd />}
+                                  onClick={(e) => e.stopPropagation()}
+                                />
+                              </NewApiRecordDropdown>
+                            </span>
+                          </Tooltip>
                         )}
                       </>
                     ) : null}
 
-                    <Dropdown
-                      menu={{ items }}
-                      trigger={["click"]}
-                      placement="bottomRight"
-                      overlayClassName="collection-dropdown-menu"
-                    >
-                      <RQButton
-                        onClick={(e) => {
-                          e.stopPropagation();
-                        }}
-                        size="small"
-                        type="transparent"
-                        icon={<MdOutlineMoreHoriz />}
-                      />
-                    </Dropdown>
+                    <Tooltip title="More actions">
+                      <span>
+                        <Dropdown
+                          menu={{ items }}
+                          trigger={["click"]}
+                          placement="bottomRight"
+                          overlayClassName="collection-dropdown-menu"
+                        >
+                          <RQButton
+                            onClick={(e) => {
+                              e.stopPropagation();
+                            }}
+                            size="small"
+                            type="transparent"
+                            icon={<MdOutlineMoreHoriz />}
+                          />
+                        </Dropdown>
+                      </span>
+                    </Tooltip>
                   </div>
                 </Conditional>
               </div>
