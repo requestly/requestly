@@ -168,7 +168,7 @@
     "semver": "^7.5.4",
     "styled-components": "^6.1.8",
     "ua-parser-js": "^1.0.2",
-    "uuid": "^8.3.2",
+    "uuid": "^14.0.0",
     "validator": "^13.7.0",
     "vscode-json-languageservice": "^5.3.6",
     "vscode-languageserver-textdocument": "^1.0.11",
