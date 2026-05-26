@@ -4,14 +4,16 @@
 
 .request-bot {
   position: fixed;
-  bottom: 30px;
-  right: 20px;
+  bottom: 16px;
+  right: clamp(16px, 5vw, 65px);
   z-index: 100;
-  width: 424px;
-  height: 640px;
+  width: min(424px, calc(100vw - 32px));
+  height: min(640px, calc(100vh - 32px));
+  box-sizing: border-box;
   background-color: var(--requestly-color-surface-2);
   padding: 8px;
   border-radius: 1rem;
+  overflow: hidden;
 }
 
 .request-bot iframe {
@@ -45,4 +47,10 @@
   border-radius: 0 0 16px 16px;
   font-size: var(--requestly-font-size-sm, 13px);
   cursor: pointer;
+}
+
+@media (max-width: 520px) {
+  .request-bot {
+    right: 16px;
+  }
 }
