@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { Row, Input, Typography } from "antd";
+import { Row, Input, Tooltip, Typography } from "antd";
 import { MdOutlineEdit } from "@react-icons/all-files/md/MdOutlineEdit";
 import "./inlineInput.scss";
 
@@ -67,10 +67,12 @@ export const InlineInput: React.FC<Props> = ({
               {value || placeholder}
             </Typography.Text>
             {!disabled && (
-              <MdOutlineEdit
-                className={`${textarea ? "align-self-start" : "align-self-center"}`}
-                onClick={() => setIsEditable(true)}
-              />
+              <Tooltip title="Edit" placement="top">
+                <MdOutlineEdit
+                  className={`${textarea ? "align-self-start" : "align-self-center"}`}
+                  onClick={() => setIsEditable(true)}
+                />
+              </Tooltip>
             )}
           </div>
         )}
