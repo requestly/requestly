@@ -33,7 +33,7 @@ export const KeyValueTableSettingsDropdown: React.FC<KeyValueTableSettingsDropdo
   return (
     <div className="key-value-settings-header">
       <Dropdown menu={{ items }} trigger={["click"]} placement="bottomLeft">
-        <Tooltip title="More actions" placement="top">
+        <Tooltip title="Settings" placement="top">
           <RQButton type="transparent" size="small" icon={<MdMoreHoriz />} className="key-value-settings-icon" />
         </Tooltip>
       </Dropdown>
