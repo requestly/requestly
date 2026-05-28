@@ -2,6 +2,12 @@
   height: 100%;
   table {
     tbody {
+      .network-log-row,
+      .network-log-row td,
+      .network-log-row [class*="Table-content"] {
+        cursor: pointer;
+      }
+
       tr[aria-selected="true"] {
         .graphql-operation-name {
           color: var(--requestly-color-text-default);
