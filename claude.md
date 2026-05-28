@@ -38,6 +38,10 @@ Browser extension implementation for Chrome, Firefox, Safari, Edge, and other br
 
 The extension shares the rule processor from `common/rule-processor`.
 
+Key subdirectories:
+- **`browser-extension/mv3/`** — MV3 extension: service worker, content scripts, page scripts, DNR rule management, Safari variants. See `browser-extension/mv3/claude.md` for details.
+- **`browser-extension/common/`** — Shared extension code: storage layer, popup UI, devtools panel, custom elements (in-page widgets), constants, and types. See `browser-extension/common/claude.md` for details.
+
 ## `common/rule-processor/` - Core Rule Processing Engine
 The core rule execution engine that processes Requestly rules. This code is shared across:
 - Browser extension (rule execution in browser)
