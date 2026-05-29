@@ -60,7 +60,6 @@ export const SidebarListHeader: React.FC<ListHeaderProps> = ({
               size="small"
               type="transparent"
               icon={<MdAdd />}
-              title="Create new environment"
               className="sidebar-list-header-button"
               onClick={() => {
                 onNewRecordClick("api_client_sidebar_header", RQAPI.RecordType.ENVIRONMENT);
