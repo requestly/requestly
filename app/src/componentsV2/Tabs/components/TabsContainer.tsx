@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { Tabs, TabsProps, Typography, Popover } from "antd";
 import { TabItem } from "./TabItem";
 import { Outlet, unstable_useBlocker } from "react-router-dom";
-import { RQButton } from "lib/design-system-v2/components";
+import { RQButton, RQTooltip } from "lib/design-system-v2/components";
 import { MdClose } from "@react-icons/all-files/md/MdClose";
 import { IoIosArrowDown } from "@react-icons/all-files/io/IoIosArrowDown";
 import { useSetUrl } from "../hooks/useSetUrl";
@@ -328,6 +328,11 @@ export const TabsContainer: React.FC = () => {
             });
           }
         }}
+        addIcon={
+          <RQTooltip title="New request">
+            <span>+</span>
+          </RQTooltip>
+        }
       />
       <ActiveWorkflowModal
         open={workflowModalTabId !== null}
