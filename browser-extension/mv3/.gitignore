@@ -1,5 +1,0 @@
-node_modules
-dist
-*.log
-test-results/
-scripts/alias.sh

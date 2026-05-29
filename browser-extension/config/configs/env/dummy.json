@@ -1,7 +1,0 @@
-{
-  "WEB_URL": "https://app.requestly.io",
-  "SESSIONS_URL": "https://app.requestly.io/sessions",
-  "OTHER_WEB_URLS": ["https://app.requestly.com"],
-  "LANDING_PAGE_BASE_URL": "https://requestly.com",
-  "logLevel": "debug"
-}

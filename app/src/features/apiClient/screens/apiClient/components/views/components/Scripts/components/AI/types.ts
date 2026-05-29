@@ -1,4 +1,0 @@
-export enum AITestGenerationError {
-  UNRELATED_QUERY = "UNRELATED_QUERY",
-  TEST_NOT_REQUESTED = "TEST_NOT_REQUESTED",
-}

@@ -1,3 +1,0 @@
-/* 
-Move homepage components here from comoponents folder
-*/

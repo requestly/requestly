@@ -1,1 +1,0 @@
-export { TemplatesList } from "./TemplatesList";

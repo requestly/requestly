@@ -1,2 +1,0 @@
-export { entitySynced } from "./actions";
-
