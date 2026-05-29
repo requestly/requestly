@@ -3,7 +3,7 @@ import type { TableProps } from "antd";
 import { Tooltip } from "antd";
 import { ContentListTable } from "componentsV2/ContentList";
 import { MdAdd } from "@react-icons/all-files/md/MdAdd";
-import { RQButton } from "lib/design-system-v2/components";
+import { RQButton, RQTooltip } from "lib/design-system-v2/components";
 import { KeyValueTableEditableRow, KeyValueTableEditableCell } from "./KeyValueTableRow";
 import { KeyValueTableSettingsDropdown } from "./KeyValueTableSettingsDropdown";
 import { KeyValuePair, KeyValueDataType } from "features/apiClient/types";
@@ -260,13 +260,15 @@ export const KeyValueTable: React.FC<React.PropsWithChildren<KeyValueTableProps>
           }
 
           return (
-            <RQButton
-              className="key-value-delete-btn"
-              icon={<RiDeleteBin6Line />}
-              type="transparent"
-              size="small"
-              onClick={() => handleDeletePair(record)}
-            />
+            <RQTooltip title="Delete">
+              <RQButton
+                className="key-value-delete-btn"
+                icon={<RiDeleteBin6Line />}
+                type="transparent"
+                size="small"
+                onClick={() => handleDeletePair(record)}
+              />
+            </RQTooltip>
           );
         },
       },
