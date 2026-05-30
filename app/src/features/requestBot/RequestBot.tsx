@@ -39,8 +39,8 @@ export const RequestBot: React.FC<RequestBotProps> = ({ isOpen, onClose, modelTy
   return (
     <>
       <m.div
-        initial={{ opacity: 0, right: -450 }}
-        animate={{ opacity: shouldShowBot ? 1 : 0, right: shouldShowBot ? 65 : -450 }}
+        initial={{ opacity: 0, right: "-450px" }}
+        animate={{ opacity: shouldShowBot ? 1 : 0, right: shouldShowBot ? "clamp(16px, 5vw, 65px)" : "-450px" }}
         transition={{ duration: 0.2 }}
         className="request-bot"
         style={{ pointerEvents: shouldShowBot ? "auto" : "none" }}
