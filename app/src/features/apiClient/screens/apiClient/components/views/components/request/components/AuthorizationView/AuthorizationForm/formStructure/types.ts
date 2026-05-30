@@ -19,6 +19,7 @@ export namespace AuthForm {
   export interface InputField extends BaseAuthFormField {
     type: FIELD_TYPE.INPUT;
     placeholder?: string;
+    isSensitive?: boolean;
   }
 
   export interface SelectField extends BaseAuthFormField {

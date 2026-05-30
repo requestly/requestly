@@ -26,6 +26,7 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
   onPaste,
   variables,
   suggestions,
+  isMasked = false,
 }) => {
   const editorRef = useRef<HTMLDivElement>(null);
   const editorViewRef = useRef<EditorView | null>(null);
@@ -206,7 +207,7 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
     <>
       <div
         ref={editorRef}
-        className={`${className ?? ""} editor-popup-container ant-input`}
+        className={`${className ?? ""} editor-popup-container ant-input ${isMasked ? "masked" : ""}`}
         onMouseLeave={handleMouseLeave}
       >
         <Conditional condition={!!hoveredVariable}>

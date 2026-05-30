@@ -1,5 +1,5 @@
-import { Select } from "antd";
-import React from "react";
+import { Select, Tooltip } from "antd";
+import React, { useState } from "react";
 import { AuthForm } from "./formStructure/types";
 import { AuthConfig, AuthConfigMeta, Authorization } from "../types/AuthConfig";
 import { useAuthFormState } from "./hooks/useAuthFormState";
@@ -9,6 +9,9 @@ import InfoIcon from "components/misc/InfoIcon";
 import { Conditional } from "components/common/Conditional";
 import { INVALID_KEY_CHARACTERS } from "features/apiClient/constants";
 import { ScopedVariables, useScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
+import { RQButton } from "lib/design-system-v2/components";
+import { RiEyeLine } from "@react-icons/all-files/ri/RiEyeLine";
+import { RiEyeOffLine } from "@react-icons/all-files/ri/RiEyeOffLine";
 
 interface AuthorizationFormProps<AuthType extends AuthConfigMeta.AuthWithConfig> {
   recordId: string;
@@ -31,6 +34,7 @@ const AuthorizationForm = <AuthType extends AuthConfigMeta.AuthWithConfig>({
   onChangeHandler,
 }: AuthorizationFormProps<AuthType>) => {
   const { formState, handleFormChange } = useAuthFormState(formType, onChangeHandler, defaultAuthValues);
+  const [visibleSensitiveFields, setVisibleSensitiveFields] = useState<Record<string, boolean>>({});
 
   const scopedVariables = useScopedVariables(recordId);
   return (
@@ -39,7 +43,20 @@ const AuthorizationForm = <AuthType extends AuthConfigMeta.AuthWithConfig>({
         <div className="field-group" key={formField.id || index}>
           <label>{formField.label}</label>
           <div className="field">
-            {generateFields(formField, index, scopedVariables, formType, handleFormChange, formState)}
+            {generateFields(
+              formField,
+              index,
+              scopedVariables,
+              formType,
+              handleFormChange,
+              formState,
+              Boolean(visibleSensitiveFields[formField.id]),
+              () =>
+                setVisibleSensitiveFields((prev) => ({
+                  ...prev,
+                  [formField.id]: !prev[formField.id],
+                }))
+            )}
           </div>
         </div>
       ))}
@@ -53,7 +70,9 @@ function generateFields(
   variables: ScopedVariables,
   formType: Authorization.Type,
   onChangeHandler: (value: string, id: string) => void,
-  formState: Record<string, string>
+  formState: Record<string, string>,
+  isSensitiveFieldVisible: boolean,
+  onToggleSensitiveField: () => void
 ) {
   const hasInvalidCharacter = INVALID_KEY_CHARACTERS.test(formState[field.id]);
   //this is used as on mount the formState is undefinded so added a fallback
@@ -78,7 +97,19 @@ function generateFields(
             defaultValue={formState[field.id]}
             onChange={(value) => onChangeHandler(value, field.id)}
             variables={variables}
+            isMasked={field.isSensitive && !isSensitiveFieldVisible}
           />
+          <Conditional condition={Boolean(field.isSensitive)}>
+            <Tooltip title={isSensitiveFieldVisible ? "Hide" : "Show"}>
+              <RQButton
+                type="transparent"
+                size="small"
+                className="sensitive-field-toggle"
+                icon={isSensitiveFieldVisible ? <RiEyeOffLine /> : <RiEyeLine />}
+                onClick={onToggleSensitiveField}
+              />
+            </Tooltip>
+          </Conditional>
           <Conditional
             condition={hasInvalidCharacter && formType === Authorization.Type.API_KEY && field.id === "key" && isHeader}
           >

@@ -1,4 +1,8 @@
 .editor-popup-container {
+  &.masked .cm-content {
+    -webkit-text-security: disc;
+  }
+
   .popup-option {
     background-color: var(--requestly-color-surface-0);
     color: var(--requestly-color-text-default);

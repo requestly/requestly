@@ -10,4 +10,5 @@ export interface SingleLineEditorProps {
   onPaste?: (event: ClipboardEvent, text: string) => void;
   variables?: ScopedVariables;
   suggestions?: Array<{ value: string }>;
+  isMasked?: boolean;
 }
