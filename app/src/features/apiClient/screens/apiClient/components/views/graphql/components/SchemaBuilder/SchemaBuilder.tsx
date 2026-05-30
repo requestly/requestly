@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useMemo } from "react";
 import Explorer from "graphiql-explorer";
 import { buildClientSchema, parse } from "graphql";
 import "@graphiql/plugin-explorer/style.css";
@@ -29,10 +29,8 @@ export const SchemaBuilder: React.FC<Props> = ({ entity, setIsSchemaBuilderOpen 
     url,
   });
 
-  const hasParsedSuccessfully = useRef(false);
-
   /*
-   * This effect is added due to Explorer component's internal query caching logic.
+   * This guard is added due to Explorer component's internal query caching logic.
    * The graphiql-explorer package uses module-level memoization that caches parsed queries
    * across all component instances. When multiple SchemaBuilder components are rendered
    * (e.g., in different tabs), they share the same parsed query cache, causing field
@@ -42,18 +40,16 @@ export const SchemaBuilder: React.FC<Props> = ({ entity, setIsSchemaBuilderOpen 
    * using a previously cached query, which can lead to unexpected behavior and further
    * state sharing issues between different instances.
    *
-   * By only passing the query to Explorer after it has been successfully parsed once,
+   * By only passing the query to Explorer after it has been successfully parsed,
    * we prevent the Explorer from caching invalid queries and reduce the likelihood of
    * shared state issues between different instances.
    */
-  useEffect(() => {
-    if (!hasParsedSuccessfully.current) {
-      try {
-        parse(operation);
-        hasParsedSuccessfully.current = true;
-      } catch (e) {
-        // NO OP
-      }
+  const parsedOperation = useMemo(() => {
+    try {
+      parse(operation);
+      return operation;
+    } catch (e) {
+      return "";
     }
   }, [operation]);
 
@@ -80,7 +76,7 @@ export const SchemaBuilder: React.FC<Props> = ({ entity, setIsSchemaBuilderOpen 
           <div className="schema-builder__content">
             <Explorer
               schema={introspectionData ? buildClientSchema(introspectionData) : {}}
-              query={hasParsedSuccessfully.current ? operation : ""}
+              query={parsedOperation}
               explorerIsOpen={true}
               arrowClosed={<Checkbox checked={false} className="schema-builder__checkbox" />}
               arrowOpen={<Checkbox checked={true} className="schema-builder__checkbox" />}
