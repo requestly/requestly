@@ -10,6 +10,7 @@ export namespace AuthForm {
     type: string;
     label: string;
     className?: string;
+    isSensitive?: boolean;
   }
   export enum FIELD_TYPE {
     INPUT = "RQ_SINGLE_LINE_EDITOR",
