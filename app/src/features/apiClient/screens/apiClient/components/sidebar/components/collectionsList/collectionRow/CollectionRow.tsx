@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
-import { Checkbox, Dropdown, MenuProps, Skeleton, Typography, notification } from "antd";
+import { Checkbox, Dropdown, MenuProps, Skeleton, Tooltip, Typography, notification } from "antd";
 import { RQAPI } from "features/apiClient/types";
 import { RQAPI as SharedRQAPI } from "@requestly/shared/types/entities/apiClient";
 import { RQButton } from "lib/design-system-v2/components";
@@ -484,6 +484,7 @@ export const CollectionRow: React.FC<Props> = ({
                 <Conditional condition={!isReadOnly}>
                   <div className={`collection-options ${hoveredId === record.id ? "active" : " "}`}>
                     <NewApiRecordDropdown
+                      tooltipTitle="New request or collection"
                       invalidActions={[NewRecordDropdownItemType.ENVIRONMENT]}
                       onSelect={(params) => {
                         setActiveKey(record.id);
@@ -501,15 +502,17 @@ export const CollectionRow: React.FC<Props> = ({
                       placement="bottomRight"
                       overlayClassName="collection-dropdown-menu"
                     >
-                      <RQButton
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setShowSelection(false);
-                        }}
-                        size="small"
-                        type="transparent"
-                        icon={<MdOutlineMoreHoriz />}
-                      />
+                      <Tooltip title="More actions">
+                        <RQButton
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setShowSelection(false);
+                          }}
+                          size="small"
+                          type="transparent"
+                          icon={<MdOutlineMoreHoriz />}
+                        />
+                      </Tooltip>
                     </Dropdown>
                   </div>
                 </Conditional>

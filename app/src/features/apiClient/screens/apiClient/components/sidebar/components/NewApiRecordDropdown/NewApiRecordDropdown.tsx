@@ -1,4 +1,4 @@
-import { Dropdown, MenuProps } from "antd";
+import { Dropdown, MenuProps, Tooltip } from "antd";
 import React, { useMemo } from "react";
 import { BsCollection } from "@react-icons/all-files/bs/BsCollection";
 import { GrGraphQl } from "@react-icons/all-files/gr/GrGraphQl";
@@ -29,6 +29,7 @@ type NewRecordDropdownProps = {
   className?: string;
   overlayClassName?: string;
   invalidActions?: NewRecordDropdownItemType[];
+  tooltipTitle?: string;
 } & (
   | {
       buttonProps?: DropdownButtonProps;
@@ -43,7 +44,7 @@ type NewRecordDropdownProps = {
 export const NewApiRecordDropdown: React.FC<NewRecordDropdownProps> = (props) => {
   const isGraphQLSupportEnabled = useFeatureIsOn("graphql-support");
 
-  const { onSelect, buttonProps, children, disabled, invalidActions } = props;
+  const { onSelect, buttonProps, children, disabled, invalidActions, tooltipTitle } = props;
 
   const allDropdownItems: MenuProps["items"] = useMemo(() => {
     return [
@@ -103,7 +104,7 @@ export const NewApiRecordDropdown: React.FC<NewRecordDropdownProps> = (props) =>
         menu={{ items: dropdownItems }}
         trigger={["click"]}
       >
-        {children}
+        {tooltipTitle ? <Tooltip title={tooltipTitle}>{children}</Tooltip> : children}
       </Dropdown>
     );
   }

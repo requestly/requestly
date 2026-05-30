@@ -184,6 +184,9 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
           <RoleBasedComponent resource="api_client_request" permission="create">
             <div className="actions">
               <NewApiRecordDropdown
+                tooltipTitle={
+                  activeTab === ApiClientSidebarTabKey.ENVIRONMENTS ? "New environment" : "New request or collection"
+                }
                 onSelect={(params) => {
                   onNewClick(params.recordType, params.entryType);
                 }}
