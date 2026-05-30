@@ -17,6 +17,10 @@
   gap: 4px;
 }
 
+.editor-title-container .editor-description {
+  align-items: flex-start;
+}
+
 .editor-title-name .editor-title-name-wrapper {
   width: 100%;
 }
@@ -35,6 +39,7 @@
 }
 
 .editor-description .ant-typography {
+  flex: 1;
   margin-bottom: 0;
   color: #86868b;
 }
@@ -92,6 +97,7 @@
   max-width: 600px;
 }
 .editor-description .edit-description-btn {
+  flex-shrink: 0;
   padding: 0;
   color: var(--text-gray);
   transition: 0.2s ease-in-out;
