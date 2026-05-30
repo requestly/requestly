@@ -68,18 +68,40 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisab
     trackRuleFilterModalToggled(false, currentlySelectedRuleData?.ruleType);
   }, [currentlySelectedRuleData?.ruleType]);
 
+  const isFilterApplied = useCallback((filterKey, filterValue) => {
+    if (filterKey === GLOBAL_CONSTANTS.RULE_SOURCE_FILTER_TYPES.PAGE_URL) {
+      return false;
+    }
+
+    if (filterKey === GLOBAL_CONSTANTS.RULE_SOURCE_FILTER_TYPES.REQUEST_PAYLOAD) {
+      return Boolean(filterValue?.key?.trim?.() && filterValue?.value?.trim?.());
+    }
+
+    if (Array.isArray(filterValue)) {
+      return filterValue.some((value) => value && value !== "all");
+    }
+
+    if (typeof filterValue === "string") {
+      return filterValue.trim() !== "" && filterValue !== "all";
+    }
+
+    if (filterValue && typeof filterValue === "object") {
+      return Object.entries(filterValue).some(([key, value]) => isFilterApplied(key, value));
+    }
+
+    return Boolean(filterValue);
+  }, []);
+
   const getFilterCount = useCallback(
     (pairIndex) => {
       const copyOfCurrentlySelectedRule = JSON.parse(JSON.stringify(currentlySelectedRuleData));
-      return isSourceFilterFormatUpgraded(pairIndex, copyOfCurrentlySelectedRule)
-        ? Object.keys(currentlySelectedRuleData.pairs[pairIndex].source.filters[0] || {}).filter(
-            (key) => key !== GLOBAL_CONSTANTS.RULE_SOURCE_FILTER_TYPES.PAGE_URL
-          ).length
-        : Object.keys(currentlySelectedRuleData.pairs[pairIndex].source.filters || {}).filter(
-            (key) => key !== GLOBAL_CONSTANTS.RULE_SOURCE_FILTER_TYPES.PAGE_URL
-          ).length;
+      const filters = isSourceFilterFormatUpgraded(pairIndex, copyOfCurrentlySelectedRule)
+        ? currentlySelectedRuleData.pairs[pairIndex].source.filters[0] || {}
+        : currentlySelectedRuleData.pairs[pairIndex].source.filters || {};
+
+      return Object.entries(filters).filter(([key, value]) => isFilterApplied(key, value)).length;
     },
-    [currentlySelectedRuleData, isSourceFilterFormatUpgraded]
+    [currentlySelectedRuleData, isFilterApplied, isSourceFilterFormatUpgraded]
   );
 
   const sourceKeys = useMemo(
