@@ -76,13 +76,19 @@ const BufferedTabLabel: React.FC<BufferedTabLabelProps> = ({ tab, onClose, onDou
   );
 };
 
-interface TabLabelProps {
+interface BaseTabLabelProps {
   tab: TabState;
   onClose: () => void;
   onDoubleClick: () => void;
 }
 
-const NonBufferedTabLabel: React.FC<TabLabelProps> = ({ tab, onClose, onDoubleClick }) => {
+interface TabLabelProps extends BaseTabLabelProps {
+  onDragStart: (tabId: TabId) => void;
+  onDragOver: (event: React.DragEvent) => void;
+  onDrop: (tabId: TabId) => void;
+}
+
+const NonBufferedTabLabel: React.FC<BaseTabLabelProps> = ({ tab, onClose, onDoubleClick }) => {
   const displayTitle = tab.source.getDefaultTitle();
   const previewTabId = usePreviewTabId();
   const isPreview = tab.id === previewTabId;
@@ -122,21 +128,41 @@ const NonBufferedTabLabel: React.FC<TabLabelProps> = ({ tab, onClose, onDoubleCl
   );
 };
 
-const TabLabel: React.FC<TabLabelProps> = ({ tab, onClose, onDoubleClick }) => {
+const TabLabel: React.FC<TabLabelProps> = ({ tab, onClose, onDoubleClick, onDragStart, onDragOver, onDrop }) => {
+  const dragProps = {
+    draggable: true,
+    onDragStart: () => onDragStart(tab.id),
+    onDragOver,
+    onDrop: () => onDrop(tab.id),
+  };
+
   if (tab.modeConfig.mode === "buffer") {
-    return <BufferedTabLabel tab={tab as BufferModeTab} onClose={onClose} onDoubleClick={onDoubleClick} />;
+    return (
+      <div {...dragProps}>
+        <BufferedTabLabel tab={tab as BufferModeTab} onClose={onClose} onDoubleClick={onDoubleClick} />
+      </div>
+    );
   }
 
-  return <NonBufferedTabLabel tab={tab} onClose={onClose} onDoubleClick={onDoubleClick} />;
+  return (
+    <div {...dragProps}>
+      <NonBufferedTabLabel
+        tab={tab}
+        onClose={onClose}
+        onDoubleClick={onDoubleClick}
+      />
+    </div>
+  );
 };
 
 export const TabsContainer: React.FC = () => {
   const tabs = useTabs();
   const activeTabId = useActiveTabId();
   const previewTabId = usePreviewTabId();
-  const { closeTab, setActiveTab, openBufferedTab, setPreviewTab } = useTabActions();
+  const { closeTab, setActiveTab, openBufferedTab, setPreviewTab, reorderTabs } = useTabActions();
   const [isMorePopoverOpen, setIsMorePopoverOpen] = useState(false);
   const [workflowModalTabId, setWorkflowModalTabId] = useState<TabId | null>(null);
+  const draggedTabIdRef = useRef<TabId | null>(null);
 
   useCloseActiveTabShortcut();
 
@@ -270,6 +296,28 @@ export const TabsContainer: React.FC = () => {
     [closeTab]
   );
 
+  const handleTabDragStart = useCallback((tabId: TabId) => {
+    draggedTabIdRef.current = tabId;
+  }, []);
+
+  const handleTabDragOver = useCallback((event: React.DragEvent) => {
+    event.preventDefault();
+  }, []);
+
+  const handleTabDrop = useCallback(
+    (targetTabId: TabId) => {
+      const draggedTabId = draggedTabIdRef.current;
+      draggedTabIdRef.current = null;
+
+      if (!draggedTabId) {
+        return;
+      }
+
+      reorderTabs({ draggedTabId, targetTabId });
+    },
+    [reorderTabs]
+  );
+
   const tabItems: TabsProps["items"] = useMemo(() => {
     return tabs.map((tab) => ({
       key: tab.id,
@@ -279,11 +327,14 @@ export const TabsContainer: React.FC = () => {
           tab={tab}
           onClose={() => handleTabCloseRequest(tab)}
           onDoubleClick={() => handleUnpreviewTab(tab.id)}
+          onDragStart={handleTabDragStart}
+          onDragOver={handleTabDragOver}
+          onDrop={handleTabDrop}
         />
       ),
       children: <TabItem tabId={tab.id}>{tab.source.render()}</TabItem>,
     }));
-  }, [tabs, handleTabCloseRequest, handleUnpreviewTab]);
+  }, [tabs, handleTabCloseRequest, handleUnpreviewTab, handleTabDragStart, handleTabDragOver, handleTabDrop]);
 
   const handleWorkflowModalCancel = useCallback(() => {
     setWorkflowModalTabId(null);

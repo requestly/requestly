@@ -70,6 +70,30 @@ export const tabsSlice = createSlice({
       state.previewTabId = action.payload;
     },
 
+    reorderTabs(state, action: PayloadAction<{ draggedTabId: TabId; targetTabId: TabId }>) {
+      const { draggedTabId, targetTabId } = action.payload;
+
+      if (draggedTabId === targetTabId) {
+        return;
+      }
+
+      const tabIds = state.tabs.ids;
+      const draggedIndex = tabIds.indexOf(draggedTabId);
+      const targetIndex = tabIds.indexOf(targetTabId);
+
+      if (draggedIndex === -1 || targetIndex === -1) {
+        return;
+      }
+
+      const [draggedId] = tabIds.splice(draggedIndex, 1);
+
+      if (!draggedId) {
+        return;
+      }
+
+      tabIds.splice(targetIndex, 0, draggedId);
+    },
+
     addActiveWorkflow(state, action: PayloadAction<{ tabId: TabId; workflow: ActiveWorkflow }>) {
       const { tabId, workflow } = action.payload;
       const tab = state.tabs.entities[tabId];
