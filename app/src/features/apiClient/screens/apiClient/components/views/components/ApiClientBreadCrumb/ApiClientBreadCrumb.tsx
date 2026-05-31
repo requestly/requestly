@@ -105,11 +105,23 @@ export const MultiViewBreadCrumb: React.FC<Props> = ({ ...props }) => {
 };
 
 export const ApiClientBreadCrumb: React.FC<Props> = ({ ...props }) => {
-  const { openInModal, autoFocus, name, placeholder, onRecordNameUpdate, onBlur } = props;
+  const { id, openInModal, autoFocus, name, placeholder, onRecordNameUpdate, onBlur, breadCrumbType } = props;
 
   const location = useLocation();
   const isHistoryPath = location.pathname.includes("history");
   const viewMode = useViewMode();
+  const ancestorRecords = useAncestorRecords(id);
+
+  const parentCollectionNames = useMemo(() => {
+    return ancestorRecords
+      .slice()
+      .reverse()
+      .map((record) => ({
+        label: record?.name,
+        pathname: "",
+        isEditable: false,
+      }));
+  }, [ancestorRecords]);
 
   return (
     <Conditional condition={!openInModal}>
@@ -128,10 +140,16 @@ export const ApiClientBreadCrumb: React.FC<Props> = ({ ...props }) => {
             autoFocus={autoFocus}
             defaultBreadcrumbs={[
               { label: "API Client", pathname: PATHS.API_CLIENT.INDEX },
+              ...parentCollectionNames,
               {
-                isEditable: !isHistoryPath,
+                isEditable: breadCrumbType === BreadcrumbType.API_REQUEST ? !isHistoryPath : true,
                 pathname: window.location.pathname,
-                label: isHistoryPath ? "History" : name || "Untitled request",
+                label:
+                  breadCrumbType === BreadcrumbType.API_REQUEST
+                    ? isHistoryPath
+                      ? "History"
+                      : name || "Untitled request"
+                    : name,
               },
             ]}
           />
