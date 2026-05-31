@@ -2,7 +2,7 @@
   .ant-popover-inner-content {
     margin-top: -10px;
     display: flex;
-    width: 240px !important;
+    width: 320px !important;
     max-height: 400px !important;
     padding: var(--space-2, 4px);
     flex-direction: column;
@@ -22,6 +22,24 @@
     .secrets-autocomplete-fixed-footer {
       border-top: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
     }
+  }
+
+  .variable-autocomplete-content {
+    width: 100%;
+  }
+
+  .variable-autocomplete-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: var(--space-2, 4px) var(--space-3, 6px);
+    color: var(--requestly-color-text-subtle, rgba(255, 255, 255, 0.45));
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 16px;
+    border-bottom: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
+    margin-bottom: var(--space-2, 4px);
   }
 
   .ant-popover-arrow {
@@ -45,7 +63,7 @@
     display: flex;
     padding: var(--space-3, 6px) var(--space-2, 4px) !important;
     flex-direction: row;
-    width: 230px !important;
+    width: 310px !important;
     border-bottom: none !important;
     justify-content: space-between;
     border-radius: 4px;
@@ -61,7 +79,9 @@
     .item-left-section {
       display: flex;
       flex-direction: row;
+      align-items: center;
       gap: var(--space-3, 6px);
+      min-width: 0;
 
       .scope-tooltip {
         .ant-tooltip-inner {
@@ -109,6 +129,22 @@
       white-space: nowrap !important;
       max-width: 160px;
       flex-shrink: 1;
+    }
+
+    .variable-label-wrapper {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .variable-meta {
+      color: var(--requestly-color-text-subtle, rgba(255, 255, 255, 0.45));
+      font-size: 11px;
+      line-height: 14px;
+      max-width: 230px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
   }
 }

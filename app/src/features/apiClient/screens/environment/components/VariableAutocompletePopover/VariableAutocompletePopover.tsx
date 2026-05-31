@@ -113,7 +113,11 @@ export const VariableAutocompletePopover: React.FC<VariableAutocompleteProps> = 
         overlayInnerStyle={{ padding: 0 }}
         content={
           emptyState || (
-            <div>
+            <div className="variable-autocomplete-content">
+              <div className="variable-autocomplete-header">
+                <span>Variables</span>
+                <span>{filteredVariables.length}</span>
+              </div>
               {filteredVariables.length > 0 && (
                 <div
                   ref={listRef}

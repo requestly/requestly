@@ -19,6 +19,12 @@ export const VariableRowContent: React.FC<{ item: AutocompleteItem; hideIcon?: b
   const isDynamic = checkIsDynamicVariable(item.variable);
   const isSecret = checkIsSecretsVariable(item.variable);
   const variableScope = Array.isArray(item.variable) ? item.variable[1].scope : item.variable.scope;
+  const variableSourceName = Array.isArray(item.variable) ? item.variable[1].name : null;
+  const variableValue = Array.isArray(item.variable)
+    ? item.variable[0].localValue || item.variable[0].syncValue
+    : "value" in item.variable
+    ? item.variable.value
+    : "";
 
   const scopeTooltipTitle = isSecret
     ? "Scope: Secrets"
@@ -34,7 +40,15 @@ export const VariableRowContent: React.FC<{ item: AutocompleteItem; hideIcon?: b
             <span className="scope-icon-wrapper">{getScopeIcon(variableScope, { showBackgroundColor: false })}</span>
           </Tooltip>
         )}
-        <span className="variable-label">{item.displayName}</span>
+        <span className="variable-label-wrapper">
+          <span className="variable-label">{item.displayName}</span>
+          {!item.isNamespace && (
+            <span className="variable-meta">
+              {variableSourceName ? `${variableSourceName} · ` : ""}
+              {variableValue || "No value"}
+            </span>
+          )}
+        </span>
       </div>
       {item.isNamespace ? (
         <RightOutlined className="namespace-chevron" />
