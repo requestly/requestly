@@ -82,9 +82,9 @@ export const ShareFromWorkspace: React.FC<Props> = ({
   const handleTransferToOtherWorkspace = useCallback(
     (teamData: Workspace) => {
       setIsLoading(true);
-      duplicateRulesToTargetWorkspace(appMode, teamData.id!, selectedRules).then(() => {
+      duplicateRulesToTargetWorkspace(appMode, teamData.id, selectedRules).then(() => {
         setIsLoading(false);
-        trackSharingModalRulesDuplicated("team", selectedRules.length);
+        trackSharingModalRulesDuplicated(teamData.id === null ? "personal" : "team", selectedRules.length);
         setPostShareViewData({
           type: WorkspaceSharingTypes.EXISTING_WORKSPACE,
           targetTeamData: teamData,
