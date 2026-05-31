@@ -20,6 +20,15 @@ export const erroredRecordsSlice = createSlice({
       state.environmentErroredRecords = action.payload;
     },
 
+    excludeErroredRecord(state, action: PayloadAction<Pick<ErroredRecord, "id" | "type">>) {
+      const { id, type } = action.payload;
+
+      state.apiErroredRecords = state.apiErroredRecords.filter((record) => record.id !== id || record.type !== type);
+      state.environmentErroredRecords = state.environmentErroredRecords.filter(
+        (record) => record.id !== id || record.type !== type
+      );
+    },
+
     hydrate(
       state,
       action: PayloadAction<{

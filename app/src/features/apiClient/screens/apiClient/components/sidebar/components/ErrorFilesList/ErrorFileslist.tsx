@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { MdEdit } from "@react-icons/all-files/md/MdEdit";
 import { MdWarningAmber } from "@react-icons/all-files/md/MdWarningAmber";
 import { RiDeleteBin6Line } from "@react-icons/all-files/ri/RiDeleteBin6Line";
+import { RiCloseCircleLine } from "@react-icons/all-files/ri/RiCloseCircleLine";
 import { ErroredRecord, FileType } from "features/apiClient/helpers/modules/sync/local/services/types";
 import { ErrorFileViewerModal } from "../../../modals/ErrorFileViewerModal/ErrorFileViewerModal";
 import { toast } from "utils/Toast";
@@ -12,7 +13,11 @@ import "./errorFilesList.scss";
 import { RiDeleteBinLine } from "@react-icons/all-files/ri/RiDeleteBinLine";
 import { ApiClientViewMode, useViewMode } from "features/apiClient/slices/workspaceView";
 import { useApiClientFeatureContext } from "features/apiClient/slices/workspaceView/helpers/ApiClientContextRegistry/hooks";
-import { useApiErroredRecords, useEnvironmentErroredRecords } from "features/apiClient/slices/erroredRecords";
+import {
+  erroredRecordsActions,
+  useApiErroredRecords,
+  useEnvironmentErroredRecords,
+} from "features/apiClient/slices/erroredRecords";
 import { forceRefreshRecords } from "features/apiClient/slices/apiRecords/thunks";
 import { forceRefreshEnvironments } from "features/apiClient/slices/environments/thunks";
 import { useSelector } from "react-redux";
@@ -105,8 +110,9 @@ const ErrorFileItemTitle: React.FC<{ file: ErroredRecord }> = ({ file }) => {
 const ErrorFileItem: React.FC<{
   file: ErroredRecord;
   openErrorFile: (file: ErroredRecord) => void;
+  excludeErrorFile(file: ErroredRecord): void;
   deleteErrorFile(file: ErroredRecord): void;
-}> = ({ file, openErrorFile, deleteErrorFile }) => {
+}> = ({ file, openErrorFile, excludeErrorFile, deleteErrorFile }) => {
   return (
     <div key={file.path} className="error-file-item">
       <ErrorFileItemTitle file={file} />
@@ -114,6 +120,9 @@ const ErrorFileItem: React.FC<{
       <div className="error-file-item-actions">
         <Tooltip title="Edit file" color="var(--requestly-color-black)" placement="top">
           <MdEdit className="error-file-item-action-icon" onClick={() => openErrorFile(file)} />
+        </Tooltip>
+        <Tooltip title="Exclude from list" color="var(--requestly-color-black)" placement="top">
+          <RiCloseCircleLine className="error-file-item-action-icon" onClick={() => excludeErrorFile(file)} />
         </Tooltip>
         <DeleteErrorFileButton
           onDelete={() => {
@@ -189,6 +198,14 @@ export const ErrorFilesList: React.FC<{ updateErrorRecordsCount?: (value: number
     setIsErrorFileViewerModalOpen(true);
   };
 
+  const handleExcludeErrorFile = useCallback(
+    (file: ErroredRecord) => {
+      context.store.dispatch(erroredRecordsActions.excludeErroredRecord({ id: file.id, type: file.type }));
+      toast.success("Error file excluded from list");
+    },
+    [context.store]
+  );
+
   const onCloseErrorFileViewerModalOpen = useCallback(() => {
     setIsErrorFileViewerModalOpen(false);
     setErrorFileToView(null);
@@ -217,6 +234,7 @@ export const ErrorFilesList: React.FC<{ updateErrorRecordsCount?: (value: number
                 file={file}
                 key={file.path}
                 openErrorFile={handleOpenErrorFile}
+                excludeErrorFile={handleExcludeErrorFile}
                 deleteErrorFile={handleDeleteErrorFile}
               />
             );
