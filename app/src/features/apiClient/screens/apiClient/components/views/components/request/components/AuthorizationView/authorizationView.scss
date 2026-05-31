@@ -63,10 +63,22 @@
               min-width: initial;
             }
 
-            .input-container.error-state {
-              position: relative;
+            .input-container {
               display: flex;
               align-items: center;
+              gap: var(--requestly-space-2, 4px);
+
+              .editor-popup-container {
+                width: 100%;
+              }
+
+              .sensitive-field-toggle {
+                flex-shrink: 0;
+              }
+            }
+
+            .input-container.error-state {
+              position: relative;
               height: var(--requestly-space-9, 32px);
               padding: 8px 8px;
               gap: var(--requestly-space-3, 6px);
