@@ -82,17 +82,19 @@ const PremiumPlanBadge = () => {
     const planName =
       userPlanDetails?.planName === "professional" ? "Pro" : getPrettyPlanName(userPlanDetails?.planName);
 
+    const urgencyClassName = daysLeft <= 3 ? "urgent" : daysLeft <= 7 ? "warning" : "";
+
     return (
       <Tooltip title={"Click for more details"} destroyTooltipOnHide={true}>
         <div
-          className="premium-plan-badge-container cursor-pointer"
+          className={`premium-plan-badge-container ${urgencyClassName} cursor-pointer`}
           role="button"
           onKeyDown={handleBadgeClick}
           onClick={handleBadgeClick}
         >
-          <div className="premium-plan-name">{`${planName} (Trial)`}</div>
+          <div className="premium-plan-name">{planName}</div>
           <div className="premium-plan-days-left">
-            {planStatus === APP_CONSTANTS.SUBSCRIPTION_STATUS.TRIALING ? `${daysLeft}d left` : "Expired"}
+            {planStatus === APP_CONSTANTS.SUBSCRIPTION_STATUS.TRIALING ? `Trial · ${daysLeft}d left` : "Expired"}
           </div>
         </div>
       </Tooltip>

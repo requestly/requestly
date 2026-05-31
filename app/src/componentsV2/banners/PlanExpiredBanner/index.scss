@@ -4,12 +4,19 @@
 
 .plan-expired-banner {
   position: relative;
-  background: var(--requestly-color-error-dark);
-  padding: 8px 2rem;
+  background: linear-gradient(90deg, var(--requestly-color-error-dark), var(--requestly-color-surface-0, #212121));
+  padding: 8px 3.5rem 8px 2rem;
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
+
+  &-content {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+  }
 
   &-badge {
     padding: 4px 8px;
@@ -20,6 +27,13 @@
     line-height: 12px;
     background: var(--requestly-color-error);
     border-radius: 4px;
+    white-space: nowrap;
+  }
+
+  &-description {
+    color: var(--requestly-color-text-subtle, rgba(255, 255, 255, 0.65));
+    font-size: var(--requestly-font-size-sm, 12px);
+    white-space: nowrap;
   }
 
   &-btn.ant-btn.ant-btn-default {
@@ -45,5 +59,19 @@
     font-size: 20px;
     color: var(--requestly-color-text-default);
     cursor: pointer;
+  }
+
+  @media screen and (max-width: 768px) {
+    justify-content: flex-start;
+
+    &-content {
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    &-description {
+      white-space: normal;
+    }
   }
 }

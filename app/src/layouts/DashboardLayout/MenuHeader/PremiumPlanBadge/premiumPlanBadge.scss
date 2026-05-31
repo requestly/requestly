@@ -2,17 +2,16 @@
   font-size: var(--requestly-font-size-sm, 12px);
   padding-left: 8px;
   padding-right: 8px;
-  color: var(--requestly-color-error);
+  color: var(--requestly-color-warning, #ffb020);
 }
 
 .premium-plan-name {
-  background-color: #30363d;
-  border: 1px solid rgba(205, 217, 229, 0.1);
-  background-image: linear-gradient(180deg, #373e47, #30363d 90%);
-  color: #adbac7;
+  background-color: var(--requestly-color-surface-2, #303030);
+  border-right: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
+  color: var(--requestly-color-text-default, #fff);
   border-radius: 5px 0px 0px 5px;
   font-size: var(--requestly-font-size-sm, 12px);
-  font-weight: 500;
+  font-weight: 600;
   width: 100%;
   padding: 0 4px;
   text-transform: capitalize;
@@ -20,12 +19,24 @@
 
 .premium-plan-badge-container {
   font-weight: 500;
-  background-color: #22272e;
-  border: 1px solid rgba(205, 217, 229, 0.1);
+  background-color: var(--requestly-color-surface-0, #212121);
+  border: 1px solid var(--requestly-color-warning, #ffb020);
   border-radius: 5px;
   text-align: center;
   display: flex;
   align-items: center;
   justify-content: center;
   white-space: nowrap;
+
+  &.warning {
+    border-color: var(--requestly-color-warning, #ffb020);
+  }
+
+  &.urgent {
+    border-color: var(--requestly-color-error, #e43434);
+
+    .premium-plan-days-left {
+      color: var(--requestly-color-error, #e43434);
+    }
+  }
 }

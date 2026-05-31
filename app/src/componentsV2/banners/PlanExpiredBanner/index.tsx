@@ -33,11 +33,13 @@ export const PlanExpiredBanner = () => {
   if (isBannerVisible) {
     return (
       <div className="plan-expired-banner">
-        <span className="plan-expired-banner-badge">PLAN EXPIRED</span>
-        <span className="text-white text-bold">
-          Your {getPrettyPlanName(getPlanNameFromId(user?.details?.planDetails?.planId))} plan has expired. Renew now to
-          get full feature access!
-        </span>
+        <div className="plan-expired-banner-content">
+          <span className="plan-expired-banner-badge">PLAN EXPIRED</span>
+          <span className="text-white text-bold">
+            Your {getPrettyPlanName(getPlanNameFromId(user?.details?.planDetails?.planId))} plan has expired.
+          </span>
+          <span className="plan-expired-banner-description">Renew to restore full feature access.</span>
+        </div>
         <RQButton
           type="default"
           className="plan-expired-banner-btn"
