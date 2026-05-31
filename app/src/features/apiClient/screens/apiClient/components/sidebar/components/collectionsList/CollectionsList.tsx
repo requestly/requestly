@@ -435,7 +435,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
       },
       canDrop: (item: DraggableApiRecord) => {
         // Can drop if the item is currently in a collection (moving it to top-level)
-        return !!item.record.collectionId;
+        return isValidPermission && !!item.record.collectionId;
       },
       collect: (monitor) => ({
         isOver: monitor.isOver({ shallow: true }),
@@ -478,6 +478,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
           <ExampleCollectionsNudge />
           {updatedRecords.count > 0 ? (
             <div className="collections-list">
+              <div className={`top-level-drop-zone top-level-drop-zone--start ${isOver && canDrop ? "active" : ""}`} />
               {updatedRecords.collections.map((record) => {
                 return (
                   <CollectionRow
@@ -524,7 +525,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
               )}
 
               {/* Dedicated drop zone for easier dropping at top-level */}
-              <div className={`top-level-drop-zone ${isOver && canDrop ? "active" : ""}`}></div>
+              <div className={`top-level-drop-zone top-level-drop-zone--end ${isOver && canDrop ? "active" : ""}`} />
             </div>
           ) : (
             <ApiRecordEmptyState

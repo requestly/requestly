@@ -36,13 +36,23 @@
       flex-direction: column;
 
       .top-level-drop-zone {
-        min-height: 20px;
+        min-height: 12px;
         transition: all 0.2s ease;
 
         &.active {
-          min-height: 10px;
+          min-height: 28px;
+          border: 1px dashed var(--requestly-color-primary-600);
+          background: var(--requestly-color-primary-600-t-10);
           opacity: 0.2;
           border-radius: 4px;
+        }
+
+        &--start {
+          margin-bottom: 4px;
+        }
+
+        &--end {
+          margin-top: 4px;
         }
       }
     }
