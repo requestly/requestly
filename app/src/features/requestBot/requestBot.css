@@ -4,19 +4,30 @@
 
 .request-bot {
   position: fixed;
-  bottom: 30px;
-  right: 20px;
+  bottom: min(30px, 4vh);
+  right: min(65px, 4vw);
   z-index: 100;
-  width: 424px;
-  height: 640px;
+  width: min(424px, calc(100vw - 32px));
+  height: min(640px, calc(100vh - 60px));
   background-color: var(--requestly-color-surface-2);
   padding: 8px;
   border-radius: 1rem;
+  overflow: hidden;
+  box-sizing: border-box;
 }
 
 .request-bot iframe {
   width: 100%;
   height: 100%;
+}
+
+@media screen and (max-width: 480px) {
+  .request-bot {
+    inset: auto 12px 12px 12px;
+    width: auto;
+    height: calc(100vh - 24px);
+    max-height: 640px;
+  }
 }
 
 .request-bot-close-btn {
