@@ -200,6 +200,8 @@
 
 // Styling to make field types more visible
 .graphiql-explorer-root {
+  min-width: max-content !important;
+
   & > div:first-child {
     flex-grow: unset !important;
     height: calc(100% - 48px) !important;
@@ -208,7 +210,7 @@
   div:nth-child(2) {
     min-height: unset !important;
     max-height: unset !important;
-    overflow: hidden !important;
+    overflow: visible !important;
   }
 
   & div[id^="query-"],
