@@ -57,7 +57,7 @@ const HttpRequestTabs: React.FC<Props> = ({
 
   const requestEntry = useApiClientSelector((s) => entity.getEntityFromState(s).data);
 
-  const METHODS_WITHOUT_BODY = [RequestMethod.GET, RequestMethod.HEAD];
+  const METHODS_WITHOUT_BODY = [RequestMethod.HEAD];
   const supportsRequestBody = supportsRequestBodyForAllMethods(appMode);
   const needsDesktopForBody = METHODS_WITHOUT_BODY.includes(method);
   const canHaveRequestBody = supportsRequestBody || !needsDesktopForBody;
