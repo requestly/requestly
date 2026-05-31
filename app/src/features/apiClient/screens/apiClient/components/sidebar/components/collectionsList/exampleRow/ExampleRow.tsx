@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useRef, useState } from "react";
-import { Typography, Dropdown, MenuProps } from "antd";
+import { Typography, Dropdown, MenuProps, Tooltip } from "antd";
 import { RQAPI } from "features/apiClient/types";
 import { RQButton } from "lib/design-system-v2/components";
 import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
@@ -275,14 +275,16 @@ export const ExampleRow: React.FC<Props> = ({ record, isReadOnly, handleRecordsT
               open={isDropdownVisible}
               onOpenChange={setIsDropdownVisible}
             >
-              <RQButton
-                onClick={(e) => {
-                  e.stopPropagation();
-                }}
-                size="small"
-                type="transparent"
-                icon={<MdOutlineMoreHoriz />}
-              />
+              <Tooltip title="More actions">
+                <RQButton
+                  onClick={(e) => {
+                    e.stopPropagation();
+                  }}
+                  size="small"
+                  type="transparent"
+                  icon={<MdOutlineMoreHoriz />}
+                />
+              </Tooltip>
             </Dropdown>
           </div>
         </Conditional>
