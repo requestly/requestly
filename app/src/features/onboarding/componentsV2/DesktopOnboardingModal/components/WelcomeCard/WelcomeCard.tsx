@@ -24,15 +24,6 @@ export const WelcomeCard: React.FC<Props> = ({ onFeatureClick }) => {
       </div>
       <div className="welcome-options">
         <WelcomeCardOption
-          title="Start using API Client"
-          description="Create, manage, and test APIs with collections and reusable variables."
-          iconSrc={"/assets/media/apiClient/api-client-icon.svg"}
-          onClick={() => {
-            trackDesktopOnboardingFeatureSelected("api_client");
-            onFeatureClick(OnboardingStep.FOLDER_SELECTION);
-          }}
-        />
-        <WelcomeCardOption
           title="Intercept and Modify Web Traffic"
           description="Capture and modify requests, responses, headers, and scripts in real time."
           iconSrc={"/assets/media/rules/rules-icon.svg"}

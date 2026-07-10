@@ -5,7 +5,6 @@ import { FeatureSection, FeatureReleaseTag } from "./types";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { FiVideo } from "@react-icons/all-files/fi/FiVideo";
 import { IoDocumentTextOutline } from "@react-icons/all-files/io5/IoDocumentTextOutline";
-import { ApiOutlined } from "@ant-design/icons";
 
 const { RULE_TYPES } = GLOBAL_CONSTANTS;
 const { RULE_TYPES_CONFIG } = APP_CONSTANTS;
@@ -75,13 +74,6 @@ export const personaRecommendationData: FeatureSection[] = [
         icon: () => <IoDocumentTextOutline />,
         subTitle: "Create mocks for your APIs",
         link: PATHS.MOCK_SERVER_V2.ABSOLUTE,
-      },
-      {
-        id: "test_api_endpoints",
-        title: "Test API endpoints",
-        icon: () => <ApiOutlined />,
-        subTitle: "Test responses quickly using API Client",
-        link: PATHS.API_CLIENT.ABSOLUTE,
       },
     ],
   },
