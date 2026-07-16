@@ -12,11 +12,11 @@
 <h1 align="center">Requestly API Client</h1>
 
 <p align="center">
-  <strong>The Privacy-first API client.</strong>
+  <strong>Design, Build & Test APIs all in one place.</strong>
 </p>
 
 <p align="center">
-  Build, test, and sync APIs your way. Stay local with Git, sync instantly with Team Projects, or Self-Host for total privacy. No login required. No cloud lock-in.
+  Design, build, and test APIs your way. Git-native by default, sync instantly with Team Projects, or self-host with enterprise-grade security. No cloud lock-in.
 </p>
 
 <p align="center">
@@ -30,13 +30,13 @@
 
 ## Why developers pick Requestly API Client
 
-- 🔒 **Complete Data Sovereignty** — Choose local, team sync, or self-hosted. Your data never leaves your control.
-- 💸 **Predictable, Flat Pricing** — Free for up to 10 collaborators. Enterprise governance without hidden add-ons.
-- ⚡ **Lightweight & Developer-First** — Open. Hit endpoint. Get response. No bloat, no lag, no noise.
+- 🔒 **Complete Data Sovereignty:** Choose local, team sync, or self-hosted. Your data never leaves your control.
+- 💸 **Predictable, Flat Pricing:** Free for up to 10 collaborators. Enterprise governance without hidden add-ons.
+- ⚡ **Lightweight & Developer-First:** Open. Hit endpoint. Get response. No bloat, no lag, no noise.
 
 > "Requestly is the first API client that has genuinely replaced Postman."
 
-Modern git-based API Client. **No login required. Switch from Postman in 1 click.**
+Modern, Git-native API client. **Switch from Postman in 1 click.**
 
 ---
 
@@ -49,7 +49,7 @@ Modern git-based API Client. **No login required. Switch from Postman in 1 click
 | 🔌 **Easy Import/Export** | Import and export API contracts from cURL, Postman, OpenAPI |
 | 🧬 **GraphQL Support** | Test GraphQL endpoints with schema introspection and auto-completion |
 | 🔀 **Git Sync** | Keep your API Collections in sync with a Git repository and collaborate using Git |
-| 💾 **Local Workspaces** | Everything private and under your control — no cloud storage, just secure local files |
+| 💾 **Local Workspaces** | Everything private and under your control, no cloud storage, just secure local files |
 
 ## Download
 
@@ -99,7 +99,7 @@ Free for up to 10 collaborators. Team and Enterprise tiers add advanced governan
 
 ## A note on this repository
 
-For developers who've been with us since 2018 — this repository previously hosted the source for our open-source browser extension and web app. That code now lives, fully open source, at [requestly/interceptor](https://github.com/requestly/interceptor) and continues to be actively maintained. We've kept this URL as the home for the broader Requestly community — bugs, ideas, and the people building this with us.
+For developers who've been with us since 2018, this repository previously hosted the source for our open-source browser extension and web app. That code now lives, fully open source, at [requestly/interceptor](https://github.com/requestly/interceptor) and continues to be actively maintained. We've kept this URL as the home for the broader Requestly community: bugs, ideas, and the people building this with us.
 
 The HTTP Interceptor isn't going anywhere. The API Client is where we're investing next.
 
@@ -113,7 +113,7 @@ The Requestly API Client application is proprietary software. See [requestly.com
 
 ### Deferred / TODO before publishing
 
-- [ ] Brand asset URLs in the header `<picture>` block — replace `requestly.com/og/logo-*.svg` placeholders with finalized assets
+- [ ] Brand asset URLs in the header `<picture>` block: replace `requestly.com/og/logo-*.svg` placeholders with finalized assets
 - [ ] Confirm `get.requestly.com/api-client-*` redirect URLs exist (or substitute actual download links from requestly.com)
 - [ ] Confirm `https://requestly.com/pricing` is live; otherwise link to landing page
 - [ ] Confirm screenshots/visual assets if any to be added later
