@@ -112,6 +112,6 @@ The HTTP Interceptor isn't going anywhere. The API Client is where we're investi
 
 ## License
 
-This repository (issue tracker, community discussions, public roadmap) is licensed under [CC BY 4.0](LICENSE).
+This repository is licensed under the [GNU AGPLv3](LICENSE). Third-party components retain the original licenses provided by their owners.
 
-The Requestly API Client application is proprietary software. See [requestly.com/terms](https://requestly.com/terms) for product terms.
+The Requestly API Client application is proprietary software and is not covered by that license. See [requestly.com/terms](https://requestly.com/terms) for product terms.
