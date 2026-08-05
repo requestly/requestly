@@ -1,0 +1,29 @@
+{
+  "name": "requestly-api-workflow",
+  "version": "0.1.0",
+  "description": "Design and verify Requestly API client and rule workflows.",
+  "author": {
+    "name": "Requestly contributors"
+  },
+  "skills": "./skills/",
+  "repository": "https://github.com/requestly/requestly",
+  "keywords": [
+    "agent-plugin",
+    "evals",
+    "requestly"
+  ],
+  "interface": {
+    "displayName": "Requestly Api Workflow",
+    "shortDescription": "Design and verify Requestly API client and rule workflows.",
+    "longDescription": "Help agents create Requestly API testing workflows with collections, request modification rules, mocks, auth headers, and regression evals.",
+    "developerName": "Requestly contributors",
+    "category": "Developer Tools",
+    "capabilities": [
+      "API collection setup",
+      "request rule review",
+      "mock behavior testing",
+      "auth header safety"
+    ],
+    "defaultPrompt": "Use the Requestly plugin to plan the workflow, identify verification checks, and produce plugin eval metadata."
+  }
+}
