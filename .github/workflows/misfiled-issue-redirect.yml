@@ -1,0 +1,155 @@
+name: Misfiled Issue Redirect
+
+# Auto-detects HTTP Interceptor issues filed on this (API Client) repo and:
+# 1. Tries to TRANSFER them to requestly/interceptor using REQUESTLY_CLOUD_TOKEN.
+#    - Preserves original author + comments + history
+#    - Old URL auto-redirects to new
+# 2. If transfer fails (token missing, no perm, rate limit) — gracefully falls
+#    back to: label + comment + close behavior.
+#
+# Threshold: 2+ HI keyword matches in title/body before triggering (conservative).
+# Safe to merge before the token is configured — falls back to close+comment.
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  issues: write
+
+jobs:
+  detect-and-route:
+    runs-on: ubuntu-latest
+    if: github.event.issue.user.type != 'Bot'
+
+    steps:
+      # ── Step 1: detect HI misfile ─────────────────────────────────────────
+      - name: Detect HI misfile
+        id: detect
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const HI_PATTERNS = [
+              /\bredirect\s+rule\b/i,
+              /\bmodify\s+header/i,
+              /\bmodify\s+response\s+body/i,
+              /\bmodify\s+request\s+body/i,
+              /\brule\s+engine\b/i,
+              /\brules\s+engine\b/i,
+              /\bmap\s+local\b/i,
+              /\bresource[- ]override\b/i,
+              /\bsession\s+replay\b/i,
+              /\bsession\s+recording\b/i,
+              /\bnetwork\s+inspector\b/i,
+              /\bhttp\s+interceptor\b/i,
+              /\binterception\b/i,
+              /\bchrome\s+extension\b/i,
+              /\bfirefox\s+extension\b/i,
+              /\bedge\s+extension\b/i,
+              /\bmanifest\s+v[23]\b/i,
+              /\bcontent[- ]script\b/i,
+              /\bcharles\s+proxy\b/i,
+              /\bfiddler\b/i,
+              /\bmodheader\b/i,
+              /\bmock\s+server\b/i,
+              /\bapi\s+mocking\b/i,
+            ];
+
+            const { issue } = context.payload;
+            const haystack = `${issue.title}\n${issue.body || ''}`;
+            const matched = HI_PATTERNS.filter(re => re.test(haystack));
+
+            const isMisfile = matched.length >= 2;
+            core.setOutput('is_misfile', isMisfile ? 'true' : 'false');
+            core.setOutput('matched_count', String(matched.length));
+
+            if (isMisfile) {
+              core.info(`Misfile detected — matched ${matched.length} keyword(s).`);
+            } else {
+              core.info(`Not a confident misfile (matched ${matched.length}). Skipping.`);
+            }
+
+      # ── Step 2: apply label (always, if misfile) — same regardless of route ──
+      - name: Apply migration:misfiled-interceptor label
+        if: steps.detect.outputs.is_misfile == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            try {
+              await github.rest.issues.addLabels({
+                ...context.repo,
+                issue_number: context.payload.issue.number,
+                labels: ['migration:misfiled-interceptor'],
+              });
+            } catch (e) {
+              core.warning(`Could not add label: ${e.message}`);
+            }
+
+      # ── Step 3 (preferred): try TRANSFER using REQUESTLY_CLOUD_TOKEN ──────
+      - name: Try transfer to requestly/interceptor
+        if: steps.detect.outputs.is_misfile == 'true'
+        id: transfer
+        env:
+          GH_TOKEN: ${{ secrets.REQUESTLY_CLOUD_TOKEN }}
+          ISSUE_NUM: ${{ github.event.issue.number }}
+          SRC_REPO: ${{ github.repository }}
+        run: |
+          # If no token, skip transfer — fallback step handles it
+          if [ -z "$GH_TOKEN" ]; then
+            echo "::warning::REQUESTLY_CLOUD_TOKEN not set; will fall back to close+comment."
+            echo "did_transfer=false" >> "$GITHUB_OUTPUT"
+            echo "reason=no_token" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          # Try the transfer
+          if NEW_URL=$(gh issue transfer "$ISSUE_NUM" requestly/interceptor --repo "$SRC_REPO" 2>&1); then
+            NEW_URL=$(echo "$NEW_URL" | tr -d '[:space:]')
+            echo "::notice::Transferred ${SRC_REPO}#${ISSUE_NUM} -> ${NEW_URL}"
+            echo "did_transfer=true" >> "$GITHUB_OUTPUT"
+            echo "new_url=${NEW_URL}" >> "$GITHUB_OUTPUT"
+          else
+            echo "::warning::Transfer failed: $NEW_URL. Will fall back to close+comment."
+            echo "did_transfer=false" >> "$GITHUB_OUTPUT"
+            echo "reason=transfer_error" >> "$GITHUB_OUTPUT"
+          fi
+        continue-on-error: true
+
+      # ── Step 4 (fallback): close + comment if transfer didn't happen ─────
+      - name: Fallback - close + comment if transfer didn't happen
+        if: |
+          steps.detect.outputs.is_misfile == 'true' &&
+          steps.transfer.outputs.did_transfer != 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const SIBLING_REPO = 'requestly/interceptor';
+
+            const comment = [
+              `Thanks for filing!`,
+              ``,
+              `It looks like this issue is about the **open-source HTTP Interceptor**, which has its own repository.`,
+              ``,
+              `👉 Please re-file at **[${SIBLING_REPO}](https://github.com/${SIBLING_REPO}/issues/new/choose)** so the right team sees it.`,
+              ``,
+              `This repository (\`${context.repo.owner}/${context.repo.repo}\`) is the community hub for the **Requestly API Client**.`,
+              ``,
+              `Closing this issue — no problem re-opening if I got this wrong. The team triages \`migration:misfiled-interceptor\`-tagged issues weekly.`,
+              ``,
+              `---`,
+              `🤖 _Auto-detected based on keywords. If this is wrong, comment and a human will reopen._`,
+            ].join('\n');
+
+            await github.rest.issues.createComment({
+              ...context.repo,
+              issue_number: context.payload.issue.number,
+              body: comment,
+            });
+
+            await github.rest.issues.update({
+              ...context.repo,
+              issue_number: context.payload.issue.number,
+              state: 'closed',
+              state_reason: 'not_planned',
+            });
+
+            core.info(`Closed and redirected issue #${context.payload.issue.number} (transfer path was unavailable)`);
